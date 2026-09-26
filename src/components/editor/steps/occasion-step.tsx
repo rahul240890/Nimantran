@@ -3,8 +3,6 @@
 import { CalendarCheck, MessageCircleQuestion, Palette } from "lucide-react";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { categoryGroups, categoryTaglines, questionLabels } from "@/content/categories";
-import { functionCopy, occasionCopy } from "@/content/editor";
 import { CATEGORIES, CATEGORY_IDS, isCategoryId } from "@/lib/categories/catalog";
 import { rankCategories } from "@/lib/categories/rank";
 import { regionLanguage } from "@/lib/categories/regions";
@@ -12,9 +10,13 @@ import { CATEGORY_GROUPS } from "@/lib/categories/schema";
 import { useVisitor } from "@/lib/categories/use-visitor";
 import { draftCategory, functionOrder, withCategory } from "@/lib/editor/draft";
 import type { StepProps } from "./types";
+import { useText } from "@/i18n/client";
+import { categoriesText, editorText } from "@/i18n/copy";
 
 /** What the chosen occasion plans, asks and suggests, so the choice never feels blind. */
 function SetsUp({ draft }: Pick<StepProps, "draft">) {
+  const { categoryTaglines, questionLabels } = useText(categoriesText);
+  const { functionCopy, occasionCopy } = useText(editorText);
   const category = draftCategory(draft);
   const planned = functionOrder(draft).suggested.filter((id) =>
     category.functions.planned.includes(id),
@@ -62,6 +64,7 @@ function SetsUp({ draft }: Pick<StepProps, "draft">) {
 }
 
 export function OccasionStep({ draft, update }: StepProps) {
+  const { categoryGroups, categoryTaglines } = useText(categoriesText);
   const visitor = useVisitor();
   const local = regionLanguage(visitor.region);
   // Local and seasonal occasions first, the same order as the home screen

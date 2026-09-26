@@ -4,17 +4,18 @@ import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send } from "lucide-rea
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
-import { checkSlug, publishInvite, type SlugCheck } from "@/app/_actions/invites";
+import { checkSlug, publishInvite, type SlugCheck } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { publishCopy } from "@/content/publish";
 import { draftProblems, type InviteDraft } from "@/lib/editor/draft";
 import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { cleanSlugInput, isSlug, suggestSlug } from "@/lib/publish/slug";
+import { useText } from "@/i18n/client";
+import { publishText } from "@/i18n/copy";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 
@@ -29,6 +30,7 @@ export function PublishButton({
   /** Called instead of opening when steps still need finishing. */
   onNotReady: () => void;
 }) {
+  const { publishCopy } = useText(publishText);
   const [open, setOpen] = useState(false);
 
   if (!signedIn) {
@@ -70,6 +72,7 @@ export function PublishButton({
 }
 
 function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => void }) {
+  const { publishCopy } = useText(publishText);
   const router = useRouter();
   const [slug, setSlug] = useState(() =>
     suggestSlug({

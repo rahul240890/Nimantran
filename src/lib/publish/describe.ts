@@ -1,5 +1,8 @@
+import { format, parseISO } from "date-fns";
+import { dateLocale } from "@/i18n/dates";
+import { editorText, publishText } from "@/i18n/copy";
+import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
-import { functionCopy } from "@/content/editor";
 import {
   draftCopy,
   formatCardDate,
@@ -22,18 +25,23 @@ export function inviteNames(draft: InviteDraft): string {
   return second ? `${first} ${joiner} ${second}` : first;
 }
 
-export function occasionName(draft: InviteDraft): string {
-  return CATEGORIES[draft.categoryId].names.en;
+export function occasionName(draft: InviteDraft, locale: UiLocale = "en"): string {
+  return CATEGORIES[draft.categoryId].names[locale];
 }
 
-/** "Saturday, 12 December 2026 · 7:30 pm" for the main function. */
-export function inviteWhen(draft: InviteDraft): string {
+/** "Saturday, 12 December 2026 · 7:30 pm" for the main function, in the site language. */
+export function inviteWhen(draft: InviteDraft, locale: UiLocale = "en"): string {
   const main = mainFunction(draft);
   if (!main) return "";
   const fn = draft.functions[main];
   if (!fn.date) return "";
-  const time = fn.time && needsTime(draft) ? ` · ${formatTime(fn.time)}` : "";
-  return `${formatCardDate(fn.date)}${time}`;
+  const words = dateLocale[locale];
+  const time = fn.time && needsTime(draft) ? ` · ${formatTime(fn.time, words)}` : "";
+  const date =
+    locale === "en"
+      ? formatCardDate(fn.date)
+      : format(parseISO(fn.date), "EEEE, d MMMM yyyy", { locale: words });
+  return `${date}${time}`;
 }
 
 export function inviteWhere(draft: InviteDraft): string {
@@ -45,7 +53,10 @@ export function inviteWhere(draft: InviteDraft): string {
 export function calendarEntries(
   draft: InviteDraft,
   { id, url }: { id: string; url: string },
+  locale: UiLocale = "en",
 ): CalendarEntry[] {
+  const { functionCopy } = editorText[locale];
+  const { guestCopy } = publishText[locale];
   const names = inviteNames(draft);
   const timed = needsTime(draft);
   return includedFunctions(draft).flatMap((kind) => {
@@ -58,7 +69,7 @@ export function calendarEntries(
         date: fn.date,
         time: timed ? fn.time : "",
         location: [fn.venue.trim(), fn.address.trim()].filter(Boolean).join(", "),
-        description: fn.dressCode.trim() ? `Dress code: ${fn.dressCode.trim()}` : "",
+        description: fn.dressCode.trim() ? `${guestCopy.dressCode}: ${fn.dressCode.trim()}` : "",
         url,
       },
     ];

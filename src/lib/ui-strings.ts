@@ -1,6 +1,6 @@
 /**
- * English text for shared UI chrome (close buttons, theme names …).
- * Components take these as props; Step 12 moves them into next-intl messages unchanged.
+ * English text for shared UI chrome (close buttons, theme names …). Components take these
+ * as props; the Hindi is in src/content/hi/ui.ts.
  */
 export const uiStrings = {
   close: "Close",
@@ -13,5 +13,10 @@ export const uiStrings = {
     pauseMusic: "Pause music",
     preparing: "Preparing 3D",
     and: "and",
+  },
+  notFound: {
+    title: "This page isn't here",
+    body: "The link may be mistyped, or the page has moved.",
+    home: "Go to Shubhdwar",
   },
 } as const;

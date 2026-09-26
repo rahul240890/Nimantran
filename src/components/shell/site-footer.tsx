@@ -1,9 +1,11 @@
 import { Logo } from "@/components/brand/logo";
 import { Mandala } from "@/components/brand/mandala";
-import { languages, nav, shell } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import { languages, type UiLocale } from "@/i18n/locales";
 import { site } from "@/lib/site";
 
-export function SiteFooter() {
+export function SiteFooter({ locale }: { locale: UiLocale }) {
+  const { nav, shell } = landingText[locale];
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-surface-2/60">
       <Mandala className="pointer-events-none absolute -end-24 -bottom-32 -z-10 size-96 text-line-strong opacity-40" />
@@ -11,7 +13,13 @@ export function SiteFooter() {
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
           <p className="font-display text-lg text-ink-muted">
-            <span lang="hi">{site.nameDevanagari}</span> · {shell.footer.meaning}
+            {locale === "hi" ? (
+              shell.footer.meaning
+            ) : (
+              <>
+                <span lang="hi">{site.nameDevanagari}</span> · {shell.footer.meaning}
+              </>
+            )}
           </p>
           <p className="max-w-xs text-ink-muted">{shell.footer.tagline}</p>
         </div>
@@ -65,7 +73,7 @@ export function SiteFooter() {
       <div className="border-t border-line">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:justify-between sm:px-6 lg:px-8">
           <p>
-            © 2026 {site.name}. {shell.footer.rights}
+            © 2026 {locale === "hi" ? site.nameDevanagari : site.name}. {shell.footer.rights}
           </p>
           <p>{shell.footer.madeIn}</p>
         </div>

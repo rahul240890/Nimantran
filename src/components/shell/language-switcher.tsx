@@ -1,6 +1,9 @@
 "use client";
 
 import { ChevronDown, Languages } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { setLocale } from "@/actions/locale";
 import { buttonClasses } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,7 +14,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { availableLanguages, languages, shell } from "@/content/landing";
+import { useLocale, useText } from "@/i18n/client";
+import { landingText } from "@/i18n/copy";
+import { UI_LOCALES, homePath, isUiLocale, languages } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
 
 type LanguageSwitcherProps = {
@@ -20,18 +25,35 @@ type LanguageSwitcherProps = {
   className?: string;
 };
 
+const HOME_PATHS = new Set(UI_LOCALES.map(homePath));
+
 /**
- * Lists every launch language in its own script. Only English works until translations
- * arrive in Step 12; the others show as coming soon rather than being hidden.
+ * Every launch language in its own script. English and Hindi switch the site; the rest
+ * show as coming soon, with their scripts, so visitors know they're on the way.
  */
 export function LanguageSwitcher({ variant = "compact", className }: LanguageSwitcherProps) {
-  const current = "en";
+  const current = useLocale();
+  const { shell } = useText(landingText);
+  const router = useRouter();
+  const pathname = usePathname();
+  const [pending, start] = useTransition();
   const currentLanguage = languages.find((language) => language.code === current)!;
+
+  const choose = (code: string) => {
+    if (!isUiLocale(code) || code === current) return;
+    start(async () => {
+      await setLocale(code);
+      // The home pages carry their language in the address; everywhere else re-renders in place
+      if (HOME_PATHS.has(pathname)) router.push(`${homePath(code)}${window.location.hash}`);
+      else router.refresh();
+    });
+  };
 
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger
-        aria-label={shell.language.current}
+        aria-label={shell.language.current(currentLanguage.native)}
+        aria-busy={pending || undefined}
         className={cn(
           buttonClasses({ variant: variant === "full" ? "secondary" : "ghost", size: "sm" }),
           variant === "full" ? "w-full justify-between" : "px-3",
@@ -41,15 +63,19 @@ export function LanguageSwitcher({ variant = "compact", className }: LanguageSwi
       >
         <span className="inline-flex items-center gap-2">
           <Languages aria-hidden />
-          {variant === "full" ? currentLanguage.native : current.toUpperCase()}
+          {variant === "full" ? (
+            <span lang={current}>{currentLanguage.native}</span>
+          ) : (
+            <span lang={current}>{current === "hi" ? "हि" : current.toUpperCase()}</span>
+          )}
         </span>
         <ChevronDown aria-hidden className="text-ink-muted" />
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64">
         <DropdownMenuLabel>{shell.language.label}</DropdownMenuLabel>
-        <DropdownMenuRadioGroup value={current}>
+        <DropdownMenuRadioGroup value={current} onValueChange={choose}>
           {languages.map((language) => {
-            const ready = availableLanguages.includes(language.code);
+            const ready = isUiLocale(language.code);
             return (
               <DropdownMenuRadioItem
                 key={language.code}
@@ -58,7 +84,7 @@ export function LanguageSwitcher({ variant = "compact", className }: LanguageSwi
                 aside={ready ? undefined : shell.language.soon}
               >
                 <span lang={language.code}>{language.native}</span>
-                {language.code !== "en" ? (
+                {language.code !== current ? (
                   <span className="ms-2 text-sm font-normal text-ink-muted">
                     {language.english}
                   </span>

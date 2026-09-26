@@ -1,27 +1,15 @@
 import type { TemplateId } from "@/lib/templates/schema";
 
-/**
- * English copy for the app shell and the landing page.
- * Kept in one place, shaped like a message file, so Step 12 can move it into next-intl unchanged.
+/*
+ * English copy for the app shell and the landing page. Hindi: src/content/hi/landing.ts.
  */
 
-export const languages = [
-  { code: "en", native: "English", english: "English" },
-  { code: "hi", native: "हिन्दी", english: "Hindi" },
-  { code: "mr", native: "मराठी", english: "Marathi" },
-  { code: "gu", native: "ગુજરાતી", english: "Gujarati" },
-  { code: "bn", native: "বাংলা", english: "Bengali" },
-  { code: "ta", native: "தமிழ்", english: "Tamil" },
-  { code: "te", native: "తెలుగు", english: "Telugu" },
-  { code: "kn", native: "ಕನ್ನಡ", english: "Kannada" },
-  { code: "ml", native: "മലയാളം", english: "Malayalam" },
-  { code: "pa", native: "ਪੰਜਾਬੀ", english: "Punjabi" },
-] as const;
-
-export type LanguageCode = (typeof languages)[number]["code"];
-
-/** Languages the site can show today. The rest arrive with translations in Step 12. */
-export const availableLanguages: readonly LanguageCode[] = ["en"];
+export const homeMeta = {
+  title: "Shubhdwar · 3D invitations your guests open, turn and keep",
+  description:
+    "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings and every celebration after.",
+  tagline: "3D invitations your guests open, turn and keep",
+} as const;
 
 export const nav = [
   { id: "how-it-works", label: "How it works" },
@@ -41,15 +29,15 @@ export const shell = {
   createInviteShort: "Create invite",
   language: {
     label: "Language",
-    current: "Language: English",
+    current: (name: string) => `Language: ${name}`,
     soon: "Soon",
-    note: "More languages arrive before launch.",
+    note: "Marathi, Gujarati, Bengali, Tamil and more follow once native speakers have checked them.",
   },
   themeHeading: "Theme",
   footer: {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",
-    languages: "Languages at launch",
+    languages: "Languages",
     meaning: "the auspicious doorway",
     madeIn: "Made in India",
     rights: "All rights reserved.",
@@ -174,7 +162,7 @@ export const faq = {
     },
     {
       q: "Can I make the invite in Hindi, Tamil or another language?",
-      a: "Yes. Ten Indian languages are planned for launch, and you can show two side by side so every elder can read it.",
+      a: "Yes. The site speaks English and Hindi today, and your card can be written in any Indian language, even two side by side so every elder can read it.",
     },
     {
       q: "Can the card follow our family's traditions?",
@@ -186,11 +174,11 @@ export const faq = {
     },
     {
       q: "How do RSVPs work?",
-      a: "Each guest picks attending or not, adds how many are coming and a meal choice, and can leave you a message. You see it all in one list.",
+      a: "Each guest picks attending or not for every function, adds how many are coming and a meal choice, and can leave you a message. You see it all in one guest list, and can send reminders to anyone who hasn't replied.",
     },
     {
       q: "When can I start?",
-      a: "Today. Make your invite in the editor and sign in to keep it on every phone. Sharing with guests opens soon; join the waitlist and we will tell you the moment it does.",
+      a: "Today. Make your invite in the editor, sign in, publish it and share the link on WhatsApp.",
     },
   ],
 } as const;

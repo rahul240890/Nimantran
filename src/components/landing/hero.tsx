@@ -1,7 +1,8 @@
 import { ArrowDown, Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { hero } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import type { UiLocale } from "@/i18n/locales";
 import { HeroInvite } from "./hero-invite";
 
 /**
@@ -9,7 +10,8 @@ import { HeroInvite } from "./hero-invite";
  * while the invitation opens, then lets go. On phones the headline scrolls away first and
  * only the card pins (inside HeroInvite). Still mode drops the extra scroll length entirely.
  */
-export function Hero() {
+export function Hero({ locale }: { locale: UiLocale }) {
+  const { hero } = landingText[locale];
   return (
     <section
       data-hero-track

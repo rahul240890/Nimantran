@@ -8,7 +8,8 @@ import { TiltCard } from "@/components/motion/tilt-card";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
-import { templates } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Section } from "./section";
 
@@ -17,6 +18,7 @@ import { Section } from "./section";
  * keyboard (Tab into the row, then arrow keys) everywhere. Cards snap into place.
  */
 export function TemplatesCarousel() {
+  const { templates } = useText(landingText);
   const rowRef = useRef<HTMLUListElement>(null);
   const [edges, setEdges] = useState({ start: true, end: false });
   const still = useReducedMotion();

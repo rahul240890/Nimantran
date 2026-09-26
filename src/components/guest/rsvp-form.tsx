@@ -12,7 +12,7 @@ import {
   Send,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { loadReply, sendReply } from "@/app/_actions/rsvp";
+import { loadReply, sendReply } from "@/actions/rsvp";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
@@ -21,13 +21,14 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { questionLabels } from "@/content/categories";
-import { rsvpCopy } from "@/content/publish";
 import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { GuestReply, ReplyStatus } from "@/lib/invites/rsvp";
 import { cn } from "@/lib/cn";
+import { useLocale, useText } from "@/i18n/client";
+import { dateLocale } from "@/i18n/dates";
+import { categoriesText, publishText } from "@/i18n/copy";
 
 export type RsvpFunction = {
   /** The function's id for replies. */
@@ -75,6 +76,7 @@ function Counter({
   min: number;
   onChange: (value: number) => void;
 }) {
+  const { rsvpCopy } = useText(publishText);
   const id = useId();
   return (
     <div role="group" aria-labelledby={id} className="flex items-center justify-between gap-3">
@@ -118,6 +120,8 @@ export function RsvpForm({
   functions: RsvpFunction[];
   questions: RsvpQuestionId[];
 }) {
+  const locale = useLocale();
+  const { rsvpCopy } = useText(publishText);
   const [token, setToken] = useState<string | null>(null);
   const [invitedTo, setInvitedTo] = useState<string[]>([]);
   const [name, setName] = useState("");
@@ -350,7 +354,7 @@ export function RsvpForm({
                 </h4>
                 {fn.date && (
                   <span className="text-sm text-ink-muted">
-                    {format(parseISO(fn.date), "EEE, d MMM")}
+                    {format(parseISO(fn.date), "EEE, d MMM", { locale: dateLocale[locale] })}
                   </span>
                 )}
               </div>
@@ -461,6 +465,8 @@ function Question({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const { questionLabels } = useText(categoriesText);
+  const { rsvpCopy } = useText(publishText);
   const spec = RSVP_QUESTIONS[id];
   const label = questionLabels[id];
   if (spec.kind === "choice") {

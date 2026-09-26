@@ -1,0 +1,151 @@
+import type * as en from "../publish";
+import type { Translation } from "@/i18n/text";
+
+/* हिन्दी: प्रकाशित करना, भेजना, मेहमान का पेज और जवाब। English: src/content/publish.ts. */
+
+export const publishCopy: Translation<typeof en.publishCopy> = {
+  publish: "प्रकाशित करें",
+  signInToPublish: "प्रकाशित करने के लिए साइन इन करें",
+  share: "भेजें",
+  finishFirst: "प्रकाशित करने के लिए ऊपर निशान लगे चरण पूरे करें।",
+  dialogTitle: "अपना लिंक चुनें",
+  dialogBody:
+    "मेहमान इसी पते पर आपका निमंत्रण खोलेंगे। एक बार भेजने के बाद यह नहीं बदलता, भले ही आप बाद में निमंत्रण बदलें।",
+  linkLabel: "निमंत्रण का लिंक",
+  linkHint: "अंग्रेज़ी अक्षर, अंक और डैश।",
+  checking: "जाँच रहे हैं…",
+  available: "यह लिंक ख़ाली है।",
+  taken: "यह लिंक किसी और का है।",
+  tryOne: "इनमें से कोई आज़माएँ:",
+  invalid: "कम से कम एक अक्षर या अंक लिखें।",
+  saving: "पहले आपका निमंत्रण सहेज रहे हैं…",
+  confirm: "निमंत्रण प्रकाशित करें",
+  cancel: "अभी नहीं",
+  close: "बंद करें",
+  failed: "प्रकाशित नहीं हो पाया। इंटरनेट जाँचें और फिर कोशिश करें।",
+  notReady: "भेजने से पहले कुछ चरण पूरे करने बाक़ी हैं।",
+  published: "आपका निमंत्रण लाइव है",
+};
+
+export const shareCopy: Translation<typeof en.shareCopy> = {
+  metaTitle: "अपना निमंत्रण भेजें",
+  eyebrow: "लाइव निमंत्रण",
+  title: "आपका निमंत्रण भेजने के लिए तैयार है",
+  intro: "WhatsApp पर भेजें, लिंक कॉपी करें, या QR कोड किसी भी काग़ज़ पर छापें।",
+  linkLabel: "आपका लिंक",
+  copy: "लिंक कॉपी करें",
+  copied: "लिंक कॉपी हो गया",
+  copyFailed: "कॉपी नहीं हुआ। लिंक चुनकर ख़ुद कॉपी करें।",
+  whatsapp: "WhatsApp पर भेजें",
+  moreWays: "भेजने के और तरीक़े",
+  open: "निमंत्रण खोलें",
+  edit: "निमंत्रण बदलें",
+  messageLabel: "संदेश",
+  messageHint: "लिंक के साथ जाता है। जैसे चाहें बदलें।",
+  message: (names, occasion, when) =>
+    [
+      occasion
+        ? `${names} के ${occasion} में आपको सप्रेम आमंत्रित करते हैं।`
+        : `${names} की ओर से आपको सप्रेम आमंत्रण।`,
+      when,
+      "निमंत्रण खोलिए और बताइए कि आप आ पाएँगे:",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  previewHeading: "WhatsApp में यह ऐसा दिखेगा",
+  previewNote: "WhatsApp आपके संदेश के नीचे यह तस्वीर, शीर्षक और पंक्ति दिखाता है।",
+  qrHeading: "QR कोड",
+  qrBody: "मेहमान फ़ोन के कैमरे से स्कैन करते हैं। इसे कार्ड, बैनर या स्वागत बोर्ड पर छापें।",
+  qrAlt: (url) => `${url} का QR कोड`,
+  downloadQr: "QR कोड डाउनलोड करें",
+  stopHeading: "भेजना बंद करें",
+  stopBody:
+    "लिंक वाले मेहमानों को दिखेगा कि निमंत्रण उपलब्ध नहीं है। आप इसे उसी लिंक पर फिर से प्रकाशित कर सकते हैं।",
+  stop: "भेजना बंद करें",
+  stopConfirmTitle: "इस निमंत्रण को भेजना बंद करें?",
+  stopConfirm: "भेजना बंद करें",
+  keepSharing: "भेजना जारी रखें",
+  close: "बंद करें",
+  stopped: "निमंत्रण अब साझा नहीं है",
+  stopFailed: "बंद नहीं हो पाया। फिर कोशिश करें।",
+  back: "मेरे निमंत्रण",
+};
+
+export const guestCopy: Translation<typeof en.guestCopy> = {
+  metaTitle: (names, occasion) => `${names} · ${occasion} का निमंत्रण`,
+  metaDescription: (when, where) =>
+    [when, where].filter(Boolean).join(" · ") ||
+    "आप आमंत्रित हैं। ब्योरा देखने के लिए निमंत्रण खोलें।",
+  invited: "आप आमंत्रित हैं",
+  openHint: "खोलने के लिए कार्ड पर टैप करें",
+  reply: "निमंत्रण का जवाब दें",
+  functions: "उत्सव",
+  when: "कब",
+  where: "कहाँ",
+  dressCode: "ड्रेस कोड",
+  directions: "रास्ता",
+  addToCalendar: "कैलेंडर में जोड़ें",
+  googleCalendar: "Google कैलेंडर",
+  appleCalendar: "Apple, Outlook और अन्य",
+  addAll: "सब कैलेंडर में जोड़ें",
+  photos: "तस्वीरें",
+  photoAlt: (index) => `परिवार की तस्वीर ${index}`,
+  madeWith: "शुभद्वार से बना",
+  createYours: "अपना निमंत्रण बनाएँ",
+  notFoundTitle: "यह निमंत्रण उपलब्ध नहीं है",
+  notFoundBody:
+    "लिंक शायद ग़लत लिखा है, या परिवार ने इसे भेजना बंद कर दिया है। उनसे दोबारा भेजने को कहें।",
+  home: "शुभद्वार पर जाएँ",
+};
+
+export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
+  heading: "क्या आप पधारेंगे?",
+  intro: "हर उत्सव के लिए जवाब दें। आप कभी भी इसी पेज से अपना जवाब बदल सकते हैं।",
+  yourName: "आपका नाम",
+  namePlaceholder: "जैसे परिवार आपको जानता है",
+  nameRequired: "कृपया अपना नाम लिखें",
+  acceptAll: "सबमें आ रहे हैं",
+  statuses: {
+    attending: { label: "सहर्ष स्वीकार", short: "आ रहे हैं" },
+    maybe: { label: "अभी पक्का नहीं", short: "शायद" },
+    declined: { label: "खेद है, नहीं आ पाएँगे", short: "नहीं आ पाएँगे" },
+  },
+  statusGroup: (name) => `${name} के लिए आपका जवाब`,
+  chooseOne: "एक जवाब चुनें",
+  adults: "बड़े",
+  children: "बच्चे",
+  fewer: (what) => `${what} कम करें`,
+  more: (what) => `${what} बढ़ाएँ`,
+  questionsHeading: "परिवार के लिए कुछ बातें",
+  optional: "वैकल्पिक",
+  yes: "हाँ",
+  no: "नहीं",
+  choose: "चुनें",
+  meal: { veg: "शाकाहारी", jain: "जैन", "non-veg": "मांसाहारी", vegan: "वीगन" },
+  message: "परिवार के लिए संदेश",
+  messagePlaceholder: "आशीर्वाद, शुभकामनाएँ, या कुछ भी जो उन्हें पता होना चाहिए",
+  send: "जवाब भेजें",
+  update: "जवाब बदलें",
+  sending: "भेज रहे हैं…",
+  failed: "आपका जवाब नहीं भेज पाए। इंटरनेट जाँचें और फिर कोशिश करें।",
+  missing: "यह निमंत्रण अब जवाब नहीं ले रहा।",
+  notInvited: "यह लिंक उनमें से किसी उत्सव के लिए नहीं है। परिवार से जाँचने को कहें।",
+  fixErrors: (count) => (count === 1 ? "एक जवाब बाक़ी है।" : `${count} जवाब बाक़ी हैं।`),
+  thanksTitle: (name) => `धन्यवाद, ${name}!`,
+  thanksBody: "आपका जवाब परिवार तक पहुँच गया। आप कभी भी यहाँ बदल सकते हैं।",
+  change: "अपना जवाब बदलें",
+  people: (count) => (count === 1 ? "1 व्यक्ति" : `${count} लोग`),
+};
+
+export const repliesCopy: Translation<typeof en.repliesCopy> = {
+  heading: "जवाब",
+  intro:
+    "मेहमानों के जवाब आते ही यहाँ दिखते हैं। मेहमान सूची में सब हैं, याद-दिहानी और सह-मेज़बानों के साथ।",
+  all: "मेहमान सूची खोलें",
+  none: "अभी कोई जवाब नहीं। मेहमानों के जवाब देते ही यहाँ दिखेंगे।",
+  coming: (count) => `${count} आ रहे हैं`,
+  maybe: (count) => `${count} शायद`,
+  declined: (count) => `${count} नहीं आ पाएँगे`,
+  latest: "ताज़ा जवाब",
+  more: (count) => `और ${count}`,
+};

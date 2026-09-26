@@ -1,11 +1,13 @@
 import { LayoutTemplate, PenLine, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { howItWorks } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import type { UiLocale } from "@/i18n/locales";
 import { Section } from "./section";
 
 const icons = [LayoutTemplate, PenLine, Send];
 
-export function HowItWorks() {
+export function HowItWorks({ locale }: { locale: UiLocale }) {
+  const { howItWorks } = landingText[locale];
   return (
     <Section
       id="how-it-works"

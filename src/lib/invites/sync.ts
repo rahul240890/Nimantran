@@ -1,6 +1,6 @@
 "use client";
 
-import { saveInvite } from "@/app/_actions/invites";
+import { saveInvite } from "@/actions/invites";
 import { MAX_PHOTOS, newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { shelvePhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { inviteDraft } from "@/lib/editor/store";

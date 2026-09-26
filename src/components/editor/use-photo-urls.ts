@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { invitePhotoUrls } from "@/app/_actions/invites";
+import { invitePhotoUrls } from "@/actions/invites";
 import { loadPhoto } from "@/lib/editor/photos";
 
 /* Object URLs for stored photos, shared by every view and kept for the visit */

@@ -3,7 +3,7 @@
 import { Minus, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useState, useTransition, type FormEvent } from "react";
-import { addGuests, updateGuest } from "@/app/_actions/guests";
+import { addGuests, updateGuest } from "@/actions/guests";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DialogContent } from "@/components/ui/dialog";
@@ -13,14 +13,13 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { dashboardCopy } from "@/content/dashboard";
-import { functionCopy } from "@/content/editor";
 import { normalizePhone } from "@/lib/auth/phone";
 import { GUEST_RULES, parseGuestList, type HostFunction, type HostGuest } from "@/lib/guests/list";
-
-const copy = dashboardCopy.form;
+import { useText } from "@/i18n/client";
+import { dashboardText, editorText } from "@/i18n/copy";
 
 function PartySize({ value, onChange }: { value: number; onChange: (value: number) => void }) {
+  const copy = useText(dashboardText).dashboardCopy.form;
   const id = useId();
   return (
     <div className="flex flex-col gap-2">
@@ -66,6 +65,8 @@ function FunctionPicker({
   onChange: (value: string[]) => void;
   error: boolean;
 }) {
+  const copy = useText(dashboardText).dashboardCopy.form;
+  const { functionCopy } = useText(editorText);
   const id = useId();
   if (functions.length < 2) return null;
   return (
@@ -110,6 +111,7 @@ type SingleProps = {
 };
 
 function SingleGuest({ inviteId, functions, guest, onDone }: SingleProps) {
+  const copy = useText(dashboardText).dashboardCopy.form;
   const router = useRouter();
   const formId = useId();
   const [name, setName] = useState(guest?.name ?? "");
@@ -214,6 +216,7 @@ function SingleGuest({ inviteId, functions, guest, onDone }: SingleProps) {
 }
 
 function PastedList({ inviteId, functions, onDone }: Omit<SingleProps, "guest">) {
+  const copy = useText(dashboardText).dashboardCopy.form;
   const router = useRouter();
   const [text, setText] = useState("");
   const [group, setGroup] = useState("");
@@ -326,6 +329,7 @@ export function GuestFormDialog({
   guest?: HostGuest;
   onDone: () => void;
 }) {
+  const copy = useText(dashboardText).dashboardCopy.form;
   return (
     <DialogContent title={guest ? copy.editTitle : copy.addTitle} closeLabel={copy.close}>
       {guest ? (

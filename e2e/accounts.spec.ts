@@ -103,19 +103,20 @@ test.describe("accounts", () => {
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page.getByText("Profile saved").first()).toBeVisible();
 
+    // Hindi as the profile language switches the app to Hindi
     await page.reload();
-    await expect(name).toHaveValue("Priya Sharma");
-    await expect(page.getByRole("combobox", { name: /Preferred language/ })).toContainText(
-      "हिन्दी",
-    );
+    await expect(page.locator("html")).toHaveAttribute("lang", "hi");
+    await expect(page.getByRole("heading", { name: "आपका ब्योरा" })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: /आपका नाम/ })).toHaveValue("Priya Sharma");
+    await expect(page.getByRole("combobox", { name: /पसंदीदा भाषा/ })).toContainText("हिन्दी");
 
     await page.goto("/");
     await page.getByRole("button", { name: "Account: Priya Sharma" }).click();
     await page.getByRole("menuitem", { name: "My invites" }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Namaste, Priya");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("नमस्ते, Priya");
 
-    await page.getByRole("button", { name: "Account: Priya Sharma" }).click();
-    await page.getByRole("menuitem", { name: "Sign out" }).click();
+    await page.getByRole("button", { name: "खाता: Priya Sharma" }).click();
+    await page.getByRole("menuitem", { name: "साइन आउट" }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole("link", { name: "Sign in" })).toBeVisible();
     await page.goto("/invites");

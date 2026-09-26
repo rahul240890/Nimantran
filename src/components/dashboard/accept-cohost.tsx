@@ -3,12 +3,14 @@
 import { UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { acceptHostInvite } from "@/app/_actions/guests";
+import { acceptHostInvite } from "@/actions/guests";
 import { Button } from "@/components/ui/button";
-import { joinCopy } from "@/content/dashboard";
+import { useText } from "@/i18n/client";
+import { dashboardText } from "@/i18n/copy";
 
 /** Accepts a co-host link for the signed-in person and opens the guest list. */
 export function AcceptCohost({ token }: { token: string }) {
+  const { joinCopy } = useText(dashboardText);
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [pending, start] = useTransition();

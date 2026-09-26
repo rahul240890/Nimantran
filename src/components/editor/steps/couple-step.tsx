@@ -3,21 +3,16 @@
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
-import { coupleCopy, editor } from "@/content/editor";
 import { slotLabels } from "@/content/templates-review";
 import { COUPLE_SLOTS, coupleValue } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
+import { useText } from "@/i18n/client";
+import { editorText } from "@/i18n/copy";
 
 const NAME_SLOTS: readonly SlotId[] = ["first", "joiner", "second"];
-
-const hints: Partial<Record<SlotId, string>> = {
-  joiner: coupleCopy.joinerHint,
-  doorLeft: coupleCopy.doorsHint,
-  doorRight: coupleCopy.doorsHint,
-};
 
 function SlotField({
   id,
@@ -32,6 +27,12 @@ function SlotField({
   error?: string;
   onChange: (value: string) => void;
 }) {
+  const { coupleCopy, editor } = useText(editorText);
+  const hints: Partial<Record<SlotId, string>> = {
+    joiner: coupleCopy.joinerHint,
+    doorLeft: coupleCopy.doorsHint,
+    doorRight: coupleCopy.doorsHint,
+  };
   const rule = SLOT_RULES[id];
   const sample = template.slots.find((slot) => slot.id === id)?.sample;
   const Control = rule.kind === "long" ? Textarea : Input;
@@ -68,6 +69,7 @@ function SlotField({
 }
 
 export function CoupleStep({ draft, update, errors }: StepProps) {
+  const { coupleCopy } = useText(editorText);
   const template = TEMPLATES[draft.templateId];
   const used = new Set(slotsOf(template));
   const names = NAME_SLOTS.filter((id) => used.has(id));

@@ -3,7 +3,7 @@
 import { Languages, LogOut, Mail, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { saveProfile, signOut } from "@/app/_actions/auth";
+import { saveProfile, signOut } from "@/actions/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,8 +11,9 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
-import { accountMenu, profileCopy, signInCopy } from "@/content/account";
-import { languages } from "@/content/landing";
+import { accountText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
+import { languages } from "@/i18n/locales";
 import { PROFILE_RULES, type Account } from "@/lib/auth/account";
 import { formatPhone } from "@/lib/auth/phone";
 import type { Locale } from "@/lib/categories/schema";
@@ -22,6 +23,7 @@ import { refreshAccountHint } from "./use-account-hint";
 type Errors = Partial<Record<"name" | "language", string>>;
 
 export function ProfileForm({ account }: { account: Account }) {
+  const { accountMenu, profileCopy, signInCopy } = useText(accountText);
   const router = useRouter();
   const [name, setName] = useState(account.name);
   const [language, setLanguage] = useState<Locale>(account.language);

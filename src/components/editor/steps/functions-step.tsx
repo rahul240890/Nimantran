@@ -9,7 +9,6 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/time-picker";
-import { editor, functionCopy, functionFields } from "@/content/editor";
 import {
   FUNCTION_RULES,
   draftCategory,
@@ -21,9 +20,8 @@ import {
 } from "@/lib/editor/draft";
 import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
-
-const message = (error: string | undefined) =>
-  error ? editor.errors[error as keyof typeof editor.errors] : undefined;
+import { useText } from "@/i18n/client";
+import { editorText } from "@/i18n/copy";
 
 function FunctionFields({
   id,
@@ -39,6 +37,10 @@ function FunctionFields({
   withTime: boolean;
   set: (change: Partial<EventFunction>) => void;
 }) {
+  const { editor } = useText(editorText);
+  const message = (error: string | undefined) =>
+    error ? editor.errors[error as keyof typeof editor.errors] : undefined;
+  const { functionCopy, functionFields } = useText(editorText);
   const copy = functionCopy[id];
   // Weddings are planned months ahead; the calendar opens on today and runs two years out
   const { today, end } = useMemo(() => {
@@ -142,6 +144,7 @@ function FunctionFields({
 }
 
 export function FunctionsStep({ draft, update, errors }: StepProps) {
+  const { editor, functionCopy, functionFields } = useText(editorText);
   const main = mainFunction(draft);
   const category = draftCategory(draft);
   const { suggested, more } = functionOrder(draft);

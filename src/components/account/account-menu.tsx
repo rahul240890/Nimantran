@@ -4,7 +4,7 @@ import { FilePlus2, LayoutList, LogIn, LogOut, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { signOut } from "@/app/_actions/auth";
+import { signOut } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -15,7 +15,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
-import { accountMenu } from "@/content/account";
+import { accountText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
 import { PersonAvatar } from "./person-avatar";
 import { refreshAccountHint, useAccountHint } from "./use-account-hint";
@@ -27,6 +28,7 @@ const iconClass = "absolute start-3 size-4.5 text-ink-muted";
  * invite, Sign out. Works on static pages because it reads the account hint cookie.
  */
 export function AccountMenu({ className, compact }: { className?: string; compact?: boolean }) {
+  const { accountMenu } = useText(accountText);
   const hint = useAccountHint();
   const pathname = usePathname();
   const router = useRouter();

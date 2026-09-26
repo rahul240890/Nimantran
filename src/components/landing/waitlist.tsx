@@ -2,24 +2,27 @@
 
 import { CircleAlert, CircleCheck, Mail, Phone, RotateCcw, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
-import { joinWaitlist } from "@/app/_actions/waitlist";
+import { joinWaitlist } from "@/actions/waitlist";
 import { Mandala } from "@/components/brand/mandala";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { waitlist } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import { useLocale, useText } from "@/i18n/client";
 import { waitlistDraft } from "@/lib/waitlist/draft";
 import { validateWaitlist, type WaitlistErrors, type WaitlistField } from "@/lib/waitlist/schema";
 
-const f = waitlist.form;
 const fieldOrder: WaitlistField[] = ["name", "email", "phone", "occasion"];
 
 type Status =
   { kind: "idle" } | { kind: "sending" } | { kind: "failed" } | { kind: "joined"; name: string };
 
 function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
+  const { waitlist } = useText(landingText);
+  const f = waitlist.form;
+  const locale = useLocale();
   const draft = useSyncExternalStore(
     waitlistDraft.subscribe,
     waitlistDraft.get,
@@ -35,7 +38,7 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
     waitlistDraft.set(next);
     // Once someone has tried to submit, errors clear as soon as a field is fixed
     if (submitted || errors[field]) {
-      const result = validateWaitlist(next);
+      const result = validateWaitlist(next, waitlist.errors);
       setErrors((current) => ({
         ...current,
         [field]: result.ok ? undefined : result.errors[field],
@@ -45,7 +48,7 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
 
   const checkOnBlur = (field: WaitlistField) => {
     if (draft[field].trim() === "") return; // don't scold an empty field someone tabbed past
-    const result = validateWaitlist(draft);
+    const result = validateWaitlist(draft, waitlist.errors);
     setErrors((current) => ({ ...current, [field]: result.ok ? undefined : result.errors[field] }));
   };
 
@@ -61,7 +64,7 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
     event?.preventDefault();
     if (status.kind === "sending") return;
     setSubmitted(true);
-    const result = validateWaitlist(draft);
+    const result = validateWaitlist(draft, waitlist.errors);
     if (!result.ok) {
       setErrors(result.errors);
       focusFirstError(result.errors);
@@ -71,7 +74,11 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
     setStatus({ kind: "sending" });
     const honeypot = new FormData(formRef.current ?? undefined).get("website");
     try {
-      const response = await joinWaitlist(draft, typeof honeypot === "string" ? honeypot : "");
+      const response = await joinWaitlist(
+        draft,
+        typeof honeypot === "string" ? honeypot : "",
+        locale,
+      );
       if (response.status === "joined") {
         waitlistDraft.clear();
         onJoined(response.name.split(/\s+/)[0] ?? response.name);
@@ -189,6 +196,7 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
 }
 
 function Joined({ name, onAgain }: { name: string; onAgain: () => void }) {
+  const { waitlist } = useText(landingText);
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -219,6 +227,7 @@ function Joined({ name, onAgain }: { name: string; onAgain: () => void }) {
 }
 
 export function Waitlist() {
+  const { waitlist } = useText(landingText);
   const [joined, setJoined] = useState<string | null>(null);
 
   return (

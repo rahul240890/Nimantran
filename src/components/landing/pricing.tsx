@@ -2,7 +2,8 @@ import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { pricing } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
 import { Section } from "./section";
 
@@ -55,7 +56,8 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
 }
 
 /** A preview only: real plans and checkout arrive with payments. */
-export function Pricing() {
+export function Pricing({ locale }: { locale: UiLocale }) {
+  const { pricing } = landingText[locale];
   return (
     <Section id="pricing" eyebrow={pricing.eyebrow} title={pricing.title} intro={pricing.intro}>
       <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2 md:gap-6">

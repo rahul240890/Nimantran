@@ -15,12 +15,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
-import { guestCopy, rsvpCopy } from "@/content/publish";
 import { draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { PublicPhoto } from "@/lib/invites/public";
-import { uiStrings } from "@/lib/ui-strings";
+import { useText } from "@/i18n/client";
+import { publishText, uiText } from "@/i18n/copy";
 
 export type GuestFunction = {
   kind: FunctionId;
@@ -60,6 +60,8 @@ export function GuestView({
   rsvpFunctions,
   questions,
 }: GuestViewProps) {
+  const { guestCopy, rsvpCopy } = useText(publishText);
+  const { uiStrings } = useText(uiText);
   const copy = useMemo(() => draftCopy(draft), [draft]);
   const template = useMemo(
     () => templateWithRaga(draft.templateId, draft.music.raga),
@@ -220,6 +222,7 @@ export function GuestView({
 }
 
 function FunctionCard({ fn }: { fn: GuestFunction }) {
+  const { guestCopy } = useText(publishText);
   const headingId = `fn-${fn.kind}`;
   return (
     <article
