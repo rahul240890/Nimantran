@@ -11,9 +11,9 @@ import {
 import { isTemplateId } from "@/lib/templates/schema";
 
 /*
- * An invite as the database stores it (supabase/migrations): one events row and one
- * functions row per planned function. Photos stay on the device until publishing
- * (Step 9) uploads them to the event-media bucket.
+ * An invite as the database stores it (supabase/migrations): one events row, one
+ * functions row per planned function, and one media row per photo, whose file lives in
+ * the event-media bucket at <event id>/<photo id>.<ext>.
  */
 
 export type EventRow = {
@@ -21,6 +21,7 @@ export type EventRow = {
   category_id: string;
   template_id: string;
   status: "draft" | "published" | "archived";
+  slug: string | null;
   content: Record<string, string>;
   music: { raga: string | null; playOnOpen: boolean };
   editor_step: string;
@@ -37,7 +38,20 @@ export type FunctionRow = {
   dress_code: string;
 };
 
-export type EventWrite = Omit<EventRow, "id" | "status" | "updated_at">;
+export type PhotoRow = {
+  id: string;
+  width: number | null;
+  height: number | null;
+  position: number;
+};
+
+export type EventWrite = Omit<EventRow, "id" | "status" | "slug" | "updated_at">;
+
+/** Where a photo's file lives in the event-media bucket. */
+export function photoPath(eventId: string, photoId: string, type: string): string {
+  const ext = type === "image/png" ? "png" : type === "image/jpeg" ? "jpg" : "webp";
+  return `${eventId}/${photoId}.${ext}`;
+}
 
 export function draftToRows(draft: InviteDraft): { event: EventWrite; functions: FunctionRow[] } {
   const functions = FUNCTION_IDS.filter((id) => draft.functions[id].included).map(
@@ -71,7 +85,11 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
 }
 
 /** Rebuilds the editor's draft, leniently: anything unknown falls back to a default. */
-export function rowsToDraft(event: EventRow, functions: FunctionRow[]): InviteDraft {
+export function rowsToDraft(
+  event: EventRow,
+  functions: FunctionRow[],
+  photos: PhotoRow[] = [],
+): InviteDraft {
   const base = newDraft(
     isTemplateId(event.template_id) ? event.template_id : "marigold",
     isCategoryId(event.category_id) ? event.category_id : "wedding",
@@ -99,8 +117,12 @@ export function rowsToDraft(event: EventRow, functions: FunctionRow[]): InviteDr
     content: event.content,
     functions: fns,
     music: event.music,
+    photos: [...photos]
+      .sort((a, b) => a.position - b.position)
+      .map((photo) => ({ id: photo.id, width: photo.width ?? 1, height: photo.height ?? 1 })),
     updatedAt: Date.parse(event.updated_at) || 0,
     remoteId: event.id,
+    slug: event.status === "published" ? event.slug : null,
   });
   return draft ?? { ...base, remoteId: event.id };
 }
@@ -111,6 +133,8 @@ export type InviteSummary = {
   categoryId: string;
   templateId: string;
   status: EventRow["status"];
+  /** The live link, when published. */
+  slug: string | null;
   first: string;
   second: string;
   joiner: string;
@@ -134,6 +158,7 @@ export function summarize(event: EventRow, functions: FunctionRow[]): InviteSumm
     categoryId: draft.categoryId,
     templateId: draft.templateId,
     status: event.status,
+    slug: draft.slug,
     first: draft.content.first?.trim() ?? "",
     second: draft.content.second?.trim() ?? "",
     joiner: draft.content.joiner?.trim() || "&",

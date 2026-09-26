@@ -18,8 +18,8 @@ import {
 
 /*
  * An invite being written in the editor. It lives on this device (local storage for the
- * words, IndexedDB for photos) until accounts and the database arrive in Steps 7 and 8,
- * which will store the same shape.
+ * words, IndexedDB for photos) and, once signed in, in the account too: the database
+ * stores the same shape and the photos move to storage (Steps 8 and 9).
  */
 
 export { FUNCTION_IDS, type FunctionId };
@@ -93,6 +93,8 @@ export const draftSchema = z.object({
   updatedAt: z.number().catch(0),
   /** The event this draft is saved as in the signed-in person's account (Step 8). */
   remoteId: z.uuid().nullable().catch(null),
+  /** The live link, /i/<slug>, once published (Step 9). Null for drafts. */
+  slug: z.string().nullable().catch(null),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
@@ -118,6 +120,7 @@ export function newDraft(
     music: { raga: null, playOnOpen: true },
     updatedAt: 0,
     remoteId: null,
+    slug: null,
   };
 }
 

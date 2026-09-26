@@ -116,6 +116,7 @@ export const invitesCopy = {
     failed: "Couldn't delete that invite. Try again in a moment.",
   },
   continueEditing: "Continue",
+  share: "Share",
   step: (label: string) => `Next: ${label.toLowerCase()}`,
   updated: (when: string) => `Edited ${when}`,
   untitled: "Your names go here",

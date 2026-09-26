@@ -1,9 +1,10 @@
 import type { PhotoRef } from "./draft";
 
 /*
- * Photos stay on the device until publishing uploads them (Step 9), so the account's copy
- * of an invite has none. When the host switches between invites on one device, each
- * invite's photo list is kept here, by its account id, and comes back when it reopens.
+ * Photos upload to the account a moment after they're added, but one added offline, or
+ * just before switching, may not be there yet. When the host switches between invites on
+ * one device, each invite's photo list is kept here, by its account id, and joins the
+ * account's list when it reopens.
  */
 
 const KEY = "nimantran-invite-photos";

@@ -32,7 +32,13 @@ function asStored(draft: InviteDraft): {
 } {
   const { event, functions } = draftToRows(draft);
   return {
-    event: { ...event, id: ID, status: "draft", updated_at: "2026-09-26T10:00:00.000Z" },
+    event: {
+      ...event,
+      id: ID,
+      status: "draft",
+      slug: null,
+      updated_at: "2026-09-26T10:00:00.000Z",
+    },
     // Postgres hands times back with seconds
     functions: functions.map((row) => ({
       ...row,
@@ -92,5 +98,26 @@ describe("invite rows", () => {
       date: "2026-12-12",
       status: "draft",
     });
+  });
+});
+
+describe("published invites and photos", () => {
+  it("carries the link only while published, and photos in order", () => {
+    const { event, functions } = asStored(sample());
+    const photos = [
+      { id: "b", width: 800, height: 600, position: 1 },
+      { id: "a", width: null, height: null, position: 0 },
+    ];
+    const draft = rowsToDraft({ ...event, slug: "a-and-b" }, functions, photos);
+    expect(draft.slug).toBeNull();
+    expect(draft.photos).toEqual([
+      { id: "a", width: 1, height: 1 },
+      { id: "b", width: 800, height: 600 },
+    ]);
+    const live = rowsToDraft({ ...event, status: "published", slug: "a-and-b" }, functions);
+    expect(live.slug).toBe("a-and-b");
+    expect(summarize({ ...event, status: "published", slug: "a-and-b" }, functions).slug).toBe(
+      "a-and-b",
+    );
   });
 });

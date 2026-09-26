@@ -1,7 +1,15 @@
 "use client";
 
 import { formatDistanceToNow, format, parseISO } from "date-fns";
-import { ArrowRight, CalendarDays, CloudAlert, FilePlus2, HardDrive, Trash2 } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  CloudAlert,
+  FilePlus2,
+  HardDrive,
+  Send,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
@@ -40,6 +48,8 @@ type CardProps = {
   href: string;
   /** Shown above the card's link, which covers the rest of it. */
   action?: ReactNode;
+  /** A second button beside the main one, such as Share. */
+  secondary?: ReactNode;
 };
 
 function InviteCard({
@@ -52,6 +62,7 @@ function InviteCard({
   badge,
   href,
   action,
+  secondary,
 }: CardProps) {
   const category = CATEGORIES[isCategoryId(categoryId) ? categoryId : "wedding"];
   return (
@@ -77,7 +88,7 @@ function InviteCard({
           </p>
         )}
         <p className="text-sm text-ink-muted">{meta}</p>
-        <div className="mt-auto pt-2">
+        <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
           <Button asChild size="sm" variant="secondary">
             {/* The whole card is clickable through this link */}
             <Link
@@ -88,6 +99,7 @@ function InviteCard({
               <ArrowRight aria-hidden className="rtl:rotate-180" />
             </Link>
           </Button>
+          {secondary && <div className="relative z-10">{secondary}</div>}
         </div>
       </div>
       {action && <div className="absolute end-2 top-2 z-10">{action}</div>}
@@ -301,6 +313,16 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                       )
                     }
                     href={`/create?invite=${invite.id}`}
+                    secondary={
+                      invite.status === "published" ? (
+                        <Button asChild size="sm">
+                          <Link href={`/invites/${invite.id}/share`}>
+                            <Send aria-hidden className="rtl:-scale-x-100" />
+                            {invitesCopy.share}
+                          </Link>
+                        </Button>
+                      ) : null
+                    }
                     action={
                       <DeleteInvite
                         invite={invite}

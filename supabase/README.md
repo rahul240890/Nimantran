@@ -17,6 +17,9 @@ database keeps every invite. Applied so far after the first setup:
 
 - `20260926170000_traditions_ready.sql` — ready for tradition packs (any ceremony id, local
   ceremony names, end times, a tradition and card languages per invite).
+- `20260926180000_publish.sql` — publishing (Step 9): the public `published_invite()` read,
+  `slug_available()`, and guests reading photos of published invites. Needs the traditions
+  migration above first.
 
 ## Setting up a project
 

@@ -69,7 +69,10 @@ export function PreviewStep({
   const problems = draftProblems(draft);
   const functions = includedFunctions(draft);
   const category = draftCategory(draft);
-  const urls = usePhotoUrls(draft.photos.map((photo) => photo.id));
+  const urls = usePhotoUrls(
+    draft.photos.map((photo) => photo.id),
+    draft.remoteId,
+  );
   const raga = RAGAS[templateWithRaga(draft.templateId, draft.music.raga).music.raga];
   const [confirming, setConfirming] = useState(false);
 
@@ -82,9 +85,13 @@ export function PreviewStep({
         >
           <PartyPopper aria-hidden className="mt-0.5 size-6 shrink-0 text-success" />
           <div className="flex flex-col gap-1">
-            <p className="font-semibold">{previewCopy.ready}</p>
-            <p className="text-sm text-ink-muted">
-              {signedIn ? previewCopy.readyBodyAccount : previewCopy.readyBody}
+            <p className="font-semibold">{draft.slug ? previewCopy.live : previewCopy.ready}</p>
+            <p className="text-sm break-words text-ink-muted">
+              {draft.slug
+                ? previewCopy.liveBody(`/i/${draft.slug}`)
+                : signedIn
+                  ? previewCopy.readyBodyAccount
+                  : previewCopy.readyBody}
             </p>
           </div>
         </Card>
