@@ -2,7 +2,7 @@
 
 What we are building, in full. The build order lives in [PLAN.md](PLAN.md); this file is the feature catalogue every step builds from.
 
-Related: [MEMORIES.md](MEMORIES.md) (3D gifts), [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market), [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+Related: [TRADITIONS.md](TRADITIONS.md) (tradition packs), [MEMORIES.md](MEMORIES.md) (3D gifts), [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market), [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
 ## Built so far
 
@@ -79,6 +79,12 @@ Customisation levels: **basic** (names, date, venue, message, photo) → **style
 Card details included in editions, never charged per guest: wax seals, tassels, foil, backgrounds, envelope and door styles.
 
 Later: **designer and artist collections** with Indian designers, illustrators and textile brands (revenue share), and a **creator marketplace** (designers keep 50–70%).
+
+## 5a. Traditions
+
+One choice in the editor (region, community, card languages) sets the deity or sacred symbol, invocation, palette, motifs, ceremony names, host order and wording structure. Twelve launch packs: North Indian Hindu, Rajasthani/Marwari, Marathi, Gujarati, Bengali, Tamil, Telugu, Kerala (Hindu, Christian, Muslim), Punjabi Sikh, Muslim, Christian, Jain, plus a Modern pack without religious symbols. Original commissioned sacred art only; respect rules enforced in code; every pack reviewed by the community before launch. Full spec: [TRADITIONS.md](TRADITIONS.md).
+
+A colourful **Rang** template family (Rang Mahal, Paithani Mor, Bandhani Utsav, Alpona Lal, Gopuram Pon, Phulkari Rang) sits beside the elegant designs.
 
 ## 6. Languages
 

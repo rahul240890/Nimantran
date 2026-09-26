@@ -2,7 +2,7 @@
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
-**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
@@ -112,6 +112,11 @@ Fast, text-first event page with cover image, details and RSVP, using the same g
 **Step 12. Languages**
 next-intl setup; English, Hindi, Marathi, Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Punjabi. Two-language invites with guest toggle.
 
+**Step 12a. Tradition packs**
+Regional and religious customisation from one choice (spec: [TRADITIONS.md](TRADITIONS.md)). Tradition pack schema and catalogue; a Tradition step after Occasion (region, community, card languages, live previews); religious-elements panel (deity or symbol, invocation, shloka or verse, optional chant); wording panel with labelled blocks (blessings, hosts, requesters, Swagatotsuk, children's line); ceremony lists with local names; respect rules enforced by tests. First six packs: North Indian Hindu, Rajasthani/Marwari, Marathi, Gujarati, Bengali, Tamil. Each pack needs community reviewers and a native proofreader before it ships.
+
+**Content task C1 (starts now, runs alongside building).** Commission 18 original sacred art pieces (deities and symbols listed in TRADITIONS.md, section 5) from Indian artists with commercial rights; recruit community reviewers and proofreaders. Never use images from Google or other apps.
+
 **Step 13. Quality pass**
 End-to-end tests for create → publish → RSVP → dashboard. Accessibility audit, Lighthouse, real-device testing on low-end Android and iPhone.
 
@@ -147,7 +152,7 @@ Detailed in the Nimantran Memories Plan. Starts once payments work (after Step 1
 **Step 20.** AI couple art from uploaded photos.
 **Step 21.** MP4 video export for WhatsApp status and Instagram.
 **Step 22.** WhatsApp Business reminders and update broadcasts.
-**Step 23.** More categories as data: birthdays, baby (godh bharai, naamkaran, mundan), home and religious (griha pravesh, puja, katha), festivals (Diwali, Eid, Holi, Navratri, Onam, Christmas), parties, dining; 30+ templates.
+**Step 23.** More categories as data: birthdays, baby (godh bharai, naamkaran, mundan), home and religious (griha pravesh, puja, katha), festivals (Diwali, Eid, Holi, Navratri, Onam, Christmas), parties, dining; 30+ templates. Tradition packs: Telugu, Kerala (Hindu, Christian, Muslim), Punjabi Sikh, Muslim, Christian, Jain and Modern; the colourful Rang template family (6 designs).
 **Step 24.** Photo sharing album after the event, thank-you cards.
 **Step 24a.** Greeting Cards line: thank-you, festival greetings, shagun cards, condolence.
 
@@ -156,7 +161,7 @@ Detailed in the Nimantran Memories Plan. Starts once payments work (after Step 1
 **Step 25.** Business accounts for planners and printers: client workspaces, own branding, bulk edits. Business and education categories: shop openings, launches, office parties, dealer meets, college fests, convocations, fundraisers.
 **Step 26.** Subscription billing (monthly/yearly).
 **Step 27.** Print partner integration (printed card with QR to the 3D invite).
-**Step 27a.** Designer and artist collections with Indian designers, illustrators and textile brands (revenue share).
+**Step 27a.** Designer and artist collections with Indian designers, illustrators and textile brands (revenue share). Includes sacred art and regional designs by named artists.
 **Step 28.** Creator marketplace for template designers.
 **Step 29.** Wedding websites and custom domains.
 
@@ -175,6 +180,7 @@ All in this folder, so every build session has them:
 
 - [PRODUCT.md](PRODUCT.md): what each step builds towards.
 - [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
+- [TRADITIONS.md](TRADITIONS.md): tradition packs, sacred art library and respect rules (Steps 12a, 23, 27a and content task C1).
 - [COMPETITORS.md](COMPETITORS.md): what we borrow from Paperless Post and what we avoid (coin pricing, per-guest add-ons, yearly free limit).
 - [PLAN_REVIEW.md](PLAN_REVIEW.md): open recommendations on launch scope, payments timing and languages, awaiting the owner's decision.
 - [Nimantran_Premium_Plan.pdf](Nimantran_Premium_Plan.pdf): original business plan.
