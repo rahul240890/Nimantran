@@ -15,7 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
-import { draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { draftCopy, draftTradition, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -25,6 +26,8 @@ import { publishText, uiText } from "@/i18n/copy";
 export type GuestFunction = {
   kind: FunctionId;
   name: string;
+  /** The ceremony's name in the family's tradition, in its own script. */
+  localName: { text: string; lang: string } | null;
   date: string;
   time: string;
   venue: string;
@@ -121,6 +124,8 @@ export function GuestView({
             )}
           </div>
         </section>
+
+        <FamilyWording draft={draft} />
 
         <section
           aria-labelledby="guest-functions"
@@ -221,6 +226,36 @@ export function GuestView({
   );
 }
 
+/** The tradition's labelled wording (blessings, hosts, the children's line), when written. */
+function FamilyWording({ draft }: { draft: InviteDraft }) {
+  const { guestCopy } = useText(publishText);
+  const pack = draftTradition(draft);
+  if (!pack) return null;
+  const blocks = WORDING_IDS.flatMap((id) => {
+    const text = draft.tradition.wording[id]?.trim();
+    const block = pack.wording[id];
+    return text && block ? [{ id, title: block.title, text }] : [];
+  });
+  if (blocks.length === 0) return null;
+  return (
+    <section aria-labelledby="guest-family" className="px-4 pb-12 sm:px-6">
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl border border-line bg-surface px-5 py-8 text-center shadow-raised sm:px-10">
+        <h2 id="guest-family" className="font-display text-2xl leading-tight">
+          {guestCopy.family}
+        </h2>
+        <dl lang={pack.language} className="grid w-full gap-5 sm:grid-cols-2">
+          {blocks.map((block) => (
+            <div key={block.id} className="flex flex-col gap-1">
+              <dt className="text-sm text-accent-text">{block.title}</dt>
+              <dd className="text-lg break-words">{block.text}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  );
+}
+
 function FunctionCard({ fn }: { fn: GuestFunction }) {
   const { guestCopy } = useText(publishText);
   const headingId = `fn-${fn.kind}`;
@@ -229,8 +264,13 @@ function FunctionCard({ fn }: { fn: GuestFunction }) {
       aria-labelledby={headingId}
       className="flex h-full flex-col gap-4 rounded-lg border border-line bg-surface p-5 shadow-raised sm:p-6"
     >
-      <h3 id={headingId} className="font-display text-2xl leading-tight">
+      <h3 id={headingId} className="flex flex-col font-display text-2xl leading-tight">
         {fn.name}
+        {fn.localName && (
+          <span lang={fn.localName.lang} className="font-sans text-lg text-accent-text">
+            {fn.localName.text}
+          </span>
+        )}
       </h3>
       <dl className="flex flex-col gap-3">
         {fn.date && (

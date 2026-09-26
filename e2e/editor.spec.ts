@@ -50,6 +50,15 @@ for (const colorScheme of ["light", "dark"] as const) {
 
       await next(page);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+        "Whose tradition should the card follow?",
+      );
+      await page.getByRole("radio", { name: /Marathi/ }).click();
+      await expect(page.getByRole("heading", { name: "Family wording" })).toBeVisible();
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+
+      await next(page);
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
         "Pick the card your guests will open",
       );
       expect(await noOverflow(page)).toBe(true);
@@ -88,6 +97,7 @@ test.describe("invite editor", () => {
   test("writes an invite from design to preview and keeps it after a reload", async ({ page }) => {
     await page.goto("/create?quality=2d");
     await expect(page.getByRole("radio", { name: /Wedding/ })).toBeChecked();
+    await next(page);
     await next(page);
     await page.getByRole("radio", { name: /Rose Garden/ }).click();
     await next(page);
@@ -174,16 +184,49 @@ test.describe("invite editor", () => {
     if (page.viewportSize()!.width < 1024) await page.keyboard.press("Escape");
 
     // Switching the occasion keeps what was typed
-    await page.getByRole("button", { name: "Back" }).click();
-    await page.getByRole("button", { name: "Back" }).click();
-    await page.getByRole("button", { name: "Back" }).click();
+    for (let i = 0; i < 4; i++) await page.getByRole("button", { name: "Back" }).click();
     await page.getByRole("radio", { name: /Engagement/ }).click();
     await expect(page.getByRole("region", { name: "What this sets up" })).toContainText(
       "Engagement",
     );
     await next(page);
     await next(page);
+    await next(page);
     await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
+  });
+
+  test("a tradition sets the symbol, invocation, ceremony names and family wording", async ({
+    page,
+  }) => {
+    await page.goto("/create?quality=2d&region=TN");
+    await next(page);
+    // The visitor's own tradition comes first
+    const traditions = page.getByRole("radiogroup", { name: "Traditions" }).getByRole("radio");
+    await expect(traditions.first()).toHaveAccessibleName(/Tamil Hindu/);
+    await traditions.first().click();
+    await expect(page.getByRole("radio", { name: "Pillaiyar suzhi", exact: true })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /In its script/ })).toBeChecked();
+    await expect(page.getByText("திருமணம்")).toBeVisible();
+
+    const wide = page.viewportSize()!.width >= 1024;
+    const card = page.locator("[data-engine-state] .sr-only");
+    if (wide) await expect(card.getByText("ஸ்ரீ விநாயகர் துணை")).toBeAttached();
+    await page.getByRole("radio", { name: /In English letters/ }).click();
+    if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toBeAttached();
+    await page.getByRole("radio", { name: /Leave it off/ }).click();
+    if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toHaveCount(0);
+
+    await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
+    await page.reload();
+    await expect(page.getByRole("textbox", { name: /Hosted by/ })).toHaveValue(
+      "ஐயர் குடும்பத்தினர்",
+    );
+    await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
+
+    // The tradition's designs lead the list
+    await next(page);
+    const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
+    await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
   });
 
   test("a save-the-date asks only for the date and the city", async ({ page }) => {
@@ -215,6 +258,7 @@ test.describe("invite editor", () => {
       await page.goto("/create?quality=2d");
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
       expect(await noOverflow(page)).toBe(true);
+      await next(page); // tradition
       await next(page); // design: Back, Preview and Continue share the bar
       await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);

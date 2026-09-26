@@ -27,6 +27,9 @@ export type EventRow = {
   music: { raga: string | null; playOnOpen: boolean };
   editor_step: string;
   updated_at: string;
+  /** The tradition pack and the family's religious elements (Step 12a). */
+  tradition_id?: string | null;
+  religious?: Record<string, unknown> | null;
 };
 
 export type FunctionRow = {
@@ -80,6 +83,12 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
       content,
       music: draft.music,
       editor_step: draft.step,
+      tradition_id: draft.tradition.id,
+      religious: {
+        symbol: draft.tradition.symbol,
+        invocation: draft.tradition.invocation,
+        wording: draft.tradition.wording,
+      },
     },
     functions,
   };
@@ -127,6 +136,8 @@ export function rowsToDraft(
     remoteId: event.id,
     slug: event.status === "published" ? event.slug : null,
     questions: questions ? RSVP_QUESTION_IDS.filter((id) => questions.includes(id)) : null,
+    // Read leniently: an unknown pack or symbol falls back to none
+    tradition: { ...event.religious, id: event.tradition_id ?? null },
   });
   return draft ?? { ...base, remoteId: event.id };
 }

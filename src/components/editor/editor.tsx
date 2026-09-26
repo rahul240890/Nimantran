@@ -44,6 +44,7 @@ import { ExtrasStep } from "./steps/extras-step";
 import { FunctionsStep } from "./steps/functions-step";
 import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
+import { TraditionStep } from "./steps/tradition-step";
 import { forgetPhotoUrl } from "./use-photo-urls";
 import { useText } from "@/i18n/client";
 import { editorText, publishText, uiText } from "@/i18n/copy";
@@ -53,6 +54,7 @@ const WIDE = "(min-width: 64rem)";
 /** The card opens on the steps where the host is writing what's inside it. */
 const opensOn: Record<EditorStep, boolean> = {
   occasion: false,
+  tradition: true,
   design: false,
   couple: true,
   functions: true,
@@ -363,6 +365,7 @@ export function Editor({
             >
               <div key={step} className="flex-1 animate-rise pb-8">
                 {step === "occasion" && <OccasionStep {...props} />}
+                {step === "tradition" && <TraditionStep {...props} />}
                 {step === "design" && <DesignStep {...props} />}
                 {step === "couple" && <CoupleStep {...props} />}
                 {step === "functions" && <FunctionsStep {...props} />}

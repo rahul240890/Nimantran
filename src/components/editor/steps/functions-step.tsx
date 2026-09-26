@@ -10,6 +10,8 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/time-picker";
 import {
+  ceremonyName,
+  draftTradition,
   FUNCTION_RULES,
   draftCategory,
   functionOrder,
@@ -160,6 +162,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
   const item = (id: FunctionId) => {
     const fn = draft.functions[id];
     const copy = functionCopy[id];
+    const local = ceremonyName(draft, id);
     return (
       <li
         key={id}
@@ -171,7 +174,20 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
       >
         <div className="flex items-start justify-between gap-3 px-4 py-2 sm:px-5">
           <Checkbox
-            label={<span className="font-display text-lg">{copy.name}</span>}
+            label={
+              <span className="font-display text-lg">
+                {copy.name}
+                {local && (
+                  <span
+                    lang={draftTradition(draft)?.language}
+                    className="font-sans text-base font-normal text-accent-text"
+                  >
+                    {" · "}
+                    {local.native}
+                  </span>
+                )}
+              </span>
+            }
             description={copy.description}
             checked={fn.included}
             invalid={Boolean(errors.functions)}

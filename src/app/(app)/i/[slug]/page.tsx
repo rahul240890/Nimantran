@@ -7,7 +7,13 @@ import { isQualityChoice } from "@/content/engine-review";
 import { dateLocale } from "@/i18n/dates";
 import { editorText, publishText } from "@/i18n/copy";
 import { getLocale } from "@/i18n/server";
-import { draftQuestions, includedFunctions, needsTime } from "@/lib/editor/draft";
+import {
+  ceremonyName,
+  draftQuestions,
+  draftTradition,
+  includedFunctions,
+  needsTime,
+} from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
@@ -63,9 +69,11 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const functions: GuestFunction[] = includedFunctions(draft).map((kind) => {
     const fn = draft.functions[kind];
     const entry = entries.find((item) => item.uid.startsWith(`${invite.id}-${kind}@`));
+    const local = ceremonyName(draft, kind);
     return {
       kind,
       name: functionCopy[kind].name,
+      localName: local ? { text: local.native, lang: draftTradition(draft)!.language } : null,
       date: fn.date ? format(parseISO(fn.date), "EEEE, d MMMM yyyy", { locale: words }) : "",
       time: timed && fn.time ? formatTime(fn.time, words) : "",
       venue: fn.venue.trim(),

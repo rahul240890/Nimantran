@@ -172,7 +172,7 @@ export const faq = {
     },
     {
       q: "Can the card follow our family's traditions?",
-      a: "That is coming next. Choose your region and community and the card sets the right deity or symbol, invocation, ceremony names and wording order, all still editable. Packs are checked by people from each community before they go live.",
+      a: "Yes. Pick your tradition, such as Marathi, Gujarati, Bengali or Tamil, and the card sets the sacred symbol, the invocation, local ceremony names and family wording like Darshanabhilashi, all still editable. People from each community are checking every tradition before launch.",
     },
     {
       q: "Can I change details after sending it?",
