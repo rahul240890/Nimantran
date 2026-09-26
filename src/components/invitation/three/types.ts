@@ -1,14 +1,16 @@
 import type { RefObject } from "react";
-import type { GateCardCopy } from "@/components/brand/gate-card";
 import type { QualitySettings } from "@/lib/engine/quality";
-import type { ResolvedStock } from "@/lib/engine/themes";
+import type { CardCopy } from "@/lib/templates/content";
+import type { Template } from "@/lib/templates/schema";
+import type { ResolvedStock } from "@/lib/templates/stock";
 
 /**
  * What every card format's 3D scene receives. The stage animates `openRef` (0 shut,
  * 1 open) and tilts the card; the format draws the card and moves its own parts.
  */
 export type FormatSceneProps = {
-  copy: GateCardCopy;
+  copy: CardCopy;
+  template: Template;
   stock: ResolvedStock;
   settings: QualitySettings;
   openRef: RefObject<number>;

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageTransition } from "@/components/motion/page-transition";
-import { isEngineThemeId } from "@/lib/engine/themes";
+import { isTemplateId } from "@/lib/templates/schema";
 import { isQualityChoice } from "@/content/engine-review";
 import { EngineReview } from "./_review";
 
@@ -12,15 +12,15 @@ export const metadata: Metadata = {
 
 /*
  * A review page for the Step 4 engine, not a product screen. ?quality=high|medium|low|2d
- * and ?theme=<design> preselect the controls (handy for tests on machines without a GPU).
+ * and ?template=<id> preselect the controls (handy for tests on machines without a GPU).
  */
 export default async function EnginePage({ searchParams }: PageProps<"/engine">) {
-  const { quality, theme } = await searchParams;
+  const { quality, template } = await searchParams;
   return (
     <PageTransition>
       <EngineReview
         initialQuality={isQualityChoice(quality) ? quality : "auto"}
-        initialTheme={isEngineThemeId(theme) ? theme : "marigold"}
+        initialTheme={isTemplateId(template) ? template : "marigold"}
       />
     </PageTransition>
   );

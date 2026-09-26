@@ -1,16 +1,14 @@
 "use client";
 
-import { useCallback, useState, useSyncExternalStore, type ReactNode } from "react";
-import { Logo } from "@/components/brand/logo";
-import { CARD_FORMATS, PLANNED_FORMATS, type CardFormatId } from "@/components/invitation/formats";
+import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
+import { CARD_FORMATS, PLANNED_FORMATS } from "@/components/invitation/formats";
 import { Invitation, type EngineStatus } from "@/components/invitation/invitation";
-import { StillModeSwitch } from "@/components/motion/still-mode-switch";
+import { ReviewHeader } from "@/components/shell/review-header";
 import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import {
   qualityLabels,
   reasonLabels,
@@ -20,11 +18,13 @@ import {
   type SampleCopyId,
 } from "@/content/engine-review";
 import { cn } from "@/lib/cn";
-import { ENGINE_THEME_IDS, ENGINE_THEMES, type EngineThemeId } from "@/lib/engine/themes";
-import { uiStrings } from "@/lib/ui-strings";
+import { RAGAS } from "@/lib/engine/music";
+import { TEMPLATES } from "@/lib/templates/catalog";
+import { toCardCopy } from "@/lib/templates/content";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
 
 /* A swatch of each design's card stock */
-const swatches: Record<EngineThemeId, string> = {
+const swatches: Record<TemplateId, string> = {
   marigold: "bg-card-ivory border-card-gold",
   rose: "bg-tpl-rose-paper border-tpl-rose-ornament",
   emerald: "bg-tpl-emerald-paper border-tpl-emerald-ornament",
@@ -32,8 +32,6 @@ const swatches: Record<EngineThemeId, string> = {
   monogram: "bg-tpl-monogram-paper border-tpl-monogram-ornament",
   kasavu: "bg-tpl-kasavu-paper border-tpl-kasavu-ornament",
 };
-
-const musicNames = { yaman: "Raag Yaman", bhupali: "Raag Bhupali", desh: "Raag Desh" } as const;
 
 /* Frame rate lives outside React state so the invitation doesn't re-render every second */
 let fps = 0;
@@ -72,32 +70,23 @@ export function EngineReview({
   initialTheme,
 }: {
   initialQuality: QualityChoice;
-  initialTheme: EngineThemeId;
+  initialTheme: TemplateId;
 }) {
-  const [theme, setTheme] = useState<EngineThemeId>(initialTheme);
+  const [theme, setTheme] = useState<TemplateId>(initialTheme);
   const [quality, setQuality] = useState<QualityChoice>(initialQuality);
-  const [format, setFormat] = useState<CardFormatId>("gate-fold");
-  const [sample, setSample] = useState<SampleCopyId>("english");
+  const [sample, setSample] = useState<SampleCopyId>("template");
+  const template = TEMPLATES[theme];
+  const copy = useMemo(
+    () => toCardCopy(template, sampleCopies[sample].content),
+    [template, sample],
+  );
   const [musicOnOpen, setMusicOnOpen] = useState(true);
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:sticky sm:top-0">
-        <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-1.5 px-4 py-2.5 sm:px-6 lg:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <Logo className="max-[359px]:[&>span]:sr-only" />
-            <span className="hidden font-label text-xs tracking-[0.24em] text-ink-muted uppercase md:inline">
-              Invitation engine
-            </span>
-          </div>
-          <div className="contents sm:flex sm:items-center sm:gap-5">
-            <StillModeSwitch className="gap-3 py-0 max-sm:order-last max-sm:w-full max-sm:border-t max-sm:border-line max-sm:pt-1.5" />
-            <ThemeToggle labels={uiStrings.theme} />
-          </div>
-        </div>
-      </header>
+      <ReviewHeader label="Invitation engine" />
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="flex flex-col gap-3">
@@ -128,9 +117,8 @@ export function EngineReview({
               }}
             />
             <Invitation
-              copy={sampleCopies[sample].copy}
-              theme={theme}
-              format={format}
+              copy={copy}
+              template={template}
               quality={quality}
               musicOnOpen={musicOnOpen}
               onStatus={onStatus}
@@ -148,15 +136,15 @@ export function EngineReview({
                   label="Design"
                   variant="card"
                   value={theme}
-                  onValueChange={(value) => setTheme(value as EngineThemeId)}
+                  onValueChange={(value) => setTheme(value as TemplateId)}
                   className="grid-cols-2 sm:grid-cols-3 lg:grid-cols-2"
                 >
-                  {ENGINE_THEME_IDS.map((id) => (
+                  {TEMPLATE_IDS.map((id) => (
                     <RadioItem
                       key={id}
                       value={id}
-                      label={ENGINE_THEMES[id].name}
-                      description={musicNames[ENGINE_THEMES[id].music]}
+                      label={TEMPLATES[id].name}
+                      description={`Raag ${RAGAS[TEMPLATES[id].music.raga].name}`}
                       icon={
                         <span
                           className={cn(
@@ -186,8 +174,8 @@ export function EngineReview({
 
               <Field label="Card format">
                 <Select
-                  value={format}
-                  onValueChange={(value) => setFormat(value as CardFormatId)}
+                  value={template.scene.format}
+                  onValueChange={() => {}}
                   options={[
                     ...Object.values(CARD_FORMATS).map((f) => ({ value: f.id, label: f.name })),
                     ...PLANNED_FORMATS.map((name) => ({

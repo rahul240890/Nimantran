@@ -6,7 +6,10 @@
 
 import { composePhrase, frequency, PHRASE_BEATS, RAGAS, TANPURA, type Note } from "./music";
 import { seededRandom } from "./particles";
-import type { MusicTrackId } from "./themes";
+import type { Template } from "@/lib/templates/schema";
+
+/** Which raga to play, and at what tempo if not the raga's own. */
+export type MusicChoice = Template["music"];
 
 type Voice = "santoor" | "tanpura";
 
@@ -87,18 +90,18 @@ export class MusicPlayer {
   private pitch = 0;
   private random = seededRandom(3);
   private playing = false;
-  private track: MusicTrackId;
+  private music: MusicChoice;
 
-  constructor(track: MusicTrackId) {
-    this.track = track;
+  constructor(music: MusicChoice) {
+    this.music = music;
   }
 
   get isPlaying() {
     return this.playing;
   }
 
-  setTrack(track: MusicTrackId) {
-    this.track = track;
+  setTrack(music: MusicChoice) {
+    this.music = music;
     this.pitch = 0;
   }
 
@@ -226,8 +229,8 @@ export class MusicPlayer {
     const ctx = this.ctx;
     if (!ctx || !this.playing) return;
     const horizon = ctx.currentTime + LOOKAHEAD_S;
-    const raga = RAGAS[this.track];
-    const beat = 60 / raga.tempo;
+    const raga = RAGAS[this.music.raga];
+    const beat = 60 / (this.music.tempo ?? raga.tempo);
 
     while (this.nextDrone < horizon) {
       const pitch = TANPURA[this.droneIndex % TANPURA.length]!;

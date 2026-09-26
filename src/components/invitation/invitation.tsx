@@ -6,13 +6,13 @@ import {
   Component,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
   type CSSProperties,
   type ReactNode,
 } from "react";
-import type { GateCardCopy } from "@/components/brand/gate-card";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Spinner } from "@/components/ui/spinner";
@@ -25,7 +25,10 @@ import {
   type QualityLevel,
   type QualityReason,
 } from "@/lib/engine/quality";
-import { ENGINE_THEMES, stockStyle, type EngineThemeId } from "@/lib/engine/themes";
+import { TEMPLATES } from "@/lib/templates/catalog";
+import type { CardCopy } from "@/lib/templates/content";
+import type { Template } from "@/lib/templates/schema";
+import { stockStyle } from "@/lib/templates/stock";
 import { uiStrings } from "@/lib/ui-strings";
 import { useDarkTheme } from "@/lib/use-color-scheme";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -54,9 +57,9 @@ export type EngineStatus = {
 };
 
 export type InvitationProps = {
-  copy: GateCardCopy;
-  theme?: EngineThemeId;
-  format?: CardFormatId;
+  copy: CardCopy;
+  /** The design: scene, colours, type and music. */
+  template?: Template;
   /** "auto" picks from the device; a level forces it (for review screens). */
   quality?: "auto" | QualityLevel;
   open?: boolean;
@@ -123,8 +126,7 @@ class StageBoundary extends Component<
  */
 export function Invitation({
   copy,
-  theme: themeId = "marigold",
-  format = "gate-fold",
+  template = TEMPLATES.marigold,
   quality = "auto",
   open: openProp,
   defaultOpen = false,
@@ -135,7 +137,7 @@ export function Invitation({
   onFps,
   className,
 }: InvitationProps) {
-  const theme = ENGINE_THEMES[themeId];
+  const format: CardFormatId = template.scene.format;
   const Flat = CARD_FORMATS[format].Flat;
   const still = useReducedMotion();
   const dark = useDarkTheme();
@@ -225,13 +227,15 @@ export function Invitation({
   }, [onStatus, state, level, detected?.level, current?.reason]);
 
   // Music: composed live, so it costs no data; loaded only when first played
+  const { raga, tempo } = template.music;
+  const music = useMemo(() => ({ raga, tempo }), [raga, tempo]);
   const player = useRef<MusicPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
   const playMusic = useCallback(async () => {
     try {
       if (!player.current) {
         const { MusicPlayer } = await import("@/lib/engine/music-player");
-        player.current = new MusicPlayer(theme.music);
+        player.current = new MusicPlayer(music);
       }
       await player.current.play();
       setPlaying(true);
@@ -239,15 +243,15 @@ export function Invitation({
       // No Web Audio: the button simply stays off
       setPlaying(false);
     }
-  }, [theme.music]);
+  }, [music]);
   const pauseMusic = useCallback(() => {
     player.current?.pause();
     setPlaying(false);
   }, []);
 
   useEffect(() => {
-    player.current?.setTrack(theme.music);
-  }, [theme.music]);
+    player.current?.setTrack(music);
+  }, [music]);
   useEffect(() => () => player.current?.dispose(), []);
 
   // Quiet in a background tab; carry on when the guest comes back
@@ -284,7 +288,7 @@ export function Invitation({
   }, [open, openProp, onOpenChange, musicOnOpen, playing, playMusic]);
 
   const flatStyle = {
-    ...stockStyle(theme),
+    ...stockStyle(template),
     "--open": open ? 1 : 0,
     transition: "--open 1.5s cubic-bezier(0.16, 1, 0.3, 1)",
   } as CSSProperties;
@@ -298,11 +302,13 @@ export function Invitation({
     >
       {/* The invitation itself, for screen readers; the pictures below are decorative */}
       <div className="sr-only">
-        <p>{copy.families}</p>
+        {copy.blessing && <p>{copy.blessing}</p>}
+        {copy.families && <p>{copy.families}</p>}
         <p>
-          {copy.first} {labels.and} {copy.second}
+          {copy.first} {!copy.joiner || copy.joiner === "&" ? labels.and : copy.joiner}{" "}
+          {copy.second}
         </p>
-        <p>{copy.line}</p>
+        {copy.line && <p>{copy.line}</p>}
         <p>{copy.date}</p>
         <p>{copy.venue}</p>
       </div>
@@ -325,7 +331,7 @@ export function Invitation({
                 "rotateX(calc((1 - var(--open, 0)) * 10deg)) scale(calc(1 - var(--open, 0) * 0.16))",
             }}
           >
-            <Flat copy={copy} />
+            <Flat copy={copy} template={template} />
           </div>
         </div>
 
@@ -340,7 +346,7 @@ export function Invitation({
               <Stage
                 key={stageKey}
                 copy={copy}
-                theme={theme}
+                template={template}
                 format={format}
                 level={level}
                 open={open}

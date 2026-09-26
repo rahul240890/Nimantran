@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { hero } from "@/content/landing";
+import { TEMPLATES } from "@/lib/templates/catalog";
 import { Invitation, type EngineStatus } from "./invitation";
 
 /*
@@ -102,7 +103,7 @@ describe("Invitation", () => {
   });
 
   it("re-colours the 2D card with the chosen design's tokens", () => {
-    const { container } = renderInvitation({ theme: "emerald" });
+    const { container } = renderInvitation({ template: TEMPLATES.emerald });
     const flat = container.querySelector<HTMLElement>("[style*='--open']")!;
     expect(flat.style.getPropertyValue("--card-ivory")).toBe("var(--tpl-emerald-paper)");
   });

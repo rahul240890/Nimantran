@@ -59,12 +59,13 @@ Added with the owner's approval: a waitlist sign-up, a hero that opens as you sc
 
 ## Phase 1 — MVP (weddings in India)
 
-**Step 4. 3D invitation engine** _(this step)_
+**Step 4. 3D invitation engine**
 Port the prototype into React Three Fiber. Card formats as components (gate-fold first). Themes, petals, lanterns, music. Automatic quality levels and 2D fallback.
 Built as: a 2D card that paints at once, with the WebGL scene loaded behind it only on devices that can draw it; six themes matching the launch designs; music composed live in the browser from a raga (no audio downloads); a `/engine` review page.
 
-**Step 5. Template system**
+**Step 5. Template system** _(this step)_
 Template data schema (scene, colours, fonts, music, text slots). First 6 templates: Marigold Gate, Rose Garden, Emerald Palace, Royal Scroll, Minimal Monogram, Kerala Kasavu.
+Built as: a Zod-checked template schema with validated text slots; ornaments stored as vector data so the 2D card and the 3D card draw identical art; one word layout shared by both; each design with its own ornaments, stock, type and raga (six ragas); a `/templates` review page. All six open as gate-folds for now.
 
 **Step 6. Invite editor**
 Step-by-step editor: choose template → couple details → functions (haldi, mehendi, sangeet, wedding, reception) with date, time, venue, dress code → photos and music → preview. Live 3D preview beside the form; autosave drafts.

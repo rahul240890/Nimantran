@@ -4,7 +4,7 @@
  * This file holds the composition (pure and unit tested); music-player.ts makes the sound.
  */
 
-import type { MusicTrackId } from "./themes";
+import type { RagaId } from "@/lib/templates/schema";
 
 export type Raga = {
   name: string;
@@ -18,7 +18,7 @@ export type Raga = {
   tempo: number;
 };
 
-export const RAGAS: Record<MusicTrackId, Raga> = {
+export const RAGAS: Record<RagaId, Raga> = {
   // Evening, romantic: every note natural except the sharp Ma
   yaman: {
     name: "Yaman",
@@ -26,6 +26,30 @@ export const RAGAS: Record<MusicTrackId, Raga> = {
     down: [0, 2, 4, 6, 7, 9, 11],
     rest: [4, 11, 0, 7],
     tempo: 68,
+  },
+  // Light and romantic, a thumri favourite: plain Ni going up, soft Ni coming down
+  khamaj: {
+    name: "Khamaj",
+    up: [0, 4, 5, 7, 9, 11],
+    down: [0, 2, 4, 5, 7, 9, 10],
+    rest: [4, 9, 0, 7],
+    tempo: 70,
+  },
+  // Late evening, a wedding raga: no Re or Dha going up, both coming down
+  bihag: {
+    name: "Bihag",
+    up: [0, 4, 5, 7, 11],
+    down: [0, 2, 4, 5, 7, 9, 11],
+    rest: [4, 11, 0, 7],
+    tempo: 62,
+  },
+  // Auspicious, sung to close a Carnatic concert: Sa Ri Ma Pa and a soft Ni
+  madhyamavati: {
+    name: "Madhyamavati",
+    up: [0, 2, 5, 7, 10],
+    down: [0, 2, 5, 7, 10],
+    rest: [2, 7, 0, 5],
+    tempo: 72,
   },
   // Bright and joyful: five notes, no Ma or Ni (Mohanam in the south)
   bhupali: {
