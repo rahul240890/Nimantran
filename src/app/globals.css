@@ -31,7 +31,7 @@
   /* Text */
   --ink: #2a1a24;
   --ink-muted: #6b5864;
-  --ink-faint: #8f7c87;
+  --ink-faint: #8f7c87; /* non-text or large text only: 3.6:1 on paper */
 
   /* Brand */
   --marigold: #f0a431;
@@ -51,10 +51,12 @@
 
   /* Invitation card stock: the same in both themes, like real paper */
   --card-ivory: #f8efdc;
-  --card-gold: #b8862f;
+  --card-gold: #b8862f; /* borders and ornaments */
+  --card-gold-text: #86611c; /* text: 4.9:1 on ivory */
   --card-ink: #3b2230;
   --card-ink-muted: #6b5160;
-  --card-accent: #d9741c;
+  --card-accent: #d9741c; /* ornaments */
+  --card-accent-text: #a14e0c; /* text: 5.1:1 on ivory */
   --card-back: #7d1d3a;
 }
 
@@ -123,9 +125,11 @@
   --color-ring: var(--ring);
   --color-card-ivory: var(--card-ivory);
   --color-card-gold: var(--card-gold);
+  --color-card-gold-text: var(--card-gold-text);
   --color-card-ink: var(--card-ink);
   --color-card-ink-muted: var(--card-ink-muted);
   --color-card-accent: var(--card-accent);
+  --color-card-accent-text: var(--card-accent-text);
   --color-card-back: var(--card-back);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;

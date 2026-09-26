@@ -5,3 +5,5 @@ next-env.d.ts
 coverage
 public
 AGENTS.md
+test-results
+playwright-report

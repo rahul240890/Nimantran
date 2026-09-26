@@ -32,9 +32,10 @@ export default function HomePage() {
 
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 lg:px-8">
         <Logo />
-        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1.5 text-sm text-ink-muted">
+        {/* Below 360px the logo and label don't fit side by side, so only the dot shows */}
+        <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-line bg-surface/70 px-3 py-1.5 text-sm whitespace-nowrap text-ink-muted max-[359px]:p-2.5">
           <span aria-hidden className="size-2 rounded-full bg-marigold" />
-          In development
+          <span className="max-[359px]:sr-only">In development</span>
         </span>
       </header>
 

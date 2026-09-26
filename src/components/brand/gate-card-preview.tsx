@@ -45,10 +45,10 @@ function Door({ side, open, label, initial }: DoorProps) {
             isLeft ? "right-0 translate-x-1/2" : "left-0 -translate-x-1/2",
           )}
         />
-        <span className="absolute inset-x-0 top-[12%] text-center font-label text-[2.6cqw] tracking-[0.35em] text-card-gold">
+        <span className="absolute inset-x-0 top-[12%] text-center font-label text-[2.6cqw] tracking-[0.35em] text-card-gold-text">
           {label}
         </span>
-        <span className="absolute inset-x-0 bottom-[8%] text-center font-display text-[8cqw] leading-none text-card-accent">
+        <span className="absolute inset-x-0 bottom-[8%] text-center font-display text-[8cqw] leading-none text-card-accent-text">
           {initial}
         </span>
         {/* Soft shadow where the doors meet */}
@@ -125,11 +125,13 @@ export function GateCardPreview({ className }: GateCardPreviewProps) {
           >
             <span className="absolute inset-[2.5%] rounded-[4px] border-2 border-card-gold" />
             <span className="absolute inset-[4%] rounded-[2px] border border-card-gold/60" />
-            <span className="font-label text-[2.9cqw] tracking-[0.3em] text-card-gold">
+            <span className="font-label text-[2.9cqw] tracking-[0.3em] text-card-gold-text">
               TOGETHER WITH THEIR FAMILIES
             </span>
             <span className="mt-[3%] font-display text-[8.5cqw] leading-[1.05]">Aarav</span>
-            <span className="font-display text-[5cqw] leading-none text-card-accent">&amp;</span>
+            <span className="font-display text-[5cqw] leading-none text-card-accent-text">
+              &amp;
+            </span>
             <span className="font-display text-[8.5cqw] leading-[1.05]">Meera</span>
             <span className="mt-[3%] text-[3.5cqw] text-card-ink-muted italic">
               invite you to celebrate their wedding
@@ -137,7 +139,7 @@ export function GateCardPreview({ className }: GateCardPreviewProps) {
             <span className="mt-[4%] font-label text-[3.4cqw] tracking-[0.12em]">
               SATURDAY, 12 DECEMBER 2026
             </span>
-            <span className="mt-[1.5%] font-display text-[4.2cqw] text-card-accent">
+            <span className="mt-[1.5%] font-display text-[4.2cqw] text-card-accent-text">
               Pichola Lakeside Gardens, Udaipur
             </span>
           </span>
