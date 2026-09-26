@@ -105,6 +105,7 @@ export const templates = {
   listLabel: "Invitation designs",
   previous: "Previous designs",
   next: "Next designs",
+  tryEditor: "Try the editor",
   items: [
     { id: "marigold", name: "Marigold Gate", kind: "Gate fold", tone: "gold" },
     { id: "rose", name: "Rose Garden", kind: "Flat card", tone: "rose" },
