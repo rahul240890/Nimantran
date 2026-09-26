@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Check, CloudOff, Eye, HardDrive, LoaderCircle } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { AccountMenu } from "@/components/account/account-menu";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
@@ -195,6 +196,7 @@ export function Editor({
           <div className="flex min-w-0 items-center gap-3 sm:gap-5">
             <SaveStatus state={save} />
             <ThemeToggle labels={uiStrings.theme} />
+            <AccountMenu compact />
           </div>
         </div>
       </header>

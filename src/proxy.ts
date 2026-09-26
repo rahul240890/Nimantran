@@ -1,14 +1,46 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { authMode } from "@/lib/auth/mode";
+import { PREVIEW_COOKIE, openPreviewSession } from "@/lib/auth/preview-session";
 import { parseRegion } from "@/lib/categories/rank";
 import { REGION_COOKIE } from "@/lib/categories/regions";
+import { refreshSupabaseSession } from "@/lib/supabase/proxy";
 
-/*
- * Remembers which Indian state a visitor is in, from the hosting platform's location
- * headers, so the home screen and the editor can put local occasions first. Only the
- * state is kept, for a day; nothing is stored on the server.
+/** Pages that need someone signed in. */
+const PRIVATE = ["/invites", "/account"];
+
+function isPrivate(pathname: string) {
+  return PRIVATE.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
+/**
+ * Runs before the pages below. Keeps the sign-in session fresh, sends signed-out visitors
+ * from account pages to sign in (and back afterwards), and remembers which Indian state a
+ * visitor is in so local occasions come first. Only the state is kept, for a day.
  */
-export function proxy(request: NextRequest) {
-  const response = NextResponse.next();
+export async function proxy(request: NextRequest) {
+  const mode = authMode();
+  const { pathname, search } = request.nextUrl;
+  let response = NextResponse.next({ request });
+  let signedIn = false;
+
+  // The landing page reads who is signed in from a hint cookie, so it skips this
+  if (mode === "supabase" && pathname !== "/") {
+    const refreshed = await refreshSupabaseSession(request, () => NextResponse.next({ request }));
+    response = refreshed.response;
+    signedIn = refreshed.signedIn;
+  } else if (mode === "preview") {
+    signedIn = Boolean(await openPreviewSession(request.cookies.get(PREVIEW_COOKIE)?.value));
+  }
+
+  if (isPrivate(pathname) && !signedIn) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/sign-in";
+    url.search = `?next=${encodeURIComponent(pathname + search)}`;
+    const redirect = NextResponse.redirect(url);
+    for (const cookie of response.cookies.getAll()) redirect.cookies.set(cookie);
+    return redirect;
+  }
+
   const country = request.headers.get("x-vercel-ip-country");
   const region =
     country === "IN" ? parseRegion(request.headers.get("x-vercel-ip-country-region")) : null;
@@ -26,5 +58,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/create"],
+  matcher: ["/", "/create", "/sign-in", "/auth/:path*", "/invites/:path*", "/account/:path*"],
 };

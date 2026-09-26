@@ -91,8 +91,9 @@ Built as: a Zod-checked category schema and catalogue (`src/lib/categories`) nam
 **Step 6. Invite editor** ✅
 Step-by-step editor: choose category and template → couple details → functions (roka, haldi, mehendi, sangeet, wedding, reception) with date, time, venue, dress code → photos and music → preview. Live 3D preview beside the form; autosave drafts.
 
-**Step 7. Accounts**
+**Step 7. Accounts** ✅
 Phone OTP and Google sign-in via Supabase. Profile, my invites list.
+Built as: `/sign-in` (mobile number with a 6-digit SMS code that fills itself from the SMS, or Google), `/account` (name and preferred language), `/invites` (the draft on this device until Step 8 stores invites in the account) and an account menu in every header. All sign-in calls go through `src/lib/auth/server.ts`; the proxy keeps the Supabase session fresh and sends signed-out visitors to sign in and back. A small readable cookie tells static pages who is signed in without a request. Without Supabase keys the site says accounts open soon; tests and local work use a preview mode (any number, code 123456) that can never run on the live site.
 
 **Step 8. Database and security**
 Tables: users, events, event_hosts (co-hosts), functions, categories, templates, guests, rsvps, rsvp_questions, scheduled_sends, media. Row Level Security so hosts and co-hosts see only their own events. Migrations and seed data.
