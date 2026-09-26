@@ -11,6 +11,7 @@ import { nav, shell } from "@/content/landing";
 import { cn } from "@/lib/cn";
 import { uiStrings } from "@/lib/ui-strings";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { AccountMenu } from "@/components/account/account-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useActiveSection } from "./use-active-section";
 
@@ -132,7 +133,7 @@ export function SiteHeader() {
         {/* Below 360px only the mandala shows, so the actions fit beside it */}
         <Logo className="shrink-0 max-[359px]:[&>span]:sr-only" />
 
-        <nav aria-label={shell.primaryNav} className="ms-6 hidden lg:block">
+        <nav aria-label={shell.primaryNav} className="ms-6 hidden xl:block">
           <ul className="flex items-center gap-1">
             {nav.map((item) => (
               <li key={item.id}>
@@ -156,12 +157,13 @@ export function SiteHeader() {
         </nav>
 
         <div className="ms-auto flex items-center gap-2">
-          <LanguageSwitcher className="hidden lg:inline-flex" />
-          <ThemeToggle labels={uiStrings.theme} className="hidden lg:inline-flex" />
-          <Button asChild size="sm" className="hidden sm:inline-flex lg:ms-2">
+          <LanguageSwitcher className="hidden xl:inline-flex" />
+          <ThemeToggle labels={uiStrings.theme} className="hidden xl:inline-flex" />
+          <AccountMenu compact />
+          <Button asChild size="sm" className="hidden sm:inline-flex xl:ms-2">
             <a href="#waitlist">{shell.joinWaitlistShort}</a>
           </Button>
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <MobileMenu />
           </div>
         </div>
