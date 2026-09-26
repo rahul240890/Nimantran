@@ -201,4 +201,33 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("heading", { name: "Make it yours" })).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
   });
+
+  test("the button bar fits common phone widths on every step", async ({ browser }, info) => {
+    test.skip(info.project.name !== "phone-320", "phones only");
+    for (const width of [360, 375, 414]) {
+      // A fresh phone each time, so no saved draft or step carries over
+      const context = await browser.newContext({
+        viewport: { width, height: 760 },
+        reducedMotion: "reduce",
+      });
+      const page = await context.newPage();
+      await page.clock.setFixedTime(new Date("2026-09-26T10:00:00"));
+      await page.goto("/create?quality=2d");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+      expect(await noOverflow(page)).toBe(true);
+      await next(page); // design: Back, Preview and Continue share the bar
+      await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
+      expect(await noOverflow(page)).toBe(true);
+      await next(page);
+      await fillCouple(page);
+      await next(page);
+      await fillWedding(page);
+      await next(page);
+      expect(await noOverflow(page)).toBe(true);
+      await next(page);
+      await expect(page.getByText("Your invitation is ready")).toBeVisible();
+      expect(await noOverflow(page)).toBe(true);
+      await context.close();
+    }
+  });
 });

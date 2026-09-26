@@ -9,6 +9,15 @@ say they open soon) until the three keys below are set.
 - `src/lib/db/schema.test.ts` runs the migrations and seed in an in-memory Postgres and checks
   every access rule, so `npm test` covers them without a Supabase project.
 
+## Updating the live project
+
+When a pull request adds a file to `migrations/`, open SQL Editor in Supabase, paste that
+file's contents and run it once. Migrations only add or widen, so running one on the live
+database keeps every invite. Applied so far after the first setup:
+
+- `20260926170000_traditions_ready.sql` — ready for tradition packs (any ceremony id, local
+  ceremony names, end times, a tradition and card languages per invite).
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).

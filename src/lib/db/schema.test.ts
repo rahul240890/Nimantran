@@ -266,7 +266,7 @@ describe("what an event contains", () => {
   it("checks what goes in", async () => {
     await expect(
       t.as(priya, () =>
-        q("insert into functions (event_id, kind) values ($1, 'party')", [wedding]),
+        q("insert into functions (event_id, kind) values ($1, 'Big Party!')", [wedding]),
       ),
     ).rejects.toThrow(/check constraint/);
     await expect(
@@ -281,6 +281,29 @@ describe("what an event contains", () => {
           [wedding],
         ),
       ),
+    ).rejects.toThrow(/check constraint/);
+  });
+
+  it("is ready for tradition packs: any ceremony id, local names and card languages", async () => {
+    const [fn] = await t.as(priya, () =>
+      q<{ name: string; end_time: string }>(
+        "insert into functions (event_id, kind, name, start_time, end_time) values ($1, 'nalangu', 'Nalangu', '09:00', '10:30') returning name, end_time",
+        [wedding],
+      ),
+    );
+    expect(fn).toEqual({ name: "Nalangu", end_time: "10:30:00" });
+    const [event] = await t.as(priya, () =>
+      q<{ languages: string[]; religious: object }>(
+        "update events set tradition_id = 'tamil-hindu', languages = '{ta,en}', religious = '{\"art\":\"ganesha\"}' where id = $1 returning languages, religious",
+        [wedding],
+      ),
+    );
+    expect(event).toEqual({ languages: ["ta", "en"], religious: { art: "ganesha" } });
+    await expect(
+      t.as(priya, () => q("update events set languages = '{ta,en,hi}' where id = $1", [wedding])),
+    ).rejects.toThrow(/check constraint/);
+    await expect(
+      t.as(priya, () => q("update events set languages = '{xx}' where id = $1", [wedding])),
     ).rejects.toThrow(/check constraint/);
   });
 

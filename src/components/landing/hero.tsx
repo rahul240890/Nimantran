@@ -1,4 +1,5 @@
 import { ArrowDown, Check } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { hero } from "@/content/landing";
 import { HeroInvite } from "./hero-invite";
@@ -29,7 +30,7 @@ export function Hero() {
           <p className="max-w-[34rem] text-lg text-ink-muted sm:text-xl">{hero.body}</p>
           <div className="flex flex-col gap-3 min-[400px]:flex-row min-[400px]:flex-wrap">
             <Button asChild size="lg">
-              <a href="#waitlist">{hero.primary}</a>
+              <Link href="/create">{hero.primary}</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
               <a href="#how-it-works">

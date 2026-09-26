@@ -1,12 +1,13 @@
 "use client";
 
 import { Menu } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeMenu, ThemeToggle } from "@/components/ui/theme-toggle";
 import { nav, shell } from "@/content/landing";
 import { cn } from "@/lib/cn";
 import { uiStrings } from "@/lib/ui-strings";
@@ -87,15 +88,21 @@ function MobileMenu() {
             </p>
             <ThemeToggle labels={uiStrings.theme} className="self-start" />
           </div>
-          <Button
-            fullWidth
-            onClick={() => {
-              pending.current = "waitlist";
-              setOpen(false);
-            }}
-          >
-            {shell.joinWaitlist}
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button asChild fullWidth>
+              <Link href="/create">{shell.createInvite}</Link>
+            </Button>
+            <Button
+              fullWidth
+              variant="secondary"
+              onClick={() => {
+                pending.current = "waitlist";
+                setOpen(false);
+              }}
+            >
+              {shell.joinWaitlist}
+            </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
@@ -133,20 +140,20 @@ export function SiteHeader() {
         {/* Below 360px only the mandala shows, so the actions fit beside it */}
         <Logo className="shrink-0 max-[359px]:[&>span]:sr-only" />
 
-        <nav aria-label={shell.primaryNav} className="ms-6 hidden xl:block">
-          <ul className="flex items-center gap-1">
+        <nav aria-label={shell.primaryNav} className="ms-4 hidden min-w-0 xl:block">
+          <ul className="flex items-center">
             {nav.map((item) => (
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
                   aria-current={active === item.id ? "true" : undefined}
-                  className="relative inline-flex min-h-11 items-center rounded-full px-3.5 text-[0.95rem] font-semibold text-ink-muted transition-colors hover:text-ink aria-[current=true]:text-ink"
+                  className="relative inline-flex min-h-11 items-center rounded-full px-3 text-[0.95rem] font-semibold whitespace-nowrap text-ink-muted transition-colors hover:text-ink aria-[current=true]:text-ink"
                 >
                   {item.label}
                   <span
                     aria-hidden
                     className={cn(
-                      "absolute inset-x-3.5 bottom-1.5 h-0.5 origin-center rounded-full bg-marigold transition-transform duration-300 ease-out-expo",
+                      "absolute inset-x-3 bottom-1.5 h-0.5 origin-center rounded-full bg-marigold transition-transform duration-300 ease-out-expo",
                       active === item.id ? "scale-x-100" : "scale-x-0",
                     )}
                   />
@@ -156,12 +163,12 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="ms-auto flex items-center gap-2">
+        <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
           <LanguageSwitcher className="hidden xl:inline-flex" />
-          <ThemeToggle labels={uiStrings.theme} className="hidden xl:inline-flex" />
+          <ThemeMenu labels={uiStrings.theme} className="hidden xl:inline-flex" />
           <AccountMenu compact />
-          <Button asChild size="sm" className="hidden sm:inline-flex xl:ms-2">
-            <a href="#waitlist">{shell.joinWaitlistShort}</a>
+          <Button asChild size="sm" className="hidden whitespace-nowrap sm:inline-flex xl:ms-1">
+            <Link href="/create">{shell.createInviteShort}</Link>
           </Button>
           <div className="xl:hidden">
             <MobileMenu />

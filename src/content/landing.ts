@@ -37,7 +37,8 @@ export const shell = {
   openMenu: "Open menu",
   menuTitle: "Menu",
   joinWaitlist: "Join the waitlist",
-  joinWaitlistShort: "Join waitlist",
+  createInvite: "Start your invite",
+  createInviteShort: "Create invite",
   language: {
     label: "Language",
     current: "Language: English",
@@ -58,11 +59,11 @@ export const hero = {
   eyebrow: "Shubh aarambh · early access",
   title: "Invitations your guests open, turn and keep.",
   body: "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings first.",
-  primary: "Join the waitlist",
+  primary: "Start your invite",
   secondary: "See how it works",
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
   hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
-  proof: ["No app to install", "RSVP in one tap", "10 Indian languages"],
+  proof: ["No app to install", "RSVP in one tap", "A raga in every design"],
   card: {
     doors: ["SHUBH", "VIVAH"],
     blessing: "",
@@ -74,6 +75,17 @@ export const hero = {
     date: "SATURDAY, 12 DECEMBER 2026",
     venue: "Pichola Lakeside Gardens, Udaipur",
   },
+} as const;
+
+export const musicDemo = {
+  label: "Hear an invitation",
+  body: "Every design plays its own raga, composed live on your guest's phone. Nothing to download.",
+  play: (design: string) => `Play the music for ${design}`,
+  pause: "Pause the music",
+  choose: "Design",
+  chooseLabel: "Choose whose music to hear",
+  raga: (name: string) => `Raga ${name}`,
+  failed: "This browser can't play the music.",
 } as const;
 
 export const howItWorks = {
@@ -102,18 +114,18 @@ export const templates = {
   eyebrow: "Designs",
   title: "Designs that feel like card stock",
   intro:
-    "Six designs at launch, each with its own opening, music and details. Here is a first look.",
+    "Six designs to start, each with its own ornaments, card stock and raga. Colourful regional designs follow with tradition packs.",
   listLabel: "Invitation designs",
   previous: "Previous designs",
   next: "Next designs",
   tryEditor: "Try the editor",
   items: [
-    { id: "marigold", name: "Marigold Gate", kind: "Gate fold", tone: "gold" },
-    { id: "rose", name: "Rose Garden", kind: "Flat card", tone: "rose" },
-    { id: "emerald", name: "Emerald Palace", kind: "Arch", tone: "success" },
-    { id: "scroll", name: "Royal Scroll", kind: "Scroll", tone: "gold" },
-    { id: "monogram", name: "Minimal Monogram", kind: "Flat card", tone: "neutral" },
-    { id: "kasavu", name: "Kerala Kasavu", kind: "Gate fold", tone: "gold" },
+    { id: "marigold", name: "Marigold Gate", kind: "Raga Yaman", tone: "gold" },
+    { id: "rose", name: "Rose Garden", kind: "Raga Khamaj", tone: "rose" },
+    { id: "emerald", name: "Emerald Palace", kind: "Raga Bihag", tone: "success" },
+    { id: "scroll", name: "Royal Scroll", kind: "Raga Desh", tone: "gold" },
+    { id: "monogram", name: "Minimal Monogram", kind: "Raga Bhupali", tone: "neutral" },
+    { id: "kasavu", name: "Kerala Kasavu", kind: "Raga Madhyamavati", tone: "gold" },
   ] satisfies { id: TemplateId; name: string; kind: string; tone: string }[],
   sample: { first: "Aarav", second: "Meera", date: "12 · XII · 2026", place: "Udaipur" },
 } as const;
@@ -164,6 +176,10 @@ export const faq = {
       a: "Yes. Ten Indian languages are planned for launch, and you can show two side by side so every elder can read it.",
     },
     {
+      q: "Can the card follow our family's traditions?",
+      a: "That is coming next. Choose your region and community and the card sets the right deity or symbol, invocation, ceremony names and wording order, all still editable. Packs are checked by people from each community before they go live.",
+    },
+    {
       q: "Can I change details after sending it?",
       a: "Yes. Edit the venue, time or any function and the same link shows the update. Guests never get a stale card.",
     },
@@ -173,7 +189,7 @@ export const faq = {
     },
     {
       q: "When can I start?",
-      a: "We are opening to couples in small groups. Join the waitlist and we will send you an invite as soon as your spot opens.",
+      a: "Today. Make your invite in the editor and sign in to keep it on every phone. Sharing with guests opens soon; join the waitlist and we will tell you the moment it does.",
     },
   ],
 } as const;

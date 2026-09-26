@@ -1,6 +1,7 @@
 import { PageTransition } from "@/components/motion/page-transition";
 import { Faq } from "@/components/landing/faq";
 import { Hero } from "@/components/landing/hero";
+import { MusicDemo } from "@/components/landing/music-demo";
 import { HowItWorks } from "@/components/landing/how-it-works";
 import { Occasions } from "@/components/landing/occasions";
 import { Pricing } from "@/components/landing/pricing";
@@ -15,6 +16,7 @@ export default function HomePage() {
       <div className="relative isolate flex min-h-dvh flex-col">
         <SiteHeader />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
+          <MusicDemo />
           <Hero />
           <HowItWorks />
           <Occasions />
