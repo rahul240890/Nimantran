@@ -44,6 +44,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("Namaste");
       await expect(page.getByText("Add your name")).toBeVisible();
       await expect(page.getByRole("heading", { name: "No invites yet" })).toBeVisible();
+      // The title streams in after a client-side move from sign-in
+      await expect(page).toHaveTitle(/My invites/);
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 
