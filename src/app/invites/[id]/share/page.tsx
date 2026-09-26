@@ -4,9 +4,11 @@ import QRCode from "qrcode";
 import { z } from "zod";
 import { AccountShell } from "@/components/account/account-shell";
 import { PageTransition } from "@/components/motion/page-transition";
+import { RepliesCard } from "@/components/publish/replies-card";
 import { SharePanel } from "@/components/publish/share-panel";
 import { shareCopy } from "@/content/publish";
 import { getAccount } from "@/lib/auth/server";
+import { hostReplies } from "@/lib/invites/rsvp";
 import { inviteStore } from "@/lib/invites/store";
 import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
@@ -55,6 +57,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           when={inviteWhen(draft)}
           message={shareCopy.message(names, occasion, inviteWhen(draft))}
           qr={await qrSvg(url)}
+          replies={<RepliesCard summary={await hostReplies(account, id)} />}
         />
       </AccountShell>
     </PageTransition>

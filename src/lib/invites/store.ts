@@ -1,7 +1,10 @@
 import "server-only";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
-import type { InviteDraft } from "@/lib/editor/draft";
+import { questionLabels } from "@/content/categories";
+import { RSVP_QUESTIONS } from "@/lib/categories/questions";
+import type { RsvpQuestionId } from "@/lib/categories/schema";
+import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
 import { supabaseServer } from "@/lib/supabase/server";
 import { previewDb, previewPhotoUrl } from "./preview-db";
 import {
@@ -47,10 +50,28 @@ const EVENT_COLUMNS =
   "id, category_id, template_id, status, slug, content, music, editor_step, updated_at";
 const FUNCTION_COLUMNS = "kind, position, date, start_time, venue, address, dress_code";
 const MEDIA_COLUMNS = "id, width, height, position";
+const QUESTION_COLUMNS = "preset";
 const BUCKET = "event-media";
 const PHOTO_LINK_SECONDS = 60 * 60;
 
-type Joined = EventRow & { functions: FunctionRow[]; media?: PhotoRow[] };
+/** A library question as the rsvp_questions table stores it. */
+function questionRow(eventId: string, preset: RsvpQuestionId, position: number) {
+  const spec = RSVP_QUESTIONS[preset];
+  return {
+    event_id: eventId,
+    preset,
+    kind: spec.kind,
+    label: questionLabels[preset],
+    options: spec.options ?? [],
+    position,
+  };
+}
+
+type Joined = EventRow & {
+  functions: FunctionRow[];
+  media?: PhotoRow[];
+  rsvp_questions?: { preset: string | null }[];
+};
 
 const supabaseStore: InviteStore = {
   async list() {
@@ -74,12 +95,19 @@ const supabaseStore: InviteStore = {
     if (!supabase) return null;
     const { data, error } = await supabase
       .from("events")
-      .select(`${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), media(${MEDIA_COLUMNS})`)
+      .select(
+        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), media(${MEDIA_COLUMNS}), rsvp_questions(${QUESTION_COLUMNS})`,
+      )
       .eq("id", id)
       .maybeSingle();
     if (error || !data) return null;
-    const { functions, media, ...event } = data as Joined;
-    return rowsToDraft(event, functions, media ?? []);
+    const { functions, media, rsvp_questions: questions, ...event } = data as Joined;
+    return rowsToDraft(
+      event,
+      functions,
+      media ?? [],
+      (questions ?? []).flatMap((row) => (row.preset ? [row.preset] : [])),
+    );
   },
 
   async save(account, draft) {
@@ -111,6 +139,32 @@ const supabaseStore: InviteStore = {
         functions.map((row) => ({ ...row, event_id: id })),
         { onConflict: "event_id,kind" },
       );
+      if (error) return { ok: false };
+    }
+
+    // The RSVP's questions: add the new ones and drop the ones taken out
+    const questions = draftQuestions(draft);
+    const { data: asked, error: askedError } = await supabase
+      .from("rsvp_questions")
+      .select("id, preset")
+      .eq("event_id", id)
+      .not("preset", "is", null);
+    if (askedError || !asked) return { ok: false };
+    const dropped = asked.filter((row) => !questions.includes(row.preset as RsvpQuestionId));
+    if (dropped.length) {
+      await supabase
+        .from("rsvp_questions")
+        .delete()
+        .in(
+          "id",
+          dropped.map((row) => row.id as string),
+        );
+    }
+    const added = questions.filter((preset) => !asked.some((row) => row.preset === preset));
+    if (added.length) {
+      const { error } = await supabase
+        .from("rsvp_questions")
+        .insert(added.map((preset) => questionRow(id, preset, questions.indexOf(preset))));
       if (error) return { ok: false };
     }
 
@@ -259,7 +313,7 @@ const previewStore: InviteStore = {
   async get(account, id) {
     const stored = previewDb.invites.get(id);
     return stored && stored.owner === account.id
-      ? rowsToDraft(stored.event, stored.functions, stored.photos)
+      ? rowsToDraft(stored.event, stored.functions, stored.photos, stored.questions)
       : null;
   },
   async save(account, draft) {
@@ -286,6 +340,7 @@ const previewStore: InviteStore = {
       },
       functions,
       photos,
+      questions: draftQuestions(draft),
       publishedAt: mine?.publishedAt ?? null,
     });
     const stored = new Set(photos.map((photo) => photo.id));

@@ -83,7 +83,8 @@ export const stepCopy: Record<
     label: "Photos & music",
     eyebrow: "Photos and music",
     title: "Make it yours",
-    intro: "Add a few photos for your guests, and choose the raga that plays as the card opens.",
+    intro:
+      "Add a few photos for your guests, choose the raga that plays as the card opens, and pick what the RSVP asks.",
   },
   preview: {
     label: "Preview",
@@ -150,7 +151,7 @@ export const functionFields = {
   more: "More functions",
   moreHint: "Add any other function you're inviting guests to.",
   address: "Address or map link",
-  addressHint: "Guests get a map button in Step 10.",
+  addressHint: "Guests get a directions button on the invitation.",
   dressCode: "Dress code",
   dressIdeas: "Dress code ideas",
   onCard: "On the card",
@@ -185,6 +186,16 @@ export const extrasCopy = {
   designsOwn: "Design's own",
   playOnOpen: "Play music when guests open the card",
   playOnOpenHint: "Guests can pause it at any time.",
+  questionsHeading: "Questions for guests",
+  questionsHint:
+    "Every reply says who's coming to each function and can include a note. Tick anything else you'd like to know.",
+  questionHints: {
+    meal: "Vegetarian, Jain, non-vegetarian or vegan",
+    arrival: "The day they reach the city",
+    stay: "Whether they need a room",
+    pickup: "Whether they need picking up from the station or airport",
+    song: "A song they'd love to hear",
+  },
   ragaMoods: {
     yaman: "Evening, romantic",
     khamaj: "Light and tender",

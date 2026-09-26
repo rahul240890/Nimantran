@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { z } from "zod";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
-import type { Category } from "@/lib/categories/schema";
+import { RSVP_QUESTION_IDS, type Category, type RsvpQuestionId } from "@/lib/categories/schema";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { contentSchema, toCardCopy, type CardCopy } from "@/lib/templates/content";
@@ -95,6 +95,8 @@ export const draftSchema = z.object({
   remoteId: z.uuid().nullable().catch(null),
   /** The live link, /i/<slug>, once published (Step 9). Null for drafts. */
   slug: z.string().nullable().catch(null),
+  /** What the RSVP asks besides who's coming (Step 10). Null uses the occasion's own. */
+  questions: z.array(z.enum(RSVP_QUESTION_IDS)).nullable().catch(null),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
@@ -121,6 +123,7 @@ export function newDraft(
     updatedAt: 0,
     remoteId: null,
     slug: null,
+    questions: null,
   };
 }
 
@@ -274,4 +277,16 @@ export function draftProblems(draft: InviteDraft): { step: EditorStep; count: nu
     step,
     count: Object.keys(stepErrors(draft, step)).length,
   })).filter((entry) => entry.count > 0);
+}
+
+/**
+ * Questions a host can add to the RSVP. Every reply already has room for a note, so the
+ * "message" question isn't offered separately.
+ */
+export const ASKABLE_QUESTIONS = RSVP_QUESTION_IDS.filter((id) => id !== "message");
+
+/** The questions this invite's RSVP asks, in a fixed order. */
+export function draftQuestions(draft: InviteDraft): RsvpQuestionId[] {
+  const chosen: readonly RsvpQuestionId[] = draft.questions ?? draftCategory(draft).rsvpQuestions;
+  return ASKABLE_QUESTIONS.filter((id) => chosen.includes(id));
 }

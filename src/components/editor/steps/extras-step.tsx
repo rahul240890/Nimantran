@@ -8,8 +8,10 @@ import { IconButton } from "@/components/ui/icon-button";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { questionLabels } from "@/content/categories";
 import { extrasCopy } from "@/content/editor";
-import { MAX_PHOTOS } from "@/lib/editor/draft";
+import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATES } from "@/lib/templates/catalog";
@@ -242,11 +244,50 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
+function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const asked = draftQuestions(draft);
+  return (
+    <section
+      aria-labelledby="questions-heading"
+      className="flex flex-col gap-3 border-t border-line pt-6"
+    >
+      <div className="flex flex-col gap-1">
+        <h2 id="questions-heading" className="font-display text-xl">
+          {extrasCopy.questionsHeading}
+        </h2>
+        <p className="text-sm text-ink-muted">{extrasCopy.questionsHint}</p>
+      </div>
+      <ul aria-labelledby="questions-heading" className="flex flex-col">
+        {ASKABLE_QUESTIONS.map((id) => (
+          <li key={id}>
+            <Checkbox
+              label={questionLabels[id]}
+              description={extrasCopy.questionHints[id]}
+              checked={asked.includes(id)}
+              onCheckedChange={(checked) =>
+                update((current) => {
+                  const now = draftQuestions(current);
+                  const next = checked === true ? [...now, id] : now.filter((q) => q !== id);
+                  return {
+                    ...current,
+                    questions: ASKABLE_QUESTIONS.filter((q) => next.includes(q)),
+                  };
+                })
+              }
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 export function ExtrasStep({ draft, update }: StepProps) {
   return (
     <div className="flex flex-col gap-8">
       <Photos draft={draft} update={update} />
       <Music draft={draft} update={update} />
+      <Questions draft={draft} update={update} />
     </div>
   );
 }

@@ -2,10 +2,11 @@ import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
+import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { functionCopy } from "@/content/editor";
 import { isQualityChoice } from "@/content/engine-review";
 import { guestCopy } from "@/content/publish";
-import { includedFunctions, needsTime } from "@/lib/editor/draft";
+import { draftQuestions, includedFunctions, needsTime } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
@@ -19,7 +20,10 @@ import { inviteUrl, mapsUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 import { formatTime } from "@/lib/time";
 
-/* A guest's invitation: the 3D card, then each function with directions and calendar. */
+/*
+ * A guest's invitation: the 3D card, each function with directions and calendar, then the
+ * reply form.
+ */
 
 export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -67,8 +71,16 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
     };
   });
 
+  const rsvpFunctions: RsvpFunction[] = includedFunctions(draft).flatMap((kind) => {
+    const id = invite.functionIds[kind];
+    return id
+      ? [{ id, kind, name: functionCopy[kind].name, date: draft.functions[kind].date }]
+      : [];
+  });
+
   return (
     <GuestView
+      slug={invite.slug}
       draft={draft}
       quality={isQualityChoice(quality) ? quality : "auto"}
       names={inviteNames(draft)}
@@ -76,6 +88,8 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
       functions={functions}
       photos={invite.photos}
       allIcsUrl={entries.length > 1 ? `/i/${invite.slug}/calendar` : null}
+      rsvpFunctions={rsvpFunctions}
+      questions={draftQuestions(draft)}
     />
   );
 }

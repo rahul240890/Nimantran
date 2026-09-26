@@ -1,10 +1,11 @@
 "use client";
 
-import { CalendarPlus, Clock, MapPin, Navigation, Shirt } from "lucide-react";
+import { CalendarPlus, Clock, MailCheck, MapPin, Navigation, Shirt } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Invitation } from "@/components/invitation/invitation";
+import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,8 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
-import { guestCopy } from "@/content/publish";
+import { guestCopy, rsvpCopy } from "@/content/publish";
 import { draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { uiStrings } from "@/lib/ui-strings";
@@ -34,6 +36,7 @@ export type GuestFunction = {
 };
 
 type GuestViewProps = {
+  slug: string;
   draft: InviteDraft;
   quality: QualityChoice;
   names: string;
@@ -41,9 +44,12 @@ type GuestViewProps = {
   functions: GuestFunction[];
   photos: PublicPhoto[];
   allIcsUrl: string | null;
+  rsvpFunctions: RsvpFunction[];
+  questions: RsvpQuestionId[];
 };
 
 export function GuestView({
+  slug,
   draft,
   quality,
   names,
@@ -51,6 +57,8 @@ export function GuestView({
   functions,
   photos,
   allIcsUrl,
+  rsvpFunctions,
+  questions,
 }: GuestViewProps) {
   const copy = useMemo(() => draftCopy(draft), [draft]);
   const template = useMemo(
@@ -99,7 +107,17 @@ export function GuestView({
               musicOnOpen={draft.music.playOnOpen}
             />
           </div>
-          {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
+          <div className="flex flex-col items-center gap-3">
+            {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
+            {rsvpFunctions.length > 0 && (
+              <Button asChild size="lg">
+                <a href="#rsvp">
+                  <MailCheck aria-hidden />
+                  {guestCopy.reply}
+                </a>
+              </Button>
+            )}
+          </div>
         </section>
 
         <section
@@ -161,6 +179,26 @@ export function GuestView({
                   </li>
                 ))}
               </ul>
+            </div>
+          </section>
+        )}
+        {rsvpFunctions.length > 0 && (
+          <section
+            id="rsvp"
+            aria-labelledby="guest-rsvp"
+            className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+          >
+            <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <h2
+                  id="guest-rsvp"
+                  className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                >
+                  {rsvpCopy.heading}
+                </h2>
+                <p className="text-ink-muted">{rsvpCopy.intro}</p>
+              </div>
+              <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} />
             </div>
           </section>
         )}
