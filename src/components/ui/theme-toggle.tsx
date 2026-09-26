@@ -3,6 +3,15 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 import { ToggleGroup } from "radix-ui";
 import { useSyncExternalStore } from "react";
+import { buttonClasses } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/cn";
 import { applyTheme, isThemeChoice, readTheme } from "@/lib/theme";
 
@@ -20,10 +29,16 @@ function subscribe(onChange: () => void): () => void {
   return () => observer.disconnect();
 }
 
+const choices = ["system", "light", "dark"] as const;
+
+/** The saved choice lives on <html>, set before paint; the server assumes "system". */
+function useThemeChoice() {
+  return useSyncExternalStore(subscribe, readTheme, () => "system" as const);
+}
+
 /** System, light or dark. The choice is remembered on this device. */
 export function ThemeToggle({ labels, className }: ThemeToggleProps) {
-  // The saved choice lives on <html>, set before paint; the server assumes "system"
-  const choice = useSyncExternalStore(subscribe, readTheme, () => "system" as const);
+  const choice = useThemeChoice();
 
   return (
     <ToggleGroup.Root
@@ -36,7 +51,7 @@ export function ThemeToggle({ labels, className }: ThemeToggleProps) {
       aria-label={labels.group}
       className={cn("inline-flex rounded-full border border-line bg-surface-2 p-1", className)}
     >
-      {(["system", "light", "dark"] as const).map((value) => {
+      {choices.map((value) => {
         const Icon = icons[value];
         return (
           <ToggleGroup.Item
@@ -51,5 +66,47 @@ export function ThemeToggle({ labels, className }: ThemeToggleProps) {
         );
       })}
     </ToggleGroup.Root>
+  );
+}
+
+/** The same choice behind one 44px button, for headers with little room. */
+export function ThemeMenu({ labels, className }: ThemeToggleProps) {
+  const choice = useThemeChoice();
+  const Icon = icons[choice];
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        aria-label={`${labels.group}: ${labels[choice]}`}
+        className={cn(
+          buttonClasses({ variant: "ghost", size: "sm" }),
+          "size-11 shrink-0 px-0 data-[state=open]:bg-surface-2",
+          className,
+        )}
+      >
+        <Icon aria-hidden />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56">
+        <DropdownMenuLabel>{labels.group}</DropdownMenuLabel>
+        <DropdownMenuRadioGroup
+          value={choice}
+          onValueChange={(value) => {
+            if (isThemeChoice(value)) applyTheme(value);
+          }}
+        >
+          {choices.map((value) => {
+            const ItemIcon = icons[value];
+            return (
+              <DropdownMenuRadioItem key={value} value={value}>
+                <span className="inline-flex items-center gap-2.5">
+                  <ItemIcon aria-hidden className="size-4.5 text-ink-muted" />
+                  {labels[value]}
+                </span>
+              </DropdownMenuRadioItem>
+            );
+          })}
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

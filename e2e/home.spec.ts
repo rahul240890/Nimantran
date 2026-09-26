@@ -128,9 +128,28 @@ test.describe("landing page", () => {
 
   test("the theme switch in the header applies", async ({ page }) => {
     await visit(page);
-    if (isPhone(page)) await page.getByRole("button", { name: "Open menu" }).click();
-    await page.getByRole("radio", { name: "Dark" }).click();
+    if (isPhone(page)) {
+      await page.getByRole("button", { name: "Open menu" }).click();
+      await page.getByRole("radio", { name: "Dark" }).click();
+    } else {
+      await page.getByRole("button", { name: /^Colour theme/ }).click();
+      await page.getByRole("menuitemradio", { name: "Dark" }).click();
+    }
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  });
+
+  test("the music strip plays a design's raga and pauses", async ({ page }) => {
+    await visit(page);
+    const strip = page.getByRole("region", { name: "Hear an invitation" });
+    await strip.getByRole("button", { name: "Choose whose music to hear" }).click();
+    await page.getByRole("menuitemradio", { name: /Kerala Kasavu/ }).click();
+    await expect(strip).toContainText("Kerala Kasavu · Raga Madhyamavati");
+    const play = strip.getByRole("button", { name: "Play the music for Kerala Kasavu" });
+    await play.click();
+    const pause = strip.getByRole("button", { name: "Pause the music" });
+    await expect(pause).toHaveAttribute("aria-pressed", "true");
+    await pause.click();
+    await expect(play).toHaveAttribute("aria-pressed", "false");
   });
 
   test("FAQ answers open and close", async ({ page }) => {

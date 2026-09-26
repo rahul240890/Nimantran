@@ -287,6 +287,7 @@
   --animate-float: float 7s ease-in-out infinite;
   --animate-petal-fall: petal-fall 11s linear infinite;
   --animate-petal-sway: petal-sway 3.6s ease-in-out infinite alternate;
+  --animate-sound-bar: sound-bar 0.9s ease-in-out infinite alternate;
 }
 
 /* Keyframes live outside @theme so page transitions and utilities can always use them */
@@ -390,6 +391,15 @@
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+/* The music strip's level bars rise and fall while a raga plays */
+@keyframes sound-bar {
+  from {
+    transform: scaleY(0.3);
+  }
+  to {
+    transform: scaleY(1);
   }
 }
 /* Petals fall the height of the stage while turning over; the inner element sways sideways */

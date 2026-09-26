@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Logo } from "@/components/brand/logo";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { uiStrings } from "@/lib/ui-strings";
 import { AccountMenu } from "./account-menu";
 
@@ -11,8 +11,8 @@ export function AccountShell({ children, menu = true }: { children: ReactNode; m
       <header className="sticky top-0 z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
           <Logo className="max-[359px]:[&>span]:sr-only" />
-          <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeToggle labels={uiStrings.theme} />
+          <div className="flex items-center gap-1 sm:gap-2">
+            <ThemeMenu labels={uiStrings.theme} />
             {menu && <AccountMenu />}
           </div>
         </div>

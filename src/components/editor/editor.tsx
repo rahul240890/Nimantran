@@ -18,7 +18,7 @@ import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { Stepper } from "@/components/ui/stepper";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { toast } from "@/components/ui/toast";
 import { editor, previewCopy, stepCopy, syncCopy } from "@/content/editor";
 import type { QualityChoice } from "@/content/engine-review";
@@ -282,7 +282,8 @@ export function Editor({
   );
 
   return (
-    <div className="flex min-h-dvh flex-col">
+    // Clipped sideways as a safety net: nothing here may widen the page on a phone
+    <div className="flex min-h-dvh flex-col overflow-x-clip">
       <header className="z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:sticky sm:top-0">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
@@ -291,14 +292,14 @@ export function Editor({
               {editor.headerLabel}
             </span>
           </div>
-          <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+          <div className="flex min-w-0 items-center gap-1 sm:gap-3">
             <SaveStatus
               state={save}
               sync={sync}
               signedIn={signedIn}
               edited={draft.updatedAt !== 0}
             />
-            <ThemeToggle labels={uiStrings.theme} />
+            <ThemeMenu labels={uiStrings.theme} />
             <AccountMenu compact />
           </div>
         </div>
@@ -382,16 +383,21 @@ export function Editor({
                     {editor.back}
                   </Button>
                 ) : null}
-                <div className="ms-auto flex items-center gap-3">
+                <div className="ms-auto flex min-w-0 items-center gap-2 sm:gap-3">
                   {!wide && !last && (
                     <Sheet>
                       <SheetTrigger asChild>
                         <Button
                           variant="ghost"
                           leadingIcon={<Eye aria-hidden />}
-                          className="max-[359px]:px-3"
+                          className={index > 0 ? "max-[479px]:px-3" : "max-[359px]:px-3"}
                         >
-                          <span className="max-[359px]:sr-only">{editor.showPreview}</span>
+                          {/* With Back beside it, only the eye fits on narrow phones */}
+                          <span
+                            className={index > 0 ? "max-[479px]:sr-only" : "max-[359px]:sr-only"}
+                          >
+                            {editor.showPreview}
+                          </span>
                         </Button>
                       </SheetTrigger>
                       <SheetContent title={editor.previewTitle} closeLabel={editor.close}>

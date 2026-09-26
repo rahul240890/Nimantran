@@ -37,7 +37,8 @@ export const shell = {
   openMenu: "Open menu",
   menuTitle: "Menu",
   joinWaitlist: "Join the waitlist",
-  joinWaitlistShort: "Join waitlist",
+  createInvite: "Start your invite",
+  createInviteShort: "Create invite",
   language: {
     label: "Language",
     current: "Language: English",
@@ -58,7 +59,7 @@ export const hero = {
   eyebrow: "Shubh aarambh · early access",
   title: "Invitations your guests open, turn and keep.",
   body: "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings first.",
-  primary: "Join the waitlist",
+  primary: "Start your invite",
   secondary: "See how it works",
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
   hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
@@ -74,6 +75,17 @@ export const hero = {
     date: "SATURDAY, 12 DECEMBER 2026",
     venue: "Pichola Lakeside Gardens, Udaipur",
   },
+} as const;
+
+export const musicDemo = {
+  label: "Hear an invitation",
+  body: "Every design plays its own raga, composed live on your guest's phone. Nothing to download.",
+  play: (design: string) => `Play the music for ${design}`,
+  pause: "Pause the music",
+  choose: "Design",
+  chooseLabel: "Choose whose music to hear",
+  raga: (name: string) => `Raga ${name}`,
+  failed: "This browser can't play the music.",
 } as const;
 
 export const howItWorks = {
