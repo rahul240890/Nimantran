@@ -2,7 +2,7 @@
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
-**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [MOTION.md](MOTION.md) (regional animation) · [PAYMENTS.md](PAYMENTS.md) (shagun, contributions, tickets) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [MOTION.md](MOTION.md) (regional animation) · [PAYMENTS.md](PAYMENTS.md) (shagun, contributions, tickets) · [PRICING.md](PRICING.md) (personal and business plans) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
@@ -156,8 +156,9 @@ Production Supabase, Vercel deploy, custom domain, analytics, error monitoring, 
 
 ## Phase 2 — Payments and editions
 
-**Step 15.** Editions (Free, Premium, Royal, Wedding bundle) and feature limits. Flat price per event in rupees; never coins or per-guest charges.
+**Step 15.** Plan catalogue and entitlements (spec: [PRICING.md](PRICING.md)): Free, Premium, Royal, Wedding bundle, Family Plus and business plans as data; per-event entitlement rows; limits enforced in the editor and guest pages. Flat price per event in rupees; never coins or per-guest charges.
 **Step 16.** Razorpay checkout (UPI, cards), receipts, GST invoices.
+**Step 16a.** Family Plus yearly plan (₹999): subscription through UPI AutoPay and cards, renewal reminders 7 days ahead, two-tap cancel, sharing with 4 family accounts, ₹500 off wedding passes.
 **Step 17.** Watermark on free invites, upgrade flow, coupons and festival offers.
 **Step 17a.** Card details included in editions: wax seals, tassels, foil, backgrounds, envelope and door styles.
 **Step 17b.** Shagun ledger with direct UPI (free): "Send shagun" opens the guest's UPI app with the family's UPI ID; UPI QR on desktop; self-reported ledger, manual cash entries, CSV export. No money through us. Spec: [PAYMENTS.md](PAYMENTS.md).
@@ -192,7 +193,8 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 
 **Step 25.** Business accounts for planners and printers: client workspaces, own branding, bulk edits. Business and education categories: shop openings, launches, office parties, dealer meets, college fests, convocations, fundraisers.
 **Step 25a.** Ticketing for paid events: ticket types, promo codes, QR tickets, check-in scanner, organiser payouts with our per-ticket commission (PAYMENTS.md).
-**Step 26.** Subscription billing (monthly/yearly).
+**Step 26.** Business Starter and Pro subscriptions (monthly and yearly, 14-day trial): team members, client workspaces and approval links, reseller pass purchases at 30% off, monthly AI and video allowances (PRICING.md).
+**Step 26a.** Enterprise: white-label on the partner's own domain, SSO, API access, custom pricing.
 **Step 27.** Print partner integration (printed card with QR to the 3D invite).
 **Step 27a.** Designer and artist collections with Indian designers, illustrators and textile brands (revenue share). Includes sacred art and regional designs by named artists.
 **Step 28.** Creator marketplace for template designers.
@@ -214,6 +216,7 @@ All in this folder, so every build session has them:
 - [PRODUCT.md](PRODUCT.md): what each step builds towards.
 - [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
 - [BRAND_SEO.md](BRAND_SEO.md): the Shubhdwar name decision, owner task B1, rename checklist (Step 8a), keyword clusters and SEO foundations (Step 12b), app store plan.
+- [PRICING.md](PRICING.md): personal passes, Family Plus, business plans, rules, revenue estimates and entitlements (Steps 15, 16, 16a, 17, 26, 26a).
 - [MOTION.md](MOTION.md): regional opening animations, per-function scenes, particles, drawn-on effects, diya countdown (Steps 12c, 21, 23).
 - [PAYMENTS.md](PAYMENTS.md): shagun ledger, platform payments with commission through a licensed provider, ticketing, trust and safety, legal review (Steps 17b, 18a, 25a, 32; owner task L1).
 - [TRADITIONS.md](TRADITIONS.md): tradition packs, sacred art library and respect rules (Steps 12a, 23, 27a and content task C1).

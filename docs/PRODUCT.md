@@ -130,35 +130,22 @@ _Open: PLAN_REVIEW.md recommends launching with English and Hindi first and addi
 - Seating, travel and stay details (Royal).
 - After the event: shared guest photo album, thank-you cards, memory gallery.
 
-## 9. Editions and pricing
+## 9. Plans and pricing
 
-Flat price per event. **Never coins, never per-guest charges.** Every link, free or paid, stays live until the last function date plus 7 days (from PLAN_REVIEW.md).
+Full detail, rules and entitlements: [PRICING.md](PRICING.md). Flat prices, never coins or per-guest charges; every link stays live until the last function date plus 7 days. Indian prices include GST.
 
-| Feature               | Free        | Premium                     | Royal                   | Business            |
-| --------------------- | ----------- | --------------------------- | ----------------------- | ------------------- |
-| Price (India)         | ₹0          | ₹499 / event                | ₹1,999 / event          | ₹999–₹2,999 / month |
-| Price (international) | $0          | $19                         | $59                     | $29–$79 / month     |
-| Templates             | 10 basic    | All standard                | All incl. exclusive     | All + white-label   |
-| Watermark             | Yes         | No                          | No                      | Own brand           |
-| Functions per invite  | 1           | Up to 3                     | Unlimited               | Unlimited           |
-| Languages per invite  | 1           | 2                           | 2 + wording in each     | All                 |
-| Guests with RSVP      | 50          | 500                         | Unlimited               | Unlimited           |
-| Music                 | 3 tracks    | Full library                | + own upload            | + own upload        |
-| Photos                | 3           | 20                          | Unlimited + video clips | Unlimited           |
-| AI wording            | 3 tries     | Unlimited                   | Unlimited               | Unlimited           |
-| AI couple art         | —           | 2 images                    | 10 images               | Per client          |
-| WhatsApp teaser video | —           | 1                           | All functions           | Unlimited           |
-| Guest dashboard       | Basic count | Full list, meals, plus-ones | + seating, travel, stay | Per client          |
-| Custom link           | —           | Yes                         | + own domain            | Yes                 |
-| Support               | Help centre | Chat                        | Personal designer       | Account manager     |
+**Personal, per event**
 
-**Wedding bundle** (all functions, Royal): ₹2,999 / $79.
+| Pass           | India  | International | For                                                                                         |
+| -------------- | ------ | ------------- | ------------------------------------------------------------------------------------------- |
+| Free           | ₹0     | $0            | Trying it: 1 function, basic designs, 50 RSVPs, watermark                                   |
+| Premium        | ₹499   | $9            | Most events: up to 3 functions, 500 RSVPs, 2 languages, no watermark                        |
+| Royal          | ₹1,999 | $29           | Big weddings: unlimited functions and guests, exclusive designs, seating and travel, AI art |
+| Wedding bundle | ₹2,999 | $49           | Royal for every function, plus save-the-date and thank-you cards                            |
 
-**Business Starter** ₹999/month or ₹9,999/year (freelance planners, photographers). **Business Pro** ₹2,999/month or ₹29,999/year (planners, print shops, venues): unlimited client invites, own logo and colours, client management, bulk edits, reseller pricing, monthly AI allowance.
+**Personal, yearly:** Family Plus ₹999/year ($29): unlimited Premium-level events for birthdays, anniversaries, festivals and pujas; 2 Memories gifts; greeting cards; 4 family accounts; ₹500 off a wedding pass.
 
-**Pricing tactics:** free watermarked preview before paying; regional pricing abroad; festival and early-bird offers; upgrade later by paying the difference; referral credit ₹100 for host and guest; pay-per-extra (more guests, photos, AI images).
-
-The Free column's 10 basic templates assumes the catalogue has grown past the 6 built today. Prices are starting proposals; revisit after the first 500 sales. Headline prices include GST (PLAN_REVIEW.md).
+**Business:** Starter ₹999/month or ₹9,999/year (10 client events a month, 2 team members); Pro ₹2,999/month or ₹29,999/year (unlimited events, 10 team members, own branding, reseller passes at 30% off); Enterprise custom (white-label, SSO, API). 14-day free trial.
 
 ## 10. Add-ons
 
