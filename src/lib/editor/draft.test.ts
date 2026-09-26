@@ -3,8 +3,11 @@ import {
   draftCopy,
   draftProblems,
   draftTemplate,
+  functionOrder,
+  includedFunctions,
   mainFunction,
   newDraft,
+  withCategory,
   parseDraft,
   stepErrors,
   type InviteDraft,
@@ -100,10 +103,86 @@ describe("invite draft", () => {
       functions: { ...draft.functions, haldi: { included: "yes", date: "soon" } },
     });
     expect(damaged?.templateId).toBe("marigold");
-    expect(damaged?.step).toBe("design");
+    expect(damaged?.step).toBe("occasion");
     expect(damaged?.functions.haldi.included).toBe(false);
     expect(damaged?.functions.haldi.date).toBe("");
     expect(damaged?.functions.wedding.venue).toBe("Taj Falaknuma, Hyderabad");
     expect(parseDraft({ version: 2 })).toBeNull();
+  });
+
+  it("reads drafts saved before occasions existed as weddings", () => {
+    const old: Partial<InviteDraft> = { ...complete(), step: "design" };
+    delete old.categoryId;
+    const draft = parseDraft(old);
+    expect(draft?.categoryId).toBe("wedding");
+    expect(draft?.step).toBe("design");
+    expect(draft?.functions.roka.included).toBe(false);
+    expect(draft?.functions.wedding.venue).toBe("Taj Falaknuma, Hyderabad");
+  });
+
+  it("plans the occasion's functions and keeps everything already typed", () => {
+    const roka = withCategory(complete(), "roka");
+    expect(includedFunctions(roka)).toEqual(["roka"]);
+    expect(mainFunction(roka)).toBe("roka");
+    // The wedding's details survive, ready if the host switches back
+    expect(roka.functions.wedding.venue).toBe("Taj Falaknuma, Hyderabad");
+    expect(roka.content.first).toBe("Aditya");
+    const back = withCategory(roka, "wedding");
+    expect(includedFunctions(back)).toEqual(["wedding"]);
+    expect(draftCopy(back).venue).toBe("Taj Falaknuma, Hyderabad");
+  });
+
+  it("lists the occasion's own functions first", () => {
+    const mehendi = withCategory(newDraft(), "mehendi");
+    expect(functionOrder(mehendi).suggested).toEqual(["haldi", "mehendi", "sangeet"]);
+    expect(functionOrder(mehendi).more).toEqual(["roka", "engagement", "wedding", "reception"]);
+    // A save-the-date announces the wedding and nothing else
+    expect(functionOrder(withCategory(newDraft(), "save-the-date"))).toEqual({
+      suggested: ["wedding"],
+      more: [],
+    });
+  });
+
+  it("uses the occasion's wording until the host writes their own", () => {
+    const sangeet = withCategory(complete(), "sangeet");
+    expect(draftCopy(sangeet).line).toBe("invite you to an evening of music and dance");
+    expect(draftCopy(sangeet).doors).toEqual(["Sangeet", "Sandhya"]);
+    const written = { ...sangeet, content: { ...sangeet.content, line: "come and dance" } };
+    expect(draftCopy(written).line).toBe("come and dance");
+    // A wedding keeps each design's own voice
+    expect(draftCopy(complete()).line).toBe(
+      "would love you to join them as they begin their life together",
+    );
+  });
+
+  it("asks a save-the-date for a date and a city, not a time", () => {
+    const base = withCategory(complete(), "save-the-date");
+    const draft = {
+      ...base,
+      functions: { ...base.functions, wedding: { ...base.functions.wedding, time: "" } },
+    };
+    expect(stepErrors(draft, "functions")).toEqual({});
+    const wedding = withCategory(draft, "wedding");
+    expect(stepErrors(wedding, "functions")).toEqual({ "wedding.time": "required" });
+  });
+
+  it("puts the roka's date on a roka card even when the wedding is planned too", () => {
+    const base = withCategory(complete(), "roka");
+    const draft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        roka: {
+          ...base.functions.roka,
+          date: "2026-11-02",
+          time: "11:00",
+          venue: "Home, Amritsar",
+        },
+        wedding: { ...base.functions.wedding, included: true },
+      },
+    };
+    expect(mainFunction(draft)).toBe("roka");
+    expect(draftCopy(draft).venue).toBe("Home, Amritsar");
+    expect(draftCopy(draft).date).toBe("Monday, 2 November 2026");
   });
 });

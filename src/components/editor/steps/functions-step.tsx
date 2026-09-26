@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/time-picker";
 import { editor, functionCopy, functionFields } from "@/content/editor";
 import {
-  FUNCTION_IDS,
   FUNCTION_RULES,
+  draftCategory,
+  functionOrder,
   mainFunction,
+  needsTime,
   type EventFunction,
   type FunctionId,
 } from "@/lib/editor/draft";
@@ -27,11 +29,14 @@ function FunctionFields({
   id,
   fn,
   errors,
+  withTime,
   set,
 }: {
   id: FunctionId;
   fn: EventFunction;
   errors: StepProps["errors"];
+  /** False for a save-the-date: a date and a city are enough. */
+  withTime: boolean;
   set: (change: Partial<EventFunction>) => void;
 }) {
   const copy = functionCopy[id];
@@ -53,90 +58,140 @@ function FunctionFields({
           endMonth={end}
         />
       </Field>
-      <Field label={functionFields.time} required error={message(errors[`${id}.time`])}>
-        <TimePicker
-          value={fn.time || undefined}
-          onValueChange={(time) => set({ time })}
-          placeholder={functionFields.timePlaceholder}
-          step={15}
-        />
-      </Field>
+      {withTime && (
+        <Field label={functionFields.time} required error={message(errors[`${id}.time`])}>
+          <TimePicker
+            value={fn.time || undefined}
+            onValueChange={(time) => set({ time })}
+            placeholder={functionFields.timePlaceholder}
+            step={15}
+          />
+        </Field>
+      )}
       <Field
-        label={functionFields.venue}
+        label={withTime ? functionFields.venue : functionFields.city}
         required
+        hint={withTime ? undefined : functionFields.cityHint}
         error={message(errors[`${id}.venue`])}
         className="sm:col-span-2"
       >
         <Input
           value={fn.venue}
           maxLength={FUNCTION_RULES.venue}
-          placeholder={functionFields.venuePlaceholder}
+          placeholder={withTime ? functionFields.venuePlaceholder : functionFields.cityPlaceholder}
           autoComplete="off"
           leading={<MapPin />}
           onChange={(event) => set({ venue: event.target.value })}
         />
       </Field>
-      <Field
-        label={functionFields.address}
-        optionalLabel={editor.optional}
-        hint={functionFields.addressHint}
-        className="sm:col-span-2"
-      >
-        <Input
-          value={fn.address}
-          maxLength={FUNCTION_RULES.address}
-          autoComplete="street-address"
-          onChange={(event) => set({ address: event.target.value })}
-        />
-      </Field>
-      <div className="flex flex-col gap-3 sm:col-span-2">
-        <Field label={functionFields.dressCode} optionalLabel={editor.optional}>
+      {withTime && (
+        <Field
+          label={functionFields.address}
+          optionalLabel={editor.optional}
+          hint={functionFields.addressHint}
+          className="sm:col-span-2"
+        >
           <Input
-            value={fn.dressCode}
-            maxLength={FUNCTION_RULES.dressCode}
-            autoComplete="off"
-            leading={<Shirt />}
-            onChange={(event) => set({ dressCode: event.target.value })}
+            value={fn.address}
+            maxLength={FUNCTION_RULES.address}
+            autoComplete="street-address"
+            onChange={(event) => set({ address: event.target.value })}
           />
         </Field>
-        <div role="group" aria-label={functionFields.dressIdeas}>
-          <ul className="flex flex-wrap gap-2">
-            {copy.dressIdeas.map((idea) => {
-              const chosen = fn.dressCode === idea;
-              return (
-                <li key={idea}>
-                  <button
-                    type="button"
-                    aria-pressed={chosen}
-                    onClick={() => set({ dressCode: chosen ? "" : idea })}
-                    className={cn(
-                      "min-h-11 cursor-pointer rounded-full border px-4 text-sm transition-[background-color,border-color,color,transform] duration-150 active:scale-95",
-                      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                      chosen
-                        ? "border-marigold bg-marigold/15 font-semibold text-accent-text"
-                        : "border-line-strong bg-surface text-ink-muted hover:border-line-control hover:text-ink",
-                    )}
-                  >
-                    {idea}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+      )}
+      {withTime && (
+        <div className="flex flex-col gap-3 sm:col-span-2">
+          <Field label={functionFields.dressCode} optionalLabel={editor.optional}>
+            <Input
+              value={fn.dressCode}
+              maxLength={FUNCTION_RULES.dressCode}
+              autoComplete="off"
+              leading={<Shirt />}
+              onChange={(event) => set({ dressCode: event.target.value })}
+            />
+          </Field>
+          <div role="group" aria-label={functionFields.dressIdeas}>
+            <ul className="flex flex-wrap gap-2">
+              {copy.dressIdeas.map((idea) => {
+                const chosen = fn.dressCode === idea;
+                return (
+                  <li key={idea}>
+                    <button
+                      type="button"
+                      aria-pressed={chosen}
+                      onClick={() => set({ dressCode: chosen ? "" : idea })}
+                      className={cn(
+                        "min-h-11 cursor-pointer rounded-full border px-4 text-sm transition-[background-color,border-color,color,transform] duration-150 active:scale-95",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                        chosen
+                          ? "border-marigold bg-marigold/15 font-semibold text-accent-text"
+                          : "border-line-strong bg-surface text-ink-muted hover:border-line-control hover:text-ink",
+                      )}
+                    >
+                      {idea}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
 export function FunctionsStep({ draft, update, errors }: StepProps) {
   const main = mainFunction(draft);
+  const category = draftCategory(draft);
+  const { suggested, more } = functionOrder(draft);
+  const withTime = needsTime(draft);
 
   const setFunction = (id: FunctionId, change: Partial<EventFunction>) =>
     update((current) => ({
       ...current,
       functions: { ...current.functions, [id]: { ...current.functions[id], ...change } },
     }));
+
+  const item = (id: FunctionId) => {
+    const fn = draft.functions[id];
+    const copy = functionCopy[id];
+    return (
+      <li
+        key={id}
+        className={cn(
+          "overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-300",
+          fn.included ? "border-marigold/70 shadow-float" : "border-line shadow-raised",
+          errors.functions && "border-danger",
+        )}
+      >
+        <div className="flex items-start justify-between gap-3 px-4 py-2 sm:px-5">
+          <Checkbox
+            label={<span className="font-display text-lg">{copy.name}</span>}
+            description={copy.description}
+            checked={fn.included}
+            invalid={Boolean(errors.functions)}
+            onCheckedChange={(checked) => setFunction(id, { included: checked === true })}
+            className="flex-1"
+          />
+          {fn.included && main === id && (
+            <Badge tone="gold" className="mt-3 shrink-0">
+              {functionFields.onCard}
+            </Badge>
+          )}
+        </div>
+        {fn.included && (
+          <FunctionFields
+            id={id}
+            fn={fn}
+            errors={errors}
+            withTime={withTime}
+            set={(change) => setFunction(id, change)}
+          />
+        )}
+      </li>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -146,46 +201,33 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
           {editor.errors["no-functions"]}
         </p>
       )}
-      <ul aria-label={functionFields.group} className="flex flex-col gap-4">
-        {FUNCTION_IDS.map((id) => {
-          const fn = draft.functions[id];
-          const copy = functionCopy[id];
-          return (
-            <li
-              key={id}
-              className={cn(
-                "overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-300",
-                fn.included ? "border-marigold/70 shadow-float" : "border-line shadow-raised",
-                errors.functions && "border-danger",
-              )}
+      <section aria-labelledby="functions-suggested" className="flex flex-col gap-3">
+        <h2
+          id="functions-suggested"
+          className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
+        >
+          {functionFields.suggested(category.names.en)}
+        </h2>
+        <ul aria-label={functionFields.group} className="flex flex-col gap-4">
+          {suggested.map(item)}
+        </ul>
+      </section>
+      {more.length > 0 && (
+        <section aria-labelledby="functions-more" className="mt-4 flex flex-col gap-3">
+          <div className="flex flex-col gap-0.5">
+            <h2
+              id="functions-more"
+              className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
             >
-              <div className="flex items-start justify-between gap-3 px-4 py-2 sm:px-5">
-                <Checkbox
-                  label={<span className="font-display text-lg">{copy.name}</span>}
-                  description={copy.description}
-                  checked={fn.included}
-                  invalid={Boolean(errors.functions)}
-                  onCheckedChange={(checked) => setFunction(id, { included: checked === true })}
-                  className="flex-1"
-                />
-                {fn.included && main === id && (
-                  <Badge tone="gold" className="mt-3 shrink-0">
-                    {functionFields.onCard}
-                  </Badge>
-                )}
-              </div>
-              {fn.included && (
-                <FunctionFields
-                  id={id}
-                  fn={fn}
-                  errors={errors}
-                  set={(change) => setFunction(id, change)}
-                />
-              )}
-            </li>
-          );
-        })}
-      </ul>
+              {functionFields.more}
+            </h2>
+            <p className="text-sm text-ink-muted">{functionFields.moreHint}</p>
+          </div>
+          <ul aria-label={functionFields.more} className="flex flex-col gap-4">
+            {more.map(item)}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

@@ -25,6 +25,7 @@ export const availableLanguages: readonly LanguageCode[] = ["en"];
 
 export const nav = [
   { id: "how-it-works", label: "How it works" },
+  { id: "occasions", label: "Occasions" },
   { id: "templates", label: "Designs" },
   { id: "pricing", label: "Pricing" },
   { id: "faq", label: "FAQ" },

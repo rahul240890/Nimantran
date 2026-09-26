@@ -84,11 +84,11 @@ Built as: a 2D card that paints at once, with the WebGL scene loaded behind it o
 Template data schema (scene, colours, fonts, music, text slots). First 6 templates: Marigold Gate, Rose Garden, Emerald Palace, Royal Scroll, Minimal Monogram, Kerala Kasavu.
 Built as: a Zod-checked template schema with validated text slots; ornaments stored as vector data so the 2D card and the 3D card draw identical art; one word layout shared by both; each design with its own ornaments, stock, type and raga (six ragas); a `/templates` review page. All six open as gate-folds for now.
 
-**Step 5a. Category system**
+**Step 5a. Category system** ✅
 Categories stored as data: name in every language, icon, season, region, default functions and RSVP questions. One template can belong to many categories. Seasonal and regional ordering on the home screen (Onam first in Kerala in August, Durga Puja in Bengal in October). Launch with the wedding journey (roka, engagement, haldi, mehendi, sangeet, wedding, reception, save-the-date); other categories are added as data in Step 23.
-Build next, after Step 6. The editor (Step 6) was built first with a fixed list of five wedding functions and no category choice, so this step also adds the category screen to the editor and moves its functions into category data (adding roka, engagement and save-the-date).
+Built as: a Zod-checked category schema and catalogue (`src/lib/categories`) naming each occasion in all ten launch languages; a scoring rank (priority + season + region, with a bonus for a short-lived occasion in its own place and time); an "Occasions" section on the home screen printed on each occasion's best design, with the visitor's state read from the host's location header into a cookie and names shown in the local script; an Occasion step first in the editor that plans the occasion's functions, uses its card wording and lists its designs first. Roka and engagement joined the functions; a save-the-date asks only for a date and a city. Indian-language names await a native speaker's review in Step 12.
 
-**Step 6. Invite editor**
+**Step 6. Invite editor** ✅
 Step-by-step editor: choose category and template → couple details → functions (roka, haldi, mehendi, sangeet, wedding, reception) with date, time, venue, dress code → photos and music → preview. Live 3D preview beside the form; autosave drafts.
 
 **Step 7. Accounts**

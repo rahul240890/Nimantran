@@ -59,6 +59,8 @@ type RadioItemProps = {
   description?: ReactNode;
   /** Card variant only: an icon above the label. */
   icon?: ReactNode;
+  /** Card variant only: a short tag beside the icon, such as a Badge. */
+  badge?: ReactNode;
   disabled?: boolean;
 };
 
@@ -73,7 +75,7 @@ function Dot() {
   );
 }
 
-export function RadioItem({ value, label, description, icon, disabled }: RadioItemProps) {
+export function RadioItem({ value, label, description, icon, badge, disabled }: RadioItemProps) {
   const variant = useContext(VariantContext);
   const id = useId();
 
@@ -103,7 +105,10 @@ export function RadioItem({ value, label, description, icon, disabled }: RadioIt
           ) : (
             <span />
           )}
-          <Dot />
+          <span className="flex min-w-0 items-center gap-2">
+            {badge}
+            <Dot />
+          </span>
         </span>
         <span className="font-semibold text-ink">{label}</span>
         {description ? (

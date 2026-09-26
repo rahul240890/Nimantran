@@ -8,8 +8,8 @@ Related: [MEMORIES.md](MEMORIES.md) (3D gifts), [COMPETITORS.md](COMPETITORS.md)
 
 This file describes the full product. Only part of it exists today, so check this list before claiming a feature on the website or in marketing:
 
-- **Built:** the 3D engine with a 2D fallback, the gate-fold format, 6 templates, music composed live from 6 ragas (no track library or uploads yet), and the invite editor with autosaved drafts in the browser.
-- **Not built yet:** categories, accounts, publishing and share links, RSVP, the host dashboard, languages other than English, payments, and every other card format.
+- **Built:** the 3D engine with a 2D fallback, the gate-fold format, 6 templates, music composed live from 6 ragas (no track library or uploads yet), the invite editor with autosaved drafts in the browser, and the category system with the wedding journey (roka, engagement, save-the-date, haldi, mehendi, sangeet, wedding, reception) ordered by season and region.
+- **Not built yet:** accounts, publishing and share links, RSVP, the host dashboard, languages other than English, payments, and every other card format.
 
 ---
 
