@@ -84,7 +84,7 @@ export function AccountMenu({ className, compact }: { className?: string; compac
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/create">
+          <Link href="/create?new=1">
             <FilePlus2 aria-hidden className={iconClass} />
             {accountMenu.newInvite}
           </Link>

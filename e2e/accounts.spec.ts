@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 const axe = (page: Page) =>
   new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]);
@@ -7,10 +7,15 @@ const axe = (page: Page) =>
 const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 
+/** Preview accounts are per number, so tests that save invites each get their own. */
+const numberFor = (info: TestInfo) =>
+  `9${String(info.workerIndex * 1000 + info.repeatEachIndex * 100 + info.retry).padStart(4, "0")}${String(Date.now()).slice(-5)}`;
+
 async function signInWithPhone(page: Page, number = "98765 43210") {
   await page.getByRole("textbox", { name: /Mobile number/ }).fill(number);
   await page.getByRole("button", { name: "Send code" }).click();
-  await expect(page.getByText("We sent a 6-digit code to +91 ••••• •3210.")).toBeVisible();
+  const last4 = number.replace(/\D/g, "").slice(-4);
+  await expect(page.getByText(`We sent a 6-digit code to +91 ••••• •${last4}.`)).toBeVisible();
   await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
 }
 
@@ -124,7 +129,7 @@ test.describe("accounts", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Namaste, Meera");
   });
 
-  test("My invites shows the draft on this device", async ({ page }) => {
+  test("a draft made before signing in moves into the account", async ({ page }, info) => {
     await page.goto("/create?quality=2d&category=engagement");
     await page.evaluate(() => localStorage.clear());
     await page.goto("/create?quality=2d&category=engagement");
@@ -134,14 +139,81 @@ test.describe("accounts", () => {
     await page.getByRole("button", { name: "Continue" }).click();
 
     await page.goto("/sign-in?next=/invites");
-    await signInWithPhone(page);
+    await signInWithPhone(page, numberFor(info));
     const draft = page.getByRole("article");
     await expect(draft.getByRole("heading", { name: "Aditya & Priya" })).toBeVisible();
     await expect(draft.getByText("Engagement")).toBeVisible();
+    await expect(draft.getByText("Not in your account")).toBeVisible();
     await draft.getByRole("link", { name: "Continue" }).click();
     await expect(page).toHaveURL(/\/create/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "When and where is everything?",
     );
+    await expect(page.getByText("Saved to your account")).toHaveCount(1);
+
+    await page.goto("/invites");
+    await expect(page.getByRole("heading", { name: "1 invite" })).toBeVisible();
+    await expect(page.getByText("Not in your account")).toHaveCount(0);
+    await expect(page.getByRole("article").getByText("Draft", { exact: true })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
+  test("an invite follows the host to another device, and can be deleted", async ({
+    page: phone,
+    browser,
+  }, info) => {
+    const number = numberFor(info);
+    await phone.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1")}`);
+    await signInWithPhone(phone, number);
+    await expect(phone).toHaveURL(/\/create/);
+    await phone.getByRole("radio", { name: /Roka/ }).click();
+    await phone.getByRole("button", { name: "Continue" }).click();
+    await phone.getByRole("button", { name: "Continue" }).click();
+    await phone.getByRole("textbox", { name: /First name/ }).fill("Kabir");
+    await phone.getByRole("textbox", { name: /Second name/ }).fill("Ananya");
+    await expect(phone.getByText("Saved to your account")).toHaveCount(1);
+
+    // A second browser has none of the first one's storage
+    const laptop = await browser.newPage({
+      baseURL: info.project.use.baseURL,
+      reducedMotion: "reduce",
+    });
+    await laptop.goto("/sign-in?next=/invites");
+    await signInWithPhone(laptop, number);
+    const card = laptop.getByRole("article");
+    await expect(card.getByRole("heading", { name: "Kabir & Ananya" })).toBeVisible();
+    await expect(card.getByText("Roka")).toBeVisible();
+    await card.getByRole("link", { name: "Continue" }).click();
+    await expect(laptop).toHaveURL(/\/create$/);
+    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await expect(laptop.getByRole("textbox", { name: /First name/ })).toHaveValue("Kabir");
+    await laptop.getByRole("textbox", { name: /First name/ }).fill("Kabir Singh");
+    await expect(laptop.getByText("Saved to your account")).toHaveCount(1);
+
+    // Starting another keeps the first in the account
+    await laptop.goto("/invites");
+    await laptop.getByRole("link", { name: "New invite" }).click();
+    await expect(laptop).toHaveURL(/\/create$/);
+    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+
+    await phone.goto("/invites");
+    await expect(phone.getByRole("heading", { name: "Kabir Singh & Ananya" })).toBeVisible();
+    await phone.getByRole("button", { name: "Delete Kabir Singh & Ananya" }).click();
+    const dialog = phone.getByRole("dialog", { name: "Delete this invite?" });
+    expect((await axe(phone).analyze()).violations).toEqual([]);
+    await dialog.getByRole("button", { name: "Delete invite" }).click();
+    await expect(phone.getByText("Invite deleted").first()).toBeVisible();
+    await expect(phone.getByRole("heading", { name: "No invites yet" })).toBeVisible();
+
+    await laptop.close();
+  });
+
+  test("an invite that isn't in the account says so", async ({ page }, info) => {
+    await page.goto("/sign-in?next=/invites");
+    await signInWithPhone(page, numberFor(info));
+    await page.goto("/create?quality=2d&invite=7d7f1f5e-3c55-4d3a-9d1c-2b1e6f0b9a11");
+    await expect(page.getByText(/isn't in your account/).first()).toBeVisible();
+    await expect(page).toHaveURL(/\/create$/);
   });
 });

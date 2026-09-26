@@ -52,4 +52,20 @@ describe("invite draft store", () => {
     localStorage.setItem(DRAFT_KEY, "{not json");
     expect(createDraftStore().get().draft).toEqual(newDraft());
   });
+
+  it("keeps the edit time for bookkeeping changes", () => {
+    const store = createDraftStore({ now: () => 7 });
+    store.update((draft) => ({ ...draft, remoteId: null }), { touch: false });
+    expect(store.get().draft.updatedAt).toBe(0);
+  });
+
+  it("swaps in another invite and saves it at once", () => {
+    const store = createDraftStore();
+    store.update((draft) => ({ ...draft, content: { first: "Meera" } }));
+    const other = { ...newDraft("kasavu"), updatedAt: 9, content: { first: "Kabir" } };
+    store.replace(other);
+    expect(store.get()).toEqual({ draft: other, save: "idle" });
+    vi.advanceTimersByTime(1000);
+    expect(createDraftStore().get().draft.content.first).toBe("Kabir");
+  });
 });

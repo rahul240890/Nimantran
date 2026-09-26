@@ -91,6 +91,8 @@ export const draftSchema = z.object({
     })
     .catch({ raga: null, playOnOpen: true }),
   updatedAt: z.number().catch(0),
+  /** The event this draft is saved as in the signed-in person's account (Step 8). */
+  remoteId: z.uuid().nullable().catch(null),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
@@ -115,6 +117,7 @@ export function newDraft(
     photos: [],
     music: { raga: null, playOnOpen: true },
     updatedAt: 0,
+    remoteId: null,
   };
 }
 
