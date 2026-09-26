@@ -1,6 +1,17 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Check, CloudOff, Eye, HardDrive, LoaderCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Cloud,
+  CloudCheck,
+  CloudOff,
+  Eye,
+  HardDrive,
+  LoaderCircle,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AccountMenu } from "@/components/account/account-menu";
 import { Logo } from "@/components/brand/logo";
@@ -9,7 +20,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { Stepper } from "@/components/ui/stepper";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { toast } from "@/components/ui/toast";
-import { editor, previewCopy, stepCopy } from "@/content/editor";
+import { editor, previewCopy, stepCopy, syncCopy } from "@/content/editor";
 import type { QualityChoice } from "@/content/engine-review";
 import type { CategoryId } from "@/lib/categories/catalog";
 import {
@@ -18,9 +29,11 @@ import {
   stepErrors,
   withCategory,
   type EditorStep,
+  type InviteDraft,
 } from "@/lib/editor/draft";
-import { clearPhotos } from "@/lib/editor/photos";
+import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
+import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
 import type { TemplateId } from "@/lib/templates/schema";
 import { uiStrings } from "@/lib/ui-strings";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -46,7 +59,40 @@ const opensOn: Record<EditorStep, boolean> = {
   preview: false,
 };
 
-function SaveStatus({ state }: { state: SaveState }) {
+const SYNC_DELAY = 1200;
+
+/** Where the draft is saved: this device, or the account once signed in. */
+function SaveStatus({
+  state,
+  sync,
+  signedIn,
+  edited,
+}: {
+  state: SaveState;
+  sync: SyncState;
+  signedIn: boolean;
+  edited: boolean;
+}) {
+  if (signedIn && state !== "unavailable" && sync !== "signed-out") {
+    const busy = state === "saving" || sync === "syncing";
+    const key = busy ? "syncing" : sync === "offline" ? "offline" : edited ? sync : "idle";
+    const icon =
+      key === "syncing" ? (
+        <LoaderCircle className="size-4 animate-spin motion-still:animate-none" />
+      ) : key === "synced" ? (
+        <CloudCheck className="size-4 text-success" />
+      ) : key === "offline" ? (
+        <CloudOff className="size-4 text-warning" />
+      ) : (
+        <Cloud className="size-4" />
+      );
+    return (
+      <span className="inline-flex min-w-0 items-center gap-1.5 text-sm text-ink-muted">
+        <span aria-hidden>{icon}</span>
+        <span className="truncate max-[419px]:sr-only">{syncCopy[key]}</span>
+      </span>
+    );
+  }
   const icon =
     state === "saving" ? (
       <LoaderCircle className="size-4 animate-spin motion-still:animate-none" />
@@ -69,17 +115,31 @@ export function Editor({
   quality,
   initialTemplate,
   initialCategory,
+  signedIn = false,
+  initialInvite = null,
+  fresh = false,
+  missing = false,
 }: {
   quality: QualityChoice;
   initialTemplate: TemplateId | null;
   initialCategory: CategoryId | null;
+  /** Drafts save to the account as well as the device. */
+  signedIn?: boolean;
+  /** An invite opened from My invites (?invite=<id>). */
+  initialInvite?: InviteDraft | null;
+  /** Start a new invite, keeping the open one in the account (?new=1). */
+  fresh?: boolean;
+  /** ?invite= named an invite this person can't open. */
+  missing?: boolean;
 }) {
   const { draft, save } = useSyncExternalStore(
     inviteDraft.subscribe,
     inviteDraft.get,
     inviteDraft.getServer,
   );
+  const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
   const update = inviteDraft.update;
+  const router = useRouter();
   const wide = useMediaQuery(WIDE);
   const still = useReducedMotion();
 
@@ -92,23 +152,49 @@ export function Editor({
   const errors = checking === step ? stepErrors(draft, step) : {};
   const errorCount = Object.keys(errors).length;
 
-  // An occasion or design picked on the landing page starts a fresh invite with it,
+  // Opening an invite from the account, or starting another, happens once per visit.
+  // Then an occasion or design picked on the landing page starts a fresh invite with it,
   // on the design step: the occasion is chosen (a design alone means a wedding).
+  const started = useRef(false);
   useEffect(() => {
-    if (!initialTemplate && !initialCategory) return;
-    const current = inviteDraft.get().draft;
-    if (current.updatedAt !== 0) return;
-    update((draft) => {
-      let next = initialCategory ? withCategory(draft, initialCategory) : draft;
-      if (draft.step === "occasion") next = { ...next, step: "design" };
-      if (initialTemplate) next = { ...next, templateId: initialTemplate };
-      return next;
-    });
-  }, [initialTemplate, initialCategory, update]);
+    if (started.current) return;
+    started.current = true;
+    void (async () => {
+      if (missing) toast({ title: syncCopy.missing, tone: "error" });
+      if (initialInvite || fresh) {
+        const switched = await switchDraft(initialInvite, { signedIn });
+        if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
+      }
+      if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
+      if (!initialTemplate && !initialCategory) return;
+      if (inviteDraft.get().draft.updatedAt !== 0) return;
+      update((draft) => {
+        let next = initialCategory ? withCategory(draft, initialCategory) : draft;
+        if (draft.step === "occasion") next = { ...next, step: "design" };
+        if (initialTemplate) next = { ...next, templateId: initialTemplate };
+        return next;
+      });
+    })();
+  }, [initialInvite, fresh, missing, signedIn, initialTemplate, initialCategory, update, router]);
+
+  // Save to the account a moment after each change, and when the connection comes back
+  useEffect(() => {
+    if (!signedIn || draft.updatedAt === 0) return;
+    const timer = setTimeout(() => void syncDraft(), SYNC_DELAY);
+    const onOnline = () => void syncDraft();
+    window.addEventListener("online", onOnline);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("online", onOnline);
+    };
+  }, [signedIn, draft.updatedAt]);
 
   // Write straight away if the tab is closed or hidden mid-edit
   useEffect(() => {
-    const flush = () => inviteDraft.flush();
+    const flush = () => {
+      inviteDraft.flush();
+      if (signedIn && inviteDraft.get().draft.updatedAt !== 0) void syncDraft();
+    };
     const onVisibility = () => document.visibilityState === "hidden" && flush();
     window.addEventListener("pagehide", flush);
     document.addEventListener("visibilitychange", onVisibility);
@@ -116,7 +202,7 @@ export function Editor({
       window.removeEventListener("pagehide", flush);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [signedIn]);
 
   // After moving between steps, bring the new step's heading into view and focus it
   const heading = useRef<HTMLHeadingElement>(null);
@@ -160,12 +246,24 @@ export function Editor({
     if (next) goTo(next);
   };
 
-  const reset = () => {
-    for (const photo of draft.photos) forgetPhotoUrl(photo.id);
-    void clearPhotos().catch(() => {
-      // Nothing stored, or storage blocked
-    });
-    inviteDraft.reset({ ...newDraft(draft.templateId, draft.categoryId) });
+  // In the account, the invite stays in My invites; otherwise it and its photos are cleared
+  const keepsInvite = signedIn && draft.remoteId !== null;
+  const reset = async () => {
+    const fresh = () => newDraft(draft.templateId, draft.categoryId);
+    if (keepsInvite) {
+      if (!(await switchDraft(null, { signedIn, fresh }))) {
+        toast({ title: syncCopy.switchFailed, tone: "error" });
+        return;
+      }
+    } else {
+      for (const photo of draft.photos) {
+        forgetPhotoUrl(photo.id);
+        void deletePhoto(photo.id).catch(() => {
+          // Already gone, or storage blocked
+        });
+      }
+      inviteDraft.reset(fresh());
+    }
     moved.current = true;
     setCardOpen(false);
     toast({ title: previewCopy.cleared, tone: "success" });
@@ -194,7 +292,12 @@ export function Editor({
             </span>
           </div>
           <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-            <SaveStatus state={save} />
+            <SaveStatus
+              state={save}
+              sync={sync}
+              signedIn={signedIn}
+              edited={draft.updatedAt !== 0}
+            />
             <ThemeToggle labels={uiStrings.theme} />
             <AccountMenu compact />
           </div>
@@ -248,7 +351,14 @@ export function Editor({
                 {step === "couple" && <CoupleStep {...props} />}
                 {step === "functions" && <FunctionsStep {...props} />}
                 {step === "extras" && <ExtrasStep {...props} />}
-                {step === "preview" && <PreviewStep {...props} onReset={reset} />}
+                {step === "preview" && (
+                  <PreviewStep
+                    {...props}
+                    onReset={() => void reset()}
+                    signedIn={signedIn}
+                    keepsInvite={keepsInvite}
+                  />
+                )}
               </div>
 
               {errorCount > 0 && (

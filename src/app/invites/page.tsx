@@ -1,4 +1,4 @@
-import { UserRoundPen } from "lucide-react";
+import { Plus, UserRoundPen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { invitesCopy } from "@/content/account";
 import { firstName } from "@/lib/auth/account";
 import { getAccount } from "@/lib/auth/server";
+import { inviteStore } from "@/lib/invites/store";
 
 export const metadata: Metadata = {
   title: invitesCopy.metaTitle,
@@ -19,6 +20,7 @@ export const metadata: Metadata = {
 export default async function InvitesPage() {
   const account = await getAccount();
   if (!account) redirect("/sign-in?next=%2Finvites");
+  const invites = (await inviteStore()?.list(account)) ?? null;
 
   return (
     <PageTransition>
@@ -34,6 +36,12 @@ export default async function InvitesPage() {
               </h1>
               <p className="text-ink-muted">{invitesCopy.intro}</p>
             </div>
+            <Button asChild>
+              <Link href="/create?new=1">
+                <Plus aria-hidden />
+                {invitesCopy.newInvite}
+              </Link>
+            </Button>
           </div>
           {!account.name && (
             <Card
@@ -52,7 +60,7 @@ export default async function InvitesPage() {
               </Button>
             </Card>
           )}
-          <MyInvites />
+          <MyInvites invites={invites} />
         </div>
       </AccountShell>
     </PageTransition>

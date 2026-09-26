@@ -53,7 +53,19 @@ function Section({
   );
 }
 
-export function PreviewStep({ draft, goTo, onReset }: StepProps & { onReset: () => void }) {
+export function PreviewStep({
+  draft,
+  goTo,
+  onReset,
+  signedIn = false,
+  keepsInvite = false,
+}: StepProps & {
+  onReset: () => void;
+  /** Saved to the account as well as this device. */
+  signedIn?: boolean;
+  /** Starting over keeps this invite in My invites instead of clearing it. */
+  keepsInvite?: boolean;
+}) {
   const problems = draftProblems(draft);
   const functions = includedFunctions(draft);
   const category = draftCategory(draft);
@@ -71,7 +83,9 @@ export function PreviewStep({ draft, goTo, onReset }: StepProps & { onReset: () 
           <PartyPopper aria-hidden className="mt-0.5 size-6 shrink-0 text-success" />
           <div className="flex flex-col gap-1">
             <p className="font-semibold">{previewCopy.ready}</p>
-            <p className="text-sm text-ink-muted">{previewCopy.readyBody}</p>
+            <p className="text-sm text-ink-muted">
+              {signedIn ? previewCopy.readyBodyAccount : previewCopy.readyBody}
+            </p>
           </div>
         </Card>
       ) : (
@@ -180,18 +194,20 @@ export function PreviewStep({ draft, goTo, onReset }: StepProps & { onReset: () 
                   <Button variant="secondary">{previewCopy.cancel}</Button>
                 </DialogClose>
                 <Button
-                  variant="danger"
+                  variant={keepsInvite ? "primary" : "danger"}
                   onClick={() => {
                     setConfirming(false);
                     onReset();
                   }}
                 >
-                  {previewCopy.startOverConfirm}
+                  {keepsInvite ? previewCopy.startOverKeepConfirm : previewCopy.startOverConfirm}
                 </Button>
               </>
             }
           >
-            <p className="text-ink-muted">{previewCopy.startOverBody}</p>
+            <p className="text-ink-muted">
+              {keepsInvite ? previewCopy.startOverKeepBody : previewCopy.startOverBody}
+            </p>
           </DialogContent>
         </Dialog>
       </div>

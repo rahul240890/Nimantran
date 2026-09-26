@@ -53,9 +53,17 @@ export function createDraftStore({ delay = 500, now = () => Date.now() } = {}) {
     },
     get,
     getServer: () => serverSnapshot,
-    update(change: (draft: InviteDraft) => InviteDraft) {
+    /**
+     * Changes the draft and saves it shortly. touch: false keeps its edit time, for
+     * bookkeeping that isn't an edit, such as recording where it was saved in the account.
+     */
+    update(change: (draft: InviteDraft) => InviteDraft, { touch = true } = {}) {
       const current = get();
-      snapshot = { draft: { ...change(current.draft), updatedAt: now() }, save: "saving" };
+      const next = change(current.draft);
+      snapshot = {
+        draft: touch ? { ...next, updatedAt: now() } : next,
+        save: "saving",
+      };
       emit();
       if (timer) clearTimeout(timer);
       timer = setTimeout(flush, delay);
@@ -63,6 +71,19 @@ export function createDraftStore({ delay = 500, now = () => Date.now() } = {}) {
     /** Writes now, for example before the page is hidden. */
     flush() {
       if (timer) flush();
+    },
+    /** Swaps in another invite, such as one opened from the account, and saves it now. */
+    replace(draft: InviteDraft) {
+      if (timer) clearTimeout(timer);
+      timer = null;
+      let save: SaveState = "idle";
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        save = "unavailable";
+      }
+      snapshot = { draft, save };
+      emit();
     },
     reset(draft: InviteDraft = newDraft()) {
       if (timer) clearTimeout(timer);

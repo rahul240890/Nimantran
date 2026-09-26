@@ -8,7 +8,7 @@ Related: [TRADITIONS.md](TRADITIONS.md) (tradition packs), [MEMORIES.md](MEMORIE
 
 This file describes the full product. Only part of it exists today, so check this list before claiming a feature on the website or in marketing:
 
-- **Built:** the 3D engine with a 2D fallback, the gate-fold format, 6 templates, music composed live from 6 ragas (no track library or uploads yet), the invite editor with autosaved drafts in the browser, and the category system with the wedding journey (roka, engagement, save-the-date, haldi, mehendi, sangeet, wedding, reception) ordered by season and region, and accounts (mobile number or Google sign-in, profile, My invites).
+- **Built:** the 3D engine with a 2D fallback, the gate-fold format, 6 templates, music composed live from 6 ragas (no track library or uploads yet), the invite editor with autosaved drafts in the browser, and the category system with the wedding journey (roka, engagement, save-the-date, haldi, mehendi, sangeet, wedding, reception) ordered by season and region, accounts (mobile number or Google sign-in, profile, My invites), and the database with row level security, where invites save to the account and follow the host across devices (photos stay on the device for now).
 - **Not built yet:** publishing and share links, RSVP, the host dashboard, languages other than English, payments, and every other card format.
 
 ---

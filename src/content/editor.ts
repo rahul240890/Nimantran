@@ -37,6 +37,16 @@ export const editor = {
   },
 } as const;
 
+/** The header's save status once signed in, and moving between invites. */
+export const syncCopy = {
+  idle: "Saves to your account",
+  syncing: "Saving…",
+  synced: "Saved to your account",
+  offline: "Saved on this device, retrying",
+  missing: "That invite isn't in your account. It may have been deleted.",
+  switchFailed: "Couldn't save the invite that's open, so it stays open. Try again in a moment.",
+} as const;
+
 export const stepCopy: Record<
   EditorStep,
   { label: string; eyebrow: string; title: string; intro: string }
@@ -200,7 +210,9 @@ export const occasionCopy = {
 export const previewCopy = {
   ready: "Your invitation is ready",
   readyBody:
-    "It's saved on this device. Sign in and publishing arrive next, then you can share it on WhatsApp.",
+    "It's saved on this device. Sign in to keep it in your account. Publishing arrives next, then you can share it on WhatsApp.",
+  readyBodyAccount:
+    "It's saved to your account, so it's on every device you sign in on. Publishing arrives next, then you can share it on WhatsApp.",
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",
@@ -216,6 +228,9 @@ export const previewCopy = {
   startOverTitle: "Start a new invite?",
   startOverBody: "This clears the names, functions and photos saved on this device.",
   startOverConfirm: "Clear and start again",
+  startOverKeepBody:
+    "This invite stays in My invites, so you can come back to it. The new one starts empty.",
+  startOverKeepConfirm: "Start a new invite",
   cancel: "Keep this invite",
   cleared: "Started a new invite",
 } as const;
