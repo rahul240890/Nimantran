@@ -138,8 +138,8 @@ export const rsvpCopy = {
 
 export const repliesCopy = {
   heading: "Replies",
-  intro:
-    "Updates as guests reply. The full guest list and reminders arrive with the host dashboard.",
+  intro: "Updates as guests reply. The guest list has everyone, with reminders and co-hosts.",
+  all: "Open guest list",
   none: "No replies yet. They appear here as soon as guests answer.",
   coming: (count: number) => (count === 1 ? "1 coming" : `${count} coming`),
   maybe: (count: number) => `${count} maybe`,

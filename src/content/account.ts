@@ -117,6 +117,8 @@ export const invitesCopy = {
   },
   continueEditing: "Continue",
   share: "Share",
+  guests: "Guests",
+  cohost: "Co-host",
   step: (label: string) => `Next: ${label.toLowerCase()}`,
   updated: (when: string) => `Edited ${when}`,
   untitled: "Your names go here",

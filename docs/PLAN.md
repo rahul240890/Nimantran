@@ -123,7 +123,9 @@ Built as: the guest page (`/i/<slug>`) ends with **Will you join us?**, reached 
 **Step 11. Host dashboard and co-hosts**
 Live guest list, opened/replied/pending counts, filters, search, CSV export, edit after publishing. Invite co-hosts (both families) to manage one event and guest list. Automatic reminders to guests who haven't replied (email and SMS; WhatsApp in Step 22).
 
-**Step 11a. Event Pages (free line)**
+Built as: **Guests** on each invite in My invites (and **Open guest list** on the share page) opens `/invites/<id>`: guests, opened, replied and waiting at the top, head counts per function (children counted separately), then the guest list with search (name, group or number), filters (coming, maybe, can't come, waiting, not opened) and a function filter. Hosts add one guest (name, WhatsApp number, group, how many people, which functions) or paste a whole list from their notes ("Sharma uncle, 98765 43210 (4)"); guests who reply from the shared link join the list by themselves. Each guest has a personal link (`?g=<token>`) sent from the host's own WhatsApp, straight to their number; opening it marks them opened. **Reminders** lists everyone who hasn't replied, each with a WhatsApp button and an editable message, and records when they were reminded. **Download CSV** gives the whole list with every reply, the host's questions and personal links, safe to open in Excel. **Co-hosts**: the owner makes a private single-use link (labelled, for example "Meera's family") and sends it on WhatsApp; whoever opens it and signs in joins, sees the same dashboard and can edit the invite; the owner can withdraw links and remove co-hosts, and co-hosts can leave. Edits after publishing go live straight away through **Edit invite**. Migration: `20260926200000_host_dashboard.sql`. **Not yet:** automatic reminders by SMS and email need an SMS provider with DLT registration (owner task); bulk WhatsApp sending is Step 22.
+
+**Step 11a. Event Pages (free line)** (moved to after launch, 26 September 2026)
 Fast, text-first event page with cover image, details and RSVP, using the same guest tools. Upsell to a 3D invitation.
 
 **Step 12. Languages**

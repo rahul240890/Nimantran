@@ -22,6 +22,9 @@ database keeps every invite. Applied so far after the first setup:
   migration above first.
 - `20260926190000_rsvp.sql` — guest replies (Step 10): `submit_rsvp()` and `guest_reply()` for
   guests with the link, the host's questions on the guest page, and `guests.self_added`.
+- `20260926200000_host_dashboard.sql` — the host dashboard (Step 11): co-host links
+  (`host_invite_preview()`, `accept_host_invite()`, `event_host_list()`), a label on co-host
+  invitations and `guests.reminded_at`.
 
 ## Setting up a project
 

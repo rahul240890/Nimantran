@@ -146,9 +146,15 @@ export type InviteSummary = {
   date: string;
   mainFunction: FunctionId | null;
   updatedAt: number;
+  /** Whether this person made the invite or helps run it (Step 11). */
+  role: "owner" | "cohost";
 };
 
-export function summarize(event: EventRow, functions: FunctionRow[]): InviteSummary {
+export function summarize(
+  event: EventRow,
+  functions: FunctionRow[],
+  role: InviteSummary["role"] = "owner",
+): InviteSummary {
   const draft = rowsToDraft(event, functions);
   const category = CATEGORIES[draft.categoryId];
   const planned = functions.map((row) => row.kind);
@@ -169,5 +175,6 @@ export function summarize(event: EventRow, functions: FunctionRow[]): InviteSumm
     date: main ? draft.functions[main].date : "",
     mainFunction: main,
     updatedAt: draft.updatedAt,
+    role,
   };
 }

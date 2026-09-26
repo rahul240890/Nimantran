@@ -57,7 +57,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           when={inviteWhen(draft)}
           message={shareCopy.message(names, occasion, inviteWhen(draft))}
           qr={await qrSvg(url)}
-          replies={<RepliesCard summary={await hostReplies(account, id)} />}
+          replies={<RepliesCard inviteId={id} summary={await hostReplies(account, id)} />}
         />
       </AccountShell>
     </PageTransition>
