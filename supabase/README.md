@@ -21,11 +21,13 @@ say they open soon) until the three keys below are set.
    - `https://*-rahul240890s-projects.vercel.app/auth/callback` (preview deployments; use the
      domain your previews actually get)
    - `http://localhost:3000/auth/callback`
-4. **Keys in Vercel.** Project Settings → API in Supabase, then Vercel → Settings →
+4. **Keys in Vercel.** Project Settings → API Keys in Supabase, then Vercel → Settings →
    Environment Variables, for Production and Preview:
    - `NEXT_PUBLIC_SUPABASE_URL` — the Project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the anon public key
-   - `SUPABASE_SERVICE_ROLE_KEY` — the service role key (secret; never exposed to browsers)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the publishable key (`sb_publishable_…`), or the
+     legacy anon key
+   - `SUPABASE_SERVICE_ROLE_KEY` — a secret key (`sb_secret_…`), or the legacy service_role
+     key (never exposed to browsers)
 
    Redeploy after saving so the build picks them up.
 
