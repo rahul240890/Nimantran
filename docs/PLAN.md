@@ -2,6 +2,8 @@
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
 ---
@@ -166,9 +168,12 @@ Detailed in the Nimantran Memories Plan. Starts once payments work (after Step 1
 
 ---
 
-## Research
+## Research and specs
 
-- **Paperless Post vs Nimantran** (Claude Docs): their categories, pricing and features; what we borrow (product lines, category breadth, co-hosts, custom questions, scheduling, collections) and what we avoid (coin pricing, per-guest add-ons, yearly free limit).
-- **Nimantran Premium Plan** (Claude Docs, PDF in `docs/`): editions, pricing, add-ons.
-- **Nimantran Memories Plan** (Claude Docs): Phase 2b in detail.
-- **Plan review** (`docs/PLAN_REVIEW.md`): open recommendations on launch scope, payments timing and languages.
+All in this folder, so every build session has them:
+
+- [PRODUCT.md](PRODUCT.md): what each step builds towards.
+- [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
+- [COMPETITORS.md](COMPETITORS.md): what we borrow from Paperless Post and what we avoid (coin pricing, per-guest add-ons, yearly free limit).
+- [PLAN_REVIEW.md](PLAN_REVIEW.md): open recommendations on launch scope, payments timing and languages, awaiting the owner's decision.
+- [Nimantran_Premium_Plan.pdf](Nimantran_Premium_Plan.pdf): original business plan.
