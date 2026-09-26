@@ -75,6 +75,26 @@ describe("invite rows", () => {
     expect({ ...back, remoteId: null, updatedAt: 0 }).toEqual({ ...draft, remoteId: null });
   });
 
+  it("keeps the family's tradition", () => {
+    const draft = {
+      ...sample(),
+      tradition: {
+        id: "gujarati" as const,
+        symbol: "none" as const,
+        invocation: "latin" as const,
+        wording: { children: "મારા મામાના લગ્નમાં જરૂર આવજો" },
+      },
+    };
+    const { event, functions } = asStored(draft);
+    expect(event.tradition_id).toBe("gujarati");
+    expect(rowsToDraft(event, functions).tradition).toEqual(draft.tradition);
+    // Saved before tradition packs, or an unknown pack: no tradition
+    expect(
+      rowsToDraft({ ...event, tradition_id: null, religious: null }, functions).tradition.id,
+    ).toBe(null);
+    expect(rowsToDraft({ ...event, tradition_id: "gone" }, functions).tradition.id).toBe(null);
+  });
+
   it("reads unknown values leniently", () => {
     const { event, functions } = asStored(sample());
     const back = rowsToDraft(

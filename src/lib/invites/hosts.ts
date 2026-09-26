@@ -77,7 +77,7 @@ type HostStore = {
 };
 
 const EVENT_COLUMNS =
-  "id, owner_id, category_id, template_id, status, slug, content, music, editor_step, updated_at";
+  "id, owner_id, category_id, template_id, status, slug, content, music, editor_step, updated_at, tradition_id, religious";
 const FUNCTION_COLUMNS = "id, kind, position, date, start_time, venue, address, dress_code";
 const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";

@@ -171,6 +171,7 @@ test.describe("accounts", () => {
     await phone.getByRole("radio", { name: /Roka/ }).click();
     await phone.getByRole("button", { name: "Continue" }).click();
     await phone.getByRole("button", { name: "Continue" }).click();
+    await phone.getByRole("button", { name: "Continue" }).click();
     await phone.getByRole("textbox", { name: /First name/ }).fill("Kabir");
     await phone.getByRole("textbox", { name: /Second name/ }).fill("Ananya");
     await expect(phone.getByText("Saved to your account")).toHaveCount(1);

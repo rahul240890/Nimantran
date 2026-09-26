@@ -1,7 +1,12 @@
 import type { CSSProperties } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { FACE, type Layer } from "@/components/invitation/art/decor";
-import { layoutDoor, layoutInside, type TextRun } from "@/components/invitation/art/layout";
+import {
+  layoutDoor,
+  layoutInside,
+  symbolLayers,
+  type TextRun,
+} from "@/components/invitation/art/layout";
 import { MOTIFS, type DoorSide, type Motif } from "@/components/invitation/art/motifs";
 import { cn } from "@/lib/cn";
 import { TEMPLATES } from "@/lib/templates/catalog";
@@ -154,6 +159,7 @@ export function GateCard({
     motif.divider && inside.divider !== null
       ? [{ items: [{ at: [50, inside.divider], children: [motif.divider] }] }]
       : null;
+  const symbol = symbolLayers(copy, inside);
   // Reveal order: runs in reading order, with the divider and monogram in their places
   const order = (top: number) => inside.runs.filter((run) => run.top < top).length;
 
@@ -188,6 +194,11 @@ export function GateCard({
               "radial-gradient(ellipse 22% 70% at 50% 50%, var(--gold-glint), color-mix(in srgb, var(--marigold) 35%, transparent) 55%, transparent 80%)",
           }}
         />
+        {symbol && (
+          <span className="absolute inset-0" style={{ opacity: reveal(0).opacity }}>
+            <DecorSvg layers={symbol} width={width} height={height} className="size-full" />
+          </span>
+        )}
         {inside.monogram && (
           <span
             className="absolute flex items-center font-display leading-none text-card-ink"

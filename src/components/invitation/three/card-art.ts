@@ -14,7 +14,7 @@ import type { CardCopy } from "@/lib/templates/content";
 import type { StockRole, Template } from "@/lib/templates/schema";
 import type { ResolvedStock } from "@/lib/templates/stock";
 import { FACE, finishOf, type Finish, type Layer, type Placement } from "../art/decor";
-import { layoutDoor, layoutInside, type TextRun } from "../art/layout";
+import { layoutDoor, layoutInside, symbolLayers, type TextRun } from "../art/layout";
 import { MOTIFS, type DoorSide } from "../art/motifs";
 
 export type Pass = "colour" | "finish";
@@ -235,6 +235,8 @@ export function paintInside(
     drawLayers(p, stock, motif.inside, units);
 
     const layout = layoutInside(copy, template, motif);
+    const symbol = symbolLayers(copy, layout);
+    if (symbol) drawLayers(p, stock, symbol, units);
     if (motif.divider && layout.divider !== null) {
       drawLayers(
         p,

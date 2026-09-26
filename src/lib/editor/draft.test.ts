@@ -186,3 +186,55 @@ describe("invite draft", () => {
     expect(draftCopy(draft).date).toBe("Monday, 2 November 2026");
   });
 });
+
+describe("tradition packs", () => {
+  const withTradition = (tradition: Partial<InviteDraft["tradition"]>): InviteDraft => {
+    const draft = complete();
+    return { ...draft, tradition: { ...draft.tradition, ...tradition } };
+  };
+
+  it("draw nothing extra until a tradition is chosen", () => {
+    const copy = draftCopy(complete());
+    expect(copy.symbol).toBeNull();
+    expect(copy.blessing).toBe("");
+  });
+
+  it("put the invocation and the pack's symbol on the card", () => {
+    const copy = draftCopy(withTradition({ id: "marathi" }));
+    expect(copy.blessing).toBe("॥ श्री गणेशाय नमः ॥");
+    expect(copy.symbol).toBe("kalash");
+    expect(copy.doors).toEqual(["Shubh", "Mangal"]);
+  });
+
+  it("follow the family's choices", () => {
+    expect(draftCopy(withTradition({ id: "bengali", invocation: "latin" })).blessing).toBe(
+      "Prajapataye Namah",
+    );
+    expect(draftCopy(withTradition({ id: "bengali", invocation: "off" })).blessing).toBe("");
+    expect(draftCopy(withTradition({ id: "tamil", symbol: "none" })).symbol).toBeNull();
+    expect(draftCopy(withTradition({ id: "tamil", symbol: "diya" })).symbol).toBe("diya");
+    // A symbol the pack doesn't offer falls back to its own
+    expect(draftCopy(withTradition({ id: "bengali", symbol: "swastik" })).symbol).toBe("prajapati");
+  });
+
+  it("never replace words the family typed", () => {
+    const draft = withTradition({ id: "north-hindu" });
+    const copy = draftCopy({ ...draft, content: { ...draft.content, blessing: "Om Shanti" } });
+    expect(copy.blessing).toBe("Om Shanti");
+  });
+
+  it("show no symbol or invocation for Modern", () => {
+    const copy = draftCopy(withTradition({ id: "modern" }));
+    expect(copy.symbol).toBeNull();
+    expect(copy.blessing).toBe("");
+  });
+
+  it("read old drafts without a tradition", () => {
+    const old: Partial<InviteDraft> = complete();
+    delete old.tradition;
+    expect(parseDraft(old)?.tradition).toEqual(newDraft().tradition);
+    expect(parseDraft({ ...complete(), tradition: { id: "gone", symbol: 4 } })?.tradition.id).toBe(
+      null,
+    );
+  });
+});

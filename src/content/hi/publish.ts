@@ -80,6 +80,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   openHint: "खोलने के लिए कार्ड पर टैप करें",
   reply: "निमंत्रण का जवाब दें",
   functions: "उत्सव",
+  family: "परिवार की ओर से",
   when: "कब",
   where: "कहाँ",
   dressCode: "ड्रेस कोड",

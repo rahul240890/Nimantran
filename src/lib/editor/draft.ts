@@ -5,6 +5,16 @@ import { RSVP_QUESTION_IDS, type Category, type RsvpQuestionId } from "@/lib/cat
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { contentSchema, toCardCopy, type CardCopy } from "@/lib/templates/content";
+import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
+import {
+  INVOCATION_MODES,
+  SYMBOL_IDS,
+  TRADITION_IDS,
+  WORDING_IDS,
+  WORDING_MAX,
+  type SymbolId,
+  type TraditionPack,
+} from "@/lib/traditions/schema";
 import {
   RAGA_IDS,
   SLOT_IDS,
@@ -26,6 +36,7 @@ export { FUNCTION_IDS, type FunctionId };
 
 export const EDITOR_STEPS = [
   "occasion",
+  "tradition",
   "design",
   "couple",
   "functions",
@@ -57,6 +68,22 @@ export type EventFunction = z.infer<typeof functionSchema>;
 
 const photoSchema = z.object({ id: z.string().min(1), width: z.number(), height: z.number() });
 export type PhotoRef = z.infer<typeof photoSchema>;
+
+const traditionSchema = z.object({
+  /** The pack the card follows; null follows none (the design's own wording). */
+  id: z.enum(TRADITION_IDS).nullable().catch(null),
+  /** The sacred symbol: null uses the pack's own, "none" shows none. */
+  symbol: z
+    .enum([...SYMBOL_IDS, "none"])
+    .nullable()
+    .catch(null),
+  invocation: z.enum(INVOCATION_MODES).catch("script"),
+  /** The pack's labelled wording blocks, as the family wrote them. */
+  wording: z.partialRecord(z.enum(WORDING_IDS), z.string().max(WORDING_MAX)).catch({}),
+});
+export type DraftTradition = z.infer<typeof traditionSchema>;
+
+const noTradition: DraftTradition = { id: null, symbol: null, invocation: "script", wording: {} };
 
 const emptyFunction: EventFunction = {
   included: false,
@@ -97,6 +124,8 @@ export const draftSchema = z.object({
   slug: z.string().nullable().catch(null),
   /** What the RSVP asks besides who's coming (Step 10). Null uses the occasion's own. */
   questions: z.array(z.enum(RSVP_QUESTION_IDS)).nullable().catch(null),
+  /** The family's tradition and religious elements (Step 12a). */
+  tradition: traditionSchema.catch(noTradition),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
@@ -124,6 +153,7 @@ export function newDraft(
     remoteId: null,
     slug: null,
     questions: null,
+    tradition: noTradition,
   };
 }
 
@@ -200,6 +230,46 @@ export function templateWithRaga(templateId: TemplateId, raga: RagaId | null): T
   return { ...template, music: { raga } };
 }
 
+/** The pack this invite follows, if its occasion takes one. */
+export function draftTradition(draft: InviteDraft): TraditionPack | null {
+  const { id } = draft.tradition;
+  return id && allowsTradition(draftCategory(draft)) ? TRADITIONS[id] : null;
+}
+
+/** The sacred symbol on the card: the family's pick, else the pack's own. */
+export function draftSymbol(draft: InviteDraft): SymbolId | null {
+  const pack = draftTradition(draft);
+  if (!pack) return null;
+  const { symbol } = draft.tradition;
+  if (symbol === "none") return null;
+  return symbol && pack.symbols.options.includes(symbol) ? symbol : pack.symbols.default;
+}
+
+/**
+ * Wording the tradition gives the card, under the host's own: the invocation as the
+ * blessing line, and a wedding's door words.
+ */
+export function traditionWording(draft: InviteDraft): Partial<Record<SlotId, string>> {
+  const pack = draftTradition(draft);
+  if (!pack) return {};
+  const wording: Partial<Record<SlotId, string>> = {};
+  const mode = draft.tradition.invocation;
+  wording.blessing = pack.invocation && mode !== "off" ? pack.invocation[mode] : "";
+  if (pack.doors && draft.categoryId === "wedding") {
+    wording.doorLeft = pack.doors[0];
+    wording.doorRight = pack.doors[1];
+  }
+  return wording;
+}
+
+/** The local name of a ceremony in this invite's tradition, if it has one. */
+export function ceremonyName(
+  draft: InviteDraft,
+  id: FunctionId,
+): { native: string; latin: string } | null {
+  return draftTradition(draft)?.ceremonies[id] ?? null;
+}
+
 /**
  * The words the card draws. The host's wording fills the slots; the date and venue come
  * from the main function; anything not written yet shows the design's sample, so the
@@ -208,8 +278,9 @@ export function templateWithRaga(templateId: TemplateId, raga: RagaId | null): T
 export function draftCopy(draft: InviteDraft): CardCopy {
   const template = TEMPLATES[draft.templateId];
   const content: Partial<Record<SlotId, string>> = {};
+  const tradition = traditionWording(draft);
   for (const id of COUPLE_SLOTS) {
-    const value = draft.content[id] ?? draftCategory(draft).wording[id];
+    const value = draft.content[id] ?? tradition[id] ?? draftCategory(draft).wording[id];
     if (value !== undefined) content[id] = value;
   }
   const main = mainFunction(draft);
@@ -218,7 +289,12 @@ export function draftCopy(draft: InviteDraft): CardCopy {
     if (fn.date) content.date = formatCardDate(fn.date).slice(0, SLOT_RULES.date.maxLength);
     if (fn.venue.trim()) content.venue = fn.venue.slice(0, SLOT_RULES.venue.maxLength);
   }
-  return toCardCopy(template, content);
+  const copy = toCardCopy(template, content);
+  // The invocation belongs on the card even when the design has no blessing line
+  const blessing = draft.content.blessing ?? tradition.blessing;
+  if (blessing !== undefined) copy.blessing = blessing.trim();
+  copy.symbol = draftSymbol(draft);
+  return copy;
 }
 
 export type StepErrors = Record<string, "required" | "too-long" | "no-functions">;
@@ -267,7 +343,9 @@ export function sampleOf(template: Template, id: SlotId, category?: Category): s
 export function coupleValue(draft: InviteDraft, template: Template, id: SlotId): string {
   return (
     draft.content[id] ??
-    (SLOT_RULES[id].required ? "" : sampleOf(template, id, draftCategory(draft)))
+    (SLOT_RULES[id].required
+      ? ""
+      : (traditionWording(draft)[id] ?? sampleOf(template, id, draftCategory(draft))))
   );
 }
 

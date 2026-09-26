@@ -2,6 +2,8 @@ import type { CardCopy } from "@/lib/templates/content";
 import { initialOf } from "@/lib/templates/content";
 import type { FontRole, StockRole, Template, TypeStyle } from "@/lib/templates/schema";
 import type { DoorSide, Motif } from "./motifs";
+import type { Layer } from "./decor";
+import { SYMBOLS } from "./symbols";
 
 /*
  * Where each line of words sits on the card, worked out once and used by both the 2D card
@@ -37,6 +39,8 @@ export type InsideLayout = {
   divider: number | null;
   /** The couple's initials with a fine rule between them (monogram layout). */
   monogram: { top: number; size: number; initials: [string, string]; x: number } | null;
+  /** A drawn sacred symbol, top-centre above every word (a lettered one is a run). */
+  symbol: { top: number; size: number; x: number } | null;
   /** How much everything was scaled down to fit the motif's text box. */
   scale: number;
 };
@@ -124,11 +128,13 @@ function run(spec: Spec, maxWidth: number, x: number): TextRun {
 }
 
 const MONOGRAM_SIZE = 17;
+const SYMBOL_SIZE = 9;
 
 type Item =
   | { kind: "run"; gap: number; run: TextRun }
   | { kind: "divider"; gap: number }
-  | { kind: "monogram"; gap: number };
+  | { kind: "monogram"; gap: number }
+  | { kind: "symbol"; gap: number };
 
 export function layoutInside(copy: CardCopy, template: Template, motif: Motif): InsideLayout {
   const { names, labels, body } = template.fonts;
@@ -140,16 +146,24 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
       items.push({ kind: "run", gap, run: run({ ...spec, gap }, box.width, x) });
   };
 
+  // A sacred symbol always leads, centred above every word
+  const sacred = copy.symbol ? SYMBOLS[copy.symbol] : null;
+  if (sacred?.kind === "art") items.push({ kind: "symbol", gap: 0 });
+  if (sacred?.kind === "glyph") {
+    const style = { font: sacred.font, italic: false, uppercase: false, tracking: 0, scale: 1 };
+    text({ key: "symbol", text: sacred.text, style, size: 8.5, ink: "goldText", lines: 1 }, 0);
+  }
   text(
     {
       key: "blessing",
       text: copy.blessing,
       style: labels,
-      size: 2.5 * labels.scale,
+      // An invocation in an Indian script needs more size to read than spaced capitals
+      size: (JOINED.test(copy.blessing) ? 3.6 : 2.5) * labels.scale,
       ink: "accentText",
       lines: 1,
     },
-    0,
+    1.6,
   );
   text(
     {
@@ -240,7 +254,9 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
       ? item.run.rows.length * item.run.lineHeight
       : item.kind === "divider"
         ? DIVIDER_HEIGHT
-        : MONOGRAM_SIZE;
+        : item.kind === "symbol"
+          ? SYMBOL_SIZE
+          : MONOGRAM_SIZE;
   const gapOf = (item: Item, i: number) => (i === 0 ? 0 : item.gap);
 
   // Stack everything, then scale it all down together if it overflows the box
@@ -252,6 +268,7 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
   const runs: TextRun[] = [];
   let divider: number | null = null;
   let monogram: InsideLayout["monogram"] = null;
+  let symbol: InsideLayout["symbol"] = null;
   items.forEach((item, i) => {
     y += gapOf(item, i) * scale;
     const h = heightOf(item) * scale;
@@ -264,6 +281,8 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
       });
     } else if (item.kind === "divider") {
       divider = y + h / 2;
+    } else if (item.kind === "symbol") {
+      symbol = { top: y, size: h, x };
     } else {
       monogram = {
         top: y,
@@ -275,7 +294,15 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
     y += h;
   });
 
-  return { runs, divider, monogram, scale };
+  return { runs, divider, monogram, symbol, scale };
+}
+
+/** The drawn sacred symbol as ornament layers, in face units, or null. */
+export function symbolLayers(copy: CardCopy, layout: InsideLayout): Layer[] | null {
+  const sacred = copy.symbol ? SYMBOLS[copy.symbol] : null;
+  if (!layout.symbol || sacred?.kind !== "art") return null;
+  const { top, size, x } = layout.symbol;
+  return [{ items: [{ at: [x, top + size / 2], scale: size / 2, shapes: sacred.shapes }] }];
 }
 
 export type DoorLayout = { label: TextRun | null; initial: TextRun };

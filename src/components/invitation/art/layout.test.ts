@@ -5,6 +5,8 @@ import { toCardCopy } from "@/lib/templates/content";
 import { TEMPLATE_IDS } from "@/lib/templates/schema";
 import { balance, estimateWidth, layoutDoor, layoutInside, trackingFor } from "./layout";
 import { MOTIFS } from "./motifs";
+import { SYMBOL_IDS } from "@/lib/traditions/schema";
+import { SYMBOLS } from "./symbols";
 
 const wordings = Object.keys(sampleCopies) as (keyof typeof sampleCopies)[];
 
@@ -37,6 +39,28 @@ describe.each(TEMPLATE_IDS)("the %s layout", (id) => {
     }
     if (motif.divider) expect(divider).not.toBeNull();
     expect(Boolean(monogram)).toBe(motif.layout === "monogram");
+  });
+
+  it.each(SYMBOL_IDS)("puts the %s symbol top-centre, above every word", (symbol) => {
+    const copy = { ...toCardCopy(template), blessing: "॥ श्री गणेशाय नमः ॥", symbol };
+    const layout = layoutInside(copy, template, motif);
+    const box = motif.textBox;
+    const glyph = layout.runs.find((run) => run.key === "symbol");
+    const mark =
+      SYMBOLS[symbol].kind === "art"
+        ? {
+            top: layout.symbol!.top,
+            bottom: layout.symbol!.top + layout.symbol!.size,
+            x: layout.symbol!.x,
+          }
+        : { top: glyph!.top, bottom: glyph!.top + glyph!.lineHeight, x: glyph!.x };
+    expect(mark.x).toBe(50);
+    expect(mark.top).toBeGreaterThanOrEqual(box.top - 0.01);
+    // Nothing sits above or on top of it
+    for (const run of layout.runs.filter((run) => run.key !== "symbol")) {
+      expect(run.top, run.key).toBeGreaterThanOrEqual(mark.bottom - 0.01);
+    }
+    expect(layout.scale).toBeGreaterThan(0.55);
   });
 
   it("puts each door's initial on its door", () => {

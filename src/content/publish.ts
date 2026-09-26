@@ -78,6 +78,7 @@ export const guestCopy = {
   openHint: "Tap the card to open it",
   reply: "Reply to the invitation",
   functions: "The celebrations",
+  family: "With love from the family",
   when: "When",
   where: "Where",
   dressCode: "Dress code",

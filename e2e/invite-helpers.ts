@@ -37,6 +37,7 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await expect(page).toHaveURL(/\/create/);
   await next(page);
   await next(page);
+  await next(page);
   await page.getByRole("textbox", { name: /First name/ }).fill(names[0]);
   await page.getByRole("textbox", { name: /Second name/ }).fill(names[1]);
   await next(page);

@@ -60,6 +60,13 @@ export const stepCopy: Record<
     intro:
       "The occasion sets up your invite: the functions it plans, its wording and the designs that suit it. Switch later and nothing you've typed is lost.",
   },
+  tradition: {
+    label: "Tradition",
+    eyebrow: "Choose a tradition",
+    title: "Whose tradition should the card follow?",
+    intro:
+      "A tradition sets the sacred symbol, the invocation, local ceremony names and the family wording. Everything stays editable, and you can skip this step.",
+  },
   design: {
     label: "Design",
     eyebrow: "Choose a design",
@@ -213,6 +220,62 @@ export const extrasCopy = {
     kafi: "Festive folk, Holi colours",
   },
 } as const;
+
+export const traditionCopy = {
+  group: "Traditions",
+  none: "No tradition",
+  noneHint: "The design's own wording, no symbol",
+  nearYou: "Near you",
+  draftNote:
+    "These traditions are early drafts. People from each community are checking the wording, symbols and ceremony names before launch, so please tell us if something is not right.",
+  names: {
+    "north-hindu": "North Indian Hindu",
+    rajasthani: "Rajasthani and Marwari",
+    marathi: "Marathi",
+    gujarati: "Gujarati",
+    bengali: "Bengali Hindu",
+    tamil: "Tamil Hindu",
+    modern: "Modern",
+  },
+  hints: {
+    "north-hindu": "Shri Ganeshaya Namah, Darshanabhilashi and Swagatotsuk",
+    rajasthani: "Shri Ganeshaya Namah, Pithi and Mahila Sangeet",
+    marathi: "Shri Ganeshaya Namah, Sakharpuda and Halad",
+    gujarati: "Kankotri wording, Gol Dhana, Pithi and a tahuko for the children",
+    bengali: "Prajapataye Namah, Gaye Holud and Bou Bhaat",
+    tamil: "The Pillaiyar suzhi, Nichayathartham and Varaverpu",
+    modern: "No religious symbols, for any couple or an interfaith wedding",
+  },
+  elements: "Religious elements",
+  symbol: "Symbol at the top of the card",
+  symbolNames: {
+    om: "Om",
+    kalash: "Mangal kalash",
+    swastik: "Swastik",
+    diya: "Diya",
+    prajapati: "Prajapati",
+    suzhi: "Pillaiyar suzhi",
+  },
+  noSymbol: "No symbol",
+  symbolNote: "Deity artwork is being drawn by Indian artists and arrives later.",
+  invocation: "Invocation",
+  invocationModes: { script: "In its script", latin: "In English letters", off: "Leave it off" },
+  meanings: {
+    "Shri Ganeshaya Namah": "Salutations to Lord Ganesha",
+    "Prajapataye Namah": "Salutations to Prajapati, lord of marriage",
+    "Sri Vinayagar Thunai": "With the grace of Lord Vinayagar",
+  } as Record<string, string>,
+  wording: "Family wording",
+  wordingIntro: "Guests read these under the card. Leave any of them empty.",
+  wordingLabels: {
+    blessingsFrom: "Blessings from",
+    requesters: "Hosted by",
+    welcome: "Waiting to welcome you",
+    children: "The children's line",
+  },
+  ceremonies: "Ceremony names",
+  ceremoniesIntro: "Functions take their local names on the guest page.",
+};
 
 /** Each design's name and one line about it, as the design step shows them. */
 export const designCopy: Record<TemplateId, { name: string; description: string }> =

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { firstGrapheme } from "@/lib/initials";
+import type { SymbolId } from "@/lib/traditions/schema";
 import { SLOT_IDS, SLOT_RULES, type SlotId, type Template } from "./schema";
 
 /** What a host has written into a template's slots. Missing slots use the sample wording. */
@@ -16,6 +17,8 @@ export type CardCopy = {
   line: string;
   date: string;
   venue: string;
+  /** A sacred symbol drawn top-centre, above every word (tradition packs, Step 12a). */
+  symbol?: SymbolId | null;
 };
 
 export function slotsOf(template: Template): SlotId[] {

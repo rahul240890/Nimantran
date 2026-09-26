@@ -3,7 +3,7 @@
 import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { draftCategory } from "@/lib/editor/draft";
+import { draftCategory, draftTradition } from "@/lib/editor/draft";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
@@ -13,7 +13,11 @@ export function DesignStep({ draft, update }: StepProps) {
   const { designCopy, occasionCopy, stepCopy } = useText(editorText);
   const locale = useLocale();
   const category = draftCategory(draft);
-  const suggested: readonly TemplateId[] = category.templates;
+  // The tradition's designs lead, then the occasion's
+  const tradition = draftTradition(draft);
+  const suggested: readonly TemplateId[] = [
+    ...new Set([...(tradition?.templates ?? []), ...category.templates]),
+  ];
   // The occasion's designs first, best first; every design stays available
   const order = [...suggested, ...TEMPLATE_IDS.filter((id) => !suggested.includes(id))];
   const allSuggested = order.length === suggested.length;
