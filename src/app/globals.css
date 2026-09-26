@@ -19,6 +19,13 @@
 }
 
 /* Still mode: the OS reduced-motion setting, or data-motion="reduce" (the /design preview switch) */
+/* How far an invitation's doors have opened, 0 to 1. Registered so it can transition. */
+@property --open {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 @custom-variant motion-still {
   @media (prefers-reduced-motion: reduce) {
     @slot;
@@ -102,6 +109,17 @@
   --tpl-kasavu-ink: #33240f;
   --tpl-kasavu-ornament: #c9a043;
   --tpl-kasavu-accent: #74540f;
+
+  /* The inside of each design's gate-fold doors, behind the gold pattern */
+  --tpl-rose-back: #7a2238;
+  --tpl-emerald-back: #6d1a2b;
+  --tpl-scroll-back: #2f3e6b;
+  --tpl-monogram-back: #2b2926;
+  --tpl-kasavu-back: #1d4a3c;
+
+  /* Petals that are not already brand colours */
+  --petal-jasmine: #fbf6e9;
+  --petal-blush: #e9a3b1;
 }
 
 @media (prefers-color-scheme: dark) {

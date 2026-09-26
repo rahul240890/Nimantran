@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Logo } from "@/components/brand/logo";
-import { Switch } from "@/components/ui/switch";
+import { StillModeSwitch } from "@/components/motion/still-mode-switch";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { uiStrings } from "@/lib/ui-strings";
 
@@ -18,29 +17,6 @@ export const sections = [
   { id: "feedback", label: "Loading and empty" },
 ];
 
-/** Lets a reviewer preview the still version without changing their device settings. */
-function StillModeSwitch() {
-  const [still, setStill] = useState(false);
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (still) root.dataset.motion = "reduce";
-    else delete root.dataset.motion;
-    return () => {
-      delete root.dataset.motion;
-    };
-  }, [still]);
-
-  return (
-    <Switch
-      label={<span className="text-sm font-semibold whitespace-nowrap">Reduce motion</span>}
-      checked={still}
-      onCheckedChange={setStill}
-      className="gap-3 py-0 max-sm:order-last max-sm:w-full max-sm:border-t max-sm:border-line max-sm:pt-1.5"
-    />
-  );
-}
-
 export function DesignHeader() {
   return (
     <header className="z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:sticky sm:top-0">
@@ -54,7 +30,7 @@ export function DesignHeader() {
         </div>
         {/* On phones the motion switch drops to its own row; from sm up both controls sit together */}
         <div className="contents sm:flex sm:items-center sm:gap-5">
-          <StillModeSwitch />
+          <StillModeSwitch className="gap-3 py-0 max-sm:order-last max-sm:w-full max-sm:border-t max-sm:border-line max-sm:pt-1.5" />
           <ThemeToggle labels={uiStrings.theme} />
         </div>
       </div>
