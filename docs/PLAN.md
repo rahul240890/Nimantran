@@ -86,6 +86,7 @@ Built as: a Zod-checked template schema with validated text slots; ornaments sto
 
 **Step 5a. Category system**
 Categories stored as data: name in every language, icon, season, region, default functions and RSVP questions. One template can belong to many categories. Seasonal and regional ordering on the home screen (Onam first in Kerala in August, Durga Puja in Bengal in October). Launch with the wedding journey (roka, engagement, haldi, mehendi, sangeet, wedding, reception, save-the-date); other categories are added as data in Step 23.
+Build next, after Step 6. The editor (Step 6) was built first with a fixed list of five wedding functions and no category choice, so this step also adds the category screen to the editor and moves its functions into category data (adding roka, engagement and save-the-date).
 
 **Step 6. Invite editor**
 Step-by-step editor: choose category and template → couple details → functions (roka, haldi, mehendi, sangeet, wedding, reception) with date, time, venue, dress code → photos and music → preview. Live 3D preview beside the form; autosave drafts.

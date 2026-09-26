@@ -4,6 +4,13 @@ What we are building, in full. The build order lives in [PLAN.md](PLAN.md); this
 
 Related: [MEMORIES.md](MEMORIES.md) (3D gifts), [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market), [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
+## Built so far
+
+This file describes the full product. Only part of it exists today, so check this list before claiming a feature on the website or in marketing:
+
+- **Built:** the 3D engine with a 2D fallback, the gate-fold format, 6 templates, music composed live from 6 ragas (no track library or uploads yet), and the invite editor with autosaved drafts in the browser.
+- **Not built yet:** categories, accounts, publishing and share links, RSVP, the host dashboard, languages other than English, payments, and every other card format.
+
 ---
 
 ## 1. Positioning
@@ -139,7 +146,7 @@ Flat price per event. **Never coins, never per-guest charges.** Every link, free
 
 **Pricing tactics:** free watermarked preview before paying; regional pricing abroad; festival and early-bird offers; upgrade later by paying the difference; referral credit ₹100 for host and guest; pay-per-extra (more guests, photos, AI images).
 
-Prices are starting proposals; revisit after the first 500 sales. Headline prices include GST (PLAN_REVIEW.md).
+The Free column's 10 basic templates assumes the catalogue has grown past the 6 built today. Prices are starting proposals; revisit after the first 500 sales. Headline prices include GST (PLAN_REVIEW.md).
 
 ## 10. Add-ons
 
