@@ -13,7 +13,7 @@ import { Surfaces } from "./_sections/surfaces";
 
 export const metadata: Metadata = {
   title: "Design system",
-  description: "Every Nimantran component in every state, in light and dark.",
+  description: "Every Shubhdwar component in every state, in light and dark.",
   robots: { index: false, follow: false },
 };
 
@@ -54,7 +54,7 @@ export default function DesignPage() {
         </div>
         <footer className="border-t border-line">
           <p className="mx-auto max-w-7xl px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:px-6 lg:px-8">
-            Nimantran design system · tokens in <code>src/app/globals.css</code>, components in{" "}
+            Shubhdwar design system · tokens in <code>src/app/globals.css</code>, components in{" "}
             <code>src/components/ui</code>
           </p>
         </footer>

@@ -50,6 +50,7 @@ export const shell = {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",
     languages: "Languages at launch",
+    meaning: "the auspicious doorway",
     madeIn: "Made in India",
     rights: "All rights reserved.",
   },
@@ -169,7 +170,7 @@ export const faq = {
     },
     {
       q: "Will it work on older or slower phones?",
-      a: "Yes. Nimantran checks each phone and shows a lighter version when needed, so every guest can open the invite and reply.",
+      a: "Yes. Shubhdwar checks each phone and shows a lighter version when needed, so every guest can open the invite and reply.",
     },
     {
       q: "Can I make the invite in Hindi, Tamil or another language?",
@@ -198,7 +199,7 @@ export const waitlist = {
   eyebrow: "Early access",
   title: "Be first to send one",
   intro:
-    "We are opening Nimantran to couples in small groups. Leave your details and we will write when your spot opens.",
+    "We are opening Shubhdwar to couples in small groups. Leave your details and we will write when your spot opens.",
   perks: [
     "An early spot before public launch",
     "Premium free for your first event",

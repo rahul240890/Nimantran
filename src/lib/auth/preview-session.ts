@@ -10,7 +10,7 @@ export const PREVIEW_COOKIE = "nimantran-preview-session";
 const encoder = new TextEncoder();
 
 function secret(): string {
-  return process.env.NIMANTRAN_AUTH_PREVIEW_SECRET || "nimantran-preview-only-not-for-production";
+  return process.env.SHUBHDWAR_AUTH_PREVIEW_SECRET || "shubhdwar-preview-only-not-for-production";
 }
 
 function toBase64Url(bytes: Uint8Array): string {

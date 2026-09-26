@@ -52,7 +52,7 @@ export default async function Image() {
           {site.name.toUpperCase()}
         </div>
         <div style={{ fontFamily: "Rozha One", fontSize: 76, lineHeight: 1.05 }}>
-          Invitations your guests open, turn and keep.
+          Invitations that open like doors.
         </div>
         <div style={{ fontFamily: "Tenor Sans", fontSize: 28, color: colors.inkMuted }}>
           3D invites · WhatsApp · RSVP in one tap

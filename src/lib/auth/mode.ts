@@ -14,7 +14,7 @@ export function supabaseEnv(): { url: string; anonKey: string } | null {
 
 export function authMode(): AuthMode {
   if (supabaseEnv()) return "supabase";
-  if (process.env.NIMANTRAN_AUTH_PREVIEW === "1" && process.env.VERCEL_ENV !== "production") {
+  if (process.env.SHUBHDWAR_AUTH_PREVIEW === "1" && process.env.VERCEL_ENV !== "production") {
     return "preview";
   }
   return "off";

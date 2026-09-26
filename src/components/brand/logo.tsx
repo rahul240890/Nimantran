@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
-import { Mandala } from "./mandala";
+import { BrandMark } from "./brand-mark";
 
 type LogoProps = {
   className?: string;
@@ -18,7 +18,7 @@ export function Logo({ className, href = "/" }: LogoProps) {
         className,
       )}
     >
-      <Mandala simple className="size-8 text-accent-text" />
+      <BrandMark className="h-9 w-8 text-accent-text" />
       <span className="font-display text-[1.375rem] leading-none tracking-[0.01em]">
         {site.name}
       </span>

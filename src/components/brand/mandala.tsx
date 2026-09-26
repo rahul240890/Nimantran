@@ -12,7 +12,7 @@ const INNER_PETALS = Array.from({ length: 12 }, (_, i) => i * 30 + 15);
 const DOTS = Array.from({ length: 32 }, (_, i) => i * 11.25);
 
 /**
- * The Nimantran mandala. Draws in `currentColor` for lines and `--mandala-fill`
+ * The Shubhdwar mandala. Draws in `currentColor` for lines and `--mandala-fill`
  * (defaults to marigold) for filled petals, so it adapts to any theme.
  */
 export function Mandala({ className, simple = false, title }: MandalaProps) {

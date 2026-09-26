@@ -60,6 +60,8 @@ Only the owner can do these; code sessions should not rename until this is done 
 
 ## 4. Step 8a: rename in code
 
+**Done 26 September 2026** (details under Step 8a in PLAN.md). Email and SMS templates and the "Made with Shubhdwar" watermark use `site.name` when they are built.
+
 After B1 (or the owner's go-ahead):
 
 - `src/lib/site.ts`: name "Shubhdwar", tagline, description, production URL

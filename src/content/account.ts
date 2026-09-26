@@ -19,7 +19,7 @@ export const signInCopy = {
   metaTitle: "Sign in",
   metaDescription: "Sign in to keep your invites safe and open them on any phone.",
   eyebrow: "Welcome",
-  title: "Sign in to Nimantran",
+  title: "Sign in to Shubhdwar",
   intro: "Keep your invites safe and open them on any phone. No password to remember.",
   phoneLabel: "Mobile number",
   phoneHint:
@@ -38,7 +38,7 @@ export const signInCopy = {
   changeNumber: "Change number",
   previewNote: "Preview mode: any number works, and the code is 123456.",
   terms: "By continuing you agree to be contacted about your invites. We never share your number.",
-  success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Nimantran"),
+  success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubhdwar"),
   side: {
     eyebrow: "Your invites, everywhere",
     title: "Start on your phone, finish on the laptop",

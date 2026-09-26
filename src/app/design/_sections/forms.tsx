@@ -64,7 +64,7 @@ export function Forms() {
               />
             </Field>
             <Field label="Invite link" hint="Set when you publish." disabled>
-              <Input defaultValue="nimantran.app/i/aarav-weds-meera" />
+              <Input defaultValue="shubhdwar.com/i/aarav-weds-meera" />
             </Field>
             <Field label="Event code">
               <Input readOnly defaultValue="NIM-4821" />

@@ -50,6 +50,6 @@ database keeps every invite. Applied so far after the first setup:
 
 ## Local work and tests
 
-Without keys, set `NIMANTRAN_AUTH_PREVIEW=1` (see `.env.example`): any mobile number signs in
+Without keys, set `SHUBHDWAR_AUTH_PREVIEW=1` (see `.env.example`): any mobile number signs in
 with code 123456, and invites are kept in the server's memory. Preview mode never runs on the
 live site.
