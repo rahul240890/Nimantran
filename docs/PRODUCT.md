@@ -1,4 +1,4 @@
-# Nimantran — Product Specification
+# Shubhdwar — Product Specification
 
 What we are building, in full. The build order lives in [PLAN.md](PLAN.md); this file is the feature catalogue every step builds from.
 
@@ -14,6 +14,8 @@ This file describes the full product. Only part of it exists today, so check thi
 ---
 
 ## 1. Positioning
+
+**Name:** Shubhdwar (शुभद्वार, "auspicious doorway"), decided 26 September 2026. Earlier docs and code say Nimantran; the rename is Step 8a. Brand and SEO plan: [BRAND_SEO.md](BRAND_SEO.md).
 
 A WhatsApp link that opens a 3D invitation, with real RSVP and guest tools, in the family's own language, for one clear price per event.
 
