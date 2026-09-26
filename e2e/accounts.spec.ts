@@ -9,7 +9,7 @@ const noOverflow = (page: Page) =>
 
 /** Preview accounts are per number, so tests that save invites each get their own. */
 const numberFor = (info: TestInfo) =>
-  `9${String(info.workerIndex * 1000 + info.repeatEachIndex * 100 + info.retry).padStart(4, "0")}${String(Date.now()).slice(-5)}`;
+  `9${String((info.parallelIndex % 10) * 1000 + info.repeatEachIndex * 100 + info.retry).padStart(4, "0")}${String(Date.now()).slice(-5)}`;
 
 async function signInWithPhone(page: Page, number = "98765 43210") {
   await page.getByRole("textbox", { name: /Mobile number/ }).fill(number);
