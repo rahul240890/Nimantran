@@ -1,18 +1,20 @@
 import type { ComponentType } from "react";
-import { GateCard, type GateCardCopy } from "@/components/brand/gate-card";
+import { GateCard } from "@/components/brand/gate-card";
+import type { CardCopy } from "@/lib/templates/content";
+import type { FormatId, Template } from "@/lib/templates/schema";
 
 /*
  * Card formats. Each has a 3D scene (in ./three, loaded on demand) and a light 2D card
  * for weaker devices and first paint. Gate-fold is the first; the business plan's
  * other formats plug in here with the same contract.
  */
-export type CardFormatId = "gate-fold";
+export type CardFormatId = FormatId;
 
 export type CardFormat = {
   id: CardFormatId;
   name: string;
   /** The 2D card: purely visual, reads the --open CSS variable (0 shut, 1 open). */
-  Flat: ComponentType<{ copy: GateCardCopy; className?: string }>;
+  Flat: ComponentType<{ copy: CardCopy; template: Template; className?: string }>;
 };
 
 export const CARD_FORMATS: Record<CardFormatId, CardFormat> = {

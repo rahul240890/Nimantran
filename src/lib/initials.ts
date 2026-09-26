@@ -6,7 +6,8 @@ export function initials(name: string): string {
   return (first + last).toLocaleUpperCase();
 }
 
-function firstGrapheme(word: string): string {
+/** The first whole character of a word (मी, not म). */
+export function firstGrapheme(word: string): string {
   const segmenter = new Intl.Segmenter(undefined, { granularity: "grapheme" });
   for (const { segment } of segmenter.segment(word)) return segment;
   return "";

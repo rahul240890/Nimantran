@@ -1,3 +1,5 @@
+import type { TemplateId } from "@/lib/templates/schema";
+
 /**
  * English copy for the app shell and the landing page.
  * Kept in one place, shaped like a message file, so Step 12 can move it into next-intl unchanged.
@@ -62,8 +64,10 @@ export const hero = {
   proof: ["No app to install", "RSVP in one tap", "10 Indian languages"],
   card: {
     doors: ["SHUBH", "VIVAH"],
+    blessing: "",
     families: "TOGETHER WITH THEIR FAMILIES",
     first: "Aarav",
+    joiner: "&",
     second: "Meera",
     line: "invite you to celebrate their wedding",
     date: "SATURDAY, 12 DECEMBER 2026",
@@ -91,7 +95,7 @@ export const howItWorks = {
   ],
 } as const;
 
-export type TemplateId = "marigold" | "rose" | "emerald" | "scroll" | "monogram" | "kasavu";
+export type { TemplateId };
 
 export const templates = {
   eyebrow: "Designs",

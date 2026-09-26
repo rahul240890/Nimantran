@@ -57,6 +57,7 @@ function useFaceMaterial(face: Face, anisotropy: number) {
  */
 export function GateFoldScene({
   copy,
+  template,
   stock,
   settings,
   openRef,
@@ -70,13 +71,13 @@ export function GateFoldScene({
 
   const faces = useMemo(
     () => ({
-      inside: paintInside(copy, stock, width, foil),
-      leftFront: paintDoorFront("left", copy.doors[0], copy.first.charAt(0), stock, width, foil),
-      rightFront: paintDoorFront("right", copy.doors[1], copy.second.charAt(0), stock, width, foil),
-      doorBack: paintDoorBack(stock, width, foil),
-      cardBack: paintCardBack(stock, width, foil),
+      inside: paintInside(copy, template, stock, width, foil),
+      leftFront: paintDoorFront("left", copy, template, stock, width, foil),
+      rightFront: paintDoorFront("right", copy, template, stock, width, foil),
+      doorBack: paintDoorBack(template, stock, width, foil),
+      cardBack: paintCardBack(template, stock, width, foil),
     }),
-    [copy, stock, width, foil],
+    [copy, template, stock, width, foil],
   );
 
   const inside = useFaceMaterial(faces.inside, anisotropy);

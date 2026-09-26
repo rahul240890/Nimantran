@@ -1,21 +1,24 @@
-import type { GateCardCopy } from "@/components/brand/gate-card";
-import { hero } from "./landing";
+import type { TemplateContent } from "@/lib/templates/content";
 
 /*
- * Sample wording for the /engine review page, including long names in other scripts so
- * reviewers can see text fitting on the card. Review-only content.
+ * Wording for the review pages. "Design's own" keeps each template's sample; the others
+ * put long names in other scripts on every design, so reviewers can see text fitting.
+ * Review-only content.
  */
 export const sampleCopies: Record<
-  "english" | "hindi" | "tamil",
-  { label: string; copy: GateCardCopy }
+  "template" | "hindi" | "tamil",
+  { label: string; content: TemplateContent }
 > = {
-  english: { label: "English", copy: hero.card },
+  template: { label: "Design's own (English)", content: {} },
   hindi: {
     label: "Hindi",
-    copy: {
-      doors: ["शुभ", "विवाह"],
+    content: {
+      doorLeft: "शुभ",
+      doorRight: "विवाह",
+      blessing: "॥ श्री गणेशाय नमः ॥",
       families: "अपने परिवारों के आशीर्वाद से",
       first: "आरव",
+      joiner: "संग",
       second: "मीरा",
       line: "आपको अपने विवाह समारोह में सादर आमंत्रित करते हैं",
       date: "शनिवार, 12 दिसंबर 2026",
@@ -24,10 +27,13 @@ export const sampleCopies: Record<
   },
   tamil: {
     label: "Tamil (long names)",
-    copy: {
-      doors: ["திருமண", "அழைப்பு"],
+    content: {
+      doorLeft: "திருமண",
+      doorRight: "அழைப்பு",
+      blessing: "",
       families: "இரு குடும்பத்தினரின் ஆசியுடன்",
       first: "அருணாசலம்",
+      joiner: "&",
       second: "மீனாட்சிசுந்தரி",
       line: "தங்கள் திருமண விழாவிற்கு உங்களை அன்புடன் அழைக்கிறார்கள்",
       date: "சனிக்கிழமை, 12 டிசம்பர் 2026",

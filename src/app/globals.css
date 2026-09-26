@@ -117,6 +117,12 @@
   --tpl-monogram-back: #2b2926;
   --tpl-kasavu-back: #1d4a3c;
 
+  /* Each design's second ornament colour: leaves, jewels, seals and lamp flames */
+  --tpl-rose-leaf: #6f8a5a;
+  --tpl-emerald-ruby: #b0283f;
+  --tpl-scroll-vermilion: #b8321f;
+  --tpl-kasavu-kumkum: #b4412a;
+
   /* Petals that are not already brand colours */
   --petal-jasmine: #fbf6e9;
   --petal-blush: #e9a3b1;
@@ -240,6 +246,10 @@
   --color-tpl-kasavu-ink: var(--tpl-kasavu-ink);
   --color-tpl-kasavu-ornament: var(--tpl-kasavu-ornament);
   --color-tpl-kasavu-accent: var(--tpl-kasavu-accent);
+  --color-tpl-rose-leaf: var(--tpl-rose-leaf);
+  --color-tpl-emerald-ruby: var(--tpl-emerald-ruby);
+  --color-tpl-scroll-vermilion: var(--tpl-scroll-vermilion);
+  --color-tpl-kasavu-kumkum: var(--tpl-kasavu-kumkum);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
   --font-sans: "Karla Variable", "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;

@@ -12,7 +12,6 @@ import {
 } from "react";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import type { GateCardCopy } from "@/components/brand/gate-card";
 import { approach, clamp } from "@/lib/hero-motion";
 import type { Bounds } from "@/lib/engine/particles";
 import {
@@ -22,7 +21,9 @@ import {
   type RenderLevel,
 } from "@/lib/engine/quality";
 import { cameraDistance, CARD, FOV, maxDoorAngle } from "@/lib/engine/scene-math";
-import { readToken, resolveStock, type EngineTheme, type ResolvedStock } from "@/lib/engine/themes";
+import type { CardCopy } from "@/lib/templates/content";
+import type { Template } from "@/lib/templates/schema";
+import { readToken, resolveStock, type ResolvedStock } from "@/lib/templates/stock";
 import { loadCardFonts } from "./card-art";
 import { GateFoldScene } from "./gate-fold";
 import { Lanterns } from "./lanterns";
@@ -39,8 +40,8 @@ const FORMAT_SCENES: Record<CardFormatId, (props: FormatSceneProps) => ReactNode
 };
 
 export type StageProps = {
-  copy: GateCardCopy;
-  theme: EngineTheme;
+  copy: CardCopy;
+  template: Template;
   format: CardFormatId;
   /** The level to draw at; the stage asks to step down when frames run slow. */
   level: RenderLevel;
@@ -61,7 +62,7 @@ type Resolved = { stock: ResolvedStock; petals: string[]; flame: string; glint: 
 /** Everything inside the canvas. */
 function Scene({
   copy,
-  theme,
+  template,
   format,
   level,
   open,
@@ -249,6 +250,7 @@ function Scene({
       <group ref={card}>
         <Format
           copy={copy}
+          template={template}
           stock={resolved.stock}
           settings={settings}
           openRef={openRef}
@@ -260,18 +262,18 @@ function Scene({
 
       <ContactShadow openRef={openRef} dark={dark} />
 
-      {theme.petals.length > 0 && (
+      {template.scene.petals.colours.length > 0 && (
         <Petals
           count={settings.petals}
           colours={resolved.petals}
-          size={theme.petalSize}
+          size={template.scene.petals.size}
           bounds={bounds}
           groundY={GROUND_Y}
           openRef={openRef}
           still={still}
         />
       )}
-      {theme.lanterns && (
+      {template.scene.lanterns && (
         <Lanterns
           count={settings.lanterns}
           flame={resolved.flame}
@@ -331,7 +333,7 @@ function ContactShadow({ openRef, dark }: { openRef: RefObject<number>; dark: bo
  * can draw it; until then (and on weaker devices) the 2D card shows instead.
  */
 export default function InvitationStage(props: StageProps) {
-  const { copy, theme, level, still, paused, dark, onFail } = props;
+  const { copy, template, level, still, paused, dark, onFail } = props;
   const settings = QUALITY[level];
   // Antialiasing and the shadow map are fixed when the canvas is made; later steps down
   // lower everything else without tearing the canvas down
@@ -342,14 +344,14 @@ export default function InvitationStage(props: StageProps) {
     let cancelled = false;
     void loadCardFonts(copy).then(() => {
       if (cancelled) return;
-      const { stock, petals } = resolveStock(theme, readToken);
+      const { stock, petals } = resolveStock(template, readToken);
       setResolved({ stock, petals, flame: readToken("marigold"), glint: readToken("gold-glint") });
     });
     return () => {
       cancelled = true;
     };
     // The colour scheme changes some petal colours (rose), so re-read on a theme switch
-  }, [copy, theme, dark]);
+  }, [copy, template, dark]);
 
   return (
     <Canvas
