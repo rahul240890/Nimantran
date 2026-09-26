@@ -3,7 +3,9 @@ import "@fontsource/rozha-one";
 import "@fontsource/tenor-sans";
 import "@fontsource-variable/karla";
 import "@fontsource-variable/karla/wght-italic.css";
+import { Providers } from "@/components/providers";
 import { site } from "@/lib/site";
+import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -40,8 +42,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className="h-full">
-      <body className="flex min-h-full flex-col">{children}</body>
+    // The theme script sets data-theme on <html> before hydration, so React must not flag it
+    <html lang="en" className="h-full" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="flex min-h-full flex-col">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

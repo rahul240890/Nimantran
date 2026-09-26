@@ -18,6 +18,16 @@
   }
 }
 
+/* Still mode: the OS reduced-motion setting, or data-motion="reduce" (the /design preview switch) */
+@custom-variant motion-still {
+  @media (prefers-reduced-motion: reduce) {
+    @slot;
+  }
+  &:where([data-motion="reduce"] *) {
+    @slot;
+  }
+}
+
 :root {
   color-scheme: light;
 
@@ -32,22 +42,34 @@
   --ink: #2a1a24;
   --ink-muted: #6b5864;
   --ink-faint: #8f7c87; /* non-text or large text only: 3.6:1 on paper */
+  --line-control: #948273; /* input and checkbox borders: 3:1 on every surface */
 
   /* Brand */
   --marigold: #f0a431;
   --marigold-strong: #e08a14;
   --on-marigold: #2a1a24;
+  --marigold-edge: #c77410; /* the pressed-in edge under primary buttons */
+  --gold-glint: #fff4d6; /* the light that sweeps across gold */
   --accent-text: #9a4c08;
   --rose: #b83d5d;
   --night: #120f24;
 
   /* Status */
-  --success: #1f7a4d;
-  --warning: #9a6200;
+  --success: #1a6f45;
+  --warning: #8a5700;
   --danger: #b3261e;
+  --on-danger: #ffffff;
 
   /* Focus ring */
   --ring: #9a4c08;
+
+  /* Depth: warm shadows on paper */
+  --scrim: rgb(42 26 36 / 0.45);
+  --elev-raised:
+    inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(74 44 20 / 0.08),
+    0 3px 8px -4px rgb(74 44 20 / 0.14);
+  --elev-float: 0 2px 6px -2px rgb(74 44 20 / 0.1), 0 18px 40px -18px rgb(74 44 20 / 0.35);
+  --elev-overlay: 0 4px 12px -4px rgb(42 26 36 / 0.12), 0 32px 72px -24px rgb(42 26 36 / 0.45);
 
   /* Invitation card stock: the same in both themes, like real paper */
   --card-ivory: #f8efdc;
@@ -80,6 +102,17 @@
     --warning: #f0b43c;
     --danger: #f2837a;
     --ring: #f5b75a;
+    --line-control: #7a6c9c;
+    --marigold-edge: #a3590a;
+    --on-danger: #2a0a08;
+    --scrim: rgb(5 3 12 / 0.7);
+    --elev-raised:
+      inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4),
+      0 4px 10px -4px rgb(0 0 0 / 0.5);
+    --elev-float:
+      inset 0 1px 0 rgb(255 255 255 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.5),
+      0 20px 44px -16px rgb(0 0 0 / 0.7);
+    --elev-overlay: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 32px 80px -20px rgb(0 0 0 / 0.8);
   }
 }
 
@@ -102,6 +135,17 @@
   --warning: #f0b43c;
   --danger: #f2837a;
   --ring: #f5b75a;
+  --line-control: #7a6c9c;
+  --marigold-edge: #a3590a;
+  --on-danger: #2a0a08;
+  --scrim: rgb(5 3 12 / 0.7);
+  --elev-raised:
+    inset 0 1px 0 rgb(255 255 255 / 0.06), 0 1px 2px rgb(0 0 0 / 0.4),
+    0 4px 10px -4px rgb(0 0 0 / 0.5);
+  --elev-float:
+    inset 0 1px 0 rgb(255 255 255 / 0.06), 0 2px 6px -2px rgb(0 0 0 / 0.5),
+    0 20px 44px -16px rgb(0 0 0 / 0.7);
+  --elev-overlay: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 32px 80px -20px rgb(0 0 0 / 0.8);
 }
 
 @theme inline {
@@ -113,15 +157,20 @@
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
   --color-ink-faint: var(--ink-faint);
+  --color-line-control: var(--line-control);
   --color-marigold: var(--marigold);
   --color-marigold-strong: var(--marigold-strong);
   --color-on-marigold: var(--on-marigold);
+  --color-marigold-edge: var(--marigold-edge);
+  --color-gold-glint: var(--gold-glint);
   --color-accent-text: var(--accent-text);
   --color-rose: var(--rose);
   --color-night: var(--night);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-on-danger: var(--on-danger);
+  --color-scrim: var(--scrim);
   --color-ring: var(--ring);
   --color-card-ivory: var(--card-ivory);
   --color-card-gold: var(--card-gold);
@@ -140,6 +189,104 @@
   --radius-md: 10px;
   --radius-lg: 16px;
   --radius-xl: 24px;
+
+  --shadow-raised: var(--elev-raised);
+  --shadow-float: var(--elev-float);
+  --shadow-overlay: var(--elev-overlay);
+
+  /* Motion: quick to respond, soft to settle */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --ease-in-soft: cubic-bezier(0.4, 0, 1, 1);
+
+  --animate-fade-in: fade-in 220ms var(--ease-out-expo) both;
+  --animate-fade-out: fade-out 160ms var(--ease-in-soft) both;
+  --animate-pop-in: pop-in 320ms var(--ease-out-expo) both;
+  --animate-pop-out: pop-out 160ms var(--ease-in-soft) both;
+  --animate-sheet-up-in: sheet-up-in 420ms var(--ease-out-expo) both;
+  --animate-sheet-up-out: sheet-up-out 220ms var(--ease-in-soft) both;
+  --animate-sheet-left-in: sheet-left-in 420ms var(--ease-out-expo) both;
+  --animate-sheet-left-out: sheet-left-out 220ms var(--ease-in-soft) both;
+  --animate-toast-in: toast-in 420ms var(--ease-spring) both;
+  --animate-toast-out: fade-out 180ms var(--ease-in-soft) both;
+  --animate-shimmer: shimmer 3.2s var(--ease-in-soft) infinite;
+  --animate-skeleton: skeleton 1.6s ease-in-out infinite;
+  --animate-rise: rise 520ms var(--ease-out-expo) both;
+}
+
+/* Keyframes live outside @theme so page transitions and utilities can always use them */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+@keyframes pop-out {
+  to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
+  }
+}
+@keyframes sheet-up-in {
+  from {
+    transform: translateY(100%);
+  }
+}
+@keyframes sheet-up-out {
+  to {
+    transform: translateY(100%);
+  }
+}
+/* --sheet-dir is -1 in right-to-left layouts, where the end edge is on the left */
+@keyframes sheet-left-in {
+  from {
+    transform: translateX(calc(100% * var(--sheet-dir, 1)));
+  }
+}
+@keyframes sheet-left-out {
+  to {
+    transform: translateX(calc(100% * var(--sheet-dir, 1)));
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+}
+@keyframes shimmer {
+  0%,
+  30% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
+}
+@keyframes skeleton {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
 }
 
 @layer base {
@@ -188,4 +335,64 @@
       scroll-behavior: auto !important;
     }
   }
+
+  :root[data-motion="reduce"] *,
+  :root[data-motion="reduce"] *::before,
+  :root[data-motion="reduce"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Gold text with a slow band of light passing over it. Large display text only. */
+@utility text-gold-shimmer {
+  color: var(--accent-text);
+  background-image: linear-gradient(
+    100deg,
+    var(--accent-text) 0%,
+    var(--accent-text) 40%,
+    var(--gold-glint) 50%,
+    var(--accent-text) 60%,
+    var(--accent-text) 100%
+  );
+  background-size: 250% 100%;
+  background-position: 120% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3.2s cubic-bezier(0.4, 0, 1, 1) infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+  &:where([data-motion="reduce"] *) {
+    animation: none;
+  }
+}
+
+/* Page transitions (React ViewTransition): the old page fades, the new one rises in */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.page-out) {
+  animation: 160ms cubic-bezier(0.4, 0, 1, 1) both fade-out;
+}
+::view-transition-new(.page-in) {
+  animation:
+    260ms cubic-bezier(0.16, 1, 0.3, 1) 120ms both fade-in,
+    520ms cubic-bezier(0.16, 1, 0.3, 1) both rise;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation: none !important;
+  }
+}
+:root[data-motion="reduce"]::view-transition-old(*),
+:root[data-motion="reduce"]::view-transition-new(*),
+:root[data-motion="reduce"]::view-transition-group(*) {
+  animation: none !important;
 }

@@ -14,7 +14,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. Every design-system component, in every state, is at http://localhost:3000/design.
 
 ## Scripts
 
@@ -37,6 +37,7 @@ src/
   components/
     brand/            Logo, mandala and brand illustrations
     ui/               Design-system components (Step 2)
+    motion/           Tilt cards and page transitions
   features/           Feature modules: editor, invite, dashboard … (from Step 4)
   lib/                Shared helpers and config
   test/               Test setup
