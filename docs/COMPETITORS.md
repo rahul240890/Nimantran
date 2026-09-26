@@ -28,6 +28,8 @@ Coin pricing, per-guest add-on charges, a yearly free limit.
 
 ### Where we win
 
+What we will win on once the plan is built. Today only the first point is live, with gate-fold cards and 6 ragas; see _Built so far_ in [PRODUCT.md](PRODUCT.md) before quoting any of these publicly.
+
 1. Interactive 3D card with music, not a flat card in an envelope.
 2. WhatsApp-first, low-end Android and slow networks, UPI.
 3. One link for every function of an Indian wedding, each with its own RSVP.
