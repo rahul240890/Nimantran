@@ -49,7 +49,7 @@ const onDoor = (side: DoorSide, children: Placement[]): Placement => ({
 
 const DOOR_TEXT = { label: 11, initial: { y: 69.2, size: 8 } };
 
-/* ---------- Marigold Gate: the Nimantran mandala ---------- */
+/* ---------- Marigold Gate: the Shubhdwar mandala ---------- */
 
 function mandalaShapes(): Shape[] {
   const outer = ring(16, 0, (deg) => ellipse(...turn(0, -70, deg), 8.5, 16, deg));

@@ -108,6 +108,8 @@ Domains, IP India trademark search and filing (classes 9, 35, 42), social handle
 **Step 8a. Rename to Shubhdwar**
 The product name changes from Nimantran to Shubhdwar before any public share links exist (decided 26 September 2026; reasons in BRAND_SEO.md). Site config, logo wordmark, favicon and icons, Open Graph image, all copy and metadata, watermark text, email and SMS templates, docs titles, tests. Repository, database and package names can stay `nimantran`. Start once task B1 is done or the owner says go.
 
+Built as (the owner said go on 26 September 2026): `site.name` is Shubhdwar with the Devanagari name beside it, a new doorway mark (the mandala inside an arch) in the logo, favicon, app icons and link-preview image ("Invitations that open like doors."), and every page, message, test and doc says Shubhdwar. Kept on purpose: the repository, the Vercel address, the database, and browser storage keys (renaming those would wipe drafts people already have). The preview sign-in switch is now `SHUBHDWAR_AUTH_PREVIEW`.
+
 **Step 9. Publish, share and schedule**
 Unique link (`/i/aarav-weds-meera`), WhatsApp share, rich link preview image (Open Graph), QR code, add-to-calendar. Scheduled sending per function (email and SMS).
 
@@ -149,7 +151,7 @@ Production Supabase, Vercel deploy, custom domain, analytics, error monitoring, 
 
 ## Phase 2b — Memories (3D gifts)
 
-Detailed in the Nimantran Memories Plan. Starts once payments work (after Step 18). Launch target: Star Map before Valentine's Day.
+Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18). Launch target: Star Map before Valentine's Day.
 
 **M1.** Memories foundation: tables, entry points on the home screen.
 **M2.** Star Map scene: sky maths, star catalogue, constellations, 5 styles.

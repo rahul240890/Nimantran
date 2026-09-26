@@ -10,6 +10,9 @@ export function SiteFooter() {
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1.4fr] lg:px-8">
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
+          <p className="font-display text-lg text-ink-muted">
+            <span lang="hi">{site.nameDevanagari}</span> · {shell.footer.meaning}
+          </p>
           <p className="max-w-xs text-ink-muted">{shell.footer.tagline}</p>
         </div>
 

@@ -1,4 +1,6 @@
-# Nimantran
+# Shubhdwar
+
+शुभद्वार, "auspicious doorway". This repository keeps its original name, `nimantran`.
 
 3D invitations your guests open, turn and keep. Create an invite in minutes, share it on WhatsApp, and collect RSVPs in one tap.
 
@@ -35,7 +37,7 @@ Open http://localhost:3000. Every design-system component, in every state, is at
 src/
   app/                Routes, layouts and global styles (design tokens in globals.css)
   components/
-    brand/            Logo, mandala, gate-fold card and design previews
+    brand/            Logo and doorway mark, mandala, gate-fold card and design previews
     ui/               Design-system components (Step 2)
     motion/           Tilt cards and page transitions
     shell/            Header, footer, language switcher (Step 3)
@@ -48,7 +50,7 @@ docs/
   PLAN.md             Phases and steps
   PLAN_REVIEW.md      Review of the build and business plans
   STEP1_REVIEW.md     Code review of Step 1 against the UI quality bar
-  Nimantran_Premium_Plan.pdf  Business plan: market, editions, pricing, costs
+  Nimantran_Premium_Plan.pdf  Original business plan (written before the rename): market, editions, pricing, costs
   images/             Landing page screenshots
 ```
 
