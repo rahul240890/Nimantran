@@ -42,6 +42,10 @@ src/
   test/               Test setup
 docs/
   PLAN.md             Phases and steps
+  PLAN_REVIEW.md      Review of the build and business plans
+  STEP1_REVIEW.md     Code review of Step 1 against the UI quality bar
+  Nimantran_Premium_Plan.pdf  Business plan: market, editions, pricing, costs
+  images/             Landing page screenshots
 ```
 
 ## Conventions

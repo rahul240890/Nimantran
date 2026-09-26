@@ -99,7 +99,7 @@ export function GateCardPreview({ className }: GateCardPreviewProps) {
       <button
         type="button"
         aria-pressed={open}
-        aria-label={open ? "Close the sample invitation" : "Open the sample invitation"}
+        aria-label="Open the sample invitation"
         onClick={() => setOpen((v) => !v)}
         className="group [container-type:inline-size] relative aspect-[5/4] w-full cursor-pointer rounded-[var(--radius-md)] [perspective:1600px]"
       >

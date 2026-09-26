@@ -6,7 +6,17 @@
  * Components use the Tailwind names below (bg-paper, text-ink, border-line …), never raw colours.
  */
 
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Matches the tokens: an explicit data-theme="dark", or the OS setting unless data-theme="light" */
+@custom-variant dark {
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      @slot;
+    }
+  }
+}
 
 :root {
   color-scheme: light;
