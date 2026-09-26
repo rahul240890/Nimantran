@@ -125,6 +125,8 @@ export function RsvpForm({
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [sent, setSent] = useState<{ name: string } | null>(null);
+  // A personal link brings a token before the guest has replied; the button says Send until then
+  const [replied, setReplied] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
@@ -170,7 +172,10 @@ export function RsvpForm({
           ]),
         ),
       );
-      if (reply.replies.length) setSent({ name: reply.name });
+      if (reply.replies.length) {
+        setSent({ name: reply.name });
+        setReplied(true);
+      }
     });
     return () => {
       cancelled = true;
@@ -235,6 +240,7 @@ export function RsvpForm({
     storeToken(slug, result.token);
     focusNext.current = "thanks";
     setSent({ name: name.trim() });
+    setReplied(true);
   };
 
   if (sent) {
@@ -440,7 +446,7 @@ export function RsvpForm({
         leadingIcon={<Send aria-hidden className="rtl:-scale-x-100" />}
         className="self-stretch sm:self-start"
       >
-        {token ? rsvpCopy.update : rsvpCopy.send}
+        {replied ? rsvpCopy.update : rsvpCopy.send}
       </Button>
     </form>
   );

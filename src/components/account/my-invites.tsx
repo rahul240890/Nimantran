@@ -9,6 +9,7 @@ import {
   HardDrive,
   Send,
   Trash2,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -304,30 +305,45 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                       formatDistanceToNow(invite.updatedAt, { addSuffix: true }),
                     )}
                     badge={
-                      invite.status === "published" ? (
-                        <Badge tone="success" dot>
-                          {invitesCopy.status.published}
-                        </Badge>
-                      ) : (
-                        <Badge tone="neutral">{invitesCopy.status.draft}</Badge>
-                      )
+                      <>
+                        {invite.status === "published" ? (
+                          <Badge tone="success" dot>
+                            {invitesCopy.status.published}
+                          </Badge>
+                        ) : (
+                          <Badge tone="neutral">{invitesCopy.status.draft}</Badge>
+                        )}
+                        {invite.role === "cohost" && (
+                          <Badge tone="rose">{invitesCopy.cohost}</Badge>
+                        )}
+                      </>
                     }
                     href={`/create?invite=${invite.id}`}
                     secondary={
-                      invite.status === "published" ? (
-                        <Button asChild size="sm">
-                          <Link href={`/invites/${invite.id}/share`}>
-                            <Send aria-hidden className="rtl:-scale-x-100" />
-                            {invitesCopy.share}
+                      <div className="flex flex-wrap gap-2">
+                        <Button asChild size="sm" variant="secondary">
+                          <Link href={`/invites/${invite.id}`}>
+                            <Users aria-hidden />
+                            {invitesCopy.guests}
                           </Link>
                         </Button>
-                      ) : null
+                        {invite.status === "published" && (
+                          <Button asChild size="sm">
+                            <Link href={`/invites/${invite.id}/share`}>
+                              <Send aria-hidden className="rtl:-scale-x-100" />
+                              {invitesCopy.share}
+                            </Link>
+                          </Button>
+                        )}
+                      </div>
                     }
                     action={
-                      <DeleteInvite
-                        invite={invite}
-                        title={invite.first && invite.second ? title : invitesCopy.remove.unnamed}
-                      />
+                      invite.role === "owner" ? (
+                        <DeleteInvite
+                          invite={invite}
+                          title={invite.first && invite.second ? title : invitesCopy.remove.unnamed}
+                        />
+                      ) : undefined
                     }
                   />
                 </li>

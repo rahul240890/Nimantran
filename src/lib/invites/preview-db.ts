@@ -16,6 +16,27 @@ export type PreviewInvite = {
   /** The RSVP's library questions, in order. */
   questions: RsvpQuestionId[];
   publishedAt: string | null;
+  /** Everyone who runs the invite, owner first (Step 11). */
+  hosts?: PreviewHost[];
+  /** Co-host links not yet used. */
+  hostInvites?: PreviewHostInvite[];
+};
+
+export type PreviewHost = {
+  userId: string;
+  name: string;
+  role: "owner" | "cohost";
+  side: string;
+  createdAt: string;
+};
+
+export type PreviewHostInvite = {
+  id: string;
+  label: string;
+  token: string;
+  invitedBy: string;
+  invitedByName: string;
+  createdAt: string;
 };
 
 type PreviewFile = { type: string; data: Uint8Array };
@@ -38,6 +59,14 @@ export type PreviewGuest = {
   selfAdded: boolean;
   functionIds: string[];
   replies: PreviewReply[];
+  /** Added with the guest list (Step 11); guests from earlier previews lack them. */
+  id?: string;
+  phone?: string | null;
+  group?: string;
+  partySize?: number;
+  openedAt?: string | null;
+  remindedAt?: string | null;
+  createdAt?: string;
 };
 
 type PreviewDb = {
@@ -61,4 +90,11 @@ previewDb.guests ??= new Map();
 export function previewPhotoUrl(eventId: string, photoId: string): string | null {
   const file = previewDb.files.get(`${eventId}/${photoId}`);
   return file ? `data:${file.type};base64,${Buffer.from(file.data).toString("base64")}` : null;
+}
+
+/** Whether this person owns or co-hosts a preview invite. */
+export function previewHosts(stored: PreviewInvite, accountId: string): boolean {
+  return (
+    stored.owner === accountId || (stored.hosts ?? []).some((host) => host.userId === accountId)
+  );
 }

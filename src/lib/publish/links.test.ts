@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inviteUrl, mapsUrl, whatsappShareUrl } from "./links";
+import { inviteUrl, mapsUrl, personalUrl, whatsappShareUrl, whatsappToUrl } from "./links";
 
 describe("links", () => {
   it("prefills WhatsApp with the whole message", () => {
@@ -18,5 +18,13 @@ describe("links", () => {
     expect(inviteUrl("https://shubhdwar.com/", "a-weds-b")).toBe(
       "https://shubhdwar.com/i/a-weds-b",
     );
+  });
+
+  it("sends to one guest's WhatsApp, or lets the host pick a chat", () => {
+    const url = new URL(whatsappToUrl("+919876543210", "Hello"));
+    expect(url.pathname).toBe("/919876543210");
+    expect(url.searchParams.get("text")).toBe("Hello");
+    expect(new URL(whatsappToUrl(null, "Hi")).pathname).toBe("/");
+    expect(personalUrl("https://x.in/i/a", "abc")).toBe("https://x.in/i/a?g=abc");
   });
 });

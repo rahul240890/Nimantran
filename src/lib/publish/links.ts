@@ -15,3 +15,16 @@ export function mapsUrl(venue: string, address: string): string {
 export function inviteUrl(origin: string, slug: string): string {
   return `${origin.replace(/\/+$/, "")}/i/${slug}`;
 }
+
+/** Opens WhatsApp on a chat with this number, the message ready to send. */
+export function whatsappToUrl(phone: string | null, text: string): string {
+  const digits = phone?.replace(/\D/g, "");
+  return digits
+    ? `https://wa.me/${digits}?text=${encodeURIComponent(text)}`
+    : whatsappShareUrl(text);
+}
+
+/** A guest's own link: replies from it are theirs, and opening it shows on the guest list. */
+export function personalUrl(inviteLink: string, token: string): string {
+  return `${inviteLink}?g=${token}`;
+}

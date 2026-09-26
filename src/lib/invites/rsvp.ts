@@ -1,11 +1,11 @@
 import "server-only";
-import { randomBytes } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { isFunctionId, type FunctionId } from "@/lib/events/functions";
 import { supabasePublic } from "@/lib/supabase/public";
 import { supabaseServer } from "@/lib/supabase/server";
-import { previewDb, type PreviewReply } from "./preview-db";
+import { previewDb, previewHosts, type PreviewReply } from "./preview-db";
 import { findPublishedInvite } from "./public";
 
 /*
@@ -83,6 +83,7 @@ export async function findReply(slug: string, token: string): Promise<GuestReply
     const invite = await findPublishedInvite(slug);
     const guest = previewDb.guests.get(token);
     if (!invite || !guest || guest.eventId !== invite.id) return null;
+    guest.openedAt ??= new Date().toISOString();
     return fromRows(
       guest.name,
       guest.functionIds,
@@ -146,10 +147,13 @@ async function submitPreview(
     guest = {
       eventId: invite.id,
       token: randomBytes(12).toString("hex"),
+      id: randomUUID(),
       name: input.name,
       selfAdded: true,
       functionIds: [],
       replies: [],
+      openedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
     previewDb.guests.set(guest.token, guest);
   } else if (guest.selfAdded) {
@@ -250,7 +254,7 @@ export async function hostReplies(account: Account, eventId: string): Promise<Re
   }
   if (mode === "preview") {
     const stored = previewDb.invites.get(eventId);
-    if (!stored || stored.owner !== account.id) return { totals: [], guests: [] };
+    if (!stored || !previewHosts(stored, account.id)) return { totals: [], guests: [] };
     const rows: HostRow[] = [...previewDb.guests.values()]
       .filter((guest) => guest.eventId === eventId)
       .flatMap((guest) =>

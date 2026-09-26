@@ -6,7 +6,7 @@ import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
 import { supabaseServer } from "@/lib/supabase/server";
-import { previewDb, previewPhotoUrl } from "./preview-db";
+import { previewDb, previewHosts, previewPhotoUrl } from "./preview-db";
 import {
   draftToRows,
   photoPath,
@@ -74,19 +74,19 @@ type Joined = EventRow & {
 };
 
 const supabaseStore: InviteStore = {
-  async list() {
+  async list(account) {
     const supabase = await supabaseServer();
     if (!supabase) return null;
     const { data, error } = await supabase
       .from("events")
-      .select(`${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS})`)
+      .select(`${EVENT_COLUMNS}, owner_id, functions(${FUNCTION_COLUMNS})`)
       .neq("status", "archived")
       .order("updated_at", { ascending: false })
       .limit(100);
     if (error || !data) return null;
     return data.map((row) => {
-      const { functions, ...event } = row as Joined;
-      return summarize(event, functions);
+      const { functions, owner_id: owner, ...event } = row as Joined & { owner_id: string };
+      return summarize(event, functions, owner === account.id ? "owner" : "cohost");
     });
   },
 
@@ -306,19 +306,21 @@ const supabaseStore: InviteStore = {
 const previewStore: InviteStore = {
   async list(account) {
     return [...previewDb.invites.values()]
-      .filter((stored) => stored.owner === account.id)
-      .map((stored) => summarize(stored.event, stored.functions))
+      .filter((stored) => previewHosts(stored, account.id))
+      .map((stored) =>
+        summarize(stored.event, stored.functions, stored.owner === account.id ? "owner" : "cohost"),
+      )
       .sort((a, b) => b.updatedAt - a.updatedAt);
   },
   async get(account, id) {
     const stored = previewDb.invites.get(id);
-    return stored && stored.owner === account.id
+    return stored && previewHosts(stored, account.id)
       ? rowsToDraft(stored.event, stored.functions, stored.photos, stored.questions)
       : null;
   },
   async save(account, draft) {
     const existing = draft.remoteId ? previewDb.invites.get(draft.remoteId) : undefined;
-    const mine = existing && existing.owner === account.id ? existing : undefined;
+    const mine = existing && previewHosts(existing, account.id) ? existing : undefined;
     const id = mine ? mine.event.id : crypto.randomUUID();
     const { event, functions } = draftToRows(draft);
     const updated = new Date();
@@ -330,7 +332,17 @@ const previewStore: InviteStore = {
       if (!wanted.includes(photo.id)) previewDb.files.delete(`${id}/${photo.id}`);
     }
     previewDb.invites.set(id, {
-      owner: account.id,
+      owner: mine?.owner ?? account.id,
+      hosts: mine?.hosts ?? [
+        {
+          userId: account.id,
+          name: account.name,
+          role: "owner",
+          side: "",
+          createdAt: updated.toISOString(),
+        },
+      ],
+      hostInvites: mine?.hostInvites ?? [],
       event: {
         ...event,
         id,
@@ -359,7 +371,7 @@ const previewStore: InviteStore = {
   },
   async addPhoto(account, id, photo, file) {
     const stored = previewDb.invites.get(id);
-    if (!stored || stored.owner !== account.id) return false;
+    if (!stored || !previewHosts(stored, account.id)) return false;
     previewDb.files.set(`${id}/${photo.id}`, {
       type: file.type,
       data: new Uint8Array(await file.arrayBuffer()),
@@ -372,7 +384,7 @@ const previewStore: InviteStore = {
   },
   async photoUrls(account, id) {
     const stored = previewDb.invites.get(id);
-    if (!stored || stored.owner !== account.id) return {};
+    if (!stored || !previewHosts(stored, account.id)) return {};
     return Object.fromEntries(
       stored.photos.flatMap((photo) => {
         const url = previewPhotoUrl(id, photo.id);
@@ -385,7 +397,7 @@ const previewStore: InviteStore = {
   },
   async publish(account, id, slug) {
     const stored = previewDb.invites.get(id);
-    if (!stored || stored.owner !== account.id) return { ok: false, reason: "missing" };
+    if (!stored || !previewHosts(stored, account.id)) return { ok: false, reason: "missing" };
     const keep = stored.publishedAt && stored.event.slug ? stored.event.slug : slug;
     const taken = [...previewDb.invites.values()].some(
       (other) => other !== stored && other.event.slug === keep,
@@ -397,7 +409,7 @@ const previewStore: InviteStore = {
   },
   async unpublish(account, id) {
     const stored = previewDb.invites.get(id);
-    if (!stored || stored.owner !== account.id) return false;
+    if (!stored || !previewHosts(stored, account.id)) return false;
     stored.event = { ...stored.event, status: "draft" };
     return true;
   },
