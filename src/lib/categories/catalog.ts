@@ -43,7 +43,20 @@ export const CATEGORIES = {
     },
     schedule: "full",
     rsvpQuestions: ["meal", "arrival", "stay", "pickup"],
-    templates: ["marigold", "rose", "emerald", "scroll", "monogram", "kasavu"],
+    templates: [
+      "marigold",
+      "rose",
+      "emerald",
+      "scroll",
+      "monogram",
+      "kasavu",
+      "rangmahal",
+      "paithani",
+      "bandhani",
+      "alpona",
+      "gopuram",
+      "phulkari",
+    ],
     // Each design keeps its own wedding wording
     wording: {},
   },
@@ -69,7 +82,7 @@ export const CATEGORIES = {
     functions: { planned: ["engagement"], suggested: ["engagement"], primary: "engagement" },
     schedule: "full",
     rsvpQuestions: ["meal"],
-    templates: ["rose", "monogram", "marigold", "emerald"],
+    templates: ["rose", "monogram", "marigold", "emerald", "paithani", "alpona"],
     wording: {
       doorLeft: "Shubh",
       doorRight: "Sagai",
@@ -128,7 +141,7 @@ export const CATEGORIES = {
     functions: { planned: ["roka"], suggested: ["roka", "engagement"], primary: "roka" },
     schedule: "full",
     rsvpQuestions: ["meal"],
-    templates: ["marigold", "rose", "emerald"],
+    templates: ["marigold", "rose", "emerald", "rangmahal", "phulkari"],
     wording: {
       doorLeft: "Shubh",
       doorRight: "Roka",
@@ -157,7 +170,7 @@ export const CATEGORIES = {
     functions: { planned: ["haldi"], suggested: ["haldi", "mehendi"], primary: "haldi" },
     schedule: "full",
     rsvpQuestions: [],
-    templates: ["marigold", "kasavu", "rose"],
+    templates: ["marigold", "kasavu", "rose", "gopuram", "paithani"],
     wording: {
       doorLeft: "Haldi",
       doorRight: "Rasam",
@@ -190,7 +203,7 @@ export const CATEGORIES = {
     },
     schedule: "full",
     rsvpQuestions: ["song"],
-    templates: ["rose", "emerald", "marigold"],
+    templates: ["rose", "emerald", "marigold", "bandhani", "paithani"],
     wording: {
       doorLeft: "Mehendi",
       doorRight: "Raat",
@@ -219,7 +232,7 @@ export const CATEGORIES = {
     functions: { planned: ["sangeet"], suggested: ["sangeet", "mehendi"], primary: "sangeet" },
     schedule: "full",
     rsvpQuestions: ["song", "meal"],
-    templates: ["emerald", "scroll", "marigold"],
+    templates: ["emerald", "scroll", "marigold", "bandhani", "phulkari", "rangmahal"],
     wording: {
       doorLeft: "Sangeet",
       doorRight: "Sandhya",
@@ -248,7 +261,7 @@ export const CATEGORIES = {
     functions: { planned: ["reception"], suggested: ["reception"], primary: "reception" },
     schedule: "full",
     rsvpQuestions: ["meal"],
-    templates: ["monogram", "emerald", "scroll", "rose"],
+    templates: ["monogram", "emerald", "scroll", "rose", "rangmahal"],
     wording: {
       doorLeft: "Swagat",
       doorRight: "Samaroh",

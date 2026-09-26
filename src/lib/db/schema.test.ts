@@ -2,7 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { CATEGORY_IDS } from "@/lib/categories/catalog";
+import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { TEMPLATE_IDS, templateSchema } from "@/lib/templates/schema";
 import { seedSql } from "./seed";
 import { createTestDb, type TestDb } from "./test-db";
@@ -54,7 +54,7 @@ describe("seed", () => {
         "select template_id from category_templates where category_id = 'roka' order by position",
       ),
     );
-    expect(links.map((row) => row.template_id)).toEqual(["marigold", "rose", "emerald"]);
+    expect(links.map((row) => row.template_id)).toEqual([...CATEGORIES.roka.templates]);
   });
 
   it("can run again on a live database", async () => {

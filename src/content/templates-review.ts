@@ -36,6 +36,12 @@ export const motifLabels: Record<MotifId, string> = {
   scroll: "Scroll rods, paisleys and a lacquer seal",
   monogram: "Hairline frame and large initials",
   kasavu: "Kasavu borders and nilavilakku lamps",
+  jharokha: "Jharokha arches and meenakari rosettes",
+  peacock: "Paithani temple border and peacock-feather fans",
+  bandhani: "Bandhani dots and mirror-work",
+  alpona: "Laal paar border and an alpona lotus",
+  gopuram: "Temple gopurams, kolam and brass lamps",
+  phulkari: "Phulkari diamonds, stars and chope borders",
 };
 
 export const fontLabels: Record<FontRole, string> = {
@@ -48,9 +54,9 @@ export const formatLabels = { "gate-fold": "Gate fold" } as const;
 
 export const templatesReview = {
   metaTitle: "Invitation templates",
-  metaDescription: "The six launch templates and the schema behind them.",
+  metaDescription: "Every invitation design and the schema behind them.",
   eyebrow: "Step 5 · Template system",
-  title: "Six designs, one schema",
+  title: "Twelve designs, one schema",
   intro:
     "Each design is data: a scene, card stock colours, type, a raga and the words a host fills in. Pick one to open it in 3D and see what it is made of.",
   preview: "Invitation preview",

@@ -14,6 +14,13 @@ export const TEMPLATE_IDS = [
   "scroll",
   "monogram",
   "kasavu",
+  // The Rang family: bright regional designs
+  "rangmahal",
+  "paithani",
+  "bandhani",
+  "alpona",
+  "gopuram",
+  "phulkari",
 ] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
@@ -22,11 +29,37 @@ export const FORMAT_IDS = ["gate-fold"] as const;
 export type FormatId = (typeof FORMAT_IDS)[number];
 
 /** Ornament sets painted onto the card (src/components/invitation/art/motifs.ts). */
-export const MOTIF_IDS = ["mandala", "roses", "palace", "scroll", "monogram", "kasavu"] as const;
+export const MOTIF_IDS = [
+  "mandala",
+  "roses",
+  "palace",
+  "scroll",
+  "monogram",
+  "kasavu",
+  "jharokha",
+  "peacock",
+  "bandhani",
+  "alpona",
+  "gopuram",
+  "phulkari",
+] as const;
 export type MotifId = (typeof MOTIF_IDS)[number];
 
 /** Ragas the music composer knows (src/lib/engine/music.ts). */
-export const RAGA_IDS = ["yaman", "khamaj", "bihag", "desh", "bhupali", "madhyamavati"] as const;
+export const RAGA_IDS = [
+  "yaman",
+  "khamaj",
+  "bihag",
+  "desh",
+  "bhupali",
+  "madhyamavati",
+  "mand",
+  "bhimpalasi",
+  "pilu",
+  "bhairavi",
+  "hamsadhwani",
+  "kafi",
+] as const;
 export type RagaId = (typeof RAGA_IDS)[number];
 
 /** The parts of the card stock a template colours. */

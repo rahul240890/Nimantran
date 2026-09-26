@@ -6,48 +6,19 @@ import {
   rect,
   ring,
   turn,
-  type Layer,
   type Placement,
   type Shape,
 } from "./decor";
+import { arch, DOOR_TEXT, lamp, onDoor, seamX, type DoorSide, type Motif } from "./motif-kit";
+import { RANG_MOTIFS } from "./rang-motifs";
+
+export { arch, type DoorSide, type Motif };
 
 /*
- * The six ornament sets. Each says what is drawn on the inside of the card, on the front
+ * The ornament sets, one per design (the Rang family lives in rang-motifs.ts). Each says what is drawn on the inside of the card, on the front
  * and the lining of each door, and on the back, plus where the words may sit. Everything
  * is in face units (inside 100 × 80, door 50 × 80); see decor.ts.
  */
-
-export type DoorSide = "left" | "right";
-
-export type Motif = {
-  inside: readonly Layer[];
-  /** Where the words may sit on the inside: top and bottom edges and widest line. */
-  textBox: { top: number; bottom: number; width: number };
-  /** Drawn between the invitation line and the date, centred on (0, 0). */
-  divider: Placement | null;
-  /** "monogram" sets the couple's initials large above their names on one line. */
-  layout: "stacked" | "monogram";
-  door: (side: DoorSide) => readonly Layer[];
-  /** Centre lines of the door word and the initial; no door word when label is null. */
-  doorText: {
-    label: number | null;
-    initial: { y: number; size: number; ink?: "ink" | "accentText" };
-  };
-  /** The inside of each door, drawn over the back colour. */
-  lining: readonly Layer[];
-  /** The back of the card. */
-  back: readonly Layer[];
-};
-
-/** Where a door's seam is, in that door's own units. */
-const seamX = (side: DoorSide) => (side === "left" ? 50 : 0);
-/** Shifts art drawn in whole-card units onto one door. */
-const onDoor = (side: DoorSide, children: Placement[]): Placement => ({
-  at: [side === "left" ? 0 : -50, 0],
-  children,
-});
-
-const DOOR_TEXT = { label: 11, initial: { y: 69.2, size: 8 } };
 
 /* ---------- Marigold Gate: the Shubhdwar mandala ---------- */
 
@@ -252,33 +223,6 @@ const roses: Motif = {
 
 /* ---------- Emerald Palace: a jaali arch ---------- */
 
-const n = (value: number) => Number(value.toFixed(2));
-
-/**
- * A Mughal ogee arch centred on `cx`, rising from `base` to its springing line and on up
- * to a point at `apex`. Open at the bottom unless `closed`.
- */
-export function arch(
-  cx: number,
-  base: number,
-  half: number,
-  spring: number,
-  apex: number,
-  closed = false,
-): string {
-  const rise = spring - apex;
-  const left = (u: number, v: number) => `${n(cx - half + u * half)} ${n(spring - v * rise)}`;
-  const right = (u: number, v: number) => `${n(cx + half - u * half)} ${n(spring - v * rise)}`;
-  return (
-    `M${n(cx - half)} ${n(base)}V${n(spring)}` +
-    `C${left(0, 0.4)} ${left(0.375, 0.6)} ${left(0.6875, 0.7)}` +
-    `C${left(0.875, 0.7667)} ${left(0.96875, 0.8667)} ${left(1, 1)}` +
-    `C${right(0.96875, 0.8667)} ${right(0.875, 0.7667)} ${right(0.6875, 0.7)}` +
-    `C${right(0.375, 0.6)} ${right(0, 0.4)} ${right(0, 0)}V${n(base)}` +
-    (closed ? "Z" : "")
-  );
-}
-
 /** Carved stone lattice: diamonds with a bead at each centre, one tile 5 units square. */
 const JAALI: Placement[] = [
   {
@@ -414,6 +358,8 @@ const paisley = (x: number, y: number, scale: number, flipX = false, flipY = fal
   shapes: PAISLEY,
 });
 
+const n = (value: number) => Number(value.toFixed(2));
+
 /** A lacquer seal with a small flower pressed into it. */
 function sealShapes(): Shape[] {
   const points = Array.from({ length: 96 }, (_, i) => {
@@ -543,35 +489,6 @@ const bandDown = (x: number, flip = false): Placement =>
     ? { at: [x, 0], rotate: 90, flipY: true, shapes: band(80) }
     : { at: [x + 5.6, 0], rotate: 90, shapes: band(80) };
 
-/** A brass nilavilakku, about 28 units tall, standing on (0, 0) with its wicks lit. */
-const LAMP: Shape[] = [
-  {
-    d: circle(-4.2, -21.6, 2.2) + circle(4.2, -21.6, 2.2),
-    fill: "accent",
-    opacity: 0.16,
-    finish: "paper",
-  },
-  { d: "M-5 0H5C5-1.2 3-1.8 1.2-2.2H-1.2C-3-1.8-5-1.2-5 0Z", fill: "gold" },
-  { d: rect(-0.7, -16, 1.4, 13.8), fill: "gold" },
-  {
-    d: ellipse(0, -5, 0.7, 1.6, 90) + ellipse(0, -9, 0.7, 1.6, 90) + ellipse(0, -13, 0.7, 1.6, 90),
-    fill: "gold",
-  },
-  { d: "M-6-16H6C5-19 3-20 0-20-3-20-5-19-6-16Z", fill: "gold" },
-  { d: rect(-0.5, -24, 1, 4.2), fill: "gold" },
-  { d: "M-1.1-24C-1.1-25.6-.2-26.8 0-27.8.2-26.8 1.1-25.6 1.1-24Z", fill: "gold" },
-  {
-    d: "M-4.2-20C-5.2-21.2-5-22.6-4.2-24-3.4-22.6-3.2-21.2-4.2-20ZM4.2-20C3.2-21.2 3.4-22.6 4.2-24 5-22.6 5.2-21.2 4.2-20Z",
-    fill: "accent",
-    finish: "paper",
-  },
-];
-const lamp = (x: number, y: number, scale: number): Placement => ({
-  at: [x, y],
-  scale,
-  shapes: LAMP,
-});
-
 const kasavu: Motif = {
   inside: [
     {
@@ -617,4 +534,5 @@ export const MOTIFS: Record<MotifId, Motif> = {
   scroll,
   monogram,
   kasavu,
+  ...RANG_MOTIFS,
 };

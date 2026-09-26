@@ -123,7 +123,7 @@ export function PreviewStep({
           <span className="grid size-9 shrink-0 place-items-center rounded-full border border-marigold/45 bg-marigold/10 text-accent-text">
             <CategoryIcon icon={category.icon} className="size-4.5" />
           </span>
-          <span className="font-display text-lg leading-tight">{category.names.en}</span>
+          <span className="font-display text-lg leading-tight">{category.names[locale]}</span>
         </p>
       </Section>
 

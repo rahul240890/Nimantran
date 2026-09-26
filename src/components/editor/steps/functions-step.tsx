@@ -20,7 +20,7 @@ import {
 } from "@/lib/editor/draft";
 import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy";
 
 function FunctionFields({
@@ -147,6 +147,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
   const { editor, functionCopy, functionFields } = useText(editorText);
   const main = mainFunction(draft);
   const category = draftCategory(draft);
+  const locale = useLocale();
   const { suggested, more } = functionOrder(draft);
   const withTime = needsTime(draft);
 
@@ -209,7 +210,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
           id="functions-suggested"
           className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
         >
-          {functionFields.suggested(category.names.en)}
+          {functionFields.suggested(category.names[locale])}
         </h2>
         <ul aria-label={functionFields.group} className="flex flex-col gap-4">
           {suggested.map(item)}

@@ -108,7 +108,7 @@ export const templates: Translation<typeof en.templates> = {
   eyebrow: "डिज़ाइन",
   title: "ऐसे डिज़ाइन, जैसे असली कार्ड",
   intro:
-    "शुरुआत के लिए छह डिज़ाइन, हर एक के अपने बेल-बूटे, कार्ड और राग। रंग-बिरंगे क्षेत्रीय डिज़ाइन परंपरा पैक के साथ आ रहे हैं।",
+    "बारह डिज़ाइन, हर एक के अपने बेल-बूटे, कार्ड और राग, इनमें राजस्थान से तमिलनाडु तक के छह रंग-बिरंगे क्षेत्रीय डिज़ाइन।",
   listLabel: "निमंत्रण डिज़ाइन",
   previous: "पिछले डिज़ाइन",
   next: "अगले डिज़ाइन",
@@ -120,6 +120,12 @@ export const templates: Translation<typeof en.templates> = {
     { id: "scroll", name: "शाही स्क्रॉल", kind: "राग देस", tone: "gold" },
     { id: "monogram", name: "सादा मोनोग्राम", kind: "राग भूपाली", tone: "neutral" },
     { id: "kasavu", name: "केरल कसवु", kind: "राग मध्यमावती", tone: "gold" },
+    { id: "rangmahal", name: "रंग महल", kind: "राग मांड", tone: "gold" },
+    { id: "paithani", name: "पैठणी मोर", kind: "राग भीमपलासी", tone: "rose" },
+    { id: "bandhani", name: "बांधनी उत्सव", kind: "राग पीलू", tone: "success" },
+    { id: "alpona", name: "अल्पना लाल", kind: "राग भैरवी", tone: "rose" },
+    { id: "gopuram", name: "गोपुरम पोन", kind: "राग हंसध्वनि", tone: "gold" },
+    { id: "phulkari", name: "फुलकारी रंग", kind: "राग काफ़ी", tone: "gold" },
   ],
   sample: { first: "आरव", second: "मीरा", date: "12 · XII · 2026", place: "उदयपुर" },
 };
