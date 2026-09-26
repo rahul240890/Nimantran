@@ -35,9 +35,12 @@ Open http://localhost:3000. Every design-system component, in every state, is at
 src/
   app/                Routes, layouts and global styles (design tokens in globals.css)
   components/
-    brand/            Logo, mandala and brand illustrations
+    brand/            Logo, mandala, gate-fold card and design previews
     ui/               Design-system components (Step 2)
     motion/           Tilt cards and page transitions
+    shell/            Header, footer, language switcher (Step 3)
+    landing/          Landing page sections and the 3D hero (Step 3)
+  content/            English copy, shaped for next-intl in Step 12
   features/           Feature modules: editor, invite, dashboard … (from Step 4)
   lib/                Shared helpers and config
   test/               Test setup

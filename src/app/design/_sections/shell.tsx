@@ -13,7 +13,7 @@ export const sections = [
   { id: "choices", label: "Choices" },
   { id: "cards", label: "Cards and depth" },
   { id: "overlays", label: "Overlays" },
-  { id: "navigation", label: "Tabs and stepper" },
+  { id: "navigation", label: "Menus and tabs" },
   { id: "status", label: "Badges and avatars" },
   { id: "feedback", label: "Loading and empty" },
 ];

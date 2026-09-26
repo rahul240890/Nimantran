@@ -47,12 +47,13 @@ Every screen must pass all of these before a step is marked done:
 **Step 1. Project setup** ✅
 Next.js + TypeScript strict + Tailwind v4, folder structure, linting, formatting, type-check scripts, fonts, base tokens, branded holding page.
 
-**Step 2. Design system** ✅ _(this step)_
+**Step 2. Design system** ✅
 Colour, type, spacing, radius and shadow tokens; light and dark themes. Core components: Button, IconButton, Input, Textarea, Select, Checkbox, Radio, Switch, DatePicker, TimePicker, Card, Sheet/Dialog, Toast, Tabs, Badge, Avatar, Skeleton, EmptyState, Stepper. A `/design` page showing every component in every state.
 Added with the owner's approval: a motion and depth layer (3D tilt with light on invitation cards, gold shimmer, buttons that press in, page transitions) with a still version for reduced motion.
 
-**Step 3. App shell and landing page**
+**Step 3. App shell and landing page** _(this step)_
 Header, footer, navigation, theme toggle, language switcher. Marketing landing page with live 3D hero, how-it-works, templates preview, pricing preview, FAQ.
+Added with the owner's approval: a waitlist sign-up, a hero that opens as you scroll and turns under a finger (with a lighter version for slow phones and a still one for reduced motion), and a pricing preview that shows only "Free to start, premium from ₹499" until payments are built.
 
 ---
 

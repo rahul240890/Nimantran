@@ -35,6 +35,21 @@ function contrast(a: string, b: string): number {
   return (hi! + 0.05) / (lo! + 0.05);
 }
 
+/** A colour laid over a background at some opacity, like bg-rose/10. */
+function mix(fg: string, bg: string, alpha: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(i, i + 2), 16);
+  return (
+    "#" +
+    [1, 3, 5]
+      .map((i) =>
+        Math.round(channel(fg, i) * alpha + channel(bg, i) * (1 - alpha))
+          .toString(16)
+          .padStart(2, "0"),
+      )
+      .join("")
+  );
+}
+
 const backgrounds = ["paper", "surface", "surface-2"];
 const text = ["ink", "ink-muted", "accent-text", "success", "warning", "danger", "rose"];
 
@@ -59,6 +74,16 @@ describe.each([
     expect(contrast(theme["on-danger"]!, theme["danger"]!)).toBeGreaterThanOrEqual(4.5);
   });
 
+  it.each(["accent-text", "success", "warning", "danger", "rose"])(
+    "%s badge text stays readable on its own tint, on every surface",
+    (tone) => {
+      for (const bg of backgrounds) {
+        const tint = mix(theme[tone]!, theme[bg]!, 0.1);
+        expect(contrast(theme[tone]!, tint)).toBeGreaterThanOrEqual(4.5);
+      }
+    },
+  );
+
   it("the focus ring is at least 3:1 on every surface", () => {
     for (const bg of backgrounds) {
       expect(contrast(theme["ring"]!, theme[bg]!)).toBeGreaterThanOrEqual(3);
@@ -74,3 +99,12 @@ it("finds both themes in the stylesheet", () => {
 it("the dark theme is identical for the OS setting and the explicit switch", () => {
   expect(block('  :root:not([data-theme="light"]) {')).toEqual(block(':root[data-theme="dark"] {'));
 });
+
+it.each(["rose", "emerald", "scroll", "monogram", "kasavu"])(
+  "the %s design's text is readable on its paper",
+  (name) => {
+    const paper = light[`tpl-${name}-paper`]!;
+    expect(contrast(light[`tpl-${name}-ink`]!, paper)).toBeGreaterThanOrEqual(7);
+    expect(contrast(light[`tpl-${name}-accent`]!, paper)).toBeGreaterThanOrEqual(4.5);
+  },
+);
