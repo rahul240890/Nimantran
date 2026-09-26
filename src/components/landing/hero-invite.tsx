@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { GateCard } from "@/components/brand/gate-card";
-import { hero } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import {
   approach,
   clamp,
@@ -76,6 +77,7 @@ function Petal({ className, style }: { className?: string; style?: CSSProperties
  * a calmer version; see src/lib/hero-motion.ts.
  */
 export function HeroInvite() {
+  const { hero } = useText(landingText);
   const still = useReducedMotion();
   const trackRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);

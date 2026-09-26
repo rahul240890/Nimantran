@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
-import { deleteInvite } from "@/app/_actions/invites";
+import { deleteInvite } from "@/actions/invites";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { TiltCard } from "@/components/motion/tilt-card";
@@ -25,9 +25,10 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { IconButton } from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
-import { invitesCopy } from "@/content/account";
+import { useLocale, useText } from "@/i18n/client";
+import { accountText, editorText } from "@/i18n/copy";
+import { dateLocale } from "@/i18n/dates";
 import { cn } from "@/lib/cn";
-import { functionCopy, stepCopy } from "@/content/editor";
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
 import { draftCategory, draftCopy, mainFunction, type FunctionId } from "@/lib/editor/draft";
 import { forgetShelvedPhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
@@ -65,6 +66,9 @@ function InviteCard({
   action,
   secondary,
 }: CardProps) {
+  const { invitesCopy } = useText(accountText);
+  const { functionCopy } = useText(editorText);
+  const locale = useLocale();
   const category = CATEGORIES[isCategoryId(categoryId) ? categoryId : "wedding"];
   return (
     <article className="group relative flex h-full gap-4 rounded-lg border border-line bg-surface p-4 shadow-raised transition-[box-shadow,border-color] duration-300 focus-within:border-marigold/60 hover:shadow-float sm:gap-5 sm:p-5">
@@ -85,7 +89,8 @@ function InviteCard({
         {main && date && (
           <p className="flex items-center gap-1.5 text-sm text-ink">
             <CalendarDays aria-hidden className="size-4 shrink-0 text-ink-muted" />
-            {functionCopy[main].name} · {format(parseISO(date), "d MMM yyyy")}
+            {functionCopy[main].name} ·{" "}
+            {format(parseISO(date), "d MMM yyyy", { locale: dateLocale[locale] })}
           </p>
         )}
         <p className="text-sm text-ink-muted">{meta}</p>
@@ -108,11 +113,12 @@ function InviteCard({
   );
 }
 
-const titleOf = (first: string, joiner: string, second: string) =>
-  first && second ? `${first} ${joiner || "&"} ${second}` : invitesCopy.untitled;
+const titleOf = (first: string, joiner: string, second: string, untitled: string) =>
+  first && second ? `${first} ${joiner || "&"} ${second}` : untitled;
 
 /** Deleting asks first: the invite, its functions and guest list go for good. */
 function DeleteInvite({ invite, title }: { invite: InviteSummary; title: string }) {
+  const { invitesCopy } = useText(accountText);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [deleting, startDeleting] = useTransition();
@@ -196,6 +202,9 @@ function SectionHeading({
  * account's list couldn't be read.
  */
 export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
+  const { invitesCopy } = useText(accountText);
+  const { stepCopy } = useText(editorText);
+  const locale = useLocale();
   const hydrated = useSyncExternalStore(
     noop,
     () => true,
@@ -242,10 +251,14 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
       <InviteCard
         templateId={draft.templateId}
         categoryId={draftCategory(draft).id}
-        title={named ? titleOf(copy.first, copy.joiner, copy.second) : invitesCopy.untitled}
+        title={
+          named
+            ? titleOf(copy.first, copy.joiner, copy.second, invitesCopy.untitled)
+            : invitesCopy.untitled
+        }
         main={main}
         date={main ? draft.functions[main].date : ""}
-        meta={`${invitesCopy.updated(formatDistanceToNow(draft.updatedAt, { addSuffix: true }))} · ${invitesCopy.step(stepCopy[draft.step].label)}`}
+        meta={`${invitesCopy.updated(formatDistanceToNow(draft.updatedAt, { addSuffix: true, locale: dateLocale[locale] }))} · ${invitesCopy.step(stepCopy[draft.step].label)}`}
         badge={
           <Badge tone="warning">
             <HardDrive aria-hidden className="me-1 -mt-0.5 inline size-3.5" />
@@ -292,7 +305,12 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
           />
           <ul className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
             {saved.map((invite) => {
-              const title = titleOf(invite.first, invite.joiner, invite.second);
+              const title = titleOf(
+                invite.first,
+                invite.joiner,
+                invite.second,
+                invitesCopy.untitled,
+              );
               return (
                 <li key={invite.id}>
                   <InviteCard
@@ -302,7 +320,10 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                     main={invite.mainFunction}
                     date={invite.date}
                     meta={invitesCopy.updated(
-                      formatDistanceToNow(invite.updatedAt, { addSuffix: true }),
+                      formatDistanceToNow(invite.updatedAt, {
+                        addSuffix: true,
+                        locale: dateLocale[locale],
+                      }),
                     )}
                     badge={
                       <>

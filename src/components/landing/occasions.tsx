@@ -5,7 +5,8 @@ import Link from "next/link";
 import { Mandala } from "@/components/brand/mandala";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { TiltCard } from "@/components/motion/tilt-card";
-import { categoryTaglines, occasionsSection } from "@/content/categories";
+import { categoriesText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { isLocal, rankCategories } from "@/lib/categories/rank";
 import { regionLanguage } from "@/lib/categories/regions";
@@ -20,6 +21,7 @@ import { Section } from "./section";
  * the browser reorders for where and when the visitor is.
  */
 export function Occasions() {
+  const { categoryTaglines, occasionsSection } = useText(categoriesText);
   const visitor = useVisitor();
   const local = regionLanguage(visitor.region);
   const ranked = rankCategories(

@@ -2,8 +2,8 @@ import { CircleCheck, CircleHelp, CircleX, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { functionCopy } from "@/content/editor";
-import { repliesCopy, rsvpCopy } from "@/content/publish";
+import { editorText, publishText } from "@/i18n/copy";
+import { getText } from "@/i18n/server";
 import type { ReplySummary } from "@/lib/invites/rsvp";
 
 const LATEST = 8;
@@ -15,7 +15,15 @@ const statusIcons = {
 } as const;
 
 /** The host's first look at replies: head counts per function and the latest guests. */
-export function RepliesCard({ summary, inviteId }: { summary: ReplySummary; inviteId: string }) {
+export async function RepliesCard({
+  summary,
+  inviteId,
+}: {
+  summary: ReplySummary;
+  inviteId: string;
+}) {
+  const { repliesCopy, rsvpCopy } = await getText(publishText);
+  const { functionCopy } = await getText(editorText);
   const latest = summary.guests.slice(0, LATEST);
   const rest = summary.guests.length - latest.length;
   return (

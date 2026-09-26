@@ -13,16 +13,17 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
-import { unpublishInvite } from "@/app/_actions/invites";
+import { unpublishInvite } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { shareCopy } from "@/content/publish";
 import { inviteDraft } from "@/lib/editor/store";
 import { whatsappShareUrl } from "@/lib/publish/links";
+import { useText } from "@/i18n/client";
+import { publishText } from "@/i18n/copy";
 
 type SharePanelProps = {
   inviteId: string;
@@ -61,6 +62,7 @@ export function SharePanel({
   qr,
   replies,
 }: SharePanelProps) {
+  const { shareCopy } = useText(publishText);
   const [message, setMessage] = useState(initialMessage);
   const nativeShare = useSyncExternalStore(noSubscribe, canShare, () => false);
   const full = `${message.trim()}\n${url}`;
@@ -233,6 +235,7 @@ export function SharePanel({
 }
 
 function StopSharing({ inviteId }: { inviteId: string }) {
+  const { shareCopy } = useText(publishText);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();

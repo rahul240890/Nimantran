@@ -4,27 +4,30 @@ import { formatDistanceToNow } from "date-fns";
 import { BellRing, Check, Copy, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { markReminded } from "@/app/_actions/guests";
+import { markReminded } from "@/actions/guests";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
-import { dashboardCopy } from "@/content/dashboard";
 import { formatPhone } from "@/lib/auth/phone";
 import { guestState, type HostGuest } from "@/lib/guests/list";
 import { whatsappToUrl } from "@/lib/publish/links";
 import { guestMessage } from "./guest-list";
 import type { DashboardView } from "./types";
-
-const copy = dashboardCopy.reminders;
+import { useLocale, useText } from "@/i18n/client";
+import { dateLocale } from "@/i18n/dates";
+import { dashboardText } from "@/i18n/copy";
 
 /**
  * Reminders for guests who haven't replied, sent from the host's own WhatsApp one tap at a
  * time. Bulk sending needs WhatsApp Business (Step 22); this works today, for free.
  */
 export function Reminders({ view }: { view: DashboardView }) {
+  const locale = useLocale();
+  const { dashboardCopy } = useText(dashboardText);
+  const copy = dashboardCopy.reminders;
   const router = useRouter();
   const waiting = view.guests.filter((guest) => guestState(guest) === "waiting");
   const [template, setTemplate] = useState(() =>
@@ -39,7 +42,9 @@ export function Reminders({ view }: { view: DashboardView }) {
 
   const copyFor = async (guest: HostGuest) => {
     try {
-      await navigator.clipboard.writeText(guestMessage(view, guest, "reminder", template));
+      await navigator.clipboard.writeText(
+        guestMessage(dashboardCopy.messages, view, guest, "reminder", template),
+      );
       toast({ title: dashboardCopy.hosts.copied, tone: "success" });
       record(guest);
     } catch {
@@ -101,7 +106,7 @@ export function Reminders({ view }: { view: DashboardView }) {
                         <span className="text-sm text-ink-muted">
                           {guest.phone ? formatPhone(guest.phone) : copy.noPhone}
                           {guest.remindedAt &&
-                            ` · ${copy.lastReminded(formatDistanceToNow(guest.remindedAt, { addSuffix: true }))}`}
+                            ` · ${copy.lastReminded(formatDistanceToNow(guest.remindedAt, { addSuffix: true, locale: dateLocale[locale] }))}`}
                         </span>
                       </div>
                       {guest.phone ? (
@@ -114,7 +119,13 @@ export function Reminders({ view }: { view: DashboardView }) {
                           <a
                             href={whatsappToUrl(
                               guest.phone,
-                              guestMessage(view, guest, "reminder", template),
+                              guestMessage(
+                                dashboardCopy.messages,
+                                view,
+                                guest,
+                                "reminder",
+                                template,
+                              ),
                             )}
                             target="_blank"
                             rel="noopener noreferrer"

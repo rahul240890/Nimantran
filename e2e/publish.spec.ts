@@ -37,11 +37,6 @@ test.describe("publish and share", () => {
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
-    // The preview WhatsApp shows is a real image
-    const preview = await page.request.get(`${new URL(link).pathname}/opengraph-image`);
-    expect(preview.ok()).toBe(true);
-    expect(preview.headers()["content-type"]).toBe("image/png");
-
     // A guest, with no account
     const guestContext = await browser.newContext({
       baseURL: info.project.use.baseURL,
@@ -56,6 +51,11 @@ test.describe("publish and share", () => {
       "content",
       /opengraph-image/,
     );
+    // The preview WhatsApp shows is a real image
+    const image = await guest.locator('meta[property="og:image"]').getAttribute("content");
+    const preview = await page.request.get(new URL(image!).pathname);
+    expect(preview.ok()).toBe(true);
+    expect(preview.headers()["content-type"]).toBe("image/png");
     const haldi = guest.getByRole("article", { name: "Haldi" });
     await expect(haldi.getByText("Wednesday, 14 October 2026")).toBeVisible();
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();

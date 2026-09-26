@@ -3,7 +3,7 @@
 import { Copy, Link2, LogOut, MessageCircle, UserMinus, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition, type FormEvent } from "react";
-import { createHostInvite, removeHost, withdrawHostInvite } from "@/app/_actions/guests";
+import { createHostInvite, removeHost, withdrawHostInvite } from "@/actions/guests";
 import { PersonAvatar } from "@/components/account/person-avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,25 +13,27 @@ import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { dashboardCopy } from "@/content/dashboard";
 import type { Host } from "@/lib/invites/hosts";
 import { whatsappShareUrl } from "@/lib/publish/links";
 import type { DashboardView } from "./types";
-
-const copy = dashboardCopy.hosts;
+import { useText } from "@/i18n/client";
+import { dashboardText } from "@/i18n/copy";
 
 const joinUrl = (origin: string, token: string) => `${origin}/join/${token}`;
 
-async function copyLink(url: string) {
+async function copyLink(url: string, words: { copied: string; failed: string }) {
   try {
     await navigator.clipboard.writeText(url);
-    toast({ title: copy.copied, tone: "success" });
+    toast({ title: words.copied, tone: "success" });
   } catch {
-    toast({ title: dashboardCopy.guest.copyFailed, tone: "error" });
+    toast({ title: words.failed, tone: "error" });
   }
 }
 
 function LinkActions({ view, token }: { view: DashboardView; token: string }) {
+  const { dashboardCopy } = useText(dashboardText);
+  const copy = dashboardCopy.hosts;
+  const words = { copied: copy.copied, failed: dashboardCopy.guest.copyFailed };
   const url = joinUrl(view.origin, token);
   return (
     <div className="flex flex-wrap gap-2">
@@ -49,7 +51,7 @@ function LinkActions({ view, token }: { view: DashboardView; token: string }) {
         size="sm"
         variant="secondary"
         leadingIcon={<Copy aria-hidden />}
-        onClick={() => void copyLink(url)}
+        onClick={() => void copyLink(url, words)}
       >
         {copy.copy}
       </Button>
@@ -58,6 +60,8 @@ function LinkActions({ view, token }: { view: DashboardView; token: string }) {
 }
 
 function InviteCohost({ view }: { view: DashboardView }) {
+  const copy = useText(dashboardText).dashboardCopy.hosts;
+  const { dashboardCopy } = useText(dashboardText);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [label, setLabel] = useState("");
@@ -142,6 +146,8 @@ function InviteCohost({ view }: { view: DashboardView }) {
 
 /** Asks before a co-host is removed, or before a co-host leaves. */
 function RemoveHost({ view, host }: { view: DashboardView; host: Host }) {
+  const copy = useText(dashboardText).dashboardCopy.hosts;
+  const { dashboardCopy } = useText(dashboardText);
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -205,6 +211,7 @@ function RemoveHost({ view, host }: { view: DashboardView; host: Host }) {
 }
 
 function Withdraw({ view, id, label }: { view: DashboardView; id: string; label: string }) {
+  const copy = useText(dashboardText).dashboardCopy.hosts;
   const router = useRouter();
   const [pending, start] = useTransition();
   return (
@@ -230,6 +237,7 @@ function Withdraw({ view, id, label }: { view: DashboardView; id: string; label:
 
 /** The people running this invite, pending co-host links, and inviting another family. */
 export function Cohosts({ view }: { view: DashboardView }) {
+  const copy = useText(dashboardText).dashboardCopy.hosts;
   const owner = view.role === "owner";
   return (
     <Card role="region" aria-labelledby="cohosts-heading" className="gap-5 p-5 sm:p-6">

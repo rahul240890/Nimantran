@@ -11,7 +11,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { musicDemo } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
 import { RAGAS } from "@/lib/engine/music";
 import type { MusicPlayer } from "@/lib/engine/music-player";
@@ -31,6 +32,7 @@ const BARS = [0.55, 0.95, 0.7, 1, 0.6];
  * before they open one. Sound starts only on a tap; the level bars stand still in still mode.
  */
 export function MusicDemo() {
+  const { musicDemo } = useText(landingText);
   const [trackId, setTrackId] = useState(tracks[0]!.id);
   const [playing, setPlaying] = useState(false);
   const [failed, setFailed] = useState(false);

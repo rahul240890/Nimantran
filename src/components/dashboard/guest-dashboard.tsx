@@ -2,15 +2,13 @@ import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { dashboardCopy } from "@/content/dashboard";
-import { functionCopy } from "@/content/editor";
+import { dashboardText, editorText } from "@/i18n/copy";
+import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
 import { Reminders } from "./reminders";
 import type { DashboardView } from "./types";
-
-const copy = dashboardCopy;
 
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return (
@@ -25,7 +23,9 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
 }
 
 /** The host's home for one invite: counts, the guest list, reminders and co-hosts. */
-export function GuestDashboard({ view }: { view: DashboardView }) {
+export async function GuestDashboard({ view }: { view: DashboardView }) {
+  const copy = (await getText(dashboardText)).dashboardCopy;
+  const { functionCopy } = await getText(editorText);
   const counts = dashboardCounts(view.guests, view.functions);
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">

@@ -20,7 +20,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { Stepper } from "@/components/ui/stepper";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { toast } from "@/components/ui/toast";
-import { editor, previewCopy, stepCopy, syncCopy } from "@/content/editor";
 import type { QualityChoice } from "@/content/engine-review";
 import type { CategoryId } from "@/lib/categories/catalog";
 import {
@@ -35,11 +34,9 @@ import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
 import type { TemplateId } from "@/lib/templates/schema";
-import { uiStrings } from "@/lib/ui-strings";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PublishButton } from "@/components/publish/publish-button";
-import { publishCopy } from "@/content/publish";
 import { PreviewStage } from "./preview-stage";
 import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
@@ -48,6 +45,8 @@ import { FunctionsStep } from "./steps/functions-step";
 import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
 import { forgetPhotoUrl } from "./use-photo-urls";
+import { useText } from "@/i18n/client";
+import { editorText, publishText, uiText } from "@/i18n/copy";
 
 const WIDE = "(min-width: 64rem)";
 
@@ -75,6 +74,7 @@ function SaveStatus({
   signedIn: boolean;
   edited: boolean;
 }) {
+  const { editor, syncCopy } = useText(editorText);
   if (signedIn && state !== "unavailable" && sync !== "signed-out") {
     const busy = state === "saving" || sync === "syncing";
     const key = busy ? "syncing" : sync === "offline" ? "offline" : edited ? sync : "idle";
@@ -134,6 +134,9 @@ export function Editor({
   /** ?invite= named an invite this person can't open. */
   missing?: boolean;
 }) {
+  const { editor, previewCopy, stepCopy, syncCopy } = useText(editorText);
+  const { publishCopy } = useText(publishText);
+  const { uiStrings } = useText(uiText);
   const { draft, save } = useSyncExternalStore(
     inviteDraft.subscribe,
     inviteDraft.get,
@@ -177,7 +180,17 @@ export function Editor({
         return next;
       });
     })();
-  }, [initialInvite, fresh, missing, signedIn, initialTemplate, initialCategory, update, router]);
+  }, [
+    initialInvite,
+    fresh,
+    missing,
+    signedIn,
+    initialTemplate,
+    initialCategory,
+    update,
+    router,
+    syncCopy,
+  ]);
 
   // Save to the account a moment after each change, and when the connection comes back
   useEffect(() => {

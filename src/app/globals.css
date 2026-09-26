@@ -252,8 +252,11 @@
   --color-tpl-kasavu-kumkum: var(--tpl-kasavu-kumkum);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
-  --font-sans: "Karla Variable", "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-label: "Tenor Sans", "Trebuchet MS", system-ui, sans-serif;
+  --font-sans:
+    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-label:
+    "Tenor Sans", "Noto Sans Devanagari Variable", "Trebuchet MS", system-ui, sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -545,4 +548,22 @@
 :root[data-motion="reduce"]::view-transition-new(*),
 :root[data-motion="reduce"]::view-transition-group(*) {
   animation: none !important;
+}
+
+/*
+ * Devanagari has no capitals and its letters join along the headline, so the wide
+ * tracking of Latin small-caps labels would break words apart. Hindi pages keep labels
+ * close-set and a touch larger, and give body text room for the matras.
+ */
+:lang(hi) .font-label {
+  letter-spacing: 0.02em !important;
+  text-transform: none;
+}
+
+:lang(hi) .font-label.text-xs {
+  font-size: 0.8125rem;
+}
+
+:lang(hi) body {
+  line-height: 1.65;
 }

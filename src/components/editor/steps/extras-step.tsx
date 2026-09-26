@@ -9,8 +9,6 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { questionLabels } from "@/content/categories";
-import { extrasCopy } from "@/content/editor";
 import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import { RAGAS } from "@/lib/engine/music";
@@ -19,6 +17,8 @@ import { RAGA_IDS, type RagaId } from "@/lib/templates/schema";
 import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
+import { useText } from "@/i18n/client";
+import { categoriesText, editorText } from "@/i18n/copy";
 
 function newId(): string {
   return typeof crypto.randomUUID === "function"
@@ -27,6 +27,7 @@ function newId(): string {
 }
 
 function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { extrasCopy } = useText(editorText);
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -191,6 +192,7 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
 }
 
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { extrasCopy } = useText(editorText);
   const own = TEMPLATES[draft.templateId].music.raga;
   const value = draft.music.raga ?? own;
 
@@ -245,6 +247,8 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
 }
 
 function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { questionLabels } = useText(categoriesText);
+  const { extrasCopy } = useText(editorText);
   const asked = draftQuestions(draft);
   return (
     <section

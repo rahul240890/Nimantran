@@ -1,8 +1,10 @@
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
-import { faq } from "@/content/landing";
+import { landingText } from "@/i18n/copy";
+import type { UiLocale } from "@/i18n/locales";
 import { Section } from "./section";
 
-export function Faq() {
+export function Faq({ locale }: { locale: UiLocale }) {
+  const { faq } = landingText[locale];
   return (
     <Section id="faq" eyebrow={faq.eyebrow} title={faq.title}>
       <Accordion type="single" collapsible className="mx-auto max-w-3xl">

@@ -3,12 +3,13 @@
 import { ArrowLeft, ArrowRight, FlaskConical, Phone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
-import { sendCode, startGoogle, verifyCode } from "@/app/_actions/auth";
+import { sendCode, startGoogle, verifyCode } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { signInCopy } from "@/content/account";
+import { accountText } from "@/i18n/copy";
+import { useText } from "@/i18n/client";
 import { firstName } from "@/lib/auth/account";
 import { OTP_LENGTH, maskPhone, normalizePhone } from "@/lib/auth/phone";
 import { CodeInput } from "./code-input";
@@ -18,7 +19,7 @@ const RESEND_SECONDS = 30;
 /** Keeps the number and step through a refresh while the SMS arrives. */
 const STORAGE_KEY = "nimantran-sign-in";
 
-type ErrorKey = keyof typeof signInCopy.errors;
+type ErrorKey = keyof (typeof accountText)["en"]["signInCopy"]["errors"];
 
 type Flow = { step: "phone" | "code"; input: string; phone: string };
 
@@ -68,6 +69,7 @@ export function SignInForm({
   preview: boolean;
   initialError?: ErrorKey;
 }) {
+  const { signInCopy } = useText(accountText);
   const router = useRouter();
   // A refresh while waiting for the SMS picks up at the code
   const saved = useSyncExternalStore(noop, readSaved, () => null);

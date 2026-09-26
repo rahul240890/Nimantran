@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDeferredValue, useMemo, useState, useTransition } from "react";
-import { markReminded, removeGuests } from "@/app/_actions/guests";
+import { markReminded, removeGuests } from "@/actions/guests";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
@@ -38,8 +38,6 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
-import { dashboardCopy } from "@/content/dashboard";
-import { functionCopy } from "@/content/editor";
 import { formatPhone } from "@/lib/auth/phone";
 import { cn } from "@/lib/cn";
 import {
@@ -55,8 +53,9 @@ import {
 import { personalUrl, whatsappToUrl } from "@/lib/publish/links";
 import { GuestFormDialog } from "./guest-form";
 import type { DashboardView } from "./types";
-
-const copy = dashboardCopy;
+import { useLocale, useText } from "@/i18n/client";
+import { dateLocale } from "@/i18n/dates";
+import { dashboardText, editorText } from "@/i18n/copy";
 
 const statusLook = {
   attending: { icon: CircleCheck, className: "border-success/35 bg-success/10 text-success" },
@@ -74,8 +73,11 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
+type Messages = (typeof dashboardText)["en"]["dashboardCopy"]["messages"];
+
 /** A message with the guest's name and their own link, for WhatsApp. */
 export function guestMessage(
+  messages: Messages,
   view: DashboardView,
   guest: HostGuest,
   kind: "invite" | "reminder",
@@ -84,7 +86,7 @@ export function guestMessage(
   const link = view.url ? personalUrl(view.url, guest.token) : "";
   const body =
     template?.replaceAll("{name}", guest.name) ??
-    copy.messages[kind](guest.name, view.names, view.occasion, view.when);
+    messages[kind](guest.name, view.names, view.occasion, view.when);
   return `${body.trim()}\n${link}`;
 }
 
@@ -99,6 +101,9 @@ function GuestRow({
   onEdit: () => void;
   onRemove: () => void;
 }) {
+  const locale = useLocale();
+  const copy = useText(dashboardText).dashboardCopy;
+  const { functionCopy } = useText(editorText);
   const router = useRouter();
   const waiting = guest.replies.length === 0;
   const opened = Boolean(guest.openedAt) || !waiting;
@@ -154,7 +159,12 @@ function GuestRow({
           {guest.remindedAt && waiting && (
             <span className="inline-flex items-center gap-1.5">
               <BellRing aria-hidden className="size-4" />
-              {copy.guest.reminded(formatDistanceToNow(guest.remindedAt, { addSuffix: true }))}
+              {copy.guest.reminded(
+                formatDistanceToNow(guest.remindedAt, {
+                  addSuffix: true,
+                  locale: dateLocale[locale],
+                }),
+              )}
             </span>
           )}
           {guest.selfAdded && <span>{copy.guest.selfAdded}</span>}
@@ -172,7 +182,7 @@ function GuestRow({
             className="max-sm:hidden"
           >
             <a
-              href={whatsappToUrl(guest.phone, guestMessage(view, guest, kind))}
+              href={whatsappToUrl(guest.phone, guestMessage(copy.messages, view, guest, kind))}
               target="_blank"
               rel="noopener noreferrer"
               onClick={send}
@@ -201,7 +211,10 @@ function GuestRow({
               <>
                 <DropdownMenuItem asChild>
                   <a
-                    href={whatsappToUrl(guest.phone, guestMessage(view, guest, "invite"))}
+                    href={whatsappToUrl(
+                      guest.phone,
+                      guestMessage(copy.messages, view, guest, "invite"),
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -212,7 +225,10 @@ function GuestRow({
                 {waiting && (
                   <DropdownMenuItem asChild>
                     <a
-                      href={whatsappToUrl(guest.phone, guestMessage(view, guest, "reminder"))}
+                      href={whatsappToUrl(
+                        guest.phone,
+                        guestMessage(copy.messages, view, guest, "reminder"),
+                      )}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() =>
@@ -264,6 +280,7 @@ function RemoveGuest({
   guest: HostGuest | null;
   onClose: () => void;
 }) {
+  const copy = useText(dashboardText).dashboardCopy;
   const router = useRouter();
   const [pending, start] = useTransition();
   const remove = () =>
@@ -304,6 +321,8 @@ function RemoveGuest({
 
 /** The guest list: search, filters, add, export and each guest's replies and actions. */
 export function GuestList({ view }: { view: DashboardView }) {
+  const copy = useText(dashboardText).dashboardCopy;
+  const { functionCopy } = useText(editorText);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<GuestFilter>("all");
   const [functionId, setFunctionId] = useState<string | null>(null);

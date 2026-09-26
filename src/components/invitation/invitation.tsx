@@ -29,10 +29,11 @@ import { TEMPLATES } from "@/lib/templates/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
-import { uiStrings } from "@/lib/ui-strings";
 import { useDarkTheme } from "@/lib/use-color-scheme";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CARD_FORMATS, type CardFormatId } from "./formats";
+import { useText } from "@/i18n/client";
+import { uiText } from "@/i18n/copy";
 
 const Stage = dynamic(() => import("./three/stage"), { ssr: false });
 
@@ -132,11 +133,13 @@ export function Invitation({
   defaultOpen = false,
   onOpenChange,
   musicOnOpen = true,
-  labels = uiStrings.invitation,
+  labels: labelsProp,
   onStatus,
   onFps,
   className,
 }: InvitationProps) {
+  const { uiStrings } = useText(uiText);
+  const labels = labelsProp ?? uiStrings.invitation;
   const format: CardFormatId = template.scene.format;
   const Flat = CARD_FORMATS[format].Flat;
   const still = useReducedMotion();

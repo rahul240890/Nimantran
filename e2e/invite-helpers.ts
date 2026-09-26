@@ -9,8 +9,9 @@ export const axe = (page: Page) =>
 export const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
 
+// Ten digits even after failed workers restart: parallelIndex stays below the worker count
 export const numberFor = (info: TestInfo) =>
-  `8${String(info.workerIndex * 1000 + info.repeatEachIndex * 100 + info.retry).padStart(4, "0")}${String(Date.now()).slice(-5)}`;
+  `8${String((info.parallelIndex % 10) * 1000 + info.repeatEachIndex * 100 + info.retry).padStart(4, "0")}${String(Date.now()).slice(-5)}`;
 
 // A 4×4 marigold PNG, enough for the browser to decode, shrink and store
 const PNG = Buffer.from(

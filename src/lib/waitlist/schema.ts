@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { waitlist } from "@/content/landing";
+import type { Translation } from "@/i18n/text";
 
-const e = waitlist.errors;
+type Messages = Translation<
+  Pick<typeof waitlist.errors, "name" | "nameLong" | "email" | "phone" | "occasion">
+>;
 
 export const occasions = ["wedding", "engagement", "family", "business"] as const;
 export type Occasion = (typeof occasions)[number];
@@ -13,22 +16,26 @@ export function phoneDigits(value: string): string {
 
 /**
  * One schema for the browser and the server: the form shows these messages inline,
- * and the server action runs the same checks before anything is stored.
+ * and the server action runs the same checks before anything is stored. The messages
+ * come in the page's language; English unless given.
  */
-export const waitlistSchema = z.object({
-  name: z.string().trim().min(1, e.name).max(80, e.nameLong),
-  email: z.string().trim().toLowerCase().max(254, e.email).pipe(z.email(e.email)),
-  phone: z
-    .string()
-    .trim()
-    .refine((value) => value === "" || /^[+\d\s()-]+$/.test(value), e.phone)
-    .refine((value) => {
-      if (value === "") return true;
-      const digits = phoneDigits(value).length;
-      return digits >= 10 && digits <= 15;
-    }, e.phone),
-  occasion: z.enum(occasions, e.occasion),
-});
+export const waitlistSchemaIn = (e: Messages) =>
+  z.object({
+    name: z.string().trim().min(1, e.name).max(80, e.nameLong),
+    email: z.string().trim().toLowerCase().max(254, e.email).pipe(z.email(e.email)),
+    phone: z
+      .string()
+      .trim()
+      .refine((value) => value === "" || /^[+\d\s()-]+$/.test(value), e.phone)
+      .refine((value) => {
+        if (value === "") return true;
+        const digits = phoneDigits(value).length;
+        return digits >= 10 && digits <= 15;
+      }, e.phone),
+    occasion: z.enum(occasions, e.occasion),
+  });
+
+export const waitlistSchema = waitlistSchemaIn(waitlist.errors);
 
 export type WaitlistEntry = z.output<typeof waitlistSchema>;
 export type WaitlistField = keyof WaitlistEntry;
@@ -50,8 +57,10 @@ export function fieldErrors(error: z.ZodError): WaitlistErrors {
 
 export function validateWaitlist(
   input: unknown,
+  messages: Messages = waitlist.errors,
 ): { ok: true; data: WaitlistEntry } | { ok: false; errors: WaitlistErrors } {
-  const result = waitlistSchema.safeParse(input);
+  const schema = messages === waitlist.errors ? waitlistSchema : waitlistSchemaIn(messages);
+  const result = schema.safeParse(input);
   return result.success
     ? { ok: true, data: result.data }
     : { ok: false, errors: fieldErrors(result.error) };

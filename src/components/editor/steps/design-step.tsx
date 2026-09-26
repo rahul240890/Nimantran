@@ -3,13 +3,15 @@
 import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { occasionCopy, stepCopy } from "@/content/editor";
 import { draftCategory } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
+import { useText } from "@/i18n/client";
+import { editorText } from "@/i18n/copy";
 
 export function DesignStep({ draft, update }: StepProps) {
+  const { occasionCopy, stepCopy } = useText(editorText);
   const category = draftCategory(draft);
   const suggested: readonly TemplateId[] = category.templates;
   // The occasion's designs first, best first; every design stays available

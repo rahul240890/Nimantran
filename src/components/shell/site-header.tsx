@@ -2,21 +2,19 @@
 
 import { Menu } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { ThemeMenu, ThemeToggle } from "@/components/ui/theme-toggle";
-import { nav, shell } from "@/content/landing";
+import { useText } from "@/i18n/client";
+import { landingText, uiText } from "@/i18n/copy";
 import { cn } from "@/lib/cn";
-import { uiStrings } from "@/lib/ui-strings";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { AccountMenu } from "@/components/account/account-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useActiveSection } from "./use-active-section";
-
-const navIds = nav.map((item) => item.id);
 
 /** Moves to a section and puts keyboard focus on it, so screen readers continue from there. */
 function goToSection(id: string, still: boolean) {
@@ -28,6 +26,8 @@ function goToSection(id: string, still: boolean) {
 }
 
 function MobileMenu() {
+  const { nav, shell } = useText(landingText);
+  const { uiStrings } = useText(uiText);
   const [open, setOpen] = useState(false);
   const pending = useRef<string | null>(null);
   const still = useReducedMotion();
@@ -111,7 +111,9 @@ function MobileMenu() {
 
 /** The sticky bar on every marketing page: logo, section links, language, theme and the main action. */
 export function SiteHeader() {
-  const active = useActiveSection(navIds);
+  const { nav, shell } = useText(landingText);
+  const { uiStrings } = useText(uiText);
+  const active = useActiveSection(useMemo(() => nav.map((item) => item.id), [nav]));
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {

@@ -1,6 +1,6 @@
 import { site } from "@/lib/site";
 
-/* The host dashboard and co-hosts (Step 11). English copy, shaped for next-intl. */
+/* The host dashboard and co-hosts (Step 11). English copy; Hindi in src/content/hi/dashboard.ts. */
 
 const plural = (count: number, one: string, many: string) =>
   count === 1 ? `1 ${one}` : `${count.toLocaleString("en-IN")} ${many}`;
@@ -185,8 +185,6 @@ export const dashboardCopy = {
     message: "Message",
     messageHint: "Their name and personal link are added for each guest.",
     send: "Send",
-    sendTo: (name: string) => `Send invitation to ${name} on WhatsApp`,
-    remindTo: (name: string) => `Remind ${name} on WhatsApp`,
     sent: "Sent",
     copy: "Copy",
     noPhone: "No number",

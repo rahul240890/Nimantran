@@ -6,7 +6,6 @@ import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { editor, extrasCopy, functionCopy, previewCopy, stepCopy } from "@/content/editor";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import {
   draftCategory,
@@ -19,6 +18,9 @@ import { RAGAS } from "@/lib/engine/music";
 import { formatTime } from "@/lib/time";
 import { usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
+import { useLocale, useText } from "@/i18n/client";
+import { dateLocale } from "@/i18n/dates";
+import { editorText } from "@/i18n/copy";
 
 function Section({
   title,
@@ -31,6 +33,7 @@ function Section({
   goTo: (step: EditorStep) => void;
   children: ReactNode;
 }) {
+  const { previewCopy } = useText(editorText);
   const id = `summary-${step}`;
   return (
     <section aria-labelledby={id} className="flex flex-col gap-3 border-t border-line pt-5">
@@ -66,6 +69,8 @@ export function PreviewStep({
   /** Starting over keeps this invite in My invites instead of clearing it. */
   keepsInvite?: boolean;
 }) {
+  const locale = useLocale();
+  const { editor, extrasCopy, functionCopy, previewCopy, stepCopy } = useText(editorText);
   const problems = draftProblems(draft);
   const functions = includedFunctions(draft);
   const category = draftCategory(draft);
@@ -134,8 +139,10 @@ export function PreviewStep({
                 <span className="font-display text-lg leading-tight">{functionCopy[id].name}</span>
                 <span className="flex items-start gap-2 text-sm">
                   <Clock aria-hidden className="mt-0.5 size-4 shrink-0 text-ink-muted" />
-                  {fn.date ? format(parseISO(fn.date), "EEE, d MMM yyyy") : "—"}
-                  {fn.time ? ` · ${formatTime(fn.time)}` : ""}
+                  {fn.date
+                    ? format(parseISO(fn.date), "EEE, d MMM yyyy", { locale: dateLocale[locale] })
+                    : "—"}
+                  {fn.time ? ` · ${formatTime(fn.time, dateLocale[locale])}` : ""}
                 </span>
                 <span className="flex items-start gap-2 text-sm break-words">
                   <MapPin aria-hidden className="mt-0.5 size-4 shrink-0 text-ink-muted" />

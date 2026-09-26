@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // The site has several root layouts, so unmatched addresses need their own page
+  experimental: { globalNotFound: true },
   // Link-preview images read these at request time (src/lib/og/assets.ts)
   outputFileTracingIncludes: {
     "/i/**": [
