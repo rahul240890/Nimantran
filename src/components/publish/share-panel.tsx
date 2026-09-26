@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useSyncExternalStore, useTransition } from "react";
+import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { unpublishInvite } from "@/app/_actions/invites";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -34,6 +34,8 @@ type SharePanelProps = {
   message: string;
   /** The QR code as an SVG string, drawn in currentColor. */
   qr: string;
+  /** Guests' replies so far, drawn on the server. */
+  replies?: ReactNode;
 };
 
 const noSubscribe = () => () => {};
@@ -57,6 +59,7 @@ export function SharePanel({
   when,
   message: initialMessage,
   qr,
+  replies,
 }: SharePanelProps) {
   const [message, setMessage] = useState(initialMessage);
   const nativeShare = useSyncExternalStore(noSubscribe, canShare, () => false);
@@ -168,6 +171,7 @@ export function SharePanel({
               </Button>
             </div>
           </Card>
+          {replies}
         </div>
 
         <div className="flex min-w-0 flex-col gap-6">

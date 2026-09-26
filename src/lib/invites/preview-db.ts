@@ -1,4 +1,5 @@
 import "server-only";
+import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { EventRow, FunctionRow, PhotoRow } from "./rows";
 
 /*
@@ -12,15 +13,39 @@ export type PreviewInvite = {
   event: EventRow;
   functions: FunctionRow[];
   photos: PhotoRow[];
+  /** The RSVP's library questions, in order. */
+  questions: RsvpQuestionId[];
   publishedAt: string | null;
 };
 
 type PreviewFile = { type: string; data: Uint8Array };
 
+export type PreviewReply = {
+  /** "<event id>:<function kind>", as the public invite names functions in preview mode. */
+  functionId: string;
+  status: "attending" | "declined" | "maybe";
+  adults: number;
+  children: number;
+  message: string;
+  answers: Record<string, string>;
+  respondedAt: string;
+};
+
+export type PreviewGuest = {
+  eventId: string;
+  token: string;
+  name: string;
+  selfAdded: boolean;
+  functionIds: string[];
+  replies: PreviewReply[];
+};
+
 type PreviewDb = {
   invites: Map<string, PreviewInvite>;
   /** Photo files by "<event id>/<photo id>". */
   files: Map<string, PreviewFile>;
+  /** Guests by token. */
+  guests: Map<string, PreviewGuest>;
 };
 
 const holder = globalThis as unknown as { __shubhdwarPreviewDb?: PreviewDb };
@@ -28,7 +53,9 @@ const holder = globalThis as unknown as { __shubhdwarPreviewDb?: PreviewDb };
 export const previewDb: PreviewDb = (holder.__shubhdwarPreviewDb ??= {
   invites: new Map(),
   files: new Map(),
+  guests: new Map(),
 });
+previewDb.guests ??= new Map();
 
 /** A photo as a data URL: preview mode has no file storage to link to. */
 export function previewPhotoUrl(eventId: string, photoId: string): string | null {

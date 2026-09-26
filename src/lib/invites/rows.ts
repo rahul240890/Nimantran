@@ -1,4 +1,5 @@
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
+import { RSVP_QUESTION_IDS } from "@/lib/categories/schema";
 import {
   EDITOR_STEPS,
   FUNCTION_IDS,
@@ -89,6 +90,8 @@ export function rowsToDraft(
   event: EventRow,
   functions: FunctionRow[],
   photos: PhotoRow[] = [],
+  /** The RSVP's questions as saved; left out, the occasion's own apply. */
+  questions?: readonly string[],
 ): InviteDraft {
   const base = newDraft(
     isTemplateId(event.template_id) ? event.template_id : "marigold",
@@ -123,6 +126,7 @@ export function rowsToDraft(
     updatedAt: Date.parse(event.updated_at) || 0,
     remoteId: event.id,
     slug: event.status === "published" ? event.slug : null,
+    questions: questions ? RSVP_QUESTION_IDS.filter((id) => questions.includes(id)) : null,
   });
   return draft ?? { ...base, remoteId: event.id };
 }

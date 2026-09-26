@@ -32,6 +32,8 @@ const PHOTO_LINK_SECONDS = 60 * 60 * 6;
 type RpcInvite = Omit<EventRow, "status" | "editor_step"> & {
   functions: (FunctionRow & { id: string })[];
   photos: { id: string; path: string; width: number | null; height: number | null }[];
+  /** Present once the RSVP migration (Step 10) has run. */
+  questions?: { preset: string | null }[];
 };
 
 async function fromSupabase(slug: string): Promise<PublicInvite | null> {
@@ -41,7 +43,12 @@ async function fromSupabase(slug: string): Promise<PublicInvite | null> {
   if (error || !data) return null;
   const row = data as RpcInvite;
   const event: EventRow = { ...row, status: "published", editor_step: "preview" };
-  const draft = rowsToDraft(event, row.functions, []);
+  const draft = rowsToDraft(
+    event,
+    row.functions,
+    [],
+    (row.questions ?? []).flatMap((question) => (question.preset ? [question.preset] : [])),
+  );
   let photos: PublicPhoto[] = [];
   if (row.photos.length) {
     const { data: links } = await supabase.storage.from("event-media").createSignedUrls(
@@ -73,7 +80,7 @@ function fromPreview(slug: string): PublicInvite | null {
   return {
     id,
     slug,
-    draft: rowsToDraft(stored.event, stored.functions, []),
+    draft: rowsToDraft(stored.event, stored.functions, [], stored.questions),
     functionIds: Object.fromEntries(stored.functions.map((fn) => [fn.kind, `${id}:${fn.kind}`])),
     photos: [...stored.photos]
       .sort((a, b) => a.position - b.position)

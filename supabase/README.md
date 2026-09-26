@@ -20,6 +20,8 @@ database keeps every invite. Applied so far after the first setup:
 - `20260926180000_publish.sql` — publishing (Step 9): the public `published_invite()` read,
   `slug_available()`, and guests reading photos of published invites. Needs the traditions
   migration above first.
+- `20260926190000_rsvp.sql` — guest replies (Step 10): `submit_rsvp()` and `guest_reply()` for
+  guests with the link, the host's questions on the guest page, and `guests.self_added`.
 
 ## Setting up a project
 

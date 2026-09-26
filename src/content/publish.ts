@@ -76,6 +76,7 @@ export const guestCopy = {
     "You're invited. Open the invitation to see the details.",
   invited: "You're invited",
   openHint: "Tap the card to open it",
+  reply: "Reply to the invitation",
   functions: "The celebrations",
   when: "When",
   where: "Where",
@@ -93,4 +94,56 @@ export const guestCopy = {
   notFoundBody:
     "The link may be mistyped, or the family may have stopped sharing it. Ask them to send it again.",
   home: `Go to ${site.name}`,
+} as const;
+
+export const rsvpCopy = {
+  heading: "Will you join us?",
+  intro: "Reply for each celebration. You can change your answer any time from this page.",
+  yourName: "Your name",
+  namePlaceholder: "As the family knows you",
+  nameRequired: "Please enter your name",
+  acceptAll: "Coming to everything",
+  statuses: {
+    attending: { label: "Joyfully accept", short: "Coming" },
+    maybe: { label: "Not sure yet", short: "Maybe" },
+    declined: { label: "Regretfully decline", short: "Can't come" },
+  },
+  statusGroup: (name: string) => `Your reply for the ${name}`,
+  chooseOne: "Choose a reply",
+  adults: "Adults",
+  children: "Children",
+  fewer: (what: string) => `Fewer ${what.toLowerCase()}`,
+  more: (what: string) => `More ${what.toLowerCase()}`,
+  questionsHeading: "A few details for the family",
+  optional: "Optional",
+  yes: "Yes",
+  no: "No",
+  choose: "Choose",
+  meal: { veg: "Vegetarian", jain: "Jain", "non-veg": "Non-vegetarian", vegan: "Vegan" },
+  message: "A note for the family",
+  messagePlaceholder: "Blessings, wishes, or anything they should know",
+  send: "Send reply",
+  update: "Update reply",
+  sending: "Sending…",
+  failed: "Couldn't send your reply. Check your connection and try again.",
+  missing: "This invitation isn't taking replies any more.",
+  notInvited: "This link isn't for one of those celebrations. Ask the family to check it.",
+  fixErrors: (count: number) =>
+    count === 1 ? "One answer still needs you." : `${count} answers still need you.`,
+  thanksTitle: (name: string) => `Thank you, ${name}!`,
+  thanksBody: "Your reply is with the family. You can change it here any time.",
+  change: "Change my reply",
+  people: (count: number) => (count === 1 ? "1 person" : `${count} people`),
+} as const;
+
+export const repliesCopy = {
+  heading: "Replies",
+  intro:
+    "Updates as guests reply. The full guest list and reminders arrive with the host dashboard.",
+  none: "No replies yet. They appear here as soon as guests answer.",
+  coming: (count: number) => (count === 1 ? "1 coming" : `${count} coming`),
+  maybe: (count: number) => `${count} maybe`,
+  declined: (count: number) => `${count} can't come`,
+  latest: "Latest replies",
+  more: (count: number) => `and ${count} more`,
 } as const;
