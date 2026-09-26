@@ -1,6 +1,8 @@
 @AGENTS.md
 
-# Nimantran project notes
+# Shubhdwar project notes
+
+- The product is named **Shubhdwar** (decided 2026-09-26). The repository and older code still say Nimantran until Step 8a renames user-facing text. Brand and SEO rules: `docs/BRAND_SEO.md`.
 
 - Roadmap and current step: `docs/PLAN.md`. Work one step at a time.
 - What to build: `docs/PRODUCT.md` (features, categories, editions, pricing), `docs/TRADITIONS.md` (regional and religious packs, sacred art rules), `docs/MEMORIES.md`, `docs/COMPETITORS.md`.

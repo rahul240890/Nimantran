@@ -1,8 +1,8 @@
-# Nimantran — Build Plan
+# Shubhdwar — Build Plan
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
-**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
@@ -99,6 +99,12 @@ Built as: `/sign-in` (mobile number with a 6-digit SMS code that fills itself fr
 Tables: users, events, event_hosts (co-hosts), functions, categories, templates, guests, rsvps, rsvp_questions, scheduled_sends, media. Row Level Security so hosts and co-hosts see only their own events. Migrations and seed data.
 Built as: `supabase/migrations` (profiles for users, created on sign-up; events with their hosts, co-host invitations, functions, guests with a private link token each, custom RSVP questions per event or function, replies, scheduled sends and media, plus a private `event-media` storage bucket) and `supabase/seed.sql`, generated from the category and template catalogs with `npm run db:seed`. Every table has row level security: hosts and co-hosts reach only their own events, co-hosts can't remove the owner, and the public can read only the catalog. `src/lib/db/schema.test.ts` runs the real migrations in an in-memory Postgres (PGlite) and checks each rule as two different people. The editor now saves each invite to the account a moment after every change (the header says "Saved to your account"), My invites lists them on every device with delete, and a draft made before signing in moves into the account when it's opened. Photos stay on the device until Step 9 uploads them. Setup: `supabase/README.md`.
 
+**Owner task B1. Secure the name "Shubhdwar"** (owner only, before Step 8a)
+Domains, IP India trademark search and filing (classes 9, 35, 42), social handles, app store names, email and Search Console. Checklist in [BRAND_SEO.md](BRAND_SEO.md), section 3.
+
+**Step 8a. Rename to Shubhdwar**
+The product name changes from Nimantran to Shubhdwar before any public share links exist (decided 26 September 2026; reasons in BRAND_SEO.md). Site config, logo wordmark, favicon and icons, Open Graph image, all copy and metadata, watermark text, email and SMS templates, docs titles, tests. Repository, database and package names can stay `nimantran`. Start once task B1 is done or the owner says go.
+
 **Step 9. Publish, share and schedule**
 Unique link (`/i/aarav-weds-meera`), WhatsApp share, rich link preview image (Open Graph), QR code, add-to-calendar. Scheduled sending per function (email and SMS).
 
@@ -118,6 +124,9 @@ next-intl setup; English, Hindi, Marathi, Gujarati, Bengali, Tamil, Telugu, Kann
 Regional and religious customisation from one choice (spec: [TRADITIONS.md](TRADITIONS.md)). Tradition pack schema and catalogue; a Tradition step after Occasion (region, community, card languages, live previews); religious-elements panel (deity or symbol, invocation, shloka or verse, optional chant); wording panel with labelled blocks (blessings, hosts, requesters, Swagatotsuk, children's line); ceremony lists with local names; respect rules enforced by tests. First six packs: North Indian Hindu, Rajasthani/Marwari, Marathi, Gujarati, Bengali, Tamil. Each pack needs community reviewers and a native proofreader before it ships.
 
 **Content task C1 (starts now, runs alongside building).** Commission 18 original sacred art pieces (deities and symbols listed in TRADITIONS.md, section 5) from Indian artists with commercial rights; recruit community reviewers and proofreaders. Never use images from Google or other apps.
+
+**Step 12b. SEO foundations**
+Keyword landing pages generated from categories, tradition packs, functions and languages; indexable template pages; `hreflang` language versions; sitemap and robots; structured data; guest invitation pages kept `noindex`; titles and descriptions in each language; Search Console. Spec: [BRAND_SEO.md](BRAND_SEO.md), sections 5–6.
 
 **Step 13. Quality pass**
 End-to-end tests for create → publish → RSVP → dashboard. Accessibility audit, Lighthouse, real-device testing on low-end Android and iPhone.
@@ -172,7 +181,7 @@ Detailed in the Nimantran Memories Plan. Starts once payments work (after Step 1
 **Step 30.** Stripe and regional pricing; international templates and categories (Western weddings, Nikah, Chinese, quinceañera, bar and bat mitzvah).
 **Step 31.** More languages including Urdu and Arabic (right-to-left).
 **Step 32.** Shagun/gift registry and live-stream page.
-**Step 33.** Android and iOS apps with Capacitor; push notifications.
+**Step 33.** Android and iOS apps with Capacitor; push notifications. Store listings localised in every launch language, following the app store plan in BRAND_SEO.md.
 
 ---
 
@@ -182,6 +191,7 @@ All in this folder, so every build session has them:
 
 - [PRODUCT.md](PRODUCT.md): what each step builds towards.
 - [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
+- [BRAND_SEO.md](BRAND_SEO.md): the Shubhdwar name decision, owner task B1, rename checklist (Step 8a), keyword clusters and SEO foundations (Step 12b), app store plan.
 - [TRADITIONS.md](TRADITIONS.md): tradition packs, sacred art library and respect rules (Steps 12a, 23, 27a and content task C1).
 - [COMPETITORS.md](COMPETITORS.md): what we borrow from Paperless Post and what we avoid (coin pricing, per-guest add-ons, yearly free limit).
 - [PLAN_REVIEW.md](PLAN_REVIEW.md): open recommendations on launch scope, payments timing and languages, awaiting the owner's decision.
