@@ -2,7 +2,7 @@
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
-**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [MOTION.md](MOTION.md) (regional animation) · [PAYMENTS.md](PAYMENTS.md) (shagun, contributions, tickets) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
 
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
@@ -143,6 +143,9 @@ Built so far (part 1 of 3): six **Rang** designs, one per region the first packs
 **Step 12b. SEO foundations**
 Keyword landing pages generated from categories, tradition packs, functions and languages; indexable template pages; `hreflang` language versions; sitemap and robots; structured data; guest invitation pages kept `noindex`; titles and descriptions in each language; Search Console. Spec: [BRAND_SEO.md](BRAND_SEO.md), sections 5–6.
 
+**Step 12c. Regional motion**
+Every tradition opens its own way (spec: [MOTION.md](MOTION.md)). Engine motion hooks: opening timeline, ambient loop, particle counts per quality level, sound only after a tap, skip. Drawn-on stroke reveal for kolam, alpona, rangoli and calligraphy. Openings and particles for the first six packs (North Indian, Rajasthani, Marathi, Gujarati, Bengali, Tamil). Diya countdown on the guest page. Full, Light and Still versions of everything.
+
 **Step 13. Quality pass**
 End-to-end tests for create → publish → RSVP → dashboard. Accessibility audit, Lighthouse, real-device testing on low-end Android and iPhone.
 
@@ -157,7 +160,10 @@ Production Supabase, Vercel deploy, custom domain, analytics, error monitoring, 
 **Step 16.** Razorpay checkout (UPI, cards), receipts, GST invoices.
 **Step 17.** Watermark on free invites, upgrade flow, coupons and festival offers.
 **Step 17a.** Card details included in editions: wax seals, tassels, foil, backgrounds, envelope and door styles.
+**Step 17b.** Shagun ledger with direct UPI (free): "Send shagun" opens the guest's UPI app with the family's UPI ID; UPI QR on desktop; self-reported ledger, manual cash entries, CSV export. No money through us. Spec: [PAYMENTS.md](PAYMENTS.md).
+**Owner task L1.** Legal and tax review of platform payments with a fintech lawyer and CA; choose the payment provider (checklist in PAYMENTS.md, section 5). Required before Step 18a.
 **Step 18.** Referral credits for hosts and guests.
+**Step 18a.** Platform payments with commission, through a licensed provider's split payments (we never hold the money): shagun and group contributions by UPI, card and netbanking; host KYC via linked accounts; fees shown before paying; automatic ledger and receipts; refunds; "verified family" badge, limits and invite reporting against fake money requests.
 
 ## Phase 2b — Memories (3D gifts)
 
@@ -176,15 +182,16 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 
 **Step 19.** AI wording in every language (Claude API).
 **Step 20.** AI couple art from uploaded photos.
-**Step 21.** MP4 video export for WhatsApp status and Instagram.
+**Step 21.** MP4 video export for WhatsApp status and Instagram. Reuses the regional motion timelines.
 **Step 22.** WhatsApp Business reminders and update broadcasts.
-**Step 23.** More categories as data: birthdays, baby (godh bharai, naamkaran, mundan), home and religious (griha pravesh, puja, katha), festivals (Diwali, Eid, Holi, Navratri, Onam, Christmas), parties, dining; 30+ templates. Tradition packs: Telugu, Kerala (Hindu, Christian, Muslim), Punjabi Sikh, Muslim, Christian, Jain and Modern; the colourful Rang template family (6 designs).
+**Step 23.** More categories as data: birthdays, baby (godh bharai, naamkaran, mundan), home and religious (griha pravesh, puja, katha), festivals (Diwali, Eid, Holi, Navratri, Onam, Christmas), parties, dining; 30+ templates. Tradition packs: Telugu, Kerala (Hindu, Christian, Muslim), Punjabi Sikh, Muslim, Christian, Jain and Modern; the colourful Rang template family (6 designs). Regional motion for the remaining packs, per-function scenes (haldi, mehendi, sangeet, baraat and more) and seasonal overlays (MOTION.md).
 **Step 24.** Photo sharing album after the event, thank-you cards.
 **Step 24a.** Greeting Cards line: thank-you, festival greetings, shagun cards, condolence.
 
 ## Phase 4 — Business edition
 
 **Step 25.** Business accounts for planners and printers: client workspaces, own branding, bulk edits. Business and education categories: shop openings, launches, office parties, dealer meets, college fests, convocations, fundraisers.
+**Step 25a.** Ticketing for paid events: ticket types, promo codes, QR tickets, check-in scanner, organiser payouts with our per-ticket commission (PAYMENTS.md).
 **Step 26.** Subscription billing (monthly/yearly).
 **Step 27.** Print partner integration (printed card with QR to the 3D invite).
 **Step 27a.** Designer and artist collections with Indian designers, illustrators and textile brands (revenue share). Includes sacred art and regional designs by named artists.
@@ -195,7 +202,7 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 
 **Step 30.** Stripe and regional pricing; international templates and categories (Western weddings, Nikah, Chinese, quinceañera, bar and bat mitzvah).
 **Step 31.** More languages including Urdu and Arabic (right-to-left).
-**Step 32.** Shagun/gift registry and live-stream page.
+**Step 32.** Gift registry with partner stores (affiliate commission), vendor referrals and live-stream page. (Shagun moved earlier to Steps 17b and 18a.)
 **Step 33.** Android and iOS apps with Capacitor; push notifications. Store listings localised in every launch language, following the app store plan in BRAND_SEO.md.
 
 ---
@@ -207,6 +214,8 @@ All in this folder, so every build session has them:
 - [PRODUCT.md](PRODUCT.md): what each step builds towards.
 - [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
 - [BRAND_SEO.md](BRAND_SEO.md): the Shubhdwar name decision, owner task B1, rename checklist (Step 8a), keyword clusters and SEO foundations (Step 12b), app store plan.
+- [MOTION.md](MOTION.md): regional opening animations, per-function scenes, particles, drawn-on effects, diya countdown (Steps 12c, 21, 23).
+- [PAYMENTS.md](PAYMENTS.md): shagun ledger, platform payments with commission through a licensed provider, ticketing, trust and safety, legal review (Steps 17b, 18a, 25a, 32; owner task L1).
 - [TRADITIONS.md](TRADITIONS.md): tradition packs, sacred art library and respect rules (Steps 12a, 23, 27a and content task C1).
 - [COMPETITORS.md](COMPETITORS.md): what we borrow from Paperless Post and what we avoid (coin pricing, per-guest add-ons, yearly free limit).
 - [PLAN_REVIEW.md](PLAN_REVIEW.md): open recommendations on launch scope, payments timing and languages, awaiting the owner's decision.

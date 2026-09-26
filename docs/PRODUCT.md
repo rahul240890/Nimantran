@@ -88,6 +88,10 @@ One choice in the editor (region, community, card languages) sets the deity or s
 
 A colourful **Rang** template family (Rang Mahal, Paithani Mor, Bandhani Utsav, Alpona Lal, Gopuram Pon, Phulkari Rang) sits beside the elegant designs.
 
+## 5b. Motion
+
+Each tradition pack has its own opening animation (a kolam drawing itself, a conch and alpona for Bengali, a phulkari unfolding for Punjabi, calligraphy for Muslim families), plus per-function scenes, regional petals and particles, and a diya countdown. Full, Light and Still versions for every phone. Spec: [MOTION.md](MOTION.md).
+
 ## 6. Languages
 
 | Phase  | Languages                                                                              |
@@ -173,6 +177,10 @@ The Free column's 10 basic templates assumes the catalogue has grown past the 6 
 | Memory album (forever)           | ₹299                  |
 | Thank-you cards                  | ₹199                  |
 | Human designer touch-up          | ₹999+                 |
+
+## 10a. Payments and commission
+
+Guests send shagun from the invite: free by direct UPI with a shagun ledger, or through the platform (UPI, cards) with a small visible fee. Group contributions and event ticketing earn a commission. A licensed payment provider splits every payment; we never hold customer money. Spec and legal checklist: [PAYMENTS.md](PAYMENTS.md).
 
 ## 11. Business edition
 
