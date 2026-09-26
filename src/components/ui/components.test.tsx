@@ -73,3 +73,27 @@ describe("Stepper", () => {
     expect(list.getByText("Design").closest("li")).toHaveTextContent("Design, done");
   });
 });
+
+describe("Accordion", () => {
+  it("opens one answer at a time and reports it", async () => {
+    const { Accordion, AccordionItem } = await import("./accordion");
+    render(
+      <Accordion type="single" collapsible>
+        <AccordionItem value="a" title="Dress code?">
+          Pastels
+        </AccordionItem>
+        <AccordionItem value="b" title="Parking?">
+          Valet
+        </AccordionItem>
+      </Accordion>,
+    );
+    const first = screen.getByRole("button", { name: "Dress code?" });
+    expect(first).toHaveAttribute("aria-expanded", "false");
+    expect(first.parentElement?.tagName).toBe("H3");
+    fireEvent.click(first);
+    expect(first).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByText("Pastels")).toBeVisible();
+    fireEvent.click(screen.getByRole("button", { name: "Parking?" }));
+    expect(first).toHaveAttribute("aria-expanded", "false");
+  });
+});

@@ -30,5 +30,7 @@ export default defineConfig({
     command: `npm run start -- -p ${port}`,
     port,
     reuseExistingServer: !process.env.CI,
+    // Waitlist sign-ups are logged instead of sent anywhere during tests
+    env: { WAITLIST_LOG_ONLY: "1" },
   },
 });

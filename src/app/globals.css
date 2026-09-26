@@ -51,7 +51,7 @@
   --marigold-edge: #c77410; /* the pressed-in edge under primary buttons */
   --gold-glint: #fff4d6; /* the light that sweeps across gold */
   --accent-text: #9a4c08;
-  --rose: #b83d5d;
+  --rose: #a8334f;
   --night: #120f24;
 
   /* Status */
@@ -80,6 +80,28 @@
   --card-accent: #d9741c; /* ornaments */
   --card-accent-text: #a14e0c; /* text: 5.1:1 on ivory */
   --card-back: #7d1d3a;
+
+  /* Design previews: each launch design has its own stock, the same in both themes */
+  --tpl-rose-paper: #f7e4e2;
+  --tpl-rose-ink: #4f1628;
+  --tpl-rose-ornament: #c0566f;
+  --tpl-rose-accent: #962c47;
+  --tpl-emerald-paper: #0e3a2d;
+  --tpl-emerald-ink: #f5ead0;
+  --tpl-emerald-ornament: #c9a45a;
+  --tpl-emerald-accent: #e6c886;
+  --tpl-scroll-paper: #efdfbb;
+  --tpl-scroll-ink: #461620;
+  --tpl-scroll-ornament: #7a4a1c;
+  --tpl-scroll-accent: #7e2424;
+  --tpl-monogram-paper: #f6f4ef;
+  --tpl-monogram-ink: #1f1d1a;
+  --tpl-monogram-ornament: #a39d8f;
+  --tpl-monogram-accent: #5c574c;
+  --tpl-kasavu-paper: #f6efd9;
+  --tpl-kasavu-ink: #33240f;
+  --tpl-kasavu-ornament: #c9a043;
+  --tpl-kasavu-accent: #74540f;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -97,7 +119,7 @@
     --marigold-strong: #f5b75a;
     --on-marigold: #1c0f08;
     --accent-text: #f5b75a;
-    --rose: #e0698a;
+    --rose: #e67594;
     --success: #4cc38a;
     --warning: #f0b43c;
     --danger: #f2837a;
@@ -130,7 +152,7 @@
   --marigold-strong: #f5b75a;
   --on-marigold: #1c0f08;
   --accent-text: #f5b75a;
-  --rose: #e0698a;
+  --rose: #e67594;
   --success: #4cc38a;
   --warning: #f0b43c;
   --danger: #f2837a;
@@ -180,6 +202,26 @@
   --color-card-accent: var(--card-accent);
   --color-card-accent-text: var(--card-accent-text);
   --color-card-back: var(--card-back);
+  --color-tpl-rose-paper: var(--tpl-rose-paper);
+  --color-tpl-rose-ink: var(--tpl-rose-ink);
+  --color-tpl-rose-ornament: var(--tpl-rose-ornament);
+  --color-tpl-rose-accent: var(--tpl-rose-accent);
+  --color-tpl-emerald-paper: var(--tpl-emerald-paper);
+  --color-tpl-emerald-ink: var(--tpl-emerald-ink);
+  --color-tpl-emerald-ornament: var(--tpl-emerald-ornament);
+  --color-tpl-emerald-accent: var(--tpl-emerald-accent);
+  --color-tpl-scroll-paper: var(--tpl-scroll-paper);
+  --color-tpl-scroll-ink: var(--tpl-scroll-ink);
+  --color-tpl-scroll-ornament: var(--tpl-scroll-ornament);
+  --color-tpl-scroll-accent: var(--tpl-scroll-accent);
+  --color-tpl-monogram-paper: var(--tpl-monogram-paper);
+  --color-tpl-monogram-ink: var(--tpl-monogram-ink);
+  --color-tpl-monogram-ornament: var(--tpl-monogram-ornament);
+  --color-tpl-monogram-accent: var(--tpl-monogram-accent);
+  --color-tpl-kasavu-paper: var(--tpl-kasavu-paper);
+  --color-tpl-kasavu-ink: var(--tpl-kasavu-ink);
+  --color-tpl-kasavu-ornament: var(--tpl-kasavu-ornament);
+  --color-tpl-kasavu-accent: var(--tpl-kasavu-accent);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
   --font-sans: "Karla Variable", "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -212,6 +254,11 @@
   --animate-shimmer: shimmer 3.2s var(--ease-in-soft) infinite;
   --animate-skeleton: skeleton 1.6s ease-in-out infinite;
   --animate-rise: rise 520ms var(--ease-out-expo) both;
+  --animate-accordion-down: accordion-down 320ms var(--ease-out-expo);
+  --animate-accordion-up: accordion-up 200ms var(--ease-in-soft);
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-petal-fall: petal-fall 11s linear infinite;
+  --animate-petal-sway: petal-sway 3.6s ease-in-out infinite alternate;
 }
 
 /* Keyframes live outside @theme so page transitions and utilities can always use them */
@@ -289,8 +336,55 @@
   }
 }
 
+@keyframes accordion-down {
+  from {
+    height: 0;
+    opacity: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+/* Petals fall the height of the stage while turning over; the inner element sways sideways */
+@keyframes petal-fall {
+  from {
+    transform: translate3d(0, -4rem, 0);
+  }
+  to {
+    transform: translate3d(0, 105svh, 0);
+  }
+}
+@keyframes petal-sway {
+  from {
+    transform: translateX(calc(var(--sway, 30px) * -1)) rotate3d(1, 0.6, 0.2, -50deg);
+  }
+  to {
+    transform: translateX(var(--sway, 30px)) rotate3d(1, 0.6, 0.2, 70deg);
+  }
+}
+
 @layer base {
   html {
+    scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
   }
@@ -369,6 +463,24 @@
   }
   &:where([data-motion="reduce"] *) {
     animation: none;
+  }
+}
+
+/*
+ * Content rises into place as it scrolls into view. Pure CSS (scroll-driven animations):
+ * browsers without support, and still mode, simply show it in place.
+ */
+@utility reveal-on-scroll {
+  @supports (animation-timeline: view()) {
+    animation: rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+  }
+  &:where([data-motion="reduce"] *) {
+    animation: none !important;
   }
 }
 
