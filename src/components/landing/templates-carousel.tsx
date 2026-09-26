@@ -1,10 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { templates } from "@/content/landing";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -80,19 +82,27 @@ export function TemplatesCarousel() {
             </li>
           ))}
         </ul>
-        <div className="flex justify-end gap-2">
-          <IconButton
-            label={templates.previous}
-            icon={<ChevronLeft className="rtl:rotate-180" />}
-            onClick={() => page(-1)}
-            disabled={edges.start}
-          />
-          <IconButton
-            label={templates.next}
-            icon={<ChevronRight className="rtl:rotate-180" />}
-            onClick={() => page(1)}
-            disabled={edges.end}
-          />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Button asChild variant="secondary">
+            <Link href="/create">
+              {templates.tryEditor}
+              <ArrowRight aria-hidden className="rtl:rotate-180" />
+            </Link>
+          </Button>
+          <div className="flex gap-2">
+            <IconButton
+              label={templates.previous}
+              icon={<ChevronLeft className="rtl:rotate-180" />}
+              onClick={() => page(-1)}
+              disabled={edges.start}
+            />
+            <IconButton
+              label={templates.next}
+              icon={<ChevronRight className="rtl:rotate-180" />}
+              onClick={() => page(1)}
+              disabled={edges.end}
+            />
+          </div>
         </div>
       </div>
     </Section>
