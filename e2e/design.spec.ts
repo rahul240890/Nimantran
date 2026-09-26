@@ -18,6 +18,11 @@ for (const colorScheme of ["light", "dark"] as const) {
 
     test("has no accessibility violations", async ({ page }) => {
       await page.goto("/design");
+      // The tab list is focusable once its tabs register after hydration
+      await expect(page.getByRole("tablist", { name: "Wedding functions" })).toHaveAttribute(
+        "tabindex",
+        "0",
+      );
       const results = await axe(page).analyze();
       expect(results.violations).toEqual([]);
     });

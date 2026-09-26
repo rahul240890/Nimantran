@@ -38,8 +38,12 @@ test("local occasions come first, named in the local script", async ({ page }) =
 test("an occasion opens the editor ready for it", async ({ page }) => {
   await page.goto("/?month=11");
   await page.evaluate(() => localStorage.clear());
-  await tiles(page).filter({ hasText: "Sangeet" }).getByRole("link").click();
-  await expect(page).toHaveURL(/\/create\?category=sangeet/);
+  // The tiles reorder for the visitor once the page hydrates, so retry a click that lands
+  // during that swap
+  await expect(async () => {
+    await tiles(page).filter({ hasText: "Sangeet" }).getByRole("link").click();
+    await expect(page).toHaveURL(/\/create\?category=sangeet/, { timeout: 2000 });
+  }).toPass();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
     "Pick the card your guests will open",
   );
