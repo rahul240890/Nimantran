@@ -209,10 +209,13 @@ export const occasionCopy = {
 
 export const previewCopy = {
   ready: "Your invitation is ready",
+  live: "Your invitation is live",
+  liveBody: (link: string) =>
+    `Guests open it at ${link}. Changes you make here show there straight away.`,
   readyBody:
-    "It's saved on this device. Sign in to keep it in your account. Publishing arrives next, then you can share it on WhatsApp.",
+    "It's saved on this device. Sign in to keep it in your account and publish it, then share the link on WhatsApp.",
   readyBodyAccount:
-    "It's saved to your account, so it's on every device you sign in on. Publishing arrives next, then you can share it on WhatsApp.",
+    "It's saved to your account, photos included. Publish it to get your link, then share it on WhatsApp.",
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",

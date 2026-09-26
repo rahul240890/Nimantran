@@ -3,13 +3,16 @@ import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import type { InviteDraft } from "@/lib/editor/draft";
 import { supabaseServer } from "@/lib/supabase/server";
+import { previewDb, previewPhotoUrl } from "./preview-db";
 import {
   draftToRows,
+  photoPath,
   rowsToDraft,
   summarize,
   type EventRow,
   type FunctionRow,
   type InviteSummary,
+  type PhotoRow,
 } from "./rows";
 
 /*
@@ -18,18 +21,36 @@ import {
  * store in preview mode, so tests can follow a draft from one browser to another.
  */
 
-export type SaveResult = { ok: true; id: string; updatedAt: number } | { ok: false };
+export type SaveResult =
+  { ok: true; id: string; updatedAt: number; missingPhotos: string[] } | { ok: false };
+
+export type PublishResult =
+  { ok: true; slug: string } | { ok: false; reason: "taken" | "missing" | "failed" };
+
+export type NewPhoto = { id: string; width: number; height: number; position: number };
 
 type InviteStore = {
   list(account: Account): Promise<InviteSummary[] | null>;
   get(account: Account, id: string): Promise<InviteDraft | null>;
+  /** Saves the draft and its photo order; photos the account doesn't have yet come back. */
   save(account: Account, draft: InviteDraft): Promise<SaveResult>;
   remove(account: Account, id: string): Promise<boolean>;
+  addPhoto(account: Account, id: string, photo: NewPhoto, file: Blob): Promise<boolean>;
+  /** Short-lived links to an invite's photos, by photo id. */
+  photoUrls(account: Account, id: string): Promise<Record<string, string>>;
+  slugAvailable(slug: string): Promise<boolean>;
+  publish(account: Account, id: string, slug: string): Promise<PublishResult>;
+  unpublish(account: Account, id: string): Promise<boolean>;
 };
 
 const EVENT_COLUMNS =
-  "id, category_id, template_id, status, content, music, editor_step, updated_at";
+  "id, category_id, template_id, status, slug, content, music, editor_step, updated_at";
 const FUNCTION_COLUMNS = "kind, position, date, start_time, venue, address, dress_code";
+const MEDIA_COLUMNS = "id, width, height, position";
+const BUCKET = "event-media";
+const PHOTO_LINK_SECONDS = 60 * 60;
+
+type Joined = EventRow & { functions: FunctionRow[]; media?: PhotoRow[] };
 
 const supabaseStore: InviteStore = {
   async list() {
@@ -43,7 +64,7 @@ const supabaseStore: InviteStore = {
       .limit(100);
     if (error || !data) return null;
     return data.map((row) => {
-      const { functions, ...event } = row as EventRow & { functions: FunctionRow[] };
+      const { functions, ...event } = row as Joined;
       return summarize(event, functions);
     });
   },
@@ -53,15 +74,15 @@ const supabaseStore: InviteStore = {
     if (!supabase) return null;
     const { data, error } = await supabase
       .from("events")
-      .select(`${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS})`)
+      .select(`${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), media(${MEDIA_COLUMNS})`)
       .eq("id", id)
       .maybeSingle();
     if (error || !data) return null;
-    const { functions, ...event } = data as EventRow & { functions: FunctionRow[] };
-    return rowsToDraft(event, functions);
+    const { functions, media, ...event } = data as Joined;
+    return rowsToDraft(event, functions, media ?? []);
   },
 
-  async save(_account, draft) {
+  async save(account, draft) {
     const supabase = await supabaseServer();
     if (!supabase) return { ok: false };
     const { event, functions } = draftToRows(draft);
@@ -75,7 +96,7 @@ const supabaseStore: InviteStore = {
       : await supabase.from("events").insert(event).select("id, updated_at").single();
     // A draft pointing at an event that's gone (deleted, or a co-host was removed) starts a new one
     if (!saved.error && !saved.data && draft.remoteId) {
-      return supabaseStore.save(_account, { ...draft, remoteId: null });
+      return supabaseStore.save(account, { ...draft, remoteId: null, slug: null });
     }
     if (saved.error || !saved.data) return { ok: false };
     const id = saved.data.id as string;
@@ -92,55 +113,238 @@ const supabaseStore: InviteStore = {
       );
       if (error) return { ok: false };
     }
-    return { ok: true, id, updatedAt: Date.parse(saved.data.updated_at as string) || Date.now() };
+
+    // Photos: drop the ones taken out, keep the order, and report the ones still to upload
+    const { data: media, error: mediaError } = await supabase
+      .from("media")
+      .select("id, storage_path, position")
+      .eq("event_id", id)
+      .eq("kind", "photo");
+    if (mediaError || !media) return { ok: false };
+    const wanted = draft.photos.map((photo) => photo.id);
+    const gone = media.filter((row) => !wanted.includes(row.id as string));
+    if (gone.length) {
+      await supabase.storage.from(BUCKET).remove(gone.map((row) => row.storage_path as string));
+      await supabase
+        .from("media")
+        .delete()
+        .in(
+          "id",
+          gone.map((row) => row.id as string),
+        );
+    }
+    for (const row of media) {
+      const position = wanted.indexOf(row.id as string);
+      if (position >= 0 && position !== row.position) {
+        await supabase
+          .from("media")
+          .update({ position })
+          .eq("id", row.id as string);
+      }
+    }
+    const stored = new Set(media.map((row) => row.id as string));
+    return {
+      ok: true,
+      id,
+      updatedAt: Date.parse(saved.data.updated_at as string) || Date.now(),
+      missingPhotos: wanted.filter((photoId) => !stored.has(photoId)),
+    };
   },
 
   async remove(_account, id) {
     const supabase = await supabaseServer();
     if (!supabase) return false;
+    // Files first: deleting the event removes the media rows but not the files
+    const { data: files } = await supabase.storage.from(BUCKET).list(id, { limit: 100 });
+    if (files?.length) {
+      await supabase.storage.from(BUCKET).remove(files.map((file) => `${id}/${file.name}`));
+    }
     const { error, count } = await supabase.from("events").delete({ count: "exact" }).eq("id", id);
+    return !error && (count ?? 0) > 0;
+  },
+
+  async addPhoto(_account, id, photo, file) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const path = photoPath(id, photo.id, file.type);
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(path, file, { contentType: file.type, upsert: true });
+    if (uploadError) return false;
+    const { error } = await supabase.from("media").upsert({
+      id: photo.id,
+      event_id: id,
+      kind: "photo",
+      storage_path: path,
+      width: photo.width,
+      height: photo.height,
+      position: photo.position,
+    });
+    return !error;
+  },
+
+  async photoUrls(_account, id) {
+    const supabase = await supabaseServer();
+    if (!supabase) return {};
+    const { data: media } = await supabase
+      .from("media")
+      .select("id, storage_path")
+      .eq("event_id", id)
+      .eq("kind", "photo");
+    if (!media?.length) return {};
+    const { data } = await supabase.storage.from(BUCKET).createSignedUrls(
+      media.map((row) => row.storage_path as string),
+      PHOTO_LINK_SECONDS,
+    );
+    const byPath = new Map((data ?? []).map((link) => [link.path, link.signedUrl]));
+    return Object.fromEntries(
+      media.flatMap((row) => {
+        const url = byPath.get(row.storage_path as string);
+        return url ? [[row.id as string, url]] : [];
+      }),
+    );
+  },
+
+  async slugAvailable(slug) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { data, error } = await supabase.rpc("slug_available", { p_slug: slug });
+    return !error && data === true;
+  },
+
+  async publish(_account, id, slug) {
+    const supabase = await supabaseServer();
+    if (!supabase) return { ok: false, reason: "failed" };
+    const { data: current } = await supabase
+      .from("events")
+      .select("status, slug, published_at")
+      .eq("id", id)
+      .maybeSingle();
+    if (!current) return { ok: false, reason: "missing" };
+    // Once shared, a link never changes, so links already sent keep working
+    const keep = current.published_at && current.slug ? (current.slug as string) : slug;
+    const { data, error } = await supabase
+      .from("events")
+      .update({
+        status: "published",
+        slug: keep,
+        published_at: (current.published_at as string | null) ?? new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select("slug")
+      .maybeSingle();
+    if (error?.code === "23505") return { ok: false, reason: "taken" };
+    if (error || !data) return { ok: false, reason: "failed" };
+    return { ok: true, slug: data.slug as string };
+  },
+
+  async unpublish(_account, id) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { error, count } = await supabase
+      .from("events")
+      .update({ status: "draft" }, { count: "exact" })
+      .eq("id", id);
     return !error && (count ?? 0) > 0;
   },
 };
 
-type Stored = { event: EventRow; functions: FunctionRow[]; owner: string };
-const globalStore = globalThis as unknown as { __nimantranPreviewInvites?: Map<string, Stored> };
-const previewInvites = (globalStore.__nimantranPreviewInvites ??= new Map());
-
 const previewStore: InviteStore = {
   async list(account) {
-    return [...previewInvites.values()]
+    return [...previewDb.invites.values()]
       .filter((stored) => stored.owner === account.id)
       .map((stored) => summarize(stored.event, stored.functions))
       .sort((a, b) => b.updatedAt - a.updatedAt);
   },
   async get(account, id) {
-    const stored = previewInvites.get(id);
+    const stored = previewDb.invites.get(id);
     return stored && stored.owner === account.id
-      ? rowsToDraft(stored.event, stored.functions)
+      ? rowsToDraft(stored.event, stored.functions, stored.photos)
       : null;
   },
   async save(account, draft) {
-    const existing = draft.remoteId ? previewInvites.get(draft.remoteId) : undefined;
-    const id = existing && existing.owner === account.id ? existing.event.id : crypto.randomUUID();
+    const existing = draft.remoteId ? previewDb.invites.get(draft.remoteId) : undefined;
+    const mine = existing && existing.owner === account.id ? existing : undefined;
+    const id = mine ? mine.event.id : crypto.randomUUID();
     const { event, functions } = draftToRows(draft);
     const updated = new Date();
-    previewInvites.set(id, {
+    const wanted = draft.photos.map((photo) => photo.id);
+    const photos = (mine?.photos ?? [])
+      .filter((photo) => wanted.includes(photo.id))
+      .map((photo) => ({ ...photo, position: wanted.indexOf(photo.id) }));
+    for (const photo of mine?.photos ?? []) {
+      if (!wanted.includes(photo.id)) previewDb.files.delete(`${id}/${photo.id}`);
+    }
+    previewDb.invites.set(id, {
       owner: account.id,
       event: {
         ...event,
         id,
-        status: existing?.event.status ?? "draft",
+        status: mine?.event.status ?? "draft",
+        slug: mine?.event.slug ?? null,
         updated_at: updated.toISOString(),
       },
       functions,
+      photos,
+      publishedAt: mine?.publishedAt ?? null,
     });
-    return { ok: true, id, updatedAt: updated.getTime() };
+    const stored = new Set(photos.map((photo) => photo.id));
+    return {
+      ok: true,
+      id,
+      updatedAt: updated.getTime(),
+      missingPhotos: wanted.filter((photoId) => !stored.has(photoId)),
+    };
   },
   async remove(account, id) {
-    const stored = previewInvites.get(id);
+    const stored = previewDb.invites.get(id);
     if (!stored || stored.owner !== account.id) return false;
-    return previewInvites.delete(id);
+    for (const photo of stored.photos) previewDb.files.delete(`${id}/${photo.id}`);
+    return previewDb.invites.delete(id);
+  },
+  async addPhoto(account, id, photo, file) {
+    const stored = previewDb.invites.get(id);
+    if (!stored || stored.owner !== account.id) return false;
+    previewDb.files.set(`${id}/${photo.id}`, {
+      type: file.type,
+      data: new Uint8Array(await file.arrayBuffer()),
+    });
+    stored.photos = [
+      ...stored.photos.filter((row) => row.id !== photo.id),
+      { id: photo.id, width: photo.width, height: photo.height, position: photo.position },
+    ];
+    return true;
+  },
+  async photoUrls(account, id) {
+    const stored = previewDb.invites.get(id);
+    if (!stored || stored.owner !== account.id) return {};
+    return Object.fromEntries(
+      stored.photos.flatMap((photo) => {
+        const url = previewPhotoUrl(id, photo.id);
+        return url ? [[photo.id, url]] : [];
+      }),
+    );
+  },
+  async slugAvailable(slug) {
+    return ![...previewDb.invites.values()].some((stored) => stored.event.slug === slug);
+  },
+  async publish(account, id, slug) {
+    const stored = previewDb.invites.get(id);
+    if (!stored || stored.owner !== account.id) return { ok: false, reason: "missing" };
+    const keep = stored.publishedAt && stored.event.slug ? stored.event.slug : slug;
+    const taken = [...previewDb.invites.values()].some(
+      (other) => other !== stored && other.event.slug === keep,
+    );
+    if (taken) return { ok: false, reason: "taken" };
+    stored.event = { ...stored.event, status: "published", slug: keep };
+    stored.publishedAt ??= new Date().toISOString();
+    return { ok: true, slug: keep };
+  },
+  async unpublish(account, id) {
+    const stored = previewDb.invites.get(id);
+    if (!stored || stored.owner !== account.id) return false;
+    stored.event = { ...stored.event, status: "draft" };
+    return true;
   },
 };
 

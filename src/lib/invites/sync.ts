@@ -1,14 +1,16 @@
 "use client";
 
 import { saveInvite } from "@/app/_actions/invites";
-import { newDraft, type InviteDraft } from "@/lib/editor/draft";
+import { MAX_PHOTOS, newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { shelvePhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { inviteDraft } from "@/lib/editor/store";
+import { uploadPhotos } from "./photo-upload";
 
 /*
- * Keeps the draft open in the editor saved to the signed-in person's account. The device
- * copy (lib/editor/store.ts) is saved first, always; this follows a moment later. Saves
- * run one at a time, so a burst of edits never creates the same invite twice.
+ * Keeps the draft open in the editor saved to the signed-in person's account, photos
+ * included. The device copy (lib/editor/store.ts) is saved first, always; this follows a
+ * moment later. Saves run one at a time, so a burst of edits never creates the same
+ * invite twice.
  */
 
 export type SyncState = "idle" | "syncing" | "synced" | "offline" | "signed-out";
@@ -65,8 +67,16 @@ async function push(): Promise<SyncState> {
   } else {
     // Record where it lives, keeping any edits made while it was saving
     inviteDraft.update((current) => ({ ...current, remoteId: result.id }), { touch: false });
-    markSynced({ ...draft, remoteId: result.id });
-    set("synced");
+    const uploaded = result.missingPhotos.length
+      ? await uploadPhotos(result.id, draft.photos, result.missingPhotos)
+      : true;
+    if (uploaded) {
+      markSynced({ ...draft, remoteId: result.id });
+      set("synced");
+    } else {
+      set("offline");
+      retry = setTimeout(() => void syncDraft(), RETRY_MS);
+    }
   }
   return state;
 }
@@ -100,10 +110,12 @@ export async function switchDraft(
 ): Promise<boolean> {
   let current = inviteDraft.get().draft;
   if (target && target.remoteId && current.remoteId === target.remoteId) {
-    // The same invite: keep whichever copy is newer, and this device's photos
+    // The same invite: keep whichever copy is newer, with photos from both
     if (target.updatedAt > current.updatedAt) {
-      inviteDraft.replace({ ...target, photos: current.photos });
+      inviteDraft.replace({ ...target, photos: mergePhotos(target.photos, current.photos) });
       markSynced(target);
+    } else if (target.slug !== current.slug) {
+      inviteDraft.update((draft) => ({ ...draft, slug: target.slug }), { touch: false });
     }
     return true;
   }
@@ -114,7 +126,10 @@ export async function switchDraft(
   }
   if (current.remoteId) shelvePhotos(current.remoteId, current.photos);
   if (target?.remoteId) {
-    inviteDraft.replace({ ...target, photos: shelvedPhotos(target.remoteId) });
+    inviteDraft.replace({
+      ...target,
+      photos: mergePhotos(target.photos, shelvedPhotos(target.remoteId)),
+    });
     markSynced(target);
     set("synced");
   } else {
@@ -122,4 +137,10 @@ export async function switchDraft(
     set("idle");
   }
   return true;
+}
+
+/** The account's photos, then any on this device that haven't been uploaded yet. */
+function mergePhotos(account: InviteDraft["photos"], device: InviteDraft["photos"]) {
+  const known = new Set(account.map((photo) => photo.id));
+  return [...account, ...device.filter((photo) => !known.has(photo.id))].slice(0, MAX_PHOTOS);
 }

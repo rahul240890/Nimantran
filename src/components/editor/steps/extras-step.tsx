@@ -28,7 +28,10 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const urls = usePhotoUrls(draft.photos.map((photo) => photo.id));
+  const urls = usePhotoUrls(
+    draft.photos.map((photo) => photo.id),
+    draft.remoteId,
+  );
   const room = MAX_PHOTOS - draft.photos.length;
 
   const add = async (files: File[]) => {

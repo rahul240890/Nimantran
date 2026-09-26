@@ -38,6 +38,8 @@ import type { TemplateId } from "@/lib/templates/schema";
 import { uiStrings } from "@/lib/ui-strings";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { PublishButton } from "@/components/publish/publish-button";
+import { publishCopy } from "@/content/publish";
 import { PreviewStage } from "./preview-stage";
 import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
@@ -404,6 +406,13 @@ export function Editor({
                         {preview("h-[min(70dvh,34rem)] min-h-[24rem]")}
                       </SheetContent>
                     </Sheet>
+                  )}
+                  {last && (
+                    <PublishButton
+                      draft={draft}
+                      signedIn={signedIn}
+                      onNotReady={() => toast({ title: publishCopy.finishFirst, tone: "error" })}
+                    />
                   )}
                   {!last && (
                     <Button
