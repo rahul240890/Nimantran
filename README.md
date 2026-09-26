@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Nimantran
 
-## Getting Started
+3D invitations your guests open, turn and keep. Create an invite in minutes, share it on WhatsApp, and collect RSVPs in one tap.
 
-First, run the development server:
+The full roadmap lives in [docs/PLAN.md](docs/PLAN.md). We build one step at a time.
+
+## Getting started
+
+Requires Node.js 22 or newer.
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command             | What it does                                      |
+| ------------------- | ------------------------------------------------- |
+| `npm run dev`       | Start the local dev server                        |
+| `npm run build`     | Production build                                  |
+| `npm run start`     | Run the production build                          |
+| `npm run typecheck` | TypeScript check                                  |
+| `npm run lint`      | ESLint, zero warnings allowed                     |
+| `npm run format`    | Format all files with Prettier                    |
+| `npm run test`      | Unit tests (Vitest)                               |
+| `npm run check`     | Type-check, lint, format check and tests together |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/                Routes, layouts and global styles (design tokens in globals.css)
+  components/
+    brand/            Logo, mandala and brand illustrations
+    ui/               Design-system components (Step 2)
+  features/           Feature modules: editor, invite, dashboard … (from Step 4)
+  lib/                Shared helpers and config
+  test/               Test setup
+docs/
+  PLAN.md             Phases and steps
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Conventions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Colours, fonts and radii come only from the tokens in `src/app/globals.css`.
+- Every screen works from 320px to 1440px, in light and dark, with keyboard and screen readers.
+- `npm run check` must pass before every commit.

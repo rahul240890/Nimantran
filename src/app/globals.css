@@ -1,26 +1,177 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/*
+ * Nimantran design tokens.
+ * Light theme on :root, dark theme via the OS setting or data-theme="dark".
+ * Components use the Tailwind names below (bg-paper, text-ink, border-line …), never raw colours.
+ */
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --paper: #fbf6ec;
+  --surface: #ffffff;
+  --surface-2: #f4ecdc;
+  --line: #e5d8c0;
+  --line-strong: #cdb993;
+
+  /* Text */
+  --ink: #2a1a24;
+  --ink-muted: #6b5864;
+  --ink-faint: #8f7c87;
+
+  /* Brand */
+  --marigold: #f0a431;
+  --marigold-strong: #e08a14;
+  --on-marigold: #2a1a24;
+  --accent-text: #9a4c08;
+  --rose: #b83d5d;
+  --night: #120f24;
+
+  /* Status */
+  --success: #1f7a4d;
+  --warning: #9a6200;
+  --danger: #b3261e;
+
+  /* Focus ring */
+  --ring: #9a4c08;
+
+  /* Invitation card stock: the same in both themes, like real paper */
+  --card-ivory: #f8efdc;
+  --card-gold: #b8862f;
+  --card-ink: #3b2230;
+  --card-ink-muted: #6b5160;
+  --card-accent: #d9741c;
+  --card-back: #7d1d3a;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #120f24;
+    --surface: #1b1532;
+    --surface-2: #241c40;
+    --line: #3a3056;
+    --line-strong: #54477a;
+    --ink: #f6ecd8;
+    --ink-muted: #b9aac7;
+    --ink-faint: #8e80a0;
+    --marigold: #f0a431;
+    --marigold-strong: #f5b75a;
+    --on-marigold: #1c0f08;
+    --accent-text: #f5b75a;
+    --rose: #e0698a;
+    --success: #4cc38a;
+    --warning: #f0b43c;
+    --danger: #f2837a;
+    --ring: #f5b75a;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #120f24;
+  --surface: #1b1532;
+  --surface-2: #241c40;
+  --line: #3a3056;
+  --line-strong: #54477a;
+  --ink: #f6ecd8;
+  --ink-muted: #b9aac7;
+  --ink-faint: #8e80a0;
+  --marigold: #f0a431;
+  --marigold-strong: #f5b75a;
+  --on-marigold: #1c0f08;
+  --accent-text: #f5b75a;
+  --rose: #e0698a;
+  --success: #4cc38a;
+  --warning: #f0b43c;
+  --danger: #f2837a;
+  --ring: #f5b75a;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-marigold: var(--marigold);
+  --color-marigold-strong: var(--marigold-strong);
+  --color-on-marigold: var(--on-marigold);
+  --color-accent-text: var(--accent-text);
+  --color-rose: var(--rose);
+  --color-night: var(--night);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-ring: var(--ring);
+  --color-card-ivory: var(--card-ivory);
+  --color-card-gold: var(--card-gold);
+  --color-card-ink: var(--card-ink);
+  --color-card-ink-muted: var(--card-ink-muted);
+  --color-card-accent: var(--card-accent);
+  --color-card-back: var(--card-back);
+
+  --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
+  --font-sans: "Karla Variable", "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-label: "Tenor Sans", "Trebuchet MS", system-ui, sans-serif;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--marigold) 35%, transparent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
