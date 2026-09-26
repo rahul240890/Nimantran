@@ -123,6 +123,44 @@
   --tpl-scroll-vermilion: #b8321f;
   --tpl-kasavu-kumkum: #b4412a;
 
+  /* The Rang family: bright regional designs, the same in both themes */
+  --tpl-rangmahal-paper: #5a0f1f;
+  --tpl-rangmahal-ink: #fbecd0;
+  --tpl-rangmahal-ornament: #d9a441;
+  --tpl-rangmahal-accent: #f0c56a;
+  --tpl-rangmahal-back: #0f4f4f;
+  --tpl-rangmahal-turquoise: #36a89e;
+  --tpl-paithani-paper: #eef3e0;
+  --tpl-paithani-ink: #15392a;
+  --tpl-paithani-ornament: #b0246b;
+  --tpl-paithani-accent: #8a1450;
+  --tpl-paithani-back: #7a1450;
+  --tpl-paithani-zari: #c4972a;
+  --tpl-bandhani-paper: #0a4d50;
+  --tpl-bandhani-ink: #fff3de;
+  --tpl-bandhani-ornament: #f59ab8;
+  --tpl-bandhani-accent: #ffd27a;
+  --tpl-bandhani-back: #b8185a;
+  --tpl-bandhani-mirror: #dfe6e8;
+  --tpl-alpona-paper: #fdf8ef;
+  --tpl-alpona-ink: #3a0c0c;
+  --tpl-alpona-ornament: #c21a2e;
+  --tpl-alpona-accent: #9a0f22;
+  --tpl-alpona-back: #a3121e;
+  --tpl-alpona-gold: #b8862f;
+  --tpl-gopuram-paper: #f8edd3;
+  --tpl-gopuram-ink: #3a1a08;
+  --tpl-gopuram-ornament: #b07a1c;
+  --tpl-gopuram-accent: #7a3d06;
+  --tpl-gopuram-back: #2f5e34;
+  --tpl-gopuram-kumkum: #b4412a;
+  --tpl-phulkari-paper: #6a1010;
+  --tpl-phulkari-ink: #fff1d6;
+  --tpl-phulkari-ornament: #f2b01e;
+  --tpl-phulkari-accent: #ffcb52;
+  --tpl-phulkari-back: #1d3a86;
+  --tpl-phulkari-orange: #f07a1a;
+
   /* Petals that are not already brand colours */
   --petal-jasmine: #fbf6e9;
   --petal-blush: #e9a3b1;
@@ -250,6 +288,42 @@
   --color-tpl-emerald-ruby: var(--tpl-emerald-ruby);
   --color-tpl-scroll-vermilion: var(--tpl-scroll-vermilion);
   --color-tpl-kasavu-kumkum: var(--tpl-kasavu-kumkum);
+  --color-tpl-rangmahal-paper: var(--tpl-rangmahal-paper);
+  --color-tpl-rangmahal-ink: var(--tpl-rangmahal-ink);
+  --color-tpl-rangmahal-ornament: var(--tpl-rangmahal-ornament);
+  --color-tpl-rangmahal-accent: var(--tpl-rangmahal-accent);
+  --color-tpl-rangmahal-back: var(--tpl-rangmahal-back);
+  --color-tpl-rangmahal-turquoise: var(--tpl-rangmahal-turquoise);
+  --color-tpl-paithani-paper: var(--tpl-paithani-paper);
+  --color-tpl-paithani-ink: var(--tpl-paithani-ink);
+  --color-tpl-paithani-ornament: var(--tpl-paithani-ornament);
+  --color-tpl-paithani-accent: var(--tpl-paithani-accent);
+  --color-tpl-paithani-back: var(--tpl-paithani-back);
+  --color-tpl-paithani-zari: var(--tpl-paithani-zari);
+  --color-tpl-bandhani-paper: var(--tpl-bandhani-paper);
+  --color-tpl-bandhani-ink: var(--tpl-bandhani-ink);
+  --color-tpl-bandhani-ornament: var(--tpl-bandhani-ornament);
+  --color-tpl-bandhani-accent: var(--tpl-bandhani-accent);
+  --color-tpl-bandhani-back: var(--tpl-bandhani-back);
+  --color-tpl-bandhani-mirror: var(--tpl-bandhani-mirror);
+  --color-tpl-alpona-paper: var(--tpl-alpona-paper);
+  --color-tpl-alpona-ink: var(--tpl-alpona-ink);
+  --color-tpl-alpona-ornament: var(--tpl-alpona-ornament);
+  --color-tpl-alpona-accent: var(--tpl-alpona-accent);
+  --color-tpl-alpona-back: var(--tpl-alpona-back);
+  --color-tpl-alpona-gold: var(--tpl-alpona-gold);
+  --color-tpl-gopuram-paper: var(--tpl-gopuram-paper);
+  --color-tpl-gopuram-ink: var(--tpl-gopuram-ink);
+  --color-tpl-gopuram-ornament: var(--tpl-gopuram-ornament);
+  --color-tpl-gopuram-accent: var(--tpl-gopuram-accent);
+  --color-tpl-gopuram-back: var(--tpl-gopuram-back);
+  --color-tpl-gopuram-kumkum: var(--tpl-gopuram-kumkum);
+  --color-tpl-phulkari-paper: var(--tpl-phulkari-paper);
+  --color-tpl-phulkari-ink: var(--tpl-phulkari-ink);
+  --color-tpl-phulkari-ornament: var(--tpl-phulkari-ornament);
+  --color-tpl-phulkari-accent: var(--tpl-phulkari-accent);
+  --color-tpl-phulkari-back: var(--tpl-phulkari-back);
+  --color-tpl-phulkari-orange: var(--tpl-phulkari-orange);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
   --font-sans:

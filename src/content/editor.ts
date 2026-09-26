@@ -1,4 +1,6 @@
 import type { EditorStep, FunctionId } from "@/lib/editor/draft";
+import { TEMPLATES } from "@/lib/templates/catalog";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
 
 /*
  * English copy for the invite editor (/create). Moves into next-intl in Step 12.
@@ -203,8 +205,23 @@ export const extrasCopy = {
     desh: "Monsoon, festive",
     bhupali: "Bright and joyful",
     madhyamavati: "Auspicious, Carnatic",
+    mand: "Rajasthani folk, royal",
+    bhimpalasi: "Warm afternoon, devotional",
+    pilu: "Folk-bright and playful",
+    bhairavi: "Tender, for farewells",
+    hamsadhwani: "Auspicious, for Ganapati",
+    kafi: "Festive folk, Holi colours",
   },
 } as const;
+
+/** Each design's name and one line about it, as the design step shows them. */
+export const designCopy: Record<TemplateId, { name: string; description: string }> =
+  Object.fromEntries(
+    TEMPLATE_IDS.map((id) => [
+      id,
+      { name: TEMPLATES[id].name, description: TEMPLATES[id].description },
+    ]),
+  ) as Record<TemplateId, { name: string; description: string }>;
 
 export const occasionCopy = {
   group: "Occasions",

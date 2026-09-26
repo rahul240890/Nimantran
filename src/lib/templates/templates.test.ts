@@ -25,7 +25,7 @@ const contrast = (a: string, b: string) => {
   return (hi! + 0.05) / (lo! + 0.05);
 };
 
-it("has the six launch templates, in order", () => {
+it("has the six launch templates and the six Rang designs, in order", () => {
   expect(TEMPLATE_LIST.map((template) => template.name)).toEqual([
     "Marigold Gate",
     "Rose Garden",
@@ -33,6 +33,12 @@ it("has the six launch templates, in order", () => {
     "Royal Scroll",
     "Minimal Monogram",
     "Kerala Kasavu",
+    "Rang Mahal",
+    "Paithani Mor",
+    "Bandhani Utsav",
+    "Alpona Lal",
+    "Gopuram Pon",
+    "Phulkari Rang",
   ]);
   expect(Object.keys(TEMPLATES)).toEqual([...TEMPLATE_IDS]);
 });
@@ -73,8 +79,8 @@ describe.each(TEMPLATE_IDS)("the %s template", (id) => {
 it("gives every template its own ornaments and music", () => {
   const motifs = new Set(TEMPLATE_LIST.map((template) => template.scene.motif));
   const ragas = new Set(TEMPLATE_LIST.map((template) => template.music.raga));
-  expect(motifs.size).toBe(6);
-  expect(ragas.size).toBe(6);
+  expect(motifs.size).toBe(TEMPLATE_LIST.length);
+  expect(ragas.size).toBe(TEMPLATE_LIST.length);
 });
 
 describe("template content", () => {

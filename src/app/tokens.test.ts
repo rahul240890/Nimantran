@@ -100,11 +100,20 @@ it("the dark theme is identical for the OS setting and the explicit switch", () 
   expect(block('  :root:not([data-theme="light"]) {')).toEqual(block(':root[data-theme="dark"] {'));
 });
 
-it.each(["rose", "emerald", "scroll", "monogram", "kasavu"])(
-  "the %s design's text is readable on its paper",
-  (name) => {
-    const paper = light[`tpl-${name}-paper`]!;
-    expect(contrast(light[`tpl-${name}-ink`]!, paper)).toBeGreaterThanOrEqual(7);
-    expect(contrast(light[`tpl-${name}-accent`]!, paper)).toBeGreaterThanOrEqual(4.5);
-  },
-);
+it.each([
+  "rose",
+  "emerald",
+  "scroll",
+  "monogram",
+  "kasavu",
+  "rangmahal",
+  "paithani",
+  "bandhani",
+  "alpona",
+  "gopuram",
+  "phulkari",
+])("the %s design's text is readable on its paper", (name) => {
+  const paper = light[`tpl-${name}-paper`]!;
+  expect(contrast(light[`tpl-${name}-ink`]!, paper)).toBeGreaterThanOrEqual(7);
+  expect(contrast(light[`tpl-${name}-accent`]!, paper)).toBeGreaterThanOrEqual(4.5);
+});

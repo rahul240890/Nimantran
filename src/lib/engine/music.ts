@@ -67,6 +67,54 @@ export const RAGAS: Record<RagaId, Raga> = {
     rest: [2, 7, 0, 5],
     tempo: 64,
   },
+  // Rajasthan's folk raga, the tune of "Kesariya Balam": all natural notes, sung in leaps
+  mand: {
+    name: "Mand",
+    up: [0, 4, 5, 7, 9, 11],
+    down: [0, 2, 4, 5, 7, 9, 11],
+    rest: [4, 7, 0, 9],
+    tempo: 74,
+  },
+  // Afternoon, warm and devotional: soft Ga and Ni, no Re or Dha going up
+  bhimpalasi: {
+    name: "Bhimpalasi",
+    up: [0, 3, 5, 7, 10],
+    down: [0, 2, 3, 5, 7, 9, 10],
+    rest: [3, 7, 0, 5],
+    tempo: 64,
+  },
+  // Light and folk-bright, beloved in Gujarat: soft Ga, both Ni
+  pilu: {
+    name: "Pilu",
+    up: [0, 3, 5, 7, 11],
+    down: [0, 2, 3, 5, 7, 9, 10],
+    rest: [3, 7, 0, 5],
+    tempo: 78,
+  },
+  // Tender and devotional, the raga of farewells: every note soft but Sa, Ma and Pa
+  bhairavi: {
+    name: "Bhairavi",
+    up: [0, 1, 3, 5, 7, 8, 10],
+    down: [0, 1, 3, 5, 7, 8, 10],
+    rest: [3, 7, 0, 5],
+    tempo: 60,
+  },
+  // Carnatic and auspicious, sung to Ganapati first: Sa Ri Ga Pa Ni
+  hamsadhwani: {
+    name: "Hamsadhwani",
+    up: [0, 2, 4, 7, 11],
+    down: [0, 2, 4, 7, 11],
+    rest: [4, 11, 0, 7],
+    tempo: 76,
+  },
+  // Folk and festive, the colour of Holi and Punjabi songs: soft Ga and Ni
+  kafi: {
+    name: "Kafi",
+    up: [0, 2, 3, 5, 7, 9, 10],
+    down: [0, 2, 3, 5, 7, 9, 10],
+    rest: [3, 7, 0, 5],
+    tempo: 80,
+  },
 };
 
 export type Note = {

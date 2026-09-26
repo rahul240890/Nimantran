@@ -31,6 +31,12 @@ const swatches: Record<TemplateId, string> = {
   scroll: "bg-tpl-scroll-paper border-tpl-scroll-ornament",
   monogram: "bg-tpl-monogram-paper border-tpl-monogram-ornament",
   kasavu: "bg-tpl-kasavu-paper border-tpl-kasavu-ornament",
+  rangmahal: "bg-tpl-rangmahal-paper border-tpl-rangmahal-ornament",
+  paithani: "bg-tpl-paithani-paper border-tpl-paithani-ornament",
+  bandhani: "bg-tpl-bandhani-paper border-tpl-bandhani-ornament",
+  alpona: "bg-tpl-alpona-paper border-tpl-alpona-ornament",
+  gopuram: "bg-tpl-gopuram-paper border-tpl-gopuram-ornament",
+  phulkari: "bg-tpl-phulkari-paper border-tpl-phulkari-ornament",
 };
 
 /* Frame rate lives outside React state so the invitation doesn't re-render every second */

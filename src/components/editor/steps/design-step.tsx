@@ -4,14 +4,14 @@ import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { draftCategory } from "@/lib/editor/draft";
-import { TEMPLATES } from "@/lib/templates/catalog";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy";
 
 export function DesignStep({ draft, update }: StepProps) {
-  const { occasionCopy, stepCopy } = useText(editorText);
+  const { designCopy, occasionCopy, stepCopy } = useText(editorText);
+  const locale = useLocale();
   const category = draftCategory(draft);
   const suggested: readonly TemplateId[] = category.templates;
   // The occasion's designs first, best first; every design stays available
@@ -29,7 +29,6 @@ export function DesignStep({ draft, update }: StepProps) {
       className="grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3"
     >
       {order.map((id) => {
-        const template = TEMPLATES[id];
         const isSuggested = !allSuggested && suggested.includes(id);
         return (
           <RadioItem
@@ -37,13 +36,15 @@ export function DesignStep({ draft, update }: StepProps) {
             value={id}
             label={
               <>
-                {template.name}
+                {designCopy[id].name}
                 {isSuggested && (
-                  <span className="sr-only">, {occasionCopy.suggestedFor(category.names.en)}</span>
+                  <span className="sr-only">
+                    , {occasionCopy.suggestedFor(category.names[locale])}
+                  </span>
                 )}
               </>
             }
-            description={template.description}
+            description={designCopy[id].description}
             badge={
               isSuggested ? (
                 <Badge aria-hidden tone="gold" className="h-6 px-2 text-xs">

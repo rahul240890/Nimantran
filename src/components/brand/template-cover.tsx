@@ -1,5 +1,9 @@
+import { DecorSvg } from "@/components/invitation/art/decor-svg";
+import { MOTIFS } from "@/components/invitation/art/motifs";
 import { templates, type TemplateId } from "@/content/landing";
 import { cn } from "@/lib/cn";
+import { TEMPLATES } from "@/lib/templates/catalog";
+import { stockStyle } from "@/lib/templates/stock";
 import { Mandala } from "./mandala";
 
 const s = templates.sample;
@@ -195,6 +199,56 @@ function KeralaKasavu() {
   );
 }
 
+/** A cover drawn from the design's own ornament data, for designs that carry one. */
+function motifCover(id: TemplateId) {
+  function MotifCover() {
+    const template = TEMPLATES[id];
+    const cover = MOTIFS[template.scene.motif].cover!;
+    const sample = (slot: string) => template.slots.find((item) => item.id === slot)?.sample ?? "";
+    const eyebrow = [sample("doorLeft"), sample("doorRight")].filter(Boolean).join(" ");
+    return (
+      <div
+        className="absolute inset-0"
+        style={{
+          ...stockStyle(template),
+          background: "var(--card-ivory)",
+          color: "var(--card-ink)",
+        }}
+      >
+        <DecorSvg
+          layers={cover.layers}
+          width={80}
+          height={100}
+          className="absolute inset-0 size-full"
+        />
+        <div
+          className="absolute inset-x-[14%] flex flex-col items-center justify-center text-center"
+          style={{ top: `${cover.textBox.top}%`, bottom: `${100 - cover.textBox.bottom}%` }}
+        >
+          {eyebrow && (
+            <span
+              className="font-label text-[4cqw] tracking-[0.3em] uppercase"
+              style={{ color: "var(--card-gold-text)" }}
+            >
+              {eyebrow}
+            </span>
+          )}
+          <span className="mt-[4%] font-display text-[11cqw] leading-none">{s.first}</span>
+          <span
+            className="font-display text-[6.5cqw] leading-none"
+            style={{ color: "var(--card-accent-text)" }}
+          >
+            &amp;
+          </span>
+          <span className="font-display text-[11cqw] leading-none">{s.second}</span>
+          <span className="mt-[6%] font-label text-[4cqw] tracking-[0.14em]">{s.date}</span>
+        </div>
+      </div>
+    );
+  }
+  return MotifCover;
+}
+
 const covers: Record<TemplateId, () => React.JSX.Element> = {
   marigold: MarigoldGate,
   rose: RoseGarden,
@@ -202,9 +256,15 @@ const covers: Record<TemplateId, () => React.JSX.Element> = {
   scroll: RoyalScroll,
   monogram: MinimalMonogram,
   kasavu: KeralaKasavu,
+  rangmahal: motifCover("rangmahal"),
+  paithani: motifCover("paithani"),
+  bandhani: motifCover("bandhani"),
+  alpona: motifCover("alpona"),
+  gopuram: motifCover("gopuram"),
+  phulkari: motifCover("phulkari"),
 };
 
-/** A flat preview of a launch design, drawn on its own card stock. Decorative: name it nearby. */
+/** A flat preview of a design, drawn on its own card stock. Decorative: name it nearby. */
 export function TemplateCover({ id, className }: { id: TemplateId; className?: string }) {
   const Cover = covers[id];
   return (

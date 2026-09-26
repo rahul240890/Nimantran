@@ -103,7 +103,7 @@ export const templates = {
   eyebrow: "Designs",
   title: "Designs that feel like card stock",
   intro:
-    "Six designs to start, each with its own ornaments, card stock and raga. Colourful regional designs follow with tradition packs.",
+    "Twelve designs, each with its own ornaments, card stock and raga, including six bright regional designs from Rajasthan to Tamil Nadu.",
   listLabel: "Invitation designs",
   previous: "Previous designs",
   next: "Next designs",
@@ -115,6 +115,12 @@ export const templates = {
     { id: "scroll", name: "Royal Scroll", kind: "Raga Desh", tone: "gold" },
     { id: "monogram", name: "Minimal Monogram", kind: "Raga Bhupali", tone: "neutral" },
     { id: "kasavu", name: "Kerala Kasavu", kind: "Raga Madhyamavati", tone: "gold" },
+    { id: "rangmahal", name: "Rang Mahal", kind: "Raga Mand", tone: "gold" },
+    { id: "paithani", name: "Paithani Mor", kind: "Raga Bhimpalasi", tone: "rose" },
+    { id: "bandhani", name: "Bandhani Utsav", kind: "Raga Pilu", tone: "success" },
+    { id: "alpona", name: "Alpona Lal", kind: "Raga Bhairavi", tone: "rose" },
+    { id: "gopuram", name: "Gopuram Pon", kind: "Raga Hamsadhwani", tone: "gold" },
+    { id: "phulkari", name: "Phulkari Rang", kind: "Raga Kafi", tone: "gold" },
   ] satisfies { id: TemplateId; name: string; kind: string; tone: string }[],
   sample: { first: "Aarav", second: "Meera", date: "12 · XII · 2026", place: "Udaipur" },
 } as const;
