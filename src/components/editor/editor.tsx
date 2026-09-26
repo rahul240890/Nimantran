@@ -10,7 +10,14 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { toast } from "@/components/ui/toast";
 import { editor, previewCopy, stepCopy } from "@/content/editor";
 import type { QualityChoice } from "@/content/engine-review";
-import { EDITOR_STEPS, newDraft, stepErrors, type EditorStep } from "@/lib/editor/draft";
+import type { CategoryId } from "@/lib/categories/catalog";
+import {
+  EDITOR_STEPS,
+  newDraft,
+  stepErrors,
+  withCategory,
+  type EditorStep,
+} from "@/lib/editor/draft";
 import { clearPhotos } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import type { TemplateId } from "@/lib/templates/schema";
@@ -22,6 +29,7 @@ import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
 import { ExtrasStep } from "./steps/extras-step";
 import { FunctionsStep } from "./steps/functions-step";
+import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
 import { forgetPhotoUrl } from "./use-photo-urls";
 
@@ -29,6 +37,7 @@ const WIDE = "(min-width: 64rem)";
 
 /** The card opens on the steps where the host is writing what's inside it. */
 const opensOn: Record<EditorStep, boolean> = {
+  occasion: false,
   design: false,
   couple: true,
   functions: true,
@@ -58,9 +67,11 @@ function SaveStatus({ state }: { state: SaveState }) {
 export function Editor({
   quality,
   initialTemplate,
+  initialCategory,
 }: {
   quality: QualityChoice;
   initialTemplate: TemplateId | null;
+  initialCategory: CategoryId | null;
 }) {
   const { draft, save } = useSyncExternalStore(
     inviteDraft.subscribe,
@@ -80,14 +91,19 @@ export function Editor({
   const errors = checking === step ? stepErrors(draft, step) : {};
   const errorCount = Object.keys(errors).length;
 
-  // A design picked on the landing page starts a fresh invite with it
+  // An occasion or design picked on the landing page starts a fresh invite with it,
+  // on the design step: the occasion is chosen (a design alone means a wedding).
   useEffect(() => {
-    if (!initialTemplate) return;
+    if (!initialTemplate && !initialCategory) return;
     const current = inviteDraft.get().draft;
-    if (current.updatedAt === 0 && current.templateId !== initialTemplate) {
-      update((draft) => ({ ...draft, templateId: initialTemplate }));
-    }
-  }, [initialTemplate, update]);
+    if (current.updatedAt !== 0) return;
+    update((draft) => {
+      let next = initialCategory ? withCategory(draft, initialCategory) : draft;
+      if (draft.step === "occasion") next = { ...next, step: "design" };
+      if (initialTemplate) next = { ...next, templateId: initialTemplate };
+      return next;
+    });
+  }, [initialTemplate, initialCategory, update]);
 
   // Write straight away if the tab is closed or hidden mid-edit
   useEffect(() => {
@@ -148,7 +164,7 @@ export function Editor({
     void clearPhotos().catch(() => {
       // Nothing stored, or storage blocked
     });
-    inviteDraft.reset({ ...newDraft(draft.templateId) });
+    inviteDraft.reset({ ...newDraft(draft.templateId, draft.categoryId) });
     moved.current = true;
     setCardOpen(false);
     toast({ title: previewCopy.cleared, tone: "success" });
@@ -225,6 +241,7 @@ export function Editor({
               className="flex flex-1 flex-col"
             >
               <div key={step} className="flex-1 animate-rise pb-8">
+                {step === "occasion" && <OccasionStep {...props} />}
                 {step === "design" && <DesignStep {...props} />}
                 {step === "couple" && <CoupleStep {...props} />}
                 {step === "functions" && <FunctionsStep {...props} />}

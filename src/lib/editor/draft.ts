@@ -1,5 +1,8 @@
 import { format, parseISO } from "date-fns";
 import { z } from "zod";
+import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
+import type { Category } from "@/lib/categories/schema";
+import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { contentSchema, toCardCopy, type CardCopy } from "@/lib/templates/content";
 import {
@@ -19,10 +22,16 @@ import {
  * which will store the same shape.
  */
 
-export const FUNCTION_IDS = ["haldi", "mehendi", "sangeet", "wedding", "reception"] as const;
-export type FunctionId = (typeof FUNCTION_IDS)[number];
+export { FUNCTION_IDS, type FunctionId };
 
-export const EDITOR_STEPS = ["design", "couple", "functions", "extras", "preview"] as const;
+export const EDITOR_STEPS = [
+  "occasion",
+  "design",
+  "couple",
+  "functions",
+  "extras",
+  "preview",
+] as const;
 export type EditorStep = (typeof EDITOR_STEPS)[number];
 
 /** The slots the couple step asks for. Date and venue come from the functions instead. */
@@ -61,7 +70,9 @@ const emptyFunction: EventFunction = {
 /** Saved drafts are read leniently: a bad field falls back to its default, never the whole draft. */
 export const draftSchema = z.object({
   version: z.literal(1),
-  step: z.enum(EDITOR_STEPS).catch("design"),
+  step: z.enum(EDITOR_STEPS).catch("occasion"),
+  /** Drafts saved before categories existed were weddings. */
+  categoryId: z.enum(CATEGORY_IDS as [CategoryId, ...CategoryId[]]).catch("wedding"),
   templateId: z.enum(TEMPLATE_IDS).catch("marigold"),
   content: z.partialRecord(z.enum(SLOT_IDS), z.string().max(200)).catch({}),
   functions: z
@@ -83,19 +94,24 @@ export const draftSchema = z.object({
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
-function defaultFunctions(): Record<FunctionId, EventFunction> {
+function defaultFunctions(categoryId: CategoryId = "wedding"): Record<FunctionId, EventFunction> {
+  const planned: readonly FunctionId[] = CATEGORIES[categoryId].functions.planned;
   return Object.fromEntries(
-    FUNCTION_IDS.map((id) => [id, { ...emptyFunction, included: id === "wedding" }]),
+    FUNCTION_IDS.map((id) => [id, { ...emptyFunction, included: planned.includes(id) }]),
   ) as Record<FunctionId, EventFunction>;
 }
 
-export function newDraft(templateId: TemplateId = "marigold"): InviteDraft {
+export function newDraft(
+  templateId: TemplateId = "marigold",
+  categoryId: CategoryId = "wedding",
+): InviteDraft {
   return {
     version: 1,
-    step: "design",
+    step: "occasion",
+    categoryId,
     templateId,
     content: {},
-    functions: defaultFunctions(),
+    functions: defaultFunctions(categoryId),
     photos: [],
     music: { raga: null, playOnOpen: true },
     updatedAt: 0,
@@ -107,14 +123,55 @@ export function parseDraft(value: unknown): InviteDraft | null {
   return result.success ? result.data : null;
 }
 
-export function includedFunctions(draft: InviteDraft): FunctionId[] {
-  return FUNCTION_IDS.filter((id) => draft.functions[id].included);
+export function draftCategory(draft: InviteDraft): Category {
+  return CATEGORIES[draft.categoryId];
 }
 
-/** The function the card itself announces: the wedding, or the first one planned. */
+/**
+ * Switches the occasion. The functions it plans are ticked and the rest unticked, but
+ * every date, venue and word already typed is kept, so switching back loses nothing.
+ */
+export function withCategory(draft: InviteDraft, categoryId: CategoryId): InviteDraft {
+  if (draft.categoryId === categoryId) return draft;
+  const planned: readonly FunctionId[] = CATEGORIES[categoryId].functions.planned;
+  const functions = Object.fromEntries(
+    FUNCTION_IDS.map((id) => [id, { ...draft.functions[id], included: planned.includes(id) }]),
+  ) as Record<FunctionId, EventFunction>;
+  return { ...draft, categoryId, functions };
+}
+
+/** Functions in the order the editor lists them: the occasion's own first, then the rest. */
+export function functionOrder(draft: InviteDraft): {
+  suggested: FunctionId[];
+  more: FunctionId[];
+} {
+  const category = draftCategory(draft);
+  const suggested = FUNCTION_IDS.filter((id) => category.functions.suggested.includes(id));
+  // A save-the-date announces one date; other occasions can add any function
+  const more =
+    category.schedule === "date-only" ? [] : FUNCTION_IDS.filter((id) => !suggested.includes(id));
+  return { suggested, more };
+}
+
+export function includedFunctions(draft: InviteDraft): FunctionId[] {
+  const { suggested, more } = functionOrder(draft);
+  return [...suggested, ...more].filter((id) => draft.functions[id].included);
+}
+
+/**
+ * The function the card itself announces: the occasion's own (the roka for a roka invite),
+ * else the wedding, else the first one planned.
+ */
 export function mainFunction(draft: InviteDraft): FunctionId | null {
+  const primary = draftCategory(draft).functions.primary;
+  if (draft.functions[primary].included) return primary;
   if (draft.functions.wedding.included) return "wedding";
   return includedFunctions(draft)[0] ?? null;
+}
+
+/** Whether the occasion needs a start time, or only a date and a city. */
+export function needsTime(draft: InviteDraft): boolean {
+  return draftCategory(draft).schedule === "full";
 }
 
 /** "Saturday, 12 December 2026", matching the templates' sample wording. */
@@ -143,7 +200,7 @@ export function draftCopy(draft: InviteDraft): CardCopy {
   const template = TEMPLATES[draft.templateId];
   const content: Partial<Record<SlotId, string>> = {};
   for (const id of COUPLE_SLOTS) {
-    const value = draft.content[id];
+    const value = draft.content[id] ?? draftCategory(draft).wording[id];
     if (value !== undefined) content[id] = value;
   }
   const main = mainFunction(draft);
@@ -185,20 +242,24 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
     for (const id of ids) {
       const fn = draft.functions[id];
       if (!fn.date) errors[`${id}.date`] = "required";
-      if (!fn.time) errors[`${id}.time`] = "required";
+      if (!fn.time && needsTime(draft)) errors[`${id}.time`] = "required";
       if (!fn.venue.trim()) errors[`${id}.venue`] = "required";
     }
   }
   return errors;
 }
 
-function sampleOf(template: Template, id: SlotId): string {
-  return template.slots.find((slot) => slot.id === id)?.sample ?? "";
+/** The wording a slot starts with: the occasion's, else the design's sample. */
+export function sampleOf(template: Template, id: SlotId, category?: Category): string {
+  return category?.wording[id] ?? template.slots.find((slot) => slot.id === id)?.sample ?? "";
 }
 
-/** What a couple field holds: the host's words, or the design's wording for optional slots. */
+/** What a couple field holds: the host's words, or the starting wording for optional slots. */
 export function coupleValue(draft: InviteDraft, template: Template, id: SlotId): string {
-  return draft.content[id] ?? (SLOT_RULES[id].required ? "" : sampleOf(template, id));
+  return (
+    draft.content[id] ??
+    (SLOT_RULES[id].required ? "" : sampleOf(template, id, draftCategory(draft)))
+  );
 }
 
 /** Every step's problems, for the preview's checklist. */

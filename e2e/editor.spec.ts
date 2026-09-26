@@ -44,6 +44,11 @@ for (const colorScheme of ["light", "dark"] as const) {
 
     test("every step fits the screen and passes an accessibility check", async ({ page }) => {
       await page.goto("/create?quality=2d");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+
+      await next(page);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(
         "Pick the card your guests will open",
       );
@@ -82,6 +87,8 @@ test.describe("invite editor", () => {
 
   test("writes an invite from design to preview and keeps it after a reload", async ({ page }) => {
     await page.goto("/create?quality=2d");
+    await expect(page.getByRole("radio", { name: /Wedding/ })).toBeChecked();
+    await next(page);
     await page.getByRole("radio", { name: /Rose Garden/ }).click();
     await next(page);
 
@@ -126,17 +133,72 @@ test.describe("invite editor", () => {
 
     await page.getByRole("button", { name: "Start a new invite" }).click();
     await page.getByRole("button", { name: "Clear and start again" }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the card your guests will open",
-    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
     await page.reload();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the card your guests will open",
-    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
   });
 
   test("a design chosen on the landing page starts the invite", async ({ page }) => {
     await page.goto("/create?quality=2d&template=kasavu");
     await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).toBeChecked();
+  });
+
+  test("an occasion from the home page sets up the functions, wording and designs", async ({
+    page,
+  }) => {
+    await page.goto("/create?quality=2d&category=roka");
+    // The occasion is chosen, so the host starts on the designs, the roka's first
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Pick the card your guests will open",
+    );
+    const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
+    await expect(designs.first()).toHaveAccessibleName(/Marigold Gate.*Suggested for roka/);
+    await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).not.toHaveAccessibleName(
+      /Suggested/,
+    );
+    await next(page);
+    await fillCouple(page);
+    await next(page);
+
+    await expect(page.getByRole("heading", { name: "Roka functions" })).toBeVisible();
+    await expect(page.getByRole("checkbox", { name: /Roka/ })).toBeChecked();
+    await expect(page.getByRole("checkbox", { name: /Wedding/ })).not.toBeChecked();
+    // The card announces the roka in the occasion's own words (in a sheet on phones)
+    if (page.viewportSize()!.width < 1024) {
+      await page.getByRole("button", { name: "Preview" }).click();
+    }
+    const card = page.locator("[data-engine-state]");
+    await expect(
+      card.locator(".sr-only").getByText("seek your blessings at their roka ceremony"),
+    ).toBeAttached();
+    if (page.viewportSize()!.width < 1024) await page.keyboard.press("Escape");
+
+    // Switching the occasion keeps what was typed
+    await page.getByRole("button", { name: "Back" }).click();
+    await page.getByRole("button", { name: "Back" }).click();
+    await page.getByRole("button", { name: "Back" }).click();
+    await page.getByRole("radio", { name: /Engagement/ }).click();
+    await expect(page.getByRole("region", { name: "What this sets up" })).toContainText(
+      "Engagement",
+    );
+    await next(page);
+    await next(page);
+    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
+  });
+
+  test("a save-the-date asks only for the date and the city", async ({ page }) => {
+    await page.goto("/create?quality=2d&category=save-the-date");
+    await next(page);
+    await fillCouple(page);
+    await next(page);
+    await expect(page.getByRole("combobox", { name: /Starts at/ })).toHaveCount(0);
+    await expect(page.getByRole("heading", { name: "More functions" })).toHaveCount(0);
+    await page.getByRole("button", { name: /^Date/ }).click();
+    await page.getByRole("button", { name: /next month/i }).click();
+    await page.getByRole("gridcell").getByRole("button", { name: /, 15 / }).click();
+    await page.getByRole("textbox", { name: /City or venue/ }).fill("Udaipur");
+    await next(page);
+    await expect(page.getByRole("heading", { name: "Make it yours" })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
   });
 });

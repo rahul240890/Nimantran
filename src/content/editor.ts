@@ -41,6 +41,13 @@ export const stepCopy: Record<
   EditorStep,
   { label: string; eyebrow: string; title: string; intro: string }
 > = {
+  occasion: {
+    label: "Occasion",
+    eyebrow: "Choose an occasion",
+    title: "What are you celebrating?",
+    intro:
+      "The occasion sets up your invite: the functions it plans, its wording and the designs that suit it. Switch later and nothing you've typed is lost.",
+  },
   design: {
     label: "Design",
     eyebrow: "Choose a design",
@@ -51,16 +58,16 @@ export const stepCopy: Record<
   couple: {
     label: "Couple",
     eyebrow: "The couple",
-    title: "Whose wedding is it?",
+    title: "Who is the couple?",
     intro:
-      "Names appear large on the card. The other lines start with the design's wording; change them to sound like your family.",
+      "Names appear large on the card. The other lines start with wording for your occasion; change them to sound like your family.",
   },
   functions: {
     label: "Functions",
     eyebrow: "Functions",
     title: "When and where is everything?",
     intro:
-      "Choose the functions you're inviting guests to. The card shows the wedding's date and venue; guests see every function when they open it.",
+      "Choose the functions you're inviting guests to. The card shows the main function's date and venue; guests see every function when they open it.",
   },
   extras: {
     label: "Photos & music",
@@ -80,6 +87,16 @@ export const functionCopy: Record<
   FunctionId,
   { name: string; description: string; dressIdeas: string[] }
 > = {
+  roka: {
+    name: "Roka",
+    description: "The families bless the match and exchange gifts",
+    dressIdeas: ["Festive ethnic", "Reds and golds", "Pastel suits and sarees"],
+  },
+  engagement: {
+    name: "Engagement",
+    description: "The ring ceremony, sagai or nischayathartham",
+    dressIdeas: ["Indo-western", "Pastels and ivory", "Festive ethnic"],
+  },
   haldi: {
     name: "Haldi",
     description: "Turmeric blessings, usually the morning before",
@@ -115,6 +132,13 @@ export const functionFields = {
   timePlaceholder: "Pick a time",
   venue: "Venue",
   venuePlaceholder: "e.g. Pichola Lakeside Gardens, Udaipur",
+  city: "City or venue",
+  cityPlaceholder: "e.g. Udaipur",
+  cityHint:
+    "A save-the-date needs only the date and the city. Times and venues follow in the invite.",
+  suggested: (occasion: string) => `${occasion} functions`,
+  more: "More functions",
+  moreHint: "Add any other function you're inviting guests to.",
   address: "Address or map link",
   addressHint: "Guests get a map button in Step 10.",
   dressCode: "Dress code",
@@ -161,12 +185,25 @@ export const extrasCopy = {
   },
 } as const;
 
+export const occasionCopy = {
+  group: "Occasions",
+  setsUp: "What this sets up",
+  planned: "Functions planned",
+  questions: "Guests are asked",
+  noQuestions: "Just whether they're coming and how many",
+  designs: (count: number) => (count === 1 ? "1 suggested design" : `${count} suggested designs`),
+  suggestedBadge: "Suggested",
+  suggestedFor: (occasion: string) => `Suggested for ${occasion.toLowerCase()}`,
+  moreDesigns: "More designs",
+} as const;
+
 export const previewCopy = {
   ready: "Your invitation is ready",
   readyBody:
     "It's saved on this device. Sign in and publishing arrive next, then you can share it on WhatsApp.",
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
+  occasionHeading: "Occasion",
   functionsHeading: "Functions",
   photosHeading: "Photos",
   noPhotos: "No photos added",

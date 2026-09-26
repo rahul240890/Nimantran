@@ -7,7 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { editor, extrasCopy, functionCopy, previewCopy, stepCopy } from "@/content/editor";
+import { CategoryIcon } from "@/components/categories/category-icon";
 import {
+  draftCategory,
   draftProblems,
   includedFunctions,
   templateWithRaga,
@@ -54,6 +56,7 @@ function Section({
 export function PreviewStep({ draft, goTo, onReset }: StepProps & { onReset: () => void }) {
   const problems = draftProblems(draft);
   const functions = includedFunctions(draft);
+  const category = draftCategory(draft);
   const urls = usePhotoUrls(draft.photos.map((photo) => photo.id));
   const raga = RAGAS[templateWithRaga(draft.templateId, draft.music.raga).music.raga];
   const [confirming, setConfirming] = useState(false);
@@ -88,6 +91,15 @@ export function PreviewStep({ draft, goTo, onReset }: StepProps & { onReset: () 
           </ul>
         </Card>
       )}
+
+      <Section title={previewCopy.occasionHeading} step="occasion" goTo={goTo}>
+        <p className="flex items-center gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-full border border-marigold/45 bg-marigold/10 text-accent-text">
+            <CategoryIcon icon={category.icon} className="size-4.5" />
+          </span>
+          <span className="font-display text-lg leading-tight">{category.names.en}</span>
+        </p>
+      </Section>
 
       <Section title={previewCopy.functionsHeading} step="functions" goTo={goTo}>
         <ol className="flex flex-col gap-3">
