@@ -5,9 +5,9 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import type { QualityChoice } from "@/content/engine-review";
 import { useLocale, useText } from "@/i18n/client";
-import { uiText } from "@/i18n/copy/ui";
 import { storyBeats } from "@/lib/engine/story";
-import { draftSuite, storyFamily, storyFunctions } from "@/lib/publish/story";
+import { cardFunctions, draftSuite, storyFamily, storyFunctions } from "@/lib/publish/story";
+import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
@@ -53,8 +53,9 @@ export function PreviewStage({
   // The pages guests will see, without the reply button (there is no form here); here they
   // play only when asked, so they never cover the form while the host is typing
   const locale = useLocale();
-  const { storyWords } = useText(uiText).uiStrings;
-  const functionsKey = JSON.stringify(storyFunctions(draft, locale));
+  const functionsKey = JSON.stringify(
+    cardFunctions(storyFunctions(draft, locale), draft, language),
+  );
   const familyKey = JSON.stringify(storyFamily(draft));
   const suite = draftSuite(draft);
   const { textBox } = draft;
@@ -66,14 +67,14 @@ export function PreviewStage({
         copy: deferredCopy,
         functions,
         replies: true,
-        words: storyWords,
+        words: CARD_STORY_WORDS[language],
         family,
       }),
       suite,
       textBox,
       onTextBox,
     };
-  }, [functionsKey, familyKey, deferredCopy, storyWords, suite, textBox, onTextBox]);
+  }, [functionsKey, familyKey, deferredCopy, language, suite, textBox, onTextBox]);
 
   const { templateId } = draft;
   const { raga } = draft.music;

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { OccasionPage, publicMetadata } from "@/components/seo/pages";
+import { OccasionGalleryPage } from "@/components/gallery/gallery-pages";
+import { publicMetadata } from "@/components/seo/pages";
 import { CATEGORY_IDS, isCategoryId } from "@/lib/categories/catalog";
 
 export const dynamicParams = false;
@@ -16,5 +17,5 @@ export async function generateMetadata({ params }: PageProps<"/hi/invitations/[o
 export default async function Page({ params }: PageProps<"/hi/invitations/[occasion]">) {
   const { occasion } = await params;
   if (!isCategoryId(occasion)) notFound();
-  return <OccasionPage id={occasion} locale="hi" />;
+  return <OccasionGalleryPage id={occasion} locale="hi" />;
 }

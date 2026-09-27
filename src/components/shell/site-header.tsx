@@ -11,6 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { ThemeMenu, ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLocale, useText } from "@/i18n/client";
 import { homePath } from "@/i18n/locales";
+import { pagePath } from "@/lib/seo/paths";
 import { landingText } from "@/i18n/copy/landing";
 import { uiText } from "@/i18n/copy/ui";
 import { cn } from "@/lib/cn";
@@ -40,7 +41,8 @@ function MobileMenu() {
   const [open, setOpen] = useState(false);
   const pending = useRef<string | null>(null);
   const still = useReducedMotion();
-  const home = homePath(useLocale());
+  const locale = useLocale();
+  const home = homePath(locale);
   const router = useRouter();
 
   return (
@@ -101,7 +103,7 @@ function MobileMenu() {
           </div>
           <div className="flex flex-col gap-3">
             <Button asChild fullWidth>
-              <Link href="/create">{shell.createInvite}</Link>
+              <Link href={pagePath({ kind: "gallery" }, locale)}>{shell.createInvite}</Link>
             </Button>
             <Button
               fullWidth
@@ -126,7 +128,8 @@ export function SiteHeader() {
   const { uiStrings } = useText(uiText);
   const active = useActiveSection(useMemo(() => nav.map((item) => item.id), [nav]));
   const [scrolled, setScrolled] = useState(false);
-  const home = homePath(useLocale());
+  const locale = useLocale();
+  const home = homePath(locale);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -182,7 +185,7 @@ export function SiteHeader() {
           <ThemeMenu labels={uiStrings.theme} className="hidden xl:inline-flex" />
           <AccountMenu compact />
           <Button asChild size="sm" className="hidden whitespace-nowrap sm:inline-flex xl:ms-1">
-            <Link href="/create">{shell.createInviteShort}</Link>
+            <Link href={pagePath({ kind: "gallery" }, locale)}>{shell.createInviteShort}</Link>
           </Button>
           <div className="xl:hidden">
             <MobileMenu />

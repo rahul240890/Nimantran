@@ -10,6 +10,7 @@ import { isQualityChoice } from "@/content/engine-review";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
 import { inviteStore } from "@/lib/invites/store";
+import { isSuiteId } from "@/lib/suites/catalog";
 import { isTemplateId } from "@/lib/templates/ids";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -28,11 +29,12 @@ const inviteId = z.uuid();
  * ?invite=<id> opens an invite from My invites; ?new=1 starts another, keeping the open
  * one in the account. ?category=<id> starts a fresh invite for that occasion (roka,
  * engagement, save-the-date…); ?template=<id> starts one with that design, and
- * ?tradition=<id> with that tradition;
+ * ?tradition=<id> with that tradition, ?suite=<id> with that page theme (the gallery's
+ * Use this design sends all four);
  * ?quality=high|medium|low|2d forces the preview's level (handy for tests without a GPU).
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const { template, category, tradition, quality, invite, new: fresh } = await searchParams;
+  const { template, category, tradition, suite, quality, invite, new: fresh } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -48,6 +50,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     initialTemplate: isTemplateId(template) ? template : null,
     initialCategory: isCategoryId(category) ? category : null,
     initialTradition: isTraditionId(tradition) ? tradition : null,
+    initialSuite: isSuiteId(suite) ? suite : null,
     fresh: fresh === "1",
   };
   return (
@@ -60,6 +63,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
           params.initialCategory,
           params.initialTemplate,
           params.initialTradition,
+          params.initialSuite,
         ].join("|")}
         {...params}
         quality={isQualityChoice(quality) ? quality : "auto"}

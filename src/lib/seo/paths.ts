@@ -3,6 +3,7 @@ import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { UI_LOCALES, homePath, type UiLocale } from "@/i18n/locales";
+import { WEDDING_KINDS, type WeddingKind } from "@/lib/gallery/ids";
 
 /*
  * The public, indexable pages (docs/BRAND_SEO.md, section 6), generated from data: one
@@ -14,7 +15,9 @@ export type PublicPage =
   | { kind: "home" }
   | { kind: "designs" }
   | { kind: "design"; id: TemplateId }
+  | { kind: "gallery" }
   | { kind: "occasion"; id: CategoryId }
+  | { kind: "wedding-kind"; id: WeddingKind }
   | { kind: "tradition"; id: TraditionId }
   | { kind: "privacy" }
   | { kind: "terms" };
@@ -28,8 +31,12 @@ function basePath(page: PublicPage): string {
       return "/designs";
     case "design":
       return `/designs/${page.id}`;
+    case "gallery":
+      return "/invitations";
     case "occasion":
       return `/invitations/${page.id}`;
+    case "wedding-kind":
+      return `/invitations/wedding/${page.id}`;
     case "tradition":
       return `/traditions/${page.id}`;
     case "privacy":
@@ -52,7 +59,9 @@ export function publicPages(): PublicPage[] {
     { kind: "home" },
     { kind: "designs" },
     ...TEMPLATE_IDS.map((id) => ({ kind: "design" as const, id })),
+    { kind: "gallery" },
     ...CATEGORY_IDS.map((id) => ({ kind: "occasion" as const, id })),
+    ...WEDDING_KINDS.map((id) => ({ kind: "wedding-kind" as const, id })),
     ...TRADITION_IDS.map((id) => ({ kind: "tradition" as const, id })),
     { kind: "privacy" },
     { kind: "terms" },

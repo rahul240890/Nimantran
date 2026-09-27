@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
+import { pagePath } from "@/lib/seo/paths";
 import { HeroInvite } from "./hero-invite";
 
 /**
@@ -32,7 +33,7 @@ export function Hero({ locale }: { locale: UiLocale }) {
           <p className="max-w-[34rem] text-lg text-ink-muted sm:text-xl">{hero.body}</p>
           <div className="flex flex-col gap-3 min-[400px]:flex-row min-[400px]:flex-wrap">
             <Button asChild size="lg">
-              <Link href="/create">{hero.primary}</Link>
+              <Link href={pagePath({ kind: "gallery" }, locale)}>{hero.primary}</Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
               <a href="#how-it-works">

@@ -26,6 +26,7 @@ import {
   EDITOR_STEPS,
   newDraft,
   withCategory,
+  withGalleryChoice,
   type EditorStep,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -33,6 +34,7 @@ import { stepErrors } from "@/lib/editor/draft-checks";
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
+import type { SuiteId } from "@/lib/suites/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { TemplateId } from "@/lib/templates/schema";
 import { useMediaQuery } from "@/lib/use-media-query";
@@ -123,6 +125,7 @@ export function Editor({
   initialTemplate,
   initialCategory,
   initialTradition = null,
+  initialSuite = null,
   signedIn = false,
   initialInvite = null,
   fresh = false,
@@ -133,6 +136,8 @@ export function Editor({
   initialCategory: CategoryId | null;
   /** A tradition picked on its page (?tradition=<id>). */
   initialTradition?: TraditionId | null;
+  /** A design chosen in the gallery (?suite=<id>, with its card, occasion and tradition). */
+  initialSuite?: SuiteId | null;
   /** Drafts save to the account as well as the device. */
   signedIn?: boolean;
   /** An invite opened from My invites (?invite=<id>). */
@@ -179,6 +184,28 @@ export function Editor({
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
       }
       if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
+      if (initialSuite) {
+        // The gallery's Use this design, straight to the names. Signed in, an invite already
+        // under way stays in My invites and a new one starts; on this device alone, the
+        // choice applies to the open invite and every word typed is kept.
+        const choice = {
+          category: initialCategory,
+          tradition: initialTradition,
+          suite: initialSuite,
+          template: initialTemplate,
+        };
+        const current = inviteDraft.get().draft;
+        const switched =
+          signedIn && current.updatedAt !== 0 && !initialInvite && !fresh
+            ? await switchDraft(null, {
+                signedIn,
+                fresh: () => withGalleryChoice(newDraft(), choice),
+              })
+            : false;
+        if (!switched) update((draft) => withGalleryChoice(draft, choice));
+        router.replace("/create", { scroll: false });
+        return;
+      }
       if (!initialTemplate && !initialCategory && !initialTradition) return;
       if (inviteDraft.get().draft.updatedAt !== 0) return;
       update((draft) => {
@@ -199,6 +226,7 @@ export function Editor({
     initialTemplate,
     initialCategory,
     initialTradition,
+    initialSuite,
     update,
     router,
     syncCopy,
