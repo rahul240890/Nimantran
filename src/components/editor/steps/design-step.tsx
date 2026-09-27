@@ -3,6 +3,7 @@
 import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import { draftCategory, draftTradition } from "@/lib/editor/draft";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import type { StepProps } from "./types";
@@ -135,6 +136,14 @@ export function DesignStep({ draft, update }: StepProps) {
             );
           })}
         </RadioGroup>
+        {SUITES[suite].art !== "card" && (
+          <Switch
+            label={suiteCopy.textBox}
+            description={suiteCopy.textBoxHint}
+            checked={draft.textBox}
+            onCheckedChange={(textBox) => update((current) => ({ ...current, textBox }))}
+          />
+        )}
       </section>
     </div>
   );

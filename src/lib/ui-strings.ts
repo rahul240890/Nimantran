@@ -25,6 +25,7 @@ export const uiStrings = {
       replay: "Play the invitation pages",
       directions: "Directions",
       calendar: "Add to calendar",
+      textBox: "Box behind the words",
     },
   },
   /** Words the story adds between the host's own (Step 12d). */

@@ -151,6 +151,7 @@ test.describe("event pages", () => {
   for (const [colorScheme, width, suite] of [
     ["light", 320, "rajwada-bagh"],
     ["dark", 1440, "kayal"],
+    ["dark", 390, "noor-bagh"],
     ["light", 390, "shahi-savari"],
     ["dark", 390, "classic"],
   ] as const) {
@@ -184,6 +185,7 @@ test.describe("event pages", () => {
       expect(beats).toEqual([
         "cover",
         "family",
+        "invite",
         "fn-haldi",
         "fn-mehendi",
         "fn-sangeet",
@@ -209,6 +211,23 @@ test.describe("event pages", () => {
       await expect(story).toHaveCount(0);
     });
   }
+
+  test("the box behind the words switches live from the pages", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 780 });
+    await page.goto("/engine?quality=2d&suite=shahi-savari");
+    await page.getByRole("button", { name: "Open invitation" }).click();
+    await page.getByRole("button", { name: "Play the invitation pages" }).click();
+    const story = page.locator("[data-story-beat]");
+    // Painted pages print the words straight onto the painting by default
+    await expect(story.locator(".story-print")).toHaveCount(1);
+    const box = page.getByRole("button", { name: "Box behind the words" });
+    await expect(box).toHaveAttribute("aria-pressed", "false");
+    await box.click();
+    await expect(box).toHaveAttribute("aria-pressed", "true");
+    await expect(story.locator(".story-print")).toHaveCount(0);
+    await expect(story).toHaveAttribute("data-story-beat", "cover");
+  });
 
   test("a swipe turns the page and keyboard focus stays inside", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });

@@ -105,11 +105,13 @@ export function EngineReview({
   initialTheme,
   initialOpening,
   initialSuite,
+  initialTextBox,
 }: {
   initialQuality: QualityChoice;
   initialTheme: TemplateId;
   initialOpening: TraditionId | null;
   initialSuite: SuiteId;
+  initialTextBox: boolean;
 }) {
   const [theme, setTheme] = useState<TemplateId>(initialTheme);
   const [quality, setQuality] = useState<QualityChoice>(initialQuality);
@@ -124,6 +126,7 @@ export function EngineReview({
   const [musicOnOpen, setMusicOnOpen] = useState(true);
   const [storyOn, setStoryOn] = useState(true);
   const [suite, setSuite] = useState<SuiteId>(initialSuite);
+  const [textBox, setTextBox] = useState(initialTextBox);
   const story = useMemo(
     () =>
       storyOn
@@ -136,9 +139,11 @@ export function EngineReview({
               family: SAMPLE_FAMILY,
             }),
             suite,
+            textBox,
+            onTextBox: setTextBox,
           }
         : null,
-    [storyOn, copy, suite],
+    [storyOn, copy, suite, textBox],
   );
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
@@ -294,6 +299,13 @@ export function EngineReview({
                   options={SUITE_IDS.map((id) => ({ value: id, label: suiteCopy.names[id] }))}
                 />
               </Field>
+
+              <Switch
+                label={suiteCopy.textBox}
+                description="Off prints the words straight onto the painting. The pages carry the same switch."
+                checked={textBox}
+                onCheckedChange={setTextBox}
+              />
 
               <Switch
                 label="Music starts when the card opens"

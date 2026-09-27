@@ -76,6 +76,13 @@ describe("invite rows", () => {
     expect({ ...back, remoteId: null, updatedAt: 0 }).toEqual({ ...draft, remoteId: null });
   });
 
+  it("keeps the box behind the words, and reads older invites without it as off", () => {
+    const { event, functions } = asStored({ ...sample(), textBox: true });
+    expect(rowsToDraft(event, functions).textBox).toBe(true);
+    const older = { ...event, religious: { ...event.religious, textBox: undefined } };
+    expect(rowsToDraft(older, functions).textBox).toBe(false);
+  });
+
   it("keeps the family's tradition", () => {
     const draft = {
       ...sample(),

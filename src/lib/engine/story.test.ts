@@ -98,7 +98,7 @@ describe("event pages", () => {
     expect(family.lines.at(-1)!.text).toBe(copy.line);
   });
 
-  it("puts the family's own wording on the family page, in its language", () => {
+  it("puts the family's own wording on its own page, then the invitation and the day", () => {
     const beats = storyBeats({
       copy,
       functions: [fn("haldi"), fn("wedding")],
@@ -111,7 +111,11 @@ describe("event pages", () => {
       "आशीर्वाद",
       "श्रीमती कमला देवी",
     ]);
-    expect(family.lines.map((l) => l.text)).toContain(words.saveTheDate);
+    expect(family.lines.map((l) => l.text)).not.toContain(words.saveTheDate);
+    const invite = beats[beats.indexOf(family) + 1]!;
+    expect(invite.id).toBe("invite");
+    expect(invite.scene).toBe("family");
+    expect(invite.lines.map((l) => l.text)).toEqual([copy.line, words.saveTheDate, copy.date]);
   });
 
   it("gives function pages their Directions and calendar links", () => {

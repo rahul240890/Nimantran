@@ -108,6 +108,8 @@ export const draftSchema = z.object({
   translation: z.partialRecord(z.enum(SLOT_IDS), z.string().max(200)).catch({}),
   /** The event pages' theme (Step 12e). Null follows the tradition's or design's own. */
   suite: z.enum(SUITE_IDS).nullable().catch(null),
+  /** A box behind the words on painted pages (Step 12f). Off prints them on the painting. */
+  textBox: z.boolean().catch(false),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

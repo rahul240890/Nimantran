@@ -9,6 +9,8 @@ import {
   Navigation,
   Pause,
   Play,
+  RectangleHorizontal,
+  X,
 } from "lucide-react";
 import {
   useCallback,
@@ -25,7 +27,8 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
-import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { textArea, type TextArea } from "@/lib/suites/areas";
+import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
@@ -43,6 +46,7 @@ export type StoryLabels = {
   done: string;
   directions: string;
   calendar: string;
+  textBox: string;
 };
 
 type StoryPlayerProps = {
@@ -51,6 +55,10 @@ type StoryPlayerProps = {
   template: Template;
   /** The theme the pages are painted in (Step 12e). */
   suite?: SuiteId;
+  /** A box behind the words on painted pages; off prints them on the painting. */
+  textBox?: boolean;
+  /** When set, the pages carry a switch for the box, so the host can compare live. */
+  onTextBox?: (on: boolean) => void;
   /** Still mode: no movement and no timer; the guest steps through with Next. */
   still: boolean;
   labels: StoryLabels;
@@ -99,6 +107,8 @@ export function StoryPlayer({
   copy,
   template,
   suite: suiteId = "classic",
+  textBox = false,
+  onTextBox,
   still,
   labels,
   lang,
@@ -167,6 +177,16 @@ export function StoryPlayer({
     };
   }, [running, index, seconds, last, next]);
 
+  // Fetch the next page's painting ahead, so it is ready when the page turns
+  const upcoming = beats[index + 1];
+  const nextImage = upcoming ? suite.images[pageLook(upcoming.scene).art] : undefined;
+  useEffect(() => {
+    if (!nextImage) return;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = nextImage;
+  }, [nextImage]);
+
   useEffect(() => {
     const onVisibility = () => setHidden(document.visibilityState === "hidden");
     document.addEventListener("visibilitychange", onVisibility);
@@ -215,7 +235,8 @@ export function StoryPlayer({
           const focusable = [
             ...(root.current?.querySelectorAll<HTMLElement>("a[href], button:not(:disabled)") ??
               []),
-          ];
+            // Controls hidden at this width (the narrow-phone skip icon) take no focus
+          ].filter((el) => el.getClientRects().length > 0);
           const first = focusable[0];
           const final = focusable.at(-1);
           if (!first || !final) return;
@@ -281,6 +302,7 @@ export function StoryPlayer({
               beat={b}
               copy={copy}
               suite={suiteId}
+              textBox={textBox}
               still={still}
               reply={last && current ? reply : null}
               labels={labels}
@@ -346,6 +368,19 @@ export function StoryPlayer({
             )}
           </div>
           <div className="flex items-center gap-1">
+            {onTextBox && themed && (
+              <IconButton
+                label={labels.textBox}
+                aria-pressed={textBox}
+                icon={<RectangleHorizontal />}
+                size="sm"
+                onClick={() => onTextBox(!textBox)}
+                className={cn(
+                  "backdrop-blur-sm",
+                  textBox ? "bg-marigold text-on-marigold" : "bg-surface/85",
+                )}
+              />
+            )}
             {music && (
               <IconButton
                 label={music.playing ? music.pause : music.play}
@@ -368,10 +403,18 @@ export function StoryPlayer({
               variant="secondary"
               size="sm"
               onClick={onDone}
-              className="bg-surface/85 backdrop-blur-sm"
+              className="bg-surface/85 backdrop-blur-sm @max-[22rem]:hidden"
             >
               {last ? labels.done : labels.skip}
             </Button>
+            {/* On the narrowest phones the way back to the card is an icon, so every control fits */}
+            <IconButton
+              label={last ? labels.done : labels.skip}
+              icon={<X />}
+              size="sm"
+              onClick={onDone}
+              className="hidden bg-surface/85 backdrop-blur-sm @max-[22rem]:inline-flex"
+            />
           </div>
         </div>
       </div>
@@ -380,11 +423,22 @@ export function StoryPlayer({
   );
 }
 
+/** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
+function areaStyle(area: TextArea): CSSProperties {
+  return {
+    top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${area.top}%)`,
+    bottom: `max(${area.bottom}%, env(safe-area-inset-bottom))`,
+    left: `${area.left}%`,
+    right: `${area.right}%`,
+  };
+}
+
 /** One full-screen page: its landscape, its function scene, and its words on the plate. */
 function Page({
   beat,
   copy,
   suite: suiteId,
+  textBox,
   still,
   reply,
   labels,
@@ -395,6 +449,7 @@ function Page({
   beat: StoryBeat;
   copy: CardCopy;
   suite: SuiteId;
+  textBox: boolean;
   still: boolean;
   reply: { href: string; label: string } | null | undefined;
   labels: StoryLabels;
@@ -405,6 +460,9 @@ function Page({
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
   const look = pageLook(beat.scene);
+  const painted = themed && Boolean(suite.images[look.art]);
+  // Words print straight onto a painting unless the host asked for the box
+  const printed = painted && !textBox;
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
   const delay = (i: number) =>
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
@@ -426,16 +484,34 @@ function Page({
           className="absolute inset-0 overflow-hidden"
         />
       )}
-      <StoryScene scene={beat.scene} themed={themed} />
+      {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
+      {!painted && <StoryScene scene={beat.scene} themed={themed} />}
 
-      <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
+      <div
+        className={cn(
+          "absolute flex items-center justify-center",
+          painted
+            ? "[container-type:size]"
+            : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
+        )}
+        style={painted ? areaStyle(textArea(suiteId, look.art)) : undefined}
+      >
         <div
+          data-tone={printed ? paintedTone(look.art) : undefined}
           className={cn(
-            "flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
-            themed &&
-              "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
+            "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
+            printed
+              ? "story-print isolate px-[4cqmin] py-[6cqmin]"
+              : themed &&
+                  "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
           )}
         >
+          {printed && (
+            <span
+              aria-hidden
+              className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
+            />
+          )}
           {sacred && (
             <span
               className="story-line mb-[1cqmin] block size-[clamp(4rem,22cqmin,7.5rem)] shrink-0"

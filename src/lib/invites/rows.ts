@@ -96,6 +96,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         // The events table has no column of its own for the second language's wording
         translation: draft.translation,
         suite: draft.suite,
+        textBox: draft.textBox,
       },
       languages: draft.languages,
     },
@@ -151,6 +152,7 @@ export function rowsToDraft(
     languages: event.languages ?? undefined,
     translation: event.religious?.translation,
     suite: event.religious?.suite,
+    textBox: event.religious?.textBox,
   });
   return draft ?? { ...base, remoteId: event.id };
 }
