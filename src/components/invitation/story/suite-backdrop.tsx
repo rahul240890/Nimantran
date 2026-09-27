@@ -607,7 +607,9 @@ export function SuiteBackdrop({
             alt=""
             decoding="async"
             loading={lazy ? "lazy" : undefined}
-            className="size-full object-cover"
+            // A mouse swipe across the page must turn it, not start dragging the picture
+            draggable={false}
+            className="pointer-events-none size-full object-cover select-none"
           />
         ) : (
           <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid slice" className="size-full!">

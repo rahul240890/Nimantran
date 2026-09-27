@@ -185,6 +185,7 @@ test.describe("event pages", () => {
       expect(beats).toEqual([
         "cover",
         "family",
+        "invite",
         "fn-haldi",
         "fn-mehendi",
         "fn-sangeet",

@@ -138,19 +138,26 @@ export function storyBeats({
   );
 
   // The family page: who invites, their words, and the day itself
-  const familyLines = [
+  const blessings = [
     ...line(copy.families, "small"),
     ...family.flatMap((block) => [
       ...line(block.title, "label", block.lang),
       ...line(block.text, "body", block.lang),
     ]),
+  ];
+  const invite = [
     ...line(copy.line, "body"),
     ...(single || !copy.date
       ? []
       : [...line(w.saveTheDate, "label"), ...line(copy.date, "display")]),
     ...(functions.length === 0 ? line(copy.date, "display") : []),
   ];
-  if (familyLines.length > 0) beats.push(beat("family", "family", familyLines));
+  // A family's own blessings fill a page, so the invitation and the day turn to the next
+  if (family.length > 0 && invite.length > 0) {
+    beats.push(beat("family", "family", blessings), beat("invite", "family", invite));
+  } else if (blessings.length + invite.length > 0) {
+    beats.push(beat("family", "family", [...blessings, ...invite]));
+  }
 
   for (const fn of functions) {
     beats.push(

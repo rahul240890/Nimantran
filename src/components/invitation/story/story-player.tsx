@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
+import { textArea, type TextArea } from "@/lib/suites/areas";
 import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
@@ -234,7 +235,8 @@ export function StoryPlayer({
           const focusable = [
             ...(root.current?.querySelectorAll<HTMLElement>("a[href], button:not(:disabled)") ??
               []),
-          ];
+            // Controls hidden at this width (the narrow-phone skip icon) take no focus
+          ].filter((el) => el.getClientRects().length > 0);
           const first = focusable[0];
           const final = focusable.at(-1);
           if (!first || !final) return;
@@ -421,6 +423,16 @@ export function StoryPlayer({
   );
 }
 
+/** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
+function areaStyle(area: TextArea): CSSProperties {
+  return {
+    top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${area.top}%)`,
+    bottom: `max(${area.bottom}%, env(safe-area-inset-bottom))`,
+    left: `${area.left}%`,
+    right: `${area.right}%`,
+  };
+}
+
 /** One full-screen page: its landscape, its function scene, and its words on the plate. */
 function Page({
   beat,
@@ -475,7 +487,15 @@ function Page({
       {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
       {!painted && <StoryScene scene={beat.scene} themed={themed} />}
 
-      <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
+      <div
+        className={cn(
+          "absolute flex items-center justify-center",
+          painted
+            ? "[container-type:size]"
+            : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
+        )}
+        style={painted ? areaStyle(textArea(suiteId, look.art)) : undefined}
+      >
         <div
           data-tone={printed ? paintedTone(look.art) : undefined}
           className={cn(
