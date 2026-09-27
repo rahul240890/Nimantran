@@ -387,3 +387,25 @@ export const previewCopy = {
   cancel: "Keep this invite",
   cleared: "Started a new invite",
 } as const;
+
+/** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */
+export const suiteCopy = {
+  heading: "Event pages",
+  intro:
+    "After the doors open, each function gets its own full-screen page in this theme. Your tradition's ceremony names, blessing and symbol stay the same in every theme.",
+  suggested: "Suits your tradition",
+  pairs: (design: string) => `Also switches the card to ${design}`,
+  preview: "Play the pages",
+  names: {
+    "rajwada-bagh": "Rajwada Bagh",
+    "shahi-savari": "Shahi Savari",
+    kayal: "Kayal",
+    classic: "Card colours",
+  },
+  descriptions: {
+    "rajwada-bagh": "A palace garden seen through a Mughal arch, fountains and lanterns.",
+    "shahi-savari": "A royal elephant procession before a desert fort, bunting overhead.",
+    kayal: "A houseboat on the Kerala backwaters, palms and floating lamps.",
+    classic: "Pages in your card's own paper and colours, with a scene for each function.",
+  },
+} as const;

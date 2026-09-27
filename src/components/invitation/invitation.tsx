@@ -19,6 +19,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/cn";
 import { motionFor, openingLength } from "@/lib/engine/motion";
 import type { StoryBeat } from "@/lib/engine/story";
+import type { SuiteId } from "@/lib/suites/catalog";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import {
   pickQuality,
@@ -56,6 +57,8 @@ export type InvitationLabels = {
 /** The story the card tells once it has opened (Step 12d). */
 export type InvitationStory = {
   beats: readonly StoryBeat[];
+  /** The theme the event pages are painted in (Step 12e). */
+  suite?: SuiteId;
   /** The last beat's button to the reply form, when the invite takes replies. */
   reply?: { href: string; label: string } | null;
 };
@@ -82,8 +85,10 @@ export type InvitationProps = {
   onOpenChange?: (open: boolean) => void;
   /** The card's tradition, whose opening plays when the card is opened (Step 12c). */
   tradition?: TraditionId | null;
-  /** Told beat by beat over the opened card; Still mode waits for the guest to ask. */
+  /** Full-screen event pages after the opening; Still mode waits for the guest to ask. */
   story?: InvitationStory | null;
+  /** Start the pages on their own once the card opens (the editor waits for a tap). */
+  autoStory?: boolean;
   /** Start the music when the guest opens the card (a tap, so browsers allow sound). */
   musicOnOpen?: boolean;
   labels?: InvitationLabels;
@@ -155,6 +160,7 @@ export function Invitation({
   musicOnOpen = true,
   tradition = null,
   story = null,
+  autoStory = true,
   labels: labelsProp,
   lang,
   onStatus,
@@ -319,17 +325,15 @@ export function Invitation({
   const hasStory = Boolean(story && story.beats.length > 0);
   const storyDelay = 1.6 + (motion ? Math.max(0, openingLength(motion) - 1.2) : 0);
   useEffect(() => {
-    if (!open || still || !hasStory) return;
+    if (!open || still || !hasStory || !autoStory) return;
     const timer = window.setTimeout(() => setStoryOn(true), storyDelay * 1000);
     return () => window.clearTimeout(timer);
-  }, [open, still, hasStory, storyDelay]);
-  // Asked for with a button, the story takes keyboard focus, and gives it back as it closes
-  const [storyFocus, setStoryFocus] = useState(false);
+  }, [open, still, hasStory, autoStory, storyDelay]);
+  // The pages take keyboard focus, and give it back to the replay button as they close
   const replayButton = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
-  const startStory = (focus = false) => {
+  const startStory = () => {
     setStoryToken((n) => n + 1);
-    setStoryFocus(focus);
     setStoryOn(true);
   };
   const endStory = (hadFocus: boolean) => {
@@ -445,11 +449,17 @@ export function Invitation({
             beats={story.beats}
             copy={copy}
             template={template}
+            suite={story.suite}
             still={still}
             labels={storyLabels}
             lang={lang}
             reply={story.reply}
-            autoFocus={storyFocus}
+            music={{
+              playing,
+              toggle: toggleMusic,
+              play: labels.playMusic,
+              pause: labels.pauseMusic,
+            }}
             onDone={endStory}
           />
         )}
@@ -461,7 +471,7 @@ export function Invitation({
             onClick={() => {
               setSkip((n) => n + 1);
               setOpening(false);
-              if (hasStory) startStory(true);
+              if (hasStory) startStory();
             }}
             className="absolute end-3 top-3 bg-surface/85 backdrop-blur-sm"
           >
@@ -496,7 +506,7 @@ export function Invitation({
             label={storyLabels.replay}
             icon={<Clapperboard />}
             variant="secondary"
-            onClick={() => startStory(true)}
+            onClick={() => startStory()}
           />
         )}
       </div>

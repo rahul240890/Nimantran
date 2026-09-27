@@ -246,6 +246,190 @@
   --elev-overlay: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 32px 80px -20px rgb(0 0 0 / 0.8);
 }
 
+/*
+ * Event suites (Step 12e): each theme's colours, the same in both site themes like card
+ * stock. The base sets the reading plate and ornaments; data-mood sets the light of the
+ * page (a haldi dawn, a sangeet night). Inside a themed page the card-* tokens point at
+ * the plate's colours, so the words and the function scenes follow the theme.
+ */
+[data-suite="rajwada-bagh"] {
+  --suite-plate: #fbf4e4;
+  --suite-ink: #1f3a2e;
+  --suite-ink-muted: #4a5d52;
+  --suite-gold-text: #7d5a14;
+  --suite-accent-text: #9b2c4a;
+  --suite-leaf: #3f7d5c;
+  --suite-accent: #b0283f;
+  --suite-gold: #c9a45a;
+  --suite-light: #ffd37a;
+  --suite-stone: #efe2c6;
+}
+[data-suite="rajwada-bagh"] [data-mood="dawn"],
+[data-suite="rajwada-bagh"][data-mood="dawn"] {
+  --suite-sky-top: #f3b58f;
+  --suite-sky-bottom: #fbe3c4;
+  --suite-glow: #fff0c2;
+  --suite-far: #d99a86;
+  --suite-mid: #7e9b77;
+  --suite-near: #2f5d4a;
+  --suite-water: #cfe3de;
+  --suite-stars: 0;
+}
+[data-suite="rajwada-bagh"] [data-mood="day"],
+[data-suite="rajwada-bagh"][data-mood="day"] {
+  --suite-sky-top: #9fd0dc;
+  --suite-sky-bottom: #eef3e2;
+  --suite-glow: #fffbe6;
+  --suite-far: #d9c3a6;
+  --suite-mid: #5f8f6a;
+  --suite-near: #1f4d3c;
+  --suite-water: #a9d6d6;
+  --suite-stars: 0;
+}
+[data-suite="rajwada-bagh"] [data-mood="dusk"],
+[data-suite="rajwada-bagh"][data-mood="dusk"] {
+  --suite-sky-top: #6f3b6e;
+  --suite-sky-bottom: #f3a96b;
+  --suite-glow: #ffd08a;
+  --suite-far: #8a4f6a;
+  --suite-mid: #3d5e4f;
+  --suite-near: #1b3a30;
+  --suite-water: #e7b58a;
+  --suite-stars: 0.35;
+}
+[data-suite="rajwada-bagh"] [data-mood="night"],
+[data-suite="rajwada-bagh"][data-mood="night"] {
+  --suite-sky-top: #0d1b2e;
+  --suite-sky-bottom: #27405a;
+  --suite-glow: #f6ecc8;
+  --suite-far: #1d3148;
+  --suite-mid: #183a33;
+  --suite-near: #0e2620;
+  --suite-water: #2b5570;
+  --suite-stars: 1;
+}
+[data-suite="shahi-savari"] {
+  --suite-plate: #fdf1e2;
+  --suite-ink: #3a1420;
+  --suite-ink-muted: #6a4050;
+  --suite-gold-text: #85580f;
+  --suite-accent-text: #a3261c;
+  --suite-leaf: #6f8a3c;
+  --suite-accent: #d63a5a;
+  --suite-gold: #e0a83c;
+  --suite-light: #ffcf6a;
+  --suite-stone: #f3d6a8;
+}
+[data-suite="shahi-savari"] [data-mood="dawn"],
+[data-suite="shahi-savari"][data-mood="dawn"] {
+  --suite-sky-top: #f7a58b;
+  --suite-sky-bottom: #fde0b8;
+  --suite-glow: #ffe7a8;
+  --suite-far: #e0a57c;
+  --suite-mid: #c7794f;
+  --suite-near: #6b2a2a;
+  --suite-water: #f0c48c;
+  --suite-stars: 0;
+}
+[data-suite="shahi-savari"] [data-mood="day"],
+[data-suite="shahi-savari"][data-mood="day"] {
+  --suite-sky-top: #7fc4e0;
+  --suite-sky-bottom: #fbe7c0;
+  --suite-glow: #fff6d8;
+  --suite-far: #e2b27a;
+  --suite-mid: #cf8a4e;
+  --suite-near: #7a2e27;
+  --suite-water: #f3cf96;
+  --suite-stars: 0;
+}
+[data-suite="shahi-savari"] [data-mood="dusk"],
+[data-suite="shahi-savari"][data-mood="dusk"] {
+  --suite-sky-top: #7b2a55;
+  --suite-sky-bottom: #f59a4a;
+  --suite-glow: #ffc56e;
+  --suite-far: #b35a45;
+  --suite-mid: #8a3a36;
+  --suite-near: #4a1628;
+  --suite-water: #e9a86a;
+  --suite-stars: 0.35;
+}
+[data-suite="shahi-savari"] [data-mood="night"],
+[data-suite="shahi-savari"][data-mood="night"] {
+  --suite-sky-top: #1a1033;
+  --suite-sky-bottom: #4a2350;
+  --suite-glow: #f8e7c0;
+  --suite-far: #3b2146;
+  --suite-mid: #2e1838;
+  --suite-near: #1f0f25;
+  --suite-water: #5a3350;
+  --suite-stars: 1;
+}
+[data-suite="kayal"] {
+  --suite-plate: #f8f3e3;
+  --suite-ink: #13332c;
+  --suite-ink-muted: #3f5a52;
+  --suite-gold-text: #74540f;
+  --suite-accent-text: #9a3b12;
+  --suite-leaf: #3f8a55;
+  --suite-accent: #c9a043;
+  --suite-gold: #d4ae4f;
+  --suite-light: #ffd37a;
+  --suite-stone: #e9dcbc;
+}
+[data-suite="kayal"] [data-mood="dawn"],
+[data-suite="kayal"][data-mood="dawn"] {
+  --suite-sky-top: #f5b98e;
+  --suite-sky-bottom: #fce6c8;
+  --suite-glow: #fff1c9;
+  --suite-far: #7c9a7a;
+  --suite-mid: #3e7a55;
+  --suite-near: #1d4a35;
+  --suite-water: #e9c7a4;
+  --suite-stars: 0;
+}
+[data-suite="kayal"] [data-mood="day"],
+[data-suite="kayal"][data-mood="day"] {
+  --suite-sky-top: #8cc9d8;
+  --suite-sky-bottom: #e8f4ea;
+  --suite-glow: #fffbe8;
+  --suite-far: #6fa38a;
+  --suite-mid: #2f7a52;
+  --suite-near: #164a33;
+  --suite-water: #7fbcb8;
+  --suite-stars: 0;
+}
+[data-suite="kayal"] [data-mood="dusk"],
+[data-suite="kayal"][data-mood="dusk"] {
+  --suite-sky-top: #5a3a6e;
+  --suite-sky-bottom: #f2a064;
+  --suite-glow: #ffcf82;
+  --suite-far: #4f5f5a;
+  --suite-mid: #2a4a3a;
+  --suite-near: #10301f;
+  --suite-water: #d99a6e;
+  --suite-stars: 0.35;
+}
+[data-suite="kayal"] [data-mood="night"],
+[data-suite="kayal"][data-mood="night"] {
+  --suite-sky-top: #081a26;
+  --suite-sky-bottom: #173848;
+  --suite-glow: #eef2d8;
+  --suite-far: #12302c;
+  --suite-mid: #0e2a22;
+  --suite-near: #06180f;
+  --suite-water: #1c4552;
+  --suite-stars: 1;
+}
+[data-suite]:not([data-suite="classic"]) {
+  --card-ivory: var(--suite-plate);
+  --card-gold: var(--suite-gold);
+  --card-gold-text: var(--suite-gold-text);
+  --card-ink: var(--suite-ink);
+  --card-ink-muted: var(--suite-ink-muted);
+  --card-accent: var(--suite-accent);
+  --card-accent-text: var(--suite-accent-text);
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
@@ -278,6 +462,12 @@
   --color-card-accent: var(--card-accent);
   --color-card-accent-text: var(--card-accent-text);
   --color-card-back: var(--card-back);
+  --color-suite-plate: var(--suite-plate);
+  --color-suite-ink: var(--suite-ink);
+  --color-suite-gold: var(--suite-gold);
+  --color-suite-near: var(--suite-near);
+  --color-suite-sky-top: var(--suite-sky-top);
+  --color-suite-sky-bottom: var(--suite-sky-bottom);
   --color-tpl-rose-paper: var(--tpl-rose-paper);
   --color-tpl-rose-ink: var(--tpl-rose-ink);
   --color-tpl-rose-ornament: var(--tpl-rose-ornament);
@@ -910,5 +1100,133 @@
   }
   .story-progress:where(:dir(rtl)) {
     transform-origin: right;
+  }
+}
+
+/* Event suites (Step 12e): page turns and the slow life of each landscape */
+@keyframes suite-turn-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes suite-turn-arch {
+  from {
+    clip-path: ellipse(0% 0% at 50% 100%);
+  }
+  to {
+    clip-path: ellipse(160% 140% at 50% 100%);
+  }
+}
+@keyframes suite-turn-sweep {
+  from {
+    opacity: 0;
+    transform: translateX(10%);
+  }
+}
+@keyframes suite-turn-ripple {
+  from {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(1.05);
+  }
+}
+@keyframes suite-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.07);
+  }
+}
+@keyframes suite-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  50% {
+    transform: translateY(0.8px) rotate(0.6deg);
+  }
+}
+@keyframes suite-ripple {
+  0%,
+  100% {
+    transform: translateX(-1.5px);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateX(1.5px);
+    opacity: 0.9;
+  }
+}
+@keyframes suite-sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+@keyframes suite-jet {
+  0%,
+  100% {
+    transform: scaleY(0.92);
+    opacity: 0.75;
+  }
+  50% {
+    transform: scaleY(1.06);
+    opacity: 1;
+  }
+}
+@keyframes suite-walk {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-0.5px);
+  }
+}
+
+@layer components {
+  .suite-turn-fade {
+    animation: suite-turn-fade 0.9s ease-out both;
+  }
+  .suite-turn-arch {
+    animation: suite-turn-arch 1.1s cubic-bezier(0.65, 0, 0.35, 1) both;
+  }
+  .suite-turn-sweep {
+    animation: suite-turn-sweep 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .suite-turn-ripple {
+    animation: suite-turn-ripple 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .suite-drift {
+    animation: suite-drift var(--suite-duration, 8s) ease-out both;
+  }
+  .suite-bob {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: suite-bob 5s ease-in-out infinite;
+  }
+  .suite-ripple {
+    animation: suite-ripple 4.5s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .suite-sway {
+    transform-box: fill-box;
+    transform-origin: var(--suite-origin, 50% 100%);
+    animation: suite-sway 6s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .suite-jet {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: suite-jet 2.4s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .suite-walk {
+    transform-box: fill-box;
+    animation: suite-walk 1.6s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .suite-stars {
+    opacity: var(--suite-stars, 0);
   }
 }

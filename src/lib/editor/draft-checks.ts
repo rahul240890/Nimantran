@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SUITE_IDS } from "@/lib/suites/catalog";
 import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
@@ -105,6 +106,8 @@ export const draftSchema = z.object({
     .catch(["en"]),
   /** The card's wording in the second language; an empty slot repeats the main words. */
   translation: z.partialRecord(z.enum(SLOT_IDS), z.string().max(200)).catch({}),
+  /** The event pages' theme (Step 12e). Null follows the tradition's or design's own. */
+  suite: z.enum(SUITE_IDS).nullable().catch(null),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

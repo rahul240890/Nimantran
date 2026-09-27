@@ -163,7 +163,7 @@ test.describe("invite editor", () => {
     );
     const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Marigold Gate.*Suggested for roka/);
-    await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).not.toHaveAccessibleName(
+    await expect(designs.filter({ hasText: "Kerala Kasavu" })).not.toHaveAccessibleName(
       /Suggested/,
     );
     await next(page);

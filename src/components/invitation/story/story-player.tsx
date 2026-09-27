@@ -1,17 +1,36 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, MailCheck, Pause, Play } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
+  MailCheck,
+  Music,
+  Navigation,
+  Pause,
+  Play,
+} from "lucide-react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+} from "react";
+import { createPortal } from "react-dom";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { SYMBOLS } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
+import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
 import { StoryScene } from "./story-scenes";
+import { SuiteBackdrop } from "./suite-backdrop";
 
 export type StoryLabels = {
   story: string;
@@ -20,85 +39,127 @@ export type StoryLabels = {
   next: string;
   previous: string;
   skip: string;
-  /** The last beat's way back to the card. */
+  /** The last page's way back to the card. */
   done: string;
+  directions: string;
+  calendar: string;
 };
 
 type StoryPlayerProps = {
   beats: readonly StoryBeat[];
   copy: CardCopy;
   template: Template;
+  /** The theme the pages are painted in (Step 12e). */
+  suite?: SuiteId;
   /** Still mode: no movement and no timer; the guest steps through with Next. */
   still: boolean;
   labels: StoryLabels;
   lang?: string;
-  /** The last beat's button, to the reply form. */
+  /** The last page's button, to the reply form. */
   reply?: { href: string; label: string } | null;
-  /** Move keyboard focus into the story (when the guest asked for it with a button). */
-  autoFocus?: boolean;
-  /** `hadFocus` says whether keyboard focus was inside the story as it closed. */
+  /** The card's music, so it can be paused without leaving the pages. */
+  music?: { playing: boolean; toggle: () => void; play: string; pause: string } | null;
+  /** `hadFocus` says whether keyboard focus was inside the pages as they closed. */
   onDone: (hadFocus: boolean) => void;
 };
 
-/* Sizes follow the panel (cqmin), within bounds that keep every line readable */
+/* Sizes follow the page (cqmin), within bounds that keep every line readable on a phone */
 const LINE_CLASS: Record<LineStyle, string> = {
   symbol: "",
   label:
-    "font-label text-[clamp(0.8rem,3.4cqmin,1.05rem)] tracking-[0.28em] text-card-gold-text uppercase",
-  script: "font-display text-[clamp(1.2rem,6cqmin,2rem)] leading-tight text-card-accent-text",
-  display: "font-display text-[clamp(1.55rem,8cqmin,2.7rem)] leading-[1.08] text-card-ink",
-  joiner: "font-display text-[clamp(1.2rem,6cqmin,2rem)] leading-none text-card-accent-text",
-  body: "font-sans text-[clamp(1rem,4.2cqmin,1.3rem)] text-card-ink-muted",
-  small: "font-sans text-[clamp(0.9rem,3.6cqmin,1.1rem)] text-card-ink-muted",
+    "font-label text-[clamp(0.85rem,3.6cqmin,1.15rem)] tracking-[0.26em] text-card-gold-text uppercase",
+  script: "font-display text-[clamp(1.35rem,6.4cqmin,2.4rem)] leading-tight text-card-accent-text",
+  display: "font-display text-[clamp(1.7rem,8.4cqmin,3.2rem)] leading-[1.08] text-card-ink",
+  joiner: "font-display text-[clamp(1.3rem,6.4cqmin,2.4rem)] leading-none text-card-accent-text",
+  body: "font-sans text-[clamp(1.05rem,4.6cqmin,1.45rem)] text-card-ink-muted",
+  small: "font-sans text-[clamp(1rem,4.1cqmin,1.25rem)] text-card-ink-muted",
 };
-/** The couple's names are the largest words in the story. */
-const NAME_CLASS = "font-display text-[clamp(2rem,12cqmin,3.8rem)] leading-[1.02] text-card-ink";
+/** The couple's names are the largest words of all. */
+const NAME_CLASS = "font-display text-[clamp(2.4rem,12cqmin,4.6rem)] leading-[1.02] text-card-ink";
+
+const TURN_CLASS = {
+  fade: "suite-turn-fade",
+  arch: "suite-turn-arch",
+  sweep: "suite-turn-sweep",
+  ripple: "suite-turn-ripple",
+} as const;
+/** How long the page underneath stays while the next one turns over it. */
+const TURN_MS = 1300;
+
+const subscribeNothing = () => () => {};
 
 /**
- * Plays an invitation's story over the opened card, beat by beat, with a progress bar
- * like a status update. Tap the right of the panel (or Next) to move on, the left to go
- * back; it pauses in a background tab. It uses the card's own colours and fonts.
+ * Plays an invitation's event pages over the whole screen, one page at a time, with a
+ * progress bar like a status update. Tap the right of the page (or swipe, or Next) to move
+ * on, the left to go back; it pauses in a background tab. Each page sits in its theme's
+ * landscape, with the words on a reading plate so they stay clear over any art.
  */
 export function StoryPlayer({
   beats,
   copy,
   template,
+  suite: suiteId = "classic",
   still,
   labels,
   lang,
   reply,
-  autoFocus = false,
+  music,
   onDone: onDoneProp,
 }: StoryPlayerProps) {
+  const suite = SUITES[suiteId];
+  const themed = suite.art !== "card";
   const root = useRef<HTMLElement>(null);
+  const mounted = useSyncExternalStore(
+    subscribeNothing,
+    () => true,
+    () => false,
+  );
   const onDone = useCallback(
     () => onDoneProp(Boolean(root.current?.contains(document.activeElement))),
     [onDoneProp],
   );
-  useEffect(() => {
-    if (autoFocus) root.current?.focus({ preventScroll: true });
-  }, [autoFocus]);
-  const [index, setIndex] = useState(0);
+
+  const [turn, setTurn] = useState<{ index: number; from: number | null }>({
+    index: 0,
+    from: null,
+  });
+  const index = turn.index;
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
   const beat = beats[index];
   const last = index >= beats.length - 1;
   const running = !still && !paused && !hidden;
 
+  const go = useCallback(
+    (to: number) =>
+      setTurn((t) =>
+        to === t.index || to < 0 || to >= beats.length
+          ? t
+          : { index: to, from: still ? null : t.index },
+      ),
+    [beats.length, still],
+  );
   const next = useCallback(() => {
     if (last) onDone();
-    else setIndex((i) => i + 1);
-  }, [last, onDone]);
-  const previous = useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
+    else go(index + 1);
+  }, [last, onDone, go, index]);
+  const previous = useCallback(() => go(index - 1), [go, index]);
 
-  // Time spent on the current beat before a pause, so resuming carries on where it was
+  // The page underneath goes once the new one has turned over it
+  useEffect(() => {
+    if (turn.from === null) return;
+    const timer = window.setTimeout(() => setTurn((t) => ({ ...t, from: null })), TURN_MS);
+    return () => window.clearTimeout(timer);
+  }, [turn]);
+
+  // Time spent on the current page before a pause, so resuming carries on where it was
   const spent = useRef({ index: -1, ms: 0 });
   const seconds = beat?.seconds ?? 0;
   useEffect(() => {
     if (!running) return;
     const already = spent.current.index === index ? spent.current.ms : 0;
     const start = performance.now();
-    // The last beat stays until the guest acts, so the reply button can be pressed
+    // The last page stays until the guest acts, so the reply button can be pressed
     const timer = last ? null : window.setTimeout(next, Math.max(0, seconds * 1000 - already));
     return () => {
       if (timer !== null) window.clearTimeout(timer);
@@ -112,49 +173,137 @@ export function StoryPlayer({
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, []);
 
-  if (!beat) return null;
-  const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
-  const delay = (i: number) =>
-    still ? undefined : ({ "--story-delay": `${lineDelay(i)}s` } as CSSProperties);
-  const offset = sacred ? 1 : 0;
+  // The pages cover the whole screen: take focus, and keep the page behind from scrolling
+  useEffect(() => {
+    if (!mounted) return;
+    root.current?.focus({ preventScroll: true });
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    return () => {
+      html.style.overflow = before;
+    };
+  }, [mounted]);
 
-  return (
+  // A swipe turns the page; the click that follows it is ignored
+  const swipe = useRef<{ x: number; y: number; swiped: boolean } | null>(null);
+
+  if (!beat || !mounted) return null;
+  const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
+  const look = pageLook(beat.scene);
+  const pages = turn.from !== null && beats[turn.from] ? [turn.from, index] : [index];
+
+  return createPortal(
     <section
       ref={root}
       tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
       aria-label={labels.story}
       lang={lang}
       data-story-beat={beat.id}
-      className="absolute inset-0 z-10 flex justify-center outline-none"
-      style={stockStyle(template)}
+      data-suite={suite.id}
+      data-mood={look.mood}
+      className={cn(
+        "fixed inset-0 z-[70] flex justify-center overflow-hidden outline-none",
+        themed ? "bg-suite-near" : "bg-card-back",
+      )}
+      style={themed ? undefined : stockStyle(template)}
       onKeyDown={(event) => {
-        if (event.key === "ArrowRight") next();
-        else if (event.key === "ArrowLeft") previous();
+        if (event.key === "Tab") {
+          // Keep keyboard focus inside the pages while they cover the screen
+          const focusable = [
+            ...(root.current?.querySelectorAll<HTMLElement>("a[href], button:not(:disabled)") ??
+              []),
+          ];
+          const first = focusable[0];
+          const final = focusable.at(-1);
+          if (!first || !final) return;
+          const active = document.activeElement;
+          if (event.shiftKey && (active === first || active === root.current)) final.focus();
+          else if (!event.shiftKey && active === final) first.focus();
+          else return;
+        } else if (event.key === "ArrowRight") (rtl ? previous : next)();
+        else if (event.key === "ArrowLeft") (rtl ? next : previous)();
         else if (event.key === "Escape") onDone();
         else return;
         event.preventDefault();
       }}
     >
+      {/* On wide screens the page's own landscape, blurred, fills the sides */}
+      {themed && (
+        <div aria-hidden data-mood={look.mood} className="absolute inset-0 hidden md:block">
+          <SuiteBackdrop
+            suite={suite}
+            image={suite.images[look.art]}
+            className="absolute inset-0 scale-110 opacity-70 blur-2xl"
+          />
+          <div className="absolute inset-0 bg-scrim/40" />
+        </div>
+      )}
+
       <div
-        className="[container-type:size] relative h-full w-full max-w-[34rem] animate-fade-in overflow-hidden rounded-xl border border-card-gold/50 bg-card-ivory shadow-raised"
+        className="[container-type:size] relative h-full w-full overflow-hidden md:max-w-[min(100%,calc(100dvh*0.62))] md:shadow-overlay"
+        onPointerDown={(event) => {
+          swipe.current = { x: event.clientX, y: event.clientY, swiped: false };
+        }}
+        onPointerUp={(event) => {
+          const start = swipe.current;
+          if (!start) return;
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+            start.swiped = true;
+            // Swiping left brings the next page, as in a book (reversed right to left)
+            if (dx < 0 !== rtl) next();
+            else previous();
+          }
+        }}
         onClick={(event) => {
-          // A tap on the left third goes back, anywhere else moves on (not on the buttons)
+          if (swipe.current?.swiped) {
+            swipe.current = null;
+            return;
+          }
+          // A tap on the start third goes back, anywhere else moves on (not on the buttons)
           if ((event.target as HTMLElement).closest("button, a")) return;
           const box = event.currentTarget.getBoundingClientRect();
-          const fromStart =
-            getComputedStyle(event.currentTarget).direction === "rtl"
-              ? box.right - event.clientX
-              : event.clientX - box.left;
+          const fromStart = rtl ? box.right - event.clientX : event.clientX - box.left;
           if (fromStart < box.width / 3) previous();
           else next();
         }}
       >
-        <StoryScene key={`scene-${beat.id}`} scene={beat.scene} />
+        {pages.map((i) => {
+          const b = beats[i]!;
+          const current = i === index;
+          return (
+            <Page
+              key={b.id}
+              beat={b}
+              copy={copy}
+              suite={suiteId}
+              still={still}
+              reply={last && current ? reply : null}
+              labels={labels}
+              onReply={onDone}
+              inert={!current}
+              className={cn(
+                current && pages.length > 1 && TURN_CLASS[suite.turn],
+                !current && "pointer-events-none",
+              )}
+            />
+          );
+        })}
 
-        {/* One bar per beat: done, playing, or still to come */}
-        <div aria-hidden className="absolute inset-x-3 top-3 flex gap-1">
+        {/* One bar per page: done, showing, or still to come */}
+        <div
+          aria-hidden
+          className="absolute inset-x-3 top-[max(0.75rem,env(safe-area-inset-top))] z-10 flex gap-1"
+        >
           {beats.map((b, i) => (
-            <span key={b.id} className="h-1 flex-1 overflow-hidden rounded-full bg-card-ink/15">
+            <span
+              key={b.id}
+              className="h-1 flex-1 overflow-hidden rounded-full bg-card-ivory/40 shadow-raised"
+            >
               {i < index && <span className="block h-full w-full bg-card-gold" />}
               {i === index && (
                 <span
@@ -175,8 +324,8 @@ export function StoryPlayer({
           ))}
         </div>
 
-        {/* Back and Next at the start, Pause and Skip at the end, under the progress bar */}
-        <div className="absolute inset-x-2 top-6 z-10 flex items-center justify-between gap-2">
+        {/* Back and Next at the start; music, Pause and Skip at the end */}
+        <div className="absolute inset-x-2 top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-10 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1">
             <IconButton
               label={labels.previous}
@@ -197,6 +346,15 @@ export function StoryPlayer({
             )}
           </div>
           <div className="flex items-center gap-1">
+            {music && (
+              <IconButton
+                label={music.playing ? music.pause : music.play}
+                icon={music.playing ? <Pause /> : <Music />}
+                size="sm"
+                onClick={music.toggle}
+                className="bg-surface/85 backdrop-blur-sm"
+              />
+            )}
             {!still && !last && (
               <IconButton
                 label={paused ? labels.play : labels.pause}
@@ -216,14 +374,71 @@ export function StoryPlayer({
             </Button>
           </div>
         </div>
+      </div>
+    </section>,
+    document.body,
+  );
+}
 
+/** One full-screen page: its landscape, its function scene, and its words on the plate. */
+function Page({
+  beat,
+  copy,
+  suite: suiteId,
+  still,
+  reply,
+  labels,
+  onReply,
+  inert,
+  className,
+}: {
+  beat: StoryBeat;
+  copy: CardCopy;
+  suite: SuiteId;
+  still: boolean;
+  reply: { href: string; label: string } | null | undefined;
+  labels: StoryLabels;
+  onReply: () => void;
+  inert: boolean;
+  className?: string;
+}) {
+  const suite = SUITES[suiteId];
+  const themed = suite.art !== "card";
+  const look = pageLook(beat.scene);
+  const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
+  const delay = (i: number) =>
+    still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
+  const offset = sacred ? 1 : 0;
+  const after = beat.lines.length + offset;
+
+  return (
+    <div
+      data-mood={look.mood}
+      data-page={beat.id}
+      inert={inert}
+      className={cn("absolute inset-0 bg-card-ivory", className)}
+    >
+      {themed && (
+        <SuiteBackdrop
+          suite={suite}
+          image={suite.images[look.art]}
+          seconds={still ? undefined : beat.seconds}
+          className="absolute inset-0 overflow-hidden"
+        />
+      )}
+      <StoryScene scene={beat.scene} themed={themed} />
+
+      <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
         <div
-          key={`words-${beat.id}`}
-          className="absolute inset-x-[9%] top-[24%] bottom-[20%] flex flex-col items-center justify-center gap-[1.8cqmin] text-center"
+          className={cn(
+            "flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
+            themed &&
+              "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
+          )}
         >
           {sacred && (
             <span
-              className="story-line mb-[1cqmin] block size-[clamp(4rem,26cqmin,7.5rem)]"
+              className="story-line mb-[1cqmin] block size-[clamp(4rem,22cqmin,7.5rem)] shrink-0"
               style={delay(0)}
             >
               {sacred.kind === "art" ? (
@@ -237,7 +452,7 @@ export function StoryPlayer({
                 <span
                   aria-hidden
                   className={cn(
-                    "block text-center text-[clamp(3.4rem,22cqmin,6.5rem)] leading-none text-card-accent-text",
+                    "block text-center text-[clamp(3.4rem,20cqmin,6.5rem)] leading-none text-card-accent-text",
                     sacred.font === "display" ? "font-display" : "font-sans",
                   )}
                 >
@@ -252,7 +467,7 @@ export function StoryPlayer({
               lang={line.lang}
               className={cn(
                 "story-line max-w-full text-balance break-words",
-                beat.scene === "names" && line.style === "display"
+                beat.scene === "cover" && line.style === "display"
                   ? NAME_CLASS
                   : LINE_CLASS[line.style],
               )}
@@ -261,10 +476,33 @@ export function StoryPlayer({
               {line.text}
             </p>
           ))}
-          {last && reply && (
-            <span className="story-line mt-[2cqmin]" style={delay(beat.lines.length)}>
+          {beat.links && (
+            <span
+              className="story-line mt-[1.5cqmin] flex flex-wrap justify-center gap-2"
+              style={delay(after)}
+            >
+              {beat.links.maps && (
+                <Button asChild variant="secondary" size="sm">
+                  <a href={beat.links.maps} target="_blank" rel="noopener noreferrer">
+                    <Navigation aria-hidden />
+                    {labels.directions}
+                  </a>
+                </Button>
+              )}
+              {beat.links.calendar && (
+                <Button asChild variant="secondary" size="sm">
+                  <a href={beat.links.calendar} download>
+                    <CalendarPlus aria-hidden />
+                    {labels.calendar}
+                  </a>
+                </Button>
+              )}
+            </span>
+          )}
+          {reply && (
+            <span className="story-line mt-[2cqmin]" style={delay(after)}>
               <Button asChild size="lg">
-                <a href={reply.href} onClick={onDone}>
+                <a href={reply.href} onClick={onReply}>
                   <MailCheck aria-hidden />
                   {reply.label}
                 </a>
@@ -273,6 +511,6 @@ export function StoryPlayer({
           )}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { createContext, use, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import type { StorySceneId } from "@/lib/engine/story";
 
@@ -94,8 +94,13 @@ function Falling({
   );
 }
 
+/** On a themed page the landscape owns the ground, so only the top bands are drawn. */
+const Themed = createContext(false);
+
 /** A band of art pinned to the top or bottom of the panel at full width. */
 function Band({ edge, children }: { edge: "top" | "bottom"; children: ReactNode }) {
+  const themed = use(Themed);
+  if (themed && edge === "bottom") return null;
   return (
     <svg
       aria-hidden
@@ -706,12 +711,13 @@ const RICE = ["var(--card-gold)", "var(--motion-turmeric)"];
 const CONFETTI = ["var(--card-gold)", "var(--card-accent)", "var(--marigold)"];
 
 /** The scene for a beat. The glow behind the words keeps them readable over everything. */
-export function StoryScene({ scene }: { scene: StorySceneId }) {
+export function StoryScene({ scene, themed = false }: { scene: StorySceneId; themed?: boolean }) {
   let art: ReactNode = null;
   switch (scene) {
-    case "blessing":
+    case "cover":
       art = (
         <>
+          {!themed && <Arch />}
           <div
             aria-hidden
             className="story-halo absolute inset-x-0 top-[18%] mx-auto aspect-square w-[70%]"
@@ -720,10 +726,7 @@ export function StoryScene({ scene }: { scene: StorySceneId }) {
         </>
       );
       break;
-    case "names":
-      art = <Arch />;
-      break;
-    case "date":
+    case "family":
       art = <Toran />;
       break;
     case "roka":
@@ -822,9 +825,9 @@ export function StoryScene({ scene }: { scene: StorySceneId }) {
   }
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0">
-      {art}
-      {/* A pool of the card's paper behind the words */}
-      <div className="story-pool absolute inset-x-[4%] top-[26%] bottom-[22%]" />
+      <Themed value={themed}>{art}</Themed>
+      {/* A pool of the card's paper behind the words (themed pages have a reading plate) */}
+      {!themed && <div className="story-pool absolute inset-x-[4%] top-[26%] bottom-[22%]" />}
     </div>
   );
 }
