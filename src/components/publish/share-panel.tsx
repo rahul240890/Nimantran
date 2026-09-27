@@ -186,7 +186,7 @@ export function SharePanel({
               <div className="ms-auto max-w-sm overflow-hidden rounded-lg rounded-se-sm border border-success/25 bg-success/10 shadow-raised">
                 {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
                 <img
-                  src={`/i/${slug}/opengraph-image`}
+                  src={`/i/${slug}/cover`}
                   alt=""
                   width={1200}
                   height={630}

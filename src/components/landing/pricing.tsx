@@ -29,7 +29,8 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
           className="absolute inset-x-6 top-0 h-px bg-linear-to-r from-transparent via-marigold to-transparent"
         />
       ) : null}
-      <div className="flex items-center justify-between gap-3">
+      {/* Wraps below the name on the narrowest phones rather than poking out of the card */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <h3 className="font-display text-2xl">{plan.name}</h3>
         {plan.badge ? (
           <Badge tone="gold" dot>
