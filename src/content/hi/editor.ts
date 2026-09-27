@@ -433,6 +433,7 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
     "phulkari-haveli": "फुलकारी हवेली",
     rajbari: "राजबाड़ी",
     "peshwai-wada": "पेशवाई वाडा",
+    "kutch-toran": "कच्छ तोरण",
     classic: "कार्ड के रंग",
   },
   descriptions: {
@@ -443,6 +444,7 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
     "phulkari-haveli": "फुलकारी से सजी पंजाबी हवेली, ढोल, गेंदे और सरसों के खेत।",
     rajbari: "लाल-सफ़ेद पुरानी बंगाली हवेली, केले के पौधे और शोला के फूल।",
     "peshwai-wada": "पैठणी रंगों में पेशवाकालीन लकड़ी का वाडा, रंगोली और आम के पत्ते।",
+    "kutch-toran": "शीशे के काम और बांधनी से सजा कच्छ का भूंगा आँगन, पीछे सफ़ेद रण।",
     classic: "आपके कार्ड के ही काग़ज़ और रंगों में पन्ने, हर रस्म का अपना दृश्य।",
   },
 };

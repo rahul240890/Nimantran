@@ -260,7 +260,7 @@ export function Doorway({
           >
             <div
               lang={lang}
-              data-tone={paintedTone("cover")}
+              data-tone={paintedTone("cover", suite)}
               className="story-print isolate flex max-h-full w-full flex-col items-center gap-[2cqmin] px-[4cqmin] text-center text-card-ink"
             >
               <span

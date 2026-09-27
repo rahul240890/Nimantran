@@ -20,6 +20,7 @@ export const SUITE_IDS = [
   "phulkari-haveli",
   "rajbari",
   "peshwai-wada",
+  "kutch-toran",
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -54,13 +55,15 @@ export type PageArt = (typeof PAGE_ARTS)[number];
 
 /**
  * The paintings made at night have a dark middle, so the words printed on them turn light.
- * Every theme's sangeet, reception and closing page is painted at night.
+ * Most themes paint their sangeet, reception and closing page at night; a theme that paints
+ * a page otherwise says so in its `tones`.
  */
 const NIGHT_PAINTINGS: readonly PageArt[] = ["sangeet", "reception", "reply"];
 
 /** Whether the words on a painted page are dark (on a light middle) or light. */
-export function paintedTone(art: PageArt): "light" | "dark" {
-  return NIGHT_PAINTINGS.includes(art) ? "dark" : "light";
+export function paintedTone(art: PageArt, suite?: SuiteId): "light" | "dark" {
+  const own = suite ? SUITES[suite].tones?.[art] : undefined;
+  return own ?? (NIGHT_PAINTINGS.includes(art) ? "dark" : "light");
 }
 
 /** Which faiths a theme's own art suits. Faith-specific themes (a Nikah garden) come later. */
@@ -81,6 +84,8 @@ export type Suite = {
   traditions: readonly TraditionId[];
   /** Painted backgrounds under /public, by page. Pages without one draw the vector landscape. */
   images: Partial<Record<PageArt, string>>;
+  /** Pages painted in a different light from most themes' (a dusk baraat, a lit reception). */
+  tones?: Partial<Record<PageArt, "light" | "dark">>;
 };
 
 export const SUITES: Record<SuiteId, Suite> = {
@@ -109,7 +114,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     turn: "sweep",
     faiths: ["all"],
     template: "rangmahal",
-    traditions: ["rajasthani", "gujarati"],
+    traditions: ["rajasthani"],
     images: {
       cover: "/suites/shahi-savari/cover.webp",
       family: "/suites/shahi-savari/family.webp",
@@ -219,6 +224,27 @@ export const SUITES: Record<SuiteId, Suite> = {
       reply: "/suites/peshwai-wada/reply.webp",
     },
   },
+  // A Kutch bhunga courtyard in mirror work and bandhani, the white Rann beyond
+  "kutch-toran": {
+    id: "kutch-toran",
+    art: "savari",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "bandhani",
+    traditions: ["gujarati"],
+    images: {
+      cover: "/suites/kutch-toran/cover.webp",
+      family: "/suites/kutch-toran/family.webp",
+      haldi: "/suites/kutch-toran/haldi.webp",
+      mehendi: "/suites/kutch-toran/mehendi.webp",
+      sangeet: "/suites/kutch-toran/sangeet.webp",
+      baraat: "/suites/kutch-toran/baraat.webp",
+      wedding: "/suites/kutch-toran/wedding.webp",
+      reception: "/suites/kutch-toran/reception.webp",
+      reply: "/suites/kutch-toran/reply.webp",
+    },
+    tones: { baraat: "dark", reception: "light", reply: "light" },
+  },
   classic: {
     id: "classic",
     art: "card",
@@ -236,7 +262,7 @@ const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
   gopuram: "kayal",
   alpona: "rajbari",
   rangmahal: "shahi-savari",
-  bandhani: "shahi-savari",
+  bandhani: "kutch-toran",
   phulkari: "phulkari-haveli",
   paithani: "peshwai-wada",
   emerald: "rajwada-bagh",

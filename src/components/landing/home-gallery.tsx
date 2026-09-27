@@ -21,7 +21,13 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
   const { galleryCopy, occasionTaglines } = galleryText[locale];
   const gallery = pagePath({ kind: "gallery" }, locale);
   const live = OCCASIONS.filter((occasion) => occasion.category);
-  const soon = OCCASIONS.filter((occasion) => !occasion.category).slice(0, 10);
+  const coming = OCCASIONS.filter((occasion) => !occasion.category);
+  // Each painting once: occasions sharing one (a baby shower and a naming ceremony) show the first
+  const paintedSoon = coming.filter(
+    (occasion, index) =>
+      occasion.tile && coming.findIndex((other) => other.tile === occasion.tile) === index,
+  );
+  const soon = coming.filter((occasion) => !paintedSoon.includes(occasion)).slice(0, 10);
   const other = locale === "en" ? "hi" : "en";
 
   return (
@@ -76,10 +82,29 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
           ))}
         </ul>
 
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col items-center gap-5 text-center">
           <p className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
             {homeGallery.soonHeading}
           </p>
+          <ul className="grid w-full grid-cols-2 gap-3 text-start sm:grid-cols-3 sm:gap-4 lg:grid-cols-7">
+            {paintedSoon.slice(0, 7).map((occasion, index) => (
+              // Six fill two or three even rows on smaller screens; the seventh joins at full width
+              <li
+                key={occasion.id}
+                className={cn("reveal-on-scroll", index === 6 && "hidden lg:block")}
+              >
+                <OccasionTile
+                  occasion={occasion}
+                  name={occasion.names[locale]}
+                  otherName={null}
+                  tagline=""
+                  href={null}
+                  soonLabel={galleryCopy.soon}
+                  compact
+                />
+              </li>
+            ))}
+          </ul>
           <ul className="flex flex-wrap justify-center gap-2">
             {soon.map((occasion) => (
               <li

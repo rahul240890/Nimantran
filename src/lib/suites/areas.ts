@@ -92,6 +92,17 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
     reception: [14, 44],
     reply: [30, 22, 30, 4],
   },
+  "kutch-toran": {
+    cover: [25, 40, 14, 14],
+    family: [20, 38],
+    haldi: [20, 42, 10, 12],
+    mehendi: [15, 42, 12, 12],
+    sangeet: [16, 50],
+    baraat: [16, 44],
+    wedding: [16, 38, 20, 20],
+    reception: [24, 46, 16, 16],
+    reply: [26, 36],
+  },
 };
 
 /** The calm part of a theme's painting for a page, where its words go. */

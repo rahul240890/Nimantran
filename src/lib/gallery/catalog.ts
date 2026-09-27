@@ -26,6 +26,8 @@ export type Occasion = {
   names: { en: string; hi: string };
   /** A painting for its tile: a theme and one of its pages. */
   art: { suite: SuiteId; page: PageArt } | null;
+  /** A painting made for the tile itself, in public/occasions, used before the theme's page. */
+  tile: string | null;
   /** Other words people search with, in any language. */
   keywords: readonly string[];
 };
@@ -40,6 +42,7 @@ const live = (
   category: id,
   names: { en: CATEGORIES[id].names.en, hi: CATEGORIES[id].names.hi },
   art,
+  tile: null,
   keywords: [...Object.values(CATEGORIES[id].names), ...keywords],
 });
 
@@ -48,7 +51,30 @@ const soon = (
   section: OccasionSection,
   names: Occasion["names"],
   keywords: readonly string[] = [],
-): Occasion => ({ id, section, category: null, names, art: null, keywords });
+): Occasion => ({ id, section, category: null, names, art: null, tile: null, keywords });
+
+/*
+ * Tile paintings made for occasions, in public/occasions. One painting can serve a few
+ * occasions (the baby's swing for a baby shower and a naming ceremony).
+ */
+const TILES: Record<string, string> = {
+  wedding: "wedding",
+  engagement: "engagement",
+  haldi: "haldi",
+  mehendi: "mehendi",
+  sangeet: "sangeet",
+  anniversary: "anniversary",
+  birthday: "birthday",
+  "baby-shower": "baby",
+  "naming-ceremony": "baby",
+  housewarming: "housewarming",
+  cocktail: "party",
+  diwali: "festival",
+  "shop-opening": "business",
+};
+
+const withTile = (occasion: Occasion): Occasion =>
+  TILES[occasion.id] ? { ...occasion, tile: `/occasions/${TILES[occasion.id]}.webp` } : occasion;
 
 export const OCCASIONS: readonly Occasion[] = [
   live("wedding", { suite: "rajwada-bagh", page: "wedding" }, [
@@ -141,7 +167,7 @@ export const OCCASIONS: readonly Occasion[] = [
     "corporate",
     "team",
   ]),
-];
+].map(withTile);
 
 export function occasionById(id: string): Occasion | undefined {
   return OCCASIONS.find((occasion) => occasion.id === id);
@@ -191,8 +217,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
   gujarati: {
     id: "gujarati",
     ...pack("gujarati"),
-    art: { suite: "shahi-savari", page: "sangeet" },
-    suites: ["shahi-savari"],
+    art: { suite: "kutch-toran", page: "sangeet" },
+    suites: ["kutch-toran", "shahi-savari"],
     cards: ["bandhani"],
     keywords: ["gujrati", "kutch", "kathiawadi", "patel", "kankotri", "hast melap"],
   },

@@ -407,6 +407,7 @@ export const suiteCopy = {
     "phulkari-haveli": "Phulkari Haveli",
     rajbari: "Rajbari",
     "peshwai-wada": "Peshwai Wada",
+    "kutch-toran": "Kutch Toran",
     classic: "Card colours",
   },
   descriptions: {
@@ -418,6 +419,7 @@ export const suiteCopy = {
       "A Punjab haveli dressed in phulkari, with dhol, marigolds and mustard fields.",
     rajbari: "An old Bengal mansion in red and white, with banana plants and shola flowers.",
     "peshwai-wada": "A Peshwa-era wooden wada in paithani colours, with rangoli and mango leaves.",
+    "kutch-toran": "A Kutch bhunga courtyard in mirror work and bandhani, the white Rann beyond.",
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
 } as const;
