@@ -100,12 +100,12 @@ Search volumes are **not yet measured**. Check every cluster in Google Keyword P
 
 ### Technical checklist (Next.js metadata APIs)
 
-- [ ] `sitemap.ts` covering landing, template, tradition, category and blog pages in every language
-- [ ] `robots.ts` allowing public pages and blocking private areas (`/account`, `/create`, `/invites`, `/auth`)
-- [ ] **Guest invitation pages (`/i/…`) are `noindex, nofollow`** and excluded from the sitemap, so family names, addresses and dates never appear in search; link previews (Open Graph) still work for WhatsApp
-- [ ] Unique title (under 60 characters) and description (under 155) for every public page, in its language
-- [ ] Structured data (JSON-LD): Organization, WebSite, SoftwareApplication (with Offer prices), FAQPage on landing pages, BreadcrumbList, and ItemList on template galleries
-- [ ] Canonical URLs on every page; no duplicate pages across filters
+- [x] `sitemap.ts` covering landing, template, tradition, category and blog pages in every language
+- [x] `robots.ts` allowing public pages and blocking private areas (`/account`, `/create`, `/invites`, `/auth`)
+- [x] **Guest invitation pages (`/i/…`) are `noindex, nofollow`** and excluded from the sitemap, so family names, addresses and dates never appear in search; link previews (Open Graph) still work for WhatsApp
+- [x] Unique title (under 60 characters) and description (under 155) for every public page, in its language
+- [x] Structured data (JSON-LD): Organization, WebSite, SoftwareApplication (with Offer prices), FAQPage on landing pages, BreadcrumbList, and ItemList on template galleries
+- [x] Canonical URLs on every page; no duplicate pages across filters
 - [ ] Open Graph and X card images per page type
 - [ ] Core Web Vitals within Google's "good" range on mobile (the quality bar's Lighthouse 90+ covers most of this); the 3D scene loads after the content so text is crawlable
 - [ ] Images with descriptive alt text in the page's language

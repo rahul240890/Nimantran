@@ -16,7 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLocale, useText } from "@/i18n/client";
 import { landingText } from "@/i18n/copy";
-import { UI_LOCALES, homePath, isUiLocale, languages } from "@/i18n/locales";
+import { isUiLocale, languages } from "@/i18n/locales";
+import { switchLocalePath } from "@/lib/seo/paths";
 import { cn } from "@/lib/cn";
 
 type LanguageSwitcherProps = {
@@ -24,8 +25,6 @@ type LanguageSwitcherProps = {
   variant?: "compact" | "full";
   className?: string;
 };
-
-const HOME_PATHS = new Set(UI_LOCALES.map(homePath));
 
 /**
  * Every launch language in its own script. English and Hindi switch the site; the rest
@@ -43,8 +42,9 @@ export function LanguageSwitcher({ variant = "compact", className }: LanguageSwi
     if (!isUiLocale(code) || code === current) return;
     start(async () => {
       await setLocale(code);
-      // The home pages carry their language in the address; everywhere else re-renders in place
-      if (HOME_PATHS.has(pathname)) router.push(`${homePath(code)}${window.location.hash}`);
+      // Public pages carry their language in the address; everywhere else re-renders in place
+      const path = switchLocalePath(pathname, code);
+      if (path) router.push(`${path}${window.location.hash}`);
       else router.refresh();
     });
   };

@@ -33,6 +33,7 @@ import {
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
+import type { TraditionId } from "@/lib/traditions/schema";
 import type { TemplateId } from "@/lib/templates/schema";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -119,6 +120,7 @@ export function Editor({
   quality,
   initialTemplate,
   initialCategory,
+  initialTradition = null,
   signedIn = false,
   initialInvite = null,
   fresh = false,
@@ -127,6 +129,8 @@ export function Editor({
   quality: QualityChoice;
   initialTemplate: TemplateId | null;
   initialCategory: CategoryId | null;
+  /** A tradition picked on its page (?tradition=<id>). */
+  initialTradition?: TraditionId | null;
   /** Drafts save to the account as well as the device. */
   signedIn?: boolean;
   /** An invite opened from My invites (?invite=<id>). */
@@ -173,12 +177,15 @@ export function Editor({
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
       }
       if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
-      if (!initialTemplate && !initialCategory) return;
+      if (!initialTemplate && !initialCategory && !initialTradition) return;
       if (inviteDraft.get().draft.updatedAt !== 0) return;
       update((draft) => {
         let next = initialCategory ? withCategory(draft, initialCategory) : draft;
         if (draft.step === "occasion") next = { ...next, step: "design" };
         if (initialTemplate) next = { ...next, templateId: initialTemplate };
+        if (initialTradition) {
+          next = { ...next, tradition: { ...next.tradition, id: initialTradition, symbol: null } };
+        }
         return next;
       });
     })();
@@ -189,6 +196,7 @@ export function Editor({
     signedIn,
     initialTemplate,
     initialCategory,
+    initialTradition,
     update,
     router,
     syncCopy,

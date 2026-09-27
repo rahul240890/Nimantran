@@ -4,8 +4,9 @@ import { getLocale } from "@/i18n/server";
 
 /* The app's pages: the editor, accounts, guest lists and invitations. Language from the visitor. */
 
+// Nothing here is for search engines: the public pages live under (home) and (home-hi)
 export async function generateMetadata(): Promise<Metadata> {
-  return rootMetadata(await getLocale());
+  return { ...rootMetadata(await getLocale()), robots: { index: false, follow: false } };
 }
 
 export const viewport = rootViewport;

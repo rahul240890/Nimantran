@@ -2,13 +2,15 @@
 
 import { Menu } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { ThemeMenu, ThemeToggle } from "@/components/ui/theme-toggle";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
+import { homePath } from "@/i18n/locales";
 import { landingText, uiText } from "@/i18n/copy";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -16,10 +18,16 @@ import { AccountMenu } from "@/components/account/account-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { useActiveSection } from "./use-active-section";
 
-/** Moves to a section and puts keyboard focus on it, so screen readers continue from there. */
-function goToSection(id: string, still: boolean) {
+/**
+ * Moves to a section and puts keyboard focus on it, so screen readers continue from there.
+ * From another page, goes to that section of the home page.
+ */
+function goToSection(id: string, still: boolean, elsewhere: () => void) {
   const target = document.getElementById(id);
-  if (!target) return;
+  if (!target) {
+    elsewhere();
+    return;
+  }
   target.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
   target.focus({ preventScroll: true });
   history.replaceState(null, "", `#${id}`);
@@ -31,6 +39,8 @@ function MobileMenu() {
   const [open, setOpen] = useState(false);
   const pending = useRef<string | null>(null);
   const still = useReducedMotion();
+  const home = homePath(useLocale());
+  const router = useRouter();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -53,7 +63,7 @@ function MobileMenu() {
           if (!id) return;
           event.preventDefault();
           pending.current = null;
-          goToSection(id, still);
+          goToSection(id, still, () => router.push(`${home}#${id}`));
         }}
       >
         <nav aria-label={shell.primaryNav}>
@@ -61,7 +71,7 @@ function MobileMenu() {
             {nav.map((item) => (
               <li key={item.id}>
                 <a
-                  href={`#${item.id}`}
+                  href={`${home}#${item.id}`}
                   onClick={(event) => {
                     event.preventDefault();
                     pending.current = item.id;
@@ -115,6 +125,7 @@ export function SiteHeader() {
   const { uiStrings } = useText(uiText);
   const active = useActiveSection(useMemo(() => nav.map((item) => item.id), [nav]));
   const [scrolled, setScrolled] = useState(false);
+  const home = homePath(useLocale());
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -147,7 +158,7 @@ export function SiteHeader() {
             {nav.map((item) => (
               <li key={item.id}>
                 <a
-                  href={`#${item.id}`}
+                  href={`${home}#${item.id}`}
                   aria-current={active === item.id ? "true" : undefined}
                   className="relative inline-flex min-h-11 items-center rounded-full px-3 text-[0.95rem] font-semibold whitespace-nowrap text-ink-muted transition-colors hover:text-ink aria-[current=true]:text-ink"
                 >
