@@ -20,7 +20,7 @@ export { arch, type DoorSide, type Motif };
  * is in face units (inside 100 × 80, door 50 × 80); see decor.ts.
  */
 
-/* ---------- Marigold Gate: the Shubhdwar mandala ---------- */
+/* ---------- Marigold Gate: the mandala ornament ---------- */
 
 function mandalaShapes(): Shape[] {
   const outer = ring(16, 0, (deg) => ellipse(...turn(0, -70, deg), 8.5, 16, deg));

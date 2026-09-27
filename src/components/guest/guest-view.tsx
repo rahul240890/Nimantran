@@ -317,7 +317,7 @@ export function GuestView({
       <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
           <p className="flex items-center gap-2 text-sm text-ink-muted">
-            <BrandMark className="h-6 w-5 text-accent-text" />
+            <BrandMark className="size-6 text-accent-text" />
             {guestCopy.madeWith}
           </p>
           <Button asChild variant="ghost" size="sm">

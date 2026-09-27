@@ -18,9 +18,15 @@ export function Logo({ className, href = "/" }: LogoProps) {
         className,
       )}
     >
-      <BrandMark className="h-9 w-8 text-accent-text" />
-      <span className="font-display text-[1.375rem] leading-none tracking-[0.01em]">
-        {site.name}
+      <BrandMark className="size-9 text-accent-text" />
+      {/* SHUBH is the brand people remember; Invitation, smaller, says what it is. */}
+      <span className="flex flex-col gap-1">
+        <span className="font-display text-[1.375rem] leading-none tracking-[0.08em] uppercase">
+          {site.shortName}
+        </span>
+        <span className="font-label text-[0.6875rem] leading-none tracking-[0.24em] text-ink-muted">
+          Invitation
+        </span>
       </span>
     </Link>
   );

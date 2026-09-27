@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Shubhdwar design tokens.
+ * Shubh Invitation design tokens.
  * Light theme on :root, dark theme via the OS setting or data-theme="dark".
  * Components use the Tailwind names below (bg-paper, text-ink, border-line …), never raw colours.
  */

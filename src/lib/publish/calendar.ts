@@ -82,7 +82,7 @@ export function icsCalendar(entries: CalendarEntry[], now: Date = new Date()): s
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Shubhdwar//Invitations//EN",
+    "PRODID:-//Shubh Invitation//Invitations//EN",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
   ];

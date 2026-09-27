@@ -42,7 +42,7 @@ test.describe("search engines", () => {
 
   test("each page links its language versions and describes itself", async ({ page }) => {
     await page.goto("/traditions/tamil");
-    await expect(page).toHaveTitle("Tamil kalyana pathirikai online · Shubhdwar");
+    await expect(page).toHaveTitle("Tamil kalyana pathirikai online · Shubh Invitation");
     await expect(page.locator('link[hreflang="hi-IN"]')).toHaveAttribute(
       "href",
       /\/hi\/traditions\/tamil$/,

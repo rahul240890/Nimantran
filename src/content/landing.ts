@@ -5,7 +5,7 @@ import type { TemplateId } from "@/lib/templates/schema";
  */
 
 export const homeMeta = {
-  title: "Shubhdwar · 3D invitations your guests open, turn and keep",
+  title: "Shubh Invitation · 3D invitations your guests open, turn and keep",
   description:
     "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings and every celebration after.",
   tagline: "3D invitations your guests open, turn and keep",
@@ -38,7 +38,7 @@ export const shell = {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",
     languages: "Languages",
-    meaning: "the auspicious doorway",
+    meaning: "Invitations that come alive.",
     madeIn: "Made in India",
     rights: "All rights reserved.",
   },
@@ -185,7 +185,7 @@ export const faq = {
     },
     {
       q: "Will it work on older or slower phones?",
-      a: "Yes. Shubhdwar checks each phone and shows a lighter version when needed, so every guest can open the invite and reply.",
+      a: "Yes. Shubh checks each phone and shows a lighter version when needed, so every guest can open the invite and reply.",
     },
     {
       q: "Can I make the invite in Hindi, Tamil or another language?",
@@ -214,7 +214,7 @@ export const waitlist = {
   eyebrow: "Early access",
   title: "Be first to send one",
   intro:
-    "We are opening Shubhdwar to couples in small groups. Leave your details and we will write when your spot opens.",
+    "We are opening Shubh to couples in small groups. Leave your details and we will write when your spot opens.",
   perks: [
     "An early spot before public launch",
     "Premium free for your first event",

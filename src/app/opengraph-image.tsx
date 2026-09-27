@@ -22,10 +22,12 @@ const fontFile = (pkg: string, file: string) =>
   readFile(join(process.cwd(), "node_modules", "@fontsource", pkg, "files", file));
 
 export default async function Image() {
-  const [rozha, tenor] = await Promise.all([
+  const [rozha, tenor, icon] = await Promise.all([
     fontFile("rozha-one", "rozha-one-latin-400-normal.woff"),
     fontFile("tenor-sans", "tenor-sans-latin-400-normal.woff"),
+    readFile(join(process.cwd(), "public", "brand", "shubh-icon.png")),
   ]);
+  const iconSrc = `data:image/png;base64,${icon.toString("base64")}`;
 
   return new ImageResponse(
     <div
@@ -41,21 +43,30 @@ export default async function Image() {
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 28 }}>
-        <div
-          style={{
-            fontFamily: "Tenor Sans",
-            fontSize: 26,
-            letterSpacing: 8,
-            color: colors.accentText,
-          }}
-        >
-          {site.name.toUpperCase()}
+        {/* The lockup: the app icon, then SHUBH over a smaller Invitation */}
+        <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+          <img src={iconSrc} width={88} height={88} alt="" />
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ fontFamily: "Rozha One", fontSize: 44, letterSpacing: 6, lineHeight: 1 }}>
+              {site.shortName.toUpperCase()}
+            </div>
+            <div
+              style={{
+                fontFamily: "Tenor Sans",
+                fontSize: 22,
+                letterSpacing: 6,
+                color: colors.accentText,
+              }}
+            >
+              Invitation
+            </div>
+          </div>
         </div>
         <div style={{ fontFamily: "Rozha One", fontSize: 76, lineHeight: 1.05 }}>
-          Invitations that open like doors.
+          Invitations that come alive.
         </div>
         <div style={{ fontFamily: "Tenor Sans", fontSize: 28, color: colors.inkMuted }}>
-          3D invites · WhatsApp · RSVP in one tap
+          Animated 3D invites · RSVP in one tap
         </div>
       </div>
 

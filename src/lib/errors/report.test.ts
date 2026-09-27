@@ -9,11 +9,14 @@ describe("describeError", () => {
   });
 
   it("names what failed to load instead of [object Event]", () => {
-    const script = { nodeName: "SCRIPT", src: "https://shubhdwar.in/_next/static/chunks/a.js?v=1" };
+    const script = {
+      nodeName: "SCRIPT",
+      src: "https://shubhinvitation.com/_next/static/chunks/a.js?v=1",
+    };
     const event = new Event("error");
     Object.defineProperty(event, "target", { value: script });
     expect(describeError(event).message).toBe(
-      "error event on SCRIPT https://shubhdwar.in/_next/static/chunks/a.js",
+      "error event on SCRIPT https://shubhinvitation.com/_next/static/chunks/a.js",
     );
   });
 

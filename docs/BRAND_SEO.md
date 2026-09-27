@@ -1,77 +1,63 @@
-# Shubhdwar — brand and SEO plan
+# Shubh Invitation — brand and SEO plan
 
-**Decision (26 September 2026):** the product is named **Shubhdwar** (शुभद्वार, "auspicious doorway"). "Nimantran" stays only as the repository name and in history.
+**Decision (27 September 2026):** the product is named **Shubh Invitation**, called **Shubh** for short and in the app. It replaces Shubhdwar (26 September 2026), which replaced Nimantran. "Nimantran" stays as the repository name; "Nimantran" and "Shubhdwar" stay in history and in a few hidden keys (section 4).
 
-Build steps: owner task B1 (secure the name), Step 8a (rename in code), Step 12b (SEO foundations), and ASO in Step 33. See [PLAN.md](PLAN.md).
+Build steps: owner task B1 (secure the name), Step 8b (rename in code), Step 12b (SEO foundations), and ASO in Step 33. See [PLAN.md](PLAN.md).
 
 ---
 
-## 1. Why not "Nimantran"
+## 1. The brand
 
-The name is already used by several invitation products, including a direct competitor:
+|                  |                                                                                                                                                                                                                                                                                        |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App name         | Shubh                                                                                                                                                                                                                                                                                  |
+| Full brand name  | Shubh Invitation                                                                                                                                                                                                                                                                       |
+| Website name     | Shubh Invitation                                                                                                                                                                                                                                                                       |
+| Domain (planned) | `shubhinvitation.com`, not yet bought. The live address comes from `NEXT_PUBLIC_SITE_URL`, so nothing in the code points at it until the owner sets that                                                                                                                               |
+| Tagline          | Invitations That Come Alive. (in running copy: "Invitations that come alive.")                                                                                                                                                                                                         |
+| Second tagline   | Create. Invite. Celebrate.                                                                                                                                                                                                                                                             |
+| Hindi            | शुभ इन्विटेशन; tagline "निमंत्रण, जो जीवंत हो उठें।"                                                                                                                                                                                                                                   |
+| Meaning          | _Shubh_ is an auspicious, beautiful beginning. The product is not limited to Indian weddings: weddings, birthdays, anniversaries, baby showers, engagements, festivals, parties, graduations, corporate events, religious occasions and every other celebration, anywhere in the world |
 
-| Product                                                                                                                                                                     | What it is                                                                                                                |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [NIMNTRN](https://nimntrn.com/digital-invitation)                                                                                                                           | Interactive invitations with RSVP, maps, schedules and WhatsApp sharing; run by a registered company; claims 500+ couples |
-| [nimantran.app](https://nimantran.app/)                                                                                                                                     | Digital invitation site                                                                                                   |
-| [Nimantran (निमंत्रण) on Google Play](https://play.google.com/store/apps/details?id=com.argames.nimantran&hl=en_US)                                                         | Code-based digital invitation app                                                                                         |
-| [nimantraninvitation.com](https://www.nimantraninvitation.com/), [nimantran.info](https://nimantran.info/), [Kerala studio](https://nimantranm-kerala-invites.lovable.app/) | Other invitation businesses                                                                                               |
+**Positioning:** Shubh is an AI-powered interactive invitation platform for creating beautiful digital, animated and 3D invitations for every occasion.
 
-Searches for our name would land on competitors, and trademark protection would be weak. Other common words for invitation are crowded too ("Nyota": [Nyota Invite](https://play.google.com/store/apps/details?id=com.kpro.nyota&hl=en_IN), [thenyota.app](https://thenyota.app/features/), [Pehla Nyota](https://pehlanyota.com/)).
+**App store description:** "Shubh — Create beautiful invitations for every celebration. Design personalized digital, animated and immersive 3D invitations with AI, then share them instantly with friends, family and guests anywhere in the world."
 
-A search on 26 September 2026 found no invitation product named Shubhdwar. That is not a legal check; task B1 does that.
+### How to write the name
 
-## 2. The name
+- Full name: **Shubh Invitation**, two words, capital S and capital I. Use it in page titles, link previews, legal text and the first mention on a page.
+- Short name: **Shubh**. Use it in short everyday copy: "Sign in to Shubh", "Welcome to Shubh", "Made with Shubh".
+- In code: `site.name` is the full name, `site.shortName` is Shubh, `site.nameDevanagari` is the Hindi name (`src/lib/site.ts`).
+- Hindi copy always uses the full name, शुभ इन्विटेशन, because शुभ alone reads as the adjective "auspicious" inside a sentence.
+- Never "ShubhInvitation", "Shubh Invitations" or "Shubh-Invitation" in our copy.
 
-|               |                                                                                                              |
-| ------------- | ------------------------------------------------------------------------------------------------------------ |
-| Name          | Shubhdwar                                                                                                    |
-| Devanagari    | शुभद्वार                                                                                                     |
-| Meaning       | _Shubh_ (auspicious) + _dwar_ (door, gateway)                                                                |
-| Say it        | shubh-dwaar                                                                                                  |
-| Spelling rule | Always **Shubhdwar**, one word, capital S only. Never "Shubh Dwar", "ShubhDwar" or "Shubhdwaar" in our copy. |
-| Other scripts | To be written by native speakers in Step 12 (Gujarati, Bengali, Tamil, Telugu, Kannada, Malayalam, Gurmukhi) |
+### Logo and icon
 
-**Why it fits:** the gate-fold card literally opens like doors; the toran and decorated doorway are how Indian homes welcome guests in every region; it works for weddings, griha pravesh, festivals and every later category; it is unique enough to own in search and to trademark.
+- **Lockup:** SHUBH above a smaller "Invitation", never both at the same weight. SHUBH in Rozha One, uppercase with wide tracking; "Invitation" in Tenor Sans, small, muted. The mark sits to the left (`src/components/brand/logo.tsx`).
+- **Mark:** a card rising from an open envelope, an S on the card and a celebration sparkle. It is the same idea as the app icon and belongs to no religion or region. The vector version (`src/components/brand/brand-mark.tsx`) follows the theme colours; the painted app icon (navy envelope, ivory card, gold S) is the favicon, the app icons and the link-preview badge (`src/app/icon.png`, `apple-icon.png`, `favicon.ico`, `public/brand/shubh-icon.png`).
+- The site palette, fonts and tokens stay as they are. The mandala remains an ornament in themes and the footer, no longer the brand mark.
 
-### Taglines (pick one; test with users)
+## 2. Earlier names
 
-- "Open the doors to your celebration."
-- "Every celebration begins at the door."
-- "Invitations that open like doors." (describes the product; good for ads)
-- Hindi: "शुभ शुरुआत, शुभद्वार से।"
+- **Nimantran** (until 26 September 2026): already used by several invitation products, including a direct competitor ([NIMNTRN](https://nimntrn.com/digital-invitation), [nimantran.app](https://nimantran.app/), [a Google Play app](https://play.google.com/store/apps/details?id=com.argames.nimantran&hl=en_US) and others), so searches would land on competitors and a trademark would be weak.
+- **Shubhdwar** (26 to 27 September 2026): "auspicious doorway". Replaced by Shubh Invitation because the product now serves every occasion worldwide, not only Indian weddings, and "Shubh" is easier to say and remember.
 
-### Visual identity notes
+## 3. Owner task B1: secure the name
 
-- Keep the mandala; consider placing it inside a doorway arch or toran for the logo mark.
-- The opening-doors animation is the signature brand moment: use it in the logo animation, app splash and ads.
-- Palette, fonts and tokens stay as they are.
+Only the owner can do these. A web search is not a legal check; the trademark search below is.
 
-## 3. Owner task B1: secure the name (before Step 8a)
-
-Only the owner can do these; code sessions should not rename until this is done or the owner says go.
-
-- [ ] Domains: `shubhdwar.com`, `shubhdwar.in`, and optionally `shubhdwar.app`; the common misspellings `shubhdwaar.com` and `shubh-dwar.com` redirecting to the main site
-- [ ] Trademark search and filing on the IP India registry, classes 9 (software, apps), 35 (online advertising and business services), 42 (software as a service); consider 16 (printed cards) for the print line
+- [ ] Domains: `shubhinvitation.com` (main), and optionally `shubhinvitation.in` and `shubhinvitation.app` redirecting to it; then set `NEXT_PUBLIC_SITE_URL` in Vercel
+- [ ] Trademark search and filing on the IP India registry for "Shubh Invitation" and the icon, classes 9 (software, apps), 35 (online advertising and business services), 42 (software as a service); consider 16 (printed cards) for the print line. "Shubh" alone is a common word, so the full name and the icon are what can be protected
 - [ ] Handles: Instagram, YouTube, Facebook, X, LinkedIn, Pinterest, WhatsApp Business
-- [ ] Google Play developer account and App Store name reservation for "Shubhdwar"
+- [ ] Google Play developer account and App Store name reservation for "Shubh Invitation" (app name shown under the icon: "Shubh")
 - [ ] Email: hello@, support@, and a sending domain for invites and reminders
 - [ ] Google Search Console and Bing Webmaster Tools verified for the main domain
 
-## 4. Step 8a: rename in code
+## 4. Step 8b: rename in code
 
-**Done 26 September 2026** (details under Step 8a in PLAN.md). Email and SMS templates and the "Made with Shubhdwar" watermark use `site.name` when they are built.
+**Done 27 September 2026** (details under Step 8b in PLAN.md). Email and SMS templates and the "Made with Shubh" watermark use `site.shortName` or `site.name` when they are built.
 
-After B1 (or the owner's go-ahead):
-
-- `src/lib/site.ts`: name "Shubhdwar", tagline, description, production URL
-- Logo wordmark, favicon, app icons, Open Graph image (`src/app/opengraph-image.tsx`), link-preview text
-- All user-facing copy in `src/content`, page titles and metadata, email and SMS templates, the watermark text on free invites ("Made with Shubhdwar")
-- README and docs titles (keep the repository name `nimantran` unless the owner renames it on GitHub)
-- Tests that assert on the product name
-- Screenshot and review pages refreshed
-
-The repository, database and package names can stay "nimantran"; users never see them.
+Kept on purpose, because users never see them and changing them would lose data or break links: the repository name `nimantran`, the Vercel address, the database, the browser keys `shubhdwar-locale` and `shubhdwar-rsvp:`, the calendar event ids (`…@shubhdwar`, so calendars update an event instead of adding a copy), and the `SHUBHDWAR_AUTH_PREVIEW` switches.
 
 ## 5. Keyword plan
 
@@ -121,14 +107,14 @@ Search volumes are **not yet measured**. Check every cluster in Google Keyword P
 
 ### Built-in growth
 
-- Every free invite shows "Made with Shubhdwar" with a link to the matching template page.
+- Every free invite shows "Made with Shubh" with a link to the matching template page.
 - Every guest page ends with "Create your own invitation" (without exposing the family's details to search).
 - Share-ready template previews for Instagram and Pinterest, each linking back to its template page.
 
 ## 7. App store optimisation (Step 33)
 
-- **Google Play title (30 characters):** "Shubhdwar: Wedding Card Maker" (29)
-- **App Store name / subtitle:** "Shubhdwar" / "3D Wedding Invitation & RSVP"
+- **Google Play title (30 characters):** "Shubh: Invitation Maker" (23)
+- **App Store name / subtitle:** "Shubh Invitation" / "Invitations That Come Alive"
 - Short description and keywords from the core, Hindi and ceremony clusters
 - Screenshots in English and Hindi first, then each launch language; the opening-doors animation as the preview video
 - Localised store listings for every launch language
@@ -137,4 +123,4 @@ Search volumes are **not yet measured**. Check every cluster in Google Keyword P
 
 - Search Console: impressions and clicks per cluster and language, monthly
 - Analytics: sign-ups and paid invites by landing page
-- Target for the first 6 months after launch: every cluster in section 5 has a live page, and the brand name ranks first for "Shubhdwar" searches
+- Target for the first 6 months after launch: every cluster in section 5 has a live page, and the brand name ranks first for "Shubh Invitation" searches

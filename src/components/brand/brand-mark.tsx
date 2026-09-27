@@ -5,13 +5,14 @@ type BrandMarkProps = {
 };
 
 /**
- * The Shubhdwar mark: the mandala framed by a doorway arch, the "auspicious door"
- * in the name. Lines follow `currentColor`, petals use `--mandala-fill`.
+ * The Shubh mark, drawn from the app icon: a card rising from an open envelope,
+ * an S on the card and a celebration sparkle beside it. Lines and the S follow
+ * `currentColor`; the sparkle uses `--mandala-fill` (marigold by default).
  */
 export function BrandMark({ className }: BrandMarkProps) {
   return (
     <svg
-      viewBox="0 0 64 72"
+      viewBox="0 0 64 64"
       className={cn("block", className)}
       aria-hidden
       fill="none"
@@ -19,37 +20,27 @@ export function BrandMark({ className }: BrandMarkProps) {
       strokeLinecap="round"
       strokeLinejoin="round"
     >
-      {/* Doorway: a rounded arch on two posts, with a finial at the crown */}
-      <path d="M8 70V32a24 24 0 0 1 48 0v38" strokeWidth="4" />
-      <path d="M4 70h56" strokeWidth="4" />
-      <circle cx="32" cy="4" r="2.5" fill="currentColor" stroke="none" />
-      <g transform="translate(32 40) scale(0.17)">
-        <MandalaShapes />
-      </g>
+      {/* The card, cut off where it slips behind the envelope's front */}
+      <path d="M16 34.2V11a3 3 0 0 1 3-3h26a3 3 0 0 1 3 3v23.2" strokeWidth="3" />
+      {/* The envelope: body and the V of its front pocket */}
+      <path d="M6 28v24a5 5 0 0 0 5 5h42a5 5 0 0 0 5-5V28" strokeWidth="4" />
+      <path d="M6 28l26 16 26-16" strokeWidth="4" />
+      <text
+        x="29"
+        y="34.5"
+        textAnchor="middle"
+        fontSize="25"
+        fill="currentColor"
+        stroke="none"
+        className="font-display"
+      >
+        S
+      </text>
+      <path
+        d="M41.5 11.5q.7 3 3.5 3.5-2.8.5-3.5 3.5-.7-3-3.5-3.5 2.8-.5 3.5-3.5z"
+        fill="var(--mandala-fill, var(--marigold))"
+        stroke="none"
+      />
     </svg>
-  );
-}
-
-const PETALS = Array.from({ length: 12 }, (_, i) => i * 30);
-
-/** The mandala reduced for small sizes: one ring, twelve petals, a filled heart. */
-function MandalaShapes() {
-  return (
-    <>
-      <circle r="92" strokeWidth="11" />
-      {PETALS.map((deg) => (
-        <ellipse
-          key={deg}
-          cx="0"
-          cy="-50"
-          rx="13"
-          ry="24"
-          transform={`rotate(${deg})`}
-          stroke="none"
-          fill="var(--mandala-fill, var(--marigold))"
-        />
-      ))}
-      <circle r="16" stroke="none" fill="var(--mandala-fill, var(--marigold))" />
-    </>
   );
 }

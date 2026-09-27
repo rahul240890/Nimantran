@@ -28,7 +28,8 @@ export function rootMetadata(locale: UiLocale): Metadata {
       template: `%s · ${locale === "hi" ? site.nameDevanagari : site.name}`,
     },
     description: meta.description,
-    applicationName: site.name,
+    applicationName: site.shortName,
+    appleWebApp: { title: site.shortName },
     openGraph: {
       type: "website",
       siteName: site.name,

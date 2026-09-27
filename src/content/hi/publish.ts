@@ -104,12 +104,12 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   addAll: "सब कैलेंडर में जोड़ें",
   photos: "तस्वीरें",
   photoAlt: (index) => `परिवार की तस्वीर ${index}`,
-  madeWith: "शुभद्वार से बना",
+  madeWith: "शुभ इन्विटेशन से बना",
   createYours: "अपना निमंत्रण बनाएँ",
   notFoundTitle: "यह निमंत्रण उपलब्ध नहीं है",
   notFoundBody:
     "लिंक शायद ग़लत लिखा है, या परिवार ने इसे भेजना बंद कर दिया है। उनसे दोबारा भेजने को कहें।",
-  home: "शुभद्वार पर जाएँ",
+  home: "शुभ इन्विटेशन पर जाएँ",
 };
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {

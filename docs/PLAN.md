@@ -1,4 +1,4 @@
-# Shubhdwar — Build Plan
+# Shubh Invitation — Build Plan
 
 3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
 
@@ -102,13 +102,16 @@ Built as: `supabase/migrations` (profiles for users, created on sign-up; events 
 **Review of Steps 1–8** ✅
 Before Step 9, every page was checked at 320px to 1440px in both themes. Fixed: the header wrapping at 1280px after Sign in was added (the theme choice is now one menu button), and the editor widening the page on phones (the Design step's button bar). Added a "Hear an invitation" strip under the home header that plays each design's raga, and pointed the main buttons at the editor now that it saves to accounts. Database: migration `20260926170000_traditions_ready.sql` lets functions use any ceremony id with a local name and an end time (muhurtham windows), gives events a tradition, one or two card languages and religious elements, and pins the search path on three helper functions.
 
-**Owner task B1. Secure the name "Shubhdwar"** (owner only, before Step 8a)
+**Owner task B1. Secure the name "Shubh Invitation"** (owner only; was "Shubhdwar" before Step 8b)
 Domains, IP India trademark search and filing (classes 9, 35, 42), social handles, app store names, email and Search Console. Checklist in [BRAND_SEO.md](BRAND_SEO.md), section 3.
 
 **Step 8a. Rename to Shubhdwar**
 The product name changes from Nimantran to Shubhdwar before any public share links exist (decided 26 September 2026; reasons in BRAND_SEO.md). Site config, logo wordmark, favicon and icons, Open Graph image, all copy and metadata, watermark text, email and SMS templates, docs titles, tests. Repository, database and package names can stay `nimantran`. Start once task B1 is done or the owner says go.
 
 Built as (the owner said go on 26 September 2026): `site.name` is Shubhdwar with the Devanagari name beside it, a new doorway mark (the mandala inside an arch) in the logo, favicon, app icons and link-preview image ("Invitations that open like doors."), and every page, message, test and doc says Shubhdwar. Kept on purpose: the repository, the Vercel address, the database, and browser storage keys (renaming those would wipe drafts people already have). The preview sign-in switch is now `SHUBHDWAR_AUTH_PREVIEW`.
+
+**Step 8b. Rename to Shubh Invitation** (done 27 September 2026)
+The owner renamed the brand again: app name **Shubh**, full name **Shubh Invitation**, planned domain `shubhinvitation.com`, tagline "Invitations That Come Alive.", for every occasion worldwide and not only Indian weddings. Built as: `site.name` is Shubh Invitation, the new `site.shortName` is Shubh (short copy such as "Sign in to Shubh" and "Made with Shubh", the app name on phones), Hindi pages say शुभ इन्विटेशन. The logo is the SHUBH / Invitation lockup with a new envelope-and-sparkle mark drawn from the owner's app icon, and the icon itself is the favicon, app icon and link-preview badge ("Invitations that come alive."). Every page, legal text, test and doc says the new name. Kept on purpose, as in Step 8a: the repository, the Vercel address, the database, the browser keys (`shubhdwar-locale`, `shubhdwar-rsvp:`), the calendar event ids and the `SHUBHDWAR_AUTH_PREVIEW` switches. Rules: BRAND_SEO.md.
 
 **Step 9. Publish, share and schedule**
 Unique link (`/i/aarav-weds-meera`), WhatsApp share, rich link preview image (Open Graph), QR code, add-to-calendar. Scheduled sending per function (email and SMS).
@@ -164,7 +167,7 @@ Built as: `src/lib/suites/catalog.ts` lists the themes as data: Rajwada Bagh (a 
 
 **Step 12k. Layout lines and page animation** (done): project files `shubhdwar/theme-recipe.md` is the recipe for every new theme, for any tradition, faith, language or occasion (not only Gujarati or weddings; the new occasions in Step 12j use it too): a style lock, one page prompt per page, and six layout lines (Centre, Window, Sky, Ground, Left, Right) that tell the image tool where to leave plain space for the words, with a map of which page uses which layout so pages vary. Painted pages now carry a light animation layer drawn in CSS, with no video files: petals drift down on the cover, haldi, mehendi and wedding pages, dust motes float on the family page, lights twinkle on sangeet and reception nights, soft fireworks burst over the baraat, and lamps bob on the reply page. The effects take the theme's own colours, never catch taps, and are off in still mode (reduced motion). Code: `src/components/invitation/story/page-effects.tsx`, the `fx-*` classes in `globals.css`.
 
-**Step 12l. Couple photos on the event pages** (planned, premium): the host adds one photo of the couple, or two (bride and groom each in their own frame, names beneath), and they appear on the cover or the page after it, and optionally on the family page. Frames are our own vector art in each theme's style (a jharokha for Rajwada Bagh, a scalloped arch for Shahi Savari and Noor Bagh, a carved wooden frame for Kayal, and so on for every theme), so any photo fits; the host can move and zoom the photo inside its frame. Photo pages are optional and the same for every tradition and language. Plans (PRICING.md): Premium gets one photo, Royal and Wedding bundle get one or two photos plus a photo per function; on Free the host can try it, and the preview carries the "Made with Shubhdwar" watermark across the photo pages until they upgrade (Step 17). Photos are shown only to people with the link, as today.
+**Step 12l. Couple photos on the event pages** (planned, premium): the host adds one photo of the couple, or two (bride and groom each in their own frame, names beneath), and they appear on the cover or the page after it, and optionally on the family page. Frames are our own vector art in each theme's style (a jharokha for Rajwada Bagh, a scalloped arch for Shahi Savari and Noor Bagh, a carved wooden frame for Kayal, and so on for every theme), so any photo fits; the host can move and zoom the photo inside its frame. Photo pages are optional and the same for every tradition and language. Plans (PRICING.md): Premium gets one photo, Royal and Wedding bundle get one or two photos plus a photo per function; on Free the host can try it, and the preview carries the "Made with Shubh" watermark across the photo pages until they upgrade (Step 17). Photos are shown only to people with the link, as today.
 
 **Redesign, asked 2026-09-27** (plan: project files `shubhdwar/redesign-plan.md`; image prompts: `shubhdwar/gallery-images.md`). A simple flow: occasion, then a wedding's kind, then only that kind's designs, then the editor already set up; a full-page editor; a new guest opening with a countdown; and a card in one language all the way through.
 
@@ -190,7 +193,7 @@ Built as (part 1): a privacy policy and terms in plain words, in English and Hin
 **Step 15.** Plan catalogue and entitlements (spec: [PRICING.md](PRICING.md)): Free, Premium, Royal, Wedding bundle, Family Plus and business plans as data; per-event entitlement rows; limits enforced in the editor and guest pages. Flat price per event in rupees; never coins or per-guest charges.
 **Step 16.** Razorpay checkout (UPI, cards), receipts, GST invoices.
 **Step 16a.** Family Plus yearly plan (₹999): subscription through UPI AutoPay and cards, renewal reminders 7 days ahead, two-tap cancel, sharing with 4 family accounts, ₹500 off wedding passes.
-**Step 17.** Watermark on free invites (the card, the event pages and any couple photo pages from Step 12l show "Made with Shubhdwar" until the host upgrades), upgrade flow, coupons and festival offers.
+**Step 17.** Watermark on free invites (the card, the event pages and any couple photo pages from Step 12l show "Made with Shubh" until the host upgrades), upgrade flow, coupons and festival offers.
 **Step 17a.** Card details included in editions: wax seals, tassels, foil, backgrounds, envelope and door styles.
 **Step 17b.** Shagun ledger with direct UPI (free): "Send shagun" opens the guest's UPI app with the family's UPI ID; UPI QR on desktop; self-reported ledger, manual cash entries, CSV export. No money through us. Spec: [PAYMENTS.md](PAYMENTS.md).
 **Step 17c.** MP4 video export for WhatsApp status and Instagram (moved from Step 21): the story reveal played into a vertical 30 to 45 second video with the design's raga, made in the host's browser so it costs nothing to run; sold as the "extra MP4" in PRICING.md.
@@ -248,7 +251,7 @@ All in this folder, so every build session has them:
 
 - [PRODUCT.md](PRODUCT.md): what each step builds towards.
 - [MEMORIES.md](MEMORIES.md): Phase 2b in detail.
-- [BRAND_SEO.md](BRAND_SEO.md): the Shubhdwar name decision, owner task B1, rename checklist (Step 8a), keyword clusters and SEO foundations (Step 12b), app store plan.
+- [BRAND_SEO.md](BRAND_SEO.md): the Shubh Invitation name and logo rules, owner task B1, rename notes (Steps 8a and 8b), keyword clusters and SEO foundations (Step 12b), app store plan.
 - [PRICING.md](PRICING.md): personal passes, Family Plus, business plans, rules, revenue estimates and entitlements (Steps 15, 16, 16a, 17, 26, 26a).
 - [SUITES.md](SUITES.md): event page themes, and how painted backgrounds are added.
 - [VIDEO_INVITES.md](VIDEO_INVITES.md): review of the video invitations sold on Instagram and what Story mode (Steps 12d, 17c, 20a) takes from them.

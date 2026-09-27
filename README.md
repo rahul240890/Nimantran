@@ -1,6 +1,6 @@
-# Shubhdwar
+# Shubh Invitation
 
-शुभद्वार, "auspicious doorway". This repository keeps its original name, `nimantran`.
+Shubh, for short: invitations that come alive, for every celebration. This repository keeps its original name, `nimantran`.
 
 3D invitations your guests open, turn and keep. Create an invite in minutes, share it on WhatsApp, and collect RSVPs in one tap.
 

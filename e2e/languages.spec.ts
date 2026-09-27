@@ -38,7 +38,9 @@ for (const colorScheme of ["light", "dark"] as const) {
         .addCookies([{ name: "shubhdwar-locale", value: "hi", url: "http://localhost:3100" }]);
       await page.goto("/sign-in");
       await expect(page.locator("html")).toHaveAttribute("lang", "hi");
-      await expect(page.getByRole("heading", { name: "शुभद्वार में साइन इन करें" })).toBeVisible();
+      await expect(
+        page.getByRole("heading", { name: "शुभ इन्विटेशन में साइन इन करें" }),
+      ).toBeVisible();
       await expect(page.getByRole("button", { name: "कोड भेजें" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
@@ -58,10 +60,12 @@ test.describe("switching language", () => {
 
     // The choice is remembered for the app's pages
     await page.goto("/sign-in");
-    await expect(page.getByRole("heading", { name: "शुभद्वार में साइन इन करें" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "शुभ इन्विटेशन में साइन इन करें" }),
+    ).toBeVisible();
     await page.getByRole("button", { name: /^भाषा: हिन्दी$/ }).click();
     await page.getByRole("menuitemradio", { name: /English/ }).click();
-    await expect(page.getByRole("heading", { name: "Sign in to Shubhdwar" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign in to Shubh" })).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
   });
 
@@ -69,7 +73,9 @@ test.describe("switching language", () => {
     const context = await browser.newContext({ locale: "hi-IN" });
     const page = await context.newPage();
     await page.goto("/sign-in");
-    await expect(page.getByRole("heading", { name: "शुभद्वार में साइन इन करें" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "शुभ इन्विटेशन में साइन इन करें" }),
+    ).toBeVisible();
     await context.close();
   });
 
@@ -80,7 +86,7 @@ test.describe("switching language", () => {
     await expect(page.getByText("यह पेज यहाँ नहीं है")).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
-    await page.getByRole("link", { name: "शुभद्वार पर जाएँ" }).click();
+    await page.getByRole("link", { name: "शुभ इन्विटेशन पर जाएँ" }).click();
     await expect(page).toHaveURL(/\/hi$/);
   });
 });

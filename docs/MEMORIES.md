@@ -1,4 +1,4 @@
-# Shubhdwar Memories — 3D gifts
+# Shubh Invitation Memories — 3D gifts
 
 Build order: Phase 2b (M1–M8) in [PLAN.md](PLAN.md), starting once payments work. Launch target: Star Map before Valentine's Day. If the invitation MVP slips past December, target Mother's Day instead.
 
@@ -19,7 +19,7 @@ Styles: Star Map (Midnight Blue, Rose Gold, Minimal Line, Kids' Night, Temple Sk
 
 ## Customer loop
 
-1. A couple sends their wedding invite with Shubhdwar.
+1. A couple sends their wedding invite with Shubh Invitation.
 2. After the wedding, the invite, RSVPs, wishes and photos become a free memory gallery.
 3. On the first anniversary: a reminder to send the sky from their wedding night.
 4. Every birthday and anniversary brings another gift; receivers become customers.
