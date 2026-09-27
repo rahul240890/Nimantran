@@ -98,3 +98,82 @@ export const CARD_SAMPLES: Record<Exclude<CardLanguage, "en">, Partial<Record<Sl
 
 /** The date a card shows before the host sets one. */
 export const SAMPLE_DATE = "2027-02-14";
+
+export type CountdownWords = {
+  days: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+  today: string;
+  tomorrow: string;
+  inDays: (n: number) => string;
+};
+
+/**
+ * The countdown on the guest's first screen and the "In 5 days" on each event page, in
+ * the card's language like every other word on it. Drafts for a native proofreader.
+ */
+export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
+  en: {
+    days: "Days",
+    hours: "Hours",
+    minutes: "Minutes",
+    seconds: "Seconds",
+    today: "Today",
+    tomorrow: "Tomorrow",
+    inDays: (n) => `In ${n} days`,
+  },
+  hi: {
+    days: "दिन",
+    hours: "घंटे",
+    minutes: "मिनट",
+    seconds: "सेकंड",
+    today: "आज",
+    tomorrow: "कल",
+    inDays: (n) => `${n} दिन बाद`,
+  },
+  mr: {
+    days: "दिवस",
+    hours: "तास",
+    minutes: "मिनिटे",
+    seconds: "सेकंद",
+    today: "आज",
+    tomorrow: "उद्या",
+    inDays: (n) => `${n} दिवसांनी`,
+  },
+  gu: {
+    days: "દિવસ",
+    hours: "કલાક",
+    minutes: "મિનિટ",
+    seconds: "સેકન્ડ",
+    today: "આજે",
+    tomorrow: "આવતીકાલે",
+    inDays: (n) => `${n} દિવસ બાકી`,
+  },
+  bn: {
+    days: "দিন",
+    hours: "ঘণ্টা",
+    minutes: "মিনিট",
+    seconds: "সেকেন্ড",
+    today: "আজ",
+    tomorrow: "আগামীকাল",
+    inDays: (n) => `আর ${n} দিন`,
+  },
+  ta: {
+    days: "நாள்",
+    hours: "மணி",
+    minutes: "நிமிடம்",
+    seconds: "விநாடி",
+    today: "இன்று",
+    tomorrow: "நாளை",
+    inDays: (n) => `இன்னும் ${n} நாட்கள்`,
+  },
+};
+
+/** "In 5 days", "Tomorrow" or "Today" for a date, or "" once it has passed. */
+export function daysAway(days: number, words: CountdownWords): string {
+  if (days < 0) return "";
+  if (days === 0) return words.today;
+  if (days === 1) return words.tomorrow;
+  return words.inDays(days);
+}

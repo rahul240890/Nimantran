@@ -24,6 +24,8 @@ export type StoryFunction = {
   time: string;
   muhurat: { text: string; lang: string } | null;
   venue: string;
+  /** "In 5 days", "Tomorrow" or "Today" on the guest page, in the card's language. */
+  countdown?: string;
   /** Directions and the calendar, on the guest page (the editor's preview has none). */
   mapsUrl?: string | null;
   icsUrl?: string | null;
@@ -162,6 +164,7 @@ export function storyBeats({
   for (const fn of functions) {
     beats.push(
       beat(`fn-${fn.kind}`, fn.kind, [
+        ...line(fn.countdown ?? "", "small"),
         ...line(fn.name, "label"),
         ...(fn.localName ? line(fn.localName.text, "script", fn.localName.lang) : []),
         ...line(fn.date, "display"),

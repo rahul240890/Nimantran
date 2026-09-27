@@ -21,7 +21,7 @@ import { requestOrigin } from "@/lib/request-origin";
 import { storyFunctions } from "@/lib/publish/story";
 
 /*
- * A guest's invitation: the 3D card, each function with directions and calendar, then the
+ * A guest's invitation: the doorway (or the 3D card), each function with directions and calendar, then the
  * reply form.
  */
 

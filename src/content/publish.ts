@@ -76,6 +76,12 @@ export const guestCopy = {
     "You're invited. Open the invitation to see the details.",
   invited: "You're invited",
   openHint: "Tap the card to open it",
+  doorway: {
+    open: "Open the invitation",
+    again: "Open it again",
+    counting: "Counting down to the celebration",
+    details: "See the details",
+  },
   countdown: {
     days: (n: number) => `${n} days to go`,
     tomorrow: "Tomorrow",
