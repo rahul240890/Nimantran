@@ -4,12 +4,14 @@ import { headers } from "next/headers";
 import { profileSchema, safeNext, type Account, type AuthFailure } from "@/lib/auth/account";
 import { isOtp, normalizePhone } from "@/lib/auth/phone";
 import {
+  getAccount,
   googleSignInUrl,
   sendPhoneCode,
   signOut as endSession,
   updateProfile,
   verifyPhoneCode,
 } from "@/lib/auth/server";
+import { deleteAccountData } from "@/lib/auth/delete-account";
 import { setLocale } from "./locale";
 
 /*
@@ -88,4 +90,17 @@ export async function saveProfile(input: unknown): Promise<SaveProfileResult> {
 
 export async function signOut(): Promise<void> {
   await endSession();
+}
+
+/**
+ * Deletes the signed-in person's account and every invite they own, then signs them out.
+ * `confirmed` must be true: the page asks them to tick that they understand first.
+ */
+export async function deleteAccount(confirmed: unknown): Promise<"deleted" | "failed"> {
+  if (confirmed !== true) return "failed";
+  const account = await getAccount();
+  if (!account) return "failed";
+  if (!(await deleteAccountData(account))) return "failed";
+  await endSession();
+  return "deleted";
 }

@@ -2,11 +2,11 @@
 
 import { CircleAlert, CircleCheck, Info, X } from "lucide-react";
 import { Toast as ToastPrimitive } from "radix-ui";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
-import { toastStore, type ToastItem, type ToastTone } from "@/lib/toast-store";
+import { showCarriedToast, toastStore, type ToastItem, type ToastTone } from "@/lib/toast-store";
 
-export { toast } from "@/lib/toast-store";
+export { toast, toastAfterNavigation } from "@/lib/toast-store";
 
 const icons: Record<ToastTone, typeof Info | null> = {
   neutral: null,
@@ -96,6 +96,7 @@ export function Toaster({ closeLabel, regionLabel }: ToasterProps) {
     toastStore.getSnapshot,
     toastStore.getSnapshot,
   );
+  useEffect(showCarriedToast, []);
 
   return (
     <ToastPrimitive.Provider swipeDirection="down" label={regionLabel}>

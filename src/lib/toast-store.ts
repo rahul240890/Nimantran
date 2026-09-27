@@ -53,3 +53,31 @@ export const toastStore = createToastStore();
 export function toast(input: ToastInput): number {
   return toastStore.show(input);
 }
+
+const CARRIED_KEY = "nimantran-toast";
+
+/**
+ * A toast for the next page, when moving to another part of the site reloads the page
+ * (the home pages and the app have separate root layouts). Plain words only.
+ */
+export function toastAfterNavigation(input: { title: string; tone?: ToastTone }) {
+  try {
+    sessionStorage.setItem(CARRIED_KEY, JSON.stringify(input));
+  } catch {
+    // Storage blocked: show it now instead
+    toast(input);
+  }
+}
+
+/** Shows a toast carried over from the previous page, once. */
+export function showCarriedToast() {
+  try {
+    const raw = sessionStorage.getItem(CARRIED_KEY);
+    if (!raw) return;
+    sessionStorage.removeItem(CARRIED_KEY);
+    const input = JSON.parse(raw) as { title?: unknown; tone?: ToastTone };
+    if (typeof input.title === "string") toast({ title: input.title, tone: input.tone });
+  } catch {
+    // Nothing to show
+  }
+}

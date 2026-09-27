@@ -4,6 +4,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 
 ## What the code already does
 
+- **Delete account** on the profile page lets hosts erase their own data, as the DPDP Act expects.
 - **Privacy policy and terms** are at `/privacy` and `/terms`, with Hindi versions at `/hi/privacy` and `/hi/terms`. The footer on every page links to them, and so does the sign-in page. Both are written for India's Digital Personal Data Protection Act, 2023. The wording lives in `src/content/legal.ts` and `src/content/hi/legal.ts`. Change `LEGAL_UPDATED` in `src/lib/legal.ts` whenever the wording changes.
 - **Visitor analytics** use Vercel Web Analytics. It sets no cookies and counts only on the live site. Invitation links, guest codes and anything after `?` are removed before a visit is counted (`src/lib/analytics.ts`), so the numbers never show whose invitation was opened.
 - **Error reports**: errors in visitors' browsers and on the server are written to the Vercel logs, one line each:
@@ -91,10 +92,11 @@ Set `WAITLIST_WEBHOOK_URL` in Vercel's environment variables to where waitlist e
 
 1. Have a lawyer familiar with the DPDP Act read `/privacy` and `/terms` in both languages. The pages are written in plain words, but they are not legal advice.
 2. The contact email from step 3 is also where requests to see, correct or delete data arrive. Reply within 7 working days, as the policy promises.
-3. Until the "Delete my account" button arrives in the next part of this step, delete an account on request:
+3. Hosts can delete their own account from **Profile**, using **Delete account**. It removes every invite they own, with its photos, guest list and replies. It needs `SUPABASE_SERVICE_ROLE_KEY` set in Vercel, which it already is.
+4. If someone asks by email instead, do it for them:
    - Open Supabase, then **Authentication**, then **Users**.
    - Find the person, then choose **⋯** and **Delete user**.
-   - This removes their invitations, guest lists and replies.
+   - Photos stay in **Storage** under the invite's id; delete that folder too.
 
 ### 11. Search engines
 

@@ -130,7 +130,7 @@ export const privacy: LegalDoc = {
             "Complain to us, and if you are not satisfied, to the Data Protection Board of India.",
           ],
         },
-        "Hosts can change their profile and invitations themselves. For anything else, write to us at the address below.",
+        "Hosts can change their profile and invitations, and delete their whole account, from their profile page. For anything else, write to us at the address below.",
       ],
     },
     {
@@ -219,7 +219,7 @@ export const terms: LegalDoc = {
       id: "ending",
       heading: "Stopping",
       body: [
-        "You can stop using Shubhdwar at any time and ask us to delete your account. Deleting an account deletes its invitations, guest lists and replies, and their links stop working.",
+        "You can stop using Shubhdwar at any time and delete your account from your profile page. Deleting an account deletes its invitations, guest lists and replies, and their links stop working.",
       ],
     },
     {
