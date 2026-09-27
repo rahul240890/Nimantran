@@ -33,6 +33,7 @@ import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
 import { StoryScene } from "./story-scenes";
+import { PageEffects } from "./page-effects";
 import { SuiteBackdrop } from "./suite-backdrop";
 
 export type StoryLabels = {
@@ -484,6 +485,7 @@ function Page({
           className="absolute inset-0 overflow-hidden"
         />
       )}
+      {painted && !still && <PageEffects art={look.art} />}
       {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
       {!painted && <StoryScene scene={beat.scene} themed={themed} />}
 
