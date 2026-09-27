@@ -83,6 +83,7 @@ export const homeGallery: Translation<typeof en.homeGallery> = {
   searchLabel: "अवसर और डिज़ाइन खोजें",
   searchPlaceholder: "जैसे गुजराती शादी, हल्दी, संगीत…",
   search: "खोजें",
+  moreHeading: "शादी के अलावा",
   soonHeading: "जल्द आ रहे हैं",
   allOccasions: "सभी अवसर देखें",
   themesEyebrow: "चित्रित थीम",

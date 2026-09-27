@@ -2,7 +2,8 @@ import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { defaultType, typeSchema } from "./type";
-import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
+import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
+import type { Category } from "@/lib/categories/schema";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { CARD_LANGUAGES } from "@/lib/templates/card-languages";
@@ -139,10 +140,14 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
     const schema = contentSchema(template);
     // Only the couple slots are checked here; date and venue belong to the functions step.
     // Names must be typed by the host; other slots keep the design's wording until changed.
+    // A card led by one name (a birthday, a party) asks for no second name
+    const one = (CATEGORIES[draft.categoryId] as Category).people === "one";
     const content = Object.fromEntries(
       SLOT_IDS.map((id) => [
         id,
-        id === "date" || id === "venue" ? "x" : coupleValue(draft, template, id),
+        id === "date" || id === "venue" || (one && (id === "second" || id === "joiner"))
+          ? "x"
+          : coupleValue(draft, template, id),
       ]),
     );
     const result = schema.safeParse(content);

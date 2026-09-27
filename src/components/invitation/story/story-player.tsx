@@ -564,7 +564,7 @@ export function StoryPage({
         }
       >
         <div
-          data-tone={printed ? paintedTone(look.art) : undefined}
+          data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
           className={cn(
             "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
             printed

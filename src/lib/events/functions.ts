@@ -24,8 +24,15 @@ export const FUNCTION_IDS = [
   "wedding",
   "vidaai",
   "reception",
+  // Beyond weddings (Step 12p): each of these occasions is one function
+  "birthday",
+  "anniversary",
+  "party",
 ] as const;
 export type FunctionId = (typeof FUNCTION_IDS)[number];
+
+/** The functions of a birthday, an anniversary or a party, which weddings don't offer. */
+export const OCCASION_FUNCTIONS: readonly FunctionId[] = ["birthday", "anniversary", "party"];
 
 export function isFunctionId(value: unknown): value is FunctionId {
   return typeof value === "string" && (FUNCTION_IDS as readonly string[]).includes(value);

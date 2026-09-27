@@ -19,7 +19,7 @@ describe("event suites", () => {
       "shahi-savari",
     );
     expect(suiteFor({ suite: null, tradition: "gujarati", templateId: "marigold" })).toBe(
-      "shahi-savari",
+      "kutch-toran",
     );
     expect(suiteFor({ suite: null, tradition: "tamil", templateId: "marigold" })).toBe("kayal");
     expect(suiteFor({ suite: null, tradition: "bengali", templateId: "marigold" })).toBe("rajbari");

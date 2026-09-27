@@ -5,7 +5,13 @@ import { useDeferredValue, useMemo, useState, useSyncExternalStore, type ReactNo
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { pagePath } from "@/lib/seo/paths";
-import { WEDDING_KIND_ENTRIES, occasionById, suiteImage, designHref } from "@/lib/gallery/catalog";
+import {
+  WEDDING_KIND_ENTRIES,
+  designHref,
+  occasionById,
+  suiteImage,
+  suiteOccasion,
+} from "@/lib/gallery/catalog";
 import { searchGallery, type SearchHit } from "@/lib/gallery/search";
 import { DesignCard } from "./design-card";
 import { designWords, searchWords } from "./design-words";
@@ -126,7 +132,7 @@ export function GallerySearch({ children }: { children: ReactNode }) {
                       design={design}
                       name={name}
                       description={description}
-                      href={designHref(design, { category: "wedding" })}
+                      href={designHref(design, { category: suiteOccasion(design.suite) })}
                     />
                   </li>
                 );

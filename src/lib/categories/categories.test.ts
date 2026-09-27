@@ -29,7 +29,7 @@ const durgaPuja = festival("durga-puja", [9, 10], ["WB"]);
 const withFestivals = [...all, onam, durgaPuja];
 
 describe("category catalogue", () => {
-  it("launches with the wedding journey", () => {
+  it("launches with the wedding journey, then birthdays, anniversaries and parties", () => {
     expect(CATEGORY_IDS).toEqual([
       "wedding",
       "engagement",
@@ -39,6 +39,9 @@ describe("category catalogue", () => {
       "mehendi",
       "sangeet",
       "reception",
+      "birthday",
+      "anniversary",
+      "party",
     ]);
   });
 

@@ -2,6 +2,7 @@ import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import {
   EDITOR_STEPS,
+  draftPeople,
   FUNCTION_IDS,
   newDraft,
   type EventFunction,
@@ -200,7 +201,8 @@ export function summarize(
     status: event.status,
     slug: draft.slug,
     first: draft.content.first?.trim() ?? "",
-    second: draft.content.second?.trim() ?? "",
+    // A birthday or a party is led by one name
+    second: (draftPeople(draft) !== "one" && draft.content.second?.trim()) || "",
     joiner: draft.content.joiner?.trim() || "&",
     date: main ? draft.functions[main].date : "",
     mainFunction: main,

@@ -24,7 +24,10 @@ insert into public.categories (id, "group", names, icon, priority, season, regio
   ('haldi', 'wedding-journey', '{"en":"Haldi","hi":"हल्दी","mr":"हळद","gu":"પીઠી","bn":"গায়ে হলুদ","ta":"மஞ்சள் நீராட்டு","te":"పసుపు","kn":"ಅರಿಶಿನ ಶಾಸ್ತ್ರ","ml":"ഹൽദി","pa":"ਹਲਦੀ"}'::jsonb, 'turmeric', 50, array[9, 10, 11, 12, 1, 2, 3, 4, 5]::smallint[], array[]::text[], '{"planned":["haldi"],"suggested":["haldi","mehendi"],"primary":"haldi"}'::jsonb, 'full', array[]::text[], '{"doorLeft":"Haldi","doorRight":"Rasam","line":"invite you to shower them with turmeric and blessings"}'::jsonb, 4),
   ('mehendi', 'wedding-journey', '{"en":"Mehendi","hi":"मेहंदी","mr":"मेहंदी","gu":"મહેંદી","bn":"মেহেন্দি","ta":"மெஹந்தி","te":"మెహందీ","kn":"ಮೆಹಂದಿ","ml":"മെഹന്ദി","pa":"ਮਹਿੰਦੀ"}'::jsonb, 'henna', 50, array[9, 10, 11, 12, 1, 2, 3, 4, 5]::smallint[], array['RJ', 'GJ', 'MP', 'MH', 'PB', 'HR', 'DL', 'CH', 'HP', 'JK', 'UP', 'UT']::text[], '{"planned":["mehendi"],"suggested":["mehendi","haldi","sangeet"],"primary":"mehendi"}'::jsonb, 'full', array['song']::text[], '{"doorLeft":"Mehendi","doorRight":"Raat","line":"invite you to an afternoon of henna, songs and laughter"}'::jsonb, 5),
   ('sangeet', 'wedding-journey', '{"en":"Sangeet","hi":"संगीत","mr":"संगीत","gu":"સંગીત","bn":"সংগীত","ta":"சங்கீத்","te":"సంగీత్","kn":"ಸಂಗೀತ್","ml":"സംഗീത്","pa":"ਸੰਗੀਤ"}'::jsonb, 'music', 50, array[9, 10, 11, 12, 1, 2, 3, 4, 5]::smallint[], array['RJ', 'GJ', 'MH', 'PB', 'HR', 'DL', 'CH', 'HP', 'JK', 'UP', 'UT']::text[], '{"planned":["sangeet"],"suggested":["sangeet","mehendi"],"primary":"sangeet"}'::jsonb, 'full', array['song', 'meal']::text[], '{"doorLeft":"Sangeet","doorRight":"Sandhya","line":"invite you to an evening of music and dance"}'::jsonb, 6),
-  ('reception', 'wedding-journey', '{"en":"Reception","hi":"स्वागत समारोह","mr":"स्वागत समारंभ","gu":"સ્વાગત સમારંભ","bn":"বৌভাত","ta":"வரவேற்பு","te":"రిసెప్షన్","kn":"ಆರತಕ್ಷತೆ","ml":"സ്വീകരണം","pa":"ਰਿਸੈਪਸ਼ਨ"}'::jsonb, 'celebrate', 45, array[9, 10, 11, 12, 1, 2, 3, 4, 5]::smallint[], array[]::text[], '{"planned":["reception"],"suggested":["reception"],"primary":"reception"}'::jsonb, 'full', array['meal']::text[], '{"doorLeft":"Swagat","doorRight":"Samaroh","line":"invite you to dinner as they celebrate their marriage"}'::jsonb, 7)
+  ('reception', 'wedding-journey', '{"en":"Reception","hi":"स्वागत समारोह","mr":"स्वागत समारंभ","gu":"સ્વાગત સમારંભ","bn":"বৌভাত","ta":"வரவேற்பு","te":"రిసెప్షన్","kn":"ಆರತಕ್ಷತೆ","ml":"സ്വീകരണം","pa":"ਰਿਸੈਪਸ਼ਨ"}'::jsonb, 'celebrate', 45, array[9, 10, 11, 12, 1, 2, 3, 4, 5]::smallint[], array[]::text[], '{"planned":["reception"],"suggested":["reception"],"primary":"reception"}'::jsonb, 'full', array['meal']::text[], '{"doorLeft":"Swagat","doorRight":"Samaroh","line":"invite you to dinner as they celebrate their marriage"}'::jsonb, 7),
+  ('birthday', 'birthdays', '{"en":"Birthday","hi":"जन्मदिन","mr":"वाढदिवस","gu":"જન્મદિવસ","bn":"জন্মদিন","ta":"பிறந்தநாள்","te":"పుట్టినరోజు","kn":"ಹುಟ್ಟುಹಬ್ಬ","ml":"ജന്മദിനം","pa":"ਜਨਮਦਿਨ"}'::jsonb, 'celebrate', 40, array[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]::smallint[], array[]::text[], '{"planned":["birthday"],"suggested":["birthday"],"primary":"birthday"}'::jsonb, 'full', array['meal']::text[], '{"doorLeft":"Happy","doorRight":"Birthday","blessing":"Happy birthday","families":"With love from the family","line":"invite you to a birthday party with cake, games and blessings"}'::jsonb, 8),
+  ('anniversary', 'birthdays', '{"en":"Anniversary","hi":"सालगिरह","mr":"लग्नाचा वाढदिवस","gu":"લગ્નજયંતી","bn":"বিবাহবার্ষিকী","ta":"திருமண நாள்","te":"పెళ్లి రోజు","kn":"ವಿವಾಹ ವಾರ್ಷಿಕೋತ್ಸವ","ml":"വിവാഹ വാർഷികം","pa":"ਵਰ੍ਹੇਗੰਢ"}'::jsonb, 'ring', 35, array[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]::smallint[], array[]::text[], '{"planned":["anniversary"],"suggested":["anniversary"],"primary":"anniversary"}'::jsonb, 'full', array['meal']::text[], '{"doorLeft":"Saath","doorRight":"Saal","blessing":"Years of togetherness","families":"With their children and family","line":"invite you to celebrate their wedding anniversary"}'::jsonb, 9),
+  ('party', 'parties', '{"en":"Party","hi":"पार्टी","mr":"पार्टी","gu":"પાર્ટી","bn":"পার্টি","ta":"விருந்து","te":"పార్టీ","kn":"ಪಾರ್ಟಿ","ml":"പാർട്ടി","pa":"ਪਾਰਟੀ"}'::jsonb, 'music', 30, array[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]::smallint[], array[]::text[], '{"planned":["party"],"suggested":["party"],"primary":"party"}'::jsonb, 'full', array['meal', 'song']::text[], '{"doorLeft":"You''re","doorRight":"Invited","families":"Hosted by friends","line":"invite you to an evening of music, food and friends"}'::jsonb, 10)
 on conflict (id) do update set "group" = excluded."group", names = excluded.names, icon = excluded.icon,
   priority = excluded.priority, season = excluded.season, regions = excluded.regions,
   functions = excluded.functions, schedule = excluded.schedule,
@@ -78,4 +81,13 @@ insert into public.category_templates (category_id, template_id, position) value
   ('reception', 'emerald', 1),
   ('reception', 'scroll', 2),
   ('reception', 'rose', 3),
-  ('reception', 'rangmahal', 4);
+  ('reception', 'rangmahal', 4),
+  ('birthday', 'rose', 0),
+  ('birthday', 'marigold', 1),
+  ('birthday', 'monogram', 2),
+  ('anniversary', 'rose', 0),
+  ('anniversary', 'emerald', 1),
+  ('anniversary', 'monogram', 2),
+  ('party', 'monogram', 0),
+  ('party', 'scroll', 1),
+  ('party', 'emerald', 2);

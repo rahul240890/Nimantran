@@ -8,6 +8,7 @@
  * `images` replace the vector landscape page by page (docs/SUITES.md).
  */
 
+import type { CategoryId } from "@/lib/categories/catalog";
 import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
@@ -20,6 +21,10 @@ export const SUITE_IDS = [
   "phulkari-haveli",
   "rajbari",
   "peshwai-wada",
+  "kutch-toran",
+  "gubbara",
+  "saath",
+  "rooftop",
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -54,13 +59,15 @@ export type PageArt = (typeof PAGE_ARTS)[number];
 
 /**
  * The paintings made at night have a dark middle, so the words printed on them turn light.
- * Every theme's sangeet, reception and closing page is painted at night.
+ * Most themes paint their sangeet, reception and closing page at night; a theme that paints
+ * a page otherwise says so in its `tones`.
  */
 const NIGHT_PAINTINGS: readonly PageArt[] = ["sangeet", "reception", "reply"];
 
 /** Whether the words on a painted page are dark (on a light middle) or light. */
-export function paintedTone(art: PageArt): "light" | "dark" {
-  return NIGHT_PAINTINGS.includes(art) ? "dark" : "light";
+export function paintedTone(art: PageArt, suite?: SuiteId): "light" | "dark" {
+  const own = suite ? SUITES[suite].tones?.[art] : undefined;
+  return own ?? (NIGHT_PAINTINGS.includes(art) ? "dark" : "light");
 }
 
 /** Which faiths a theme's own art suits. Faith-specific themes (a Nikah garden) come later. */
@@ -81,6 +88,13 @@ export type Suite = {
   traditions: readonly TraditionId[];
   /** Painted backgrounds under /public, by page. Pages without one draw the vector landscape. */
   images: Partial<Record<PageArt, string>>;
+  /** Pages painted in a different light from most themes' (a dusk baraat, a lit reception). */
+  tones?: Partial<Record<PageArt, "light" | "dark">>;
+  /**
+   * The occasions a theme is painted for. Missing means the wedding journey; a birthday
+   * theme has four pages (cover, family, the party itself as its reception, the reply).
+   */
+  occasions?: readonly CategoryId[];
 };
 
 export const SUITES: Record<SuiteId, Suite> = {
@@ -109,7 +123,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     turn: "sweep",
     faiths: ["all"],
     template: "rangmahal",
-    traditions: ["rajasthani", "gujarati"],
+    traditions: ["rajasthani"],
     images: {
       cover: "/suites/shahi-savari/cover.webp",
       family: "/suites/shahi-savari/family.webp",
@@ -219,6 +233,78 @@ export const SUITES: Record<SuiteId, Suite> = {
       reply: "/suites/peshwai-wada/reply.webp",
     },
   },
+  // A Kutch bhunga courtyard in mirror work and bandhani, the white Rann beyond
+  "kutch-toran": {
+    id: "kutch-toran",
+    art: "savari",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "bandhani",
+    traditions: ["gujarati"],
+    images: {
+      cover: "/suites/kutch-toran/cover.webp",
+      family: "/suites/kutch-toran/family.webp",
+      haldi: "/suites/kutch-toran/haldi.webp",
+      mehendi: "/suites/kutch-toran/mehendi.webp",
+      sangeet: "/suites/kutch-toran/sangeet.webp",
+      baraat: "/suites/kutch-toran/baraat.webp",
+      wedding: "/suites/kutch-toran/wedding.webp",
+      reception: "/suites/kutch-toran/reception.webp",
+      reply: "/suites/kutch-toran/reply.webp",
+    },
+    tones: { baraat: "dark", reception: "light", reply: "light" },
+  },
+  // A pastel garden arch of balloons and bunting, the cake table under it
+  gubbara: {
+    id: "gubbara",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/gubbara/cover.webp",
+      family: "/suites/gubbara/family.webp",
+      reception: "/suites/gubbara/reception.webp",
+      reply: "/suites/gubbara/reply.webp",
+    },
+    tones: { reception: "light", reply: "light" },
+    occasions: ["birthday"],
+  },
+  // Red roses and candlelight over a lake at sunset, for years together
+  saath: {
+    id: "saath",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/saath/cover.webp",
+      family: "/suites/saath/family.webp",
+      reception: "/suites/saath/reception.webp",
+      reply: "/suites/saath/reply.webp",
+    },
+    tones: { reception: "light", reply: "light" },
+    occasions: ["anniversary"],
+  },
+  // A city rooftop at night: fairy lights, floor cushions, a DJ and fireworks
+  rooftop: {
+    id: "rooftop",
+    art: "kayal",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    images: {
+      cover: "/suites/rooftop/cover.webp",
+      family: "/suites/rooftop/family.webp",
+      reception: "/suites/rooftop/reception.webp",
+      reply: "/suites/rooftop/reply.webp",
+    },
+    tones: { cover: "dark", family: "dark" },
+    occasions: ["party"],
+  },
   classic: {
     id: "classic",
     art: "card",
@@ -236,19 +322,38 @@ const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
   gopuram: "kayal",
   alpona: "rajbari",
   rangmahal: "shahi-savari",
-  bandhani: "shahi-savari",
+  bandhani: "kutch-toran",
   phulkari: "phulkari-haveli",
   paithani: "peshwai-wada",
   emerald: "rajwada-bagh",
 };
 
-/** The theme an invite uses: the host's choice, else its tradition's, else its design's. */
+/** Whether a theme is painted for an occasion: wedding themes for the wedding journey. */
+export function suiteSuits(suite: SuiteId, category: CategoryId): boolean {
+  const { occasions } = SUITES[suite];
+  if (occasions) return occasions.includes(category);
+  return !OCCASION_SUITES.some((id) => SUITES[id].occasions!.includes(category));
+}
+
+/** Themes painted for one occasion beyond weddings. */
+const OCCASION_SUITES = SUITE_IDS.filter((id) => SUITES[id].occasions);
+
+/**
+ * The theme an invite uses: the host's choice, else its occasion's own, else its
+ * tradition's, else its design's.
+ */
 export function suiteFor(input: {
   suite: SuiteId | null;
   tradition: TraditionId | null;
   templateId: TemplateId;
+  category?: CategoryId;
 }): SuiteId {
   if (input.suite) return input.suite;
+  const category = input.category;
+  if (category) {
+    const own = OCCASION_SUITES.find((id) => SUITES[id].occasions!.includes(category));
+    if (own) return own;
+  }
   if (input.tradition) {
     const match = SUITE_IDS.find((id) => SUITES[id].traditions.includes(input.tradition!));
     if (match) return match;
@@ -277,6 +382,11 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   wedding: { art: "wedding", mood: "dusk" },
   vidaai: { art: "wedding", mood: "dawn" },
   reception: { art: "reception", mood: "night" },
+  // The one-function occasions use the reception's painting: their themes paint it as the
+  // party itself (the cake table, the dinner, the dance floor)
+  birthday: { art: "reception", mood: "day" },
+  anniversary: { art: "reception", mood: "dusk" },
+  party: { art: "reception", mood: "night" },
 };
 
 /** Which painting and what light a page gets. */

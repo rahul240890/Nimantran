@@ -13,6 +13,8 @@ import type { Category } from "./schema";
 const WEDDING_SEASON = [9, 10, 11, 12, 1, 2, 3, 4, 5];
 /** Roka, engagement and save-the-dates come a few months before the season. */
 const EARLY_SEASON = [6, 7, 8, 9, 10];
+/** Birthdays, anniversaries and parties happen all year. */
+const ALL_YEAR = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
 const NORTH = ["PB", "HR", "DL", "CH", "HP", "JK", "UP", "UT"] as const;
 
@@ -267,6 +269,101 @@ export const CATEGORIES = {
       doorRight: "Samaroh",
       line: "invite you to dinner as they celebrate their marriage",
     },
+  },
+  // Beyond weddings (Step 12p): each is one function with its own painted theme
+  birthday: {
+    id: "birthday",
+    group: "birthdays",
+    names: {
+      en: "Birthday",
+      hi: "जन्मदिन",
+      mr: "वाढदिवस",
+      gu: "જન્મદિવસ",
+      bn: "জন্মদিন",
+      ta: "பிறந்தநாள்",
+      te: "పుట్టినరోజు",
+      kn: "ಹುಟ್ಟುಹಬ್ಬ",
+      ml: "ജന്മദിനം",
+      pa: "ਜਨਮਦਿਨ",
+    },
+    icon: "celebrate",
+    priority: 40,
+    season: ALL_YEAR,
+    regions: [],
+    functions: { planned: ["birthday"], suggested: ["birthday"], primary: "birthday" },
+    schedule: "full",
+    rsvpQuestions: ["meal"],
+    templates: ["rose", "marigold", "monogram"],
+    wording: {
+      doorLeft: "Happy",
+      doorRight: "Birthday",
+      blessing: "Happy birthday",
+      families: "With love from the family",
+      line: "invite you to a birthday party with cake, games and blessings",
+    },
+    people: "one",
+  },
+  anniversary: {
+    id: "anniversary",
+    group: "birthdays",
+    names: {
+      en: "Anniversary",
+      hi: "सालगिरह",
+      mr: "लग्नाचा वाढदिवस",
+      gu: "લગ્નજયંતી",
+      bn: "বিবাহবার্ষিকী",
+      ta: "திருமண நாள்",
+      te: "పెళ్లి రోజు",
+      kn: "ವಿವಾಹ ವಾರ್ಷಿಕೋತ್ಸವ",
+      ml: "വിവാഹ വാർഷികം",
+      pa: "ਵਰ੍ਹੇਗੰਢ",
+    },
+    icon: "ring",
+    priority: 35,
+    season: ALL_YEAR,
+    regions: [],
+    functions: { planned: ["anniversary"], suggested: ["anniversary"], primary: "anniversary" },
+    schedule: "full",
+    rsvpQuestions: ["meal"],
+    templates: ["rose", "emerald", "monogram"],
+    wording: {
+      doorLeft: "Saath",
+      doorRight: "Saal",
+      blessing: "Years of togetherness",
+      families: "With their children and family",
+      line: "invite you to celebrate their wedding anniversary",
+    },
+  },
+  party: {
+    id: "party",
+    group: "parties",
+    names: {
+      en: "Party",
+      hi: "पार्टी",
+      mr: "पार्टी",
+      gu: "પાર્ટી",
+      bn: "পার্টি",
+      ta: "விருந்து",
+      te: "పార్టీ",
+      kn: "ಪಾರ್ಟಿ",
+      ml: "പാർട്ടി",
+      pa: "ਪਾਰਟੀ",
+    },
+    icon: "music",
+    priority: 30,
+    season: ALL_YEAR,
+    regions: [],
+    functions: { planned: ["party"], suggested: ["party"], primary: "party" },
+    schedule: "full",
+    rsvpQuestions: ["meal", "song"],
+    templates: ["monogram", "scroll", "emerald"],
+    wording: {
+      doorLeft: "You're",
+      doorRight: "Invited",
+      families: "Hosted by friends",
+      line: "invite you to an evening of music, food and friends",
+    },
+    people: "one",
   },
 } satisfies Record<string, Category>;
 

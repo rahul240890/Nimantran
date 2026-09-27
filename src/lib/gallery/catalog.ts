@@ -1,5 +1,5 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { SUITES, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
@@ -26,6 +26,8 @@ export type Occasion = {
   names: { en: string; hi: string };
   /** A painting for its tile: a theme and one of its pages. */
   art: { suite: SuiteId; page: PageArt } | null;
+  /** A painting made for the tile itself, in public/occasions, used before the theme's page. */
+  tile: string | null;
   /** Other words people search with, in any language. */
   keywords: readonly string[];
 };
@@ -34,12 +36,14 @@ const live = (
   id: CategoryId,
   art: Occasion["art"],
   keywords: readonly string[] = [],
+  section: OccasionSection = "wedding",
 ): Occasion => ({
   id,
-  section: "wedding",
+  section,
   category: id,
   names: { en: CATEGORIES[id].names.en, hi: CATEGORIES[id].names.hi },
   art,
+  tile: null,
   keywords: [...Object.values(CATEGORIES[id].names), ...keywords],
 });
 
@@ -48,7 +52,30 @@ const soon = (
   section: OccasionSection,
   names: Occasion["names"],
   keywords: readonly string[] = [],
-): Occasion => ({ id, section, category: null, names, art: null, keywords });
+): Occasion => ({ id, section, category: null, names, art: null, tile: null, keywords });
+
+/*
+ * Tile paintings made for occasions, in public/occasions. One painting can serve a few
+ * occasions (the baby's swing for a baby shower and a naming ceremony).
+ */
+const TILES: Record<string, string> = {
+  wedding: "wedding",
+  engagement: "engagement",
+  haldi: "haldi",
+  mehendi: "mehendi",
+  sangeet: "sangeet",
+  anniversary: "anniversary",
+  birthday: "birthday",
+  "baby-shower": "baby",
+  "naming-ceremony": "baby",
+  housewarming: "housewarming",
+  party: "party",
+  diwali: "festival",
+  "shop-opening": "business",
+};
+
+const withTile = (occasion: Occasion): Occasion =>
+  TILES[occasion.id] ? { ...occasion, tile: `/occasions/${TILES[occasion.id]}.webp` } : occasion;
 
 export const OCCASIONS: readonly Occasion[] = [
   live("wedding", { suite: "rajwada-bagh", page: "wedding" }, [
@@ -68,13 +95,18 @@ export const OCCASIONS: readonly Occasion[] = [
   live("sangeet", { suite: "rajbari", page: "sangeet" }, ["garba", "dandiya", "ladies sangeet"]),
   live("reception", { suite: "peshwai-wada", page: "reception" }, ["party", "dinner"]),
 
-  soon("anniversary", "family", { en: "Anniversary", hi: "सालगिरह" }, ["wedding anniversary"]),
-  soon("birthday", "family", { en: "Birthday", hi: "जन्मदिन" }, [
-    "janamdin",
-    "bday",
-    "first birthday",
-    "party",
-  ]),
+  live(
+    "birthday",
+    { suite: "gubbara", page: "cover" },
+    ["janamdin", "bday", "first birthday", "happy birthday", "kids party"],
+    "family",
+  ),
+  live(
+    "anniversary",
+    { suite: "saath", page: "cover" },
+    ["wedding anniversary", "silver jubilee", "golden jubilee", "25th", "50th"],
+    "family",
+  ),
   soon("baby-shower", "family", { en: "Baby shower", hi: "गोद भराई" }, [
     "godh bharai",
     "seemantham",
@@ -116,7 +148,12 @@ export const OCCASIONS: readonly Occasion[] = [
   soon("kitty-party", "parties", { en: "Kitty party", hi: "किटी पार्टी" }, ["kitty", "ladies"]),
   soon("reunion", "parties", { en: "Reunion", hi: "रीयूनियन" }, ["alumni", "get together"]),
   soon("retirement", "parties", { en: "Retirement", hi: "सेवानिवृत्ति" }, ["retirement party"]),
-  soon("cocktail", "parties", { en: "Cocktail party", hi: "कॉकटेल पार्टी" }, ["cocktail"]),
+  live(
+    "party",
+    { suite: "rooftop", page: "cover" },
+    ["cocktail", "rooftop", "get together", "dinner party", "new year"],
+    "parties",
+  ),
 
   soon("diwali", "festivals", { en: "Diwali", hi: "दिवाली" }, ["deepavali", "lakshmi puja"]),
   soon("holi", "festivals", { en: "Holi", hi: "होली" }, ["rang", "colours"]),
@@ -141,7 +178,7 @@ export const OCCASIONS: readonly Occasion[] = [
     "corporate",
     "team",
   ]),
-];
+].map(withTile);
 
 export function occasionById(id: string): Occasion | undefined {
   return OCCASIONS.find((occasion) => occasion.id === id);
@@ -191,8 +228,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
   gujarati: {
     id: "gujarati",
     ...pack("gujarati"),
-    art: { suite: "shahi-savari", page: "sangeet" },
-    suites: ["shahi-savari"],
+    art: { suite: "kutch-toran", page: "sangeet" },
+    suites: ["kutch-toran", "shahi-savari"],
     cards: ["bandhani"],
     keywords: ["gujrati", "kutch", "kathiawadi", "patel", "kankotri", "hast melap"],
   },
@@ -277,9 +314,17 @@ export const PAINTED_SUITES: readonly SuiteId[] = (Object.keys(SUITES) as SuiteI
   (id) => SUITES[id].images.cover,
 );
 
-/** Every design for an occasion: all the painted themes, then the cards that suit it. */
+/** Every design for an occasion: the painted themes made for it, then the cards that suit it. */
 export function occasionDesigns(category: CategoryId): GalleryDesign[] {
-  return [...PAINTED_SUITES.map(paintedDesign), ...CATEGORIES[category].templates.map(cardDesign)];
+  return [
+    ...PAINTED_SUITES.filter((suite) => suiteSuits(suite, category)).map(paintedDesign),
+    ...CATEGORIES[category].templates.map(cardDesign),
+  ];
+}
+
+/** The occasion a theme opens in the editor: its own, else a wedding. */
+export function suiteOccasion(suite: SuiteId): CategoryId {
+  return SUITES[suite].occasions?.[0] ?? "wedding";
 }
 
 /** Every design in the gallery, painted first. */

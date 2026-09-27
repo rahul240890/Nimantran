@@ -8,7 +8,7 @@ import { draftCategory, draftTradition } from "@/lib/editor/draft";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import type { StepProps } from "./types";
 import { SuiteThumb } from "@/components/invitation/story/suite-thumb";
-import { SUITES, SUITE_IDS, isSuiteId, suiteFor } from "@/lib/suites/catalog";
+import { SUITES, SUITE_IDS, isSuiteId, suiteFor, suiteSuits } from "@/lib/suites/catalog";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -26,7 +26,12 @@ export function DesignStep({ draft, update }: StepProps) {
   const allSuggested = order.length === suggested.length;
 
   // The event pages' theme: the host's choice, else the one their tradition suggests
-  const suggestedSuite = suiteFor({ ...draft, suite: null, tradition: draft.tradition.id });
+  const suggestedSuite = suiteFor({
+    ...draft,
+    suite: null,
+    tradition: draft.tradition.id,
+    category: draft.categoryId,
+  });
   const suite = draft.suite ?? suggestedSuite;
 
   return (
@@ -97,7 +102,10 @@ export function DesignStep({ draft, update }: StepProps) {
           }}
           className="grid-cols-1 min-[400px]:grid-cols-2"
         >
-          {SUITE_IDS.map((id) => {
+          {SUITE_IDS.filter(
+            // Themes painted for this occasion, the card colours, and whatever is chosen
+            (id) => suiteSuits(id, draft.categoryId) || id === "classic" || id === suite,
+          ).map((id) => {
             const pair = SUITES[id].template;
             const isSuggested = id === suggestedSuite;
             // Only a chosen tradition can be "yours"; otherwise the occasion's design suggests it
