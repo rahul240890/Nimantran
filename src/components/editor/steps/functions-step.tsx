@@ -200,6 +200,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
     return (
       <li
         key={id}
+        data-page-target={`fn-${id}`}
         className={cn(
           "overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-300",
           fn.included ? "border-marigold/70 shadow-float" : "border-line shadow-raised",

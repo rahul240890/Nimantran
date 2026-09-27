@@ -97,6 +97,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         translation: draft.translation,
         suite: draft.suite,
         textBox: draft.textBox,
+        type: draft.type,
       },
       languages: draft.languages,
     },
@@ -153,6 +154,7 @@ export function rowsToDraft(
     translation: event.religious?.translation,
     suite: event.religious?.suite,
     textBox: event.religious?.textBox,
+    type: event.religious?.type,
   });
   return draft ?? { ...base, remoteId: event.id };
 }

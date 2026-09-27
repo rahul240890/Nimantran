@@ -28,7 +28,9 @@ import {
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
+import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
+import "@/components/invitation/type/fonts.css";
 import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -106,6 +108,7 @@ export function GuestView({
       }),
       suite: draftSuite(draft),
       textBox: draft.textBox,
+      type: pageType(draft.type, [language]),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
     [copy, functions, replies, language, guestCopy.reply, draft],

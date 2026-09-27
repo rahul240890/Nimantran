@@ -446,3 +446,48 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
     classic: "आपके कार्ड के ही काग़ज़ और रंगों में पन्ने, हर रस्म का अपना दृश्य।",
   },
 };
+
+export const studioCopy: Translation<typeof en.studioCopy> = {
+  views: "दिखाएँ",
+  pages: "पन्ने",
+  card: "कार्ड",
+  pagesHint: "आप जो पन्ना भर रहे हैं, वह लिखते-लिखते यहाँ दिखता है।",
+  pageNames: {
+    cover: "मुखपृष्ठ",
+    family: "परिवार",
+    invite: "निमंत्रण",
+    reply: "जवाब",
+  },
+  pageList: "निमंत्रण के पन्ने",
+  showPage: (name) => `${name} का पन्ना दिखाएँ`,
+  phone: (name) => `${name} का पन्ना, जैसा मेहमान देखेंगे`,
+  lettering: "अक्षर",
+  letteringIntro:
+    "हर पन्ने पर शब्द कैसे दिखें, चुनें। सिर्फ़ वही फ़ॉन्ट दिखते हैं जो आपके कार्ड की भाषा लिख सकते हैं।",
+  namesFont: "नाम",
+  wordsFont: "बाक़ी शब्द",
+  themeFont: "थीम का अपना",
+  size: "आकार",
+  sizes: { small: "छोटा", medium: "मध्यम", large: "बड़ा" },
+  style: "नामों की शैली",
+  bold: "मोटा",
+  italic: "तिरछा",
+  capitals: "बड़े अक्षर",
+  colour: "नामों का रंग",
+  colours: {
+    theme: "थीम का अपना",
+    maroon: "मरून",
+    gold: "सुनहरा",
+    saffron: "केसरिया",
+    ink: "स्याही",
+    ivory: "हाथीदाँत",
+  },
+  feels: {
+    classic: "पारंपरिक",
+    script: "बहता हुआ",
+    bold: "गाढ़ा",
+    clean: "सादा",
+    handwritten: "हाथ से लिखा",
+  },
+  reset: "थीम के अक्षर वापस लाएँ",
+};

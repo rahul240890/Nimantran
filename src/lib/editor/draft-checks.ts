@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SUITE_IDS } from "@/lib/suites/catalog";
+import { defaultType, typeSchema } from "./type";
 import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
@@ -110,6 +111,8 @@ export const draftSchema = z.object({
   suite: z.enum(SUITE_IDS).nullable().catch(null),
   /** A box behind the words on painted pages (Step 12f). Off prints them on the painting. */
   textBox: z.boolean().catch(false),
+  /** The host's lettering on the pages (Step 12n): fonts, size, weight, slant, colour. */
+  type: typeSchema.catch(defaultType),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

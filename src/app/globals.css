@@ -540,6 +540,10 @@
     transparent
   );
 }
+/* Spaced-out capitals suit Latin letters; in Indic scripts spacing pulls the letters apart */
+.story-line:is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) {
+  letter-spacing: normal;
+}
 
 @theme inline {
   --color-paper: var(--paper);

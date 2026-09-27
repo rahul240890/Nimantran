@@ -132,6 +132,7 @@ test.describe("invite editor", () => {
     await expect(summary.getByText("Taj Falaknuma, Hyderabad")).toBeVisible();
     await expect(page.getByText(/Raag Bhupali/)).toBeVisible();
     // The live card carries the couple's names and the wedding's venue
+    await page.getByRole("button", { name: "Card", exact: true }).click();
     const card = page.locator("[data-engine-state]");
     await expect(card.locator(".sr-only").getByText("Aditya and Priya")).toBeAttached();
     await expect(card.locator(".sr-only").getByText("Taj Falaknuma, Hyderabad")).toBeAttached();
@@ -177,6 +178,7 @@ test.describe("invite editor", () => {
     if (page.viewportSize()!.width < 1024) {
       await page.getByRole("button", { name: "Preview" }).click();
     }
+    await page.getByRole("button", { name: "Card", exact: true }).click();
     const card = page.locator("[data-engine-state]");
     await expect(
       card.locator(".sr-only").getByText("seek your blessings at their roka ceremony"),
@@ -210,6 +212,7 @@ test.describe("invite editor", () => {
 
     const wide = page.viewportSize()!.width >= 1024;
     const card = page.locator("[data-engine-state] .sr-only");
+    if (wide) await page.getByRole("button", { name: "Card", exact: true }).click();
     if (wide) await expect(card.getByText("ஸ்ரீ விநாயகர் துணை")).toBeAttached();
     await page.getByRole("radio", { name: /In English letters/ }).click();
     if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toBeAttached();
@@ -227,6 +230,58 @@ test.describe("invite editor", () => {
     await next(page);
     const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
+  });
+
+  test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {
+    await page.goto(
+      "/create?quality=2d&category=wedding&tradition=gujarati&suite=shahi-savari&template=bandhani",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    const wide = page.viewportSize()!.width >= 1024;
+    const showPhone = async () => {
+      if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+    };
+    const hidePhone = async () => {
+      if (!wide) await page.keyboard.press("Escape");
+    };
+    await page.getByRole("textbox", { name: /First name/ }).fill("રાધા");
+    await page.getByRole("textbox", { name: /Second name/ }).fill("અર્જુન");
+    // Untyped lines preview in the card's language, never the design's English samples
+    await expect(page.getByRole("textbox", { name: /Families/ })).toHaveValue(
+      "પટેલ પરિવાર અને શાહ પરિવાર",
+    );
+
+    // Lettering: a Gujarati card offers only fonts that write Gujarati
+    const names = page.getByRole("radiogroup", { name: "Names", exact: true });
+    await expect(names.getByRole("radio", { name: /Great Vibes/ })).toHaveCount(0);
+    await names.getByRole("radio", { name: /Mogra/ }).click();
+    await page.getByRole("button", { name: "Bold", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Bold", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(await axe(page).include("#lettering-heading").analyze()).toMatchObject({
+      violations: [],
+    });
+
+    await showPhone();
+    const phone = page.getByRole("img", { name: /The Cover page, as guests see it/ });
+    await expect(phone).toBeVisible();
+    const name = page.locator('[data-page="cover"]').getByText("રાધા");
+    await expect(name).toHaveCSS("font-family", /Mogra/);
+    await expect(name).toHaveCSS("font-weight", "700");
+    await hidePhone();
+
+    await next(page);
+    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
+    await page.getByRole("checkbox", { name: /Sangeet/ }).focus();
+    await showPhone();
+    await expect(page.getByRole("img", { name: /The Sangeet page/ })).toBeVisible();
+    await expect(page.locator('[data-page="fn-sangeet"]').getByText("સંગીત સંધ્યા")).toBeVisible();
+    // Every page is a tap away
+    await page.getByRole("button", { name: "Show the Cover page" }).click();
+    await expect(page.getByRole("img", { name: /The Cover page/ })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
   });
 
   test("a save-the-date asks only for the date and the city", async ({ page }) => {
