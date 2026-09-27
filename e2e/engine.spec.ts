@@ -157,6 +157,8 @@ test.describe("event pages", () => {
     test(`turns full-screen pages one at a time, ${suite}, ${colorScheme} theme at ${width}px`, async ({
       page,
     }) => {
+      // Eight pages plus an accessibility scan over full-screen art: slower on CI runners
+      test.slow();
       const height = width === 1440 ? 900 : 720;
       await page.setViewportSize({ width, height });
       await page.emulateMedia({ colorScheme });
