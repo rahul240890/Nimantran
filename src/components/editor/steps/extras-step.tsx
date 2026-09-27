@@ -1,6 +1,7 @@
 "use client";
 
-import { ImagePlus, ImageIcon, X } from "lucide-react";
+import { ImageIcon, ImageOff, ImagePlus, Images, X } from "lucide-react";
+import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useRef, useState, type DragEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,12 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  COUPLE_LAYOUTS,
+  coupleFrameIds,
+  frameCount,
+  type CoupleLayout,
+} from "@/lib/editor/couple-photos";
 import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import { RAGAS } from "@/lib/engine/music";
@@ -192,6 +199,104 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
+const LAYOUT_ICONS: Record<CoupleLayout, typeof ImageIcon> = {
+  none: ImageOff,
+  one: ImageIcon,
+  two: Images,
+};
+
+/** The couple's photo page (Step 12l): none, one photo, or two, and which photo fills each frame. */
+function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { extrasCopy } = useText(editorText);
+  const ids = draft.photos.map((photo) => photo.id);
+  const urls = usePhotoUrls(ids, draft.remoteId);
+  const { layout } = draft.couplePhotos;
+  const frames = frameCount(layout);
+  const filled = coupleFrameIds(draft.couplePhotos, ids);
+
+  const choose = (frame: number, id: string) =>
+    update((current) => {
+      const next = coupleFrameIds(current.couplePhotos, ids);
+      // The photo leaves any other frame it was in, which then takes the next free one
+      const picked = next.map((other, i) => (i === frame ? id : other === id ? "" : other));
+      picked[frame] = id;
+      return { ...current, couplePhotos: { ...current.couplePhotos, ids: picked } };
+    });
+
+  return (
+    <section
+      aria-labelledby="couple-heading"
+      data-page-target="couple"
+      className="flex flex-col gap-4 border-t border-line pt-6"
+    >
+      <div className="flex flex-col gap-1">
+        <h2 id="couple-heading" className="font-display text-xl">
+          {extrasCopy.coupleHeading}
+        </h2>
+        <p className="text-sm text-ink-muted">{extrasCopy.coupleHint}</p>
+      </div>
+      <RadioGroup
+        label={extrasCopy.coupleHeading}
+        variant="card"
+        value={layout}
+        onValueChange={(next) =>
+          update((current) => ({
+            ...current,
+            couplePhotos: { ...current.couplePhotos, layout: next as CoupleLayout },
+          }))
+        }
+        className="grid-cols-1"
+      >
+        {COUPLE_LAYOUTS.map((id) => {
+          const Icon = LAYOUT_ICONS[id];
+          return (
+            <RadioItem key={id} value={id} icon={<Icon />} label={extrasCopy.coupleLayouts[id]} />
+          );
+        })}
+      </RadioGroup>
+      {frames > 0 && ids.length === 0 && (
+        <p className="text-sm text-ink-muted">{extrasCopy.coupleAddFirst}</p>
+      )}
+      {frames > 0 &&
+        ids.length > 1 &&
+        Array.from({ length: frames }, (_, frame) => (
+          <div key={frame} className="flex flex-col gap-2">
+            <p id={`couple-frame-${frame}`} className="text-sm font-semibold text-ink">
+              {extrasCopy.coupleFrame(frame + 1, frames)}
+            </p>
+            <RadioPrimitive.Root
+              aria-labelledby={`couple-frame-${frame}`}
+              orientation="horizontal"
+              value={filled[frame] ?? ""}
+              onValueChange={(id) => choose(frame, id)}
+              className="flex flex-wrap gap-2"
+            >
+              {draft.photos.map((photo, index) => {
+                const url = urls[photo.id];
+                return (
+                  <RadioPrimitive.Item
+                    key={photo.id}
+                    value={photo.id}
+                    aria-label={extrasCopy.useThisPhoto(index + 1)}
+                    className="size-14 cursor-pointer overflow-hidden rounded-md border-2 border-line bg-surface-2 transition-[border-color,box-shadow] duration-200 hover:border-line-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=checked]:border-marigold data-[state=checked]:shadow-[0_0_0_2px_var(--marigold)]"
+                  >
+                    {url ? (
+                      // Local object URLs: next/image can't optimise these
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={url} alt="" className="size-full object-cover" />
+                    ) : (
+                      <ImageIcon aria-hidden className="m-auto size-5 text-ink-faint" />
+                    )}
+                  </RadioPrimitive.Item>
+                );
+              })}
+            </RadioPrimitive.Root>
+          </div>
+        ))}
+    </section>
+  );
+}
+
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
   const own = TEMPLATES[draft.templateId].music.raga;
@@ -291,6 +396,7 @@ export function ExtrasStep({ draft, update }: StepProps) {
   return (
     <div className="flex flex-col gap-8">
       <Photos draft={draft} update={update} />
+      <CouplePage draft={draft} update={update} />
       <Music draft={draft} update={update} />
       <Questions draft={draft} update={update} />
     </div>

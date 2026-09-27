@@ -123,6 +123,10 @@ test.describe("invite editor", () => {
       buffer: PNG,
     });
     await expect(page.getByRole("img", { name: "Photo 1" })).toBeVisible();
+    // The photo goes into the theme's own frame on a page after the names
+    const onePhoto = page.getByRole("radio", { name: "One photo of you both" });
+    await onePhoto.click();
+    await expect(onePhoto).toBeChecked();
     await page.getByRole("radio", { name: /Raag Bhupali/ }).click();
     await next(page);
 

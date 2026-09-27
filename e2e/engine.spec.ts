@@ -212,6 +212,29 @@ test.describe("event pages", () => {
     });
   }
 
+  test("the couple's photos show through the theme's frames", async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto("/engine?quality=2d&suite=noor-bagh&photos=2");
+    await page.getByRole("button", { name: "Open invitation" }).click();
+    const story = page.locator("[data-story-beat]");
+    await expect(story).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("button", { name: "Pause the pages" }).click();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await expect(story).toHaveAttribute("data-story-beat", "couple");
+    const photos = story.locator(
+      '[data-page="couple"] img[src*="/suites/kayal/"], [data-page="couple"] img[src*="/suites/rajbari/"]',
+    );
+    await expect(photos).toHaveCount(2);
+    // Both frames stay whole on a narrow phone: each photo is fully on screen
+    for (const photo of await photos.all()) {
+      const box = (await photo.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(360);
+    }
+    await expect(story.getByText("Sample photo, Sample photo")).toBeAttached();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
   test("the box behind the words switches live from the pages", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.setViewportSize({ width: 390, height: 780 });

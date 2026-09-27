@@ -22,6 +22,7 @@ import { cn } from "@/lib/cn";
 import { pageType, type PageType } from "@/lib/editor/type";
 import { Mail, Smartphone } from "lucide-react";
 import { PagePreview } from "./page-preview";
+import { useCouplePhotos } from "./use-couple-photos";
 
 type PreviewStageProps = {
   draft: InviteDraft;
@@ -72,6 +73,7 @@ export function PreviewStage({
   const { textBox } = draft;
   const typeKey = JSON.stringify(pageType(draft.type, [language]));
   const type = useMemo(() => JSON.parse(typeKey) as PageType, [typeKey]);
+  const couple = useCouplePhotos(draft, deferredCopy);
   const story = useMemo<InvitationStory>(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
     const family = JSON.parse(familyKey) as ReturnType<typeof storyFamily>;
@@ -82,13 +84,14 @@ export function PreviewStage({
         replies: true,
         words: CARD_STORY_WORDS[language],
         family,
+        couple,
       }),
       suite,
       textBox,
       type,
       onTextBox,
     };
-  }, [functionsKey, familyKey, deferredCopy, language, suite, textBox, type, onTextBox]);
+  }, [functionsKey, familyKey, deferredCopy, language, suite, textBox, type, onTextBox, couple]);
 
   const { templateId } = draft;
   const { raga } = draft.music;

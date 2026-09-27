@@ -1,4 +1,5 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
+import { cn } from "@/lib/cn";
 import type { Suite } from "@/lib/suites/catalog";
 
 /*
@@ -580,6 +581,8 @@ export function SuiteBackdrop({
   seconds,
   lazy = false,
   className,
+  under,
+  contain = false,
   children,
 }: {
   suite: Suite;
@@ -589,6 +592,10 @@ export function SuiteBackdrop({
   /** Load the painting only when it scrolls near, for pickers with many themes. */
   lazy?: boolean;
   className?: string;
+  /** Drawn under the painting and moving with it: photos showing through its frames. */
+  under?: ReactNode;
+  /** Show the whole painting (its frames must not be cropped), a blurred copy filling round it. */
+  contain?: boolean;
   children?: ReactNode;
 }) {
   const raw = useId();
@@ -600,6 +607,17 @@ export function SuiteBackdrop({
         className="suite-drift absolute inset-0"
         style={seconds ? ({ "--suite-duration": `${seconds + 2}s` } as Vars) : undefined}
       >
+        {contain && image && (
+          // eslint-disable-next-line @next/next/no-img-element -- decorative fill round the painting
+          <img
+            src={image}
+            alt=""
+            decoding="async"
+            draggable={false}
+            className="pointer-events-none absolute inset-0 size-full scale-110 object-cover opacity-80 blur-2xl select-none"
+          />
+        )}
+        {under}
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element -- decorative, sized by the page
           <img
@@ -609,7 +627,13 @@ export function SuiteBackdrop({
             loading={lazy ? "lazy" : undefined}
             // A mouse swipe across the page must turn it, not start dragging the picture
             draggable={false}
-            className="pointer-events-none size-full object-cover select-none"
+            className={cn(
+              "pointer-events-none relative size-full select-none",
+              // Its top and bottom edges melt into the blurred copy round it
+              contain
+                ? "[mask-image:linear-gradient(to_bottom,transparent,black_4%,black_96%,transparent)] object-contain"
+                : "object-cover",
+            )}
           />
         ) : (
           <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid slice" className="size-full!">

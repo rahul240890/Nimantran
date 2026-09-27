@@ -52,7 +52,12 @@ export type StoryBeat = {
   seconds: number;
   /** A function page's Directions and Add to calendar links. */
   links?: { maps: string | null; calendar: string | null };
+  /** The couple's photos on their photo page: one of them together, or one each. */
+  photos?: readonly StoryPhoto[];
 };
+
+/** A photo on the couple's page: where it loads from and what it shows. */
+export type StoryPhoto = { src: string; alt: string };
 
 export type StoryInput = {
   copy: CardCopy;
@@ -62,6 +67,8 @@ export type StoryInput = {
   words: StoryWords;
   /** The tradition's family wording (blessings from, hosts), as the family wrote it. */
   family?: readonly FamilyLine[];
+  /** The couple's photos (one or two) for a photo page after the cover; none skips it. */
+  couple?: readonly StoryPhoto[];
 };
 
 /** One labelled block of the family's wording: "आशीर्वाद" over the grandparents' names. */
@@ -118,6 +125,7 @@ export function storyBeats({
   replies,
   words: w,
   family = [],
+  couple = [],
 }: StoryInput): StoryBeat[] {
   const beats: StoryBeat[] = [];
   // A birthday or a party is led by one name, with nothing to join
@@ -139,6 +147,19 @@ export function storyBeats({
       Boolean(copy.symbol),
     ),
   );
+
+  // The couple's photo page: their photo in the theme's own frame, their names beneath
+  if (couple.length > 0) {
+    // One-name occasions (a birthday) have no joiner or second name
+    const names = [
+      ...line(copy.first, "display"),
+      ...(copy.second.trim() ? line(joiner, "joiner") : []),
+      ...line(copy.second, "display"),
+    ];
+    // A photo takes a moment longer to take in than a line of words
+    const page = beat("couple", "cover", names);
+    beats.push({ ...page, seconds: Math.max(page.seconds, 6), photos: couple.slice(0, 2) });
+  }
 
   // The family page: who invites, their words, and the day itself
   const blessings = [
