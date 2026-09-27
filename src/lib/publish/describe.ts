@@ -6,6 +6,7 @@ import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import {
   draftCopy,
+  draftPeople,
   formatCardDate,
   includedFunctions,
   mainFunction,
@@ -21,7 +22,7 @@ import type { CalendarEntry } from "./calendar";
 export function inviteNames(draft: InviteDraft): string {
   const copy = draftCopy(draft);
   const first = draft.content.first?.trim() || copy.first;
-  const second = draft.content.second?.trim() || copy.second;
+  const second = draftPeople(draft) === "one" ? "" : draft.content.second?.trim() || copy.second;
   const joiner = draft.content.joiner?.trim() || "&";
   return second ? `${first} ${joiner} ${second}` : first;
 }

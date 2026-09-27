@@ -179,6 +179,21 @@ export const functionCopy: Translation<typeof en.functionCopy> = {
     description: "सबके साथ भोज और जश्न",
     dressIdeas: ["औपचारिक", "ब्लैक टाई", "उत्सवी शाम के कपड़े"],
   },
+  birthday: {
+    name: "जन्मदिन की पार्टी",
+    description: "केक, खेल और जन्मदिन पर आशीर्वाद",
+    dressIdeas: ["हल्के रंग", "स्मार्ट कैज़ुअल", "जैसे चाहें"],
+  },
+  anniversary: {
+    name: "सालगिरह का भोज",
+    description: "साथ बिताए बरसों के जश्न की शाम",
+    dressIdeas: ["औपचारिक", "उत्सवी पारंपरिक", "लाल और सुनहरा"],
+  },
+  party: {
+    name: "पार्टी",
+    description: "संगीत, खाना और दोस्त",
+    dressIdeas: ["स्मार्ट कैज़ुअल", "कॉकटेल", "कुछ चमकीला"],
+  },
 };
 
 export const functionFields: Translation<typeof en.functionFields> = {
@@ -217,6 +232,20 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   bothLanguages: (main, second) => `${main} और ${second}`,
   secondHeading: (language) => `${language} में कार्ड`,
   secondHint: (main) => `कोई पंक्ति ख़ाली छोड़ें तो ${main} कार्ड वाले शब्द ही आएँगे।`,
+};
+
+export const namesCopy: Translation<typeof en.namesCopy> = {
+  steps: {
+    birthday: { label: "जन्मदिन", eyebrow: "जन्मदिन", title: "किसका जन्मदिन है?" },
+    anniversary: { label: "जोड़ा", eyebrow: "जोड़ा", title: "किनकी सालगिरह है?" },
+    party: { label: "पार्टी", eyebrow: "पार्टी", title: "पार्टी का नाम क्या है?" },
+  },
+  one: {
+    birthday: { label: "जन्मदिन वाले का नाम", example: "आरव" },
+    party: { label: "पार्टी का नाम", example: "दिवाली की रात" },
+  },
+  oneHint:
+    "यह मुखपृष्ठ पर बड़े अक्षरों में छपता है। कौन बुला रहा है और क्यों, यह नीचे के शब्दों में लिखें।",
 };
 
 export const extrasCopy: Translation<typeof en.extrasCopy> = {
@@ -433,6 +462,10 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
     "phulkari-haveli": "फुलकारी हवेली",
     rajbari: "राजबाड़ी",
     "peshwai-wada": "पेशवाई वाडा",
+    "kutch-toran": "कच्छ तोरण",
+    gubbara: "गुब्बारा",
+    saath: "साथ",
+    rooftop: "रूफ़टॉप",
     classic: "कार्ड के रंग",
   },
   descriptions: {
@@ -443,6 +476,10 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
     "phulkari-haveli": "फुलकारी से सजी पंजाबी हवेली, ढोल, गेंदे और सरसों के खेत।",
     rajbari: "लाल-सफ़ेद पुरानी बंगाली हवेली, केले के पौधे और शोला के फूल।",
     "peshwai-wada": "पैठणी रंगों में पेशवाकालीन लकड़ी का वाडा, रंगोली और आम के पत्ते।",
+    "kutch-toran": "शीशे के काम और बांधनी से सजा कच्छ का भूंगा आँगन, पीछे सफ़ेद रण।",
+    gubbara: "गुब्बारों और झंडियों वाला हल्के रंगों का बाग़ीचा, नीचे केक की मेज़।",
+    saath: "सूर्यास्त में झील पर लाल गुलाब और मोमबत्तियाँ, साथ के बरसों के लिए।",
+    rooftop: "रात में शहर की छत, झिलमिल रोशनियाँ, गद्दे और आतिशबाज़ी।",
     classic: "आपके कार्ड के ही काग़ज़ और रंगों में पन्ने, हर रस्म का अपना दृश्य।",
   },
 };

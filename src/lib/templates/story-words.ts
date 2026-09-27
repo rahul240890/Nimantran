@@ -96,6 +96,122 @@ export const CARD_SAMPLES: Record<Exclude<CardLanguage, "en">, Partial<Record<Sl
   },
 };
 
+type Samples = Record<Exclude<CardLanguage, "en">, Partial<Record<SlotId, string>>>;
+
+/**
+ * Occasions beyond weddings (Step 12p) change the sample's gates, family line and invitation,
+ * and a birthday or a party its one name, so a Gujarati birthday card reads as a birthday.
+ */
+export const CARD_OCCASION_SAMPLES: Partial<Record<"birthday" | "anniversary" | "party", Samples>> =
+  {
+    birthday: {
+      hi: {
+        doorLeft: "जन्मदिन",
+        doorRight: "मुबारक",
+        families: "शर्मा परिवार",
+        first: "आरव",
+        line: "जन्मदिन की ख़ुशियों में आपको सादर आमंत्रित करते हैं",
+      },
+      mr: {
+        doorLeft: "वाढदिवस",
+        doorRight: "शुभेच्छा",
+        families: "देशपांडे परिवार",
+        first: "आरव",
+        line: "वाढदिवसाच्या आनंदात सहभागी होण्यासाठी आपणास आग्रहाचे निमंत्रण",
+      },
+      gu: {
+        doorLeft: "જન્મદિવસ",
+        doorRight: "મુબારક",
+        families: "પટેલ પરિવાર",
+        first: "આરવ",
+        line: "જન્મદિવસની ઉજવણીમાં પધારવા ભાવભર્યું આમંત્રણ",
+      },
+      bn: {
+        doorLeft: "শুভ",
+        doorRight: "জন্মদিন",
+        families: "বসু পরিবার",
+        first: "আরভ",
+        line: "জন্মদিনের আনন্দে আপনাকে সাদর আমন্ত্রণ জানাই",
+      },
+      ta: {
+        doorLeft: "பிறந்தநாள்",
+        doorRight: "வாழ்த்துகள்",
+        families: "ஐயர் குடும்பத்தினர்",
+        first: "ஆரவ்",
+        line: "பிறந்தநாள் கொண்டாட்டத்திற்கு தங்களை அன்புடன் அழைக்கிறோம்",
+      },
+    },
+    anniversary: {
+      hi: {
+        doorLeft: "शुभ",
+        doorRight: "सालगिरह",
+        families: "बच्चों और परिवार के साथ",
+        line: "शादी की सालगिरह पर आपको सादर आमंत्रित करते हैं",
+      },
+      mr: {
+        doorLeft: "लग्नाचा",
+        doorRight: "वाढदिवस",
+        families: "मुले व परिवारासह",
+        line: "लग्नाच्या वाढदिवसानिमित्त आपणास सस्नेह निमंत्रण",
+      },
+      gu: {
+        doorLeft: "શુભ",
+        doorRight: "લગ્નજયંતી",
+        families: "બાળકો અને પરિવાર સાથે",
+        line: "લગ્નજયંતીની ઉજવણીમાં પધારવા ભાવભર્યું આમંત્રણ",
+      },
+      bn: {
+        doorLeft: "শুভ",
+        doorRight: "বিবাহবার্ষিকী",
+        families: "সন্তান ও পরিবারের সঙ্গে",
+        line: "বিবাহবার্ষিকীর উৎসবে আপনাকে সাদর আমন্ত্রণ জানাই",
+      },
+      ta: {
+        doorLeft: "திருமண",
+        doorRight: "நாள்",
+        families: "குழந்தைகள் மற்றும் குடும்பத்துடன்",
+        line: "திருமண நாள் கொண்டாட்டத்திற்கு தங்களை அன்புடன் அழைக்கிறோம்",
+      },
+    },
+    party: {
+      hi: {
+        doorLeft: "आप",
+        doorRight: "आमंत्रित हैं",
+        families: "प्रिया और रोहन",
+        first: "दिवाली की रात",
+        line: "संगीत, खाने और दोस्तों की शाम में आपका स्वागत है",
+      },
+      mr: {
+        doorLeft: "आपले",
+        doorRight: "स्वागत",
+        families: "प्रिया आणि रोहन",
+        first: "दिवाळी रात्र",
+        line: "संगीत, जेवण आणि मित्रांच्या संध्याकाळी आपणास निमंत्रण",
+      },
+      gu: {
+        doorLeft: "આપનું",
+        doorRight: "સ્વાગત",
+        families: "પ્રિયા અને રોહન",
+        first: "દિવાળીની રાત",
+        line: "સંગીત, ભોજન અને મિત્રોની સાંજમાં આપનું સ્વાગત છે",
+      },
+      bn: {
+        doorLeft: "আপনাকে",
+        doorRight: "স্বাগতম",
+        families: "প্রিয়া ও রোহন",
+        first: "দীপাবলির রাত",
+        line: "গান, খাবার আর বন্ধুদের সন্ধ্যায় আপনাকে আমন্ত্রণ",
+      },
+      ta: {
+        doorLeft: "அன்புடன்",
+        doorRight: "வரவேற்கிறோம்",
+        families: "பிரியா மற்றும் ரோஹன்",
+        first: "தீபாவளி இரவு",
+        line: "இசை, உணவு, நண்பர்களுடன் ஒரு மாலைக்கு அழைக்கிறோம்",
+      },
+    },
+  };
+
 /** The date a card shows before the host sets one. */
 export const SAMPLE_DATE = "2027-02-14";
 

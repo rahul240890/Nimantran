@@ -10,6 +10,7 @@ import { slotLabels } from "@/content/templates-review";
 import {
   cardLanguages,
   COUPLE_SLOTS,
+  draftPeople,
   coupleValue,
   draftCopy,
   languageOptions,
@@ -41,12 +42,19 @@ function SlotField({
   error,
   onChange,
   translation,
+  label,
+  example,
+  hint,
 }: {
   id: SlotId;
   template: Template;
   value: string;
   error?: string;
   onChange: (value: string) => void;
+  /** The occasion's own name for the slot (a birthday name), with its example and hint. */
+  label?: string;
+  example?: string;
+  hint?: string;
   /** A field for the second language: optional, showing what repeats when left empty. */
   translation?: { language: CardLanguage; placeholder: string };
 }) {
@@ -57,14 +65,14 @@ function SlotField({
     doorRight: coupleCopy.doorsHint,
   };
   const rule = SLOT_RULES[id];
-  const sample = template.slots.find((slot) => slot.id === id)?.sample;
+  const sample = example ?? template.slots.find((slot) => slot.id === id)?.sample;
   const Control = rule.kind === "long" ? Textarea : Input;
   return (
     <Field
-      label={slotLabels[id]}
+      label={label ?? slotLabels[id]}
       required={rule.required && !translation}
       optionalLabel={editor.optional}
-      hint={translation ? undefined : hints[id]}
+      hint={translation ? undefined : (hint ?? hints[id])}
       error={error ? editor.errors[error as keyof typeof editor.errors] : undefined}
       aside={
         rule.kind === "short" && rule.maxLength <= 14 ? undefined : (
@@ -135,10 +143,15 @@ function LanguageChoice({ draft, update }: Pick<StepProps, "draft" | "update">) 
 }
 
 export function CoupleStep({ draft, update, errors }: StepProps) {
-  const { coupleCopy } = useText(editorText);
+  const { coupleCopy, namesCopy } = useText(editorText);
   const template = TEMPLATES[draft.templateId];
   const used = new Set(slotsOf(template));
-  const names = NAME_SLOTS.filter((id) => used.has(id));
+  // A birthday or a party is led by one name: no second name and nothing to join them
+  const one =
+    draftPeople(draft) === "one"
+      ? (namesCopy.one[draft.categoryId as keyof typeof namesCopy.one] ?? null)
+      : null;
+  const names = (one ? ["first" as const] : NAME_SLOTS).filter((id) => used.has(id));
   const wording = COUPLE_SLOTS.filter((id) => used.has(id) && !NAME_SLOTS.includes(id));
 
   const set = (id: SlotId, value: string) =>
@@ -160,6 +173,9 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       value={coupleValue(draft, template, id)}
       error={errors[id]}
       onChange={(value) => set(id, value)}
+      {...(id === "first" && one
+        ? { label: one.label, example: one.example, hint: namesCopy.oneHint }
+        : {})}
     />
   );
 
@@ -172,6 +188,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
         value={draft.translation[id] ?? ""}
         onChange={(value) => setTranslation(id, value)}
         translation={{ language: second, placeholder: shownOn(secondCopy, id) }}
+        label={id === "first" && one ? one.label : undefined}
       />
     ) : null;
 

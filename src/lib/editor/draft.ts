@@ -1,11 +1,11 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/ids";
+import { RSVP_QUESTION_IDS, type People, type RsvpQuestionId } from "@/lib/categories/ids";
 import type { Category } from "@/lib/categories/schema";
-import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
+import { FUNCTION_IDS, OCCASION_FUNCTIONS, type FunctionId } from "@/lib/events/functions";
 import { CARD_LANGUAGES, formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy, type CardCopy } from "@/lib/templates/content";
-import { CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
+import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
 import {
@@ -113,6 +113,11 @@ export function draftCategory(draft: InviteDraft): Category {
   return CATEGORIES[draft.categoryId];
 }
 
+/** Whose names lead the card: a couple, or one name for a birthday or a party. */
+export function draftPeople(draft: InviteDraft): People {
+  return draftCategory(draft).people ?? "couple";
+}
+
 /**
  * Switches the occasion. The functions it plans are ticked and the rest unticked, but
  * every date, venue and word already typed is kept, so switching back loses nothing.
@@ -169,9 +174,15 @@ export function functionOrder(draft: InviteDraft): {
   const pack = draft.categoryId === "wedding" ? draftTradition(draft) : null;
   const own: readonly FunctionId[] = [...category.functions.suggested, ...(pack?.functions ?? [])];
   const suggested = FUNCTION_IDS.filter((id) => own.includes(id));
-  // A save-the-date announces one date; other occasions can add any function
+  // A save-the-date announces one date; a wedding's occasions can add any wedding function,
+  // and a birthday, anniversary or party the other parties
+  const family = category.group === "wedding-journey";
   const more =
-    category.schedule === "date-only" ? [] : FUNCTION_IDS.filter((id) => !suggested.includes(id));
+    category.schedule === "date-only"
+      ? []
+      : FUNCTION_IDS.filter(
+          (id) => !suggested.includes(id) && OCCASION_FUNCTIONS.includes(id) !== family,
+        );
   return { suggested, more };
 }
 
@@ -311,7 +322,7 @@ export function draftCopy(
   const tradition = traditionWording(draft, language);
   // Untyped slots preview in the card's own language: the occasion's and the design's
   // samples are English, so other languages use their own sample wording instead
-  const samples = language === "en" ? draftCategory(draft).wording : CARD_SAMPLES[language];
+  const samples = language === "en" ? draftCategory(draft).wording : cardSamples(draft, language);
   for (const id of COUPLE_SLOTS) {
     // The tradition's wording in the second language beats the main card's typed words
     const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
@@ -329,6 +340,11 @@ export function draftCopy(
       content.date = formatCardDate(fn.date, language).slice(0, SLOT_RULES.date.maxLength);
     }
     if (fn.venue.trim()) content.venue = fn.venue.slice(0, SLOT_RULES.venue.maxLength);
+  }
+  // A card led by one name has no second name and nothing to join them
+  if (draftPeople(draft) === "one") {
+    content.joiner = "";
+    content.second = "";
   }
   const copy = toCardCopy(template, content);
   // The invocation belongs on the card even when the design has no blessing line
@@ -351,7 +367,16 @@ function languageSample(draft: InviteDraft, template: Template, id: SlotId): str
   const main = cardLanguages(draft)[0];
   return main === "en"
     ? sampleOf(template, id, draftCategory(draft))
-    : (CARD_SAMPLES[main][id] ?? "");
+    : (cardSamples(draft, main)[id] ?? "");
+}
+
+/** The sample wording in a language other than English, for this occasion. */
+function cardSamples(
+  draft: InviteDraft,
+  language: Exclude<CardLanguage, "en">,
+): Partial<Record<SlotId, string>> {
+  const own = CARD_OCCASION_SAMPLES[draft.categoryId as keyof typeof CARD_OCCASION_SAMPLES];
+  return { ...CARD_SAMPLES[language], ...own?.[language] };
 }
 
 /** What a couple field holds: the host's words, or the starting wording for optional slots. */
