@@ -120,13 +120,18 @@ export function withCategory(draft: InviteDraft, categoryId: CategoryId): Invite
   return { ...draft, categoryId, functions };
 }
 
-/** Functions in the order the editor lists them: the occasion's own first, then the rest. */
+/**
+ * Functions in the order the editor lists them: the occasion's own first (with a
+ * wedding's, the tradition's own too), then the rest, each list in the order they happen.
+ */
 export function functionOrder(draft: InviteDraft): {
   suggested: FunctionId[];
   more: FunctionId[];
 } {
   const category = draftCategory(draft);
-  const suggested = FUNCTION_IDS.filter((id) => category.functions.suggested.includes(id));
+  const pack = draft.categoryId === "wedding" ? draftTradition(draft) : null;
+  const own: readonly FunctionId[] = [...category.functions.suggested, ...(pack?.functions ?? [])];
+  const suggested = FUNCTION_IDS.filter((id) => own.includes(id));
   // A save-the-date announces one date; other occasions can add any function
   const more =
     category.schedule === "date-only" ? [] : FUNCTION_IDS.filter((id) => !suggested.includes(id));

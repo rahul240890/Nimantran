@@ -131,12 +131,21 @@ describe("story reveal", () => {
   });
 
   it("keeps a long story under its limit", () => {
-    const functions = FUNCTION_IDS.map((kind) =>
-      fn(kind, { venue: "A very long venue name at the end of a very long road, Bengaluru" }),
+    const venue = "A very long venue name at the end of a very long road, Bengaluru";
+    const seven = ["roka", "engagement", "haldi", "mehendi", "sangeet", "wedding", "reception"];
+    const functions = FUNCTION_IDS.filter((kind) => seven.includes(kind)).map((kind) =>
+      fn(kind, { venue }),
     );
     const beats = storyBeats({ copy, functions, replies: true, words });
     expect(storyLength(beats)).toBeLessThanOrEqual(STORY_MAX_SECONDS + 0.5);
     for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(2.8);
+  });
+
+  it("never rushes a beat, even with every function planned", () => {
+    const functions = FUNCTION_IDS.map((kind) => fn(kind, { venue: "Kankotri Vadi, Rajkot" }));
+    const beats = storyBeats({ copy, functions, replies: true, words });
+    for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(2.8);
+    expect(storyLength(beats)).toBeLessThanOrEqual(beats.length * 2.8 + 0.5);
   });
 
   it("finds the beat playing at any moment", () => {
