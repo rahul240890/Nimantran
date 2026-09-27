@@ -1,10 +1,21 @@
 "use client";
 
+import { languageName } from "@/components/invitation/card-language-toggle";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
+import type { ReactNode } from "react";
 import { slotLabels } from "@/content/templates-review";
-import { COUPLE_SLOTS, coupleValue } from "@/lib/editor/draft";
+import {
+  cardLanguages,
+  COUPLE_SLOTS,
+  coupleValue,
+  draftCopy,
+  languageOptions,
+  type CardLanguage,
+} from "@/lib/editor/draft";
+import type { CardCopy } from "@/lib/templates/content";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
@@ -14,18 +25,29 @@ import { editorText } from "@/i18n/copy";
 
 const NAME_SLOTS: readonly SlotId[] = ["first", "joiner", "second"];
 
+/** What a slot shows on a card, for the second language's placeholders. */
+function shownOn(copy: CardCopy, id: SlotId): string {
+  if (id === "doorLeft") return copy.doors[0];
+  if (id === "doorRight") return copy.doors[1];
+  if (id === "date" || id === "venue") return "";
+  return copy[id];
+}
+
 function SlotField({
   id,
   template,
   value,
   error,
   onChange,
+  translation,
 }: {
   id: SlotId;
   template: Template;
   value: string;
   error?: string;
   onChange: (value: string) => void;
+  /** A field for the second language: optional, showing what repeats when left empty. */
+  translation?: { language: CardLanguage; placeholder: string };
 }) {
   const { coupleCopy, editor } = useText(editorText);
   const hints: Partial<Record<SlotId, string>> = {
@@ -39,9 +61,9 @@ function SlotField({
   return (
     <Field
       label={slotLabels[id]}
-      required={rule.required}
+      required={rule.required && !translation}
       optionalLabel={editor.optional}
-      hint={hints[id]}
+      hint={translation ? undefined : hints[id]}
       error={error ? editor.errors[error as keyof typeof editor.errors] : undefined}
       aside={
         rule.kind === "short" && rule.maxLength <= 14 ? undefined : (
@@ -57,14 +79,57 @@ function SlotField({
       <Control
         value={value}
         maxLength={rule.maxLength}
-        placeholder={rule.required && sample ? coupleCopy.example(sample) : undefined}
+        placeholder={
+          translation
+            ? translation.placeholder || undefined
+            : rule.required && sample
+              ? coupleCopy.example(sample)
+              : undefined
+        }
+        lang={translation?.language}
         autoComplete="off"
         spellCheck={rule.kind === "long"}
         onChange={(event) => onChange(event.target.value)}
         className={rule.kind === "name" ? "font-display text-xl" : undefined}
-        data-slot={id}
+        data-slot={translation ? undefined : id}
+        data-translation={translation ? id : undefined}
       />
     </Field>
+  );
+}
+
+function LanguageChoice({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { coupleCopy } = useText(editorText);
+  const [own, other] = languageOptions(draft);
+  const choices: CardLanguage[][] = [[own], [other], [own, other]];
+  const label = (choice: CardLanguage[]) =>
+    choice.length === 2
+      ? coupleCopy.bothLanguages(languageName(choice[0]!), languageName(choice[1]!))
+      : languageName(choice[0]!);
+  return (
+    <section aria-labelledby="languages-heading" className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <h2 id="languages-heading" className="font-display text-xl">
+          {coupleCopy.languagesHeading}
+        </h2>
+        <p className="text-sm text-ink-muted">{coupleCopy.languagesHint}</p>
+      </div>
+      <RadioGroup
+        label={coupleCopy.languagesHeading}
+        orientation="horizontal"
+        value={cardLanguages(draft).join("+")}
+        onValueChange={(value) =>
+          update((current) => ({
+            ...current,
+            languages: choices.find((choice) => choice.join("+") === value) ?? ["en"],
+          }))
+        }
+      >
+        {choices.map((choice) => (
+          <RadioItem key={choice.join("+")} value={choice.join("+")} label={label(choice)} />
+        ))}
+      </RadioGroup>
+    </section>
   );
 }
 
@@ -78,6 +143,14 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
 
+  const [main, second] = cardLanguages(draft);
+  const secondCopy = second ? draftCopy(draft, second) : null;
+  const setTranslation = (id: SlotId, value: string) =>
+    update((current) => ({
+      ...current,
+      translation: { ...current.translation, [id]: value },
+    }));
+
   const field = (id: SlotId) => (
     <SlotField
       key={id}
@@ -89,9 +162,38 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
     />
   );
 
+  const translatedField = (id: SlotId) =>
+    second && secondCopy ? (
+      <SlotField
+        key={id}
+        id={id}
+        template={template}
+        value={draft.translation[id] ?? ""}
+        onChange={(value) => setTranslation(id, value)}
+        translation={{ language: second, placeholder: shownOn(secondCopy, id) }}
+      />
+    ) : null;
+
+  const wordingGrid = (render: (id: SlotId) => ReactNode) => (
+    <div className="grid gap-5 sm:grid-cols-2">
+      {wording.map((id) => (
+        <div
+          key={id}
+          className={id === "doorLeft" || id === "doorRight" ? undefined : "sm:col-span-2"}
+        >
+          {render(id)}
+        </div>
+      ))}
+    </div>
+  );
+
   return (
     <div className="flex flex-col gap-8">
-      <section aria-labelledby="names-heading" className="flex flex-col gap-5">
+      <LanguageChoice draft={draft} update={update} />
+      <section
+        aria-labelledby="names-heading"
+        className="flex flex-col gap-5 border-t border-line pt-6"
+      >
         <div className="flex flex-col gap-1">
           <h2 id="names-heading" className="font-display text-xl">
             {coupleCopy.namesHeading}
@@ -108,16 +210,22 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           <h2 id="wording-heading" className="font-display text-xl">
             {coupleCopy.wordingHeading}
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2">
-            {wording.map((id) => (
-              <div
-                key={id}
-                className={id === "doorLeft" || id === "doorRight" ? undefined : "sm:col-span-2"}
-              >
-                {field(id)}
-              </div>
-            ))}
+          {wordingGrid(field)}
+        </section>
+      )}
+      {second && (
+        <section
+          aria-labelledby="second-heading"
+          className="flex flex-col gap-5 rounded-xl border border-line bg-surface-2/60 p-4 sm:p-6"
+        >
+          <div className="flex flex-col gap-1">
+            <h2 id="second-heading" className="font-display text-xl">
+              {coupleCopy.secondHeading(languageName(second))}
+            </h2>
+            <p className="text-sm text-ink-muted">{coupleCopy.secondHint(languageName(main))}</p>
           </div>
+          <div className="flex flex-col gap-5">{names.map(translatedField)}</div>
+          {wording.length > 0 && wordingGrid(translatedField)}
         </section>
       )}
     </div>

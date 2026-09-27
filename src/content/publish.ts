@@ -79,6 +79,8 @@ export const guestCopy = {
   reply: "Reply to the invitation",
   functions: "The celebrations",
   family: "With love from the family",
+  cardLanguage: "Card language",
+  timeRange: (start: string, end: string) => `${start} to ${end}`,
   when: "When",
   where: "Where",
   dressCode: "Dress code",

@@ -12,12 +12,14 @@ export type CalendarEntry = {
   date: string;
   /** HH:mm, or empty for a date-only entry (save-the-date). */
   time: string;
+  /** HH:mm when the function ends; past midnight counts as the next day. */
+  endTime?: string;
   location: string;
   description: string;
   url?: string;
 };
 
-/** How long a timed function is assumed to last. */
+/** How long a timed function is assumed to last when no end time is given. */
 export const DEFAULT_HOURS = 3;
 const IST_OFFSET_MINUTES = 330;
 
@@ -37,14 +39,19 @@ function dayStamp(date: string, addDays = 0): string {
 }
 
 /** Start and end in UTC for a timed entry. */
-export function entryTimes(entry: Pick<CalendarEntry, "date" | "time">): {
+export function entryTimes(entry: Pick<CalendarEntry, "date" | "time" | "endTime">): {
   start: Date;
   end: Date;
 } {
   const [y, m, d] = entry.date.split("-").map(Number) as [number, number, number];
   const [hh, mm] = entry.time.split(":").map(Number) as [number, number];
   const start = new Date(Date.UTC(y, m - 1, d, hh, mm) - IST_OFFSET_MINUTES * 60_000);
-  return { start, end: new Date(start.getTime() + DEFAULT_HOURS * 3_600_000) };
+  if (!entry.endTime) return { start, end: new Date(start.getTime() + DEFAULT_HOURS * 3_600_000) };
+  const [eh, em] = entry.endTime.split(":").map(Number) as [number, number];
+  let end = new Date(Date.UTC(y, m - 1, d, eh, em) - IST_OFFSET_MINUTES * 60_000);
+  // A sangeet from 8 PM to 1 AM ends the next morning
+  if (end <= start) end = new Date(end.getTime() + 24 * 3_600_000);
+  return { start, end };
 }
 
 function escapeText(text: string): string {

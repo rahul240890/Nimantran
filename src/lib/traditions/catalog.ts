@@ -38,6 +38,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
       reception: { native: "आशीर्वाद समारोह", latin: "Ashirwad Samaroh" },
     },
     hostOrder: "groom-first",
+    muhurat: { native: "शुभ मुहूर्त", latin: "Shubh Muhurat" },
     wording: HINDI_WORDING,
     doors: ["Shubh", "Vivah"],
     status: "draft",
@@ -62,6 +63,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
       reception: { native: "प्रीतिभोज", latin: "Preetibhoj" },
     },
     hostOrder: "groom-first",
+    muhurat: { native: "शुभ मुहूर्त", latin: "Shubh Muhurat" },
     wording: HINDI_WORDING,
     doors: ["Shubh", "Vivah"],
     status: "draft",
@@ -85,6 +87,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
       reception: { native: "स्वागत समारंभ", latin: "Swagat Samarambh" },
     },
     hostOrder: "groom-first",
+    muhurat: { native: "शुभमुहूर्त", latin: "Shubh Muhurta" },
     wording: {
       blessingsFrom: { title: "आशीर्वाद", example: "श्रीमती सुमन व श्री विठ्ठल देशमुख" },
       requesters: { title: "निमंत्रक", example: "समस्त देशमुख परिवार" },
@@ -112,6 +115,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
       reception: { native: "સ્વાગત સમારંભ", latin: "Swagat Samarambh" },
     },
     hostOrder: "groom-first",
+    muhurat: { native: "શુભ મુહૂર્ત", latin: "Shubh Muhurat" },
     wording: {
       blessingsFrom: { title: "આશીર્વાદ", example: "શ્રીમતી શારદાબેન અને શ્રી રમણલાલ પટેલ" },
       requesters: { title: "નિમંત્રક", example: "સમસ્ત પટેલ પરિવાર" },
@@ -140,6 +144,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
     },
     // The bride's family hosts the wedding
     hostOrder: "bride-first",
+    muhurat: { native: "শুভ লগ্ন", latin: "Shubho Lagna" },
     wording: {
       requesters: { title: "বিনীত", example: "বন্দ্যোপাধ্যায় পরিবার" },
     },
@@ -163,6 +168,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
       reception: { native: "வரவேற்பு", latin: "Varaverpu" },
     },
     hostOrder: "both",
+    muhurat: { native: "முகூர்த்தம்", latin: "Muhurtham" },
     wording: {
       requesters: {
         title: "தங்கள் நல்வரவை விரும்பும்",
@@ -184,6 +190,7 @@ export const TRADITIONS: Record<TraditionId, TraditionPack> = {
     templates: ["monogram", "rose", "emerald"],
     ceremonies: {},
     hostOrder: "both",
+    muhurat: null,
     wording: {},
     status: "draft",
     reviewedBy: [],

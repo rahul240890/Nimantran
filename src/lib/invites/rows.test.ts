@@ -43,6 +43,7 @@ function asStored(draft: InviteDraft): {
     functions: functions.map((row) => ({
       ...row,
       start_time: row.start_time ? `${row.start_time}:00` : null,
+      end_time: row.end_time ? `${row.end_time}:00` : null,
     })),
   };
 }
@@ -93,6 +94,30 @@ describe("invite rows", () => {
       rowsToDraft({ ...event, tradition_id: null, religious: null }, functions).tradition.id,
     ).toBe(null);
     expect(rowsToDraft({ ...event, tradition_id: "gone" }, functions).tradition.id).toBe(null);
+  });
+
+  it("keeps end times, card languages and the second language's words", () => {
+    const base = sample();
+    const draft: InviteDraft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        engagement: { ...base.functions.engagement, endTime: "22:45" },
+      },
+      languages: ["hi", "en"],
+      translation: { first: "Aditya", line: "With love" },
+    };
+    const { event, functions } = asStored(draft);
+    expect(event.languages).toEqual(["hi", "en"]);
+    expect(functions.find((row) => row.kind === "engagement")?.end_time).toBe("22:45:00");
+    const back = rowsToDraft(event, functions);
+    expect(back.functions.engagement.endTime).toBe("22:45");
+    expect(back.languages).toEqual(["hi", "en"]);
+    expect(back.translation).toEqual(draft.translation);
+    // Saved before two-language cards
+    const old = rowsToDraft({ ...event, languages: undefined, religious: {} }, functions);
+    expect(old.languages).toEqual(["en"]);
+    expect(old.translation).toEqual({});
   });
 
   it("reads unknown values leniently", () => {

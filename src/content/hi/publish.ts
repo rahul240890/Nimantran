@@ -81,6 +81,8 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   reply: "निमंत्रण का जवाब दें",
   functions: "उत्सव",
   family: "परिवार की ओर से",
+  cardLanguage: "कार्ड की भाषा",
+  timeRange: (start, end) => `${start} से ${end} तक`,
   when: "कब",
   where: "कहाँ",
   dressCode: "ड्रेस कोड",

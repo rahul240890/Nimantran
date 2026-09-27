@@ -15,12 +15,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
-import { draftCopy, draftTradition, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
+import {
+  cardLanguages,
+  draftCopy,
+  draftTradition,
+  templateWithRaga,
+  type CardLanguage,
+  type InviteDraft,
+} from "@/lib/editor/draft";
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { PublicPhoto } from "@/lib/invites/public";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { publishText, uiText } from "@/i18n/copy";
 
 export type GuestFunction = {
@@ -29,7 +37,10 @@ export type GuestFunction = {
   /** The ceremony's name in the family's tradition, in its own script. */
   localName: { text: string; lang: string } | null;
   date: string;
+  /** "7:30 PM", or "9:47 AM to 10:31 AM" when it has an end. */
   time: string;
+  /** The tradition's name for the wedding's auspicious time, shown with its window. */
+  muhurat: { text: string; lang: string } | null;
   venue: string;
   address: string;
   dressCode: string;
@@ -65,7 +76,13 @@ export function GuestView({
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
-  const copy = useMemo(() => draftCopy(draft), [draft]);
+  const locale = useLocale();
+  const languages = cardLanguages(draft);
+  // A two-language card opens in the guest's own language when it has it
+  const [language, setLanguage] = useState<CardLanguage>(
+    () => languages.find((code) => code === locale) ?? languages[0],
+  );
+  const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
   const template = useMemo(
     () => templateWithRaga(draft.templateId, draft.music.raga),
     [draft.templateId, draft.music.raga],
@@ -102,9 +119,18 @@ export function GuestView({
             {names}
           </h1>
           <p className="text-ink-muted">{occasion}</p>
+          {languages.length > 1 && (
+            <CardLanguageToggle
+              label={guestCopy.cardLanguage}
+              languages={languages}
+              value={language}
+              onValueChange={setLanguage}
+            />
+          )}
           <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
             <Invitation
               copy={copy}
+              lang={language}
               template={template}
               quality={quality}
               open={open}
@@ -281,7 +307,15 @@ function FunctionCard({ fn }: { fn: GuestFunction }) {
             </dt>
             <dd>
               {fn.date}
-              {fn.time && <span className="text-ink-muted"> · {fn.time}</span>}
+              {fn.time && !fn.muhurat && <span className="text-ink-muted"> · {fn.time}</span>}
+              {fn.time && fn.muhurat && (
+                <span className="block">
+                  <span lang={fn.muhurat.lang} className="font-semibold text-accent-text">
+                    {fn.muhurat.text}
+                  </span>
+                  <span className="text-ink-muted"> · {fn.time}</span>
+                </span>
+              )}
             </dd>
           </div>
         )}

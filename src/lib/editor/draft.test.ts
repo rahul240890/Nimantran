@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  cardLanguages,
   draftCopy,
   draftProblems,
   draftTemplate,
   functionOrder,
   includedFunctions,
   mainFunction,
+  muhuratName,
   newDraft,
   withCategory,
   parseDraft,
@@ -236,5 +238,94 @@ describe("tradition packs", () => {
     expect(parseDraft({ ...complete(), tradition: { id: "gone", symbol: 4 } })?.tradition.id).toBe(
       null,
     );
+  });
+});
+
+describe("two-language cards", () => {
+  const tamil = (languages: InviteDraft["languages"]): InviteDraft => {
+    const draft = complete();
+    return {
+      ...draft,
+      tradition: { ...draft.tradition, id: "tamil" },
+      languages,
+      content: { first: "ஆதித்யா", second: "பிரியா" },
+      translation: { first: "Aditya" },
+    };
+  };
+
+  it("offer the tradition's language and English, or English and Hindi", () => {
+    expect(cardLanguages(tamil(["ta", "en"]))).toEqual(["ta", "en"]);
+    expect(cardLanguages(complete())).toEqual(["en"]);
+    expect(cardLanguages({ ...complete(), languages: ["hi", "en"] })).toEqual(["hi", "en"]);
+    // A language the tradition doesn't offer falls away
+    expect(cardLanguages({ ...tamil(["mr", "en"]) })).toEqual(["en"]);
+    expect(cardLanguages({ ...tamil(["mr"]) })).toEqual(["en"]);
+  });
+
+  it("draw each language's own words, repeating the main card's where left empty", () => {
+    const draft = tamil(["ta", "en"]);
+    const main = draftCopy(draft);
+    expect(main.first).toBe("ஆதித்யா");
+    expect(main.blessing).toBe("ஸ்ரீ விநாயகர் துணை");
+    expect(main.date).toBe("ஞாயிறு, 14 பிப்ரவரி 2027");
+    const english = draftCopy(draft, "en");
+    expect(english.first).toBe("Aditya");
+    expect(english.second).toBe("பிரியா");
+    expect(english.blessing).toBe("Sri Vinayagar Thunai");
+    expect(english.date).toBe("Sunday, 14 February 2027");
+    expect(english.symbol).toBe(main.symbol);
+  });
+
+  it("write the invocation in script when the second language is the tradition's", () => {
+    const draft = {
+      ...tamil(["en", "ta"]),
+      tradition: { ...tamil([]).tradition, invocation: "latin" as const },
+    };
+    expect(draftCopy(draft).blessing).toBe("Sri Vinayagar Thunai");
+    expect(draftCopy(draft, "ta").blessing).toBe("ஸ்ரீ விநாயகர் துணை");
+    const off = { ...draft, tradition: { ...draft.tradition, invocation: "off" as const } };
+    expect(draftCopy(off, "ta").blessing).toBe("");
+  });
+
+  it("write dates in Marathi", () => {
+    const draft = {
+      ...complete(),
+      tradition: { ...complete().tradition, id: "marathi" as const },
+      languages: ["mr" as const],
+    };
+    expect(draftCopy(draft).date).toBe("रविवार, 14 फेब्रुवारी 2027");
+  });
+
+  it("read old drafts as English only", () => {
+    const old: Partial<InviteDraft> = complete();
+    delete old.languages;
+    delete old.translation;
+    const draft = parseDraft(old)!;
+    expect(draft.languages).toEqual(["en"]);
+    expect(draft.translation).toEqual({});
+    expect(parseDraft({ ...complete(), languages: ["en", "en"] })?.languages).toEqual(["en"]);
+  });
+});
+
+describe("muhurat", () => {
+  it("names the wedding's auspicious time in the tradition's words", () => {
+    const draft = { ...complete(), tradition: { ...complete().tradition, id: "bengali" as const } };
+    expect(muhuratName(draft, "wedding")?.native).toBe("শুভ লগ্ন");
+    expect(muhuratName(draft, "sangeet")).toBeNull();
+    expect(muhuratName(complete(), "wedding")).toBeNull();
+  });
+
+  it("keeps end times and reads bad ones as empty", () => {
+    const draft = complete();
+    const withEnd = {
+      ...draft,
+      functions: { ...draft.functions, wedding: { ...draft.functions.wedding, endTime: "10:31" } },
+    };
+    expect(parseDraft(withEnd)?.functions.wedding.endTime).toBe("10:31");
+    const bad = {
+      ...draft,
+      functions: { ...draft.functions, wedding: { ...draft.functions.wedding, endTime: "25:00" } },
+    };
+    expect(parseDraft(bad)?.functions.wedding.endTime).toBe("");
   });
 });

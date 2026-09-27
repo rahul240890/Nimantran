@@ -47,8 +47,8 @@ type InviteStore = {
 };
 
 const EVENT_COLUMNS =
-  "id, category_id, template_id, status, slug, content, music, editor_step, updated_at, tradition_id, religious";
-const FUNCTION_COLUMNS = "kind, position, date, start_time, venue, address, dress_code";
+  "id, category_id, template_id, status, slug, content, music, editor_step, updated_at, tradition_id, religious, languages";
+const FUNCTION_COLUMNS = "kind, position, date, start_time, end_time, venue, address, dress_code";
 const MEDIA_COLUMNS = "id, width, height, position";
 const QUESTION_COLUMNS = "preset";
 const BUCKET = "event-media";

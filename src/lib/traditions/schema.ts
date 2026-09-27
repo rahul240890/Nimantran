@@ -62,6 +62,8 @@ export type TraditionPack = {
   /** Local ceremony names, in script and in English letters. */
   ceremonies: Partial<Record<FunctionId, { native: string; latin: string }>>;
   hostOrder: HostOrder;
+  /** What the tradition calls the wedding's auspicious time, shown beside its exact window. */
+  muhurat: { native: string; latin: string } | null;
   /** The wording blocks this tradition's cards carry, with their heading in its own script. */
   wording: Partial<Record<WordingId, { title: string; example: string }>>;
   /** Door words for a wedding card, in English letters. */

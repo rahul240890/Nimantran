@@ -1,8 +1,8 @@
-import { format, parseISO } from "date-fns";
 import { z } from "zod";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS, type Category, type RsvpQuestionId } from "@/lib/categories/schema";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
+import { CARD_LANGUAGES, formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { contentSchema, toCardCopy, type CardCopy } from "@/lib/templates/content";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
@@ -32,7 +32,7 @@ import {
  * stores the same shape and the photos move to storage (Steps 8 and 9).
  */
 
-export { FUNCTION_IDS, type FunctionId };
+export { FUNCTION_IDS, formatCardDate, type CardLanguage, type FunctionId };
 
 export const EDITOR_STEPS = [
   "occasion",
@@ -60,6 +60,8 @@ const functionSchema = z.object({
   included: z.boolean().catch(false),
   date: isoDate.or(z.literal("")).catch(""),
   time: time.or(z.literal("")).catch(""),
+  /** When it ends, for a muhurat window ("9:47 to 10:31"). Kept exactly as chosen. */
+  endTime: time.or(z.literal("")).catch(""),
   venue: z.string().max(FUNCTION_RULES.venue).catch(""),
   address: z.string().max(FUNCTION_RULES.address).catch(""),
   dressCode: z.string().max(FUNCTION_RULES.dressCode).catch(""),
@@ -89,6 +91,7 @@ const emptyFunction: EventFunction = {
   included: false,
   date: "",
   time: "",
+  endTime: "",
   venue: "",
   address: "",
   dressCode: "",
@@ -126,6 +129,15 @@ export const draftSchema = z.object({
   questions: z.array(z.enum(RSVP_QUESTION_IDS)).nullable().catch(null),
   /** The family's tradition and religious elements (Step 12a). */
   tradition: traditionSchema.catch(noTradition),
+  /** The card's languages, main first; a second one gives guests a toggle (Step 12a). */
+  languages: z
+    .array(z.enum(CARD_LANGUAGES))
+    .min(1)
+    .max(2)
+    .refine((list) => new Set(list).size === list.length)
+    .catch(["en"]),
+  /** The card's wording in the second language; an empty slot repeats the main words. */
+  translation: z.partialRecord(z.enum(SLOT_IDS), z.string().max(200)).catch({}),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
@@ -154,6 +166,8 @@ export function newDraft(
     slug: null,
     questions: null,
     tradition: noTradition,
+    languages: ["en"],
+    translation: {},
   };
 }
 
@@ -213,11 +227,6 @@ export function needsTime(draft: InviteDraft): boolean {
   return draftCategory(draft).schedule === "full";
 }
 
-/** "Saturday, 12 December 2026", matching the templates' sample wording. */
-export function formatCardDate(date: string): string {
-  return format(parseISO(date), "EEEE, d MMMM yyyy");
-}
-
 /** The design with the host's music choice applied. */
 export function draftTemplate(draft: InviteDraft): Template {
   return templateWithRaga(draft.templateId, draft.music.raga);
@@ -247,19 +256,59 @@ export function draftSymbol(draft: InviteDraft): SymbolId | null {
 
 /**
  * Wording the tradition gives the card, under the host's own: the invocation as the
- * blessing line, and a wedding's door words.
+ * blessing line, and a wedding's door words. The second language's card writes the
+ * invocation in its own way: in English letters for English, else in its script.
  */
-export function traditionWording(draft: InviteDraft): Partial<Record<SlotId, string>> {
+export function traditionWording(
+  draft: InviteDraft,
+  language: CardLanguage = cardLanguages(draft)[0],
+): Partial<Record<SlotId, string>> {
   const pack = draftTradition(draft);
   if (!pack) return {};
   const wording: Partial<Record<SlotId, string>> = {};
-  const mode = draft.tradition.invocation;
+  const chosen = draft.tradition.invocation;
+  const mode =
+    chosen === "off" || !isSecondLanguage(draft, language)
+      ? chosen
+      : language === "en"
+        ? "latin"
+        : "script";
   wording.blessing = pack.invocation && mode !== "off" ? pack.invocation[mode] : "";
   if (pack.doors && draft.categoryId === "wedding") {
     wording.doorLeft = pack.doors[0];
     wording.doorRight = pack.doors[1];
   }
   return wording;
+}
+
+/** What the tradition calls the wedding's auspicious time, when it has a name for it. */
+export function muhuratName(
+  draft: InviteDraft,
+  id: FunctionId,
+): { native: string; latin: string } | null {
+  return id === "wedding" ? (draftTradition(draft)?.muhurat ?? null) : null;
+}
+
+/**
+ * The languages a card can be written in: the tradition's own and English, or English
+ * and Hindi when there is none.
+ */
+export function languageOptions(draft: InviteDraft): [CardLanguage, CardLanguage] {
+  const language = draftTradition(draft)?.language;
+  const own = language && language !== "en" ? (language as CardLanguage) : null;
+  return own && (CARD_LANGUAGES as readonly string[]).includes(own) ? [own, "en"] : ["en", "hi"];
+}
+
+/** The card's languages, main first. A language the tradition no longer offers falls away. */
+export function cardLanguages(draft: InviteDraft): [CardLanguage, ...CardLanguage[]] {
+  const options: readonly CardLanguage[] = languageOptions(draft);
+  const [first, ...rest] = draft.languages.filter((language) => options.includes(language));
+  return first ? [first, ...rest] : ["en"];
+}
+
+function isSecondLanguage(draft: InviteDraft, language: CardLanguage): boolean {
+  const languages = cardLanguages(draft);
+  return languages.length === 2 && language === languages[1];
 }
 
 /** The local name of a ceremony in this invite's tradition, if it has one. */
@@ -270,28 +319,47 @@ export function ceremonyName(
   return draftTradition(draft)?.ceremonies[id] ?? null;
 }
 
+/** The host's words for one of the card's languages; the second repeats the main where empty. */
+function hostWording(draft: InviteDraft, language: CardLanguage): Partial<Record<SlotId, string>> {
+  if (!isSecondLanguage(draft, language)) return draft.content;
+  const translated = Object.entries(draft.translation).filter(([, value]) => value?.trim());
+  return { ...draft.content, ...Object.fromEntries(translated) };
+}
+
 /**
- * The words the card draws. The host's wording fills the slots; the date and venue come
- * from the main function; anything not written yet shows the design's sample, so the
- * preview always looks finished.
+ * The words the card draws, in one of its languages (the main one unless asked). The
+ * host's wording fills the slots; the date and venue come from the main function; anything
+ * not written yet shows the design's sample, so the preview always looks finished.
  */
-export function draftCopy(draft: InviteDraft): CardCopy {
+export function draftCopy(
+  draft: InviteDraft,
+  language: CardLanguage = cardLanguages(draft)[0],
+): CardCopy {
   const template = TEMPLATES[draft.templateId];
   const content: Partial<Record<SlotId, string>> = {};
-  const tradition = traditionWording(draft);
+  const words = hostWording(draft, language);
+  const second = isSecondLanguage(draft, language);
+  const tradition = traditionWording(draft, language);
   for (const id of COUPLE_SLOTS) {
-    const value = draft.content[id] ?? tradition[id] ?? draftCategory(draft).wording[id];
+    // The tradition's wording in the second language beats the main card's typed words
+    const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
+    const value = own ?? tradition[id] ?? words[id] ?? draftCategory(draft).wording[id];
     if (value !== undefined) content[id] = value;
   }
   const main = mainFunction(draft);
   if (main) {
     const fn = draft.functions[main];
-    if (fn.date) content.date = formatCardDate(fn.date).slice(0, SLOT_RULES.date.maxLength);
+    if (fn.date) {
+      content.date = formatCardDate(fn.date, language).slice(0, SLOT_RULES.date.maxLength);
+    }
     if (fn.venue.trim()) content.venue = fn.venue.slice(0, SLOT_RULES.venue.maxLength);
   }
   const copy = toCardCopy(template, content);
   // The invocation belongs on the card even when the design has no blessing line
-  const blessing = draft.content.blessing ?? tradition.blessing;
+  const ownBlessing = second
+    ? draft.translation.blessing?.trim() || undefined
+    : draft.content.blessing;
+  const blessing = ownBlessing ?? tradition.blessing ?? (second ? words.blessing : undefined);
   if (blessing !== undefined) copy.blessing = blessing.trim();
   copy.symbol = draftSymbol(draft);
   return copy;
