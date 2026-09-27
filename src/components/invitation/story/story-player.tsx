@@ -167,6 +167,16 @@ export function StoryPlayer({
     };
   }, [running, index, seconds, last, next]);
 
+  // Fetch the next page's painting ahead, so it is ready when the page turns
+  const upcoming = beats[index + 1];
+  const nextImage = upcoming ? suite.images[pageLook(upcoming.scene).art] : undefined;
+  useEffect(() => {
+    if (!nextImage) return;
+    const image = new Image();
+    image.decoding = "async";
+    image.src = nextImage;
+  }, [nextImage]);
+
   useEffect(() => {
     const onVisibility = () => setHidden(document.visibilityState === "hidden");
     document.addEventListener("visibilitychange", onVisibility);
@@ -405,6 +415,7 @@ function Page({
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
   const look = pageLook(beat.scene);
+  const painted = themed && Boolean(suite.images[look.art]);
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
   const delay = (i: number) =>
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
@@ -426,7 +437,8 @@ function Page({
           className="absolute inset-0 overflow-hidden"
         />
       )}
-      <StoryScene scene={beat.scene} themed={themed} />
+      {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
+      {!painted && <StoryScene scene={beat.scene} themed={themed} />}
 
       <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
         <div

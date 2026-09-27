@@ -4,8 +4,8 @@
  * A theme is only the look (the place, colours, ornaments and page turn). The tradition
  * pack still gives the ceremony names, blessing and sacred symbol, and the language the
  * words, so any theme works for any family; each tradition suggests the one that suits it.
- * Colours live in globals.css under [data-suite] and [data-mood]; the art is vector for
- * now, and painted backgrounds drop into `images` as they are made (docs/SUITES.md).
+ * Colours live in globals.css under [data-suite] and [data-mood]. Painted backgrounds in
+ * `images` replace the vector landscape page by page (docs/SUITES.md).
  */
 
 import type { FunctionId } from "@/lib/events/functions";
@@ -56,7 +56,7 @@ export type Suite = {
   template: TemplateId | null;
   /** Traditions that suggest this theme. */
   traditions: readonly TraditionId[];
-  /** Painted backgrounds under /public, by page. Empty until the paintings are made. */
+  /** Painted backgrounds under /public, by page. Pages without one draw the vector landscape. */
   images: Partial<Record<PageArt, string>>;
 };
 
@@ -68,7 +68,17 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "emerald",
     traditions: ["north-hindu", "marathi"],
-    images: {},
+    images: {
+      cover: "/suites/rajwada-bagh/cover.webp",
+      family: "/suites/rajwada-bagh/family.webp",
+      haldi: "/suites/rajwada-bagh/haldi.webp",
+      mehendi: "/suites/rajwada-bagh/mehendi.webp",
+      sangeet: "/suites/rajwada-bagh/sangeet.webp",
+      baraat: "/suites/rajwada-bagh/baraat.webp",
+      wedding: "/suites/rajwada-bagh/wedding.webp",
+      reception: "/suites/rajwada-bagh/reception.webp",
+      reply: "/suites/rajwada-bagh/reply.webp",
+    },
   },
   "shahi-savari": {
     id: "shahi-savari",
@@ -77,7 +87,17 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "rangmahal",
     traditions: ["rajasthani", "gujarati"],
-    images: {},
+    images: {
+      cover: "/suites/shahi-savari/cover.webp",
+      family: "/suites/shahi-savari/family.webp",
+      haldi: "/suites/shahi-savari/haldi.webp",
+      mehendi: "/suites/shahi-savari/mehendi.webp",
+      sangeet: "/suites/shahi-savari/sangeet.webp",
+      baraat: "/suites/shahi-savari/baraat.webp",
+      wedding: "/suites/shahi-savari/wedding.webp",
+      reception: "/suites/shahi-savari/reception.webp",
+      reply: "/suites/shahi-savari/reply.webp",
+    },
   },
   kayal: {
     id: "kayal",
@@ -86,7 +106,17 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "kasavu",
     traditions: ["tamil", "bengali"],
-    images: {},
+    images: {
+      cover: "/suites/kayal/cover.webp",
+      family: "/suites/kayal/family.webp",
+      haldi: "/suites/kayal/haldi.webp",
+      mehendi: "/suites/kayal/mehendi.webp",
+      sangeet: "/suites/kayal/sangeet.webp",
+      baraat: "/suites/kayal/baraat.webp",
+      wedding: "/suites/kayal/wedding.webp",
+      reception: "/suites/kayal/reception.webp",
+      reply: "/suites/kayal/reply.webp",
+    },
   },
   classic: {
     id: "classic",

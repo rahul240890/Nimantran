@@ -26,7 +26,7 @@ export function SuiteThumb({
       {suite.art === "card" ? (
         <span className="absolute inset-[12%] rounded-sm border border-card-gold" />
       ) : (
-        <SuiteBackdrop suite={suite} className="absolute inset-0" />
+        <SuiteBackdrop suite={suite} image={suite.images.cover} className="absolute inset-0" />
       )}
       <span className="absolute inset-x-[16%] top-[36%] h-[22%] rounded-sm border border-card-gold/70 bg-card-ivory/90" />
     </span>

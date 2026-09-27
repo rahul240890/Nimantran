@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { FUNCTION_IDS } from "@/lib/events/functions";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
@@ -38,6 +40,16 @@ describe("event suites", () => {
     for (const id of SUITE_IDS) {
       const pair = SUITES[id].template;
       if (pair) expect(TEMPLATE_IDS).toContain(pair);
+    }
+  });
+});
+
+describe("painted backgrounds", () => {
+  it("point at files that exist under public", () => {
+    for (const id of SUITE_IDS) {
+      for (const src of Object.values(SUITES[id].images)) {
+        expect(existsSync(join(process.cwd(), "public", src)), src).toBe(true);
+      }
     }
   });
 });
