@@ -3,6 +3,7 @@ import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
+import { legalText } from "@/i18n/copy/legal";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
@@ -44,6 +45,11 @@ function wordsFor(page: PublicPage, locale: UiLocale): Words {
       return seoCopy.occasions[page.id];
     case "tradition":
       return seoCopy.traditionPages[page.id];
+    case "privacy":
+    case "terms": {
+      const { title, description } = legalText[locale][page.kind];
+      return { title, description };
+    }
   }
 }
 

@@ -37,7 +37,13 @@ export const signInCopy = {
   resent: "A new code is on its way",
   changeNumber: "Change number",
   previewNote: "Preview mode: any number works, and the code is 123456.",
-  terms: "By continuing you agree to be contacted about your invites. We never share your number.",
+  terms: {
+    before: "By continuing you agree to the ",
+    terms: "terms",
+    and: " and ",
+    privacy: "privacy policy",
+    after: ". We never share your number.",
+  },
   success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubhdwar"),
   side: {
     eyebrow: "Your invites, everywhere",

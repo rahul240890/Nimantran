@@ -15,7 +15,9 @@ export type PublicPage =
   | { kind: "designs" }
   | { kind: "design"; id: TemplateId }
   | { kind: "occasion"; id: CategoryId }
-  | { kind: "tradition"; id: TraditionId };
+  | { kind: "tradition"; id: TraditionId }
+  | { kind: "privacy" }
+  | { kind: "terms" };
 
 /** The page's address without the language prefix: "/invitations/haldi". */
 function basePath(page: PublicPage): string {
@@ -30,6 +32,10 @@ function basePath(page: PublicPage): string {
       return `/invitations/${page.id}`;
     case "tradition":
       return `/traditions/${page.id}`;
+    case "privacy":
+      return "/privacy";
+    case "terms":
+      return "/terms";
   }
 }
 
@@ -48,6 +54,8 @@ export function publicPages(): PublicPage[] {
     ...TEMPLATE_IDS.map((id) => ({ kind: "design" as const, id })),
     ...CATEGORY_IDS.map((id) => ({ kind: "occasion" as const, id })),
     ...TRADITION_IDS.map((id) => ({ kind: "tradition" as const, id })),
+    { kind: "privacy" },
+    { kind: "terms" },
   ];
 }
 
@@ -62,7 +70,7 @@ export function pageAlternates(page: PublicPage, locale: UiLocale): Metadata["al
   };
 }
 
-const LOCALIZED = /^\/(designs|invitations|traditions)(\/|$)/;
+const LOCALIZED = /^\/(designs|invitations|traditions|privacy|terms)(\/|$)/;
 
 /**
  * The same page in another language, for the language menu: public pages carry their

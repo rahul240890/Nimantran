@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, ArrowRight, FlaskConical, Phone } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import { sendCode, startGoogle, verifyCode } from "@/actions/auth";
@@ -9,13 +10,16 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { accountText } from "@/i18n/copy/account";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
+import { homePath } from "@/i18n/locales";
 import { firstName } from "@/lib/auth/account";
 import { OTP_LENGTH, maskPhone, normalizePhone } from "@/lib/auth/phone";
 import { CodeInput } from "./code-input";
 import { refreshAccountHint } from "./use-account-hint";
 
 const RESEND_SECONDS = 30;
+const legalLink =
+  "font-medium text-accent-text underline underline-offset-4 decoration-accent-text/40 hover:decoration-current";
 /** Keeps the number and step through a refresh while the SMS arrives. */
 const STORAGE_KEY = "nimantran-sign-in";
 
@@ -70,6 +74,9 @@ export function SignInForm({
   initialError?: ErrorKey;
 }) {
   const { signInCopy } = useText(accountText);
+  const locale = useLocale();
+  const legalPath = (kind: "privacy" | "terms") =>
+    locale === "en" ? `/${kind}` : `${homePath(locale)}/${kind}`;
   const router = useRouter();
   // A refresh while waiting for the SMS picks up at the code
   const saved = useSyncExternalStore(noop, readSaved, () => null);
@@ -309,7 +316,17 @@ export function SignInForm({
           >
             {signInCopy.google}
           </Button>
-          <p className="text-center text-sm text-ink-muted">{signInCopy.terms}</p>
+          <p className="text-center text-sm text-ink-muted">
+            {signInCopy.terms.before}
+            <Link href={legalPath("terms")} className={legalLink}>
+              {signInCopy.terms.terms}
+            </Link>
+            {signInCopy.terms.and}
+            <Link href={legalPath("privacy")} className={legalLink}>
+              {signInCopy.terms.privacy}
+            </Link>
+            {signInCopy.terms.after}
+          </p>
         </>
       )}
     </div>
