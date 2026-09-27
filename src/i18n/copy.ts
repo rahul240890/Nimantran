@@ -8,9 +8,11 @@ import * as hiDashboard from "@/content/hi/dashboard";
 import * as hiEditor from "@/content/hi/editor";
 import * as hiLanding from "@/content/hi/landing";
 import * as hiPublish from "@/content/hi/publish";
+import * as hiSeo from "@/content/hi/seo";
 import * as hiUi from "@/content/hi/ui";
 import * as enLanding from "@/content/landing";
 import * as enPublish from "@/content/publish";
+import * as enSeo from "@/content/seo";
 import * as enUi from "@/lib/ui-strings";
 import type { Localized } from "./text";
 
@@ -29,4 +31,5 @@ export const dashboardText: Localized<typeof enDashboard> = { en: enDashboard, h
 export const editorText: Localized<typeof enEditor> = { en: enEditor, hi: hiEditor };
 export const landingText: Localized<typeof enLanding> = { en: enLanding, hi: hiLanding };
 export const publishText: Localized<typeof enPublish> = { en: enPublish, hi: hiPublish };
+export const seoText: Localized<typeof enSeo> = { en: enSeo, hi: hiSeo };
 export const uiText: Localized<typeof enUi> = { en: enUi, hi: hiUi };

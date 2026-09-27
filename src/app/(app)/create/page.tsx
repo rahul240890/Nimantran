@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { isTraditionId } from "@/lib/traditions/catalog";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Editor } from "@/components/editor/editor";
@@ -26,11 +27,12 @@ const inviteId = z.uuid();
  * The invite editor. Drafts save on this device, and to the account once signed in.
  * ?invite=<id> opens an invite from My invites; ?new=1 starts another, keeping the open
  * one in the account. ?category=<id> starts a fresh invite for that occasion (roka,
- * engagement, save-the-date…); ?template=<id> starts one with that design;
+ * engagement, save-the-date…); ?template=<id> starts one with that design, and
+ * ?tradition=<id> with that tradition;
  * ?quality=high|medium|low|2d forces the preview's level (handy for tests without a GPU).
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const { template, category, quality, invite, new: fresh } = await searchParams;
+  const { template, category, tradition, quality, invite, new: fresh } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -45,13 +47,20 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
   const params = {
     initialTemplate: isTemplateId(template) ? template : null,
     initialCategory: isCategoryId(category) ? category : null,
+    initialTradition: isTraditionId(tradition) ? tradition : null,
     fresh: fresh === "1",
   };
   return (
     <PageTransition>
       <Editor
         // A new ?invite= or ?new= while the editor is open starts it over
-        key={[wanted, params.fresh, params.initialCategory, params.initialTemplate].join("|")}
+        key={[
+          wanted,
+          params.fresh,
+          params.initialCategory,
+          params.initialTemplate,
+          params.initialTradition,
+        ].join("|")}
         {...params}
         quality={isQualityChoice(quality) ? quality : "auto"}
         signedIn={Boolean(account)}

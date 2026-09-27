@@ -1,15 +1,45 @@
 import { Logo } from "@/components/brand/logo";
 import { Mandala } from "@/components/brand/mandala";
-import { landingText } from "@/i18n/copy";
-import { languages, type UiLocale } from "@/i18n/locales";
+import Link from "next/link";
+import { editorText, landingText, seoText } from "@/i18n/copy";
+import { homePath, languages, type UiLocale } from "@/i18n/locales";
+import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
+import { pagePath } from "@/lib/seo/paths";
+import { TRADITION_IDS } from "@/lib/traditions/schema";
 import { site } from "@/lib/site";
 
 export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { nav, shell } = landingText[locale];
+  const { seoCopy } = seoText[locale];
+  const { traditionCopy } = editorText[locale];
+  const home = homePath(locale);
+  const linkClass =
+    "inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text";
+  const pageLinks = [
+    {
+      id: "footer-invitations",
+      heading: seoCopy.footerInvitations,
+      links: CATEGORY_IDS.map((id) => ({
+        label: CATEGORIES[id].names[locale],
+        href: pagePath({ kind: "occasion", id }, locale),
+      })),
+    },
+    {
+      id: "footer-more",
+      heading: seoCopy.footerMore,
+      links: [
+        { label: seoCopy.allDesigns, href: pagePath({ kind: "designs" }, locale) },
+        ...TRADITION_IDS.map((id) => ({
+          label: traditionCopy.names[id],
+          href: pagePath({ kind: "tradition", id }, locale),
+        })),
+      ],
+    },
+  ];
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-surface-2/60">
       <Mandala className="pointer-events-none absolute -end-24 -bottom-32 -z-10 size-96 text-line-strong opacity-40" />
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:px-6 md:grid-cols-[1.4fr_1fr_1.4fr] lg:px-8">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.3fr] lg:px-8">
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
           <p className="font-display text-lg text-ink-muted">
@@ -34,24 +64,38 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           <ul className="-ms-2 mt-3 flex flex-col">
             {nav.map((item) => (
               <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  className="inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text"
-                >
+                <a href={`${home}#${item.id}`} className={linkClass}>
                   {item.label}
                 </a>
               </li>
             ))}
             <li>
-              <a
-                href="#waitlist"
-                className="inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text"
-              >
+              <a href={`${home}#waitlist`} className={linkClass}>
                 {shell.joinWaitlist}
               </a>
             </li>
           </ul>
         </nav>
+
+        {pageLinks.map((group) => (
+          <nav key={group.id} aria-labelledby={group.id}>
+            <h2
+              id={group.id}
+              className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+            >
+              {group.heading}
+            </h2>
+            <ul className="-ms-2 mt-3 grid grid-cols-2 gap-x-4 sm:flex sm:flex-col">
+              {group.links.map((link) => (
+                <li key={link.href}>
+                  <Link href={link.href} className={linkClass}>
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
 
         <div>
           <h2 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
