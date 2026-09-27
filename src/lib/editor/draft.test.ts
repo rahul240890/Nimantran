@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  ceremonyName,
   cardLanguages,
   draftCopy,
   draftTemplate,
@@ -135,7 +136,22 @@ describe("invite draft", () => {
   it("lists the occasion's own functions first", () => {
     const mehendi = withCategory(newDraft(), "mehendi");
     expect(functionOrder(mehendi).suggested).toEqual(["haldi", "mehendi", "sangeet"]);
-    expect(functionOrder(mehendi).more).toEqual(["roka", "engagement", "wedding", "reception"]);
+    expect(functionOrder(mehendi).more).toEqual([
+      "roka",
+      "engagement",
+      "tilak",
+      "ganesh-puja",
+      "grah-shanti",
+      "mandap",
+      "mameru",
+      "garba",
+      "bhoj",
+      "baraat",
+      "baraat-welcome",
+      "wedding",
+      "vidaai",
+      "reception",
+    ]);
     // A save-the-date announces the wedding and nothing else
     expect(functionOrder(withCategory(newDraft(), "save-the-date"))).toEqual({
       suggested: ["wedding"],
@@ -227,6 +243,36 @@ describe("tradition packs", () => {
     const copy = draftCopy(withTradition({ id: "modern" }));
     expect(copy.symbol).toBeNull();
     expect(copy.blessing).toBe("");
+  });
+
+  it("list a wedding's regional functions first, in the order they happen", () => {
+    const gujarati = withTradition({ id: "gujarati" });
+    const { suggested, more } = functionOrder(gujarati);
+    expect(suggested).toEqual([
+      "ganesh-puja",
+      "grah-shanti",
+      "mandap",
+      "mameru",
+      "haldi",
+      "mehendi",
+      "sangeet",
+      "garba",
+      "bhoj",
+      "baraat",
+      "baraat-welcome",
+      "wedding",
+      "vidaai",
+      "reception",
+    ]);
+    expect(more).toEqual(["roka", "engagement", "tilak"]);
+    expect(ceremonyName(gujarati, "baraat")?.latin).toBe("Jaan Prasthan");
+    expect(ceremonyName(gujarati, "baraat-welcome")?.latin).toBe("Jaan Aagman");
+    // Other occasions keep their own short list
+    expect(functionOrder(withCategory(gujarati, "mehendi")).suggested).toEqual([
+      "haldi",
+      "mehendi",
+      "sangeet",
+    ]);
   });
 
   it("read old drafts without a tradition", () => {

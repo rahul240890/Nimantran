@@ -5,23 +5,11 @@
  * Data and pure timing only, so the player, the review page and the tests read the same.
  */
 
-import type { FunctionId } from "@/lib/events/functions";
+import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import type { CardCopy } from "@/lib/templates/content";
 
 /** The painted scene behind a beat. Functions each have their own. */
-export const STORY_SCENES = [
-  "blessing",
-  "names",
-  "date",
-  "roka",
-  "engagement",
-  "haldi",
-  "mehendi",
-  "sangeet",
-  "wedding",
-  "reception",
-  "reply",
-] as const;
+export const STORY_SCENES = ["blessing", "names", "date", ...FUNCTION_IDS, "reply"] as const;
 export type StorySceneId = (typeof STORY_SCENES)[number];
 
 /** A function as the story tells it: the words the guest page already shows. */
@@ -163,7 +151,11 @@ export function storyBeats({ copy, functions, replies, words: w }: StoryInput): 
   return fitStory(beats);
 }
 
-/** Squeezes a long story so it stays under STORY_MAX_SECONDS, each beat keeping its share. */
+/**
+ * Squeezes a long story so it stays under STORY_MAX_SECONDS, each beat keeping its share.
+ * No beat drops below its floor, so a kankotri with a dozen functions runs a little longer
+ * rather than too fast to read.
+ */
 export function fitStory(beats: StoryBeat[]): StoryBeat[] {
   const total = storyLength(beats);
   if (total <= STORY_MAX_SECONDS) return beats;

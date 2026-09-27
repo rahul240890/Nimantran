@@ -59,6 +59,11 @@ export type TraditionPack = {
   };
   /** Designs shown first in the design step. */
   templates: readonly TemplateId[];
+  /**
+   * The functions this tradition's cards usually list beyond the occasion's own, in the
+   * editor's first list for a wedding (a Gujarati kankotri's Mameru, Garba and Jaan Aagman).
+   */
+  functions: readonly FunctionId[];
   /** Local ceremony names, in script and in English letters. */
   ceremonies: Partial<Record<FunctionId, { native: string; latin: string }>>;
   hostOrder: HostOrder;

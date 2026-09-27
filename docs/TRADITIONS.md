@@ -326,3 +326,37 @@ A pack cannot ship until:
 | **23**                       | Packs 4.7–4.12 and the Modern pack; Rang template family                                                                                    |
 | **27a**                      | Artist collections: sacred art and regional designs by named Indian artists                                                                 |
 | Later                        | Additional packs (section 4, "Later packs")                                                                                                 |
+
+---
+
+## 12. Wedding functions by region (research, 27 September 2026)
+
+Families list many more functions on a kankotri or lagna patrika than the seven the editor started with. Each is a `FunctionId` shared by every pack; a pack gives it the local name and lists the ones its cards usually carry (`functions`), which the editor shows first for a wedding. Guests see the local name beside the English one, and every function gets its own story scene.
+
+| Function id      | English name   | North Indian    | Rajasthani       | Marathi       | Gujarati         | Bengali       | Tamil               |
+| ---------------- | -------------- | --------------- | ---------------- | ------------- | ---------------- | ------------- | ------------------- |
+| `tilak`          | Tilak          | Tilak           | Tilak            |               |                  |               |                     |
+| `ganesh-puja`    | Ganesh puja    | Ganesh Pujan    | Vinayak Sthapana | Ganpati Pujan | Ganesh Sthapana  |               |                     |
+| `grah-shanti`    | Griha shanti   | Grah Shanti     | Grah Shanti      | Grahamakh     | Grah Shanti      |               |                     |
+| `mandap`         | Mandap muhurat |                 |                  | Mandav        | Mandap Muhurat   |               | Panthakal Muhurtham |
+| `mameru`         | Mameru         | Bhaat           | Mayra            |               | Mameru           |               |                     |
+| `haldi`          | Haldi          | Haldi           | Pithi            | Halad         | Pithi            | Gaye Holud    | Nalangu             |
+| `garba`          | Garba night    |                 |                  |               | Raas Garba       |               |                     |
+| `bhoj`           | Family feast   | Preetibhoj      | Bhoj             | Kelvan        | Bhojan Samarambh | Aiburobhat    |                     |
+| `baraat`         | Baraat         | Baraat Prasthan | Nikasi           |               | Jaan Prasthan    | Bor Jatri     |                     |
+| `baraat-welcome` | Baraat welcome | Baraat Swagat   | Toran            | Seemant Pujan | Jaan Aagman      | Bor Boron     | Mappillai Azhaippu  |
+| `wedding`        | Wedding        | Shubh Vivah     | Shubh Vivah      | Shubhvivah    | Hast Melap       | Shubho Bibaho | Thirumanam          |
+| `vidaai`         | Vidaai         | Vidaai          | Vidaai           | Pathavani     | Kanya Viday      | Bidaay        |                     |
+
+Roka, engagement, mehendi, sangeet and reception keep their names from section 4. All names are drafts for community review (section 10).
+
+**For the packs still to come (Step 23)**, the functions their cards list, mapped to the ids above where they match and new ids where they don't:
+
+- **Punjabi and Sikh:** Roka, Chunni, Kurmai (`engagement`), Chooda, Jaggo, Maiyan (`haldi`), Mehendi, Sangeet, Sehrabandi and Ghodi (`baraat`), Milni (`baraat-welcome`), Anand Karaj (`anand-karaj`), Doli (`vidaai`), Reception.
+- **Telugu:** Nischitartham (`engagement`), Pellikuturu and Pellikoduku (`haldi`), Snathakam, Kasi Yatra, Muhurtham, Talambralu, Reception.
+- **Kerala Hindu:** Nischayam (`engagement`), Muhurtham (thali kettu), Sadya (`bhoj`), Reception.
+- **Muslim:** Mangni (`engagement`), Manjha (`haldi`), Mehndi, Baraat, Nikah (`nikah`), Rukhsati (`vidaai`), Walima (`walima`).
+- **Christian:** Engagement, Bridal shower, Holy Matrimony (`wedding`), Reception.
+- **Tamil, not yet in the pack:** Sumangali Prarthanai, Pallikai Thellichal, Kasi Yatra, Oonjal (all part of the wedding day).
+
+Sources: [Gujarati kankotri guide](https://www.weddingkart.co/blog/gujarati-wedding-invitation-card-kankotri-tahuko-guide), [Gujarati rituals](https://www.fineartproduction.com/post/gujarati-wedding-rituals-ganesh-puja-pithi-mandap-muhurat-grah-satak-mameru-vero-beach-orlando), [Gujarati mandap muhurat and Ganesh sthapana](https://www.sanskarteaching.com/post/gujarati-wedding-traditions-mandap-mahoorat-ganesh-sthaapnaa-thaambli-poojan-1), [Rajasthani card with Mayra, Tilak, Nikasi](https://pikaaso.com/product/vibrant-royal-rajasthani-wedding-celebration-invitation-with-mayra-bhaat-battisi-kacholar-shubh-tilak-sangeet-haldi-korath-nikasi-baraat-wedding-reception-and-phere-events/), [Marwari rituals](https://www.weddingbazaar.com/blog/marwari-wedding-rituals), [Maharashtrian rituals](https://www.culturalindia.net/weddings/regional-weddings/maharashtrian-wedding.html), [Marathi lagna patrika format](https://www.parekhcards.com/cardwordings/marathi-lagn-patrika-format.asp), [Bengali Hindu wedding](https://en.wikipedia.org/wiki/Bengali_Hindu_wedding), [Tamil wedding events](https://rawinvites.com/tamil-wedding-event-breakdown/), [Tamil wedding rituals](https://www.weddingwire.in/wedding-tips/tamil-marriage--c6381).

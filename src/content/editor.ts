@@ -117,6 +117,31 @@ export const functionCopy: Record<
     description: "The ring ceremony, sagai or nischayathartham",
     dressIdeas: ["Indo-western", "Pastels and ivory", "Festive ethnic"],
   },
+  tilak: {
+    name: "Tilak",
+    description: "The bride's family blesses the groom with a tilak and gifts",
+    dressIdeas: ["Festive ethnic", "Kurta and bandhgala", "Reds and golds"],
+  },
+  "ganesh-puja": {
+    name: "Ganesh puja",
+    description: "Ganesh sthapana or pujan, so the celebrations begin without obstacles",
+    dressIdeas: ["Traditional Indian", "Yellows and reds", "Simple and elegant"],
+  },
+  "grah-shanti": {
+    name: "Griha shanti",
+    description: "A havan at home to bless the family before the wedding",
+    dressIdeas: ["Traditional Indian", "Cotton and silk", "Soft pastels"],
+  },
+  mandap: {
+    name: "Mandap muhurat",
+    description: "The mandap is raised and blessed; panthakal in the south",
+    dressIdeas: ["Traditional Indian", "Bright and colourful", "Comfortable ethnic"],
+  },
+  mameru: {
+    name: "Mameru",
+    description: "The maternal uncle's family brings gifts; mayra or bhaat in the north",
+    dressIdeas: ["Bandhani and leheriya", "Festive ethnic", "Reds and pinks"],
+  },
   haldi: {
     name: "Haldi",
     description: "Turmeric blessings, usually the morning before",
@@ -132,10 +157,35 @@ export const functionCopy: Record<
     description: "An evening of songs, dance and performances",
     dressIdeas: ["Indo-western", "Sequins and sparkle", "Jewel tones"],
   },
+  garba: {
+    name: "Garba night",
+    description: "Raas, garba and dandiya till late",
+    dressIdeas: ["Chaniya choli and kediyu", "Mirror work", "Bright and colourful"],
+  },
+  bhoj: {
+    name: "Family feast",
+    description: "A meal for family and friends: kelvan, aiburobhat or bhojan samarambh",
+    dressIdeas: ["Festive ethnic", "Comfortable ethnic", "Smart casual"],
+  },
+  baraat: {
+    name: "Baraat",
+    description: "The groom's procession sets out with music and dancing",
+    dressIdeas: ["Safas and turbans", "Sherwani and kurta", "Festive ethnic"],
+  },
+  "baraat-welcome": {
+    name: "Baraat welcome",
+    description: "The bride's family welcomes the groom's party: milni or jaan aagman",
+    dressIdeas: ["Traditional Indian", "Silk and zari", "Festive ethnic"],
+  },
   wedding: {
     name: "Wedding",
     description: "The pheras, vows and ceremony",
     dressIdeas: ["Traditional Indian", "Pastels, no black or white", "Silk and zari"],
+  },
+  vidaai: {
+    name: "Vidaai",
+    description: "The bride's farewell as she leaves with blessings",
+    dressIdeas: ["Traditional Indian", "Soft pastels", "Silk and zari"],
   },
   reception: {
     name: "Reception",

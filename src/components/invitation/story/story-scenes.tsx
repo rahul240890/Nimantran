@@ -622,6 +622,85 @@ function Diyas() {
   );
 }
 
+/** Lanterns swaying on a string over the baraat as it sets out. */
+function Lanterns() {
+  return (
+    <Band edge="top">
+      <path d="M0 3Q50 11 100 3" fill="none" stroke="var(--card-gold)" strokeWidth={0.4} />
+      {[10, 26, 42, 58, 74, 90].map((x, i) => {
+        const top = r2(3 + Math.sin(Math.PI * (x / 100)) * 4);
+        return (
+          <g
+            key={x}
+            className="story-swing"
+            style={{ transformOrigin: `${x}px ${top}px`, "--story-delay": `${-i * 0.5}s` } as Vars}
+          >
+            <path d={`M${x} ${top}V${top + 5}`} stroke="var(--card-gold)" strokeWidth={0.4} />
+            <rect
+              x={x - 3}
+              y={top + 5}
+              width={6}
+              height={9}
+              rx={2.6}
+              fill="var(--card-accent)"
+              stroke="var(--card-gold)"
+              strokeWidth={0.4}
+            />
+            <ellipse
+              cx={x}
+              cy={top + 9.5}
+              rx={1.2}
+              ry={2}
+              fill="var(--motion-flame)"
+              className="story-glow"
+              style={{ "--story-delay": `${r2(i * 0.3)}s` } as Vars}
+            />
+            <path
+              d={`M${x - 3.4} ${top + 14.4}H${x + 3.4}`}
+              stroke="var(--card-gold)"
+              strokeWidth={0.6}
+            />
+          </g>
+        );
+      })}
+    </Band>
+  );
+}
+
+/** Pairs of dandiya sticks clicking round a circle, for the garba. */
+function Dandiya() {
+  return (
+    <Band edge="bottom">
+      <Draw
+        d="M12 36C12 30 88 30 88 36C88 42 12 42 12 36Z"
+        colour="var(--card-gold)"
+        width={0.4}
+        duration={2.6}
+      />
+      {[14, 32, 50, 68, 86].map((x, i) => (
+        <g
+          key={x}
+          className="story-swing"
+          style={{ transformOrigin: `${x}px 30px`, "--story-delay": `${-i * 0.4}s` } as Vars}
+        >
+          {[-1, 1].map((side) => (
+            <g key={side}>
+              <path
+                d={`M${x - side * 5} 22L${x + side * 3} 34`}
+                stroke="var(--card-accent)"
+                strokeWidth={1}
+                strokeLinecap="round"
+              />
+              <circle cx={x - side * 5} cy={22} r={0.9} fill="var(--card-gold)" />
+            </g>
+          ))}
+        </g>
+      ))}
+      <Sparkles count={8} seed={21} area={[8, 6, 84, 14]} />
+    </Band>
+  );
+}
+
 const PETALS = ["var(--marigold)", "var(--marigold-strong)", "var(--motion-turmeric)"];
 const RICE = ["var(--card-gold)", "var(--motion-turmeric)"];
 const CONFETTI = ["var(--card-gold)", "var(--card-accent)", "var(--marigold)"];
@@ -651,6 +730,56 @@ export function StoryScene({ scene }: { scene: StorySceneId }) {
     case "engagement":
       art = <Rings />;
       break;
+    // Pujas: the lamps are lit and petals fall before the family's own symbol
+    case "tilak":
+    case "ganesh-puja":
+    case "grah-shanti":
+      art = (
+        <>
+          <div
+            aria-hidden
+            className="story-halo absolute inset-x-0 top-[18%] mx-auto aspect-square w-[70%]"
+          />
+          <Diyas />
+          <Falling count={12} seed={10} colours={PETALS} shape="petal" />
+        </>
+      );
+      break;
+    // A toran goes up over the door: the mandap, the gifts and the welcome
+    case "mandap":
+    case "mameru":
+    case "baraat-welcome":
+      art = (
+        <>
+          <Toran />
+          <Falling count={16} seed={12} colours={PETALS} shape="petal" />
+        </>
+      );
+      break;
+    case "garba":
+      art = (
+        <>
+          <Dandiya />
+          <Falling count={12} seed={14} colours={CONFETTI} shape="confetti" />
+        </>
+      );
+      break;
+    case "baraat":
+      art = (
+        <>
+          <Lanterns />
+          <Falling count={16} seed={16} colours={CONFETTI} shape="confetti" />
+        </>
+      );
+      break;
+    case "vidaai":
+      art = (
+        <>
+          <Diyas />
+          <Falling count={18} seed={18} colours={RICE} shape="rice" />
+        </>
+      );
+      break;
     case "haldi":
       art = (
         <>
@@ -673,6 +802,7 @@ export function StoryScene({ scene }: { scene: StorySceneId }) {
         </>
       );
       break;
+    case "bhoj":
     case "reception":
       art = (
         <>
