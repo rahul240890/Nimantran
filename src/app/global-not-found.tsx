@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { RootHtml, rootViewport } from "@/components/root-html";
 import { Button } from "@/components/ui/button";
-import { uiText } from "@/i18n/copy";
+import { uiText } from "@/i18n/copy/ui";
 import { site } from "@/lib/site";
 
 /*

@@ -4,10 +4,10 @@ import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { draftCategory, draftTradition } from "@/lib/editor/draft";
-import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 
 export function DesignStep({ draft, update }: StepProps) {
   const { designCopy, occasionCopy, stepCopy } = useText(editorText);

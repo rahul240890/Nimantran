@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { STOCK_ROLES, type StockRole, type Template } from "./schema";
+import { STOCK_ROLES, type StockRole } from "./ids";
+import type { Template } from "./schema";
 
 /*
  * A template's card stock is a set of design token names, never raw colours, so the 3D

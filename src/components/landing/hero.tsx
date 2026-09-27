@@ -1,7 +1,7 @@
 import { ArrowDown, Check } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { HeroInvite } from "./hero-invite";
 

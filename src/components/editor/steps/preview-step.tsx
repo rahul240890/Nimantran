@@ -9,18 +9,18 @@ import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/
 import { CategoryIcon } from "@/components/categories/category-icon";
 import {
   draftCategory,
-  draftProblems,
   includedFunctions,
   templateWithRaga,
   type EditorStep,
 } from "@/lib/editor/draft";
+import { draftProblems } from "@/lib/editor/draft-checks";
 import { RAGAS } from "@/lib/engine/music";
 import { formatTime } from "@/lib/time";
 import { usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 
 function Section({
   title,

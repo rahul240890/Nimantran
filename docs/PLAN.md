@@ -151,6 +151,8 @@ Every tradition opens its own way (spec: [MOTION.md](MOTION.md)). Engine motion 
 **Step 13. Quality pass**
 End-to-end tests for create → publish → RSVP → dashboard. Accessibility audit, Lighthouse, real-device testing on low-end Android and iPhone.
 
+Built as: create, publish, RSVP and the dashboard were already covered end to end; this step adds a strict accessibility sweep of all 61 pages (WCAG 2.2 AA plus axe's best practices, at 320px and 1440px) and a guest who replies with the keyboard alone. Lighthouse on phones went from 66–89 to 90–94 on the English public pages, 86 on guest invitations (Hindi pages still swing between 73 and 84 on their Devanagari fonts): English pages stopped downloading Devanagari fonts for the footer, pages that only show things stopped sending the form validator, and copy is split so each page ships only its own words. Scores, what changed and a real-phone checklist for the owner: [QUALITY.md](QUALITY.md). **Not yet (owner task):** trying the live site on a low-end Android and an iPhone, using that checklist.
+
 **Step 14. Launch**
 Production Supabase, Vercel deploy, custom domain, analytics, error monitoring, privacy policy and terms.
 

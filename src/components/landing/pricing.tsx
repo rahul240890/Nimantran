@@ -2,7 +2,7 @@ import { Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
 import { Section } from "./section";

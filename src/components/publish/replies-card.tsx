@@ -2,7 +2,8 @@ import { CircleCheck, CircleHelp, CircleX, Users } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { editorText, publishText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { publishText } from "@/i18n/copy/publish";
 import { getText } from "@/i18n/server";
 import type { ReplySummary } from "@/lib/invites/rsvp";
 

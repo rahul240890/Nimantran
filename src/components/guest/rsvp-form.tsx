@@ -28,7 +28,8 @@ import type { GuestReply, ReplyStatus } from "@/lib/invites/rsvp";
 import { cn } from "@/lib/cn";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
-import { categoriesText, publishText } from "@/i18n/copy";
+import { categoriesText } from "@/i18n/copy/categories";
+import { publishText } from "@/i18n/copy/publish";
 
 export type RsvpFunction = {
   /** The function's id for replies. */
@@ -349,9 +350,9 @@ export function RsvpForm({
               )}
             >
               <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h4 id={headingId} className="font-display text-xl leading-tight">
+                <h3 id={headingId} className="font-display text-xl leading-tight">
                   {fn.name}
-                </h4>
+                </h3>
                 {fn.date && (
                   <span className="text-sm text-ink-muted">
                     {format(parseISO(fn.date), "EEE, d MMM", { locale: dateLocale[locale] })}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { GateCard } from "@/components/brand/gate-card";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { useText } from "@/i18n/client";
 import {
   approach,

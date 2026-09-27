@@ -6,7 +6,7 @@ import "@fontsource-variable/karla";
 import "@fontsource-variable/karla/wght-italic.css";
 import "@fontsource-variable/noto-sans-devanagari";
 import { Providers } from "@/components/providers";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { site } from "@/lib/site";
 import { themeInitScript } from "@/lib/theme";

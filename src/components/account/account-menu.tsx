@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "@/components/ui/toast";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
 import { PersonAvatar } from "./person-avatar";

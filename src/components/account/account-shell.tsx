@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Logo } from "@/components/brand/logo";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { LanguageSwitcher } from "@/components/shell/language-switcher";
-import { uiText } from "@/i18n/copy";
+import { uiText } from "@/i18n/copy/ui";
 import { getText } from "@/i18n/server";
 import { AccountMenu } from "./account-menu";
 

@@ -4,13 +4,13 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Editor } from "@/components/editor/editor";
 import { PageTransition } from "@/components/motion/page-transition";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 import { getText } from "@/i18n/server";
 import { isQualityChoice } from "@/content/engine-review";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
 import { inviteStore } from "@/lib/invites/store";
-import { isTemplateId } from "@/lib/templates/schema";
+import { isTemplateId } from "@/lib/templates/ids";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { editor } = await getText(editorText);

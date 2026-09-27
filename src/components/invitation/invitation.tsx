@@ -33,7 +33,7 @@ import { useDarkTheme } from "@/lib/use-color-scheme";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CARD_FORMATS, type CardFormatId } from "./formats";
 import { useText } from "@/i18n/client";
-import { uiText } from "@/i18n/copy";
+import { uiText } from "@/i18n/copy/ui";
 
 const Stage = dynamic(() => import("./three/stage"), { ssr: false });
 

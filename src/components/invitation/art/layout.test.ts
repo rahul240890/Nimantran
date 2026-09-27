@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { sampleCopies } from "@/content/engine-review";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
-import { TEMPLATE_IDS } from "@/lib/templates/schema";
+import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { balance, estimateWidth, layoutDoor, layoutInside, trackingFor } from "./layout";
 import { MOTIFS } from "./motifs";
 import { SYMBOL_IDS } from "@/lib/traditions/schema";

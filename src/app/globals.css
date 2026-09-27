@@ -331,6 +331,9 @@
     "Segoe UI", sans-serif;
   --font-label:
     "Tenor Sans", "Noto Sans Devanagari Variable", "Trebuchet MS", system-ui, sans-serif;
+  /* The device's own type, for a few native-script words on English pages (the footer), so
+     those pages don't download ~190 KB of Devanagari fonts before they paint */
+  --font-system: system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --radius-sm: 6px;
   --radius-md: 10px;

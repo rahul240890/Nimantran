@@ -16,7 +16,8 @@ import { toast } from "@/components/ui/toast";
 import { normalizePhone } from "@/lib/auth/phone";
 import { GUEST_RULES, parseGuestList, type HostFunction, type HostGuest } from "@/lib/guests/list";
 import { useText } from "@/i18n/client";
-import { dashboardText, editorText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
+import { editorText } from "@/i18n/copy/editor";
 
 function PartySize({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const copy = useText(dashboardText).dashboardCopy.form;

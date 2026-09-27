@@ -26,7 +26,8 @@ import { IconButton } from "@/components/ui/icon-button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
-import { accountText, editorText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
+import { editorText } from "@/i18n/copy/editor";
 import { dateLocale } from "@/i18n/dates";
 import { cn } from "@/lib/cn";
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
@@ -35,7 +36,7 @@ import { forgetShelvedPhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft } from "@/lib/editor/store";
 import type { InviteSummary } from "@/lib/invites/rows";
-import { isTemplateId, type TemplateId } from "@/lib/templates/schema";
+import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
 
 const noop = () => () => {};
 

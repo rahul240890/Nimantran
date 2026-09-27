@@ -3,7 +3,8 @@ import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATE_LIST, TEMPLATES } from "./catalog";
-import { contentSchema, initialOf, sampleContent, slotsOf, toCardCopy } from "./content";
+import { initialOf, sampleContent, slotsOf, toCardCopy } from "./content";
+import { contentSchema } from "./content-schema";
 import { isTemplateId, SLOT_RULES, TEMPLATE_IDS, templateSchema } from "./schema";
 
 const css = readFileSync(resolve(process.cwd(), "src/app/globals.css"), "utf8");

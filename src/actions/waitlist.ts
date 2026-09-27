@@ -1,6 +1,6 @@
 "use server";
 
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { isUiLocale } from "@/i18n/locales";
 import { validateWaitlist, type WaitlistErrors } from "@/lib/waitlist/schema";
 import { storeWaitlistEntry } from "@/lib/waitlist/store";

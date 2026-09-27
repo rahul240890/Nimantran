@@ -43,8 +43,6 @@ export type WaitlistField = keyof WaitlistEntry;
 export type WaitlistDraft = Record<WaitlistField, string>;
 export type WaitlistErrors = Partial<Record<WaitlistField, string>>;
 
-export const emptyWaitlist: WaitlistDraft = { name: "", email: "", phone: "", occasion: "" };
-
 /** The first message for each field, ready to show under it. */
 export function fieldErrors(error: z.ZodError): WaitlistErrors {
   const out: WaitlistErrors = {};

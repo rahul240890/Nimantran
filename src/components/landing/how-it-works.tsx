@@ -1,6 +1,6 @@
 import { LayoutTemplate, PenLine, Send } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { Section } from "./section";
 

@@ -1,5 +1,7 @@
 import { z } from "zod";
-import { categoriesText, dashboardText, editorText } from "@/i18n/copy";
+import { categoriesText } from "@/i18n/copy/categories";
+import { dashboardText } from "@/i18n/copy/dashboard";
+import { editorText } from "@/i18n/copy/editor";
 import { getLocale } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
 import { guestsCsv, sortGuests } from "@/lib/guests/list";

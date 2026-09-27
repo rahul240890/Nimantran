@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
-import { editorText, landingText, seoText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { landingText } from "@/i18n/copy/landing";
+import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS, TRADITION_LIST } from "@/lib/traditions/catalog";
 import { WORDING_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { site } from "@/lib/site";

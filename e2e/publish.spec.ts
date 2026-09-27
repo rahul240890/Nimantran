@@ -90,7 +90,17 @@ test.describe("publish and share", () => {
     await writeInvite(page, number, ["Kabir", "Ananya"]);
     // Let the autosave timer fire under the test clock, then wait for the save and upload
     await page.clock.runFor(2_000);
-    await expect(page.getByText("Saved to your account")).toHaveCount(1);
+    // "Saved" can still be showing from an earlier save while the last one, with the photo,
+    // is on its way: wait until the draft as it stands now is the one marked saved
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const draft = JSON.parse(localStorage.getItem("nimantran-invite-draft") ?? "null");
+          const saved = localStorage.getItem("nimantran-invite-synced");
+          return Boolean(draft?.remoteId) && saved === `${draft.remoteId}:${draft.updatedAt}`;
+        }),
+      )
+      .toBe(true);
     await page.goto("/invites");
     await expect(page.getByRole("article").getByText("Draft", { exact: true })).toBeVisible();
 

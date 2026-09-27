@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageTransition } from "@/components/motion/page-transition";
 import { isQualityChoice } from "@/content/engine-review";
 import { templatesReview } from "@/content/templates-review";
-import { isTemplateId } from "@/lib/templates/schema";
+import { isTemplateId } from "@/lib/templates/ids";
 import { TemplatesReview } from "./_review";
 
 export const metadata: Metadata = {

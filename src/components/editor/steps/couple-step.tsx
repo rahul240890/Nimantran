@@ -21,7 +21,7 @@ import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 
 const NAME_SLOTS: readonly SlotId[] = ["first", "joiner", "second"];
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Mandala } from "@/components/brand/mandala";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { TiltCard } from "@/components/motion/tilt-card";
-import { categoriesText } from "@/i18n/copy";
+import { categoriesText } from "@/i18n/copy/categories";
 import { useText } from "@/i18n/client";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { isLocal, rankCategories } from "@/lib/categories/rank";

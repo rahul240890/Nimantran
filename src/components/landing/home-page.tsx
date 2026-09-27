@@ -10,7 +10,7 @@ import { Waitlist } from "./waitlist";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
 import { JsonLd } from "@/components/seo/json-ld";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { homePath, type UiLocale } from "@/i18n/locales";
 import { application, faqPage, organization, website } from "@/lib/seo/structured-data";
 

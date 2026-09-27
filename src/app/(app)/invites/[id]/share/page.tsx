@@ -13,7 +13,7 @@ import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 import { getLocale, getText } from "@/i18n/server";
-import { publishText } from "@/i18n/copy";
+import { publishText } from "@/i18n/copy/publish";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { shareCopy } = await getText(publishText);

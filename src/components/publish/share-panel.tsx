@@ -23,7 +23,7 @@ import { toast } from "@/components/ui/toast";
 import { inviteDraft } from "@/lib/editor/store";
 import { whatsappShareUrl } from "@/lib/publish/links";
 import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy";
+import { publishText } from "@/i18n/copy/publish";
 
 type SharePanelProps = {
   inviteId: string;

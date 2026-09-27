@@ -3,12 +3,12 @@ import { randomBytes, randomUUID } from "node:crypto";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { isCategoryId } from "@/lib/categories/catalog";
-import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/schema";
+import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/ids";
 import { isFunctionId } from "@/lib/events/functions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { GuestReplyRow, HostFunction, HostGuest, ReplyStatus } from "@/lib/guests/list";
 import { supabaseServer } from "@/lib/supabase/server";
-import { isTemplateId, type TemplateId } from "@/lib/templates/schema";
+import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import { previewDb, previewHosts, type PreviewGuest, type PreviewInvite } from "./preview-db";
 import { rowsToDraft, type EventRow, type FunctionRow } from "./rows";
 

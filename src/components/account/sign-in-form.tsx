@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 import { useText } from "@/i18n/client";
 import { firstName } from "@/lib/auth/account";
 import { OTP_LENGTH, maskPhone, normalizePhone } from "@/lib/auth/phone";

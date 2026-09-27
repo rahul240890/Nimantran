@@ -1,5 +1,5 @@
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { Section } from "./section";
 

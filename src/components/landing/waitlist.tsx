@@ -9,15 +9,23 @@ import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { useLocale, useText } from "@/i18n/client";
 import { waitlistDraft } from "@/lib/waitlist/draft";
-import { validateWaitlist, type WaitlistErrors, type WaitlistField } from "@/lib/waitlist/schema";
+import type { WaitlistErrors, WaitlistField, validateWaitlist } from "@/lib/waitlist/schema";
 
 const fieldOrder: WaitlistField[] = ["name", "email", "phone", "occasion"];
 
 type Status =
   { kind: "idle" } | { kind: "sending" } | { kind: "failed" } | { kind: "joined"; name: string };
+
+/*
+ * The checks load after the page has painted, not with it: the waitlist sits at the foot
+ * of the home page, and its validator is the largest script the page would otherwise send.
+ */
+let validator: Promise<typeof validateWaitlist> | undefined;
+const loadValidator = () =>
+  (validator ??= import("@/lib/waitlist/schema").then((module) => module.validateWaitlist));
 
 function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
   const { waitlist } = useText(landingText);
@@ -33,23 +41,34 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const formRef = useRef<HTMLFormElement>(null);
 
+  useEffect(() => {
+    void loadValidator();
+  }, []);
+
   const update = (field: WaitlistField, value: string) => {
     const next = { ...draft, [field]: value };
     waitlistDraft.set(next);
     // Once someone has tried to submit, errors clear as soon as a field is fixed
     if (submitted || errors[field]) {
-      const result = validateWaitlist(next, waitlist.errors);
-      setErrors((current) => ({
-        ...current,
-        [field]: result.ok ? undefined : result.errors[field],
-      }));
+      void loadValidator().then((validate) => {
+        const result = validate(next, waitlist.errors);
+        setErrors((current) => ({
+          ...current,
+          [field]: result.ok ? undefined : result.errors[field],
+        }));
+      });
     }
   };
 
   const checkOnBlur = (field: WaitlistField) => {
     if (draft[field].trim() === "") return; // don't scold an empty field someone tabbed past
-    const result = validateWaitlist(draft, waitlist.errors);
-    setErrors((current) => ({ ...current, [field]: result.ok ? undefined : result.errors[field] }));
+    void loadValidator().then((validate) => {
+      const result = validate(draft, waitlist.errors);
+      setErrors((current) => ({
+        ...current,
+        [field]: result.ok ? undefined : result.errors[field],
+      }));
+    });
   };
 
   const focusFirstError = (found: WaitlistErrors) => {
@@ -64,7 +83,7 @@ function WaitlistForm({ onJoined }: { onJoined: (name: string) => void }) {
     event?.preventDefault();
     if (status.kind === "sending") return;
     setSubmitted(true);
-    const result = validateWaitlist(draft, waitlist.errors);
+    const result = (await loadValidator())(draft, waitlist.errors);
     if (!result.ok) {
       setErrors(result.errors);
       focusFirstError(result.errors);

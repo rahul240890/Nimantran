@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { dateLocale } from "@/i18n/dates";
-import { editorText, publishText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { publishText } from "@/i18n/copy/publish";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import {

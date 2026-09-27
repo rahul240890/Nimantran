@@ -14,7 +14,7 @@ import { newDraft } from "@/lib/editor/draft";
 import { hostStore, type JoinPreview } from "@/lib/invites/hosts";
 import { inviteNames } from "@/lib/publish/describe";
 import { getLocale, getText } from "@/i18n/server";
-import { dashboardText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { joinCopy } = await getText(dashboardText);

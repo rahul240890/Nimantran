@@ -13,7 +13,7 @@ import { safeNext } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
 import { getText } from "@/i18n/server";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { signInCopy } = await getText(accountText);

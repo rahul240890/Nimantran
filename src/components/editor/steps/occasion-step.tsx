@@ -6,12 +6,13 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { CATEGORIES, CATEGORY_IDS, isCategoryId } from "@/lib/categories/catalog";
 import { rankCategories } from "@/lib/categories/rank";
 import { regionLanguage } from "@/lib/categories/regions";
-import { CATEGORY_GROUPS } from "@/lib/categories/schema";
+import { CATEGORY_GROUPS } from "@/lib/categories/ids";
 import { useVisitor } from "@/lib/categories/use-visitor";
 import { draftCategory, functionOrder, withCategory } from "@/lib/editor/draft";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
-import { categoriesText, editorText } from "@/i18n/copy";
+import { categoriesText } from "@/i18n/copy/categories";
+import { editorText } from "@/i18n/copy/editor";
 
 /** What the chosen occasion plans, asks and suggests, so the choice never feels blind. */
 function SetsUp({ draft }: Pick<StepProps, "draft">) {

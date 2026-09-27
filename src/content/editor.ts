@@ -1,6 +1,6 @@
 import type { EditorStep, FunctionId } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 
 /*
  * English copy for the invite editor (/create). Moves into next-intl in Step 12.

@@ -21,7 +21,7 @@ import { cn } from "@/lib/cn";
 import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 
 /* A swatch of each design's card stock */
 const swatches: Record<TemplateId, string> = {
