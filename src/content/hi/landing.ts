@@ -49,7 +49,7 @@ export const shell: Translation<typeof en.shell> = {
 export const hero: Translation<typeof en.hero> = {
   eyebrow: "शुभ आरंभ · शुरुआती पहुँच",
   title: "निमंत्रण, जिन्हें मेहमान खोलें, घुमाएँ और सहेजें।",
-  body: "कुछ ही मिनटों में 3D निमंत्रण बनाइए, WhatsApp पर भेजिए और एक टैप में जवाब पाइए। सबसे पहले भारतीय शादियों के लिए।",
+  body: "अपने परिवार की परंपरा के लिए बनी चित्रित थीम चुनिए, नाम और रस्में जोड़िए, WhatsApp पर भेजिए और एक टैप में जवाब पाइए।",
   primary: "अपना निमंत्रण बनाएँ",
   secondary: "देखें कैसे काम करता है",
   cardLabel: { closed: "नमूना निमंत्रण खोलें", open: "नमूना निमंत्रण बंद करें" },
@@ -58,7 +58,7 @@ export const hero: Translation<typeof en.hero> = {
     tap: "खोलने के लिए टैप करें",
     close: "बंद करने के लिए टैप करें",
   },
-  proof: ["कोई ऐप नहीं चाहिए", "एक टैप में जवाब", "हर डिज़ाइन में एक राग"],
+  proof: ["कोई ऐप नहीं चाहिए", "एक टैप में जवाब", "परिवार की अपनी भाषा में"],
   card: {
     doors: ["शुभ", "विवाह"],
     blessing: "",
@@ -70,6 +70,26 @@ export const hero: Translation<typeof en.hero> = {
     date: "शनिवार, 12 दिसंबर 2026",
     venue: "पिछोला लेकसाइड गार्डन्स, उदयपुर",
   },
+};
+
+export const homeGallery: Translation<typeof en.homeGallery> = {
+  deckLabel: "चित्रित निमंत्रण थीम",
+  showTheme: (name: string) => `${name} दिखाएँ`,
+  coverDate: "12 दिसंबर 2026",
+  occasionsEyebrow: "यहाँ से शुरू करें",
+  occasionsTitle: "आप क्या मना रहे हैं?",
+  occasionsIntro:
+    "अवसर चुनिए, फिर उसी के लिए बना डिज़ाइन। शादी परंपरा के हिसाब से खुलती है: गुजराती, बंगाली, मराठी, तमिल और भी।",
+  searchLabel: "अवसर और डिज़ाइन खोजें",
+  searchPlaceholder: "जैसे गुजराती शादी, हल्दी, संगीत…",
+  search: "खोजें",
+  soonHeading: "जल्द आ रहे हैं",
+  allOccasions: "सभी अवसर देखें",
+  themesEyebrow: "चित्रित थीम",
+  themesTitle: "हर रस्म का अपना चित्रित पन्ना",
+  themesIntro:
+    "हर थीम चित्रों का एक सेट है: मुखपृष्ठ, परिवार, हल्दी, मेहँदी, संगीत, बारात, विवाह, स्वागत समारोह और जवाब। किसी पर टैप करके सारे पन्ने देखिए।",
+  allDesigns: "शादी के सभी डिज़ाइन देखें",
 };
 
 export const musicDemo: Translation<typeof en.musicDemo> = {

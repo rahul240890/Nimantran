@@ -15,6 +15,7 @@ import {
   type TemplateId,
 } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
+import type { SuiteId } from "@/lib/suites/catalog";
 import type {
   DraftTradition,
   EventFunction,
@@ -120,6 +121,37 @@ export function withCategory(draft: InviteDraft, categoryId: CategoryId): Invite
     FUNCTION_IDS.map((id) => [id, { ...draft.functions[id], included: planned.includes(id) }]),
   ) as Record<FunctionId, EventFunction>;
   return { ...draft, categoryId, functions };
+}
+
+/**
+ * Applies a design chosen in the gallery: its occasion, its tradition (or none, for a kind
+ * without a pack yet), its page theme and card. The card is written in the tradition's own
+ * language, so a Gujarati wedding starts in Gujarati. Every word already typed is kept.
+ */
+export function withGalleryChoice(
+  draft: InviteDraft,
+  choice: {
+    category: CategoryId | null;
+    tradition: TraditionPack["id"] | null;
+    suite: SuiteId;
+    template: TemplateId | null;
+  },
+): InviteDraft {
+  let next = choice.category ? withCategory(draft, choice.category) : draft;
+  if (next.tradition.id !== choice.tradition) {
+    next = { ...next, tradition: { ...noTradition, id: choice.tradition } };
+  }
+  const language = choice.tradition ? TRADITIONS[choice.tradition].language : "en";
+  const main = (CARD_LANGUAGES as readonly string[]).includes(language)
+    ? (language as CardLanguage)
+    : "en";
+  return {
+    ...next,
+    suite: choice.suite,
+    templateId: choice.template ?? next.templateId,
+    languages: [main],
+    step: "couple",
+  };
 }
 
 /**

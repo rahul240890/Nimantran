@@ -13,6 +13,7 @@ import {
 } from "@/lib/editor/draft";
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
 import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import { formatTime } from "@/lib/time";
 
@@ -39,6 +40,43 @@ export function storyFunctions(draft: InviteDraft, locale: UiLocale): StoryFunct
       time: start && fn.endTime ? guestCopy.timeRange(start, formatTime(fn.endTime, words)) : start,
       muhurat: muhurat && start ? { text: muhurat.native, lang: language } : null,
       venue: fn.venue.trim(),
+    };
+  });
+}
+
+/**
+ * The functions as the pages print them in one of the card's languages, and only in that
+ * language: a Gujarati card is headed by each ceremony's Gujarati name and dated in
+ * Gujarati, its English side by the same names in English letters, a Hindi card in Hindi.
+ * Nothing falls back to the site's own language.
+ */
+export function cardFunctions<T extends StoryFunction>(
+  functions: readonly T[],
+  draft: InviteDraft,
+  language: CardLanguage,
+): T[] {
+  const pack = draftTradition(draft);
+  return functions.map((fn) => {
+    const local = ceremonyName(draft, fn.kind);
+    const muhurat = muhuratName(draft, fn.kind);
+    const own = pack !== null && pack.language === language;
+    const english = language === "en";
+    const siteNames = editorText[language === "hi" ? "hi" : "en"].functionCopy;
+    const name = own
+      ? (local?.native ?? siteNames[fn.kind].name)
+      : english
+        ? (local?.latin ?? siteNames[fn.kind].name)
+        : siteNames[fn.kind].name;
+    const date = draft.functions[fn.kind].date;
+    return {
+      ...fn,
+      name,
+      localName: null,
+      date: date ? formatCardDate(date, language) : fn.date,
+      muhurat:
+        fn.muhurat && muhurat
+          ? { text: own ? muhurat.native : muhurat.latin, lang: language }
+          : fn.muhurat,
     };
   });
 }

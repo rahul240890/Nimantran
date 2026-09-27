@@ -1,0 +1,306 @@
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import { SUITES, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
+import { TRADITIONS } from "@/lib/traditions/catalog";
+import type { TraditionId } from "@/lib/traditions/schema";
+import type { WeddingKind } from "./ids";
+
+export { WEDDING_KINDS, isWeddingKind, type WeddingKind } from "./ids";
+
+/*
+ * The gallery (Step 12g): what a host browses before the editor. Occasions come first,
+ * a wedding then opens its kinds (Gujarati, Bengali…), and each kind shows only the designs
+ * made for it. Plain data, so a master admin can add occasions, kinds and designs later
+ * without code. An occasion is live once it has a category (its functions and wording);
+ * the rest are listed so hosts see what is coming.
+ */
+
+export const OCCASION_SECTIONS = ["wedding", "family", "parties", "festivals", "business"] as const;
+export type OccasionSection = (typeof OCCASION_SECTIONS)[number];
+
+export type Occasion = {
+  id: string;
+  section: OccasionSection;
+  /** The editor's category; null until the occasion's words and events exist. */
+  category: CategoryId | null;
+  names: { en: string; hi: string };
+  /** A painting for its tile: a theme and one of its pages. */
+  art: { suite: SuiteId; page: PageArt } | null;
+  /** Other words people search with, in any language. */
+  keywords: readonly string[];
+};
+
+const live = (
+  id: CategoryId,
+  art: Occasion["art"],
+  keywords: readonly string[] = [],
+): Occasion => ({
+  id,
+  section: "wedding",
+  category: id,
+  names: { en: CATEGORIES[id].names.en, hi: CATEGORIES[id].names.hi },
+  art,
+  keywords: [...Object.values(CATEGORIES[id].names), ...keywords],
+});
+
+const soon = (
+  id: string,
+  section: OccasionSection,
+  names: Occasion["names"],
+  keywords: readonly string[] = [],
+): Occasion => ({ id, section, category: null, names, art: null, keywords });
+
+export const OCCASIONS: readonly Occasion[] = [
+  live("wedding", { suite: "rajwada-bagh", page: "wedding" }, [
+    "shaadi",
+    "vivah",
+    "lagna",
+    "biye",
+    "kankotri",
+    "marriage",
+    "shadi",
+  ]),
+  live("engagement", { suite: "shahi-savari", page: "reception" }, ["sagai", "ring ceremony"]),
+  live("roka", { suite: "phulkari-haveli", page: "family" }, ["tilak", "shagun"]),
+  live("save-the-date", { suite: "rajwada-bagh", page: "cover" }, ["std"]),
+  live("haldi", { suite: "kayal", page: "haldi" }, ["pithi", "manjha", "gaye holud"]),
+  live("mehendi", { suite: "noor-bagh", page: "mehendi" }, ["mehndi", "henna"]),
+  live("sangeet", { suite: "rajbari", page: "sangeet" }, ["garba", "dandiya", "ladies sangeet"]),
+  live("reception", { suite: "peshwai-wada", page: "reception" }, ["party", "dinner"]),
+
+  soon("anniversary", "family", { en: "Anniversary", hi: "सालगिरह" }, ["wedding anniversary"]),
+  soon("birthday", "family", { en: "Birthday", hi: "जन्मदिन" }, [
+    "janamdin",
+    "bday",
+    "first birthday",
+    "party",
+  ]),
+  soon("baby-shower", "family", { en: "Baby shower", hi: "गोद भराई" }, [
+    "godh bharai",
+    "seemantham",
+    "valaikappu",
+    "shrimant",
+  ]),
+  soon("naming-ceremony", "family", { en: "Naming ceremony", hi: "नामकरण" }, [
+    "naamkaran",
+    "barsa",
+    "cradle ceremony",
+  ]),
+  soon("mundan", "family", { en: "Mundan", hi: "मुंडन" }, ["chudakarana", "first haircut"]),
+  soon("housewarming", "family", { en: "Housewarming", hi: "गृह प्रवेश" }, [
+    "griha pravesh",
+    "vastu",
+    "new home",
+  ]),
+  soon("puja", "family", { en: "Puja and katha", hi: "पूजा और कथा" }, [
+    "satyanarayan",
+    "katha",
+    "havan",
+    "jagran",
+  ]),
+  soon("thread-ceremony", "family", { en: "Thread ceremony", hi: "जनेऊ संस्कार" }, [
+    "janeu",
+    "upanayan",
+    "munj",
+  ]),
+
+  soon("fresher-party", "parties", { en: "Fresher party", hi: "फ्रेशर पार्टी" }, [
+    "college",
+    "freshers",
+  ]),
+  soon("welcome-party", "parties", { en: "Welcome party", hi: "वेलकम पार्टी" }, ["welcome"]),
+  soon("farewell-party", "parties", { en: "Farewell party", hi: "फेयरवेल पार्टी" }, [
+    "farewell",
+    "send off",
+  ]),
+  soon("kitty-party", "parties", { en: "Kitty party", hi: "किटी पार्टी" }, ["kitty", "ladies"]),
+  soon("reunion", "parties", { en: "Reunion", hi: "रीयूनियन" }, ["alumni", "get together"]),
+  soon("retirement", "parties", { en: "Retirement", hi: "सेवानिवृत्ति" }, ["retirement party"]),
+  soon("cocktail", "parties", { en: "Cocktail party", hi: "कॉकटेल पार्टी" }, ["cocktail"]),
+
+  soon("diwali", "festivals", { en: "Diwali", hi: "दिवाली" }, ["deepavali", "lakshmi puja"]),
+  soon("holi", "festivals", { en: "Holi", hi: "होली" }, ["rang", "colours"]),
+  soon("navratri", "festivals", { en: "Navratri and garba", hi: "नवरात्रि और गरबा" }, [
+    "garba",
+    "dandiya",
+    "durga puja",
+  ]),
+  soon("ganesh-chaturthi", "festivals", { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, [
+    "ganpati",
+  ]),
+  soon("eid", "festivals", { en: "Eid", hi: "ईद" }, ["iftar", "eid milan"]),
+  soon("christmas", "festivals", { en: "Christmas", hi: "क्रिसमस" }, ["xmas", "new year"]),
+
+  soon("shop-opening", "business", { en: "Shop opening", hi: "दुकान का उद्घाटन" }, [
+    "inauguration",
+    "opening",
+    "udghatan",
+  ]),
+  soon("launch", "business", { en: "Launch event", hi: "लॉन्च इवेंट" }, ["product launch"]),
+  soon("office-party", "business", { en: "Office party", hi: "ऑफ़िस पार्टी" }, [
+    "corporate",
+    "team",
+  ]),
+];
+
+export function occasionById(id: string): Occasion | undefined {
+  return OCCASIONS.find((occasion) => occasion.id === id);
+}
+
+/*
+ * A design in the gallery: a theme for the event pages with its matching card, or, for the
+ * card-colour theme, one of the 3D card designs on its own.
+ */
+export type GalleryDesign = { id: string; suite: SuiteId; template: TemplateId };
+
+export function paintedDesign(suite: SuiteId): GalleryDesign {
+  return { id: suite, suite, template: SUITES[suite].template ?? "marigold" };
+}
+
+export function cardDesign(template: TemplateId): GalleryDesign {
+  return { id: `card-${template}`, suite: "classic", template };
+}
+
+export type WeddingKindEntry = {
+  id: WeddingKind;
+  /** The tradition pack that gives its ceremony names, blessing and language, if one exists. */
+  tradition: TraditionId | null;
+  /** Its name in its own script, for the tile. */
+  nativeName: { text: string; lang: string } | null;
+  /** The painting on its tile. */
+  art: { suite: SuiteId; page: PageArt };
+  suites: readonly SuiteId[];
+  cards: readonly TemplateId[];
+  keywords: readonly string[];
+};
+
+const pack = (id: TraditionId) => ({
+  tradition: id,
+  nativeName: { text: TRADITIONS[id].nativeName, lang: TRADITIONS[id].language },
+});
+
+export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
+  "north-indian": {
+    id: "north-indian",
+    ...pack("north-hindu"),
+    art: { suite: "rajwada-bagh", page: "cover" },
+    suites: ["rajwada-bagh"],
+    cards: ["marigold", "scroll"],
+    keywords: ["hindi", "up", "delhi", "bihar", "punjabi hindu"],
+  },
+  gujarati: {
+    id: "gujarati",
+    ...pack("gujarati"),
+    art: { suite: "shahi-savari", page: "sangeet" },
+    suites: ["shahi-savari"],
+    cards: ["bandhani"],
+    keywords: ["gujrati", "kutch", "kathiawadi", "patel", "kankotri", "hast melap"],
+  },
+  rajasthani: {
+    id: "rajasthani",
+    ...pack("rajasthani"),
+    art: { suite: "shahi-savari", page: "cover" },
+    suites: ["shahi-savari"],
+    cards: ["rangmahal", "scroll"],
+    keywords: ["marwari", "rajput", "jaipur", "udaipur"],
+  },
+  marathi: {
+    id: "marathi",
+    ...pack("marathi"),
+    art: { suite: "peshwai-wada", page: "cover" },
+    suites: ["peshwai-wada"],
+    cards: ["paithani"],
+    keywords: ["maharashtrian", "lagna", "mumbai", "pune"],
+  },
+  bengali: {
+    id: "bengali",
+    ...pack("bengali"),
+    art: { suite: "rajbari", page: "cover" },
+    suites: ["rajbari"],
+    cards: ["alpona"],
+    keywords: ["bangali", "biye", "kolkata", "gaye holud"],
+  },
+  tamil: {
+    id: "tamil",
+    ...pack("tamil"),
+    art: { suite: "kayal", page: "cover" },
+    suites: ["kayal"],
+    cards: ["gopuram", "kasavu"],
+    keywords: ["south indian", "chennai", "kalyanam", "kerala", "malayali"],
+  },
+  punjabi: {
+    id: "punjabi",
+    tradition: null,
+    nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
+    art: { suite: "phulkari-haveli", page: "cover" },
+    suites: ["phulkari-haveli"],
+    cards: ["phulkari"],
+    keywords: ["sikh", "anand karaj", "punjab", "sardar"],
+  },
+  muslim: {
+    id: "muslim",
+    tradition: null,
+    nativeName: { text: "نکاح", lang: "ur" },
+    art: { suite: "noor-bagh", page: "cover" },
+    suites: ["noor-bagh"],
+    cards: ["emerald"],
+    keywords: ["nikah", "walima", "shaadi", "islamic"],
+  },
+  modern: {
+    id: "modern",
+    ...pack("modern"),
+    nativeName: null,
+    art: { suite: "rajwada-bagh", page: "reception" },
+    suites: ["classic"],
+    cards: ["monogram", "rose", "marigold"],
+    keywords: ["simple", "minimal", "court marriage", "english", "christian", "destination"],
+  },
+};
+
+/** The designs a wedding kind offers: its painted themes, then its 3D cards. */
+export function kindDesigns(kind: WeddingKind): GalleryDesign[] {
+  const entry = WEDDING_KIND_ENTRIES[kind];
+  return [
+    // A kind's painted theme pairs with the kind's own card (Shahi Savari with Bandhani)
+    ...entry.suites
+      .filter((suite) => suite !== "classic")
+      .map((suite) => ({
+        ...paintedDesign(suite),
+        template: entry.cards[0] ?? paintedDesign(suite).template,
+      })),
+    ...entry.cards.map(cardDesign),
+  ];
+}
+
+/** Painted themes with pictures, in the order the gallery shows them. */
+export const PAINTED_SUITES: readonly SuiteId[] = (Object.keys(SUITES) as SuiteId[]).filter(
+  (id) => SUITES[id].images.cover,
+);
+
+/** Every design for an occasion: all the painted themes, then the cards that suit it. */
+export function occasionDesigns(category: CategoryId): GalleryDesign[] {
+  return [...PAINTED_SUITES.map(paintedDesign), ...CATEGORIES[category].templates.map(cardDesign)];
+}
+
+/** Every design in the gallery, painted first. */
+export function allDesigns(): GalleryDesign[] {
+  return [...PAINTED_SUITES.map(paintedDesign), ...TEMPLATE_IDS.map(cardDesign)];
+}
+
+/** Where "Use this design" takes the host: the editor, set up for this choice. */
+export function designHref(
+  design: GalleryDesign,
+  context: { category: CategoryId; kind?: WeddingKind | null },
+): string {
+  const params = new URLSearchParams({ category: context.category });
+  const tradition = context.kind ? WEDDING_KIND_ENTRIES[context.kind].tradition : null;
+  if (tradition) params.set("tradition", tradition);
+  params.set("suite", design.suite);
+  params.set("template", design.template);
+  return `/create?${params.toString()}`;
+}
+
+/** The painting for a theme's page, or null for the card-colour theme. */
+export function suiteImage(suite: SuiteId, page: PageArt = "cover"): string | null {
+  return SUITES[suite].images[page] ?? null;
+}

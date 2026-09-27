@@ -29,7 +29,8 @@ import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import { storyBeats } from "@/lib/engine/story";
-import { draftSuite, storyFamily } from "@/lib/publish/story";
+import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
+import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -80,7 +81,6 @@ export function GuestView({
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
-  const { storyWords } = uiStrings;
   const locale = useLocale();
   const languages = cardLanguages(draft);
   // A two-language card opens in the guest's own language when it has it
@@ -98,16 +98,17 @@ export function GuestView({
     () => ({
       beats: storyBeats({
         copy,
-        functions,
+        // The pages speak the card's language, not the site's
+        functions: cardFunctions(functions, draft, language),
         replies,
-        words: storyWords,
+        words: CARD_STORY_WORDS[language],
         family: storyFamily(draft),
       }),
       suite: draftSuite(draft),
       textBox: draft.textBox,
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, storyWords, guestCopy.reply, draft],
+    [copy, functions, replies, language, guestCopy.reply, draft],
   );
   const dates = useMemo(
     () =>

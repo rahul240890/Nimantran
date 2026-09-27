@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { editorText } from "@/i18n/copy/editor";
+import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
 import { seoText } from "@/i18n/copy/seo";
@@ -41,8 +42,16 @@ function wordsFor(page: PublicPage, locale: UiLocale): Words {
         description: seoCopy.design.description(design.description),
       };
     }
+    case "gallery": {
+      const { galleryCopy } = galleryText[locale];
+      return { title: galleryCopy.metaTitle, description: galleryCopy.metaDescription };
+    }
     case "occasion":
       return seoCopy.occasions[page.id];
+    case "wedding-kind": {
+      const { galleryCopy, weddingKindCopy } = galleryText[locale];
+      return galleryCopy.kindMeta(weddingKindCopy[page.id].name);
+    }
     case "tradition":
       return seoCopy.traditionPages[page.id];
     case "privacy":
@@ -100,65 +109,6 @@ function traditionLinks(locale: UiLocale, ids: readonly TraditionId[]) {
     label: traditionCopy.names[id],
     href: pagePath({ kind: "tradition", id }, locale),
   }));
-}
-
-export function OccasionPage({ id, locale }: { id: CategoryId; locale: UiLocale }) {
-  const { seoCopy } = seoText[locale];
-  const { functionCopy } = editorText[locale];
-  const category = CATEGORIES[id];
-  const words = seoCopy.occasions[id];
-  const name = category.names[locale];
-  const functions = category.functions.suggested;
-  return (
-    <PublicShell
-      locale={locale}
-      crumbs={[homeCrumb(locale), { name, path: pagePath({ kind: "occasion", id }, locale) }]}
-      jsonLd={[
-        itemList(
-          category.templates.map((template) => ({
-            name: editorText[locale].designCopy[template].name,
-            path: pagePath({ kind: "design", id: template }, locale),
-          })),
-        ),
-      ]}
-    >
-      <PageHero
-        locale={locale}
-        eyebrow={seoCopy.invitations}
-        heading={words.heading}
-        intro={words.intro}
-        createHref={`/create?category=${id}`}
-        aside={<Cover id={category.templates[0]!} />}
-      />
-      <FeatureRow locale={locale} />
-      <Block id="designs" heading={seoCopy.designsHeading} intro={seoCopy.designsIntro}>
-        <DesignGrid locale={locale} ids={category.templates} />
-      </Block>
-      {functions.length > 1 && (
-        <Block
-          id="functions"
-          heading={seoCopy.functionsHeading}
-          intro={seoCopy.functionsIntro}
-          className="pt-0 sm:pt-0"
-        >
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {functions.map((fn) => (
-              <li
-                key={fn}
-                className="flex flex-col gap-1 rounded-lg border border-line bg-surface p-5 shadow-raised"
-              >
-                <h3 className="font-display text-xl">{functionCopy[fn].name}</h3>
-                <p className="text-sm text-ink-muted">{functionCopy[fn].description}</p>
-              </li>
-            ))}
-          </ul>
-        </Block>
-      )}
-      <Block id="more" heading={seoCopy.moreOccasions} className="pt-0 sm:pt-0">
-        <LinkPills links={occasionLinks(locale, id)} />
-      </Block>
-    </PublicShell>
-  );
 }
 
 export function TraditionPage({ id, locale }: { id: TraditionId; locale: UiLocale }) {

@@ -10,25 +10,25 @@ const axe = (page: Page) =>
 /** Opens a page and waits until React has taken over, so taps and typing are handled. */
 async function visit(page: Page, path = "/") {
   await page.goto(path);
-  await expect(page.locator("[data-tier]")).toHaveAttribute("style", /--open/);
+  await expect(page.locator("[data-deck-live]")).toHaveAttribute("data-deck-live", "true");
 }
 
 const isPhone = (page: Page) => page.viewportSize()!.width < 1024;
 
-const openAmount = (page: Page) =>
-  page
-    .locator("[data-tier]")
-    .evaluate((el) => Number(getComputedStyle(el).getPropertyValue("--open") || 0));
+const deckTheme = (page: Page) =>
+  page.getByRole("list", { name: "Painted invitation themes" }).getByRole("button", {
+    pressed: true,
+  });
 
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`landing page, ${colorScheme} theme`, () => {
     test.use({ colorScheme, reducedMotion: "reduce" });
 
-    test("has no horizontal scroll, with the card closed or open", async ({ page }) => {
+    test("has no horizontal scroll, whichever theme leads the deck", async ({ page }) => {
       await visit(page);
       expect(await noOverflow(page)).toBe(true);
-      await page.getByRole("button", { name: "Open the sample invitation" }).click();
-      await expect(page.getByRole("button", { pressed: true })).toBeVisible();
+      await page.getByRole("button", { name: "Show Kayal" }).click();
+      await expect(deckTheme(page)).toHaveAccessibleName("Show Kayal");
       expect(await noOverflow(page)).toBe(true);
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
       expect(await noOverflow(page)).toBe(true);
@@ -59,21 +59,26 @@ for (const colorScheme of ["light", "dark"] as const) {
 test.describe("landing page", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("card toggles with the keyboard", async ({ page }) => {
+  test("the theme dots bring a theme to the front", async ({ page }) => {
     await visit(page);
-    const card = page.getByRole("button", { name: "Open the sample invitation" });
-    await card.focus();
-    await page.keyboard.press("Enter");
-    await expect(card).toHaveAttribute("aria-pressed", "true");
-    await page.keyboard.press("Space");
-    await expect(card).toHaveAttribute("aria-pressed", "false");
+    await page.getByRole("button", { name: "Show Rajbari" }).click();
+    await expect(page.getByRole("img", { name: /Rajbari$/ })).toBeVisible();
   });
 
-  test("still mode never opens the card on scroll", async ({ page }) => {
+  test("still mode never turns the deck by itself", async ({ page }) => {
     await visit(page);
-    await page.evaluate(() => window.scrollTo(0, window.innerHeight * 1.2));
-    await page.waitForTimeout(300);
-    expect(await openAmount(page)).toBe(0);
+    const first = await deckTheme(page).getAttribute("aria-label");
+    await page.waitForTimeout(5500);
+    await expect(deckTheme(page)).toHaveAttribute("aria-label", first!);
+  });
+
+  test("searching from the home page opens the gallery with the results", async ({ page }) => {
+    await visit(page);
+    const search = page.getByRole("searchbox", { name: "Search occasions and designs" });
+    await search.fill("bengali");
+    await search.press("Enter");
+    await expect(page).toHaveURL(/\/invitations\?q=bengali$/);
+    await expect(page.locator('[data-kind="bengali"]')).toBeVisible();
   });
 
   test("header links move to their section and highlight it", async ({ page }) => {
@@ -168,14 +173,12 @@ test.describe("landing page", () => {
     await expect(question).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("the designs row pages with its arrows", async ({ page }) => {
+  test("a painted theme previews every page", async ({ page }) => {
     await visit(page);
-    const previous = page.getByRole("button", { name: "Previous designs" });
-    const next = page.getByRole("button", { name: "Next designs" });
-    await next.scrollIntoViewIfNeeded();
-    await expect(previous).toBeDisabled();
-    await next.click();
-    await expect(previous).toBeEnabled();
+    await page.getByRole("button", { name: "Preview Kayal" }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Kayal" }).getByText("Page 1 of 9"),
+    ).toBeVisible();
   });
 
   test("every control is at least 44px tall", async ({ page }) => {
@@ -245,7 +248,7 @@ test.describe("waitlist", () => {
     await form.getByRole("textbox", { name: /Your name/ }).fill("Meera Sharma");
     await form.getByRole("textbox", { name: /Email/ }).fill("meera@example.com");
     await page.reload();
-    await expect(page.locator("[data-tier]")).toHaveAttribute("style", /--open/);
+    await expect(page.locator("[data-deck-live]")).toHaveAttribute("data-deck-live", "true");
     await expect(form.getByRole("textbox", { name: /Your name/ })).toHaveValue("Meera Sharma");
     await expect(form.getByRole("textbox", { name: /Email/ })).toHaveValue("meera@example.com");
   });
@@ -276,34 +279,10 @@ test.describe("waitlist", () => {
 test.describe("landing page motion", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test("scrolling opens the invitation and scrolling back closes it", async ({ page }) => {
+  test("the deck turns to the next theme by itself", async ({ page }) => {
     await visit(page);
-    expect(await openAmount(page)).toBe(0);
-    const card = page.getByRole("button", { name: "Open the sample invitation" });
-
-    // Scroll until the card's track has passed, then wait for the doors to settle
-    await page.evaluate(() => {
-      const hero = document.querySelector<HTMLElement>("[data-hero-track]")!;
-      window.scrollTo(0, hero.offsetTop + hero.offsetHeight - window.innerHeight);
-    });
-    await expect(card).toHaveAttribute("aria-pressed", "true");
-    await expect.poll(() => openAmount(page)).toBe(1);
-
-    await page.evaluate(() => window.scrollTo(0, 0));
-    await expect(card).toHaveAttribute("aria-pressed", "false");
-    await expect.poll(() => openAmount(page)).toBe(0);
-  });
-
-  test("tapping opens the card without scrolling", async ({ page }) => {
-    await visit(page);
-    const card = page.getByRole("button", { name: "Open the sample invitation" });
-    await card.scrollIntoViewIfNeeded();
-    const before = await page.evaluate(() => window.scrollY);
-    await card.click();
-    await expect(card).toHaveAttribute("aria-pressed", "true");
-    // Only a small scroll to reveal the card happened, so the tap stays in control
-    expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(96);
-    await expect.poll(() => openAmount(page)).toBe(1);
+    const first = await deckTheme(page).getAttribute("aria-label");
+    await expect(deckTheme(page)).not.toHaveAttribute("aria-label", first!, { timeout: 8000 });
   });
 });
 
