@@ -169,7 +169,11 @@ test.describe("publish and share", () => {
       reducedMotion: "reduce",
     });
     const guest = await guestContext.newPage();
+    // Five days before the wedding, in India
+    await guest.clock.install({ time: new Date("2026-10-10T09:00:00+05:30") });
     await guest.goto(`${path}?quality=2d`);
+    const countdown = guest.getByTestId("diya-countdown");
+    await expect(countdown.getByText("5 days to go")).toBeVisible();
     const toggle = guest.getByRole("radiogroup", { name: "Card language" });
     const card = guest.locator("[data-engine-state] .sr-only");
     // An English-speaking guest sees the English card first

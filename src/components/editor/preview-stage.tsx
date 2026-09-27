@@ -9,6 +9,7 @@ import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
   draftCopy,
+  draftTradition,
   templateWithRaga,
   type CardLanguage,
   type InviteDraft,
@@ -75,6 +76,7 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
         open={open}
         onOpenChange={onOpenChange}
         musicOnOpen={draft.music.playOnOpen}
+        tradition={draftTradition(draft)?.id ?? null}
       />
     </div>
   );
