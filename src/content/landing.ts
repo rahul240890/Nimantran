@@ -47,12 +47,12 @@ export const shell = {
 export const hero = {
   eyebrow: "Shubh aarambh · early access",
   title: "Invitations your guests open, turn and keep.",
-  body: "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings first.",
+  body: "Pick a painted theme made for your family's tradition, add your names and functions, share it on WhatsApp and collect replies in one tap.",
   primary: "Start your invite",
   secondary: "See how it works",
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
   hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
-  proof: ["No app to install", "RSVP in one tap", "A raga in every design"],
+  proof: ["No app to install", "RSVP in one tap", "In your family's own language"],
   card: {
     doors: ["SHUBH", "VIVAH"],
     blessing: "",
@@ -65,6 +65,27 @@ export const hero = {
     venue: "Pichola Lakeside Gardens, Udaipur",
   },
 } as const;
+
+/** The home page's painted deck, occasions and themes (Step 12g). */
+export const homeGallery = {
+  deckLabel: "Painted invitation themes",
+  showTheme: (name: string) => `Show ${name}`,
+  coverDate: "12 December 2026",
+  occasionsEyebrow: "Start here",
+  occasionsTitle: "What are you celebrating?",
+  occasionsIntro:
+    "Pick the occasion, then a design made for it. Weddings open by tradition: Gujarati, Bengali, Marathi, Tamil and more.",
+  searchLabel: "Search occasions and designs",
+  searchPlaceholder: "Try Gujarati wedding, haldi, sangeet…",
+  search: "Search",
+  soonHeading: "Coming next",
+  allOccasions: "See every occasion",
+  themesEyebrow: "Painted themes",
+  themesTitle: "A painted page for every function",
+  themesIntro:
+    "Each theme is a set of paintings, one for the cover, the family, haldi, mehendi, sangeet, baraat, the wedding, the reception and the reply. Tap one to see every page.",
+  allDesigns: "See all wedding designs",
+};
 
 export const musicDemo = {
   label: "Hear an invitation",

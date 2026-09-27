@@ -3,9 +3,8 @@ import { Faq } from "./faq";
 import { Hero } from "./hero";
 import { MusicDemo } from "./music-demo";
 import { HowItWorks } from "./how-it-works";
-import { Occasions } from "./occasions";
 import { Pricing } from "./pricing";
-import { TemplatesCarousel } from "./templates-carousel";
+import { HomeOccasions, HomeThemes } from "./home-gallery";
 import { Waitlist } from "./waitlist";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -24,9 +23,9 @@ export function HomePage({ locale }: { locale: UiLocale }) {
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <MusicDemo />
           <Hero locale={locale} />
+          <HomeOccasions locale={locale} />
           <HowItWorks locale={locale} />
-          <Occasions />
-          <TemplatesCarousel />
+          <HomeThemes locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />
           <Waitlist />
