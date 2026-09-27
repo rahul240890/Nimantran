@@ -78,6 +78,11 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     "आप आमंत्रित हैं। ब्योरा देखने के लिए निमंत्रण खोलें।",
   invited: "आप आमंत्रित हैं",
   openHint: "खोलने के लिए कार्ड पर टैप करें",
+  countdown: {
+    days: (n) => `${n} दिन बाकी`,
+    tomorrow: "कल",
+    today: "आज",
+  },
   reply: "निमंत्रण का जवाब दें",
   functions: "उत्सव",
   family: "परिवार की ओर से",

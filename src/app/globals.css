@@ -164,6 +164,20 @@
   /* Petals that are not already brand colours */
   --petal-jasmine: #fbf6e9;
   --petal-blush: #e9a3b1;
+
+  /* Ritual objects in the regional openings (docs/MOTION.md): real things, so the same
+     in both themes, like the card stock */
+  --motion-turmeric: #f2b705;
+  --motion-kumkum: #c8102e;
+  --motion-leaf: #3f7d2c;
+  --motion-leaf-light: #74a83a;
+  --motion-clay: #a4502a;
+  --motion-flame: #ffb347;
+  --motion-rice: #fffaf0;
+  --motion-kite-pink: #e6326e;
+  --motion-kite-blue: #1e88e5;
+  --motion-kite-yellow: #ffc107;
+  --motion-kite-green: #43a047;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -324,6 +338,17 @@
   --color-tpl-phulkari-accent: var(--tpl-phulkari-accent);
   --color-tpl-phulkari-back: var(--tpl-phulkari-back);
   --color-tpl-phulkari-orange: var(--tpl-phulkari-orange);
+  --color-motion-turmeric: var(--motion-turmeric);
+  --color-motion-kumkum: var(--motion-kumkum);
+  --color-motion-leaf: var(--motion-leaf);
+  --color-motion-leaf-light: var(--motion-leaf-light);
+  --color-motion-clay: var(--motion-clay);
+  --color-motion-flame: var(--motion-flame);
+  --color-motion-rice: var(--motion-rice);
+  --color-motion-kite-pink: var(--motion-kite-pink);
+  --color-motion-kite-blue: var(--motion-kite-blue);
+  --color-motion-kite-yellow: var(--motion-kite-yellow);
+  --color-motion-kite-green: var(--motion-kite-green);
 
   --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
   --font-sans:
@@ -368,6 +393,7 @@
   --animate-petal-fall: petal-fall 11s linear infinite;
   --animate-petal-sway: petal-sway 3.6s ease-in-out infinite alternate;
   --animate-sound-bar: sound-bar 0.9s ease-in-out infinite alternate;
+  --animate-flicker: flicker 1.7s ease-in-out infinite alternate;
 }
 
 /* Keyframes live outside @theme so page transitions and utilities can always use them */
@@ -412,6 +438,20 @@
 @keyframes sheet-left-out {
   to {
     transform: translateX(calc(100% * var(--sheet-dir, 1)));
+  }
+}
+@keyframes flicker {
+  0% {
+    transform: scale(1, 1);
+  }
+  40% {
+    transform: scale(0.94, 1.08);
+  }
+  70% {
+    transform: scale(1.04, 0.95);
+  }
+  100% {
+    transform: scale(0.97, 1.04);
   }
 }
 @keyframes toast-in {

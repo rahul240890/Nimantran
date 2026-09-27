@@ -15,6 +15,15 @@ import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment
 import { approach, clamp } from "@/lib/hero-motion";
 import type { Bounds } from "@/lib/engine/particles";
 import {
+  openingAt,
+  openingLength,
+  profileColours,
+  resolveColour,
+  type ColourRef,
+  type MotionProfile,
+  type TrackId,
+} from "@/lib/engine/motion";
+import {
   createQualityGovernor,
   QUALITY,
   type QualityLevel,
@@ -28,11 +37,26 @@ import { loadCardFonts } from "./card-art";
 import { GateFoldScene } from "./gate-fold";
 import { Lanterns } from "./lanterns";
 import { Petals } from "./petals";
+import { Butterflies } from "./motion/butterflies";
+import { Garlands } from "./motion/garlands";
+import { Kites } from "./motion/kites";
+import { Lamps } from "./motion/lamps";
+import { Motes } from "./motion/motes";
+import { PatternBackdrop } from "./motion/pattern";
+import { legible, type MotionClock } from "./motion/shared";
+import { SymbolGlow } from "./motion/symbol-glow";
 import type { FormatSceneProps } from "./types";
 import type { CardFormatId } from "../formats";
 
 const MAX_TILT = 0.14;
 const GROUND_Y = -CARD.height / 2 - 0.2;
+
+const GARLAND_COLOURS: Record<"marigold" | "mango-leaf", ColourRef[]> = {
+  marigold: ["marigold", "marigold-strong", "motion-turmeric"],
+  "mango-leaf": ["motion-leaf", "motion-leaf-light"],
+};
+const LAMP_COLOURS: ColourRef[] = ["motion-clay", "motion-flame"];
+const DETAIL: Record<RenderLevel, 0 | 1 | 2> = { high: 2, medium: 1, low: 0 };
 
 /** The 3D scene for each card format. New formats register here. */
 const FORMAT_SCENES: Record<CardFormatId, (props: FormatSceneProps) => ReactNode> = {
@@ -55,9 +79,22 @@ export type StageProps = {
   onStepDown: (level: QualityLevel) => void;
   onFail: (reason: "graphics-lost") => void;
   onFps?: (fps: number) => void;
+  /** The tradition's opening (Step 12c); without one the design's own scene plays. */
+  motion?: MotionProfile | null;
+  /** Bumped by the Skip button: jump straight to the end of the opening. */
+  skip?: number;
+  /** Told when the opening starts and finishes playing, for the Skip button. */
+  onOpening?: (playing: boolean) => void;
 };
 
-type Resolved = { stock: ResolvedStock; petals: string[]; flame: string; glint: string };
+type Resolved = {
+  stock: ResolvedStock;
+  petals: string[];
+  flame: string;
+  glint: string;
+  /** The opening's colours, by reference. */
+  motion: Record<ColourRef, string>;
+};
 
 /** Everything inside the canvas. */
 function Scene({
@@ -73,6 +110,9 @@ function Scene({
   onReady,
   onStepDown,
   onFps,
+  motion = null,
+  skip = 0,
+  onOpening,
   resolved,
 }: StageProps & { resolved: Resolved }) {
   const settings = QUALITY[level];
@@ -83,6 +123,18 @@ function Scene({
   const aspect = size.width / Math.max(size.height, 1);
   const maxAngleRef = useRef(maxDoorAngle(aspect));
   const tilt = useRef({ x: 0, y: 0, targetX: 0, targetY: 0 });
+
+  // The opening's clock: seconds since the doors began to open, and each part's progress
+  const length = motion ? openingLength(motion) : 0;
+  const timeRef = useRef(still ? length : 0);
+  const tracksRef = useRef<Record<TrackId, number>>(
+    motion ? openingAt(motion, still ? length : 0) : openingAt(IDLE, 0),
+  );
+  const playing = useRef(false);
+  const clock = useMemo<MotionClock>(
+    () => ({ tracks: tracksRef, time: timeRef, open: openRef, still }),
+    [still],
+  );
 
   // Soft studio reflections for the foil, generated on the GPU (nothing to download)
   useEffect(() => {
@@ -109,9 +161,19 @@ function Scene({
   useEffect(() => {
     if (still) {
       openRef.current = open ? 1 : 0;
+      timeRef.current = length;
+      if (motion) tracksRef.current = openingAt(motion, length);
       invalidate();
     }
-  }, [still, open, invalidate]);
+  }, [still, open, invalidate, motion, length]);
+
+  // Skip: the doors stand open and every part of the opening is finished
+  useEffect(() => {
+    if (skip > 0) {
+      openRef.current = 1;
+      timeRef.current = Math.max(timeRef.current, length);
+    }
+  }, [skip, length]);
 
   // Pointer: a mouse tilts the card toward itself; a sideways finger drag turns it
   useEffect(() => {
@@ -178,6 +240,18 @@ function Scene({
     t.x = still ? 0 : approach(t.x, t.targetX, 6, ms);
     t.y = still ? 0 : approach(t.y, t.targetY, 6, ms);
     const o = openRef.current;
+
+    if (motion && !still) {
+      // Runs while the card is open; starts again from the top once it is shut
+      if (open) timeRef.current += delta;
+      else if (o < 0.02) timeRef.current = 0;
+      tracksRef.current = openingAt(motion, timeRef.current);
+      const now = open && timeRef.current < length;
+      if (now !== playing.current) {
+        playing.current = now;
+        onOpening?.(now);
+      }
+    }
 
     if (card.current) {
       // Leans back a little while shut, faces the guest once open
@@ -258,31 +332,187 @@ function Scene({
           onToggle={onToggle}
           onBuilt={onBuilt}
         />
+        {motion?.symbolGlow && (
+          <SymbolGlow
+            copy={copy}
+            template={template}
+            colour={resolved.glint}
+            dark={dark}
+            clock={clock}
+          />
+        )}
       </group>
 
       <ContactShadow openRef={openRef} dark={dark} />
 
-      {template.scene.petals.colours.length > 0 && (
-        <Petals
-          count={settings.petals}
-          colours={resolved.petals}
-          size={template.scene.petals.size}
+      {motion ? (
+        <Opening
+          motion={motion}
+          level={level}
           bounds={bounds}
-          groundY={GROUND_Y}
-          openRef={openRef}
-          still={still}
-        />
-      )}
-      {template.scene.lanterns && (
-        <Lanterns
-          count={settings.lanterns}
-          flame={resolved.flame}
-          paper={resolved.stock.accent}
           dark={dark}
+          resolved={resolved}
           openRef={openRef}
-          still={still}
+          clock={clock}
+        />
+      ) : (
+        <>
+          {template.scene.petals.colours.length > 0 && (
+            <Petals
+              count={settings.petals}
+              colours={resolved.petals}
+              size={template.scene.petals.size}
+              bounds={bounds}
+              groundY={GROUND_Y}
+              openRef={openRef}
+              still={still}
+            />
+          )}
+          {template.scene.lanterns && (
+            <Lanterns
+              count={settings.lanterns}
+              flame={resolved.flame}
+              paper={resolved.stock.accent}
+              dark={dark}
+              openRef={openRef}
+              still={still}
+            />
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+/** A profile with no parts, for cards without a tradition. */
+const IDLE: MotionProfile = {
+  id: "modern",
+  tracks: {},
+  pattern: null,
+  garland: null,
+  lamps: false,
+  symbolGlow: false,
+  burst: null,
+  prajapati: false,
+  ambient: [],
+};
+
+/** Everything a tradition adds around the card: patterns, garlands, lamps and what flies. */
+function Opening({
+  motion,
+  level,
+  bounds,
+  dark,
+  resolved,
+  openRef,
+  clock,
+}: {
+  motion: MotionProfile;
+  level: RenderLevel;
+  bounds: Bounds;
+  dark: boolean;
+  resolved: Resolved;
+  openRef: RefObject<number>;
+  clock: MotionClock;
+}) {
+  const colours = resolved.motion;
+  const pick = (refs: readonly ColourRef[]) => refs.map((ref) => colours[ref] ?? resolved.flame);
+  const lampX = Math.min(CARD.width / 2 + 0.3, bounds.x - 0.15);
+  return (
+    <>
+      {motion.pattern && (
+        <PatternBackdrop
+          id={motion.pattern.id}
+          colours={pick(motion.pattern.colours) as [string, string]}
+          clock={clock}
         />
       )}
+      {motion.garland && (
+        <Garlands
+          kind={motion.garland}
+          colours={pick(GARLAND_COLOURS[motion.garland])}
+          bounds={bounds}
+          detail={DETAIL[level]}
+          clock={clock}
+        />
+      )}
+      {motion.lamps && (
+        <Lamps
+          x={lampX}
+          y={GROUND_Y + 0.03}
+          clay={colours["motion-clay"]!}
+          flame={colours["motion-flame"]!}
+          dark={dark}
+          clock={clock}
+        />
+      )}
+      {motion.burst && (
+        <Motes
+          count={motion.burst.counts[level]}
+          colours={pick(motion.burst.colours)}
+          bounds={bounds}
+          mode="burst"
+          clock={clock}
+        />
+      )}
+      {motion.ambient.map((set) => {
+        const count = set.counts[level];
+        const tint = pick(set.colours);
+        switch (set.kind) {
+          case "petals":
+            return (
+              <Petals
+                key={set.kind}
+                count={count}
+                colours={tint}
+                size={set.size ?? 1}
+                bounds={bounds}
+                groundY={GROUND_Y}
+                openRef={openRef}
+                still={clock.still}
+              />
+            );
+          case "lanterns":
+            return (
+              <Lanterns
+                key={set.kind}
+                count={count}
+                flame={tint[0]!}
+                paper={tint[1] ?? resolved.stock.accent}
+                dark={dark}
+                openRef={openRef}
+                still={clock.still}
+              />
+            );
+          case "butterflies":
+            return (
+              <Butterflies
+                key={set.kind}
+                count={count}
+                colours={tint}
+                bounds={bounds}
+                prajapati={motion.prajapati}
+                clock={clock}
+              />
+            );
+          case "kites":
+            return (
+              <Kites key={set.kind} count={count} colours={tint} bounds={bounds} clock={clock} />
+            );
+          case "motes":
+            return (
+              <Motes
+                key={set.kind}
+                count={count}
+                colours={tint}
+                bounds={bounds}
+                mode="ambient"
+                size={set.size}
+                clock={clock}
+              />
+            );
+        }
+      })}
     </>
   );
 }
@@ -333,7 +563,7 @@ function ContactShadow({ openRef, dark }: { openRef: RefObject<number>; dark: bo
  * can draw it; until then (and on weaker devices) the 2D card shows instead.
  */
 export default function InvitationStage(props: StageProps) {
-  const { copy, template, level, still, paused, dark, onFail } = props;
+  const { copy, template, level, still, paused, dark, onFail, motion } = props;
   const settings = QUALITY[level];
   // Antialiasing and the shadow map are fixed when the canvas is made; later steps down
   // lower everything else without tearing the canvas down
@@ -345,13 +575,30 @@ export default function InvitationStage(props: StageProps) {
     void loadCardFonts(copy).then(() => {
       if (cancelled) return;
       const { stock, petals } = resolveStock(template, readToken);
-      setResolved({ stock, petals, flame: readToken("marigold"), glint: readToken("gold-glint") });
+      // Rice-paste white is swapped for the card's gold where it would vanish on a light page
+      const refs = motion
+        ? [
+            ...profileColours(motion),
+            ...LAMP_COLOURS,
+            ...(motion.garland ? GARLAND_COLOURS[motion.garland] : []),
+          ]
+        : [];
+      const colours = Object.fromEntries(
+        refs.map((ref) => [ref, legible(resolveColour(ref, stock, readToken), dark, stock.gold)]),
+      );
+      setResolved({
+        stock,
+        petals,
+        flame: readToken("marigold"),
+        glint: readToken("gold-glint"),
+        motion: colours,
+      });
     });
     return () => {
       cancelled = true;
     };
     // The colour scheme changes some petal colours (rose), so re-read on a theme switch
-  }, [copy, template, dark]);
+  }, [copy, template, dark, motion]);
 
   return (
     <Canvas

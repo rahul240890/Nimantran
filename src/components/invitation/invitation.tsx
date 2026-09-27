@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/cn";
+import { motionFor } from "@/lib/engine/motion";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import {
   pickQuality,
@@ -28,10 +29,12 @@ import {
 import { TEMPLATES } from "@/lib/templates/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
+import type { TraditionId } from "@/lib/traditions/schema";
 import { stockStyle } from "@/lib/templates/stock";
 import { useDarkTheme } from "@/lib/use-color-scheme";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CARD_FORMATS, type CardFormatId } from "./formats";
+import { FlatPattern } from "./flat-pattern";
 import { useText } from "@/i18n/client";
 import { uiText } from "@/i18n/copy/ui";
 
@@ -44,6 +47,7 @@ export type InvitationLabels = {
   pauseMusic: string;
   preparing: string;
   and: string;
+  skip?: string;
 };
 
 export type EngineState = "poster" | "loading" | "ready" | "fallback";
@@ -66,6 +70,8 @@ export type InvitationProps = {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /** The card's tradition, whose opening plays when the card is opened (Step 12c). */
+  tradition?: TraditionId | null;
   /** Start the music when the guest opens the card (a tap, so browsers allow sound). */
   musicOnOpen?: boolean;
   labels?: InvitationLabels;
@@ -135,6 +141,7 @@ export function Invitation({
   defaultOpen = false,
   onOpenChange,
   musicOnOpen = true,
+  tradition = null,
   labels: labelsProp,
   lang,
   onStatus,
@@ -148,6 +155,11 @@ export function Invitation({
   const still = useReducedMotion();
   const dark = useDarkTheme();
   const profile = useDeviceProfile();
+  const motion = motionFor(tradition);
+
+  // The Skip button shows while the 3D opening plays
+  const [opening, setOpening] = useState(false);
+  const [skip, setSkip] = useState(0);
 
   const [openState, setOpenState] = useState(defaultOpen);
   const open = openProp ?? openState;
@@ -325,11 +337,20 @@ export function Invitation({
           aria-hidden
           onClick={toggle}
           className={cn(
-            "absolute inset-0 flex cursor-pointer items-center justify-center transition-opacity duration-500 [perspective:1100px]",
+            "absolute inset-0 flex cursor-pointer items-center justify-center overflow-hidden transition-opacity duration-500 [perspective:1100px]",
             ready && "pointer-events-none opacity-0",
           )}
           style={flatStyle}
         >
+          {motion?.pattern && (
+            <FlatPattern
+              id={motion.pattern.id}
+              colours={motion.pattern.colours}
+              open={open}
+              still={still}
+              dark={dark}
+            />
+          )}
           <div
             className="w-[min(88%,30rem)] [transform-style:preserve-3d]"
             style={{
@@ -364,9 +385,26 @@ export function Invitation({
                 onStepDown={onStepDown}
                 onFail={onFail}
                 onFps={onFps}
+                motion={motion}
+                skip={skip}
+                onOpening={setOpening}
               />
             </StageBoundary>
           </div>
+        )}
+
+        {ready && opening && open && !still && (
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setSkip((n) => n + 1);
+              setOpening(false);
+            }}
+            className="absolute end-3 top-3 bg-surface/85 backdrop-blur-sm"
+          >
+            {labels.skip ?? uiStrings.invitation.skip}
+          </Button>
         )}
 
         {state === "loading" && (

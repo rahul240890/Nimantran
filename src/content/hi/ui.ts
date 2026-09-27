@@ -13,6 +13,7 @@ export const uiStrings: Translation<typeof en> = {
     playMusic: "संगीत चलाएँ",
     pauseMusic: "संगीत रोकें",
     preparing: "3D तैयार हो रहा है",
+    skip: "एनिमेशन छोड़ें",
     and: "और",
   },
   notFound: {

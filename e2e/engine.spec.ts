@@ -114,3 +114,35 @@ test.describe("invitation engine", () => {
     await expect(page.getByRole("radio", { name: /Emerald Palace/ })).toBeChecked();
   });
 });
+
+test.describe("regional openings", () => {
+  test("a tradition's opening plays and can be skipped", async ({ page }) => {
+    await page.goto("/engine?quality=low&opening=tamil");
+    await expect(engine(page)).toHaveAttribute("data-engine-state", "ready", { timeout: 30_000 });
+    await page.getByRole("button", { name: "Open invitation" }).click();
+    const skip = page.getByRole("button", { name: "Skip opening" });
+    await expect(skip).toBeVisible();
+    const box = (await skip.boundingBox())!;
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    await skip.click();
+    await expect(skip).toBeHidden();
+    await expect(page.getByRole("button", { name: "Close invitation" })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+  });
+
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`still mode shows the finished pattern with no skip, ${colorScheme} theme`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ reducedMotion: "reduce", colorScheme });
+      await page.setViewportSize({ width: 320, height: 720 });
+      await page.goto("/engine?quality=2d&opening=bengali");
+      await expect(engine(page)).toHaveAttribute("data-engine-state", "fallback");
+      await page.getByRole("button", { name: "Open invitation" }).click();
+      await expect(engine(page).locator("svg path").first()).toBeAttached();
+      await expect(page.getByRole("button", { name: "Skip opening" })).toHaveCount(0);
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+    });
+  }
+});

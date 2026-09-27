@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Invitation } from "@/components/invitation/invitation";
+import { DiyaCountdown } from "@/components/guest/diya-countdown";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,6 +90,13 @@ export function GuestView({
     [draft.templateId, draft.music.raga],
   );
   const [open, setOpen] = useState(false);
+  const dates = useMemo(
+    () =>
+      Object.values(draft.functions)
+        .filter((f) => f.included)
+        .map((f) => f.date),
+    [draft.functions],
+  );
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -120,6 +128,7 @@ export function GuestView({
             {names}
           </h1>
           <p className="text-ink-muted">{occasion}</p>
+          <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
           {languages.length > 1 && (
             <CardLanguageToggle
               label={guestCopy.cardLanguage}
@@ -137,6 +146,7 @@ export function GuestView({
               open={open}
               onOpenChange={setOpen}
               musicOnOpen={draft.music.playOnOpen}
+              tradition={draftTradition(draft)?.id ?? null}
             />
           </div>
           <div className="flex flex-col items-center gap-3">

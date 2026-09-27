@@ -22,6 +22,9 @@ import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
+import { traditionCopy } from "@/content/editor";
+import { TRADITIONS } from "@/lib/traditions/catalog";
+import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 
 /* A swatch of each design's card stock */
 const swatches: Record<TemplateId, string> = {
@@ -74,18 +77,22 @@ function StatusRow({ term, children }: { term: string; children: ReactNode }) {
 export function EngineReview({
   initialQuality,
   initialTheme,
+  initialOpening,
 }: {
   initialQuality: QualityChoice;
   initialTheme: TemplateId;
+  initialOpening: TraditionId | null;
 }) {
   const [theme, setTheme] = useState<TemplateId>(initialTheme);
   const [quality, setQuality] = useState<QualityChoice>(initialQuality);
   const [sample, setSample] = useState<SampleCopyId>("template");
+  const [opening, setOpening] = useState<TraditionId | null>(initialOpening);
   const template = TEMPLATES[theme];
-  const copy = useMemo(
-    () => toCardCopy(template, sampleCopies[sample].content),
-    [template, sample],
-  );
+  const copy = useMemo(() => {
+    const base = toCardCopy(template, sampleCopies[sample].content);
+    // The tradition's own symbol, so its glow shows
+    return opening ? { ...base, symbol: TRADITIONS[opening].symbols.default } : base;
+  }, [template, sample, opening]);
   const [musicOnOpen, setMusicOnOpen] = useState(true);
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
@@ -127,6 +134,7 @@ export function EngineReview({
               template={template}
               quality={quality}
               musicOnOpen={musicOnOpen}
+              tradition={opening}
               onStatus={onStatus}
               onFps={fpsStore.set}
             />
@@ -189,6 +197,22 @@ export function EngineReview({
                       label: `${name} (later)`,
                       disabled: true,
                     })),
+                  ]}
+                />
+              </Field>
+
+              <Field
+                label="Opening"
+                hint="Each tradition opens the card its own way: kolam, alpona, garlands, kites."
+              >
+                <Select
+                  value={opening ?? "none"}
+                  onValueChange={(value) =>
+                    setOpening(value === "none" ? null : (value as TraditionId))
+                  }
+                  options={[
+                    { value: "none", label: "The design's own" },
+                    ...TRADITION_IDS.map((id) => ({ value: id, label: traditionCopy.names[id] })),
                   ]}
                 />
               </Field>

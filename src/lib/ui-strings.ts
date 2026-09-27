@@ -12,6 +12,7 @@ export const uiStrings = {
     playMusic: "Play music",
     pauseMusic: "Pause music",
     preparing: "Preparing 3D",
+    skip: "Skip opening",
     and: "and",
   },
   notFound: {

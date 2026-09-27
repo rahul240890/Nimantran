@@ -34,6 +34,8 @@ test.describe("publish and share", () => {
     expect(href.origin).toBe("https://wa.me");
     expect(href.searchParams.get("text")).toContain(link);
     await expect(page.getByRole("img", { name: /QR code for/ }).locator("svg")).toBeVisible();
+    // The title streams in after the page on a client navigation; wait for it before axe
+    await expect(page).toHaveTitle(/\S/);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
@@ -169,7 +171,11 @@ test.describe("publish and share", () => {
       reducedMotion: "reduce",
     });
     const guest = await guestContext.newPage();
+    // Five days before the wedding, in India
+    await guest.clock.install({ time: new Date("2026-10-10T09:00:00+05:30") });
     await guest.goto(`${path}?quality=2d`);
+    const countdown = guest.getByTestId("diya-countdown");
+    await expect(countdown.getByText("5 days to go")).toBeVisible();
     const toggle = guest.getByRole("radiogroup", { name: "Card language" });
     const card = guest.locator("[data-engine-state] .sr-only");
     // An English-speaking guest sees the English card first
