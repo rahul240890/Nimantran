@@ -422,6 +422,9 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
   suggested: "आपकी परंपरा के अनुरूप",
   pairs: (design) => `कार्ड भी ${design} में बदल जाएगा`,
   preview: "पन्ने चलाएँ",
+  textBox: "शब्दों के पीछे डिब्बा",
+  textBoxHint:
+    "बंद रहने पर शब्द सीधे चित्र पर दिखते हैं। चालू करने पर वे कार्ड के रंग के हल्के डिब्बे में दिखते हैं। तुलना के लिए पन्ने चलाएँ; यही बटन पन्नों पर भी है।",
   names: {
     "rajwada-bagh": "रजवाड़ा बाग़",
     "shahi-savari": "शाही सवारी",

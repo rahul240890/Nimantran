@@ -304,6 +304,7 @@ export function Editor({
       quality={quality}
       open={cardOpen}
       onOpenChange={setCardOpen}
+      onTextBox={(textBox) => update((current) => ({ ...current, textBox }))}
       className={className}
     />
   );

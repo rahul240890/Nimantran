@@ -101,6 +101,7 @@ export function newDraft(
     languages: ["en"],
     translation: {},
     suite: null,
+    textBox: false,
   };
 }
 

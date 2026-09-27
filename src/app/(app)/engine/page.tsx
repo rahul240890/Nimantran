@@ -14,10 +14,10 @@ export const metadata: Metadata = {
 
 /*
  * A review page for the Step 4 engine, not a product screen. ?quality=high|medium|low|2d
- * ?template=<id>, ?opening=<tradition> and ?suite=<theme> preselect the controls (handy for tests on machines without a GPU).
+ * ?template=<id>, ?opening=<tradition>, ?suite=<theme> and ?box=1 (the box behind the words) preselect the controls (handy for tests on machines without a GPU).
  */
 export default async function EnginePage({ searchParams }: PageProps<"/engine">) {
-  const { quality, template, opening, suite } = await searchParams;
+  const { quality, template, opening, suite, box } = await searchParams;
   return (
     <PageTransition>
       <EngineReview
@@ -25,6 +25,7 @@ export default async function EnginePage({ searchParams }: PageProps<"/engine">)
         initialTheme={isTemplateId(template) ? template : "marigold"}
         initialOpening={isTraditionId(opening) ? opening : null}
         initialSuite={isSuiteId(suite) ? suite : "rajwada-bagh"}
+        initialTextBox={box === "1"}
       />
     </PageTransition>
   );

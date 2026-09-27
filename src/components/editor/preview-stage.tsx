@@ -25,6 +25,8 @@ type PreviewStageProps = {
   quality: QualityChoice;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Switches the box behind the words from the pages, so the host can compare live. */
+  onTextBox?: (on: boolean) => void;
   className?: string;
 };
 
@@ -32,7 +34,14 @@ type PreviewStageProps = {
  * The live invitation beside the form. Typing is never held up by the card: the words
  * reach it as a deferred value, and it only repaints when they actually change.
  */
-export function PreviewStage({ draft, quality, open, onOpenChange, className }: PreviewStageProps) {
+export function PreviewStage({
+  draft,
+  quality,
+  open,
+  onOpenChange,
+  onTextBox,
+  className,
+}: PreviewStageProps) {
   const { coupleCopy } = useText(editorText);
   const languages = cardLanguages(draft);
   const [chosen, setChosen] = useState<CardLanguage | null>(null);
@@ -48,6 +57,7 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
   const functionsKey = JSON.stringify(storyFunctions(draft, locale));
   const familyKey = JSON.stringify(storyFamily(draft));
   const suite = draftSuite(draft);
+  const { textBox } = draft;
   const story = useMemo<InvitationStory>(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
     const family = JSON.parse(familyKey) as ReturnType<typeof storyFamily>;
@@ -60,8 +70,10 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
         family,
       }),
       suite,
+      textBox,
+      onTextBox,
     };
-  }, [functionsKey, familyKey, deferredCopy, storyWords, suite]);
+  }, [functionsKey, familyKey, deferredCopy, storyWords, suite, textBox, onTextBox]);
 
   const { templateId } = draft;
   const { raga } = draft.music;

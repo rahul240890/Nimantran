@@ -104,6 +104,7 @@ export function GuestView({
         family: storyFamily(draft),
       }),
       suite: draftSuite(draft),
+      textBox: draft.textBox,
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
     [copy, functions, replies, storyWords, guestCopy.reply, draft],

@@ -59,6 +59,10 @@ export type InvitationStory = {
   beats: readonly StoryBeat[];
   /** The theme the event pages are painted in (Step 12e). */
   suite?: SuiteId;
+  /** A box behind the words on painted pages; off prints them on the painting (Step 12f). */
+  textBox?: boolean;
+  /** Lets the host switch the box from the pages themselves (editor and review only). */
+  onTextBox?: (on: boolean) => void;
   /** The last beat's button to the reply form, when the invite takes replies. */
   reply?: { href: string; label: string } | null;
 };
@@ -450,6 +454,8 @@ export function Invitation({
             copy={copy}
             template={template}
             suite={story.suite}
+            textBox={story.textBox}
+            onTextBox={story.onTextBox}
             still={still}
             labels={storyLabels}
             lang={lang}

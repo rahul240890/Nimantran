@@ -26,6 +26,7 @@ export const uiStrings: Translation<typeof en> = {
       replay: "निमंत्रण के पन्ने चलाएँ",
       directions: "रास्ता देखें",
       calendar: "कैलेंडर में जोड़ें",
+      textBox: "शब्दों के पीछे डिब्बा",
     },
   },
   storyWords: {

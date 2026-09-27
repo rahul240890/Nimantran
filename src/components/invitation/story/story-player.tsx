@@ -9,6 +9,8 @@ import {
   Navigation,
   Pause,
   Play,
+  RectangleHorizontal,
+  X,
 } from "lucide-react";
 import {
   useCallback,
@@ -43,6 +45,7 @@ export type StoryLabels = {
   done: string;
   directions: string;
   calendar: string;
+  textBox: string;
 };
 
 type StoryPlayerProps = {
@@ -51,6 +54,10 @@ type StoryPlayerProps = {
   template: Template;
   /** The theme the pages are painted in (Step 12e). */
   suite?: SuiteId;
+  /** A box behind the words on painted pages; off prints them on the painting. */
+  textBox?: boolean;
+  /** When set, the pages carry a switch for the box, so the host can compare live. */
+  onTextBox?: (on: boolean) => void;
   /** Still mode: no movement and no timer; the guest steps through with Next. */
   still: boolean;
   labels: StoryLabels;
@@ -99,6 +106,8 @@ export function StoryPlayer({
   copy,
   template,
   suite: suiteId = "classic",
+  textBox = false,
+  onTextBox,
   still,
   labels,
   lang,
@@ -291,6 +300,7 @@ export function StoryPlayer({
               beat={b}
               copy={copy}
               suite={suiteId}
+              textBox={textBox}
               still={still}
               reply={last && current ? reply : null}
               labels={labels}
@@ -356,6 +366,19 @@ export function StoryPlayer({
             )}
           </div>
           <div className="flex items-center gap-1">
+            {onTextBox && themed && (
+              <IconButton
+                label={labels.textBox}
+                aria-pressed={textBox}
+                icon={<RectangleHorizontal />}
+                size="sm"
+                onClick={() => onTextBox(!textBox)}
+                className={cn(
+                  "backdrop-blur-sm",
+                  textBox ? "bg-marigold text-on-marigold" : "bg-surface/85",
+                )}
+              />
+            )}
             {music && (
               <IconButton
                 label={music.playing ? music.pause : music.play}
@@ -378,10 +401,18 @@ export function StoryPlayer({
               variant="secondary"
               size="sm"
               onClick={onDone}
-              className="bg-surface/85 backdrop-blur-sm"
+              className="bg-surface/85 backdrop-blur-sm @max-[22rem]:hidden"
             >
               {last ? labels.done : labels.skip}
             </Button>
+            {/* On the narrowest phones the way back to the card is an icon, so every control fits */}
+            <IconButton
+              label={last ? labels.done : labels.skip}
+              icon={<X />}
+              size="sm"
+              onClick={onDone}
+              className="hidden bg-surface/85 backdrop-blur-sm @max-[22rem]:inline-flex"
+            />
           </div>
         </div>
       </div>
@@ -395,6 +426,7 @@ function Page({
   beat,
   copy,
   suite: suiteId,
+  textBox,
   still,
   reply,
   labels,
@@ -405,6 +437,7 @@ function Page({
   beat: StoryBeat;
   copy: CardCopy;
   suite: SuiteId;
+  textBox: boolean;
   still: boolean;
   reply: { href: string; label: string } | null | undefined;
   labels: StoryLabels;
@@ -416,6 +449,8 @@ function Page({
   const themed = suite.art !== "card";
   const look = pageLook(beat.scene);
   const painted = themed && Boolean(suite.images[look.art]);
+  // Words print straight onto a painting unless the host asked for the box
+  const printed = painted && !textBox;
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
   const delay = (i: number) =>
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
@@ -442,16 +477,16 @@ function Page({
 
       <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
         <div
-          data-tone={painted ? paintedTone(look.art) : undefined}
+          data-tone={printed ? paintedTone(look.art) : undefined}
           className={cn(
             "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
-            painted
+            printed
               ? "story-print isolate px-[4cqmin] py-[6cqmin]"
               : themed &&
                   "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
           )}
         >
-          {painted && (
+          {printed && (
             <span
               aria-hidden
               className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"

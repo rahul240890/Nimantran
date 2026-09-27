@@ -396,6 +396,9 @@ export const suiteCopy = {
   suggested: "Suits your tradition",
   pairs: (design: string) => `Also switches the card to ${design}`,
   preview: "Play the pages",
+  textBox: "Box behind the words",
+  textBoxHint:
+    "Off, the words sit straight on the painting. On, they sit in a soft card-coloured box. Play the pages to compare; the same switch is on the pages too.",
   names: {
     "rajwada-bagh": "Rajwada Bagh",
     "shahi-savari": "Shahi Savari",
