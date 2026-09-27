@@ -195,6 +195,22 @@ test.describe("landing page", () => {
     );
     expect(small).toEqual([]);
   });
+
+  for (const path of ["/", "/hi"]) {
+    test(`the plan cards keep their badges inside, ${path}`, async ({ page }) => {
+      await page.goto(path);
+      const outside = await page.locator("#pricing").evaluate((section) =>
+        [...section.querySelectorAll("h3")].flatMap((heading) => {
+          const card = heading.closest("[class*='rounded']")!.getBoundingClientRect();
+          return [...heading.parentElement!.children]
+            .map((el) => el.getBoundingClientRect())
+            .filter((box) => box.right > card.right || box.left < card.left)
+            .map(() => heading.textContent);
+        }),
+      );
+      expect(outside).toEqual([]);
+    });
+  }
 });
 
 test.describe("waitlist", () => {

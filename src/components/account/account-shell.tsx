@@ -18,10 +18,11 @@ export async function AccountShell({
   return (
     <div className="flex min-h-dvh flex-col">
       <header className="sticky top-0 z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 px-4 sm:px-6 lg:px-8">
           <Logo className="max-[359px]:[&>span]:sr-only" />
           <div className="flex items-center gap-1 sm:gap-2">
-            <LanguageSwitcher />
+            {/* Below 400px the chevron goes so the name, language, theme and account all fit */}
+            <LanguageSwitcher className="max-[399px]:px-2.5 max-[399px]:[&>svg]:hidden" />
             <ThemeMenu labels={uiStrings.theme} />
             {menu && <AccountMenu />}
           </div>

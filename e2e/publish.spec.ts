@@ -34,6 +34,17 @@ test.describe("publish and share", () => {
     expect(href.origin).toBe("https://wa.me");
     expect(href.searchParams.get("text")).toContain(link);
     await expect(page.getByRole("img", { name: /QR code for/ }).locator("svg")).toBeVisible();
+    // The WhatsApp preview on this page loads the real picture
+    const bubble = page.getByRole("region", { name: "How it looks in WhatsApp" }).locator("img");
+    await expect
+      .poll(() => bubble.evaluate((img: HTMLImageElement) => img.naturalWidth))
+      .toBe(1200);
+    // The signed-in header fits common phone widths, with the name showing
+    for (const width of [360, 375]) {
+      await page.setViewportSize({ width, height: 760 });
+      await expect.poll(() => noOverflow(page)).toBe(true);
+    }
+    await page.setViewportSize(info.project.use.viewport!);
     // The title streams in after the page on a client navigation; wait for it before axe
     await expect(page).toHaveTitle(/\S/);
     expect(await noOverflow(page)).toBe(true);

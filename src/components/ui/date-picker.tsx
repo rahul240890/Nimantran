@@ -102,6 +102,8 @@ export function DatePicker({
 
   // date-fns rather than Intl, so server and browser always agree and hydration never mismatches
   const text = value ? format(value, "PPPP", { locale }) : placeholder;
+  // "Wed, 14 Oct 2026" when the field is too narrow for the weekday and month in full
+  const short = value ? format(value, "EEE, d MMM yyyy", { locale }) : placeholder;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -115,13 +117,17 @@ export function DatePicker({
           data-invalid={field?.invalid || undefined}
           className={cn(
             controlClasses,
-            "group flex h-12 cursor-pointer items-center gap-2.5 px-3.5 text-start text-base data-invalid:border-danger data-[state=open]:border-ring",
+            "group @container flex h-12 cursor-pointer items-center gap-2.5 px-3.5 text-start text-base data-invalid:border-danger data-[state=open]:border-ring",
             className,
           )}
         >
           <CalendarDays aria-hidden className="size-5 shrink-0 text-ink-muted" />
-          <span id={valueId} className={cn("min-w-0 flex-1 truncate", !value && "text-ink-muted")}>
+          <span id={valueId} className="sr-only">
             {text}
+          </span>
+          <span aria-hidden className={cn("min-w-0 flex-1 truncate", !value && "text-ink-muted")}>
+            <span className="@max-[17rem]:hidden">{text}</span>
+            <span className="@min-[17rem]:hidden">{short}</span>
           </span>
         </button>
       </PopoverTrigger>
