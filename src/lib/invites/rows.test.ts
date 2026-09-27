@@ -83,6 +83,14 @@ describe("invite rows", () => {
     expect(rowsToDraft(older, functions).textBox).toBe(false);
   });
 
+  it("keeps the couple's photo page, and reads older invites without it as none", () => {
+    const couplePhotos = { layout: "two" as const, ids: ["b", "a"] };
+    const { event, functions } = asStored({ ...sample(), couplePhotos });
+    expect(rowsToDraft(event, functions).couplePhotos).toEqual(couplePhotos);
+    const older = { ...event, religious: { ...event.religious, couplePhotos: undefined } };
+    expect(rowsToDraft(older, functions).couplePhotos).toEqual({ layout: "none", ids: [] });
+  });
+
   it("keeps the family's tradition", () => {
     const draft = {
       ...sample(),

@@ -40,6 +40,31 @@ const fn = (kind: FunctionId, extra: Partial<StoryFunction> = {}): StoryFunction
 const words = uiStrings.storyWords;
 
 describe("event pages", () => {
+  it("adds the couple's photo page after the cover, with their names and photos", () => {
+    const photos = [
+      { src: "/a.webp", alt: "Aarav" },
+      { src: "/b.webp", alt: "Meera" },
+      { src: "/c.webp", alt: "extra" },
+    ];
+    const beats = storyBeats({
+      copy,
+      functions: [fn("wedding")],
+      replies: true,
+      words,
+      couple: photos,
+    });
+    expect(beats.map((b) => b.id).slice(0, 2)).toEqual(["cover", "couple"]);
+    const page = beats[1]!;
+    expect(page.photos).toEqual(photos.slice(0, 2));
+    expect(page.symbol).toBe(false);
+    expect(page.lines.filter((l) => l.style === "display")).toHaveLength(2);
+    expect(page.seconds).toBeGreaterThanOrEqual(6);
+    // No photos, no page
+    expect(
+      storyBeats({ copy, functions: [], replies: true, words }).map((b) => b.id),
+    ).not.toContain("couple");
+  });
+
   it("turns through cover, family, each function, then asks for a reply", () => {
     const beats = storyBeats({
       copy,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { defaultType, typeSchema } from "./type";
 import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
@@ -51,6 +52,11 @@ export type EventFunction = z.infer<typeof functionSchema>;
 
 const photoSchema = z.object({ id: z.string().min(1), width: z.number(), height: z.number() });
 export type PhotoRef = z.infer<typeof photoSchema>;
+
+const couplePhotosSchema = z.object({
+  layout: z.enum(COUPLE_LAYOUTS).catch("none"),
+  ids: z.array(z.string()).max(2).catch([]),
+});
 
 const traditionSchema = z.object({
   /** The pack the card follows; null follows none (the design's own wording). */
@@ -113,6 +119,8 @@ export const draftSchema = z.object({
   textBox: z.boolean().catch(false),
   /** The host's lettering on the pages (Step 12n): fonts, size, weight, slant, colour. */
   type: typeSchema.catch(defaultType),
+  /** The couple's photo page (Step 12l): which of the invite's photos fill its frames. */
+  couplePhotos: couplePhotosSchema.catch(noCouplePhotos),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

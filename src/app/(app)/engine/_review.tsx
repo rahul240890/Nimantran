@@ -100,18 +100,27 @@ function StatusRow({ term, children }: { term: string; children: ReactNode }) {
   );
 }
 
+/** Stand-ins for the couple's photos: any picture shows how the frames crop. */
+const SAMPLE_PHOTOS = [
+  { src: "/suites/kayal/haldi.webp", alt: "Sample photo" },
+  { src: "/suites/rajbari/mehendi.webp", alt: "Sample photo" },
+];
+
 export function EngineReview({
   initialQuality,
   initialTheme,
   initialOpening,
   initialSuite,
   initialTextBox,
+  photos = 0,
 }: {
   initialQuality: QualityChoice;
   initialTheme: TemplateId;
   initialOpening: TraditionId | null;
   initialSuite: SuiteId;
   initialTextBox: boolean;
+  /** The couple's photo page with this many sample photos (a painting stands in for them). */
+  photos?: number;
 }) {
   const [theme, setTheme] = useState<TemplateId>(initialTheme);
   const [quality, setQuality] = useState<QualityChoice>(initialQuality);
@@ -137,13 +146,14 @@ export function EngineReview({
               replies: true,
               words: uiStrings.storyWords,
               family: SAMPLE_FAMILY,
+              couple: SAMPLE_PHOTOS.slice(0, photos),
             }),
             suite,
             textBox,
             onTextBox: setTextBox,
           }
         : null,
-    [storyOn, copy, suite, textBox],
+    [storyOn, copy, suite, textBox, photos],
   );
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
