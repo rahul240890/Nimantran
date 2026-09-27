@@ -10,6 +10,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     for (const [path, heading] of [
       ["/invitations", "What are you celebrating?"],
       ["/invitations/wedding/gujarati", "ગુજરાતીGujarati wedding invitations"],
+      ["/invitations/birthday", "Birthday invitations full of balloons and cake"],
       ["/hi/invitations", "आप क्या मना रहे हैं?"],
     ] as const) {
       test(`${path} fits the screen and passes an accessibility check`, async ({ page }) => {
@@ -30,7 +31,8 @@ test.describe("finding a design", () => {
     await page.locator('[data-kind="gujarati"]').click();
     await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/);
     const designs = page.locator("[data-design]");
-    await expect(designs).toHaveCount(2);
+    await expect(designs).toHaveCount(3);
+    await expect(page.locator('[data-design="kutch-toran"]')).toBeVisible();
     await expect(page.locator('[data-design="shahi-savari"]')).toBeVisible();
     await expect(page.locator('[data-design="card-bandhani"]')).toBeVisible();
   });
@@ -59,5 +61,29 @@ test.describe("finding a design", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
     // A Gujarati wedding is written in Gujarati
     await expect(page.getByRole("radio", { name: "ગુજરાતી", exact: true })).toBeChecked();
+  });
+
+  test("a birthday has its own theme and one name on the cover", async ({ page }) => {
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.goto("/invitations/birthday");
+    await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
+    // Wedding themes stay with weddings
+    await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
+    await page.getByRole("button", { name: "Preview Gubbara" }).click();
+    const preview = page.getByRole("dialog", { name: "Gubbara" });
+    await expect(preview.getByText("Page 1 of 4")).toBeVisible();
+    await preview.getByRole("link", { name: "Use this design" }).click();
+    await expect(page).toHaveURL(/\/create$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Whose birthday is it?");
+    await expect(page.getByLabel(/^Second name/)).toHaveCount(0);
+    await page.getByLabel(/^Birthday name/).fill("Aarav");
+    // Phones show the live page behind a Preview button
+    if (page.viewportSize()!.width < 1024)
+      await page.getByRole("button", { name: "Preview" }).click();
+    const cover = page.locator('[data-suite="gubbara"]').first();
+    await expect(cover).toContainText("Happy birthday");
+    await expect(cover).toContainText("Aarav");
+    await expect(cover).not.toContainText("&");
   });
 });

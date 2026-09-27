@@ -380,8 +380,9 @@ export function Invitation({
         {copy.blessing && <p>{copy.blessing}</p>}
         {copy.families && <p>{copy.families}</p>}
         <p>
-          {copy.first} {!copy.joiner || copy.joiner === "&" ? labels.and : copy.joiner}{" "}
-          {copy.second}
+          {copy.second
+            ? `${copy.first} ${!copy.joiner || copy.joiner === "&" ? labels.and : copy.joiner} ${copy.second}`
+            : copy.first}
         </p>
         {copy.line && <p>{copy.line}</p>}
         <p>{copy.date}</p>

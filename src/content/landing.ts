@@ -78,6 +78,7 @@ export const homeGallery = {
   searchLabel: "Search occasions and designs",
   searchPlaceholder: "Try Gujarati wedding, haldi, sangeet…",
   search: "Search",
+  moreHeading: "Beyond weddings",
   soonHeading: "Coming next",
   allOccasions: "See every occasion",
   themesEyebrow: "Painted themes",

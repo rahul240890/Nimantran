@@ -57,3 +57,7 @@ export type RsvpQuestionId = (typeof RSVP_QUESTION_IDS)[number];
 /** full: date, time and venue. date-only: a date and a city, for save-the-dates. */
 export const SCHEDULES = ["full", "date-only"] as const;
 export type Schedule = (typeof SCHEDULES)[number];
+
+/** Whose names lead a card: a couple, or one name (a birthday, a party's title). */
+export const PEOPLE = ["couple", "one"] as const;
+export type People = (typeof PEOPLE)[number];

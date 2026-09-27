@@ -8,7 +8,13 @@ import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
-import { OCCASIONS, PAINTED_SUITES, designHref, paintedDesign } from "@/lib/gallery/catalog";
+import {
+  OCCASIONS,
+  PAINTED_SUITES,
+  designHref,
+  paintedDesign,
+  suiteOccasion,
+} from "@/lib/gallery/catalog";
 import { pagePath } from "@/lib/seo/paths";
 import { Section } from "./section";
 
@@ -20,8 +26,19 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
   const { homeGallery } = landingText[locale];
   const { galleryCopy, occasionTaglines } = galleryText[locale];
   const gallery = pagePath({ kind: "gallery" }, locale);
-  const live = OCCASIONS.filter((occasion) => occasion.category);
-  const soon = OCCASIONS.filter((occasion) => !occasion.category).slice(0, 10);
+  const wedding = OCCASIONS.filter((occasion) => occasion.section === "wedding");
+  const beyond = OCCASIONS.filter((occasion) => occasion.section !== "wedding");
+  // Each painting once: occasions sharing one (a baby shower and a naming ceremony) show the
+  // first. Live occasions lead, then the paintings of those still to come.
+  const painted = beyond
+    .filter(
+      (occasion, index) =>
+        occasion.tile && beyond.findIndex((other) => other.tile === occasion.tile) === index,
+    )
+    .sort((a, b) => Number(Boolean(b.category)) - Number(Boolean(a.category)));
+  const soon = beyond
+    .filter((occasion) => !occasion.category && !painted.includes(occasion))
+    .slice(0, 10);
   const other = locale === "en" ? "hi" : "en";
 
   return (
@@ -58,7 +75,7 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
         </form>
 
         <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {live.map((occasion, index) => (
+          {wedding.map((occasion, index) => (
             <li
               key={occasion.id}
               className={cn("reveal-on-scroll", index === 0 && "col-span-2 row-span-2")}
@@ -76,8 +93,34 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
           ))}
         </ul>
 
-        <div className="flex flex-col items-center gap-4 text-center">
-          <p className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
+        <div className="flex flex-col items-center gap-5 text-center">
+          <h3 className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
+            {homeGallery.moreHeading}
+          </h3>
+          <ul className="grid w-full grid-cols-2 gap-3 text-start sm:grid-cols-3 sm:gap-4 lg:grid-cols-7">
+            {painted.slice(0, 7).map((occasion, index) => (
+              // Six fill two or three even rows on smaller screens; the seventh joins at full width
+              <li
+                key={occasion.id}
+                className={cn("reveal-on-scroll", index === 6 && "hidden lg:block")}
+              >
+                <OccasionTile
+                  occasion={occasion}
+                  name={occasion.names[locale]}
+                  otherName={null}
+                  tagline=""
+                  href={
+                    occasion.category
+                      ? pagePath({ kind: "occasion", id: occasion.category }, locale)
+                      : null
+                  }
+                  soonLabel={galleryCopy.soon}
+                  compact
+                />
+              </li>
+            ))}
+          </ul>
+          <p className="pt-2 font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
             {homeGallery.soonHeading}
           </p>
           <ul className="flex flex-wrap justify-center gap-2">
@@ -124,7 +167,7 @@ export function HomeThemes({ locale }: { locale: UiLocale }) {
                   design={design}
                   name={name}
                   description={description}
-                  href={designHref(design, { category: "wedding" })}
+                  href={designHref(design, { category: suiteOccasion(suite) })}
                 />
               </li>
             );

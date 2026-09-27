@@ -807,10 +807,21 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
       break;
     case "bhoj":
     case "reception":
+    case "anniversary":
       art = (
         <>
           <Reception />
           <Falling count={18} seed={6} colours={CONFETTI} shape="confetti" />
+        </>
+      );
+      break;
+    // A party: lanterns strung up and confetti in the air
+    case "birthday":
+    case "party":
+      art = (
+        <>
+          <Lanterns />
+          <Falling count={22} seed={20} colours={CONFETTI} shape="confetti" />
         </>
       );
       break;

@@ -120,7 +120,8 @@ export function storyBeats({
   family = [],
 }: StoryInput): StoryBeat[] {
   const beats: StoryBeat[] = [];
-  const joiner = !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
+  // A birthday or a party is led by one name, with nothing to join
+  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   // With one function, its own page carries the date
   const single = functions.length === 1;
 

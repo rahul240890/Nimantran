@@ -92,11 +92,12 @@ export function storyFamily(draft: InviteDraft): FamilyLine[] {
   });
 }
 
-/** The theme the invite's event pages use: the host's choice, else the tradition's. */
+/** The theme the invite's event pages use: the host's choice, else the occasion's or tradition's. */
 export function draftSuite(draft: InviteDraft): SuiteId {
   return suiteFor({
     suite: draft.suite,
     tradition: draft.tradition.id,
     templateId: draft.templateId,
+    category: draft.categoryId,
   });
 }

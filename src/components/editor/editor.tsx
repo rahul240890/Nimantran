@@ -158,7 +158,7 @@ export function Editor({
   /** ?invite= named an invite this person can't open. */
   missing?: boolean;
 }) {
-  const { editor, previewCopy, stepCopy, syncCopy } = useText(editorText);
+  const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
   const { publishCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
   const { draft, save } = useSyncExternalStore(
@@ -166,6 +166,11 @@ export function Editor({
     inviteDraft.get,
     inviteDraft.getServer,
   );
+  // Occasions beyond weddings name the names step their own way ("Whose birthday is it?")
+  const ownNames = namesCopy.steps[draft.categoryId as keyof typeof namesCopy.steps];
+  const stepCopy = ownNames
+    ? { ...baseSteps, couple: { ...baseSteps.couple, ...ownNames } }
+    : baseSteps;
   const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
   const update = inviteDraft.update;
   const router = useRouter();

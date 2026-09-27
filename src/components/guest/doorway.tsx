@@ -154,7 +154,7 @@ export function Doorway({
   const theme = SUITES[suite];
   const cover = theme.images.cover!;
   const area = textArea(suite, "cover");
-  const joiner = !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
+  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
 
   // The pages follow the doors; in still mode they come at once
   useEffect(() => {
@@ -260,7 +260,7 @@ export function Doorway({
           >
             <div
               lang={lang}
-              data-tone={paintedTone("cover")}
+              data-tone={paintedTone("cover", suite)}
               className="story-print isolate flex max-h-full w-full flex-col items-center gap-[2cqmin] px-[4cqmin] text-center text-card-ink"
             >
               <span
@@ -288,12 +288,16 @@ export function Doorway({
                 <span className="text-[length:calc(clamp(2.3rem,13cqmin,4.4rem)*var(--story-scale,1))]">
                   {copy.first}
                 </span>{" "}
-                <span className="text-[length:calc(clamp(1.3rem,7cqmin,2.4rem)*var(--story-scale,1))] text-card-accent-text">
-                  {joiner}
-                </span>{" "}
-                <span className="text-[length:calc(clamp(2.3rem,13cqmin,4.4rem)*var(--story-scale,1))]">
-                  {copy.second}
-                </span>
+                {joiner && (
+                  <>
+                    <span className="text-[length:calc(clamp(1.3rem,7cqmin,2.4rem)*var(--story-scale,1))] text-card-accent-text">
+                      {joiner}
+                    </span>{" "}
+                    <span className="text-[length:calc(clamp(2.3rem,13cqmin,4.4rem)*var(--story-scale,1))]">
+                      {copy.second}
+                    </span>
+                  </>
+                )}
               </h1>
               {copy.date && (
                 <p

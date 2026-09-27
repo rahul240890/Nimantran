@@ -31,7 +31,13 @@ import { editorText } from "@/i18n/copy/editor";
 import { dateLocale } from "@/i18n/dates";
 import { cn } from "@/lib/cn";
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
-import { draftCategory, draftCopy, mainFunction, type FunctionId } from "@/lib/editor/draft";
+import {
+  draftCategory,
+  draftCopy,
+  draftPeople,
+  mainFunction,
+  type FunctionId,
+} from "@/lib/editor/draft";
 import { forgetShelvedPhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft } from "@/lib/editor/store";
@@ -114,8 +120,9 @@ function InviteCard({
   );
 }
 
+// A birthday or a party is led by one name
 const titleOf = (first: string, joiner: string, second: string, untitled: string) =>
-  first && second ? `${first} ${joiner || "&"} ${second}` : untitled;
+  first && second ? `${first} ${joiner || "&"} ${second}` : first || untitled;
 
 /** Deleting asks first: the invite, its functions and guest list go for good. */
 function DeleteInvite({ invite, title }: { invite: InviteSummary; title: string }) {
@@ -247,7 +254,9 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
   const deviceCard = () => {
     const copy = draftCopy(draft);
     const main = mainFunction(draft);
-    const named = Boolean(draft.content.first?.trim() && draft.content.second?.trim());
+    const named = Boolean(
+      draft.content.first?.trim() && (draft.content.second?.trim() || draftPeople(draft) === "one"),
+    );
     return (
       <InviteCard
         templateId={draft.templateId}

@@ -208,7 +208,7 @@ test.describe("publish and share", () => {
     await guest.getByRole("button", { name: "Open the invitation" }).click();
     const story = guest.locator("[data-story-beat]");
     await expect(story).toHaveAttribute("data-story-beat", "cover");
-    await expect(story).toHaveAttribute("data-suite", "shahi-savari");
+    await expect(story).toHaveAttribute("data-suite", "kutch-toran");
     await expect(story.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
     await expect(story.getByText("આરવ")).toBeVisible();
     await guest.keyboard.press("ArrowRight");

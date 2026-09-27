@@ -7,6 +7,7 @@ import {
   LOCALES,
   REGION_CODES,
   RSVP_QUESTION_IDS,
+  PEOPLE,
   SCHEDULES,
   type Locale,
 } from "./ids";
@@ -54,6 +55,11 @@ export const categorySchema = z
     templates: z.array(z.enum(TEMPLATE_IDS)).min(1),
     /** Card wording that replaces a design's sample for this occasion (English). */
     wording: z.partialRecord(z.enum(SLOT_IDS), z.string()),
+    /**
+     * Whose names lead the card: a couple (two names and a joiner), or one name, the
+     * birthday child or the party's own title. Missing means a couple.
+     */
+    people: z.enum(PEOPLE).optional(),
   })
   .refine((category) => category.functions.planned.includes(category.functions.primary), {
     message: "the primary function is planned",
