@@ -1,4 +1,5 @@
-import { newDraft, parseDraft, type InviteDraft } from "./draft";
+import { newDraft, type InviteDraft } from "./draft";
+import { parseDraft } from "./draft-checks";
 
 export const DRAFT_KEY = "nimantran-invite-draft";
 

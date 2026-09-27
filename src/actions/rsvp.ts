@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { RSVP_QUESTION_IDS } from "@/lib/categories/schema";
+import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import {
   findReply,
   REPLY_STATUSES,

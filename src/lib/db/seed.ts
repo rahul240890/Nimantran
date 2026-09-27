@@ -1,6 +1,6 @@
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { TEMPLATES } from "@/lib/templates/catalog";
-import { TEMPLATE_IDS } from "@/lib/templates/schema";
+import { TEMPLATE_IDS } from "@/lib/templates/ids";
 
 /*
  * supabase/seed.sql, written from the category and design catalogues so the database

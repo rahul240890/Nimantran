@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { GateCard } from "@/components/brand/gate-card";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
-import { MOTIF_IDS, TEMPLATE_IDS } from "@/lib/templates/schema";
+import { MOTIF_IDS, TEMPLATE_IDS } from "@/lib/templates/ids";
 import { circle, ellipse, rect, type Layer, type Placement } from "./decor";
 import { arch, MOTIFS } from "./motifs";
 

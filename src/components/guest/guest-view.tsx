@@ -29,7 +29,8 @@ import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
-import { publishText, uiText } from "@/i18n/copy";
+import { publishText } from "@/i18n/copy/publish";
+import { uiText } from "@/i18n/copy/ui";
 
 export type GuestFunction = {
   kind: FunctionId;

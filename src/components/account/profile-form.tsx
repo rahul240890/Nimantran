@@ -11,7 +11,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 import { useText } from "@/i18n/client";
 import { languages } from "@/i18n/locales";
 import { PROFILE_RULES, type Account } from "@/lib/auth/account";

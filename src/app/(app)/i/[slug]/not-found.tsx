@@ -2,7 +2,7 @@ import Link from "next/link";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Button } from "@/components/ui/button";
 import { getText } from "@/i18n/server";
-import { publishText } from "@/i18n/copy";
+import { publishText } from "@/i18n/copy/publish";
 
 export default async function InviteNotFound() {
   const { guestCopy } = await getText(publishText);

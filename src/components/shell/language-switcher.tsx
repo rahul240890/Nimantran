@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale, useText } from "@/i18n/client";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { isUiLocale, languages } from "@/i18n/locales";
 import { switchLocalePath } from "@/lib/seo/paths";
 import { cn } from "@/lib/cn";

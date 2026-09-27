@@ -3,7 +3,7 @@ import { traditionCopy as en } from "@/content/editor";
 import { traditionCopy as hi } from "@/content/hi/editor";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { isFunctionId } from "@/lib/events/functions";
-import { SLOT_RULES, TEMPLATE_IDS } from "@/lib/templates/schema";
+import { SLOT_RULES, TEMPLATE_IDS } from "@/lib/templates/ids";
 import { allowsTradition, rankTraditions, TRADITION_LIST } from "./catalog";
 import { WORDING_MAX } from "./schema";
 

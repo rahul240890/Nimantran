@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import {
   cardLanguages,
   draftCopy,
-  draftProblems,
   draftTemplate,
   functionOrder,
   includedFunctions,
@@ -10,10 +9,9 @@ import {
   muhuratName,
   newDraft,
   withCategory,
-  parseDraft,
-  stepErrors,
   type InviteDraft,
 } from "./draft";
+import { draftProblems, parseDraft, stepErrors } from "./draft-checks";
 
 function complete(): InviteDraft {
   const draft = newDraft("rose");

@@ -13,12 +13,13 @@ import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draf
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATES } from "@/lib/templates/catalog";
-import { RAGA_IDS, type RagaId } from "@/lib/templates/schema";
+import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
-import { categoriesText, editorText } from "@/i18n/copy";
+import { categoriesText } from "@/i18n/copy/categories";
+import { editorText } from "@/i18n/copy/editor";
 
 function newId(): string {
   return typeof crypto.randomUUID === "function"

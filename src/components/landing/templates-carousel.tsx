@@ -8,7 +8,7 @@ import { TiltCard } from "@/components/motion/tilt-card";
 import { Badge, type BadgeTone } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { useText } from "@/i18n/client";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Section } from "./section";

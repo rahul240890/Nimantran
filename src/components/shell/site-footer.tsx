@@ -1,12 +1,15 @@
 import { Logo } from "@/components/brand/logo";
 import { Mandala } from "@/components/brand/mandala";
 import Link from "next/link";
-import { editorText, landingText, seoText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { landingText } from "@/i18n/copy/landing";
+import { seoText } from "@/i18n/copy/seo";
 import { homePath, languages, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
 import { site } from "@/lib/site";
+import { cn } from "@/lib/cn";
 
 export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { nav, shell } = landingText[locale];
@@ -47,7 +50,10 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               shell.footer.meaning
             ) : (
               <>
-                <span lang="hi">{site.nameDevanagari}</span> · {shell.footer.meaning}
+                <span lang="hi" className="font-system">
+                  {site.nameDevanagari}
+                </span>{" "}
+                · {shell.footer.meaning}
               </>
             )}
           </p>
@@ -106,7 +112,10 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               <li
                 key={language.code}
                 lang={language.code}
-                className="rounded-full border border-line bg-surface px-3 py-1 text-sm text-ink-muted"
+                className={cn(
+                  "rounded-full border border-line bg-surface px-3 py-1 text-sm text-ink-muted",
+                  locale !== "hi" && "font-system",
+                )}
               >
                 {language.native}
               </li>

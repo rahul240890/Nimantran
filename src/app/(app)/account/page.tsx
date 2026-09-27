@@ -5,7 +5,7 @@ import { ProfileForm } from "@/components/account/profile-form";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { getText } from "@/i18n/server";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { profileCopy } = await getText(accountText);

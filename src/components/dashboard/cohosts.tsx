@@ -17,7 +17,7 @@ import type { Host } from "@/lib/invites/hosts";
 import { whatsappShareUrl } from "@/lib/publish/links";
 import type { DashboardView } from "./types";
 import { useText } from "@/i18n/client";
-import { dashboardText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
 
 const joinUrl = (origin: string, token: string) => `${origin}/join/${token}`;
 

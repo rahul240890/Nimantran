@@ -1,15 +1,15 @@
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
-import { RSVP_QUESTION_IDS } from "@/lib/categories/schema";
+import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import {
   EDITOR_STEPS,
   FUNCTION_IDS,
   newDraft,
-  parseDraft,
   type EventFunction,
   type FunctionId,
   type InviteDraft,
 } from "@/lib/editor/draft";
-import { isTemplateId } from "@/lib/templates/schema";
+import { parseDraft } from "@/lib/editor/draft-checks";
+import { isTemplateId } from "@/lib/templates/ids";
 
 /*
  * An invite as the database stores it (supabase/migrations): one events row, one

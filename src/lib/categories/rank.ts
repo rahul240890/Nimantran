@@ -1,4 +1,5 @@
-import { REGION_CODES, type Category, type RegionCode } from "./schema";
+import { REGION_CODES, type RegionCode } from "./ids";
+import type { Category } from "./schema";
 
 /*
  * Seasonal and regional ordering for the home screen. A category scores its base priority,

@@ -55,7 +55,8 @@ import { GuestFormDialog } from "./guest-form";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
-import { dashboardText, editorText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
+import { editorText } from "@/i18n/copy/editor";
 
 const statusLook = {
   attending: { icon: CircleCheck, className: "border-success/35 bg-success/10 text-success" },

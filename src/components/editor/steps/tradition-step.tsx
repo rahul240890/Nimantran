@@ -28,7 +28,7 @@ import {
 } from "@/lib/traditions/schema";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 
 const NONE = "none";
 

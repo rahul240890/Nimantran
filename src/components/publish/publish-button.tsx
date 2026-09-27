@@ -10,12 +10,13 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { draftProblems, type InviteDraft } from "@/lib/editor/draft";
+import { type InviteDraft } from "@/lib/editor/draft";
+import { draftProblems } from "@/lib/editor/draft-checks";
 import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { cleanSlugInput, isSlug, suggestSlug } from "@/lib/publish/slug";
 import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy";
+import { publishText } from "@/i18n/copy/publish";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 

@@ -2,7 +2,8 @@
 
 import { z } from "zod";
 import { getAccount } from "@/lib/auth/server";
-import { draftProblems, parseDraft, type InviteDraft } from "@/lib/editor/draft";
+import { type InviteDraft } from "@/lib/editor/draft";
+import { draftProblems, parseDraft } from "@/lib/editor/draft-checks";
 import { inviteStore } from "@/lib/invites/store";
 import { isSlug, slugAlternatives } from "@/lib/publish/slug";
 

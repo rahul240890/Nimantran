@@ -1,4 +1,7 @@
-import { emptyWaitlist, type WaitlistDraft } from "./schema";
+// Types only: the form's validator loads after the page paints (components/landing/waitlist.tsx)
+import type { WaitlistDraft } from "./schema";
+
+export const emptyWaitlist: WaitlistDraft = { name: "", email: "", phone: "", occasion: "" };
 
 const KEY = "nimantran-waitlist-draft";
 

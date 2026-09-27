@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createDraftStore } from "./draft";
-import { emptyWaitlist } from "./schema";
+import { createDraftStore, emptyWaitlist } from "./draft";
 
 const draft = { name: "Meera", email: "meera@example.com", phone: "", occasion: "wedding" };
 

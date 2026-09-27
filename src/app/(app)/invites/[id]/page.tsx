@@ -10,7 +10,7 @@ import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 import { getLocale, getText } from "@/i18n/server";
-import { dashboardText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dashboardCopy } = await getText(dashboardText);

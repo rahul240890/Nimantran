@@ -11,7 +11,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { landingText } from "@/i18n/copy";
+import { landingText } from "@/i18n/copy/landing";
 import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
 import { RAGAS } from "@/lib/engine/music";

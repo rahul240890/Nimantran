@@ -1,7 +1,7 @@
 import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { LOCALES, type Locale } from "@/lib/categories/schema";
+import { LOCALES, type Locale } from "@/lib/categories/ids";
 import { supabaseServer } from "@/lib/supabase/server";
 import type { Account, AuthFailure, Profile } from "./account";
 import { ACCOUNT_HINT_COOKIE, encodeAccountHint } from "./hint";

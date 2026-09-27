@@ -24,7 +24,7 @@ import {
 import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 
 function FunctionFields({
   id,

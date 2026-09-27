@@ -1,7 +1,7 @@
-import { z } from "zod";
 import { firstGrapheme } from "@/lib/initials";
 import type { SymbolId } from "@/lib/traditions/schema";
-import { SLOT_IDS, SLOT_RULES, type SlotId, type Template } from "./schema";
+import { SLOT_IDS, type SlotId } from "./ids";
+import type { Template } from "./schema";
 
 /** What a host has written into a template's slots. Missing slots use the sample wording. */
 export type TemplateContent = Partial<Record<SlotId, string>>;
@@ -30,20 +30,6 @@ export function sampleContent(template: Template): Record<SlotId, string> {
   const content = Object.fromEntries(SLOT_IDS.map((id) => [id, ""])) as Record<SlotId, string>;
   for (const slot of template.slots) content[slot.id] = slot.sample;
   return content;
-}
-
-/**
- * Validates a host's wording for one template: only its slots, trimmed, within each
- * slot's length, and the names, date and venue filled in. Messages are keys for the UI.
- */
-export function contentSchema(template: Template) {
-  const shape: Partial<Record<SlotId, z.ZodType<string | undefined>>> = {};
-  for (const id of slotsOf(template)) {
-    const rule = SLOT_RULES[id];
-    const base = z.string().trim().max(rule.maxLength, { message: "too-long" });
-    shape[id] = rule.required ? base.min(1, { message: "required" }) : base.optional();
-  }
-  return z.object(shape as Record<SlotId, z.ZodType<string | undefined>>);
 }
 
 /** Fills a template's slots with a host's wording, falling back to the samples. */

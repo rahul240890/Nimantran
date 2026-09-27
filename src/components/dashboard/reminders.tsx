@@ -18,7 +18,7 @@ import { guestMessage } from "./guest-list";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
-import { dashboardText } from "@/i18n/copy";
+import { dashboardText } from "@/i18n/copy/dashboard";
 
 /**
  * Reminders for guests who haven't replied, sent from the host's own WhatsApp one tap at a

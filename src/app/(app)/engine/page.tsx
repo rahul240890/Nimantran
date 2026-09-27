@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { PageTransition } from "@/components/motion/page-transition";
-import { isTemplateId } from "@/lib/templates/schema";
+import { isTemplateId } from "@/lib/templates/ids";
 import { isQualityChoice } from "@/content/engine-review";
 import { EngineReview } from "./_review";
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { UI_LOCALES, homePath, type UiLocale } from "@/i18n/locales";
 

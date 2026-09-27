@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { DesignPage, publicMetadata } from "@/components/seo/pages";
-import { TEMPLATE_IDS, isTemplateId } from "@/lib/templates/schema";
+import { TEMPLATE_IDS, isTemplateId } from "@/lib/templates/ids";
 
 export const dynamicParams = false;
 

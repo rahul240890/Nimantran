@@ -5,7 +5,7 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import { Invitation } from "@/components/invitation/invitation";
 import type { QualityChoice } from "@/content/engine-review";
 import { useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
   draftCopy,

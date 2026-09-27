@@ -5,7 +5,8 @@ import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { isQualityChoice } from "@/content/engine-review";
 import { dateLocale } from "@/i18n/dates";
-import { editorText, publishText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
 import {
   ceremonyName,

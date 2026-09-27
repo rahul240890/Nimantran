@@ -25,11 +25,11 @@ import type { CategoryId } from "@/lib/categories/catalog";
 import {
   EDITOR_STEPS,
   newDraft,
-  stepErrors,
   withCategory,
   type EditorStep,
   type InviteDraft,
 } from "@/lib/editor/draft";
+import { stepErrors } from "@/lib/editor/draft-checks";
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
@@ -48,7 +48,9 @@ import { PreviewStep } from "./steps/preview-step";
 import { TraditionStep } from "./steps/tradition-step";
 import { forgetPhotoUrl } from "./use-photo-urls";
 import { useText } from "@/i18n/client";
-import { editorText, publishText, uiText } from "@/i18n/copy";
+import { editorText } from "@/i18n/copy/editor";
+import { publishText } from "@/i18n/copy/publish";
+import { uiText } from "@/i18n/copy/ui";
 
 const WIDE = "(min-width: 64rem)";
 

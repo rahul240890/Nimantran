@@ -11,7 +11,7 @@ import { firstName } from "@/lib/auth/account";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
 import { getText } from "@/i18n/server";
-import { accountText } from "@/i18n/copy";
+import { accountText } from "@/i18n/copy/account";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { invitesCopy } = await getText(accountText);

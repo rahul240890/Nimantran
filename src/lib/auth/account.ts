@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LOCALES, type Locale } from "@/lib/categories/schema";
+import { LOCALES, type Locale } from "@/lib/categories/ids";
 
 /*
  * The signed-in person, the same shape whichever sign-in service is behind it. The profile
