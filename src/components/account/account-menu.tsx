@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/components/ui/toast";
+import { toast, toastAfterNavigation } from "@/components/ui/toast";
 import { accountText } from "@/i18n/copy/account";
 import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
@@ -50,8 +50,14 @@ export function AccountMenu({ className, compact }: { className?: string; compac
     startTransition(async () => {
       await signOut();
       refreshAccountHint();
-      toast({ title: accountMenu.signedOut, tone: "success" });
-      if (pathname?.startsWith("/invites") || pathname?.startsWith("/account")) router.push("/");
+      const done = { title: accountMenu.signedOut, tone: "success" } as const;
+      if (pathname?.startsWith("/invites") || pathname?.startsWith("/account")) {
+        // Home is another part of the site, so the page reloads and the toast rides along
+        toastAfterNavigation(done);
+        router.push("/");
+      } else {
+        toast(done);
+      }
       router.refresh();
     });
 

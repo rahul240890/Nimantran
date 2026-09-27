@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { axe, noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
 
-/* Step 14: the privacy policy and terms, security headers and error reports. */
+/* Step 14: the privacy policy and terms, security headers, error reports, deleting an account. */
 
 test.describe("launch", () => {
   test.use({ reducedMotion: "reduce" });
@@ -55,5 +56,36 @@ test.describe("launch", () => {
       data: { message: "x".repeat(5000), url: "/", source: "window" },
     });
     expect(huge.status()).toBe(413);
+  });
+});
+
+test.describe("deleting an account", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("a host deletes their account and their invitation goes with it", async ({ page }, info) => {
+    await writeInvite(page, numberFor(info), ["Kabir", "Tara"]);
+    const path = await publish(page, "kabir-weds-tara");
+
+    await page.goto("/account");
+    const confirm = page.getByRole("button", { name: "Delete my account" });
+    await page.getByRole("button", { name: "Delete account" }).click();
+    const dialog = page.getByRole("dialog", { name: "Delete your account?" });
+    await expect(dialog.getByRole("button", { name: "Delete my account" })).toBeDisabled();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await dialog.getByRole("checkbox", { name: /I understand/ }).click();
+    await confirm.click();
+
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.getByText("Your account has been deleted")).toBeVisible();
+    expect(await page.evaluate(() => localStorage.getItem("nimantran-invite-draft"))).toBeNull();
+
+    // The guest link is closed, and the account pages ask to sign in again
+    await page.goto(path);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "This invitation isn't available",
+    );
+    await page.goto("/invites");
+    await expect(page).toHaveURL(/\/sign-in/);
   });
 });

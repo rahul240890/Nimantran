@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { AccountShell } from "@/components/account/account-shell";
+import { DeleteAccount } from "@/components/account/delete-account";
 import { ProfileForm } from "@/components/account/profile-form";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
@@ -35,6 +36,7 @@ export default async function AccountPage() {
             <p className="text-ink-muted">{profileCopy.intro}</p>
           </div>
           <ProfileForm account={account} />
+          <DeleteAccount />
         </div>
       </AccountShell>
     </PageTransition>

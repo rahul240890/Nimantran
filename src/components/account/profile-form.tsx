@@ -10,7 +10,7 @@ import { Card } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { toast } from "@/components/ui/toast";
+import { toast, toastAfterNavigation } from "@/components/ui/toast";
 import { accountText } from "@/i18n/copy/account";
 import { useText } from "@/i18n/client";
 import { languages } from "@/i18n/locales";
@@ -55,7 +55,7 @@ export function ProfileForm({ account }: { account: Account }) {
     startLeaving(async () => {
       await signOut();
       refreshAccountHint();
-      toast({ title: accountMenu.signedOut, tone: "success" });
+      toastAfterNavigation({ title: accountMenu.signedOut, tone: "success" });
       router.push("/");
       router.refresh();
     });

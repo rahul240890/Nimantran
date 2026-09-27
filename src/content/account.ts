@@ -89,6 +89,20 @@ export const profileCopy = {
   saved: "Profile saved",
   signOut: "Sign out",
   signOutHint: "You'll stay signed in on your other devices.",
+  deleteAccount: {
+    heading: "Delete your account",
+    hint: "Deletes your account and every invite you made, with its guest list and replies. Invites you co-host stay with their owners.",
+    open: "Delete account",
+    title: "Delete your account?",
+    body: "Every invite you made will be deleted with its photos, guest list and replies, and its link will stop working for guests. This can't be undone.",
+    understand: "I understand this deletes my invites for good",
+    confirm: "Delete my account",
+    cancel: "Keep my account",
+    close: "Close",
+    done: "Your account has been deleted",
+    failed:
+      "Couldn't delete your account just now. Try again, or write to us from the privacy page.",
+  },
   errors: {
     required: "Please enter your name",
     "too-long": "Keep it under 60 characters",
