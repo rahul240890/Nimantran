@@ -34,6 +34,8 @@ test.describe("publish and share", () => {
     expect(href.origin).toBe("https://wa.me");
     expect(href.searchParams.get("text")).toContain(link);
     await expect(page.getByRole("img", { name: /QR code for/ }).locator("svg")).toBeVisible();
+    // The title streams in after the page on a client navigation; wait for it before axe
+    await expect(page).toHaveTitle(/\S/);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
