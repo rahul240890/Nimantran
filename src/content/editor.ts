@@ -164,6 +164,10 @@ export const functionFields = {
   dressCode: "Dress code",
   dressIdeas: "Dress code ideas",
   onCard: "On the card",
+  endTime: "Ends at",
+  endHint: "Leave it empty if the evening runs open.",
+  muhuratHint:
+    "choose the exact start and end, to the minute. Guests see them just as you set them.",
 } as const;
 
 export const coupleCopy = {
@@ -173,6 +177,11 @@ export const coupleCopy = {
   joinerHint: "The word between the names, like &, weds or संग.",
   doorsHint: "Two short words painted on the gates.",
   anyScript: "Type in any script. Hindi, Tamil, Bengali and more all fit the card.",
+  languagesHeading: "Card language",
+  languagesHint: "With two languages, guests switch between them on the invitation.",
+  bothLanguages: (main: string, second: string) => `${main} and ${second}`,
+  secondHeading: (language: string) => `The card in ${language}`,
+  secondHint: (main: string) => `Leave a line empty to repeat the ${main} card's words.`,
 } as const;
 
 export const extrasCopy = {

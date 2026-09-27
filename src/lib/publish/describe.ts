@@ -68,6 +68,7 @@ export function calendarEntries(
         title: `${functionCopy[kind].name} · ${names}`,
         date: fn.date,
         time: timed ? fn.time : "",
+        endTime: timed && fn.time ? fn.endTime : "",
         location: [fn.venue.trim(), fn.address.trim()].filter(Boolean).join(", "),
         description: fn.dressCode.trim() ? `${guestCopy.dressCode}: ${fn.dressCode.trim()}` : "",
         url,

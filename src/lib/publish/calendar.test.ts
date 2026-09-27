@@ -23,6 +23,17 @@ describe("entryTimes", () => {
       "2026-12-31T22:30:00.000Z",
     );
   });
+
+  it("ends a muhurat exactly when the family says", () => {
+    const { start, end } = entryTimes({ date: "2026-12-12", time: "09:47", endTime: "10:31" });
+    expect(start.toISOString()).toBe("2026-12-12T04:17:00.000Z");
+    expect(end.toISOString()).toBe("2026-12-12T05:01:00.000Z");
+  });
+
+  it("carries an end time past midnight into the next day", () => {
+    const { end } = entryTimes({ date: "2026-12-12", time: "20:00", endTime: "01:00" });
+    expect(end.toISOString()).toBe("2026-12-12T19:30:00.000Z");
+  });
 });
 
 describe("icsCalendar", () => {

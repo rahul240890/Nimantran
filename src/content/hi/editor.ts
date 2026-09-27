@@ -150,6 +150,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
   dressCode: "ड्रेस कोड",
   dressIdeas: "ड्रेस कोड के सुझाव",
   onCard: "कार्ड पर",
+  endTime: "ख़त्म होने का समय",
+  endHint: "देर तक चलना हो तो ख़ाली छोड़ दें।",
+  muhuratHint: "शुरू और ख़त्म होने का सही समय, मिनट तक, चुनें। मेहमानों को ठीक वैसा ही दिखेगा।",
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
@@ -159,6 +162,11 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   joinerHint: "नामों के बीच का शब्द, जैसे &, संग या weds।",
   doorsHint: "द्वारों पर लिखे दो छोटे शब्द।",
   anyScript: "किसी भी लिपि में लिखें। हिन्दी, तमिल, बांग्ला और बाक़ी सब कार्ड पर आ जाती हैं।",
+  languagesHeading: "कार्ड की भाषा",
+  languagesHint: "दो भाषाएँ चुनने पर मेहमान निमंत्रण पर उनके बीच बदल सकते हैं।",
+  bothLanguages: (main, second) => `${main} और ${second}`,
+  secondHeading: (language) => `${language} में कार्ड`,
+  secondHint: (main) => `कोई पंक्ति ख़ाली छोड़ें तो ${main} कार्ड वाले शब्द ही आएँगे।`,
 };
 
 export const extrasCopy: Translation<typeof en.extrasCopy> = {

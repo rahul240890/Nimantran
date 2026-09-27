@@ -30,6 +30,8 @@ export type EventRow = {
   /** The tradition pack and the family's religious elements (Step 12a). */
   tradition_id?: string | null;
   religious?: Record<string, unknown> | null;
+  /** The card's languages, main first (Step 12a part 3). */
+  languages?: string[] | null;
 };
 
 export type FunctionRow = {
@@ -37,6 +39,8 @@ export type FunctionRow = {
   position: number;
   date: string | null;
   start_time: string | null;
+  /** Read and written from Step 12a; older reads may leave it out. */
+  end_time?: string | null;
   venue: string;
   address: string;
   dress_code: string;
@@ -66,6 +70,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         position: FUNCTION_IDS.indexOf(kind),
         date: fn.date || null,
         start_time: fn.time || null,
+        end_time: fn.endTime || null,
         venue: fn.venue,
         address: fn.address,
         dress_code: fn.dressCode,
@@ -88,7 +93,10 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         symbol: draft.tradition.symbol,
         invocation: draft.tradition.invocation,
         wording: draft.tradition.wording,
+        // The events table has no column of its own for the second language's wording
+        translation: draft.translation,
       },
+      languages: draft.languages,
     },
     functions,
   };
@@ -116,6 +124,7 @@ export function rowsToDraft(
       date: row.date ?? "",
       // Postgres returns times as HH:MM:SS
       time: row.start_time ? row.start_time.slice(0, 5) : "",
+      endTime: row.end_time ? row.end_time.slice(0, 5) : "",
       venue: row.venue,
       address: row.address,
       dressCode: row.dress_code,
@@ -138,6 +147,8 @@ export function rowsToDraft(
     questions: questions ? RSVP_QUESTION_IDS.filter((id) => questions.includes(id)) : null,
     // Read leniently: an unknown pack or symbol falls back to none
     tradition: { ...event.religious, id: event.tradition_id ?? null },
+    languages: event.languages ?? undefined,
+    translation: event.religious?.translation,
   });
   return draft ?? { ...base, remoteId: event.id };
 }

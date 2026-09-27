@@ -12,6 +12,7 @@ import {
   draftQuestions,
   draftTradition,
   includedFunctions,
+  muhuratName,
   needsTime,
 } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
@@ -61,6 +62,8 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const { draft } = invite;
   const locale = await getLocale();
   const { functionCopy } = editorText[locale];
+  const { guestCopy } = publishText[locale];
+  const language = draftTradition(draft)?.language ?? "en";
   const words = dateLocale[locale];
   const url = inviteUrl(await requestOrigin(), invite.slug);
   const entries = calendarEntries(draft, { id: invite.id, url }, locale);
@@ -70,12 +73,15 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
     const fn = draft.functions[kind];
     const entry = entries.find((item) => item.uid.startsWith(`${invite.id}-${kind}@`));
     const local = ceremonyName(draft, kind);
+    const muhurat = muhuratName(draft, kind);
+    const start = timed && fn.time ? formatTime(fn.time, words) : "";
     return {
       kind,
       name: functionCopy[kind].name,
-      localName: local ? { text: local.native, lang: draftTradition(draft)!.language } : null,
+      localName: local ? { text: local.native, lang: language } : null,
       date: fn.date ? format(parseISO(fn.date), "EEEE, d MMMM yyyy", { locale: words }) : "",
-      time: timed && fn.time ? formatTime(fn.time, words) : "",
+      time: start && fn.endTime ? guestCopy.timeRange(start, formatTime(fn.endTime, words)) : start,
+      muhurat: muhurat && start ? { text: muhurat.native, lang: language } : null,
       venue: fn.venue.trim(),
       address: fn.address.trim(),
       dressCode: fn.dressCode.trim(),

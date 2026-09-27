@@ -69,6 +69,8 @@ export type InvitationProps = {
   /** Start the music when the guest opens the card (a tap, so browsers allow sound). */
   musicOnOpen?: boolean;
   labels?: InvitationLabels;
+  /** The language the card's words are in, for screen readers. */
+  lang?: string;
   onStatus?: (status: EngineStatus) => void;
   onFps?: (fps: number) => void;
   className?: string;
@@ -134,6 +136,7 @@ export function Invitation({
   onOpenChange,
   musicOnOpen = true,
   labels: labelsProp,
+  lang,
   onStatus,
   onFps,
   className,
@@ -304,7 +307,7 @@ export function Invitation({
       className={cn("flex h-full min-h-0 w-full flex-col", className)}
     >
       {/* The invitation itself, for screen readers; the pictures below are decorative */}
-      <div className="sr-only">
+      <div className="sr-only" lang={lang}>
         {copy.blessing && <p>{copy.blessing}</p>}
         {copy.families && <p>{copy.families}</p>}
         <p>

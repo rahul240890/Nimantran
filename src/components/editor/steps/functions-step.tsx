@@ -16,6 +16,7 @@ import {
   draftCategory,
   functionOrder,
   mainFunction,
+  muhuratName,
   needsTime,
   type EventFunction,
   type FunctionId,
@@ -30,6 +31,7 @@ function FunctionFields({
   fn,
   errors,
   withTime,
+  muhurat,
   set,
 }: {
   id: FunctionId;
@@ -37,6 +39,8 @@ function FunctionFields({
   errors: StepProps["errors"];
   /** False for a save-the-date: a date and a city are enough. */
   withTime: boolean;
+  /** The tradition's name for the wedding's auspicious time, when it has one. */
+  muhurat: { name: string; lang: string } | null;
   set: (change: Partial<EventFunction>) => void;
 }) {
   const { editor } = useText(editorText);
@@ -52,7 +56,12 @@ function FunctionFields({
 
   return (
     <div className="grid gap-5 border-t border-line px-4 pt-5 pb-5 sm:grid-cols-2 sm:px-5">
-      <Field label={functionFields.date} required error={message(errors[`${id}.date`])}>
+      <Field
+        label={functionFields.date}
+        required
+        error={message(errors[`${id}.date`])}
+        className={withTime ? "sm:col-span-2" : undefined}
+      >
         <DatePicker
           value={fn.date ? parseISO(fn.date) : undefined}
           onValueChange={(date) => set({ date: date ? format(date, "yyyy-MM-dd") : "" })}
@@ -68,9 +77,33 @@ function FunctionFields({
             value={fn.time || undefined}
             onValueChange={(time) => set({ time })}
             placeholder={functionFields.timePlaceholder}
-            step={15}
+            // A muhurat is set to the minute, never rounded
+            step={muhurat ? 1 : 15}
           />
         </Field>
+      )}
+      {withTime && (
+        <Field
+          label={functionFields.endTime}
+          optionalLabel={editor.optional}
+          hint={muhurat ? undefined : functionFields.endHint}
+        >
+          <TimePicker
+            value={fn.endTime || undefined}
+            onValueChange={(endTime) => set({ endTime })}
+            placeholder={functionFields.timePlaceholder}
+            step={muhurat ? 1 : 15}
+          />
+        </Field>
+      )}
+      {withTime && muhurat && (
+        <p className="-mt-2 text-sm text-ink-muted sm:col-span-2">
+          <span lang={muhurat.lang} className="font-semibold text-accent-text">
+            {muhurat.name}
+          </span>
+          {": "}
+          {functionFields.muhuratHint}
+        </p>
       )}
       <Field
         label={withTime ? functionFields.venue : functionFields.city}
@@ -163,6 +196,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
     const fn = draft.functions[id];
     const copy = functionCopy[id];
     const local = ceremonyName(draft, id);
+    const muhurat = muhuratName(draft, id);
     return (
       <li
         key={id}
@@ -206,6 +240,9 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
             fn={fn}
             errors={errors}
             withTime={withTime}
+            muhurat={
+              muhurat ? { name: muhurat.native, lang: draftTradition(draft)!.language } : null
+            }
             set={(change) => setFunction(id, change)}
           />
         )}

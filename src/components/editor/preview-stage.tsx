@@ -1,9 +1,18 @@
 "use client";
 
-import { useDeferredValue, useMemo } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
+import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import { Invitation } from "@/components/invitation/invitation";
 import type { QualityChoice } from "@/content/engine-review";
-import { draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { useText } from "@/i18n/client";
+import { editorText } from "@/i18n/copy";
+import {
+  cardLanguages,
+  draftCopy,
+  templateWithRaga,
+  type CardLanguage,
+  type InviteDraft,
+} from "@/lib/editor/draft";
 import type { CardCopy } from "@/lib/templates/content";
 import { cn } from "@/lib/cn";
 
@@ -20,7 +29,11 @@ type PreviewStageProps = {
  * reach it as a deferred value, and it only repaints when they actually change.
  */
 export function PreviewStage({ draft, quality, open, onOpenChange, className }: PreviewStageProps) {
-  const key = JSON.stringify(draftCopy(draft));
+  const { coupleCopy } = useText(editorText);
+  const languages = cardLanguages(draft);
+  const [chosen, setChosen] = useState<CardLanguage | null>(null);
+  const language = chosen && languages.includes(chosen) ? chosen : languages[0];
+  const key = JSON.stringify(draftCopy(draft, language));
   const copy = useMemo(() => JSON.parse(key) as CardCopy, [key]);
   const deferredCopy = useDeferredValue(copy);
 
@@ -44,8 +57,19 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
             "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 30%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
         }}
       />
+      {languages.length > 1 && (
+        <div className="flex shrink-0 justify-center pb-3">
+          <CardLanguageToggle
+            label={coupleCopy.languagesHeading}
+            languages={languages}
+            value={language}
+            onValueChange={setChosen}
+          />
+        </div>
+      )}
       <Invitation
         copy={deferredCopy}
+        lang={language}
         template={template}
         quality={quality}
         open={open}

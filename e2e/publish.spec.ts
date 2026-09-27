@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { axe, noOverflow, numberFor, signIn, writeInvite } from "./invite-helpers";
+import { axe, next, noOverflow, numberFor, publish, signIn, writeInvite } from "./invite-helpers";
 
 test.describe("publish and share", () => {
   test.use({ reducedMotion: "reduce" });
@@ -110,6 +110,79 @@ test.describe("publish and share", () => {
           .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
       )
       .toBe(true);
+  });
+
+  test("a two-language card with a muhurat opens in the guest's language", async ({
+    page,
+    browser,
+  }, info) => {
+    await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
+    await page.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1&region=GJ")}`);
+    await signIn(page, numberFor(info));
+    await expect(page).toHaveURL(/\/create/);
+    await next(page);
+    await page.getByRole("radio", { name: /^Gujarati/ }).click();
+    await next(page);
+    await next(page);
+
+    await page.getByRole("radio", { name: "ગુજરાતી and English" }).click();
+    await page.locator('[data-slot="first"]').fill("આરવ");
+    await page.locator('[data-slot="second"]').fill("મીરા");
+    const english = page.getByRole("region", { name: "The card in English" });
+    await english.locator('[data-translation="first"]').fill("Aarav");
+    await english.locator('[data-translation="second"]').fill("Meera");
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await next(page);
+
+    const wedding = page
+      .getByRole("listitem")
+      .filter({ has: page.getByRole("checkbox", { name: /^Wedding/ }) });
+    await wedding.getByRole("button", { name: /^Date/ }).click();
+    await page.getByRole("button", { name: /next month/i }).click();
+    await page.getByRole("gridcell").getByRole("button", { name: /, 15 / }).click();
+    await expect(wedding.getByText("શુભ મુહૂર્ત")).toBeVisible();
+    // A muhurat is set to the minute
+    await wedding.getByRole("combobox", { name: /Starts at/ }).click();
+    await page.getByRole("option", { name: "9:47 am" }).click();
+    await wedding.getByRole("combobox", { name: /Ends at/ }).click();
+    await page.getByRole("option", { name: "10:31 am" }).click();
+    await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Hotel Grand Bhagwati, Surat");
+    await next(page);
+    await next(page);
+    await expect(page.getByText("Your invitation is ready")).toBeVisible();
+    const path = await publish(page, "aarav-meera-gu");
+
+    const guestContext = await browser.newContext({
+      baseURL: info.project.use.baseURL,
+      viewport: info.project.use.viewport,
+      reducedMotion: "reduce",
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(`${path}?quality=2d`);
+    const toggle = guest.getByRole("radiogroup", { name: "Card language" });
+    const card = guest.locator("[data-engine-state] .sr-only");
+    // An English-speaking guest sees the English card first
+    await expect(toggle.getByRole("radio", { name: "English" })).toBeChecked();
+    await expect(card.getByText("Aarav")).toBeAttached();
+    await expect(card.getByText("Shri Ganeshaya Namah")).toBeAttached();
+    await toggle.getByRole("radio", { name: "ગુજરાતી" }).click();
+    await expect(card.getByText("આરવ")).toBeAttached();
+    await expect(card.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeAttached();
+    await expect(card.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeAttached();
+
+    const article = guest.getByRole("article", { name: /Wedding/ });
+    await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
+    await expect(article.getByText("9:47 am to 10:31 am")).toBeVisible();
+    await article.getByRole("button", { name: "Add to calendar" }).click();
+    const ics = await guest.getByRole("menuitem", { name: /Apple/ }).getAttribute("href");
+    const calendar = await (await guest.request.get(ics!)).text();
+    expect(calendar).toContain("DTSTART:20261015T041700Z");
+    expect(calendar).toContain("DTEND:20261015T050100Z");
+    await guest.keyboard.press("Escape");
+    expect(await noOverflow(guest)).toBe(true);
+    expect((await axe(guest).analyze()).violations).toEqual([]);
+    await guestContext.close();
   });
 
   test("an unknown link says the invitation isn't available", async ({ page }) => {
