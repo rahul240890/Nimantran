@@ -1341,3 +1341,127 @@
     opacity: var(--suite-stars, 0);
   }
 }
+
+/* Movement over the painted event pages (Step 12g), in each theme's own light */
+@keyframes fx-fall {
+  from {
+    transform: translate3d(0, -8cqh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.95;
+  }
+  90% {
+    opacity: 0.9;
+  }
+  to {
+    transform: translate3d(calc(var(--fx-drift, 1) * 14cqw), 108cqh, 0) rotate(540deg);
+    opacity: 0;
+  }
+}
+@keyframes fx-rise {
+  from {
+    transform: translate3d(0, 104cqh, 0);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 0.8;
+  }
+  to {
+    transform: translate3d(3cqw, 30cqh, 0);
+    opacity: 0;
+  }
+}
+@keyframes fx-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.6);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fx-spark {
+  0%,
+  8% {
+    transform: rotate(var(--fx-angle)) translateY(0) scale(0.4);
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  40% {
+    transform: rotate(var(--fx-angle)) translateY(-7cqmin) scale(1);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(var(--fx-angle)) translateY(-7cqmin) scale(1);
+    opacity: 0;
+  }
+}
+@keyframes fx-bob {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translate3d(1.5cqw, -1cqh, 0);
+    opacity: 1;
+  }
+}
+@layer components {
+  .fx-petal {
+    position: absolute;
+    top: 0;
+    width: calc(var(--fx-size, 1) * 2.2cqmin);
+    height: calc(var(--fx-size, 1) * 1.4cqmin);
+    border-radius: 100% 0;
+    background: var(--suite-light);
+    box-shadow: inset -0.2cqmin -0.2cqmin 0 var(--suite-accent);
+    opacity: 0;
+    animation: fx-fall 9s linear var(--fx-delay, 0s) infinite;
+  }
+  .fx-dust {
+    position: absolute;
+    top: 0;
+    width: calc(var(--fx-size, 1) * 0.9cqmin);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--suite-light);
+    box-shadow: 0 0 1.6cqmin var(--suite-light);
+    opacity: 0;
+    animation: fx-rise 11s ease-in-out var(--fx-delay, 0s) infinite;
+  }
+  .fx-twinkle {
+    position: absolute;
+    width: calc(var(--fx-size, 1) * 1cqmin);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--suite-light);
+    box-shadow: 0 0 2cqmin 0.4cqmin var(--suite-light);
+    animation: fx-twinkle 2.8s ease-in-out var(--fx-delay, 0s) infinite;
+  }
+  .fx-spark {
+    position: absolute;
+    width: 0.8cqmin;
+    height: 2.4cqmin;
+    border-radius: 999px;
+    background: var(--suite-light);
+    box-shadow: 0 0 1.4cqmin var(--suite-light);
+    opacity: 0;
+    animation: fx-spark 4.8s ease-out var(--fx-delay, 0s) infinite;
+  }
+  .fx-lamp {
+    position: absolute;
+    width: calc(var(--fx-size, 1) * 5cqmin);
+    aspect-ratio: 2;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, var(--suite-light), transparent);
+    mix-blend-mode: screen;
+    animation: fx-bob 5.5s ease-in-out var(--fx-delay, 0s) infinite;
+  }
+}
