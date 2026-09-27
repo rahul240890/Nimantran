@@ -149,9 +149,10 @@ export function storyBeats({
 
   // The couple's photo page: their photo in the theme's own frame, their names beneath
   if (couple.length > 0) {
+    // One-name occasions (a birthday) have no joiner or second name
     const names = [
       ...line(copy.first, "display"),
-      ...line(joiner, "joiner"),
+      ...(copy.second.trim() ? line(joiner, "joiner") : []),
       ...line(copy.second, "display"),
     ];
     // A photo takes a moment longer to take in than a line of words

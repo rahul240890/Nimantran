@@ -549,16 +549,16 @@ export function StoryPage({
       <div
         className={cn(
           "absolute flex items-center justify-center",
-          painted
-            ? "[container-type:size]"
-            : arches
-              ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
+          arches
+            ? "[container-type:size] inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
+            : painted
+              ? "[container-type:size]"
               : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
         )}
         style={
           frames
             ? areaStyle(frames.area, true)
-            : painted
+            : painted && !arches
               ? areaStyle(textArea(suiteId, look.art))
               : undefined
         }
