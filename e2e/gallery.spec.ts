@@ -78,6 +78,9 @@ test.describe("finding a design", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Whose birthday is it?");
     await expect(page.getByLabel(/^Second name/)).toHaveCount(0);
     await page.getByLabel(/^Birthday name/).fill("Aarav");
+    // Phones show the live page behind a Preview button
+    if (page.viewportSize()!.width < 1024)
+      await page.getByRole("button", { name: "Preview" }).click();
     const cover = page.locator('[data-suite="gubbara"]').first();
     await expect(cover).toContainText("Happy birthday");
     await expect(cover).toContainText("Aarav");
