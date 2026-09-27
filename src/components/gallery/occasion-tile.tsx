@@ -45,7 +45,7 @@ const ICONS: Record<string, LucideIcon> = {
   "kitty-party": Coffee,
   reunion: Users,
   retirement: Briefcase,
-  cocktail: GlassWater,
+  party: GlassWater,
   diwali: Lamp,
   holi: Palette,
   navratri: Music,

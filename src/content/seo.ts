@@ -137,6 +137,30 @@ export const seoCopy = {
       intro:
         "Send the evening's details with directions and an add-to-calendar button, and count adults and children from the replies.",
     },
+    birthday: {
+      title: "Birthday invitation card online",
+      description:
+        "Create a birthday invitation with painted pages, music and one-tap RSVP. Share it on WhatsApp and know who is coming to the party.",
+      heading: "Birthday invitations full of balloons and cake",
+      intro:
+        "Write the birthday name once, add the time and place, and send one link. Guests open painted pages and reply in a tap.",
+    },
+    anniversary: {
+      title: "Anniversary invitation card online",
+      description:
+        "Create a wedding anniversary invitation with painted pages, music and one-tap RSVP, shared on WhatsApp.",
+      heading: "Anniversary invitations for years together",
+      intro:
+        "Celebrate a silver or golden anniversary with a card the family opens and turns, with directions and replies in one place.",
+    },
+    party: {
+      title: "Party invitation card online",
+      description:
+        "Create a party invitation with painted night-time pages, music and one-tap RSVP. Share it on WhatsApp and count your guests.",
+      heading: "Party invitations for a night to remember",
+      intro:
+        "Name the party, add the time and place, and send one link. Guests see the evening's page, directions and a reply button.",
+    },
   } satisfies Record<CategoryId, PageWords>,
   traditionPages: {
     "north-hindu": {

@@ -24,6 +24,9 @@ export const categoryTaglines: Translation<typeof en.categoryTaglines> = {
   mehendi: "मेहँदी, ढोलक और सुकून भरी दोपहर",
   sangeet: "गीत, नृत्य और परिवार की प्रस्तुतियाँ",
   reception: "फेरों के बाद भोज और जश्न",
+  birthday: "केक, गुब्बारे और सारे अपने",
+  anniversary: "साथ के बरस, परिवार के साथ जश्न",
+  party: "तारों भरी रात में संगीत, खाना और दोस्त",
 };
 
 export const questionLabels: Translation<typeof en.questionLabels> = {

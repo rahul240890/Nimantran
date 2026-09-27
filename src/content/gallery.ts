@@ -92,7 +92,7 @@ export const occasionTaglines: Record<string, string> = {
   "kitty-party": "The monthly get-together",
   reunion: "Old friends, one evening",
   retirement: "A career celebrated",
-  cocktail: "Drinks the night before",
+  party: "Rooftops, music and friends",
   diwali: "Diyas and dinner",
   holi: "Colours and gujiya",
   navratri: "Nine nights of garba",

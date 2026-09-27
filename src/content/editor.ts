@@ -192,6 +192,21 @@ export const functionCopy: Record<
     description: "Dinner and celebration with everyone",
     dressIdeas: ["Formal", "Black tie", "Festive evening wear"],
   },
+  birthday: {
+    name: "Birthday party",
+    description: "Cake, games and blessings for the birthday",
+    dressIdeas: ["Pastels", "Smart casual", "Come as you are"],
+  },
+  anniversary: {
+    name: "Anniversary dinner",
+    description: "An evening to celebrate the years together",
+    dressIdeas: ["Formal", "Festive ethnic", "Reds and golds"],
+  },
+  party: {
+    name: "Party",
+    description: "Music, food and friends",
+    dressIdeas: ["Smart casual", "Cocktail", "Something that sparkles"],
+  },
 };
 
 export const functionFields = {
@@ -232,6 +247,23 @@ export const coupleCopy = {
   bothLanguages: (main: string, second: string) => `${main} and ${second}`,
   secondHeading: (language: string) => `The card in ${language}`,
   secondHint: (main: string) => `Leave a line empty to repeat the ${main} card's words.`,
+} as const;
+
+/**
+ * The names step for occasions beyond weddings (Step 12p): its own title, and for a card
+ * led by one name (a birthday, a party), what that name is.
+ */
+export const namesCopy = {
+  steps: {
+    birthday: { label: "Birthday", eyebrow: "The birthday", title: "Whose birthday is it?" },
+    anniversary: { label: "Couple", eyebrow: "The couple", title: "Who is celebrating?" },
+    party: { label: "Party", eyebrow: "The party", title: "What's the party called?" },
+  },
+  one: {
+    birthday: { label: "Birthday name", example: "Aarav" },
+    party: { label: "Party name", example: "Diwali Night" },
+  },
+  oneHint: "It's printed large on the cover. Say who invites and why in the wording below.",
 } as const;
 
 export const extrasCopy = {
@@ -408,6 +440,9 @@ export const suiteCopy = {
     rajbari: "Rajbari",
     "peshwai-wada": "Peshwai Wada",
     "kutch-toran": "Kutch Toran",
+    gubbara: "Gubbara",
+    saath: "Saath",
+    rooftop: "Rooftop",
     classic: "Card colours",
   },
   descriptions: {
@@ -420,6 +455,9 @@ export const suiteCopy = {
     rajbari: "An old Bengal mansion in red and white, with banana plants and shola flowers.",
     "peshwai-wada": "A Peshwa-era wooden wada in paithani colours, with rangoli and mango leaves.",
     "kutch-toran": "A Kutch bhunga courtyard in mirror work and bandhani, the white Rann beyond.",
+    gubbara: "A pastel garden arch of balloons and bunting, with the cake table beneath.",
+    saath: "Red roses and candlelight over a lake at sunset, for years together.",
+    rooftop: "A city rooftop at night with fairy lights, floor cushions and fireworks.",
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
 } as const;

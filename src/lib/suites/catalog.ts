@@ -8,6 +8,7 @@
  * `images` replace the vector landscape page by page (docs/SUITES.md).
  */
 
+import type { CategoryId } from "@/lib/categories/catalog";
 import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
@@ -21,6 +22,9 @@ export const SUITE_IDS = [
   "rajbari",
   "peshwai-wada",
   "kutch-toran",
+  "gubbara",
+  "saath",
+  "rooftop",
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -86,6 +90,11 @@ export type Suite = {
   images: Partial<Record<PageArt, string>>;
   /** Pages painted in a different light from most themes' (a dusk baraat, a lit reception). */
   tones?: Partial<Record<PageArt, "light" | "dark">>;
+  /**
+   * The occasions a theme is painted for. Missing means the wedding journey; a birthday
+   * theme has four pages (cover, family, the party itself as its reception, the reply).
+   */
+  occasions?: readonly CategoryId[];
 };
 
 export const SUITES: Record<SuiteId, Suite> = {
@@ -245,6 +254,57 @@ export const SUITES: Record<SuiteId, Suite> = {
     },
     tones: { baraat: "dark", reception: "light", reply: "light" },
   },
+  // A pastel garden arch of balloons and bunting, the cake table under it
+  gubbara: {
+    id: "gubbara",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/gubbara/cover.webp",
+      family: "/suites/gubbara/family.webp",
+      reception: "/suites/gubbara/reception.webp",
+      reply: "/suites/gubbara/reply.webp",
+    },
+    tones: { reception: "light", reply: "light" },
+    occasions: ["birthday"],
+  },
+  // Red roses and candlelight over a lake at sunset, for years together
+  saath: {
+    id: "saath",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/saath/cover.webp",
+      family: "/suites/saath/family.webp",
+      reception: "/suites/saath/reception.webp",
+      reply: "/suites/saath/reply.webp",
+    },
+    tones: { reception: "light", reply: "light" },
+    occasions: ["anniversary"],
+  },
+  // A city rooftop at night: fairy lights, floor cushions, a DJ and fireworks
+  rooftop: {
+    id: "rooftop",
+    art: "kayal",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    images: {
+      cover: "/suites/rooftop/cover.webp",
+      family: "/suites/rooftop/family.webp",
+      reception: "/suites/rooftop/reception.webp",
+      reply: "/suites/rooftop/reply.webp",
+    },
+    tones: { cover: "dark", family: "dark" },
+    occasions: ["party"],
+  },
   classic: {
     id: "classic",
     art: "card",
@@ -268,13 +328,32 @@ const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
   emerald: "rajwada-bagh",
 };
 
-/** The theme an invite uses: the host's choice, else its tradition's, else its design's. */
+/** Whether a theme is painted for an occasion: wedding themes for the wedding journey. */
+export function suiteSuits(suite: SuiteId, category: CategoryId): boolean {
+  const { occasions } = SUITES[suite];
+  if (occasions) return occasions.includes(category);
+  return !OCCASION_SUITES.some((id) => SUITES[id].occasions!.includes(category));
+}
+
+/** Themes painted for one occasion beyond weddings. */
+const OCCASION_SUITES = SUITE_IDS.filter((id) => SUITES[id].occasions);
+
+/**
+ * The theme an invite uses: the host's choice, else its occasion's own, else its
+ * tradition's, else its design's.
+ */
 export function suiteFor(input: {
   suite: SuiteId | null;
   tradition: TraditionId | null;
   templateId: TemplateId;
+  category?: CategoryId;
 }): SuiteId {
   if (input.suite) return input.suite;
+  const category = input.category;
+  if (category) {
+    const own = OCCASION_SUITES.find((id) => SUITES[id].occasions!.includes(category));
+    if (own) return own;
+  }
   if (input.tradition) {
     const match = SUITE_IDS.find((id) => SUITES[id].traditions.includes(input.tradition!));
     if (match) return match;
@@ -303,6 +382,11 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   wedding: { art: "wedding", mood: "dusk" },
   vidaai: { art: "wedding", mood: "dawn" },
   reception: { art: "reception", mood: "night" },
+  // The one-function occasions use the reception's painting: their themes paint it as the
+  // party itself (the cake table, the dinner, the dance floor)
+  birthday: { art: "reception", mood: "day" },
+  anniversary: { art: "reception", mood: "dusk" },
+  party: { art: "reception", mood: "night" },
 };
 
 /** Which painting and what light a page gets. */

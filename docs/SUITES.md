@@ -12,6 +12,8 @@ After the doors open, an invitation turns into full-screen pages: the cover, the
 
 Without a tradition, the design decides (Kasavu, Gopuram and Alpona suggest Kayal; Rang Mahal suggests Shahi Savari, Bandhani suggests Kutch Toran), and otherwise Rajwada Bagh. The host can pick any theme in the editor's design step.
 
+Occasions beyond weddings (Step 12p) have their own four-page themes: **Gubbara** (birthday, balloons and a cake table), **Saath** (anniversary, roses and candlelight at sunset) and **Rooftop** (party, a city rooftop at night). Their event painting is stored as `reception`, which is the page art their one function uses. A theme's `occasions` lists what it is painted for; themes without it belong to the wedding journey.
+
 ## Light per page
 
 Each page has a mood that repaints the sky, sun or moon, and silhouettes: `dawn` (haldi, pujas, vidaai), `day` (family, mehendi, tilak, mandap, mameru), `dusk` (cover, wedding, baraat, roka and engagement) and `night` (sangeet, garba, bhoj, reception, reply). The table is `pageLook()` in `src/lib/suites/catalog.ts`; colours are `--suite-*` tokens per theme and mood in `src/app/globals.css`.

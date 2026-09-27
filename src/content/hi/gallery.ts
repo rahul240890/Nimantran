@@ -89,7 +89,7 @@ export const occasionTaglines: Translation<typeof en.occasionTaglines> = {
   "kitty-party": "हर महीने की महफ़िल",
   reunion: "पुराने दोस्त, एक शाम",
   retirement: "एक लंबे सफ़र का जश्न",
-  cocktail: "शादी से पहले की शाम",
+  party: "छत, संगीत और दोस्त",
   diwali: "दीये और दावत",
   holi: "रंग और गुझिया",
   navratri: "नौ रातें, गरबा",

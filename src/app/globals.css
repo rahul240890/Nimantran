@@ -266,6 +266,10 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="dawn"],
 [data-suite="rajwada-bagh"][data-mood="dawn"],
+[data-suite="gubbara"] [data-mood="dawn"],
+[data-suite="gubbara"][data-mood="dawn"],
+[data-suite="saath"] [data-mood="dawn"],
+[data-suite="saath"][data-mood="dawn"],
 [data-suite="noor-bagh"] [data-mood="dawn"],
 [data-suite="noor-bagh"][data-mood="dawn"],
 [data-suite="peshwai-wada"] [data-mood="dawn"],
@@ -281,6 +285,10 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="day"],
 [data-suite="rajwada-bagh"][data-mood="day"],
+[data-suite="gubbara"] [data-mood="day"],
+[data-suite="gubbara"][data-mood="day"],
+[data-suite="saath"] [data-mood="day"],
+[data-suite="saath"][data-mood="day"],
 [data-suite="noor-bagh"] [data-mood="day"],
 [data-suite="noor-bagh"][data-mood="day"],
 [data-suite="peshwai-wada"] [data-mood="day"],
@@ -296,6 +304,10 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="dusk"],
 [data-suite="rajwada-bagh"][data-mood="dusk"],
+[data-suite="gubbara"] [data-mood="dusk"],
+[data-suite="gubbara"][data-mood="dusk"],
+[data-suite="saath"] [data-mood="dusk"],
+[data-suite="saath"][data-mood="dusk"],
 [data-suite="noor-bagh"] [data-mood="dusk"],
 [data-suite="noor-bagh"][data-mood="dusk"],
 [data-suite="peshwai-wada"] [data-mood="dusk"],
@@ -311,6 +323,10 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="night"],
 [data-suite="rajwada-bagh"][data-mood="night"],
+[data-suite="gubbara"] [data-mood="night"],
+[data-suite="gubbara"][data-mood="night"],
+[data-suite="saath"] [data-mood="night"],
+[data-suite="saath"][data-mood="night"],
 [data-suite="noor-bagh"] [data-mood="night"],
 [data-suite="noor-bagh"][data-mood="night"],
 [data-suite="peshwai-wada"] [data-mood="night"],
@@ -410,6 +426,8 @@
 }
 [data-suite="kayal"] [data-mood="dawn"],
 [data-suite="kayal"][data-mood="dawn"],
+[data-suite="rooftop"] [data-mood="dawn"],
+[data-suite="rooftop"][data-mood="dawn"],
 [data-suite="rajbari"] [data-mood="dawn"],
 [data-suite="rajbari"][data-mood="dawn"] {
   --suite-sky-top: #f5b98e;
@@ -423,6 +441,8 @@
 }
 [data-suite="kayal"] [data-mood="day"],
 [data-suite="kayal"][data-mood="day"],
+[data-suite="rooftop"] [data-mood="day"],
+[data-suite="rooftop"][data-mood="day"],
 [data-suite="rajbari"] [data-mood="day"],
 [data-suite="rajbari"][data-mood="day"] {
   --suite-sky-top: #8cc9d8;
@@ -436,6 +456,8 @@
 }
 [data-suite="kayal"] [data-mood="dusk"],
 [data-suite="kayal"][data-mood="dusk"],
+[data-suite="rooftop"] [data-mood="dusk"],
+[data-suite="rooftop"][data-mood="dusk"],
 [data-suite="rajbari"] [data-mood="dusk"],
 [data-suite="rajbari"][data-mood="dusk"] {
   --suite-sky-top: #5a3a6e;
@@ -449,6 +471,8 @@
 }
 [data-suite="kayal"] [data-mood="night"],
 [data-suite="kayal"][data-mood="night"],
+[data-suite="rooftop"] [data-mood="night"],
+[data-suite="rooftop"][data-mood="night"],
 [data-suite="rajbari"] [data-mood="night"],
 [data-suite="rajbari"][data-mood="night"] {
   --suite-sky-top: #081a26;
@@ -520,6 +544,42 @@
   --suite-gold: #d9a632;
   --suite-light: #ffd27a;
   --suite-stone: #f3e6d0;
+}
+[data-suite="gubbara"] {
+  --suite-plate: #fff6f8;
+  --suite-ink: #3d1830;
+  --suite-ink-muted: #6b4560;
+  --suite-gold-text: #7d5410;
+  --suite-accent-text: #a8245f;
+  --suite-leaf: #3f7d5c;
+  --suite-accent: #d6457f;
+  --suite-gold: #e0b04a;
+  --suite-light: #ffe3a3;
+  --suite-stone: #fbe7ec;
+}
+[data-suite="saath"] {
+  --suite-plate: #fdf4ee;
+  --suite-ink: #3b0f16;
+  --suite-ink-muted: #6b3d42;
+  --suite-gold-text: #7d5410;
+  --suite-accent-text: #a3122a;
+  --suite-leaf: #3f6e3a;
+  --suite-accent: #b3122f;
+  --suite-gold: #d4a64a;
+  --suite-light: #ffd9a0;
+  --suite-stone: #f5e3da;
+}
+[data-suite="rooftop"] {
+  --suite-plate: #f8f1ff;
+  --suite-ink: #24123d;
+  --suite-ink-muted: #54406e;
+  --suite-gold-text: #7a5114;
+  --suite-accent-text: #8a1f8f;
+  --suite-leaf: #2f7d6c;
+  --suite-accent: #c2379a;
+  --suite-gold: #f0b84a;
+  --suite-light: #ffd27a;
+  --suite-stone: #ece2f5;
 }
 [data-suite]:not([data-suite="classic"]) {
   --card-ivory: var(--suite-plate);

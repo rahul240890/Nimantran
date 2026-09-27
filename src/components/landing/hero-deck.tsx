@@ -6,12 +6,15 @@ import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
 import { cn } from "@/lib/cn";
-import { PAINTED_SUITES } from "@/lib/gallery/catalog";
+import { PAINTED_SUITES as ALL_PAINTED } from "@/lib/gallery/catalog";
 import { textArea } from "@/lib/suites/areas";
 import { SUITES } from "@/lib/suites/catalog";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const noSubscribe = () => () => {};
+
+/** The deck prints a couple's names, so it deals only the wedding themes. */
+const PAINTED_SUITES = ALL_PAINTED.filter((suite) => !SUITES[suite].occasions);
 
 /** How long each theme leads the deck before the next comes forward. */
 const TURN_MS = 4500;

@@ -28,6 +28,9 @@ export const categoryTaglines: Record<CategoryId, string> = {
   mehendi: "Henna, dholki and an easy afternoon",
   sangeet: "Songs, dance and family performances",
   reception: "Dinner and celebration after the vows",
+  birthday: "Cake, balloons and everyone they love",
+  anniversary: "Years together, celebrated with family",
+  party: "Music, food and friends on a starry night",
 };
 
 export const questionLabels: Record<RsvpQuestionId, string> = {
