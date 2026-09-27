@@ -43,6 +43,17 @@ export const PAGE_ARTS = [
 ] as const;
 export type PageArt = (typeof PAGE_ARTS)[number];
 
+/**
+ * The paintings made at night have a dark middle, so the words printed on them turn light.
+ * Every theme's sangeet, reception and closing page is painted at night.
+ */
+const NIGHT_PAINTINGS: readonly PageArt[] = ["sangeet", "reception", "reply"];
+
+/** Whether the words on a painted page are dark (on a light middle) or light. */
+export function paintedTone(art: PageArt): "light" | "dark" {
+  return NIGHT_PAINTINGS.includes(art) ? "dark" : "light";
+}
+
 /** Which faiths a theme's own art suits. Faith-specific themes (a Nikah garden) come later. */
 export type SuiteFaith = "all" | "hindu" | "muslim" | "christian" | "sikh";
 

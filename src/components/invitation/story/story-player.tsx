@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
-import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
@@ -442,12 +442,21 @@ function Page({
 
       <div className="absolute inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))] flex items-center justify-center">
         <div
+          data-tone={painted ? paintedTone(look.art) : undefined}
           className={cn(
-            "flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
-            themed &&
-              "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
+            "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
+            painted
+              ? "story-print isolate px-[4cqmin] py-[6cqmin]"
+              : themed &&
+                  "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
           )}
         >
+          {painted && (
+            <span
+              aria-hidden
+              className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
+            />
+          )}
           {sacred && (
             <span
               className="story-line mb-[1cqmin] block size-[clamp(4rem,22cqmin,7.5rem)] shrink-0"

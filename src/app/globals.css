@@ -430,6 +430,36 @@
   --card-accent-text: var(--suite-accent-text);
 }
 
+/*
+ * Words printed straight onto a painting (Step 12f): no plate, only a soft glow in the
+ * painting's own light and a feathered haze behind, so the words read as part of the art.
+ * A night painting has a dark middle, so its words turn light.
+ */
+.story-print {
+  --print-glow: var(--suite-plate);
+  text-shadow:
+    0 0 0.35em var(--print-glow),
+    0 0 0.9em var(--print-glow),
+    0 0 1.6em var(--print-glow);
+}
+.story-print[data-tone="dark"] {
+  --print-glow: color-mix(in oklab, var(--suite-near) 85%, transparent);
+  --card-ink: var(--suite-plate);
+  --card-ink-muted: color-mix(in oklab, var(--suite-plate) 90%, var(--suite-gold));
+  --card-gold-text: var(--suite-light);
+  --card-accent-text: var(--suite-light);
+}
+.story-print a {
+  text-shadow: none;
+}
+.story-print-haze {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--print-glow) 62%, transparent) 35%,
+    transparent
+  );
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-surface: var(--surface);
