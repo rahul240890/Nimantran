@@ -281,6 +281,18 @@ export const extrasCopy = {
   storageFailed: "Photos can't be saved in this browser, for example in private mode.",
   emptyPhotos: "No photos yet",
   emptyPhotosBody: "Couple portraits and pre-wedding shots work best.",
+  coupleHeading: "Photo page",
+  coupleHint:
+    "Your photo inside the theme's own frame, on the page after your names. Every theme has its own frame shape.",
+  coupleLayouts: {
+    none: "No photo page",
+    one: "One photo of you both",
+    two: "Two photos, one each",
+  },
+  coupleAddFirst: "Add a photo above and it fills the frame.",
+  coupleFrame: (index: number, frames: number) =>
+    frames === 1 ? "Photo in the frame" : index === 1 ? "First frame" : "Second frame",
+  useThisPhoto: (index: number) => `Photo ${index}`,
   musicHeading: "Music",
   musicHint: "Composed live as the card opens, so it costs your guests no data.",
   designsOwn: "Design's own",

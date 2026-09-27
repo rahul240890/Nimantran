@@ -99,6 +99,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         suite: draft.suite,
         textBox: draft.textBox,
         type: draft.type,
+        couplePhotos: draft.couplePhotos,
       },
       languages: draft.languages,
     },
@@ -156,6 +157,7 @@ export function rowsToDraft(
     suite: event.religious?.suite,
     textBox: event.religious?.textBox,
     type: event.religious?.type,
+    couplePhotos: event.religious?.couplePhotos,
   });
   return draft ?? { ...base, remoteId: event.id };
 }

@@ -17,6 +17,7 @@ import {
 } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
 import type { SuiteId } from "@/lib/suites/catalog";
+import { noCouplePhotos } from "./couple-photos";
 import { defaultType } from "./type";
 import type {
   DraftTradition,
@@ -106,6 +107,7 @@ export function newDraft(
     suite: null,
     textBox: false,
     type: defaultType,
+    couplePhotos: noCouplePhotos,
   };
 }
 

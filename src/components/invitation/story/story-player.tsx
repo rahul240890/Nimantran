@@ -30,11 +30,13 @@ import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
 import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
 import { StoryScene } from "./story-scenes";
 import { PageEffects } from "./page-effects";
+import { PhotoArches, PhotoWindows } from "./photo-windows";
 import { SuiteBackdrop } from "./suite-backdrop";
 
 export type StoryLabels = {
@@ -189,7 +191,7 @@ export function StoryPlayer({
 
   // Fetch the next page's painting ahead, so it is ready when the page turns
   const upcoming = beats[index + 1];
-  const nextImage = upcoming ? suite.images[pageLook(upcoming.scene).art] : undefined;
+  const nextImage = upcoming ? pageImage(suiteId, upcoming) : undefined;
   useEffect(() => {
     if (!nextImage) return;
     const image = new Image();
@@ -266,7 +268,7 @@ export function StoryPlayer({
         <div aria-hidden data-mood={look.mood} className="absolute inset-0 hidden md:block">
           <SuiteBackdrop
             suite={suite}
-            image={suite.images[look.art]}
+            image={pageImage(suiteId, beat)}
             className="absolute inset-0 scale-110 opacity-70 blur-2xl"
           />
           <div className="absolute inset-0 bg-scrim/40" />
@@ -435,7 +437,24 @@ export function StoryPlayer({
 }
 
 /** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
-function areaStyle(area: TextArea): CSSProperties {
+/** The painting behind a page: the couple's framed one on their photo page. */
+function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
+  const frames = beat.photos?.length ? photoPage(suiteId, beat.photos.length) : null;
+  return frames?.image ?? SUITES[suiteId].images[pageLook(beat.scene).art];
+}
+
+function areaStyle(area: TextArea, whole = false): CSSProperties {
+  if (whole) {
+    // The whole painting shows, centred: place the area on it rather than on the page
+    const height = `min(100cqh, calc(100cqw / ${PAINTING_ASPECT}))`;
+    const at = (percent: number) => `calc((100cqh - ${height}) / 2 + ${height} * ${percent / 100})`;
+    return {
+      top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${at(area.top)})`,
+      bottom: `max(${at(area.bottom)}, env(safe-area-inset-bottom))`,
+      left: `${area.left}%`,
+      right: `${area.right}%`,
+    };
+  }
   return {
     top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${area.top}%)`,
     bottom: `max(${area.bottom}%, env(safe-area-inset-bottom))`,
@@ -489,7 +508,13 @@ export function StoryPage({
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
   const look = pageLook(beat.scene);
-  const painted = themed && Boolean(suite.images[look.art]);
+  // The couple's photo page uses the theme's framed painting, the photos showing through
+  const photos = beat.photos ?? [];
+  const frames = photos.length > 0 ? photoPage(suiteId, photos.length) : null;
+  const image = frames?.image ?? suite.images[look.art];
+  const painted = themed && Boolean(image);
+  // Themes without one hang the photos in plain arches over the page instead
+  const arches = photos.length > 0 && !frames;
   // Words print straight onto a painting unless the host asked for the box
   const printed = painted && !textBox;
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
@@ -509,23 +534,34 @@ export function StoryPage({
       {themed && (
         <SuiteBackdrop
           suite={suite}
-          image={suite.images[look.art]}
+          image={image}
           seconds={still ? undefined : beat.seconds}
           className="absolute inset-0 overflow-hidden"
+          contain={Boolean(frames)}
+          under={frames ? <PhotoWindows frames={frames.frames} photos={photos} /> : undefined}
         />
       )}
       {painted && !still && <PageEffects art={look.art} />}
       {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
       {!painted && <StoryScene scene={beat.scene} themed={themed} />}
+      {arches && <PhotoArches photos={photos} />}
 
       <div
         className={cn(
           "absolute flex items-center justify-center",
-          painted
-            ? "[container-type:size]"
-            : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
+          arches
+            ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
+            : painted
+              ? "[container-type:size]"
+              : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
         )}
-        style={painted ? areaStyle(textArea(suiteId, look.art)) : undefined}
+        style={
+          frames
+            ? areaStyle(frames.area, true)
+            : painted && !arches
+              ? areaStyle(textArea(suiteId, look.art))
+              : undefined
+        }
       >
         <div
           data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
@@ -567,6 +603,9 @@ export function StoryPage({
                 </span>
               )}
             </span>
+          )}
+          {photos.length > 0 && (
+            <p className="sr-only">{photos.map((photo) => photo.alt).join(", ")}</p>
           )}
           {beat.lines.map((line, i) => {
             const name = beat.scene === "cover" && line.style === "display";

@@ -37,6 +37,7 @@ import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES } from "@/lib/suites/catalog";
+import { couplePagePhotos } from "@/lib/editor/couple-photos";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -121,13 +122,19 @@ export function GuestView({
         replies,
         words: CARD_STORY_WORDS[language],
         family: storyFamily(draft),
+        couple: couplePagePhotos(
+          draft.couplePhotos,
+          photos.map((photo) => photo.id),
+          (id) => photos.find((photo) => photo.id === id)?.url,
+          copy,
+        ),
       }),
       suite: draftSuite(draft),
       textBox: draft.textBox,
       type: pageType(draft.type, [language]),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, language, guestCopy.reply, draft, today],
+    [copy, functions, replies, language, guestCopy.reply, draft, today, photos],
   );
   // A painted theme opens as a doorway with a countdown; the card colours keep the 3D card
   const suite = draftSuite(draft);
