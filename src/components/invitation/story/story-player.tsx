@@ -550,7 +550,7 @@ export function StoryPage({
         className={cn(
           "absolute flex items-center justify-center",
           arches
-            ? "[container-type:size] inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
+            ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
             : painted
               ? "[container-type:size]"
               : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
