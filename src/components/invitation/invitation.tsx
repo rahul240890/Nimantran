@@ -20,6 +20,7 @@ import { cn } from "@/lib/cn";
 import { motionFor, openingLength } from "@/lib/engine/motion";
 import type { StoryBeat } from "@/lib/engine/story";
 import type { SuiteId } from "@/lib/suites/catalog";
+import type { PageType } from "@/lib/editor/type";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import {
   pickQuality,
@@ -61,6 +62,8 @@ export type InvitationStory = {
   suite?: SuiteId;
   /** A box behind the words on painted pages; off prints them on the painting (Step 12f). */
   textBox?: boolean;
+  /** The host's lettering on the pages (Step 12n). */
+  type?: PageType;
   /** Lets the host switch the box from the pages themselves (editor and review only). */
   onTextBox?: (on: boolean) => void;
   /** The last beat's button to the reply form, when the invite takes replies. */
@@ -455,6 +458,7 @@ export function Invitation({
             template={template}
             suite={story.suite}
             textBox={story.textBox}
+            type={story.type}
             onTextBox={story.onTextBox}
             still={still}
             labels={storyLabels}

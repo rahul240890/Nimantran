@@ -2,6 +2,7 @@ import { uiStrings as hiUi } from "@/content/hi/ui";
 import type { StoryWords } from "@/lib/engine/story";
 import { uiStrings as enUi } from "@/lib/ui-strings";
 import type { CardLanguage } from "./card-languages";
+import type { SlotId } from "./ids";
 
 /*
  * The few words the event pages add of their own ("Save the date", "Will you join us?"),
@@ -36,3 +37,64 @@ export const CARD_STORY_WORDS: Record<CardLanguage, StoryWords> = {
     and: "மற்றும்",
   },
 };
+
+/**
+ * The wording a card shows before the host types their own, in the card's language: a
+ * Gujarati card previews Gujarati names and lines, never the designs' English samples.
+ * English cards keep each design's own samples. Drafts for a native proofreader.
+ */
+export const CARD_SAMPLES: Record<Exclude<CardLanguage, "en">, Partial<Record<SlotId, string>>> = {
+  hi: {
+    doorLeft: "शुभ",
+    doorRight: "विवाह",
+    families: "शर्मा परिवार एवं वर्मा परिवार",
+    first: "राधा",
+    joiner: "संग",
+    second: "अर्जुन",
+    line: "आपको सपरिवार सादर आमंत्रित करते हैं",
+    venue: "होटल ग्रैंड, जयपुर",
+  },
+  mr: {
+    doorLeft: "शुभ",
+    doorRight: "विवाह",
+    families: "देशपांडे व कुलकर्णी परिवार",
+    first: "राधा",
+    joiner: "आणि",
+    second: "अर्जुन",
+    line: "आपणास सहकुटुंब सस्नेह निमंत्रण",
+    venue: "शुभमंगल कार्यालय, पुणे",
+  },
+  gu: {
+    doorLeft: "શુભ",
+    doorRight: "વિવાહ",
+    families: "પટેલ પરિવાર અને શાહ પરિવાર",
+    first: "રાધા",
+    joiner: "અને",
+    second: "અર્જુન",
+    line: "આપને સહકુટુંબ પધારવા ભાવભર્યું આમંત્રણ",
+    venue: "હોટેલ ગ્રાન્ડ, અમદાવાદ",
+  },
+  bn: {
+    doorLeft: "শুভ",
+    doorRight: "বিবাহ",
+    families: "বসু ও সেন পরিবার",
+    first: "রাধা",
+    joiner: "ও",
+    second: "অর্জুন",
+    line: "আপনাকে সপরিবারে সাদর আমন্ত্রণ জানাই",
+    venue: "রাজবাড়ি, কলকাতা",
+  },
+  ta: {
+    doorLeft: "சுப",
+    doorRight: "விவாஹம்",
+    families: "ஐயர் மற்றும் ராமன் குடும்பத்தினர்",
+    first: "ராதா",
+    joiner: "&",
+    second: "அர்ஜுன்",
+    line: "தங்களை அன்புடன் அழைக்கிறோம்",
+    venue: "மஹால், சென்னை",
+  },
+};
+
+/** The date a card shows before the host sets one. */
+export const SAMPLE_DATE = "2027-02-14";

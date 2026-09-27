@@ -20,6 +20,7 @@ import { TEMPLATES } from "@/lib/templates/catalog";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
+import { Lettering } from "../lettering";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -179,6 +180,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       {wording.map((id) => (
         <div
           key={id}
+          data-page-target={id === "blessing" ? "cover" : "family"}
           className={id === "doorLeft" || id === "doorRight" ? undefined : "sm:col-span-2"}
         >
           {render(id)}
@@ -192,6 +194,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       <LanguageChoice draft={draft} update={update} />
       <section
         aria-labelledby="names-heading"
+        data-page-target="cover"
         className="flex flex-col gap-5 border-t border-line pt-6"
       >
         <div className="flex flex-col gap-1">
@@ -228,6 +231,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           {wording.length > 0 && wordingGrid(translatedField)}
         </section>
       )}
+      <Lettering draft={draft} update={update} />
     </div>
   );
 }

@@ -26,6 +26,7 @@ import { SYMBOLS } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
+import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
 import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
@@ -60,6 +61,8 @@ type StoryPlayerProps = {
   textBox?: boolean;
   /** When set, the pages carry a switch for the box, so the host can compare live. */
   onTextBox?: (on: boolean) => void;
+  /** The host's lettering (Step 12n); left out, the theme's own. */
+  type?: PageType;
   /** Still mode: no movement and no timer; the guest steps through with Next. */
   still: boolean;
   labels: StoryLabels;
@@ -76,15 +79,20 @@ type StoryPlayerProps = {
 const LINE_CLASS: Record<LineStyle, string> = {
   symbol: "",
   label:
-    "font-label text-[clamp(0.85rem,3.6cqmin,1.15rem)] tracking-[0.26em] text-card-gold-text uppercase",
-  script: "font-display text-[clamp(1.35rem,6.4cqmin,2.4rem)] leading-tight text-card-accent-text",
-  display: "font-display text-[clamp(1.7rem,8.4cqmin,3.2rem)] leading-[1.08] text-card-ink",
-  joiner: "font-display text-[clamp(1.3rem,6.4cqmin,2.4rem)] leading-none text-card-accent-text",
-  body: "font-sans text-[clamp(1.05rem,4.6cqmin,1.45rem)] text-card-ink-muted",
-  small: "font-sans text-[clamp(1rem,4.1cqmin,1.25rem)] text-card-ink-muted",
+    "font-label text-[length:calc(clamp(0.85rem,3.6cqmin,1.15rem)*var(--story-scale,1))] tracking-[0.26em] text-card-gold-text uppercase",
+  script:
+    "font-display text-[length:calc(clamp(1.35rem,6.4cqmin,2.4rem)*var(--story-scale,1))] leading-tight text-card-accent-text",
+  display:
+    "font-display text-[length:calc(clamp(1.7rem,8.4cqmin,3.2rem)*var(--story-scale,1))] leading-[1.08] text-card-ink",
+  joiner:
+    "font-display text-[length:calc(clamp(1.3rem,6.4cqmin,2.4rem)*var(--story-scale,1))] leading-none text-card-accent-text",
+  body: "font-sans text-[length:calc(clamp(1.05rem,4.6cqmin,1.45rem)*var(--story-scale,1))] text-card-ink-muted",
+  small:
+    "font-sans text-[length:calc(clamp(1rem,4.1cqmin,1.25rem)*var(--story-scale,1))] text-card-ink-muted",
 };
 /** The couple's names are the largest words of all. */
-const NAME_CLASS = "font-display text-[clamp(2.4rem,12cqmin,4.6rem)] leading-[1.02] text-card-ink";
+const NAME_CLASS =
+  "font-display text-[length:calc(clamp(2.4rem,12cqmin,4.6rem)*var(--story-scale,1))] leading-[1.02] text-card-ink";
 
 const TURN_CLASS = {
   fade: "suite-turn-fade",
@@ -110,6 +118,7 @@ export function StoryPlayer({
   suite: suiteId = "classic",
   textBox = false,
   onTextBox,
+  type,
   still,
   labels,
   lang,
@@ -298,12 +307,13 @@ export function StoryPlayer({
           const b = beats[i]!;
           const current = i === index;
           return (
-            <Page
+            <StoryPage
               key={b.id}
               beat={b}
               copy={copy}
               suite={suiteId}
               textBox={textBox}
+              type={type}
               still={still}
               reply={last && current ? reply : null}
               labels={labels}
@@ -434,12 +444,29 @@ function areaStyle(area: TextArea): CSSProperties {
   };
 }
 
-/** One full-screen page: its landscape, its function scene, and its words on the plate. */
-function Page({
+/** The styles the host's lettering puts on one line: names get the names' font and colour. */
+function lineType(type: PageType | undefined, style: LineStyle, name: boolean): CSSProperties {
+  if (!type) return {};
+  const names = style === "display" || style === "script" || style === "joiner";
+  return {
+    fontFamily: names ? type.names : type.words,
+    ...(names && type.bold ? { fontWeight: 700 } : {}),
+    ...(names && type.italic ? { fontStyle: "italic" } : {}),
+    ...(name && type.capitals ? { textTransform: "uppercase", letterSpacing: "0.04em" } : {}),
+    ...(name && type.colour ? { color: type.colour } : {}),
+  };
+}
+
+/**
+ * One full-screen page: its landscape, its function scene, and its words on the plate.
+ * The player shows it over the whole screen; the editor shows it inside a phone frame.
+ */
+export function StoryPage({
   beat,
   copy,
   suite: suiteId,
   textBox,
+  type,
   still,
   reply,
   labels,
@@ -451,6 +478,7 @@ function Page({
   copy: CardCopy;
   suite: SuiteId;
   textBox: boolean;
+  type?: PageType;
   still: boolean;
   reply: { href: string; label: string } | null | undefined;
   labels: StoryLabels;
@@ -476,6 +504,7 @@ function Page({
       data-page={beat.id}
       inert={inert}
       className={cn("absolute inset-0 bg-card-ivory", className)}
+      style={type ? ({ "--story-scale": type.scale } as CSSProperties) : undefined}
     >
       {themed && (
         <SuiteBackdrop
@@ -539,21 +568,22 @@ function Page({
               )}
             </span>
           )}
-          {beat.lines.map((line, i) => (
-            <p
-              key={i}
-              lang={line.lang}
-              className={cn(
-                "story-line max-w-full text-balance break-words",
-                beat.scene === "cover" && line.style === "display"
-                  ? NAME_CLASS
-                  : LINE_CLASS[line.style],
-              )}
-              style={delay(i + offset)}
-            >
-              {line.text}
-            </p>
-          ))}
+          {beat.lines.map((line, i) => {
+            const name = beat.scene === "cover" && line.style === "display";
+            return (
+              <p
+                key={i}
+                lang={line.lang}
+                className={cn(
+                  "story-line max-w-full text-balance break-words",
+                  name ? NAME_CLASS : LINE_CLASS[line.style],
+                )}
+                style={{ ...delay(i + offset), ...lineType(type, line.style, name) }}
+              >
+                {line.text}
+              </p>
+            );
+          })}
           {beat.links && (
             <span
               className="story-line mt-[1.5cqmin] flex flex-wrap justify-center gap-2"

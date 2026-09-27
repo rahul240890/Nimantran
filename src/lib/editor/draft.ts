@@ -5,6 +5,7 @@ import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { CARD_LANGUAGES, formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy, type CardCopy } from "@/lib/templates/content";
+import { CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
 import {
@@ -16,6 +17,7 @@ import {
 } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
 import type { SuiteId } from "@/lib/suites/catalog";
+import { defaultType } from "./type";
 import type {
   DraftTradition,
   EventFunction,
@@ -103,6 +105,7 @@ export function newDraft(
     translation: {},
     suite: null,
     textBox: false,
+    type: defaultType,
   };
 }
 
@@ -306,11 +309,18 @@ export function draftCopy(
   const words = hostWording(draft, language);
   const second = isSecondLanguage(draft, language);
   const tradition = traditionWording(draft, language);
+  // Untyped slots preview in the card's own language: the occasion's and the design's
+  // samples are English, so other languages use their own sample wording instead
+  const samples = language === "en" ? draftCategory(draft).wording : CARD_SAMPLES[language];
   for (const id of COUPLE_SLOTS) {
     // The tradition's wording in the second language beats the main card's typed words
     const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
-    const value = own ?? tradition[id] ?? words[id] ?? draftCategory(draft).wording[id];
+    const value = own ?? tradition[id] ?? words[id] ?? samples[id];
     if (value !== undefined) content[id] = value;
+  }
+  if (language !== "en") {
+    content.date = formatCardDate(SAMPLE_DATE, language).slice(0, SLOT_RULES.date.maxLength);
+    content.venue = samples.venue;
   }
   const main = mainFunction(draft);
   if (main) {
@@ -336,13 +346,21 @@ export function sampleOf(template: Template, id: SlotId, category?: Category): s
   return category?.wording[id] ?? template.slots.find((slot) => slot.id === id)?.sample ?? "";
 }
 
+/** A slot's starting wording in the card's main language (the samples are English). */
+function languageSample(draft: InviteDraft, template: Template, id: SlotId): string {
+  const main = cardLanguages(draft)[0];
+  return main === "en"
+    ? sampleOf(template, id, draftCategory(draft))
+    : (CARD_SAMPLES[main][id] ?? "");
+}
+
 /** What a couple field holds: the host's words, or the starting wording for optional slots. */
 export function coupleValue(draft: InviteDraft, template: Template, id: SlotId): string {
   return (
     draft.content[id] ??
     (SLOT_RULES[id].required
       ? ""
-      : (traditionWording(draft)[id] ?? sampleOf(template, id, draftCategory(draft))))
+      : (traditionWording(draft)[id] ?? languageSample(draft, template, id)))
   );
 }
 

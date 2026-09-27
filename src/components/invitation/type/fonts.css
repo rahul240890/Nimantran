@@ -1,0 +1,55 @@
+/*
+ * The lettering hosts can choose for their event pages (Step 12n, src/lib/editor/type.ts).
+ * Only the editor and the guest page load this file, and a browser downloads a face only
+ * when a page actually uses it, so unused fonts cost a few lines of CSS and nothing more.
+ */
+
+@import "@fontsource/playfair-display/400.css";
+@import "@fontsource/playfair-display/700.css";
+@import "@fontsource/playfair-display/400-italic.css";
+@import "@fontsource/playfair-display/700-italic.css";
+@import "@fontsource/cinzel/400.css";
+@import "@fontsource/cinzel/700.css";
+@import "@fontsource/cormorant-garamond/400.css";
+@import "@fontsource/cormorant-garamond/700.css";
+@import "@fontsource/cormorant-garamond/400-italic.css";
+@import "@fontsource/cormorant-garamond/700-italic.css";
+@import "@fontsource/great-vibes/400.css";
+@import "@fontsource/marcellus/400.css";
+@import "@fontsource/yeseva-one/400.css";
+@import "@fontsource/tiro-devanagari-hindi/400.css";
+@import "@fontsource/tiro-devanagari-hindi/400-italic.css";
+@import "@fontsource/yatra-one/400.css";
+@import "@fontsource/kalam/400.css";
+@import "@fontsource/kalam/700.css";
+@import "@fontsource/rasa/400.css";
+@import "@fontsource/rasa/700.css";
+@import "@fontsource/rasa/400-italic.css";
+@import "@fontsource/rasa/700-italic.css";
+@import "@fontsource/mogra/400.css";
+@import "@fontsource/hind-vadodara/400.css";
+@import "@fontsource/hind-vadodara/700.css";
+@import "@fontsource/tiro-bangla/400.css";
+@import "@fontsource/tiro-bangla/400-italic.css";
+@import "@fontsource/galada/400.css";
+@import "@fontsource/arima/400.css";
+@import "@fontsource/arima/700.css";
+@import "@fontsource/tiro-tamil/400.css";
+@import "@fontsource/tiro-tamil/400-italic.css";
+@import "@fontsource/alex-brush/400.css";
+@import "@fontsource/amita/400.css";
+@import "@fontsource/amita/700.css";
+@import "@fontsource/martel/400.css";
+@import "@fontsource/martel/700.css";
+@import "@fontsource/shrikhand/400.css";
+@import "@fontsource/farsan/400.css";
+@import "@fontsource/kumar-one/400.css";
+@import "@fontsource/baloo-bhai-2/400.css";
+@import "@fontsource/baloo-bhai-2/700.css";
+@import "@fontsource/baloo-da-2/400.css";
+@import "@fontsource/baloo-da-2/700.css";
+@import "@fontsource/atma/400.css";
+@import "@fontsource/atma/700.css";
+@import "@fontsource/catamaran/400.css";
+@import "@fontsource/catamaran/700.css";
+@import "@fontsource/meera-inimai/400.css";

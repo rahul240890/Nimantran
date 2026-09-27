@@ -421,3 +421,49 @@ export const suiteCopy = {
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
 } as const;
+
+/** The editor's live page and lettering (Step 12n). */
+export const studioCopy = {
+  views: "Show",
+  pages: "Pages",
+  card: "Card",
+  pagesHint: "The page you're editing comes up here as you type.",
+  pageNames: {
+    cover: "Cover",
+    family: "Family",
+    invite: "Invitation",
+    reply: "Reply",
+  },
+  pageList: "Pages of the invitation",
+  showPage: (name: string) => `Show the ${name} page`,
+  phone: (name: string) => `The ${name} page, as guests see it`,
+  lettering: "Lettering",
+  letteringIntro:
+    "Choose how the words look on every page. Only fonts that can write your card's language are listed.",
+  namesFont: "Names",
+  wordsFont: "Other words",
+  themeFont: "The theme's own",
+  size: "Size",
+  sizes: { small: "Small", medium: "Medium", large: "Large" },
+  style: "Style of the names",
+  bold: "Bold",
+  italic: "Italic",
+  capitals: "Capitals",
+  colour: "Colour of the names",
+  colours: {
+    theme: "The theme's own",
+    maroon: "Maroon",
+    gold: "Gold",
+    saffron: "Saffron",
+    ink: "Ink",
+    ivory: "Ivory",
+  },
+  feels: {
+    classic: "Classic",
+    script: "Flowing",
+    bold: "Bold",
+    clean: "Clean",
+    handwritten: "Handwritten",
+  },
+  reset: "Back to the theme's lettering",
+} as const;

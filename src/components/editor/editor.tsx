@@ -26,6 +26,7 @@ import {
   EDITOR_STEPS,
   newDraft,
   withCategory,
+  functionOrder,
   withGalleryChoice,
   type EditorStep,
   type InviteDraft,
@@ -41,6 +42,7 @@ import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PublishButton } from "@/components/publish/publish-button";
 import { PreviewStage } from "./preview-stage";
+import "@/components/invitation/type/fonts.css";
 import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
 import { ExtrasStep } from "./steps/extras-step";
@@ -68,6 +70,15 @@ const opensOn: Record<EditorStep, boolean> = {
 };
 
 const SYNC_DELAY = 1200;
+
+/** The page the phone shows as each step opens: the one that step fills in. */
+function stepPage(draft: InviteDraft, step: EditorStep): string {
+  if (step === "functions") {
+    const first = functionOrder(draft).suggested.find((id) => draft.functions[id].included);
+    return first ? `fn-${first}` : "cover";
+  }
+  return "cover";
+}
 
 /** Where the draft is saved: this device, or the account once signed in. */
 function SaveStatus({
@@ -166,6 +177,7 @@ export function Editor({
   const last = index === EDITOR_STEPS.length - 1;
 
   const [cardOpen, setCardOpen] = useState(opensOn[step]);
+  const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
   const errors = checking === step ? stepErrors(draft, step) : {};
   const errorCount = Object.keys(errors).length;
@@ -277,6 +289,7 @@ export function Editor({
       moved.current = true;
       setChecking(null);
       setCardOpen(opensOn[next]);
+      setPage(stepPage(inviteDraft.get().draft, next));
       update((current) => ({ ...current, step: next }));
     },
     [update],
@@ -333,6 +346,8 @@ export function Editor({
       open={cardOpen}
       onOpenChange={setCardOpen}
       onTextBox={(textBox) => update((current) => ({ ...current, textBox }))}
+      page={page}
+      onPage={setPage}
       className={className}
     />
   );
@@ -341,7 +356,7 @@ export function Editor({
     // Clipped sideways as a safety net: nothing here may widen the page on a phone
     <div className="flex min-h-dvh flex-col overflow-x-clip">
       <header className="z-40 border-b border-line bg-paper/85 pt-[env(safe-area-inset-top)] backdrop-blur-md sm:sticky sm:top-0">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-[90rem] items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <Logo className="max-[359px]:[&>span]:sr-only" />
             <span className="hidden font-label text-xs tracking-[0.24em] text-ink-muted uppercase md:inline">
@@ -361,7 +376,7 @@ export function Editor({
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
+      <main className="mx-auto flex w-full max-w-[90rem] flex-1 flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
         <Stepper
           steps={EDITOR_STEPS.map((id) => ({ id, label: stepCopy[id].label }))}
           current={index}
@@ -370,8 +385,8 @@ export function Editor({
           doneLabel={editor.done}
         />
 
-        <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-          <div className="flex min-w-0 flex-col">
+        <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
+          <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
             <div key={step} className="flex animate-rise flex-col gap-2 pb-6">
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {copy.eyebrow}
@@ -396,6 +411,13 @@ export function Editor({
             <form
               ref={form}
               noValidate
+              // Filling in a function brings its page up in the phone, the names the cover
+              onFocusCapture={(event) => {
+                const target = (event.target as HTMLElement).closest<HTMLElement>(
+                  "[data-page-target]",
+                );
+                if (target?.dataset.pageTarget) setPage(target.dataset.pageTarget);
+              }}
               onSubmit={(event) => {
                 event.preventDefault();
                 advance();
