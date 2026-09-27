@@ -7,7 +7,7 @@ import type { QualityChoice } from "@/content/engine-review";
 import { useLocale, useText } from "@/i18n/client";
 import { uiText } from "@/i18n/copy/ui";
 import { storyBeats } from "@/lib/engine/story";
-import { storyFunctions } from "@/lib/publish/story";
+import { draftSuite, storyFamily, storyFunctions } from "@/lib/publish/story";
 import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
@@ -41,16 +41,27 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
   const copy = useMemo(() => JSON.parse(key) as CardCopy, [key]);
   const deferredCopy = useDeferredValue(copy);
 
-  // The story guests will see, without the reply button (there is no form here)
+  // The pages guests will see, without the reply button (there is no form here); here they
+  // play only when asked, so they never cover the form while the host is typing
   const locale = useLocale();
   const { storyWords } = useText(uiText).uiStrings;
   const functionsKey = JSON.stringify(storyFunctions(draft, locale));
+  const familyKey = JSON.stringify(storyFamily(draft));
+  const suite = draftSuite(draft);
   const story = useMemo<InvitationStory>(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
+    const family = JSON.parse(familyKey) as ReturnType<typeof storyFamily>;
     return {
-      beats: storyBeats({ copy: deferredCopy, functions, replies: true, words: storyWords }),
+      beats: storyBeats({
+        copy: deferredCopy,
+        functions,
+        replies: true,
+        words: storyWords,
+        family,
+      }),
+      suite,
     };
-  }, [functionsKey, deferredCopy, storyWords]);
+  }, [functionsKey, familyKey, deferredCopy, storyWords, suite]);
 
   const { templateId } = draft;
   const { raga } = draft.music;
@@ -92,6 +103,7 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
         musicOnOpen={draft.music.playOnOpen}
         tradition={draftTradition(draft)?.id ?? null}
         story={story}
+        autoStory={false}
       />
     </div>
   );

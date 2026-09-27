@@ -29,6 +29,7 @@ import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import { storyBeats } from "@/lib/engine/story";
+import { draftSuite, storyFamily } from "@/lib/publish/story";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -95,10 +96,17 @@ export function GuestView({
   const replies = rsvpFunctions.length > 0;
   const story = useMemo<InvitationStory>(
     () => ({
-      beats: storyBeats({ copy, functions, replies, words: storyWords }),
+      beats: storyBeats({
+        copy,
+        functions,
+        replies,
+        words: storyWords,
+        family: storyFamily(draft),
+      }),
+      suite: draftSuite(draft),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, storyWords, guestCopy.reply],
+    [copy, functions, replies, storyWords, guestCopy.reply, draft],
   );
   const dates = useMemo(
     () =>

@@ -11,7 +11,9 @@ import {
   needsTime,
   type InviteDraft,
 } from "@/lib/editor/draft";
-import type { StoryFunction } from "@/lib/engine/story";
+import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
+import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { WORDING_IDS } from "@/lib/traditions/schema";
 import { formatTime } from "@/lib/time";
 
 /**
@@ -38,5 +40,25 @@ export function storyFunctions(draft: InviteDraft, locale: UiLocale): StoryFunct
       muhurat: muhurat && start ? { text: muhurat.native, lang: language } : null,
       venue: fn.venue.trim(),
     };
+  });
+}
+
+/** The tradition's family wording the host wrote, for the family page (Step 12e). */
+export function storyFamily(draft: InviteDraft): FamilyLine[] {
+  const pack = draftTradition(draft);
+  if (!pack) return [];
+  return WORDING_IDS.flatMap((id) => {
+    const text = draft.tradition.wording[id]?.trim();
+    const block = pack.wording[id];
+    return text && block ? [{ title: block.title, text, lang: pack.language }] : [];
+  });
+}
+
+/** The theme the invite's event pages use: the host's choice, else the tradition's. */
+export function draftSuite(draft: InviteDraft): SuiteId {
+  return suiteFor({
+    suite: draft.suite,
+    tradition: draft.tradition.id,
+    templateId: draft.templateId,
   });
 }

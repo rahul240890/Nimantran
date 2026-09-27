@@ -147,35 +147,41 @@ test.describe("regional openings", () => {
   }
 });
 
-test.describe("story reveal", () => {
-  for (const [colorScheme, width] of [
-    ["light", 320],
-    ["dark", 1440],
+test.describe("event pages", () => {
+  for (const [colorScheme, width, suite] of [
+    ["light", 320, "rajwada-bagh"],
+    ["dark", 1440, "kayal"],
+    ["light", 390, "shahi-savari"],
+    ["dark", 390, "classic"],
   ] as const) {
-    test(`tells the invitation one beat at a time, ${colorScheme} theme at ${width}px`, async ({
+    test(`turns full-screen pages one at a time, ${suite}, ${colorScheme} theme at ${width}px`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width, height: width === 320 ? 720 : 900 });
+      const height = width === 1440 ? 900 : 720;
+      await page.setViewportSize({ width, height });
       await page.emulateMedia({ colorScheme });
-      await page.goto("/engine?quality=2d&opening=north-hindu");
+      await page.goto(`/engine?quality=2d&opening=north-hindu&suite=${suite}`);
       await page.getByRole("button", { name: "Open invitation" }).click();
       const story = page.locator("[data-story-beat]");
-      // It starts on its own once the opening has played
+      // It starts on its own once the opening has played, over the whole screen
       await expect(story).toBeVisible({ timeout: 10_000 });
-      await page.getByRole("button", { name: "Pause the story" }).click();
+      await expect(story).toHaveAttribute("data-suite", suite);
+      const box = (await story.boundingBox())!;
+      expect(box.width).toBe(width);
+      expect(box.height).toBe(height);
+      await page.getByRole("button", { name: "Pause the pages" }).click();
       await expect(page.getByRole("button", { name: "Carry on" })).toBeVisible();
 
       const beats: string[] = [];
       for (let i = 0; i < 12; i++) {
         beats.push((await story.getAttribute("data-story-beat"))!);
-        const next = page.getByRole("button", { name: "Next", exact: true });
+        const next = page.getByRole("button", { name: "Next page", exact: true });
         if ((await next.count()) === 0) break;
         await next.click();
       }
       expect(beats).toEqual([
-        ...beats.filter((b) => b === "blessing"),
-        "names",
-        "date",
+        "cover",
+        "family",
         "fn-haldi",
         "fn-mehendi",
         "fn-sangeet",
@@ -184,21 +190,40 @@ test.describe("story reveal", () => {
         "reply",
       ]);
       await expect(story.getByText("Will you join us?")).toBeVisible();
-      for (const name of ["Back", "See the card"]) {
-        const box = (await page.getByRole("button", { name }).boundingBox())!;
-        expect(box.height).toBeGreaterThanOrEqual(44);
+      for (const name of ["Previous page", "See the card"]) {
+        const button = (await page.getByRole("button", { name }).boundingBox())!;
+        expect(button.height).toBeGreaterThanOrEqual(44);
       }
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 
       await page.getByRole("button", { name: "See the card" }).click();
       await expect(story).toHaveCount(0);
-      await page.getByRole("button", { name: "Play the story" }).click();
-      await expect(story).toHaveAttribute("data-story-beat", /blessing|names/);
+      // Focus comes back to the button that plays the pages again
+      await expect(page.getByRole("button", { name: "Play the invitation pages" })).toBeFocused();
+      await page.getByRole("button", { name: "Play the invitation pages" }).click();
+      await expect(story).toHaveAttribute("data-story-beat", "cover");
       await page.keyboard.press("Escape");
       await expect(story).toHaveCount(0);
     });
   }
+
+  test("a swipe turns the page and keyboard focus stays inside", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 390, height: 780 });
+    await page.goto("/engine?quality=2d&suite=kayal");
+    await page.getByRole("button", { name: "Open invitation" }).click();
+    await page.getByRole("button", { name: "Play the invitation pages" }).click();
+    const story = page.locator("[data-story-beat]");
+    await expect(story).toHaveAttribute("data-story-beat", "cover");
+    await page.mouse.move(320, 700);
+    await page.mouse.down();
+    await page.mouse.move(120, 705, { steps: 6 });
+    await page.mouse.up();
+    await expect(story).toHaveAttribute("data-story-beat", "family");
+    for (let i = 0; i < 8; i++) await page.keyboard.press("Tab");
+    expect(await story.evaluate((el) => el.contains(document.activeElement))).toBe(true);
+  });
 
   test("still mode waits to be asked and never moves on by itself", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
@@ -208,12 +233,12 @@ test.describe("story reveal", () => {
     await page.waitForTimeout(3_000);
     const story = page.locator("[data-story-beat]");
     await expect(story).toHaveCount(0);
-    await page.getByRole("button", { name: "Play the story" }).click();
+    await page.getByRole("button", { name: "Play the invitation pages" }).click();
     const first = await story.getAttribute("data-story-beat");
-    await expect(page.getByRole("button", { name: "Pause the story" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Pause the pages" })).toHaveCount(0);
     await page.waitForTimeout(6_000);
     await expect(story).toHaveAttribute("data-story-beat", first!);
-    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("button", { name: "Next page", exact: true }).click();
     await expect(story).not.toHaveAttribute("data-story-beat", first!);
     expect((await axe(page).analyze()).violations).toEqual([]);
   });

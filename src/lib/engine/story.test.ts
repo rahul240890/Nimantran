@@ -4,6 +4,7 @@ import { toCardCopy } from "@/lib/templates/content";
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { uiStrings } from "@/lib/ui-strings";
 import {
+  BEAT_MIN,
   STORY_MAX_SECONDS,
   STORY_SCENES,
   beatAt,
@@ -38,8 +39,8 @@ const fn = (kind: FunctionId, extra: Partial<StoryFunction> = {}): StoryFunction
 
 const words = uiStrings.storyWords;
 
-describe("story reveal", () => {
-  it("tells blessing, names, date, each function, then asks for a reply", () => {
+describe("event pages", () => {
+  it("turns through cover, family, each function, then asks for a reply", () => {
     const beats = storyBeats({
       copy,
       functions: [fn("haldi"), fn("sangeet"), fn("wedding")],
@@ -47,9 +48,8 @@ describe("story reveal", () => {
       words,
     });
     expect(beats.map((b) => b.scene)).toEqual([
-      "blessing",
-      "names",
-      "date",
+      "cover",
+      "family",
       "haldi",
       "sangeet",
       "wedding",
@@ -65,8 +65,9 @@ describe("story reveal", () => {
     for (const kind of FUNCTION_IDS) expect(STORY_SCENES).toContain(kind);
   });
 
-  it("puts the names in order with the joiner between them", () => {
-    const [, names] = storyBeats({ copy, functions: [], replies: false, words });
+  it("puts the blessing over the names, in order with the joiner between them", () => {
+    const [names] = storyBeats({ copy, functions: [], replies: false, words });
+    expect(names!.lines[0]!.text).toBe("Shri Ganeshaya Namah");
     expect(names!.lines.map((l) => l.text)).toEqual(
       expect.arrayContaining(["Aanya", "&", "Vihaan"]),
     );
@@ -82,17 +83,52 @@ describe("story reveal", () => {
       replies: false,
       words,
     });
-    expect(beats[0]!.scene).toBe("names");
+    expect(beats[0]!.scene).toBe("cover");
+    expect(beats[0]!.symbol).toBe(false);
     for (const beat of beats) for (const line of beat.lines) expect(line.text).not.toBe("");
     const mehendi = beats.find((b) => b.scene === "mehendi")!;
     expect(mehendi.lines.map((l) => l.text)).toEqual(["Mehendi", "Friday, 12 February 2027"]);
     expect(beats.at(-1)!.lines[0]!.text).toBe(words.withLove);
   });
 
-  it("keeps a single function's date on its own beat and skips the separate date", () => {
+  it("keeps a single function's date on its own page, not the family's", () => {
     const beats = storyBeats({ copy, functions: [fn("wedding")], replies: true, words });
-    expect(beats.map((b) => b.scene)).not.toContain("date");
-    expect(beats.find((b) => b.scene === "names")!.lines.at(-1)!.text).toBe(copy.line);
+    const family = beats.find((b) => b.scene === "family")!;
+    expect(family.lines.map((l) => l.text)).not.toContain(words.saveTheDate);
+    expect(family.lines.at(-1)!.text).toBe(copy.line);
+  });
+
+  it("puts the family's own wording on the family page, in its language", () => {
+    const beats = storyBeats({
+      copy,
+      functions: [fn("haldi"), fn("wedding")],
+      replies: true,
+      words,
+      family: [{ title: "आशीर्वाद", text: "श्रीमती कमला देवी", lang: "hi" }],
+    });
+    const family = beats.find((b) => b.scene === "family")!;
+    expect(family.lines.filter((l) => l.lang === "hi").map((l) => l.text)).toEqual([
+      "आशीर्वाद",
+      "श्रीमती कमला देवी",
+    ]);
+    expect(family.lines.map((l) => l.text)).toContain(words.saveTheDate);
+  });
+
+  it("gives function pages their Directions and calendar links", () => {
+    const beats = storyBeats({
+      copy,
+      functions: [
+        fn("haldi", { mapsUrl: "https://maps.example/x", icsUrl: "/ics/haldi" }),
+        fn("sangeet"),
+      ],
+      replies: true,
+      words,
+    });
+    expect(beats.find((b) => b.scene === "haldi")!.links).toEqual({
+      maps: "https://maps.example/x",
+      calendar: "/ics/haldi",
+    });
+    expect(beats.find((b) => b.scene === "sangeet")!.links).toBeUndefined();
   });
 
   it("marks local ceremony names and the muhurat in their own language", () => {
@@ -123,9 +159,9 @@ describe("story reveal", () => {
       { text: "10:00 AM onwards, followed by lunch", style: "body" },
       { text: "The Leela Palace, Udaipur", style: "small" },
     ]);
-    expect(short).toBeGreaterThanOrEqual(2.5);
+    expect(short).toBeGreaterThanOrEqual(3.5);
     expect(long).toBeGreaterThan(short);
-    expect(long).toBeLessThan(8);
+    expect(long).toBeLessThan(9);
     expect(lineDelay(0)).toBe(0);
     expect(lineDelay(2)).toBeGreaterThan(lineDelay(1));
   });
@@ -138,14 +174,16 @@ describe("story reveal", () => {
     );
     const beats = storyBeats({ copy, functions, replies: true, words });
     expect(storyLength(beats)).toBeLessThanOrEqual(STORY_MAX_SECONDS + 0.5);
-    for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(2.8);
+    for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(BEAT_MIN);
   });
 
   it("never rushes a beat, even with every function planned", () => {
     const functions = FUNCTION_IDS.map((kind) => fn(kind, { venue: "Kankotri Vadi, Rajkot" }));
     const beats = storyBeats({ copy, functions, replies: true, words });
-    for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(2.8);
-    expect(storyLength(beats)).toBeLessThanOrEqual(beats.length * 2.8 + 0.5);
+    for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(BEAT_MIN);
+    expect(storyLength(beats)).toBeLessThanOrEqual(
+      Math.max(STORY_MAX_SECONDS, beats.length * BEAT_MIN) + 0.5,
+    );
   });
 
   it("finds the beat playing at any moment", () => {

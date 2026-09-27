@@ -100,6 +100,7 @@ export function newDraft(
     tradition: noTradition,
     languages: ["en"],
     translation: {},
+    suite: null,
   };
 }
 

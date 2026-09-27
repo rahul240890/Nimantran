@@ -187,14 +187,17 @@ test.describe("publish and share", () => {
     await expect(card.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeAttached();
     await expect(card.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeAttached();
 
-    // The story, asked for in Still mode, tells the card in the chosen language
+    // The event pages, asked for in Still mode, tell the card in the chosen language, in
+    // the Gujarati tradition's own theme
     await guest.getByRole("button", { name: "Open invitation" }).click();
-    await guest.getByRole("button", { name: "Play the story" }).click();
+    await guest.getByRole("button", { name: "Play the invitation pages" }).click();
     const story = guest.locator("[data-story-beat]");
-    await expect(story).toHaveAttribute("data-story-beat", "blessing");
+    await expect(story).toHaveAttribute("data-story-beat", "cover");
+    await expect(story).toHaveAttribute("data-suite", "shahi-savari");
     await expect(story.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
-    await guest.keyboard.press("ArrowRight");
     await expect(story.getByText("આરવ")).toBeVisible();
+    await guest.keyboard.press("ArrowRight");
+    await expect(story).toHaveAttribute("data-story-beat", "family");
     await guest.keyboard.press("ArrowRight");
     await expect(story).toHaveAttribute("data-story-beat", "fn-wedding");
     await expect(story.getByText("શુભ મુહૂર્ત")).toBeVisible();

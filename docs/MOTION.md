@@ -2,7 +2,7 @@
 
 Every tradition opens its own way. This spec adds regional opening animations, per-function scenes, regional particles and other effects on top of the 3D engine (Step 4) and tradition packs ([TRADITIONS.md](TRADITIONS.md)).
 
-Build order: Step 12c (engine hooks, first six packs, countdown), Step 12d (story reveal and the wedding function scenes), Step 17c (the story in MP4 export), Step 23 (remaining packs and their own function scenes). See [PLAN.md](PLAN.md).
+Build order: Step 12c (engine hooks, first six packs, countdown), Step 12d (story reveal and the wedding function scenes), Step 12e (full-screen event pages and themes), Step 17c (the story in MP4 export), Step 23 (remaining packs and their own function scenes). See [PLAN.md](PLAN.md).
 
 ---
 
@@ -114,6 +114,7 @@ The Rang templates (TRADITIONS.md, section 6) use the fullest motion: busier amb
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **12c**   | Motion hooks in the engine (opening timeline, ambient loop, per-quality particle counts, sound-after-tap, skip); drawn-on stroke reveal; openings and particles for the first six packs (North Indian, Rajasthani, Marathi, Gujarati, Bengali, Tamil); diya countdown |
 | **12d**   | Story reveal: blessing, names, date, one beat per function with its scene, then the reply; tap and keyboard controls; Still mode steps through on request                                                                                                             |
+| **12e**   | Event pages: full-screen cover, family, one page per function and reply, in a theme (Rajwada Bagh, Shahi Savari, Kayal); page turns per theme; swipe                                                                                                                  |
 | **17c**   | MP4 export reuses the same timelines                                                                                                                                                                                                                                  |
 | **23**    | Openings for the remaining packs; per-function scenes; seasonal overlays; Rang family motion                                                                                                                                                                          |
 | **M2–M7** | Memories scenes reuse the particle and drawn-on systems                                                                                                                                                                                                               |

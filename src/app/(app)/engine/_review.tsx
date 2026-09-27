@@ -22,7 +22,8 @@ import { RAGAS } from "@/lib/engine/music";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
-import { traditionCopy } from "@/content/editor";
+import { suiteCopy, traditionCopy } from "@/content/editor";
+import { SUITE_IDS, isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
@@ -44,6 +45,12 @@ const SAMPLE_FUNCTIONS: StoryFunction[] = [
   muhurat: null,
   venue: venue!,
 }));
+
+/* The family page's wording on the review page (Step 12e) */
+const SAMPLE_FAMILY = [
+  { title: "With the blessings of", text: "Smt. Kamla Devi and Shri Ramprasad Sharma" },
+  { title: "Awaiting you", text: "The Sharma and Mehta families" },
+];
 
 /* A swatch of each design's card stock */
 const swatches: Record<TemplateId, string> = {
@@ -97,10 +104,12 @@ export function EngineReview({
   initialQuality,
   initialTheme,
   initialOpening,
+  initialSuite,
 }: {
   initialQuality: QualityChoice;
   initialTheme: TemplateId;
   initialOpening: TraditionId | null;
+  initialSuite: SuiteId;
 }) {
   const [theme, setTheme] = useState<TemplateId>(initialTheme);
   const [quality, setQuality] = useState<QualityChoice>(initialQuality);
@@ -114,6 +123,7 @@ export function EngineReview({
   }, [template, sample, opening]);
   const [musicOnOpen, setMusicOnOpen] = useState(true);
   const [storyOn, setStoryOn] = useState(true);
+  const [suite, setSuite] = useState<SuiteId>(initialSuite);
   const story = useMemo(
     () =>
       storyOn
@@ -123,10 +133,12 @@ export function EngineReview({
               functions: SAMPLE_FUNCTIONS,
               replies: true,
               words: uiStrings.storyWords,
+              family: SAMPLE_FAMILY,
             }),
+            suite,
           }
         : null,
-    [storyOn, copy],
+    [storyOn, copy, suite],
   );
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
@@ -264,11 +276,24 @@ export function EngineReview({
               </Field>
 
               <Switch
-                label="Story after the opening"
-                description="Blessing, names, date and a scene for each function, one at a time."
+                label="Event pages after the opening"
+                description="Full-screen pages: the cover, the family, one per function, then the reply."
                 checked={storyOn}
                 onCheckedChange={setStoryOn}
               />
+
+              <Field
+                label="Page theme"
+                hint="The landscape behind the pages. Each function gets its own light."
+              >
+                <Select
+                  value={suite}
+                  onValueChange={(value) => {
+                    if (isSuiteId(value)) setSuite(value);
+                  }}
+                  options={SUITE_IDS.map((id) => ({ value: id, label: suiteCopy.names[id] }))}
+                />
+              </Field>
 
               <Switch
                 label="Music starts when the card opens"

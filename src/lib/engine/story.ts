@@ -1,15 +1,16 @@
 /*
- * Story reveal (Step 12d): once the doors have opened, the invitation tells itself one
- * thing at a time, like the short wedding films families share: the blessing, the couple,
- * the date, each function in its own scene, then the question "Will you join us?".
- * Data and pure timing only, so the player, the review page and the tests read the same.
+ * Story reveal (Step 12d) and event pages (Step 12e): once the doors have opened, the
+ * invitation turns into full-screen pages, one thing at a time, like the short wedding
+ * films families share: the cover (blessing and names), the family, one page per
+ * function, then the question "Will you join us?". Data and pure timing only, so the
+ * player, the review page and the tests read the same.
  */
 
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import type { CardCopy } from "@/lib/templates/content";
 
-/** The painted scene behind a beat. Functions each have their own. */
-export const STORY_SCENES = ["blessing", "names", "date", ...FUNCTION_IDS, "reply"] as const;
+/** The page a beat is, and so the scene painted behind it. Functions each have their own. */
+export const STORY_SCENES = ["cover", "family", ...FUNCTION_IDS, "reply"] as const;
 export type StorySceneId = (typeof STORY_SCENES)[number];
 
 /** A function as the story tells it: the words the guest page already shows. */
@@ -23,6 +24,10 @@ export type StoryFunction = {
   time: string;
   muhurat: { text: string; lang: string } | null;
   venue: string;
+  /** Directions and the calendar, on the guest page (the editor's preview has none). */
+  mapsUrl?: string | null;
+  icsUrl?: string | null;
+  googleCalendarUrl?: string | null;
 };
 
 /** How a line is set: which font and how large, from the story's own small type scale. */
@@ -39,10 +44,12 @@ export type StoryBeat = {
   id: string;
   scene: StorySceneId;
   lines: readonly StoryLine[];
-  /** Draw the card's sacred symbol above the lines (the blessing beat only). */
+  /** Draw the card's sacred symbol above the lines (the cover only). */
   symbol: boolean;
   /** Seconds the beat stays before the next one begins. */
   seconds: number;
+  /** A function page's Directions and Add to calendar links. */
+  links?: { maps: string | null; calendar: string | null };
 };
 
 export type StoryInput = {
@@ -51,7 +58,12 @@ export type StoryInput = {
   /** Whether the invite takes replies, so the last beat asks for one. */
   replies: boolean;
   words: StoryWords;
+  /** The tradition's family wording (blessings from, hosts), as the family wrote it. */
+  family?: readonly FamilyLine[];
 };
+
+/** One labelled block of the family's wording: "आशीर्वाद" over the grandparents' names. */
+export type FamilyLine = { title: string; text: string; lang?: string };
 
 /** The few words the story adds of its own, in the page's language. */
 export type StoryWords = {
@@ -66,13 +78,13 @@ export const LINE_STAGGER = 0.45;
 /** How long a line takes to arrive. */
 export const LINE_IN = 0.9;
 /** Time left to read once the last line has arrived, per word, within bounds. */
-const READ_PER_WORD = 0.28;
-const READ_MIN = 1.6;
-const READ_MAX = 3.6;
+const READ_PER_WORD = 0.32;
+const READ_MIN = 3;
+const READ_MAX = 5.5;
 /** A whole story never runs longer than this; long lists of functions read faster. */
-export const STORY_MAX_SECONDS = 45;
-/** Nor any beat shorter than this, however it is squeezed. */
-const BEAT_MIN = 2.8;
+export const STORY_MAX_SECONDS = 75;
+/** Nor any page shorter than this, however it is squeezed. */
+export const BEAT_MIN = 4.5;
 
 const words = (lines: readonly StoryLine[]) =>
   lines.reduce((sum, line) => sum + line.text.split(/\s+/).filter(Boolean).length, 0);
@@ -82,7 +94,7 @@ export function beatSeconds(lines: readonly StoryLine[], symbol = false): number
   const count = lines.length + (symbol ? 1 : 0);
   const arrive = Math.max(0, count - 1) * LINE_STAGGER + LINE_IN;
   const read = Math.min(READ_MAX, Math.max(READ_MIN, words(lines) * READ_PER_WORD));
-  return Number((arrive + read).toFixed(2));
+  return Number(Math.max(BEAT_MIN, arrive + read).toFixed(2));
 }
 
 /** When a line (by its place in the beat) starts to rise in. */
@@ -97,38 +109,48 @@ function beat(id: string, scene: StorySceneId, lines: StoryLine[], symbol = fals
   return { id, scene, lines, symbol, seconds: beatSeconds(lines, symbol) };
 }
 
-/** The story an invitation tells, beat by beat, from what the host has written. */
-export function storyBeats({ copy, functions, replies, words: w }: StoryInput): StoryBeat[] {
+/** The pages an invitation turns through, from what the host has written. */
+export function storyBeats({
+  copy,
+  functions,
+  replies,
+  words: w,
+  family = [],
+}: StoryInput): StoryBeat[] {
   const beats: StoryBeat[] = [];
-
-  // The blessing, under the sacred symbol when there is one; sacred art only glows
-  if (copy.blessing || copy.symbol) {
-    beats.push(beat("blessing", "blessing", line(copy.blessing, "script"), Boolean(copy.symbol)));
-  }
-
   const joiner = !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
-  // With one function, its own beat carries the date, so the card's line joins the names
+  // With one function, its own page carries the date
   const single = functions.length === 1;
+
+  // The cover: the sacred symbol and blessing over the couple's names
   beats.push(
-    beat("names", "names", [
-      ...line(copy.families, "small"),
-      ...line(copy.first, "display"),
-      ...line(joiner, "joiner"),
-      ...line(copy.second, "display"),
-      ...(single ? line(copy.line, "body") : []),
-    ]),
+    beat(
+      "cover",
+      "cover",
+      [
+        ...line(copy.blessing, "script"),
+        ...line(copy.first, "display"),
+        ...line(joiner, "joiner"),
+        ...line(copy.second, "display"),
+      ],
+      Boolean(copy.symbol),
+    ),
   );
 
-  // The day itself, like the "save the date" card of the films
-  if (!single && (copy.date || copy.line)) {
-    beats.push(
-      beat("date", "date", [
-        ...line(w.saveTheDate, "label"),
-        ...line(copy.date, "display"),
-        ...line(copy.line, "body"),
-      ]),
-    );
-  }
+  // The family page: who invites, their words, and the day itself
+  const familyLines = [
+    ...line(copy.families, "small"),
+    ...family.flatMap((block) => [
+      ...line(block.title, "label", block.lang),
+      ...line(block.text, "body", block.lang),
+    ]),
+    ...line(copy.line, "body"),
+    ...(single || !copy.date
+      ? []
+      : [...line(w.saveTheDate, "label"), ...line(copy.date, "display")]),
+    ...(functions.length === 0 ? line(copy.date, "display") : []),
+  ];
+  if (familyLines.length > 0) beats.push(beat("family", "family", familyLines));
 
   for (const fn of functions) {
     beats.push(
@@ -141,9 +163,12 @@ export function storyBeats({ copy, functions, replies, words: w }: StoryInput): 
         ...line(fn.venue, "small"),
       ]),
     );
+    const maps = fn.mapsUrl ?? null;
+    const calendar = fn.icsUrl ?? fn.googleCalendarUrl ?? null;
+    if (maps || calendar) beats[beats.length - 1]!.links = { maps, calendar };
   }
 
-  // One function's venue is on its own beat; a single card venue closes the story instead
+  // One function's venue is on its own page; a single card venue closes the story instead
   const closing = [...line(replies ? w.joinUs : w.withLove, "display")];
   if (functions.length === 0) closing.push(...line(copy.venue, "body"));
   beats.push(beat("reply", "reply", closing));
