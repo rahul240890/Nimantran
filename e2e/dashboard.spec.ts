@@ -162,6 +162,8 @@ test.describe("host dashboard", () => {
       await dialog.getByRole("button", { name: "Add guest" }).click();
       await expect(page.getByTestId("guest-list")).toContainText("Masi");
       expect(await noOverflow(page)).toBe(true);
+      // After a client navigation the <title> streams in late
+      await expect(page).toHaveTitle(/\S/);
       expect((await axe(page).analyze()).violations).toEqual([]);
     });
   }

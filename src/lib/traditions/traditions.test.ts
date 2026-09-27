@@ -18,6 +18,7 @@ describe.each(TRADITION_LIST)("the $id pack", (pack) => {
   it("points only at designs and functions that exist", () => {
     for (const id of pack.templates) expect(TEMPLATE_IDS).toContain(id);
     for (const id of Object.keys(pack.ceremonies)) expect(isFunctionId(id)).toBe(true);
+    for (const id of pack.functions) expect(isFunctionId(id)).toBe(true);
   });
 
   it("uses its own symbols, with the default among them", () => {
