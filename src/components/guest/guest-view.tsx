@@ -2,10 +2,11 @@
 
 import { CalendarPlus, Clock, MailCheck, MapPin, Navigation, Shirt } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import { DiyaCountdown } from "@/components/guest/diya-countdown";
+import { Doorway } from "@/components/guest/doorway";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,6 +22,7 @@ import {
   cardLanguages,
   draftCopy,
   draftTradition,
+  mainFunction,
   templateWithRaga,
   type CardLanguage,
   type InviteDraft,
@@ -32,11 +34,15 @@ import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
 import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
-import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
+import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
+import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
+import { SUITES } from "@/lib/suites/catalog";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { uiText } from "@/i18n/copy/ui";
+
+const noSubscribe = () => () => {};
 
 export type GuestFunction = {
   kind: FunctionId;
@@ -96,12 +102,22 @@ export function GuestView({
   );
   const [open, setOpen] = useState(false);
   const replies = rsvpFunctions.length > 0;
+  // Today in India, for "In 5 days" on each event page; only known in the browser
+  const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
   const story = useMemo<InvitationStory>(
     () => ({
       beats: storyBeats({
         copy,
         // The pages speak the card's language, not the site's
-        functions: cardFunctions(functions, draft, language),
+        functions: cardFunctions(functions, draft, language).map((fn) => ({
+          ...fn,
+          countdown: today
+            ? daysAway(
+                daysBetween(today, draft.functions[fn.kind].date),
+                CARD_COUNTDOWN_WORDS[language],
+              )
+            : undefined,
+        })),
         replies,
         words: CARD_STORY_WORDS[language],
         family: storyFamily(draft),
@@ -111,8 +127,15 @@ export function GuestView({
       type: pageType(draft.type, [language]),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, language, guestCopy.reply, draft],
+    [copy, functions, replies, language, guestCopy.reply, draft, today],
   );
+  // A painted theme opens as a doorway with a countdown; the card colours keep the 3D card
+  const suite = draftSuite(draft);
+  const doorway = SUITES[suite].art !== "card" && Boolean(SUITES[suite].images.cover);
+  const mainKind = mainFunction(draft);
+  const mainDate = mainKind ? draft.functions[mainKind].date : "";
+  const mainAt = mainKind ? startsAt(mainDate, draft.functions[mainKind].time) : null;
+  const main = mainAt === null ? null : { date: mainDate, at: mainAt };
   const dates = useMemo(
     () =>
       Object.values(draft.functions)
@@ -128,63 +151,82 @@ export function GuestView({
       </div>
 
       <main id="main" className="flex flex-1 flex-col">
-        {/* The card, first and large, in a warm pool of light */}
-        <section
-          aria-labelledby="guest-names"
-          className="relative isolate flex flex-col items-center gap-4 overflow-hidden px-4 pt-[max(3.5rem,calc(env(safe-area-inset-top)+3rem))] pb-10 sm:px-6"
-        >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute top-[45%] left-1/2 -z-10 aspect-square w-[min(140%,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-            style={{
-              background:
-                "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
-            }}
+        {doorway ? (
+          <Doorway
+            suite={suite}
+            template={template}
+            copy={copy}
+            lang={language}
+            languages={languages}
+            onLanguage={setLanguage}
+            beats={story.beats}
+            textBox={draft.textBox}
+            type={story.type!}
+            main={main}
+            reply={story.reply ?? null}
+            musicOnOpen={draft.music.playOnOpen}
           />
-          <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
-            {guestCopy.invited}
-          </p>
-          <h1
-            id="guest-names"
-            className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
-          >
-            {names}
-          </h1>
-          <p className="text-ink-muted">{occasion}</p>
-          <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
-          {languages.length > 1 && (
-            <CardLanguageToggle
-              label={guestCopy.cardLanguage}
-              languages={languages}
-              value={language}
-              onValueChange={setLanguage}
-            />
-          )}
-          <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
-            <Invitation
-              copy={copy}
-              lang={language}
-              template={template}
-              quality={quality}
-              open={open}
-              onOpenChange={setOpen}
-              musicOnOpen={draft.music.playOnOpen}
-              tradition={draftTradition(draft)?.id ?? null}
-              story={story}
-            />
-          </div>
-          <div className="flex flex-col items-center gap-3">
-            {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
-            {rsvpFunctions.length > 0 && (
-              <Button asChild size="lg">
-                <a href="#rsvp">
-                  <MailCheck aria-hidden />
-                  {guestCopy.reply}
-                </a>
-              </Button>
-            )}
-          </div>
-        </section>
+        ) : (
+          <>
+            {/* The card, first and large, in a warm pool of light */}
+            <section
+              aria-labelledby="guest-names"
+              className="relative isolate flex flex-col items-center gap-4 overflow-hidden px-4 pt-[max(3.5rem,calc(env(safe-area-inset-top)+3rem))] pb-10 sm:px-6"
+            >
+              <div
+                aria-hidden
+                className="pointer-events-none absolute top-[45%] left-1/2 -z-10 aspect-square w-[min(140%,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
+                }}
+              />
+              <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
+                {guestCopy.invited}
+              </p>
+              <h1
+                id="guest-names"
+                className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
+              >
+                {names}
+              </h1>
+              <p className="text-ink-muted">{occasion}</p>
+              <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
+              {languages.length > 1 && (
+                <CardLanguageToggle
+                  label={guestCopy.cardLanguage}
+                  languages={languages}
+                  value={language}
+                  onValueChange={setLanguage}
+                />
+              )}
+              <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
+                <Invitation
+                  copy={copy}
+                  lang={language}
+                  template={template}
+                  quality={quality}
+                  open={open}
+                  onOpenChange={setOpen}
+                  musicOnOpen={draft.music.playOnOpen}
+                  tradition={draftTradition(draft)?.id ?? null}
+                  story={story}
+                />
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
+                {rsvpFunctions.length > 0 && (
+                  <Button asChild size="lg">
+                    <a href="#rsvp">
+                      <MailCheck aria-hidden />
+                      {guestCopy.reply}
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </section>
+          </>
+        )}
 
         <FamilyWording draft={draft} />
 

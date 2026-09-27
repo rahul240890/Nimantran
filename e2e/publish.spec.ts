@@ -185,23 +185,27 @@ test.describe("publish and share", () => {
     // Five days before the wedding, in India
     await guest.clock.install({ time: new Date("2026-10-10T09:00:00+05:30") });
     await guest.goto(`${path}?quality=2d`);
-    const countdown = guest.getByTestId("diya-countdown");
-    await expect(countdown.getByText("5 days to go")).toBeVisible();
+    // The painted theme opens as a doorway, counting down to the wedding
+    const door = guest.locator("[data-doorway]");
+    await expect(door).toHaveAttribute("data-doorway", "closed");
+    await expect(guest.getByRole("timer", { name: /In 5 days/ })).toBeVisible();
     const toggle = guest.getByRole("radiogroup", { name: "Card language" });
-    const card = guest.locator("[data-engine-state] .sr-only");
     // An English-speaking guest sees the English card first
     await expect(toggle.getByRole("radio", { name: "English" })).toBeChecked();
-    await expect(card.getByText("Aarav")).toBeAttached();
-    await expect(card.getByText("Shri Ganeshaya Namah")).toBeAttached();
+    await expect(door.getByRole("heading", { level: 1 })).toContainText("Aarav");
+    await expect(door.getByText("Shri Ganeshaya Namah")).toBeVisible();
     await toggle.getByRole("radio", { name: "ગુજરાતી" }).click();
-    await expect(card.getByText("આરવ")).toBeAttached();
-    await expect(card.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeAttached();
-    await expect(card.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeAttached();
+    await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
+    await expect(door.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
+    await expect(door.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeVisible();
+    // The countdown speaks the card's language too
+    await expect(door.getByText("દિવસ", { exact: true })).toBeVisible();
+    expect(await noOverflow(guest)).toBe(true);
+    expect((await axe(guest).analyze()).violations).toEqual([]);
 
-    // The event pages, asked for in Still mode, tell the card in the chosen language, in
-    // the Gujarati tradition's own theme
-    await guest.getByRole("button", { name: "Open invitation" }).click();
-    await guest.getByRole("button", { name: "Play the invitation pages" }).click();
+    // Opening it brings the event pages, in the chosen language and the Gujarati
+    // tradition's own theme (in Still mode, straight away)
+    await guest.getByRole("button", { name: "Open the invitation" }).click();
     const story = guest.locator("[data-story-beat]");
     await expect(story).toHaveAttribute("data-story-beat", "cover");
     await expect(story).toHaveAttribute("data-suite", "shahi-savari");
@@ -211,6 +215,7 @@ test.describe("publish and share", () => {
     await expect(story).toHaveAttribute("data-story-beat", "family");
     await guest.keyboard.press("ArrowRight");
     await expect(story).toHaveAttribute("data-story-beat", "fn-wedding");
+    await expect(story.getByText("5 દિવસ બાકી")).toBeVisible();
     await expect(story.getByText("શુભ મુહૂર્ત")).toBeVisible();
     await expect(story.getByText("9:47 am to 10:31 am")).toBeVisible();
     await guest.keyboard.press("ArrowRight");

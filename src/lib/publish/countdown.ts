@@ -50,3 +50,28 @@ export function todayInIndia(now = new Date()): string {
     day: "2-digit",
   }).format(now);
 }
+
+/**
+ * The moment an event starts, in India: its date at its start time, or at midnight when
+ * it has no time. Null for a missing or malformed date.
+ */
+export function startsAt(date: string, time = ""): number | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const clock = /^\d{2}:\d{2}$/.test(time) ? time : "00:00";
+  const at = Date.parse(`${date}T${clock}:00+05:30`);
+  return Number.isNaN(at) ? null : at;
+}
+
+export type Remaining = { days: number; hours: number; minutes: number; seconds: number };
+
+/** What is left until `target`, in whole units, or null once it has come. */
+export function remaining(target: number, now: number): Remaining | null {
+  const left = Math.floor((target - now) / 1000);
+  if (left <= 0) return null;
+  return {
+    days: Math.floor(left / 86400),
+    hours: Math.floor((left % 86400) / 3600),
+    minutes: Math.floor((left % 3600) / 60),
+    seconds: left % 60,
+  };
+}
