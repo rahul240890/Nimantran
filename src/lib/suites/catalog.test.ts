@@ -21,6 +21,13 @@ describe("event suites", () => {
       "shahi-savari",
     );
     expect(suiteFor({ suite: null, tradition: "tamil", templateId: "marigold" })).toBe("kayal");
+    expect(suiteFor({ suite: null, tradition: "bengali", templateId: "marigold" })).toBe("rajbari");
+    expect(suiteFor({ suite: null, tradition: "marathi", templateId: "marigold" })).toBe(
+      "peshwai-wada",
+    );
+    expect(suiteFor({ suite: null, tradition: null, templateId: "phulkari" })).toBe(
+      "phulkari-haveli",
+    );
     expect(suiteFor({ suite: null, tradition: null, templateId: "kasavu" })).toBe("kayal");
     expect(suiteFor({ suite: null, tradition: null, templateId: "marigold" })).toBe("rajwada-bagh");
   });

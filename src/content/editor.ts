@@ -403,12 +403,21 @@ export const suiteCopy = {
     "rajwada-bagh": "Rajwada Bagh",
     "shahi-savari": "Shahi Savari",
     kayal: "Kayal",
+    "noor-bagh": "Noor Bagh",
+    "phulkari-haveli": "Phulkari Haveli",
+    rajbari: "Rajbari",
+    "peshwai-wada": "Peshwai Wada",
     classic: "Card colours",
   },
   descriptions: {
     "rajwada-bagh": "A palace garden seen through a Mughal arch, fountains and lanterns.",
     "shahi-savari": "A royal elephant procession before a desert fort, bunting overhead.",
     kayal: "A houseboat on the Kerala backwaters, palms and floating lamps.",
+    "noor-bagh": "A Mughal garden of white marble, jaali screens and a long water channel.",
+    "phulkari-haveli":
+      "A Punjab haveli dressed in phulkari, with dhol, marigolds and mustard fields.",
+    rajbari: "An old Bengal mansion in red and white, with banana plants and shola flowers.",
+    "peshwai-wada": "A Peshwa-era wooden wada in paithani colours, with rangoli and mango leaves.",
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
 } as const;

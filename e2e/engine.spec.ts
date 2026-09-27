@@ -151,6 +151,7 @@ test.describe("event pages", () => {
   for (const [colorScheme, width, suite] of [
     ["light", 320, "rajwada-bagh"],
     ["dark", 1440, "kayal"],
+    ["dark", 390, "noor-bagh"],
     ["light", 390, "shahi-savari"],
     ["dark", 390, "classic"],
   ] as const) {

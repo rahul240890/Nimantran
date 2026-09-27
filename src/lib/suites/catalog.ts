@@ -12,7 +12,16 @@ import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
 
-export const SUITE_IDS = ["rajwada-bagh", "shahi-savari", "kayal", "classic"] as const;
+export const SUITE_IDS = [
+  "rajwada-bagh",
+  "shahi-savari",
+  "kayal",
+  "noor-bagh",
+  "phulkari-haveli",
+  "rajbari",
+  "peshwai-wada",
+  "classic",
+] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
 
 export function isSuiteId(value: unknown): value is SuiteId {
@@ -59,7 +68,10 @@ export type SuiteFaith = "all" | "hindu" | "muslim" | "christian" | "sikh";
 
 export type Suite = {
   id: SuiteId;
-  /** Which vector landscape stands behind the pages; "card" keeps the card's own paper. */
+  /**
+   * Which vector landscape stands behind the pages; "card" keeps the card's own paper.
+   * Painted themes borrow the nearest landscape for any page without a painting.
+   */
   art: "card" | "bagh" | "savari" | "kayal";
   turn: PageTurn;
   faiths: readonly SuiteFaith[];
@@ -78,7 +90,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     turn: "arch",
     faiths: ["all"],
     template: "emerald",
-    traditions: ["north-hindu", "marathi"],
+    traditions: ["north-hindu"],
     images: {
       cover: "/suites/rajwada-bagh/cover.webp",
       family: "/suites/rajwada-bagh/family.webp",
@@ -116,7 +128,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     turn: "ripple",
     faiths: ["all"],
     template: "kasavu",
-    traditions: ["tamil", "bengali"],
+    traditions: ["tamil"],
     images: {
       cover: "/suites/kayal/cover.webp",
       family: "/suites/kayal/family.webp",
@@ -127,6 +139,84 @@ export const SUITES: Record<SuiteId, Suite> = {
       wedding: "/suites/kayal/wedding.webp",
       reception: "/suites/kayal/reception.webp",
       reply: "/suites/kayal/reply.webp",
+    },
+  },
+  // A Mughal garden for Nikah and Walima; its words come from the family's own pack
+  "noor-bagh": {
+    id: "noor-bagh",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["muslim", "all"],
+    template: "emerald",
+    traditions: [],
+    images: {
+      cover: "/suites/noor-bagh/cover.webp",
+      family: "/suites/noor-bagh/family.webp",
+      haldi: "/suites/noor-bagh/haldi.webp",
+      mehendi: "/suites/noor-bagh/mehendi.webp",
+      sangeet: "/suites/noor-bagh/sangeet.webp",
+      baraat: "/suites/noor-bagh/baraat.webp",
+      wedding: "/suites/noor-bagh/wedding.webp",
+      reception: "/suites/noor-bagh/reception.webp",
+      reply: "/suites/noor-bagh/reply.webp",
+    },
+  },
+  // A Punjab haveli for Sikh and Punjabi weddings
+  "phulkari-haveli": {
+    id: "phulkari-haveli",
+    art: "savari",
+    turn: "sweep",
+    faiths: ["sikh", "all"],
+    template: "phulkari",
+    traditions: [],
+    images: {
+      cover: "/suites/phulkari-haveli/cover.webp",
+      family: "/suites/phulkari-haveli/family.webp",
+      haldi: "/suites/phulkari-haveli/haldi.webp",
+      mehendi: "/suites/phulkari-haveli/mehendi.webp",
+      sangeet: "/suites/phulkari-haveli/sangeet.webp",
+      baraat: "/suites/phulkari-haveli/baraat.webp",
+      wedding: "/suites/phulkari-haveli/wedding.webp",
+      reception: "/suites/phulkari-haveli/reception.webp",
+      reply: "/suites/phulkari-haveli/reply.webp",
+    },
+  },
+  rajbari: {
+    id: "rajbari",
+    art: "kayal",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "alpona",
+    traditions: ["bengali"],
+    images: {
+      cover: "/suites/rajbari/cover.webp",
+      family: "/suites/rajbari/family.webp",
+      haldi: "/suites/rajbari/haldi.webp",
+      mehendi: "/suites/rajbari/mehendi.webp",
+      sangeet: "/suites/rajbari/sangeet.webp",
+      baraat: "/suites/rajbari/baraat.webp",
+      wedding: "/suites/rajbari/wedding.webp",
+      reception: "/suites/rajbari/reception.webp",
+      reply: "/suites/rajbari/reply.webp",
+    },
+  },
+  "peshwai-wada": {
+    id: "peshwai-wada",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "paithani",
+    traditions: ["marathi"],
+    images: {
+      cover: "/suites/peshwai-wada/cover.webp",
+      family: "/suites/peshwai-wada/family.webp",
+      haldi: "/suites/peshwai-wada/haldi.webp",
+      mehendi: "/suites/peshwai-wada/mehendi.webp",
+      sangeet: "/suites/peshwai-wada/sangeet.webp",
+      baraat: "/suites/peshwai-wada/baraat.webp",
+      wedding: "/suites/peshwai-wada/wedding.webp",
+      reception: "/suites/peshwai-wada/reception.webp",
+      reply: "/suites/peshwai-wada/reply.webp",
     },
   },
   classic: {
@@ -144,10 +234,11 @@ export const SUITES: Record<SuiteId, Suite> = {
 const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
   kasavu: "kayal",
   gopuram: "kayal",
-  alpona: "kayal",
+  alpona: "rajbari",
   rangmahal: "shahi-savari",
   bandhani: "shahi-savari",
-  paithani: "rajwada-bagh",
+  phulkari: "phulkari-haveli",
+  paithani: "peshwai-wada",
   emerald: "rajwada-bagh",
 };
 

@@ -578,6 +578,7 @@ export function SuiteBackdrop({
   suite,
   image,
   seconds,
+  lazy = false,
   className,
   children,
 }: {
@@ -585,6 +586,8 @@ export function SuiteBackdrop({
   image?: string;
   /** How long the page stays, for the slow push-in. */
   seconds?: number;
+  /** Load the painting only when it scrolls near, for pickers with many themes. */
+  lazy?: boolean;
   className?: string;
   children?: ReactNode;
 }) {
@@ -599,7 +602,13 @@ export function SuiteBackdrop({
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element -- decorative, sized by the page
-          <img src={image} alt="" decoding="async" className="size-full object-cover" />
+          <img
+            src={image}
+            alt=""
+            decoding="async"
+            loading={lazy ? "lazy" : undefined}
+            className="size-full object-cover"
+          />
         ) : (
           <svg viewBox="0 0 100 180" preserveAspectRatio="xMidYMid slice" className="size-full!">
             {suite.art === "bagh" && <Bagh id={id} />}
