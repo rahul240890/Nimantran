@@ -1,5 +1,5 @@
 /*
- * The languages Shubhdwar speaks (Step 12). The site itself is in English and Hindi at
+ * The languages Shubh Invitation speaks (Step 12). The site itself is in English and Hindi at
  * launch; the other eight arrive one at a time, each once a native speaker has proofread
  * it. Invitations themselves can be written in any of the ten (src/lib/categories).
  */

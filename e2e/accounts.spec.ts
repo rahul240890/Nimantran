@@ -27,7 +27,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       page,
     }) => {
       await page.goto("/sign-in");
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sign in to Shubhdwar");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sign in to Shubh");
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 

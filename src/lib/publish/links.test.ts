@@ -15,8 +15,8 @@ describe("links", () => {
   });
 
   it("builds the guest link", () => {
-    expect(inviteUrl("https://shubhdwar.com/", "a-weds-b")).toBe(
-      "https://shubhdwar.com/i/a-weds-b",
+    expect(inviteUrl("https://shubhinvitation.com/", "a-weds-b")).toBe(
+      "https://shubhinvitation.com/i/a-weds-b",
     );
   });
 

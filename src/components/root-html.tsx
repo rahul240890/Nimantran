@@ -28,7 +28,25 @@ export function rootMetadata(locale: UiLocale): Metadata {
       template: `%s · ${locale === "hi" ? site.nameDevanagari : site.name}`,
     },
     description: meta.description,
-    applicationName: site.name,
+    applicationName: site.shortName,
+    appleWebApp: { title: site.shortName },
+    // The cream icon for light screens, the night one for dark; favicon.ico and apple-icon.png are the cream one.
+    icons: {
+      icon: [
+        {
+          url: "/brand/icon-light.png",
+          type: "image/png",
+          sizes: "192x192",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          url: "/brand/icon-dark.png",
+          type: "image/png",
+          sizes: "192x192",
+          media: "(prefers-color-scheme: dark)",
+        },
+      ],
+    },
     openGraph: {
       type: "website",
       siteName: site.name,

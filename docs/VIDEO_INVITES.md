@@ -26,9 +26,9 @@ The Luxury Invites shop lists its videos at ₹5,999, currently on sale for ₹2
 - **Typos slip in.** One paid sample says "FACALITY".
 - **Price.** ₹2,000 to ₹6,000 for a video alone. Our Royal pass is ₹1,999 and already includes the live 3D invite, RSVP and guest list.
 
-## 4. How Shubhdwar compares today
+## 4. How Shubh Invitation compares today
 
-|                                                      | Their videos | Shubhdwar now                         |
+|                                                      | Their videos | Shubh Invitation now                  |
 | ---------------------------------------------------- | ------------ | ------------------------------------- |
 | Door or gate opening                                 | Yes          | Yes (3D gate-fold)                    |
 | Step-by-step reveal of names, date, functions        | Yes          | No, the card shows everything at once |

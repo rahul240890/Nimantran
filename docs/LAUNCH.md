@@ -20,7 +20,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 
 ### 1. Choose and buy the domain
 
-1. Pick the address, for example `shubhdwar.com` or `shubhdwar.in`. Check both at a registrar such as GoDaddy, Namecheap, Hostinger or Cloudflare.
+1. Pick the address, for example `shubhinvitation.com` (the planned domain) or `shubhinvitation.in`. Check both at a registrar such as GoDaddy, Namecheap, Hostinger or Cloudflare.
 2. Buy it. Turn on auto-renew.
 
 ### 2. Point the domain at Vercel

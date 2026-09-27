@@ -102,12 +102,12 @@ export const guestCopy = {
   addAll: "Add all to calendar",
   photos: "Photos",
   photoAlt: (index: number) => `Photo ${index} from the family`,
-  madeWith: `Made with ${site.name}`,
+  madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",
   notFoundTitle: "This invitation isn't available",
   notFoundBody:
     "The link may be mistyped, or the family may have stopped sharing it. Ask them to send it again.",
-  home: `Go to ${site.name}`,
+  home: `Go to ${site.shortName}`,
 } as const;
 
 export const rsvpCopy = {

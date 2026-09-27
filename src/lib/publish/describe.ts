@@ -66,6 +66,7 @@ export function calendarEntries(
     if (!fn.date) return [];
     return [
       {
+        // Kept from the earlier name so calendars that saved an event update it rather than add a copy.
         uid: `${id}-${kind}@shubhdwar`,
         title: `${functionCopy[kind].name} · ${names}`,
         date: fn.date,

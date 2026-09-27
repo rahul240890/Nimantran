@@ -47,18 +47,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.3fr] lg:px-8">
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
-          <p className="font-display text-lg text-ink-muted">
-            {locale === "hi" ? (
-              shell.footer.meaning
-            ) : (
-              <>
-                <span lang="hi" className="font-system">
-                  {site.nameDevanagari}
-                </span>{" "}
-                · {shell.footer.meaning}
-              </>
-            )}
-          </p>
+          <p className="font-display text-lg text-ink-muted">{shell.footer.meaning}</p>
           <p className="max-w-xs text-ink-muted">{shell.footer.tagline}</p>
         </div>
 

@@ -20,16 +20,16 @@ export const legalCopy = {
   contactHeading: "Contact",
   contactEmail: (email: string) => `Write to us at ${email}. We reply within 7 working days.`,
   contactPending:
-    "Our contact address will appear here before launch. Until then, reply to any message from the Shubhdwar team.",
+    "Our contact address will appear here before launch. Until then, reply to any message from the Shubh Invitation team.",
   footer: { heading: "Legal", privacy: "Privacy", terms: "Terms" },
 } as const;
 
 export const privacy: LegalDoc = {
   title: "Privacy policy",
   description:
-    "What Shubhdwar collects when you make or open an invitation, why, who else handles it, and how to see, correct or delete it.",
+    "What Shubh Invitation collects when you make or open an invitation, why, who else handles it, and how to see, correct or delete it.",
   intro:
-    "Shubhdwar helps families make invitations, send them on WhatsApp and collect replies. To do that we keep some details about hosts, the people they invite, and the replies guests send. This page says exactly what, and what you can do about it.",
+    "Shubh Invitation helps families make invitations, send them on WhatsApp and collect replies. To do that we keep some details about hosts, the people they invite, and the replies guests send. This page says exactly what, and what you can do about it.",
   sections: [
     {
       id: "what-we-collect",
@@ -71,7 +71,7 @@ export const privacy: LegalDoc = {
             "To sign you in and keep your invitations in your account.",
             "To show an invitation to the guests the host shares it with, and to pass their replies to the host and co-hosts.",
             "To keep the service working, safe and fast, and to fix what breaks.",
-            "To tell waitlist members when Shubhdwar opens to them.",
+            "To tell waitlist members when Shubh Invitation opens to them.",
           ],
         },
         "We do not sell personal data, show advertising, or use invitations or guest lists to train software.",
@@ -89,7 +89,7 @@ export const privacy: LegalDoc = {
       id: "who-else",
       heading: "Who else handles it",
       body: [
-        "We use a few companies to run Shubhdwar. They handle data only to provide their service to us:",
+        "We use a few companies to run Shubh Invitation. They handle data only to provide their service to us:",
         {
           list: [
             "Supabase stores accounts, invitations, guest lists, replies and photos, in its Mumbai data centre in India.",
@@ -113,7 +113,7 @@ export const privacy: LegalDoc = {
       id: "how-long",
       heading: "How long we keep it",
       body: [
-        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubhdwar opens to you. Technical error details are kept for at most 30 days.",
+        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubh Invitation opens to you. Technical error details are kept for at most 30 days.",
       ],
     },
     {
@@ -160,15 +160,15 @@ export const privacy: LegalDoc = {
 export const terms: LegalDoc = {
   title: "Terms of use",
   description:
-    "The rules for making, sharing and replying to invitations on Shubhdwar, in plain words.",
+    "The rules for making, sharing and replying to invitations on Shubh Invitation, in plain words.",
   intro:
-    "These terms apply when you use Shubhdwar to make an invitation, open one, or reply to one. By using Shubhdwar you agree to them.",
+    "These terms apply when you use Shubh Invitation to make an invitation, open one, or reply to one. By using Shubh Invitation you agree to them.",
   sections: [
     {
       id: "the-service",
-      heading: "What Shubhdwar is",
+      heading: "What Shubh Invitation is",
       body: [
-        "Shubhdwar lets you make digital invitations, share them by link, and collect replies from guests. Guests do not need an account to open an invitation or reply. Shubhdwar is in early access: features may change, and some may come and go while we improve them.",
+        "Shubh Invitation lets you make digital invitations, share them by link, and collect replies from guests. Guests do not need an account to open an invitation or reply. Shubh Invitation is in early access: features may change, and some may come and go while we improve them.",
       ],
     },
     {
@@ -183,7 +183,7 @@ export const terms: LegalDoc = {
       heading: "What you put on invitations",
       body: [
         "Your wording, photos and guest lists stay yours. You give us permission to store them and show them to the people you share the invitation with, only to run the service.",
-        "You agree to add only content you have the right to use, and guests who would expect to hear from you. Do not use Shubhdwar to:",
+        "You agree to add only content you have the right to use, and guests who would expect to hear from you. Do not use Shubh Invitation to:",
         {
           list: [
             "Pretend to be someone else, or make an invitation for an event that is not real.",
@@ -198,28 +198,28 @@ export const terms: LegalDoc = {
       id: "designs",
       heading: "Our designs, music and art",
       body: [
-        "The designs, ornaments, sacred symbols, animations and music on Shubhdwar belong to us or the people who licensed them to us. You may share invitations made with them; you may not copy them for other uses. Sacred symbols are drawn with care for their meaning, and are offered only for the occasions they belong to.",
+        "The designs, ornaments, sacred symbols, animations and music on Shubh Invitation belong to us or the people who licensed them to us. You may share invitations made with them; you may not copy them for other uses. Sacred symbols are drawn with care for their meaning, and are offered only for the occasions they belong to.",
       ],
     },
     {
       id: "money",
       heading: "Money",
       body: [
-        "Making and sharing invitations is free during early access. If we introduce paid plans, prices will be shown before you pay, and we will never charge you without asking. Shubhdwar never holds money sent between guests and families.",
+        "Making and sharing invitations is free during early access. If we introduce paid plans, prices will be shown before you pay, and we will never charge you without asking. Shubh Invitation never holds money sent between guests and families.",
       ],
     },
     {
       id: "availability",
       heading: "No guarantees",
       body: [
-        "We work hard to keep Shubhdwar running and your invitations safe, but we provide it as it is and cannot promise it will never be interrupted. Please check important details, such as dates, times and venues, before you share an invitation. To the extent the law allows, we are not responsible for losses caused by an invitation being unavailable or wrong, and our total responsibility to you is limited to what you paid us in the last 12 months.",
+        "We work hard to keep Shubh Invitation running and your invitations safe, but we provide it as it is and cannot promise it will never be interrupted. Please check important details, such as dates, times and venues, before you share an invitation. To the extent the law allows, we are not responsible for losses caused by an invitation being unavailable or wrong, and our total responsibility to you is limited to what you paid us in the last 12 months.",
       ],
     },
     {
       id: "ending",
       heading: "Stopping",
       body: [
-        "You can stop using Shubhdwar at any time and delete your account from your profile page. Deleting an account deletes its invitations, guest lists and replies, and their links stop working.",
+        "You can stop using Shubh Invitation at any time and delete your account from your profile page. Deleting an account deletes its invitations, guest lists and replies, and their links stop working.",
       ],
     },
     {
@@ -233,7 +233,7 @@ export const terms: LegalDoc = {
       id: "changes",
       heading: "Changes",
       body: [
-        "If we change these terms, we will update the date at the top and tell hosts before important changes take effect. Continuing to use Shubhdwar after that means you accept the new terms.",
+        "If we change these terms, we will update the date at the top and tell hosts before important changes take effect. Continuing to use Shubh Invitation after that means you accept the new terms.",
       ],
     },
   ],

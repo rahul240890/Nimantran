@@ -12,7 +12,7 @@ Build order: Step 17b (free shagun ledger with direct UPI), owner task L1 (legal
 
 Under RBI rules, a company that collects customers' money and passes it on to others must itself be an authorised payment aggregator; platforms doing this must register their payment aggregator activity separately, and new aggregators need a minimum net worth of ₹25 crore ([Trilegal summary](https://trilegal.com/knowledge_repository/rbis-guidelines-on-regulation-of-payment-aggregators-and-payment-gateways/)). That is out of reach, so:
 
-- **Money never enters a Shubhdwar bank account on its way to the family.**
+- **Money never enters a Shubh Invitation bank account on its way to the family.**
 - A licensed payment aggregator moves the money and splits it: most to the family's bank account, our commission to us. Razorpay Route is built for this: it splits incoming payments among multiple third-party linked accounts ([Razorpay Route docs](https://razorpay.com/docs/route/)). Linked accounts must be added before transfers can happen.
 - Where no fee is charged, guests pay the family directly by UPI and the money never touches any of our systems.
 

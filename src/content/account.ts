@@ -19,7 +19,7 @@ export const signInCopy = {
   metaTitle: "Sign in",
   metaDescription: "Sign in to keep your invites safe and open them on any phone.",
   eyebrow: "Welcome",
-  title: "Sign in to Shubhdwar",
+  title: "Sign in to Shubh",
   intro: "Keep your invites safe and open them on any phone. No password to remember.",
   phoneLabel: "Mobile number",
   phoneHint:
@@ -44,7 +44,7 @@ export const signInCopy = {
     privacy: "privacy policy",
     after: ". We never share your number.",
   },
-  success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubhdwar"),
+  success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubh"),
   side: {
     eyebrow: "Your invites, everywhere",
     title: "Start on your phone, finish on the laptop",

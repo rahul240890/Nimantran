@@ -1,6 +1,6 @@
 # Pricing — personal and business plans
 
-The single source of truth for what Shubhdwar charges. [PRODUCT.md](PRODUCT.md) section 9 summarises it; [PAYMENTS.md](PAYMENTS.md) covers shagun, contributions and ticket commission.
+The single source of truth for what Shubh Invitation charges. [PRODUCT.md](PRODUCT.md) section 9 summarises it; [PAYMENTS.md](PAYMENTS.md) covers shagun, contributions and ticket commission.
 
 Build order: Step 15 (plans and entitlements), Step 16 (one-time checkout), Step 16a (Family Plus subscription), Step 26 (business subscriptions), Step 26a (Enterprise and reseller). See [PLAN.md](PLAN.md).
 
@@ -34,7 +34,7 @@ An **event** is one occasion with all its functions (a wedding with haldi, mehen
 | **Price (international)**           | $0                          | $9                                                 | $29                                             | $49                                               |
 | Best for                            | Trying it, small gatherings | Most birthdays, pujas, engagements                 | Big weddings and receptions                     | Multi-day Indian weddings                         |
 | Designs                             | Basic set                   | All standard                                       | All, including exclusive and artist collections | All, including exclusive                          |
-| Watermark                           | Yes, "Made with Shubhdwar"  | No                                                 | No                                              | No                                                |
+| Watermark                           | Yes, "Made with Shubh"      | No                                                 | No                                              | No                                                |
 | Functions per event                 | 1                           | Up to 3                                            | Unlimited                                       | Unlimited, plus save-the-date and thank-you cards |
 | Card languages                      | 1                           | 2                                                  | 2, with AI wording in each                      | 2, with AI wording in each                        |
 | Guests with RSVP                    | 50                          | 500                                                | Unlimited                                       | Unlimited                                         |
@@ -82,7 +82,7 @@ Why weddings stay separate: they are our largest single payment and need the Roy
 | Client events                | 10 a month                                    | Unlimited                                             | Unlimited                                                                |
 | Level of each event          | Royal                                         | Royal                                                 | Royal                                                                    |
 | Team members                 | 2                                             | 10                                                    | Unlimited                                                                |
-| Branding                     | Your logo in the footer                       | Your logo and colours; no Shubhdwar watermark         | Full white-label on your own domain                                      |
+| Branding                     | Your logo in the footer                       | Your logo and colours; no Shubh Invitation watermark  | Full white-label on your own domain                                      |
 | Client workspace             | Yes                                           | Yes, with client approval links                       | Yes, with SSO                                                            |
 | Bulk tools                   | —                                             | Bulk guest import, duplicate events, bulk edits       | Plus API access                                                          |
 | Reselling                    | —                                             | Buy passes at 30% off and resell at your own price    | Custom wholesale pricing                                                 |

@@ -4,7 +4,7 @@ import type { TraditionId } from "@/lib/traditions/schema";
 /*
  * Words for the public pages search engines index (docs/BRAND_SEO.md, sections 5 and 6):
  * one page per occasion, tradition and design, and the design gallery. Titles stay under
- * 48 characters, as " · Shubhdwar" is added to them; descriptions under 155.
+ * 48 characters, as " · Shubh Invitation" is added to them; descriptions under 155.
  */
 
 type PageWords = {

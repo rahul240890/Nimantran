@@ -1,8 +1,8 @@
 @AGENTS.md
 
-# Shubhdwar project notes
+# Shubh Invitation project notes
 
-- The product is named **Shubhdwar** (decided 2026-09-26). Step 8a renamed everything users see; the repository name, database and browser storage keys keep "nimantran". Brand and SEO rules: `docs/BRAND_SEO.md`.
+- The product is named **Shubh Invitation**, **Shubh** for short (decided 2026-09-27; `site.name` and `site.shortName`). Step 8b renamed everything users see from Shubhdwar; the repository name, database and browser storage keys keep the older names. Brand and SEO rules: `docs/BRAND_SEO.md`.
 
 - Roadmap and current step: `docs/PLAN.md`. Work one step at a time.
 - What to build: `docs/PRODUCT.md` (features, categories), `docs/PRICING.md` (personal and business plans, entitlements), `docs/TRADITIONS.md` (regional and religious packs, sacred art rules), `docs/MOTION.md` (regional animation), `docs/PAYMENTS.md` (shagun and commission; never hold customer money), `docs/MEMORIES.md`, `docs/COMPETITORS.md`.

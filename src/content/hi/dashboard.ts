@@ -224,7 +224,7 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     withdrawLabel: (label) => (label ? `${label} का लिंक वापस लें` : "यह लिंक वापस लें"),
     withdrawn: "लिंक वापस लिया गया",
     message: (names, url) =>
-      `कृपया शुभद्वार पर ${names} का निमंत्रण सँभालने में मेरी मदद करें। मेहमान सूची और जवाब देखने के लिए यह लिंक खोलकर साइन इन करें:\n${url}`,
+      `कृपया शुभ इन्विटेशन पर ${names} का निमंत्रण सँभालने में मेरी मदद करें। मेहमान सूची और जवाब देखने के लिए यह लिंक खोलकर साइन इन करें:\n${url}`,
     remove: (name) => `${name} को हटाएँ`,
     removeTitle: "इस सह-मेज़बान को हटाएँ?",
     removeBody: (name) =>

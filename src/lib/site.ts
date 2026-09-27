@@ -10,12 +10,15 @@ function siteUrl(): string {
 }
 
 export const site = {
-  name: "Shubhdwar",
-  /** शुभद्वार, "auspicious doorway". Spelling rules: docs/BRAND_SEO.md. */
-  nameDevanagari: "शुभद्वार",
-  tagline: "3D invitations your guests open, turn and keep",
+  /** The full brand, for titles, link previews and legal text. Rules: docs/BRAND_SEO.md. */
+  name: "Shubh Invitation",
+  /** The app's name and the core brand, for short everyday copy ("Sign in to Shubh"). */
+  shortName: "Shubh",
+  /** Used on Hindi pages. */
+  nameDevanagari: "शुभ इन्विटेशन",
+  tagline: "Invitations that come alive",
   description:
-    "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings and every celebration after.",
+    "Create beautiful digital, animated and 3D invitations for every celebration, share them on WhatsApp, and collect RSVPs in one tap.",
   url: siteUrl(),
   /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,

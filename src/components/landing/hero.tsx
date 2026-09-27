@@ -8,7 +8,7 @@ import { pagePath } from "@/lib/seo/paths";
 import { HeroDeck } from "./hero-deck";
 
 /**
- * The first screen: what Shubhdwar is, the way in, and a fanned deck of the painted themes,
+ * The first screen: what Shubh Invitation is, the way in, and a fanned deck of the painted themes,
  * standing before a painted doorway that fades into the page behind the words.
  */
 export function Hero({ locale }: { locale: UiLocale }) {
