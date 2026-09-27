@@ -15,6 +15,22 @@ export const uiStrings: Translation<typeof en> = {
     preparing: "3D तैयार हो रहा है",
     skip: "एनिमेशन छोड़ें",
     and: "और",
+    story: {
+      story: "निमंत्रण, एक-एक पल करके",
+      pause: "कहानी रोकें",
+      play: "आगे चलाएँ",
+      next: "आगे",
+      previous: "पीछे",
+      skip: "कहानी छोड़ें",
+      done: "कार्ड देखें",
+      replay: "कहानी चलाएँ",
+    },
+  },
+  storyWords: {
+    saveTheDate: "तारीख़ याद रखें",
+    joinUs: "क्या आप हमारे साथ होंगे?",
+    withLove: "सप्रेम, आपकी प्रतीक्षा में",
+    and: "और",
   },
   error: {
     title: "कुछ गड़बड़ हो गई",

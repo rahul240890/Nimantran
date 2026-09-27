@@ -14,6 +14,23 @@ export const uiStrings = {
     preparing: "Preparing 3D",
     skip: "Skip opening",
     and: "and",
+    story: {
+      story: "The invitation, one moment at a time",
+      pause: "Pause the story",
+      play: "Carry on",
+      next: "Next",
+      previous: "Back",
+      skip: "Skip story",
+      done: "See the card",
+      replay: "Play the story",
+    },
+  },
+  /** Words the story adds between the host's own (Step 12d). */
+  storyWords: {
+    saveTheDate: "Save the date",
+    joinUs: "Will you join us?",
+    withLove: "With love, we await you",
+    and: "and",
   },
   error: {
     title: "Something went wrong",

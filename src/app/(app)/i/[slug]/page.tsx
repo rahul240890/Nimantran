@@ -1,21 +1,12 @@
-import { format, parseISO } from "date-fns";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { isQualityChoice } from "@/content/engine-review";
-import { dateLocale } from "@/i18n/dates";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
-import {
-  ceremonyName,
-  draftQuestions,
-  draftTradition,
-  includedFunctions,
-  muhuratName,
-  needsTime,
-} from "@/lib/editor/draft";
+import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
@@ -27,7 +18,7 @@ import {
 } from "@/lib/publish/describe";
 import { inviteUrl, mapsUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
-import { formatTime } from "@/lib/time";
+import { storyFunctions } from "@/lib/publish/story";
 
 /*
  * A guest's invitation: the 3D card, each function with directions and calendar, then the
@@ -63,27 +54,15 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const { draft } = invite;
   const locale = await getLocale();
   const { functionCopy } = editorText[locale];
-  const { guestCopy } = publishText[locale];
-  const language = draftTradition(draft)?.language ?? "en";
-  const words = dateLocale[locale];
   const url = inviteUrl(await requestOrigin(), invite.slug);
   const entries = calendarEntries(draft, { id: invite.id, url }, locale);
-  const timed = needsTime(draft);
 
-  const functions: GuestFunction[] = includedFunctions(draft).map((kind) => {
+  const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
+    const { kind } = told;
     const fn = draft.functions[kind];
     const entry = entries.find((item) => item.uid.startsWith(`${invite.id}-${kind}@`));
-    const local = ceremonyName(draft, kind);
-    const muhurat = muhuratName(draft, kind);
-    const start = timed && fn.time ? formatTime(fn.time, words) : "";
     return {
-      kind,
-      name: functionCopy[kind].name,
-      localName: local ? { text: local.native, lang: language } : null,
-      date: fn.date ? format(parseISO(fn.date), "EEEE, d MMMM yyyy", { locale: words }) : "",
-      time: start && fn.endTime ? guestCopy.timeRange(start, formatTime(fn.endTime, words)) : start,
-      muhurat: muhurat && start ? { text: muhurat.native, lang: language } : null,
-      venue: fn.venue.trim(),
+      ...told,
       address: fn.address.trim(),
       dressCode: fn.dressCode.trim(),
       mapsUrl: fn.venue.trim() || fn.address.trim() ? mapsUrl(fn.venue, fn.address) : null,

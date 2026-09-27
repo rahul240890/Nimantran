@@ -1,6 +1,6 @@
 "use client";
 
-import { Music, Pause } from "lucide-react";
+import { Clapperboard, Music, Pause } from "lucide-react";
 import dynamic from "next/dynamic";
 import {
   Component,
@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/cn";
-import { motionFor } from "@/lib/engine/motion";
+import { motionFor, openingLength } from "@/lib/engine/motion";
+import type { StoryBeat } from "@/lib/engine/story";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import {
   pickQuality,
@@ -35,6 +36,7 @@ import { useDarkTheme } from "@/lib/use-color-scheme";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CARD_FORMATS, type CardFormatId } from "./formats";
 import { FlatPattern } from "./flat-pattern";
+import { StoryPlayer, type StoryLabels } from "./story/story-player";
 import { useText } from "@/i18n/client";
 import { uiText } from "@/i18n/copy/ui";
 
@@ -48,6 +50,14 @@ export type InvitationLabels = {
   preparing: string;
   and: string;
   skip?: string;
+  story?: StoryLabels & { replay: string };
+};
+
+/** The story the card tells once it has opened (Step 12d). */
+export type InvitationStory = {
+  beats: readonly StoryBeat[];
+  /** The last beat's button to the reply form, when the invite takes replies. */
+  reply?: { href: string; label: string } | null;
 };
 
 export type EngineState = "poster" | "loading" | "ready" | "fallback";
@@ -72,6 +82,8 @@ export type InvitationProps = {
   onOpenChange?: (open: boolean) => void;
   /** The card's tradition, whose opening plays when the card is opened (Step 12c). */
   tradition?: TraditionId | null;
+  /** Told beat by beat over the opened card; Still mode waits for the guest to ask. */
+  story?: InvitationStory | null;
   /** Start the music when the guest opens the card (a tap, so browsers allow sound). */
   musicOnOpen?: boolean;
   labels?: InvitationLabels;
@@ -142,6 +154,7 @@ export function Invitation({
   onOpenChange,
   musicOnOpen = true,
   tradition = null,
+  story = null,
   labels: labelsProp,
   lang,
   onStatus,
@@ -150,6 +163,7 @@ export function Invitation({
 }: InvitationProps) {
   const { uiStrings } = useText(uiText);
   const labels = labelsProp ?? uiStrings.invitation;
+  const storyLabels = labels.story ?? uiStrings.invitation.story;
   const format: CardFormatId = template.scene.format;
   const Flat = CARD_FORMATS[format].Flat;
   const still = useReducedMotion();
@@ -298,12 +312,44 @@ export function Invitation({
     }
   };
 
+  // The story follows the opening: on its own once the doors and the tradition's motion
+  // are done, at once if the guest skips the opening, and only on request in Still mode
+  const [storyOn, setStoryOn] = useState(false);
+  const [storyToken, setStoryToken] = useState(0);
+  const hasStory = Boolean(story && story.beats.length > 0);
+  const storyDelay = 1.6 + (motion ? Math.max(0, openingLength(motion) - 1.2) : 0);
+  useEffect(() => {
+    if (!open || still || !hasStory) return;
+    const timer = window.setTimeout(() => setStoryOn(true), storyDelay * 1000);
+    return () => window.clearTimeout(timer);
+  }, [open, still, hasStory, storyDelay]);
+  // Asked for with a button, the story takes keyboard focus, and gives it back as it closes
+  const [storyFocus, setStoryFocus] = useState(false);
+  const replayButton = useRef<HTMLButtonElement>(null);
+  const returnFocus = useRef(false);
+  const startStory = (focus = false) => {
+    setStoryToken((n) => n + 1);
+    setStoryFocus(focus);
+    setStoryOn(true);
+  };
+  const endStory = (hadFocus: boolean) => {
+    returnFocus.current = hadFocus;
+    setStoryOn(false);
+  };
+  useEffect(() => {
+    if (!storyOn && returnFocus.current) {
+      returnFocus.current = false;
+      replayButton.current?.focus();
+    }
+  }, [storyOn]);
+
   const toggle = useCallback(() => {
     const next = !open;
     if (openProp === undefined) setOpenState(next);
+    if (!next) setStoryOn(false);
     onOpenChange?.(next);
     if (next && musicOnOpen && !playing && !readMuted()) void playMusic();
-  }, [open, openProp, onOpenChange, musicOnOpen, playing, playMusic]);
+  }, [open, openProp, onOpenChange, musicOnOpen, playing, playMusic, setOpenState, setStoryOn]);
 
   const flatStyle = {
     ...stockStyle(template),
@@ -393,13 +439,29 @@ export function Invitation({
           </div>
         )}
 
-        {ready && opening && open && !still && (
+        {storyOn && open && story && hasStory && (
+          <StoryPlayer
+            key={storyToken}
+            beats={story.beats}
+            copy={copy}
+            template={template}
+            still={still}
+            labels={storyLabels}
+            lang={lang}
+            reply={story.reply}
+            autoFocus={storyFocus}
+            onDone={endStory}
+          />
+        )}
+
+        {ready && opening && open && !still && !storyOn && (
           <Button
             variant="secondary"
             size="sm"
             onClick={() => {
               setSkip((n) => n + 1);
               setOpening(false);
+              if (hasStory) startStory(true);
             }}
             className="absolute end-3 top-3 bg-surface/85 backdrop-blur-sm"
           >
@@ -418,7 +480,7 @@ export function Invitation({
         )}
       </div>
 
-      <div className="flex shrink-0 items-center justify-center gap-3 pt-4">
+      <div className="flex shrink-0 flex-wrap items-center justify-center gap-3 pt-4">
         <Button variant={open ? "secondary" : "primary"} onClick={toggle} className="min-w-44">
           {open ? labels.close : labels.open}
         </Button>
@@ -428,6 +490,15 @@ export function Invitation({
           variant="secondary"
           onClick={toggleMusic}
         />
+        {hasStory && open && !storyOn && (
+          <IconButton
+            ref={replayButton}
+            label={storyLabels.replay}
+            icon={<Clapperboard />}
+            variant="secondary"
+            onClick={() => startStory(true)}
+          />
+        )}
       </div>
     </div>
   );
