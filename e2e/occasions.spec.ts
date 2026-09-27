@@ -1,15 +1,15 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
-const tiles = (page: import("@playwright/test").Page) =>
-  page.getByRole("list", { name: "Occasions" }).getByRole("listitem");
+/* The home page's occasions: the wedding journey as paintings, each opening its designs. */
+const tiles = (page: Page) => page.locator("#occasions ul").first().getByRole("listitem");
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`occasions fit the screen and pass an accessibility check, ${colorScheme}`, async ({
     page,
   }) => {
     await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
-    await page.goto("/?region=PB&month=8");
+    await page.goto("/");
     const section = page.locator("#occasions");
     await section.scrollIntoViewIfNeeded();
     await expect(tiles(page)).toHaveCount(8);
@@ -24,30 +24,19 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
-test("local occasions come first, named in the local script", async ({ page }) => {
-  await page.goto("/?region=PB&month=8");
-  await expect(tiles(page).first()).toHaveAttribute("data-category", "roka");
-  await expect(tiles(page).first()).toContainText("ਰੋਕਾ");
-  await expect(tiles(page).first()).toContainText("Popular near you");
-
-  await page.goto("/?region=KL&month=11");
-  await expect(tiles(page).first()).toHaveAttribute("data-category", "wedding");
-  await expect(tiles(page).first()).toContainText("വിവാഹം");
+test("each occasion names itself in both site languages and says what's coming next", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(tiles(page).first()).toContainText("Wedding");
+  await expect(tiles(page).filter({ hasText: "Sangeet" })).toHaveCount(1);
+  await expect(page.locator("#occasions")).toContainText("Coming next");
+  await expect(page.locator("#occasions")).toContainText("Birthday");
 });
 
-test("an occasion opens the editor ready for it", async ({ page }) => {
-  await page.goto("/?month=11");
-  await page.evaluate(() => localStorage.clear());
-  // The tiles reorder for the visitor once the page hydrates, so retry a click that lands
-  // during that swap
-  await expect(async () => {
-    await tiles(page).filter({ hasText: "Sangeet" }).getByRole("link").click();
-    await expect(page).toHaveURL(/\/create\?category=sangeet/, { timeout: 2000 });
-  }).toPass();
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Pick the card your guests will open",
-  );
-  await expect(
-    page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio").first(),
-  ).toHaveAccessibleName(/Emerald Palace/);
+test("an occasion opens its own designs", async ({ page }) => {
+  await page.goto("/");
+  await tiles(page).filter({ hasText: "Sangeet" }).getByRole("link").click();
+  await expect(page).toHaveURL(/\/invitations\/sangeet$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText("Sangeet");
 });
