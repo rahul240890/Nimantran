@@ -52,6 +52,8 @@ describe("public pages", () => {
     expect(switchLocalePath("/hi", "en")).toBe("/");
     expect(switchLocalePath("/designs/rose", "hi")).toBe("/hi/designs/rose");
     expect(switchLocalePath("/hi/traditions/bengali", "en")).toBe("/traditions/bengali");
+    expect(switchLocalePath("/privacy", "hi")).toBe("/hi/privacy");
+    expect(switchLocalePath("/hi/terms", "en")).toBe("/terms");
     expect(switchLocalePath("/create", "hi")).toBeNull();
     expect(switchLocalePath("/invites/abc", "hi")).toBeNull();
   });

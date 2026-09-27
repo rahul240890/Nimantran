@@ -6,6 +6,7 @@ import "@fontsource-variable/karla";
 import "@fontsource-variable/karla/wght-italic.css";
 import "@fontsource-variable/noto-sans-devanagari";
 import { Providers } from "@/components/providers";
+import { SiteAnalytics } from "@/components/shell/site-analytics";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { site } from "@/lib/site";
@@ -60,6 +61,8 @@ export function RootHtml({ locale, children }: { locale: UiLocale; children: Rea
       </head>
       <body className="flex min-h-full flex-col">
         <Providers locale={locale}>{children}</Providers>
+        {/* Counted only on the live site, where Analytics is switched on (docs/LAUNCH.md) */}
+        {process.env.VERCEL_ENV === "production" && <SiteAnalytics />}
       </body>
     </html>
   );

@@ -3,6 +3,7 @@ import { Mandala } from "@/components/brand/mandala";
 import Link from "next/link";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
+import { legalText } from "@/i18n/copy/legal";
 import { seoText } from "@/i18n/copy/seo";
 import { homePath, languages, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/cn";
 export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { nav, shell } = landingText[locale];
   const { seoCopy } = seoText[locale];
+  const { legalCopy } = legalText[locale];
   const { traditionCopy } = editorText[locale];
   const home = homePath(locale);
   const linkClass =
@@ -124,11 +126,24 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
         </div>
       </div>
       <div className="border-t border-line">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:justify-between sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
             © 2026 {locale === "hi" ? site.nameDevanagari : site.name}. {shell.footer.rights}
           </p>
-          <p>{shell.footer.madeIn}</p>
+          <div className="flex flex-wrap items-center gap-x-4">
+            <nav aria-label={legalCopy.footer.heading} className="-ms-2 flex">
+              {(["privacy", "terms"] as const).map((kind) => (
+                <Link
+                  key={kind}
+                  href={pagePath({ kind }, locale)}
+                  className="inline-flex min-h-11 items-center rounded-md px-2 underline-offset-4 transition-colors hover:text-accent-text hover:underline"
+                >
+                  {legalCopy.footer[kind]}
+                </Link>
+              ))}
+            </nav>
+            <p>{shell.footer.madeIn}</p>
+          </div>
         </div>
       </div>
     </footer>

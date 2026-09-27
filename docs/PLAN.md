@@ -158,6 +158,8 @@ Built as: create, publish, RSVP and the dashboard were already covered end to en
 **Step 14. Launch**
 Production Supabase, Vercel deploy, custom domain, analytics, error monitoring, privacy policy and terms.
 
+Built as (part 1): a privacy policy and terms in plain words, in English and Hindi (`/privacy`, `/terms`, `/hi/…`), written for India's DPDP Act 2023 and linked from every footer and the sign-in page; Vercel Web Analytics on the live site only, with invitation links, guest codes and query strings removed before counting; browser and server errors written to the Vercel logs as one-line JSON (`[client-error]`, `[server-error]`), with friendly error pages in both languages; and security headers on every response (no framing, strict referrer, HSTS, no `x-powered-by`). The owner's click-by-click list for the domain, Supabase, Google sign-in, analytics, SMS and legal review: [LAUNCH.md](LAUNCH.md). **Next (part 2):** a "Delete my account" button, so hosts can erase their data themselves.
+
 ---
 
 ## Phase 2 — Payments and editions

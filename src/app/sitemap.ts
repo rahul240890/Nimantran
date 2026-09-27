@@ -7,6 +7,7 @@ import { absolute } from "@/lib/seo/structured-data";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return publicPages().flatMap((page) => {
+    const legal = page.kind === "privacy" || page.kind === "terms";
     const languages = {
       ...Object.fromEntries(
         UI_LOCALES.map((code) => [`${code}-IN`, absolute(pagePath(page, code))]),
@@ -15,8 +16,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
     return UI_LOCALES.map((locale) => ({
       url: absolute(pagePath(page, locale)),
-      changeFrequency: "weekly" as const,
-      priority: page.kind === "home" ? 1 : page.kind === "designs" ? 0.8 : 0.7,
+      changeFrequency: legal ? ("yearly" as const) : ("weekly" as const),
+      priority: page.kind === "home" ? 1 : page.kind === "designs" ? 0.8 : legal ? 0.2 : 0.7,
       alternates: { languages },
     }));
   });

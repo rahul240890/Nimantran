@@ -17,4 +17,6 @@ export const site = {
   description:
     "Create a 3D invitation in minutes, share it on WhatsApp, and collect RSVPs in one tap. Made for Indian weddings and every celebration after.",
   url: siteUrl(),
+  /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
 } as const;
