@@ -187,6 +187,26 @@ test.describe("publish and share", () => {
     await expect(card.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeAttached();
     await expect(card.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeAttached();
 
+    // The story, asked for in Still mode, tells the card in the chosen language
+    await guest.getByRole("button", { name: "Open invitation" }).click();
+    await guest.getByRole("button", { name: "Play the story" }).click();
+    const story = guest.locator("[data-story-beat]");
+    await expect(story).toHaveAttribute("data-story-beat", "blessing");
+    await expect(story.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
+    await guest.keyboard.press("ArrowRight");
+    await expect(story.getByText("આરવ")).toBeVisible();
+    await guest.keyboard.press("ArrowRight");
+    await expect(story).toHaveAttribute("data-story-beat", "fn-wedding");
+    await expect(story.getByText("શુભ મુહૂર્ત")).toBeVisible();
+    await expect(story.getByText("9:47 am to 10:31 am")).toBeVisible();
+    await guest.keyboard.press("ArrowRight");
+    const reply = story.getByRole("link", { name: "Reply to the invitation" });
+    await expect(reply).toHaveAttribute("href", "#rsvp");
+    expect((await axe(guest).analyze()).violations).toEqual([]);
+    await reply.click();
+    await expect(story).toHaveCount(0);
+    await expect(guest).toHaveURL(/#rsvp$/);
+
     const article = guest.getByRole("article", { name: /Wedding/ });
     await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
     await expect(article.getByText("9:47 am to 10:31 am")).toBeVisible();

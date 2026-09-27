@@ -2,7 +2,7 @@
 
 Every tradition opens its own way. This spec adds regional opening animations, per-function scenes, regional particles and other effects on top of the 3D engine (Step 4) and tradition packs ([TRADITIONS.md](TRADITIONS.md)).
 
-Build order: Step 12c (engine hooks, first six packs, countdown), Step 23 (remaining packs, per-function scenes), Step 21 (the same scenes in MP4 export). See [PLAN.md](PLAN.md).
+Build order: Step 12c (engine hooks, first six packs, countdown), Step 12d (story reveal and the wedding function scenes), Step 17c (the story in MP4 export), Step 23 (remaining packs and their own function scenes). See [PLAN.md](PLAN.md).
 
 ---
 
@@ -35,9 +35,9 @@ Build order: Step 12c (engine hooks, first six packs, countdown), Step 23 (remai
 
 Muslim, Sikh and Jain packs keep `figuresAllowed` rules: no deity or human figures in motion either.
 
-## 3. Per-function scenes (Step 23)
+## 3. Per-function scenes (Step 12d; tradition-specific ones in Step 23)
 
-Each function tab in the invite has its own short scene when the guest opens it:
+Each function has its own short scene in the story reveal, the beat that shows its date, time and venue:
 
 | Function                                  | Scene                                                                    |
 | ----------------------------------------- | ------------------------------------------------------------------------ |
@@ -113,6 +113,7 @@ The Rang templates (TRADITIONS.md, section 6) use the fullest motion: busier amb
 | Step      | Scope                                                                                                                                                                                                                                                                 |
 | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **12c**   | Motion hooks in the engine (opening timeline, ambient loop, per-quality particle counts, sound-after-tap, skip); drawn-on stroke reveal; openings and particles for the first six packs (North Indian, Rajasthani, Marathi, Gujarati, Bengali, Tamil); diya countdown |
-| **21**    | MP4 export reuses the same timelines                                                                                                                                                                                                                                  |
+| **12d**   | Story reveal: blessing, names, date, one beat per function with its scene, then the reply; tap and keyboard controls; Still mode steps through on request                                                                                                             |
+| **17c**   | MP4 export reuses the same timelines                                                                                                                                                                                                                                  |
 | **23**    | Openings for the remaining packs; per-function scenes; seasonal overlays; Rang family motion                                                                                                                                                                          |
 | **M2–M7** | Memories scenes reuse the particle and drawn-on systems                                                                                                                                                                                                               |

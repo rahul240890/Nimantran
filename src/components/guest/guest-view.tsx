@@ -4,7 +4,7 @@ import { CalendarPlus, Clock, MailCheck, MapPin, Navigation, Shirt } from "lucid
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { Invitation } from "@/components/invitation/invitation";
+import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import { DiyaCountdown } from "@/components/guest/diya-countdown";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { Button } from "@/components/ui/button";
@@ -28,6 +28,7 @@ import {
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
+import { storyBeats } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -78,6 +79,7 @@ export function GuestView({
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
+  const { storyWords } = uiStrings;
   const locale = useLocale();
   const languages = cardLanguages(draft);
   // A two-language card opens in the guest's own language when it has it
@@ -90,6 +92,14 @@ export function GuestView({
     [draft.templateId, draft.music.raga],
   );
   const [open, setOpen] = useState(false);
+  const replies = rsvpFunctions.length > 0;
+  const story = useMemo<InvitationStory>(
+    () => ({
+      beats: storyBeats({ copy, functions, replies, words: storyWords }),
+      reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
+    }),
+    [copy, functions, replies, storyWords, guestCopy.reply],
+  );
   const dates = useMemo(
     () =>
       Object.values(draft.functions)
@@ -147,6 +157,7 @@ export function GuestView({
               onOpenChange={setOpen}
               musicOnOpen={draft.music.playOnOpen}
               tradition={draftTradition(draft)?.id ?? null}
+              story={story}
             />
           </div>
           <div className="flex flex-col items-center gap-3">

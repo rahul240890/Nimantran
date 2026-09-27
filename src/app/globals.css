@@ -684,3 +684,231 @@
 :lang(hi) body {
   line-height: 1.65;
 }
+
+/*
+ * Story reveal (Step 12d): the words of each beat rise in one after another, and the scene
+ * behind them moves gently. Each piece reads its own --story-delay and --story-duration.
+ * Still mode's global rule shortens every animation to its end, which leaves a finished
+ * picture: petals gone, henna drawn, flowers open.
+ */
+@keyframes story-line-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    letter-spacing: 0.08em;
+    filter: blur(6px);
+  }
+}
+@keyframes story-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes story-fall {
+  from {
+    transform: translateY(-8px) rotate(var(--story-spin, 0deg)) scale(var(--story-size, 1));
+  }
+  50% {
+    transform: translate(3px, 70px) rotate(calc(var(--story-spin, 0deg) + 180deg))
+      scale(var(--story-size, 1));
+  }
+  to {
+    transform: translate(-2px, 150px) rotate(calc(var(--story-spin, 0deg) + 360deg))
+      scale(var(--story-size, 1));
+  }
+}
+@keyframes story-bloom {
+  from {
+    transform: scale(0) rotate(-40deg);
+    opacity: 0;
+  }
+}
+@keyframes story-swing {
+  0%,
+  100% {
+    transform: rotate(-1.4deg);
+  }
+  50% {
+    transform: rotate(1.4deg);
+  }
+}
+@keyframes story-glow {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 0.36;
+    transform: scale(1.06);
+  }
+}
+@keyframes story-flame {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  35% {
+    transform: scale(0.9, 1.1) skewX(3deg);
+  }
+  70% {
+    transform: scale(1.06, 0.92) skewX(-2deg);
+  }
+}
+@keyframes story-twinkle {
+  0%,
+  100% {
+    transform: scale(0.45);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes story-splash {
+  from {
+    transform: translate(0, 0) scale(0.3);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--story-dx), var(--story-dy)) scale(1);
+    opacity: 0.9;
+  }
+}
+@keyframes story-sweep {
+  0%,
+  100% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+@keyframes story-note {
+  from {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translate(3px, -26px);
+    opacity: 0;
+  }
+}
+@keyframes story-beat-ring {
+  from {
+    transform: scale(0.8);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+@keyframes story-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@layer components {
+  .story-line {
+    animation: story-line-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0s) both;
+  }
+  .story-draw {
+    stroke-dasharray: 1;
+    animation: story-draw var(--story-duration, 2.4s) cubic-bezier(0.45, 0, 0.2, 1)
+      var(--story-delay, 0s) both;
+  }
+  .story-fall {
+    animation: story-fall var(--story-duration, 8s) linear var(--story-delay, 0s) infinite both;
+  }
+  .story-bloom {
+    animation: story-bloom 0.9s cubic-bezier(0.34, 1.4, 0.64, 1) var(--story-delay, 0s) both;
+  }
+  .story-bloom-inner {
+    animation: story-swing 5s ease-in-out infinite;
+  }
+  .story-swing {
+    transform-box: view-box;
+    animation: story-swing 4.2s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .story-glow {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: story-glow 2.6s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .story-flame {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: story-flame 1.3s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .story-twinkle {
+    transform-box: view-box;
+    animation: story-twinkle 2.2s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .story-splash {
+    animation: story-splash 1.1s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0s) both;
+  }
+  .story-sweep {
+    transform-box: view-box;
+    animation: story-sweep 5.4s ease-in-out var(--story-delay, 0s) infinite;
+  }
+  .story-note {
+    animation: story-note 3.2s ease-out var(--story-delay, 0s) infinite both;
+  }
+  .story-beat-ring {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: story-beat-ring 0.9s ease-out infinite;
+  }
+  .story-rise-in {
+    animation: fade-in 0.7s ease-out var(--story-delay, 0s) both;
+  }
+  .story-wash {
+    background:
+      radial-gradient(
+        120% 40% at 50% 100%,
+        color-mix(in srgb, var(--story-wash) 34%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        120% 30% at 50% 0%,
+        color-mix(in srgb, var(--story-wash) 22%, transparent),
+        transparent 70%
+      );
+    animation: fade-in 1.2s ease-out both;
+  }
+  .story-halo {
+    border-radius: 9999px;
+    background: radial-gradient(
+      closest-side,
+      color-mix(in srgb, var(--motion-flame) 42%, transparent),
+      transparent
+    );
+    animation: story-glow 3.4s ease-in-out infinite;
+  }
+  .story-pool {
+    border-radius: 9999px;
+    background: radial-gradient(closest-side, var(--card-ivory) 35%, transparent);
+  }
+  .story-progress {
+    transform-origin: left;
+    animation: story-progress var(--story-duration, 4s) linear both;
+  }
+  .story-progress:where(:dir(rtl)) {
+    transform-origin: right;
+  }
+}

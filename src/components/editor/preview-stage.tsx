@@ -2,9 +2,12 @@
 
 import { useDeferredValue, useMemo, useState } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
-import { Invitation } from "@/components/invitation/invitation";
+import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import type { QualityChoice } from "@/content/engine-review";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
+import { uiText } from "@/i18n/copy/ui";
+import { storyBeats } from "@/lib/engine/story";
+import { storyFunctions } from "@/lib/publish/story";
 import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
@@ -37,6 +40,17 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
   const key = JSON.stringify(draftCopy(draft, language));
   const copy = useMemo(() => JSON.parse(key) as CardCopy, [key]);
   const deferredCopy = useDeferredValue(copy);
+
+  // The story guests will see, without the reply button (there is no form here)
+  const locale = useLocale();
+  const { storyWords } = useText(uiText).uiStrings;
+  const functionsKey = JSON.stringify(storyFunctions(draft, locale));
+  const story = useMemo<InvitationStory>(() => {
+    const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
+    return {
+      beats: storyBeats({ copy: deferredCopy, functions, replies: true, words: storyWords }),
+    };
+  }, [functionsKey, deferredCopy, storyWords]);
 
   const { templateId } = draft;
   const { raga } = draft.music;
@@ -77,6 +91,7 @@ export function PreviewStage({ draft, quality, open, onOpenChange, className }: 
         onOpenChange={onOpenChange}
         musicOnOpen={draft.music.playOnOpen}
         tradition={draftTradition(draft)?.id ?? null}
+        story={story}
       />
     </div>
   );

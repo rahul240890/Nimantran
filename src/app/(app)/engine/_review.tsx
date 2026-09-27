@@ -25,6 +25,25 @@ import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { traditionCopy } from "@/content/editor";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
+import { storyBeats, type StoryFunction } from "@/lib/engine/story";
+import { uiStrings } from "@/lib/ui-strings";
+
+/* The story plays these functions on the review page (Step 12d) */
+const SAMPLE_FUNCTIONS: StoryFunction[] = [
+  ["haldi", "Haldi", "Friday, 12 February 2027", "10:00 AM", "Family home, Civil Lines"],
+  ["mehendi", "Mehendi", "Friday, 12 February 2027", "4:00 PM", "The courtyard, Samode Haveli"],
+  ["sangeet", "Sangeet", "Friday, 12 February 2027", "8:00 PM", "Durbar Hall, Samode Haveli"],
+  ["wedding", "Wedding", "Saturday, 13 February 2027", "7:30 PM", "Samode Palace, Jaipur"],
+  ["reception", "Reception", "Sunday, 14 February 2027", "8:00 PM", "Rambagh Palace, Jaipur"],
+].map(([kind, name, date, time, venue]) => ({
+  kind: kind as StoryFunction["kind"],
+  name: name!,
+  localName: null,
+  date: date!,
+  time: time!,
+  muhurat: null,
+  venue: venue!,
+}));
 
 /* A swatch of each design's card stock */
 const swatches: Record<TemplateId, string> = {
@@ -94,6 +113,21 @@ export function EngineReview({
     return opening ? { ...base, symbol: TRADITIONS[opening].symbols.default } : base;
   }, [template, sample, opening]);
   const [musicOnOpen, setMusicOnOpen] = useState(true);
+  const [storyOn, setStoryOn] = useState(true);
+  const story = useMemo(
+    () =>
+      storyOn
+        ? {
+            beats: storyBeats({
+              copy,
+              functions: SAMPLE_FUNCTIONS,
+              replies: true,
+              words: uiStrings.storyWords,
+            }),
+          }
+        : null,
+    [storyOn, copy],
+  );
   const [status, setStatus] = useState<EngineStatus | null>(null);
   const onStatus = useCallback((next: EngineStatus) => setStatus(next), []);
 
@@ -135,6 +169,7 @@ export function EngineReview({
               quality={quality}
               musicOnOpen={musicOnOpen}
               tradition={opening}
+              story={story}
               onStatus={onStatus}
               onFps={fpsStore.set}
             />
@@ -227,6 +262,13 @@ export function EngineReview({
                   }))}
                 />
               </Field>
+
+              <Switch
+                label="Story after the opening"
+                description="Blessing, names, date and a scene for each function, one at a time."
+                checked={storyOn}
+                onCheckedChange={setStoryOn}
+              />
 
               <Switch
                 label="Music starts when the card opens"
