@@ -75,22 +75,32 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
         </form>
 
         <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {wedding.map((occasion, index) => (
-            <li
-              key={occasion.id}
-              className={cn("reveal-on-scroll", index === 0 && "col-span-2 row-span-2")}
-            >
-              <OccasionTile
-                occasion={occasion}
-                name={occasion.names[locale]}
-                otherName={{ text: occasion.names[other], lang: other }}
-                tagline={occasionTaglines[occasion.id] ?? ""}
-                href={pagePath({ kind: "occasion", id: occasion.category! }, locale)}
-                soonLabel={galleryCopy.soon}
-                feature={index === 0}
-              />
-            </li>
-          ))}
+          {wedding.map((occasion, index) => {
+            // The big first tile takes four cells, so with a multiple of four the last row
+            // would end one short in both the phone's two columns and the desktop's four
+            const fillsLastRow = index === wedding.length - 1 && wedding.length % 4 === 0;
+            return (
+              <li
+                key={occasion.id}
+                className={cn(
+                  "reveal-on-scroll",
+                  index === 0 && "col-span-2 row-span-2",
+                  fillsLastRow && "col-span-2",
+                )}
+              >
+                <OccasionTile
+                  occasion={occasion}
+                  name={occasion.names[locale]}
+                  otherName={{ text: occasion.names[other], lang: other }}
+                  tagline={occasionTaglines[occasion.id] ?? ""}
+                  href={pagePath({ kind: "occasion", id: occasion.category! }, locale)}
+                  soonLabel={galleryCopy.soon}
+                  feature={index === 0}
+                  className={cn(fillsLastRow && "aspect-[8/5] lg:aspect-auto lg:h-full")}
+                />
+              </li>
+            );
+          })}
         </ul>
 
         <div className="flex flex-col items-center gap-5 text-center">

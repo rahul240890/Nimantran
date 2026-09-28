@@ -86,7 +86,7 @@ export default async function OrdersPage() {
                 role="region"
                 aria-label="Latest orders"
                 tabIndex={0}
-                className="-mx-5 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:-mx-6"
+                className="relative -mx-5 overflow-x-auto focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:-mx-6"
               >
                 <table className="w-full min-w-[52rem] text-start text-sm">
                   <thead>
