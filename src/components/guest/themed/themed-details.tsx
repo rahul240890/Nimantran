@@ -16,7 +16,16 @@ import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import type { CardCopy } from "@/lib/templates/content";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
-import { Festoon, FloorArt, Houseboat, Lamps, PalaceSkyline, Palm } from "./scenery";
+import {
+  Balloons,
+  Bunting,
+  Festoon,
+  FloorArt,
+  Houseboat,
+  Lamps,
+  PalaceSkyline,
+  Palm,
+} from "./scenery";
 import { useInView, useOnScreen } from "./use-in-view";
 
 const noSubscribe = () => () => {};
@@ -145,7 +154,7 @@ function Framed({
   children: ReactNode;
   className?: string;
 }) {
-  const shape = look.style === "garden" ? "ring" : "arch";
+  const shape = look.style === "garden" || look.style === "party" ? "ring" : "arch";
   return (
     <div className={cn("relative", className)}>
       <div data-shape={shape} className="guest-frame relative aspect-[4/5] overflow-hidden">
@@ -156,10 +165,32 @@ function Framed({
   );
 }
 
-/** The scenery along the foot of a section: a palace skyline, or water. */
+/** The scenery along the foot of a section: water, a skyline, or nothing at a party. */
 function Ground({ look, className }: { look: GuestLook; className?: string }) {
   if (look.style === "garden") return <span aria-hidden className={cn("guest-water", className)} />;
+  if (look.style === "party") return null;
   return <PalaceSkyline className={cn("guest-skyline", className)} />;
+}
+
+/**
+ * What hangs between the hours: a garland in a palace, mirror-work bunting on a
+ * procession, a kasavu border by the water, coloured bulbs at a party.
+ */
+function Divider({ look }: { look: GuestLook }) {
+  if (look.style === "garden")
+    return <span aria-hidden className="guest-kasavu absolute inset-x-0 top-0" />;
+  if (look.style === "procession")
+    return <Bunting className="guest-garland absolute inset-x-0 top-0 h-12 w-full sm:h-16" />;
+  if (look.style === "party")
+    return <Festoon className="guest-festoon absolute inset-x-0 top-0 h-10 w-full sm:h-14" />;
+  return (
+    <Garland
+      flower={look.flower}
+      second={look.secondFlower}
+      swags={8}
+      className="guest-garland absolute inset-x-0 top-0 h-14 w-full sm:h-20"
+    />
+  );
 }
 
 function Welcome({
@@ -195,6 +226,7 @@ function Welcome({
         className="guest-garland relative z-10 h-24 w-full sm:h-32 lg:h-40"
       />
       <PetalDrift flowers={[look.flower, look.secondFlower]} />
+      {look.style === "party" && <Balloons className="guest-balloons absolute inset-0 -z-10" />}
       {garden && (
         <>
           <Palm className="guest-palm absolute -start-10 bottom-8 -z-10 h-72 sm:h-96" />
@@ -348,16 +380,7 @@ function Celebrations({
               data-mood={mood}
               className="guest-sky guest-hour relative isolate px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
             >
-              {look.style === "garden" ? (
-                <span aria-hidden className="guest-kasavu absolute inset-x-0 top-0" />
-              ) : (
-                <Garland
-                  flower={look.flower}
-                  second={look.secondFlower}
-                  swags={8}
-                  className="guest-garland guest-garland-small absolute inset-x-0 top-0 h-14 w-full sm:h-20"
-                />
-              )}
+              <Divider look={look} />
               <Reveal className="guest-hour-body mx-auto grid w-full max-w-5xl items-center gap-10 pt-12 md:grid-cols-2 md:gap-14 md:pt-16">
                 {image && (
                   <Framed look={look} className="guest-hour-art mx-auto w-[min(68vw,20rem)]">
@@ -411,16 +434,7 @@ function Dusk({
   const { guestCopy } = useText(publishText);
   return (
     <div data-mood="dusk" className="guest-sky relative isolate pb-16">
-      {look.style === "garden" ? (
-        <span aria-hidden className="guest-kasavu absolute inset-x-0 top-0" />
-      ) : (
-        <Garland
-          flower={look.flower}
-          second={look.secondFlower}
-          swags={8}
-          className="guest-garland guest-garland-small absolute inset-x-0 top-0 h-14 w-full sm:h-20"
-        />
-      )}
+      <Divider look={look} />
       <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
       {photos.length > 0 && (
         <section aria-labelledby="guest-photos" className="relative pt-20 pb-6">

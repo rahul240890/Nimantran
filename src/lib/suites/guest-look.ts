@@ -21,7 +21,16 @@ export const GUEST_FLOWERS = ["marigold", "rose", "jasmine", "lotus"] as const;
 /** The lamps the guest lights for the couple at night. */
 export const GUEST_LAMPS = ["diyas", "lanterns", "nilavilakku", "fairy"] as const;
 /** The floor pattern the date is drawn in. */
-export const GUEST_PATTERNS = ["rangoli", "kolam", "alpona", "pookalam"] as const;
+export const GUEST_PATTERNS = [
+  "rangoli",
+  "kolam",
+  "alpona",
+  "pookalam",
+  /** A Mughal geometric star, for themes of any faith. */
+  "jaali",
+  /** Rays and dots, for a party. */
+  "burst",
+] as const;
 
 export type GuestStyle = (typeof GUEST_STYLES)[number];
 export type GuestFlower = (typeof GUEST_FLOWERS)[number];
@@ -77,7 +86,7 @@ export const STYLE_LOOKS: Record<GuestStyle, GuestLook> = {
     flower: "rose",
     secondFlower: "marigold",
     lamp: "fairy",
-    pattern: "alpona",
+    pattern: "burst",
   },
 };
 

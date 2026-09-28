@@ -14,7 +14,22 @@ const axe = (page: Page) =>
   ]);
 
 /* The themed guest page below the painted pages (Step 12q), on the sample review page */
-for (const suite of ["rajwada-bagh", "kayal"] as const) {
+// Every theme with a guest look (SUITES[id].guest in src/lib/suites/catalog.ts)
+const THEMES = [
+  "rajwada-bagh",
+  "shahi-savari",
+  "kayal",
+  "noor-bagh",
+  "phulkari-haveli",
+  "rajbari",
+  "peshwai-wada",
+  "kutch-toran",
+  "gubbara",
+  "saath",
+  "rooftop",
+] as const;
+
+for (const suite of THEMES) {
   for (const colorScheme of ["light", "dark"] as const) {
     test.describe(`${suite} guest page, ${colorScheme} theme`, () => {
       test.use({ colorScheme, reducedMotion: "reduce" });
@@ -31,7 +46,7 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
         await page.getByRole("button", { name: "Shower flowers on the couple" }).click();
         await expect(page.getByText("Your flowers are on their way")).toBeVisible();
 
-        const lamps = page.getByRole("button", { name: /Light the/ });
+        const lamps = page.getByRole("button", { name: /Light the|Switch on the lights/ });
         await lamps.click();
         await expect(lamps).toHaveAttribute("aria-pressed", "true");
         await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");

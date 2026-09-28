@@ -1609,8 +1609,9 @@
   --ink-muted: var(--suite-ink-muted);
   --ink-faint: color-mix(in oklab, var(--suite-ink-muted) 85%, var(--guest-cloth));
   --accent-text: var(--suite-accent-text);
-  --marigold: var(--guest-jewel);
-  --marigold-strong: color-mix(in oklab, var(--guest-jewel) 85%, black);
+  /* The jewel deepened toward the ink, so pale words on a button read on every theme */
+  --marigold: color-mix(in oklab, var(--guest-jewel) 76%, var(--suite-ink));
+  --marigold-strong: color-mix(in oklab, var(--guest-jewel) 64%, var(--suite-ink));
   --marigold-edge: color-mix(in oklab, var(--guest-jewel) 55%, black);
   --on-marigold: var(--guest-cloth);
   --success: var(--flower-leaf-deep);
@@ -1782,6 +1783,15 @@
 }
 .guest-night .guest-windows {
   opacity: 0.85;
+}
+.guest-balloons {
+  pointer-events: none;
+}
+@media (max-width: 40rem) {
+  /* On a phone the balloons stay at the edges, clear of the words */
+  .guest-balloon {
+    opacity: 0.7;
+  }
 }
 .guest-palm {
   color: color-mix(in oklab, var(--suite-mid) 70%, transparent);
@@ -2042,6 +2052,10 @@
     .guest-float-diya {
       animation: guest-bob 3.6s ease-in-out infinite alternate;
       animation-delay: calc(var(--i) * -0.9s);
+    }
+    .guest-balloon {
+      animation: guest-bob 4.2s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i) * -0.8s);
     }
     [data-guest="garden"] .guest-photo {
       animation: guest-bob 5s ease-in-out infinite alternate;

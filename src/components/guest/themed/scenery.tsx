@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
-import { patternStrokes, strokeLength, strokePath } from "@/lib/engine/patterns";
+import { strokeLength, strokePath } from "@/lib/engine/patterns";
 import type { GuestFlower, GuestLamp, GuestPattern } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
+import { floorStrokes } from "./floor-patterns";
 
 /*
  * The scenery of the themed guest page: a palace skyline and palms by the water, a
@@ -157,7 +158,7 @@ export function FloorArt({
   second: GuestFlower;
 }) {
   if (pattern === "pookalam") return <Pookalam />;
-  const strokes = patternStrokes(pattern);
+  const strokes = floorStrokes(pattern);
   const lengths = strokes.map((s) => strokeLength(s.points));
   const total = lengths.reduce((sum, length) => sum + length, 0);
   // Where each stroke starts, as a share of the whole drawing
@@ -514,5 +515,90 @@ export function Festoon({ className }: { className?: string }) {
         );
       })}
     </svg>
+  );
+}
+
+/** Triangles of bandhani cloth with a mirror in each, strung on a cord. */
+export function Bunting({ className }: { className?: string }) {
+  const cloth = [JEWEL, "var(--flower-marigold)", "var(--flower-leaf)", "var(--flower-rose)"];
+  return (
+    <svg
+      aria-hidden
+      viewBox="0 0 1200 70"
+      preserveAspectRatio="xMidYMin slice"
+      className={className}
+    >
+      <path d="M0 6Q300 22 600 6T1200 6" stroke={GILT} strokeWidth="2" fill="none" />
+      {Array.from({ length: 30 }, (_, i) => {
+        const x = 20 + i * 40;
+        const t = (x % 600) / 600;
+        const y = 6 + Math.sin(t * Math.PI) * 8;
+        return (
+          <g key={i}>
+            <path
+              d={`M${x - 16} ${y}L${x + 16} ${y}L${x} ${y + 44}z`}
+              fill={cloth[i % cloth.length]}
+            />
+            {/* Bandhani dots and a mirror */}
+            <circle cx={x - 6} cy={y + 8} r="1.6" fill="var(--flower-jasmine)" />
+            <circle cx={x + 6} cy={y + 8} r="1.6" fill="var(--flower-jasmine)" />
+            <circle
+              cx={x}
+              cy={y + 18}
+              r="4.5"
+              fill="var(--flower-jasmine)"
+              stroke={GILT}
+              strokeWidth="1.5"
+            />
+            <circle cx={x} cy={y + 30} r="1.6" fill="var(--flower-jasmine)" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+/** Balloons rising behind a party's welcome. */
+export function Balloons({ className }: { className?: string }) {
+  const colours = [
+    JEWEL,
+    "var(--flower-marigold)",
+    "var(--flower-lotus)",
+    GILT,
+    "var(--flower-leaf)",
+    "var(--flower-rose)",
+  ];
+  // Along the edges only, clear of the words and the photo
+  const spots = [
+    [1, 22, 1],
+    [5, 58, 0.8],
+    [2, 78, 0.9],
+    [91, 20, 1],
+    [95, 52, 0.8],
+    [89, 74, 1.1],
+  ];
+  return (
+    <div aria-hidden className={className}>
+      {spots.map(([left, top, scale], i) => (
+        <svg
+          key={i}
+          viewBox="0 0 40 90"
+          className="guest-balloon absolute w-12 sm:w-16"
+          style={
+            {
+              left: `${left}%`,
+              top: `${top}%`,
+              scale,
+              "--i": i,
+            } as CSSProperties
+          }
+        >
+          <path d="M20 52Q14 66 22 76T18 90" stroke={GILT} strokeWidth="1" fill="none" />
+          <ellipse cx="20" cy="26" rx="17" ry="22" fill={colours[i % colours.length]} />
+          <path d="M16 48h8l-4 5z" fill={colours[i % colours.length]} />
+          <ellipse cx="13" cy="17" rx="4" ry="7" fill="white" opacity="0.35" />
+        </svg>
+      ))}
+    </div>
   );
 }
