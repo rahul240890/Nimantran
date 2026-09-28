@@ -195,10 +195,7 @@ function Welcome({
   const welcome = [copy.families, copy.line].filter((text) => text.trim());
 
   return (
-    <section
-      aria-labelledby="guest-welcome"
-      className="guest-welcome relative px-4 pt-16 pb-14 sm:px-6 sm:pt-20"
-    >
+    <section className="guest-welcome relative px-4 pt-16 pb-14 sm:px-6 sm:pt-20">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-10 lg:grid-cols-[1fr_minmax(0,22rem)_1fr]">
         <Reveal className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-start">
           <p className="font-label text-xs tracking-[0.34em] text-accent-text uppercase">
@@ -479,7 +476,7 @@ function Photos({ photos, look }: { photos: readonly PublicPhoto[]; look: GuestL
       </div>
       {/* Scrolls sideways; focusable so a keyboard can scroll it too */}
       <div
-        role="region"
+        role="group"
         aria-labelledby="guest-photos"
         tabIndex={0}
         className="guest-frames mt-10 snap-x snap-mandatory overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"

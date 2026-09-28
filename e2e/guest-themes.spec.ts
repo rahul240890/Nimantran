@@ -1,5 +1,17 @@
-import { expect, test } from "@playwright/test";
-import { axe, noOverflow } from "./invite-helpers";
+import AxeBuilder from "@axe-core/playwright";
+import { expect, test, type Page } from "@playwright/test";
+import { noOverflow } from "./invite-helpers";
+
+// Best practice too, as the keyboard test on a real guest page checks
+const axe = (page: Page) =>
+  new AxeBuilder({ page }).withTags([
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa",
+    "best-practice",
+  ]);
 
 /* The themed guest page below the painted pages (Step 12q), on the sample review page */
 for (const suite of ["rajwada-bagh", "kayal"] as const) {
