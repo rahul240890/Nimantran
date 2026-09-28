@@ -3,7 +3,13 @@
 import { format, parseISO } from "date-fns";
 import { CalendarPlus, Music, Pause } from "lucide-react";
 import Image from "next/image";
-import { useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react";
+import {
+  useState,
+  useSyncExternalStore,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import { Button } from "@/components/ui/button";
@@ -16,7 +22,7 @@ import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { monogram, type GuestLook, type GuestStyle } from "@/lib/suites/guest-look";
 import type { CardCopy } from "@/lib/templates/content";
 import { LightArt, Ornament, PlayerArt, SealArt } from "./touches";
-import { useInView } from "./use-in-view";
+import { useInView, useOnScreen } from "./use-in-view";
 
 const noSubscribe = () => () => {};
 /** True in the browser once hydrated: sections wait to play their entrance only there. */
@@ -72,6 +78,8 @@ export function ThemedDetails({
   const words = guestCopy.themed;
   const mark = monogram(copy.first, copy.second);
   const [top, topSeen] = useInView<HTMLDivElement>("0px");
+  // The floating music button stands in for the player once it has scrolled away
+  const [player, playerOnScreen] = useOnScreen<HTMLButtonElement>();
 
   return (
     <div
@@ -81,7 +89,15 @@ export function ThemedDetails({
       data-guest={look.style}
       className="guest-themed relative isolate overflow-hidden"
     >
-      <Welcome copy={copy} lang={lang} look={look} mark={mark} music={music} photo={photos[0]} />
+      <Welcome
+        copy={copy}
+        lang={lang}
+        look={look}
+        mark={mark}
+        music={music}
+        photo={photos[0]}
+        player={player}
+      />
       <Lights copy={copy} lang={lang} look={look} />
       {main && <SaveTheDate main={main} look={look} />}
       <Celebrations suite={suite} style={look.style} functions={functions} allIcsUrl={allIcsUrl} />
@@ -109,7 +125,7 @@ export function ThemedDetails({
       <p className="px-6 pb-12 text-center font-display text-xl text-balance text-ink-muted italic">
         {words.closing}
       </p>
-      {topSeen && <FloatingMusic music={music} />}
+      {topSeen && playerOnScreen === false && <FloatingMusic music={music} />}
     </div>
   );
 }
@@ -162,6 +178,7 @@ function Welcome({
   mark,
   music,
   photo,
+  player,
 }: {
   copy: CardCopy;
   lang: string;
@@ -169,6 +186,7 @@ function Welcome({
   mark: string;
   music: Music;
   photo: PublicPhoto | undefined;
+  player: RefObject<HTMLButtonElement | null>;
 }) {
   const { guestCopy } = useText(publishText);
   const words = guestCopy.themed;
@@ -254,6 +272,7 @@ function Welcome({
 
         <Reveal className="mx-auto w-full max-w-[16rem] sm:max-w-xs">
           <button
+            ref={player}
             type="button"
             onClick={music.toggle}
             aria-pressed={music.playing}

@@ -30,3 +30,19 @@ export function useInView<T extends Element>(margin = "0px 0px -15% 0px") {
   }, [margin, seen]);
   return [ref, seen] as const;
 }
+
+/** Whether the element is on screen right now (null until known). */
+export function useOnScreen<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [onScreen, setOnScreen] = useState<boolean | null>(null);
+  useEffect(() => {
+    const node = ref.current;
+    if (!node || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver((entries) =>
+      setOnScreen(entries.some((entry) => entry.isIntersecting)),
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, onScreen] as const;
+}
