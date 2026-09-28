@@ -23,7 +23,7 @@ import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy } from "@/lib/templates/content";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { suiteCopy, traditionCopy } from "@/content/editor";
-import { SUITE_IDS, isSuiteId, type SuiteId } from "@/lib/suites/catalog";
+import { SUITE_IDS, hasBlessingPage, isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
@@ -147,6 +147,8 @@ export function EngineReview({
               words: uiStrings.storyWords,
               family: SAMPLE_FAMILY,
               couple: SAMPLE_PHOTOS.slice(0, photos),
+              // Themes painted with a god open on it, as a guest's would
+              blessing: hasBlessingPage(suite),
             }),
             suite,
             textBox,

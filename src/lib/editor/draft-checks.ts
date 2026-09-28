@@ -122,6 +122,8 @@ export const draftSchema = z.object({
   type: typeSchema.catch(defaultType),
   /** The couple's photo page (Step 12l): which of the invite's photos fill its frames. */
   couplePhotos: couplePhotosSchema.catch(noCouplePhotos),
+  /** Open with the theme's painted god, where it has one (Step 12r). */
+  blessingPage: z.boolean().catch(true),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

@@ -16,7 +16,7 @@ import {
   frameCount,
   type CoupleLayout,
 } from "@/lib/editor/couple-photos";
-import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
+import { ASKABLE_QUESTIONS, draftPeople, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import { TEMPLATES } from "@/lib/templates/catalog";
@@ -210,7 +210,10 @@ function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
   const ids = draft.photos.map((photo) => photo.id);
   const urls = usePhotoUrls(ids, draft.remoteId);
-  const { layout } = draft.couplePhotos;
+  // A birthday or party has one guest of honour, so one photo at most
+  const one = draftPeople(draft) === "one";
+  const layout = one && draft.couplePhotos.layout === "two" ? "one" : draft.couplePhotos.layout;
+  const layouts = one ? (["none", "one"] as const) : COUPLE_LAYOUTS;
   const frames = frameCount(layout);
   const filled = coupleFrameIds(draft.couplePhotos, ids);
 
@@ -233,7 +236,9 @@ function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
         <h2 id="couple-heading" className="font-display text-xl">
           {extrasCopy.coupleHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.coupleHint}</p>
+        <p className="text-sm text-ink-muted">
+          {one ? extrasCopy.photoHintOne : extrasCopy.coupleHint}
+        </p>
       </div>
       <RadioGroup
         label={extrasCopy.coupleHeading}
@@ -247,11 +252,11 @@ function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
         }
         className="grid-cols-1"
       >
-        {COUPLE_LAYOUTS.map((id) => {
+        {layouts.map((id) => {
           const Icon = LAYOUT_ICONS[id];
-          return (
-            <RadioItem key={id} value={id} icon={<Icon />} label={extrasCopy.coupleLayouts[id]} />
-          );
+          const label =
+            one && id !== "two" ? extrasCopy.photoLayoutsOne[id] : extrasCopy.coupleLayouts[id];
+          return <RadioItem key={id} value={id} icon={<Icon />} label={label} />;
         })}
       </RadioGroup>
       {frames > 0 && ids.length === 0 && (

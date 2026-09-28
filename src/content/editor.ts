@@ -289,6 +289,12 @@ export const extrasCopy = {
     one: "One photo of you both",
     two: "Two photos, one each",
   },
+  /** A birthday or party has one guest of honour. */
+  photoHintOne: "A photo inside the theme's own frame, on the page after the name.",
+  photoLayoutsOne: {
+    none: "No photo page",
+    one: "One photo",
+  },
   coupleAddFirst: "Add a photo above and it fills the frame.",
   coupleFrame: (index: number, frames: number) =>
     frames === 1 ? "Photo in the frame" : index === 1 ? "First frame" : "Second frame",
@@ -459,6 +465,9 @@ export const suiteCopy = {
   textBox: "Box behind the words",
   textBoxHint:
     "Off, the words sit straight on the painting. On, they sit in a soft card-coloured box. Play the pages to compare; the same switch is on the pages too.",
+  blessingPage: "Open with the blessing page",
+  blessingPageHint:
+    "This theme opens with a painting of the god and your blessing beneath it, before your names.",
   names: {
     "rajwada-bagh": "Rajwada Bagh",
     "shahi-savari": "Shahi Savari",
@@ -471,6 +480,18 @@ export const suiteCopy = {
     gubbara: "Gubbara",
     saath: "Saath",
     rooftop: "Rooftop",
+    "ivory-arch": "Ivory Arch",
+    gulaab: "Gulaab",
+    "deco-noir": "Deco Noir",
+    taara: "Taara",
+    kaagaz: "Kaagaz",
+    mitti: "Mitti",
+    neel: "Neel",
+    pichwai: "Pichwai",
+    tanjore: "Tanjore",
+    kashi: "Kashi",
+    sagar: "Sagar",
+    "jungle-party": "Jungle Party",
     classic: "Card colours",
   },
   descriptions: {
@@ -486,6 +507,18 @@ export const suiteCopy = {
     gubbara: "A pastel garden arch of balloons and bunting, with the cake table beneath.",
     saath: "Red roses and candlelight over a lake at sunset, for years together.",
     rooftop: "A city rooftop at night with fairy lights, floor cushions and fireworks.",
+    "ivory-arch": "Modern and calm: ivory arches, pampas grass and soft sunlight by the sea.",
+    gulaab: "Loose watercolour roses and peonies on white paper.",
+    "deco-noir": "Black and gold art deco, like a grand 1920s hotel ballroom.",
+    taara: "A midnight sky of gold moons, stars and soft clouds.",
+    kaagaz: "Layers of pastel cut paper, with lotuses, jaali and real depth.",
+    mitti: "A boho desert wedding: terracotta arches, pampas grass and the dunes.",
+    neel: "Jaipur blue pottery: cobalt and turquoise tiles on white marble.",
+    pichwai: "A Nathdwara Pichwai of lotus ponds and cows, opening with Shrinathji.",
+    tanjore: "A Thanjavur painting in gold leaf and gems, opening with Ganesha.",
+    kashi: "The ghats of Banaras at dawn, opening with Ganesha, lamps on the Ganga.",
+    sagar: "A beach wedding: white drapes, palms and a pastel sunset over the sea.",
+    "jungle-party": "A storybook jungle of friendly animals, balloons and big leaves.",
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
 } as const;

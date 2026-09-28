@@ -108,6 +108,7 @@ export function newDraft(
     textBox: false,
     type: defaultType,
     couplePhotos: noCouplePhotos,
+    blessingPage: true,
   };
 }
 

@@ -27,6 +27,7 @@ describe("gallery catalog", () => {
     expect(kindDesigns("gujarati").map((design) => design.id)).toEqual([
       "kutch-toran",
       "shahi-savari",
+      "pichwai",
       "card-bandhani",
     ]);
     // The kind's painted theme opens with the kind's own card

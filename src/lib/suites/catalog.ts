@@ -26,6 +26,18 @@ export const SUITE_IDS = [
   "gubbara",
   "saath",
   "rooftop",
+  "ivory-arch",
+  "gulaab",
+  "deco-noir",
+  "taara",
+  "kaagaz",
+  "mitti",
+  "neel",
+  "pichwai",
+  "tanjore",
+  "kashi",
+  "sagar",
+  "jungle-party",
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -46,6 +58,8 @@ export type PageTurn = "fade" | "arch" | "sweep" | "ripple";
  * share the closest one (a garba uses the sangeet's night, a tilak the wedding's mandap).
  */
 export const PAGE_ARTS = [
+  // A god's own page before the cover, only in themes painted with one (Step 12r)
+  "blessing",
   "cover",
   "family",
   "haldi",
@@ -313,6 +327,262 @@ export const SUITES: Record<SuiteId, Suite> = {
     tones: { cover: "dark", family: "dark" },
     occasions: ["party"],
   },
+  // Modern and minimal: ivory plaster arches, pampas grass and soft sunlight
+  "ivory-arch": {
+    id: "ivory-arch",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    images: {
+      cover: "/suites/ivory-arch/cover.webp",
+      family: "/suites/ivory-arch/family.webp",
+      haldi: "/suites/ivory-arch/haldi.webp",
+      mehendi: "/suites/ivory-arch/mehendi.webp",
+      sangeet: "/suites/ivory-arch/sangeet.webp",
+      baraat: "/suites/ivory-arch/baraat.webp",
+      wedding: "/suites/ivory-arch/wedding.webp",
+      reception: "/suites/ivory-arch/reception.webp",
+      reply: "/suites/ivory-arch/reply.webp",
+    },
+    tones: { reception: "light" },
+  },
+  // Loose watercolour roses and peonies on white paper
+  gulaab: {
+    id: "gulaab",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/gulaab/cover.webp",
+      family: "/suites/gulaab/family.webp",
+      haldi: "/suites/gulaab/haldi.webp",
+      mehendi: "/suites/gulaab/mehendi.webp",
+      sangeet: "/suites/gulaab/sangeet.webp",
+      baraat: "/suites/gulaab/baraat.webp",
+      wedding: "/suites/gulaab/wedding.webp",
+      reception: "/suites/gulaab/reception.webp",
+      reply: "/suites/gulaab/reply.webp",
+    },
+    tones: { reception: "light" },
+  },
+  // Black lacquer and gold art deco, like a grand 1920s hotel
+  "deco-noir": {
+    id: "deco-noir",
+    art: "kayal",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    images: {
+      cover: "/suites/deco-noir/cover.webp",
+      family: "/suites/deco-noir/family.webp",
+      haldi: "/suites/deco-noir/haldi.webp",
+      mehendi: "/suites/deco-noir/mehendi.webp",
+      sangeet: "/suites/deco-noir/sangeet.webp",
+      baraat: "/suites/deco-noir/baraat.webp",
+      wedding: "/suites/deco-noir/wedding.webp",
+      reception: "/suites/deco-noir/reception.webp",
+      reply: "/suites/deco-noir/reply.webp",
+    },
+    tones: {
+      cover: "dark",
+      family: "dark",
+      haldi: "dark",
+      mehendi: "dark",
+      baraat: "dark",
+      wedding: "dark",
+    },
+  },
+  // A midnight sky of gold moons, stars and soft clouds
+  taara: {
+    id: "taara",
+    art: "kayal",
+    turn: "fade",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    images: {
+      cover: "/suites/taara/cover.webp",
+      family: "/suites/taara/family.webp",
+      haldi: "/suites/taara/haldi.webp",
+      mehendi: "/suites/taara/mehendi.webp",
+      sangeet: "/suites/taara/sangeet.webp",
+      baraat: "/suites/taara/baraat.webp",
+      wedding: "/suites/taara/wedding.webp",
+      reception: "/suites/taara/reception.webp",
+      reply: "/suites/taara/reply.webp",
+    },
+    tones: { cover: "dark", family: "dark", baraat: "dark" },
+  },
+  // Layers of cut paper in pastel shades, with real depth
+  kaagaz: {
+    id: "kaagaz",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/kaagaz/cover.webp",
+      family: "/suites/kaagaz/family.webp",
+      haldi: "/suites/kaagaz/haldi.webp",
+      mehendi: "/suites/kaagaz/mehendi.webp",
+      sangeet: "/suites/kaagaz/sangeet.webp",
+      baraat: "/suites/kaagaz/baraat.webp",
+      wedding: "/suites/kaagaz/wedding.webp",
+      reception: "/suites/kaagaz/reception.webp",
+      reply: "/suites/kaagaz/reply.webp",
+    },
+  },
+  // Boho desert: terracotta arches, pampas grass and the dunes at sunset
+  mitti: {
+    id: "mitti",
+    art: "savari",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "rangmahal",
+    traditions: [],
+    images: {
+      cover: "/suites/mitti/cover.webp",
+      family: "/suites/mitti/family.webp",
+      haldi: "/suites/mitti/haldi.webp",
+      mehendi: "/suites/mitti/mehendi.webp",
+      sangeet: "/suites/mitti/sangeet.webp",
+      baraat: "/suites/mitti/baraat.webp",
+      wedding: "/suites/mitti/wedding.webp",
+      reception: "/suites/mitti/reception.webp",
+      reply: "/suites/mitti/reply.webp",
+    },
+    tones: { reply: "light" },
+  },
+  // Jaipur blue pottery: cobalt and turquoise tiles on white marble
+  neel: {
+    id: "neel",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "emerald",
+    traditions: [],
+    images: {
+      cover: "/suites/neel/cover.webp",
+      family: "/suites/neel/family.webp",
+      haldi: "/suites/neel/haldi.webp",
+      mehendi: "/suites/neel/mehendi.webp",
+      sangeet: "/suites/neel/sangeet.webp",
+      baraat: "/suites/neel/baraat.webp",
+      wedding: "/suites/neel/wedding.webp",
+      reception: "/suites/neel/reception.webp",
+      reply: "/suites/neel/reply.webp",
+    },
+    tones: { reception: "light" },
+  },
+  // A Nathdwara Pichwai: lotus ponds, cows and Shrinathji's blessing
+  pichwai: {
+    id: "pichwai",
+    art: "kayal",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "marigold",
+    traditions: [],
+    images: {
+      blessing: "/suites/pichwai/blessing.webp",
+      cover: "/suites/pichwai/cover.webp",
+      family: "/suites/pichwai/family.webp",
+      haldi: "/suites/pichwai/haldi.webp",
+      mehendi: "/suites/pichwai/mehendi.webp",
+      sangeet: "/suites/pichwai/sangeet.webp",
+      baraat: "/suites/pichwai/baraat.webp",
+      wedding: "/suites/pichwai/wedding.webp",
+      reception: "/suites/pichwai/reception.webp",
+      reply: "/suites/pichwai/reply.webp",
+    },
+    tones: { blessing: "dark", cover: "dark" },
+  },
+  // A Thanjavur painting in gold leaf and gems, with Ganesha and Lakshmi
+  tanjore: {
+    id: "tanjore",
+    art: "kayal",
+    turn: "arch",
+    faiths: ["all"],
+    template: "gopuram",
+    traditions: [],
+    images: {
+      blessing: "/suites/tanjore/blessing.webp",
+      cover: "/suites/tanjore/cover.webp",
+      family: "/suites/tanjore/family.webp",
+      haldi: "/suites/tanjore/haldi.webp",
+      mehendi: "/suites/tanjore/mehendi.webp",
+      sangeet: "/suites/tanjore/sangeet.webp",
+      baraat: "/suites/tanjore/baraat.webp",
+      wedding: "/suites/tanjore/wedding.webp",
+      reception: "/suites/tanjore/reception.webp",
+      reply: "/suites/tanjore/reply.webp",
+    },
+    tones: { blessing: "dark", cover: "dark", mehendi: "dark", baraat: "dark", wedding: "dark" },
+  },
+  // The ghats of Banaras at dawn, with Ganesha's blessing and lamps on the Ganga
+  kashi: {
+    id: "kashi",
+    art: "kayal",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "marigold",
+    traditions: [],
+    images: {
+      blessing: "/suites/kashi/blessing.webp",
+      cover: "/suites/kashi/cover.webp",
+      family: "/suites/kashi/family.webp",
+      haldi: "/suites/kashi/haldi.webp",
+      mehendi: "/suites/kashi/mehendi.webp",
+      sangeet: "/suites/kashi/sangeet.webp",
+      baraat: "/suites/kashi/baraat.webp",
+      wedding: "/suites/kashi/wedding.webp",
+      reception: "/suites/kashi/reception.webp",
+      reply: "/suites/kashi/reply.webp",
+    },
+    tones: { reception: "light" },
+  },
+  // A beach wedding: white drapes, palms and a pastel sunset over the sea
+  sagar: {
+    id: "sagar",
+    art: "kayal",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/sagar/cover.webp",
+      family: "/suites/sagar/family.webp",
+      haldi: "/suites/sagar/haldi.webp",
+      mehendi: "/suites/sagar/mehendi.webp",
+      sangeet: "/suites/sagar/sangeet.webp",
+      baraat: "/suites/sagar/baraat.webp",
+      wedding: "/suites/sagar/wedding.webp",
+      reception: "/suites/sagar/reception.webp",
+      reply: "/suites/sagar/reply.webp",
+    },
+    tones: { reception: "light", reply: "light" },
+  },
+  // A storybook jungle of friendly animals, balloons and big leaves
+  "jungle-party": {
+    id: "jungle-party",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    images: {
+      cover: "/suites/jungle-party/cover.webp",
+      family: "/suites/jungle-party/family.webp",
+      reception: "/suites/jungle-party/reception.webp",
+      reply: "/suites/jungle-party/reply.webp",
+    },
+    occasions: ["birthday"],
+  },
   classic: {
     id: "classic",
     art: "card",
@@ -369,7 +639,7 @@ export function suiteFor(input: {
   return TEMPLATE_SUITES[input.templateId] ?? "rajwada-bagh";
 }
 
-type PageKind = "cover" | "family" | "reply" | FunctionId;
+type PageKind = "blessing" | "cover" | "family" | "reply" | FunctionId;
 
 /** Each function's page art and light. */
 const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
@@ -397,8 +667,14 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   party: { art: "reception", mood: "night" },
 };
 
+/** Whether a theme opens with a god's own page before the cover. */
+export function hasBlessingPage(suite: SuiteId): boolean {
+  return Boolean(SUITES[suite].images.blessing);
+}
+
 /** Which painting and what light a page gets. */
 export function pageLook(kind: PageKind): { art: PageArt; mood: Mood } {
+  if (kind === "blessing") return { art: "blessing", mood: "dawn" };
   if (kind === "cover") return { art: "cover", mood: "dusk" };
   if (kind === "family") return { art: "family", mood: "day" };
   if (kind === "reply") return { art: "reply", mood: "night" };

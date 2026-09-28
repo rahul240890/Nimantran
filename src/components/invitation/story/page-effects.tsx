@@ -11,6 +11,8 @@ import type { PageArt } from "@/lib/suites/catalog";
 type Effect = "petals" | "twinkle" | "fireworks" | "lamps" | "dust";
 
 const EFFECTS: Record<PageArt, Effect> = {
+  // Petals fall before the god, as at a darshan
+  blessing: "petals",
   cover: "petals",
   family: "dust",
   haldi: "petals",

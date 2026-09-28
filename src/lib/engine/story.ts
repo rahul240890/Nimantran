@@ -10,7 +10,7 @@ import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import type { CardCopy } from "@/lib/templates/content";
 
 /** The page a beat is, and so the scene painted behind it. Functions each have their own. */
-export const STORY_SCENES = ["cover", "family", ...FUNCTION_IDS, "reply"] as const;
+export const STORY_SCENES = ["blessing", "cover", "family", ...FUNCTION_IDS, "reply"] as const;
 export type StorySceneId = (typeof STORY_SCENES)[number];
 
 /** A function as the story tells it: the words the guest page already shows. */
@@ -69,6 +69,11 @@ export type StoryInput = {
   family?: readonly FamilyLine[];
   /** The couple's photos (one or two) for a photo page after the cover; none skips it. */
   couple?: readonly StoryPhoto[];
+  /**
+   * Open with the theme's painted god and the blessing before the names (Step 12r). The
+   * painting shows the god, so the blessing moves there and the cover keeps the names.
+   */
+  blessing?: boolean;
 };
 
 /** One labelled block of the family's wording: "आशीर्वाद" over the grandparents' names. */
@@ -126,6 +131,7 @@ export function storyBeats({
   words: w,
   family = [],
   couple = [],
+  blessing = false,
 }: StoryInput): StoryBeat[] {
   const beats: StoryBeat[] = [];
   // A birthday or a party is led by one name, with nothing to join
@@ -133,18 +139,26 @@ export function storyBeats({
   // With one function, its own page carries the date
   const single = functions.length === 1;
 
+  // The blessing page: the painted god, the family's blessing beneath
+  if (blessing) {
+    const page = beat("blessing", "blessing", line(copy.blessing, "script"));
+    // A moment to take in the god, even with no words
+    beats.push({ ...page, seconds: Math.max(page.seconds, 5) });
+  }
+
   // The cover: the sacred symbol and blessing over the couple's names
   beats.push(
     beat(
       "cover",
       "cover",
       [
-        ...line(copy.blessing, "script"),
+        ...(blessing ? [] : line(copy.blessing, "script")),
         ...line(copy.first, "display"),
         ...line(joiner, "joiner"),
         ...line(copy.second, "display"),
       ],
-      Boolean(copy.symbol),
+      // The painted god already blesses the page before
+      Boolean(copy.symbol) && !blessing,
     ),
   );
 

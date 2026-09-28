@@ -99,7 +99,7 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("radio", { name: /Wedding/ })).toBeChecked();
     await next(page);
     await next(page);
-    await page.getByRole("radio", { name: /Rose Garden/ }).click();
+    await page.getByRole("radio", { name: /^Rose Garden/ }).click();
     await next(page);
 
     await fillCouple(page);
