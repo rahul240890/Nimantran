@@ -95,15 +95,21 @@ export function DesignCard({ design, name, description, href, priority, cover }:
           <Eye aria-hidden className="size-5" />
         </span>
       </button>
-      <div className="flex flex-1 flex-col gap-3 p-4">
+      <div className="@container flex flex-1 flex-col gap-3 p-3 sm:p-4">
         <div className="flex flex-col gap-1">
           <h3 className="font-display text-xl leading-tight">{name}</h3>
           <p className="line-clamp-2 text-sm text-ink-muted">{description}</p>
         </div>
-        <Button asChild size="sm" className="mt-auto w-full">
+        {/* Two cards to a row on a phone leave little room: the arrow goes and the words
+            may wrap before they would ever touch the button's edge */}
+        <Button
+          asChild
+          size="sm"
+          className="mt-auto h-auto min-h-11 w-full px-3 py-2 text-center leading-tight whitespace-normal"
+        >
           <Link href={href}>
             {galleryCopy.useDesign}
-            <ArrowRight aria-hidden className="rtl:rotate-180" />
+            <ArrowRight aria-hidden className="@max-[10.5rem]:hidden rtl:rotate-180" />
           </Link>
         </Button>
       </div>
