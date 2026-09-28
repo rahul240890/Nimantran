@@ -37,6 +37,8 @@ type SharePanelProps = {
   qr: string;
   /** Guests' replies so far, drawn on the server. */
   replies?: ReactNode;
+  /** The video for WhatsApp Status and Reels (Step 17c). */
+  video?: ReactNode;
 };
 
 const noSubscribe = () => () => {};
@@ -61,6 +63,7 @@ export function SharePanel({
   message: initialMessage,
   qr,
   replies,
+  video,
 }: SharePanelProps) {
   const { shareCopy } = useText(publishText);
   const [message, setMessage] = useState(initialMessage);
@@ -226,6 +229,8 @@ export function SharePanel({
               </Button>
             </div>
           </Card>
+
+          {video}
         </div>
       </div>
 
