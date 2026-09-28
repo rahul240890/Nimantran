@@ -40,6 +40,7 @@ export const galleryCopy = {
   cardNote:
     "A 3D card that opens on the guest's phone, followed by pages in the card's own colours.",
   pageNames: {
+    blessing: "Blessing",
     cover: "Cover",
     family: "Family",
     haldi: "Haldi",

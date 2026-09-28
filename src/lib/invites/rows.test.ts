@@ -89,6 +89,10 @@ describe("invite rows", () => {
     expect(rowsToDraft(event, functions).couplePhotos).toEqual(couplePhotos);
     const older = { ...event, religious: { ...event.religious, couplePhotos: undefined } };
     expect(rowsToDraft(older, functions).couplePhotos).toEqual({ layout: "none", ids: [] });
+    // Older invites open with the god's page wherever their theme has one
+    expect(rowsToDraft(older, functions).blessingPage).toBe(true);
+    const off = asStored({ ...sample(), blessingPage: false });
+    expect(rowsToDraft(off.event, off.functions).blessingPage).toBe(false);
   });
 
   it("keeps the family's tradition", () => {

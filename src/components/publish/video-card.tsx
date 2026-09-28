@@ -14,7 +14,7 @@ import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
-import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
+import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { drawFrame, videoImages, type VideoScene } from "@/lib/video/draw";
 import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/look";
@@ -86,6 +86,7 @@ export function VideoCard(props: VideoCardProps) {
         (id) => photos.find((photo) => photo.id === id)?.url,
         copy,
       ),
+      blessing: draftBlessing(draft),
     });
     return {
       copy,

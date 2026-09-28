@@ -12,7 +12,7 @@ import {
   type InviteDraft,
 } from "@/lib/editor/draft";
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
-import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { hasBlessingPage, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { formatCardDate, formatCardTime, type CardLanguage } from "@/lib/templates/card-languages";
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import { formatTime } from "@/lib/time";
@@ -102,4 +102,9 @@ export function draftSuite(draft: InviteDraft): SuiteId {
     templateId: draft.templateId,
     category: draft.categoryId,
   });
+}
+
+/** Whether the pages open with the theme's painted god: when it has one and the host keeps it. */
+export function draftBlessing(draft: InviteDraft): boolean {
+  return draft.blessingPage && hasBlessingPage(draftSuite(draft));
 }

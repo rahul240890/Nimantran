@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { SUITE_IDS } from "./catalog";
+import { SUITES, SUITE_IDS } from "./catalog";
 import { PHOTO_PAGE_SUITES, photoPage } from "./photo-frames";
 
 describe("couple photo paintings", () => {
@@ -11,7 +11,9 @@ describe("couple photo paintings", () => {
       for (const count of [1, 2]) {
         const page = photoPage(suite, count)!;
         expect(existsSync(join(process.cwd(), "public", page.image)), page.image).toBe(true);
-        expect(page.frames).toHaveLength(count);
+        // A birthday theme has one frame, which two photos share
+        expect(page.frames.length).toBeGreaterThanOrEqual(1);
+        expect(page.frames.length).toBeLessThanOrEqual(count);
         for (const [x, y, width, height] of page.frames) {
           expect(x).toBeGreaterThanOrEqual(0);
           expect(y).toBeGreaterThanOrEqual(0);
@@ -24,6 +26,13 @@ describe("couple photo paintings", () => {
         expect(100 - page.area.bottom).toBeGreaterThan(page.area.top + 10);
       }
     }
+  });
+
+  it("gives every wedding theme a frame for each of the couple", () => {
+    for (const suite of PHOTO_PAGE_SUITES.filter((id) => !SUITES[id].occasions)) {
+      expect(photoPage(suite, 2)!.frames, suite).toHaveLength(2);
+    }
+    expect(photoPage("jungle-party", 1)!.image).toBe("/suites/jungle-party/photo.webp");
   });
 
   it("has no page for themes without the paintings, or without photos", () => {

@@ -31,7 +31,7 @@ import type { FunctionId } from "@/lib/events/functions";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
-import { cardFunctions, draftSuite, storyFamily } from "@/lib/publish/story";
+import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES } from "@/lib/suites/catalog";
@@ -130,6 +130,7 @@ export function GuestView({
           (id) => photos.find((photo) => photo.id === id)?.url,
           copy,
         ),
+        blessing: draftBlessing(draft),
       }),
       suite: draftSuite(draft),
       textBox: draft.textBox,

@@ -522,6 +522,10 @@ export function StoryPage({
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
   const offset = sacred ? 1 : 0;
   const after = beat.lines.length + offset;
+  // A god's page shows the whole painting, so the crown stays clear of the controls above
+  const whole = Boolean(frames) || look.art === "blessing";
+  // A blessing nobody wrote leaves the god's page to itself, with no empty glow
+  const empty = beat.lines.length === 0 && !sacred;
 
   return (
     <div
@@ -537,7 +541,7 @@ export function StoryPage({
           image={image}
           seconds={still ? undefined : beat.seconds}
           className="absolute inset-0 overflow-hidden"
-          contain={Boolean(frames)}
+          contain={whole}
           under={frames ? <PhotoWindows frames={frames.frames} photos={photos} /> : undefined}
         />
       )}
@@ -549,6 +553,7 @@ export function StoryPage({
       <div
         className={cn(
           "absolute flex items-center justify-center",
+          empty && "invisible",
           arches
             ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
             : painted
@@ -559,7 +564,7 @@ export function StoryPage({
           frames
             ? areaStyle(frames.area, true)
             : painted && !arches
-              ? areaStyle(textArea(suiteId, look.art))
+              ? areaStyle(textArea(suiteId, look.art), whole)
               : undefined
         }
       >

@@ -37,6 +37,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   pagesLabel: "इस डिज़ाइन के पन्ने",
   cardNote: "मेहमान के फ़ोन पर खुलने वाला 3D कार्ड, फिर कार्ड के अपने रंगों में पन्ने।",
   pageNames: {
+    blessing: "आशीर्वाद",
     cover: "मुखपृष्ठ",
     family: "परिवार",
     haldi: "हल्दी",

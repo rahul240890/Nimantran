@@ -47,7 +47,8 @@ export function couplePagePhotos(
   urlFor: (id: string) => string | undefined,
   names: { first: string; second: string; joiner: string },
 ): StoryPhoto[] {
-  const ids = coupleFrameIds(couple, photoIds);
+  // A birthday's one name has one photo, whatever layout a couple's invite left behind
+  const ids = coupleFrameIds(couple, photoIds).slice(0, names.second.trim() ? 2 : 1);
   const together = [names.first, names.second].filter(Boolean).join(` ${names.joiner || "&"} `);
   const alts = ids.length > 1 ? [names.first, names.second] : [together];
   return ids.flatMap((id, i) => {

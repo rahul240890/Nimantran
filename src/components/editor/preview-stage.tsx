@@ -6,7 +6,13 @@ import { Invitation, type InvitationStory } from "@/components/invitation/invita
 import type { QualityChoice } from "@/content/engine-review";
 import { useLocale, useText } from "@/i18n/client";
 import { storyBeats } from "@/lib/engine/story";
-import { cardFunctions, draftSuite, storyFamily, storyFunctions } from "@/lib/publish/story";
+import {
+  cardFunctions,
+  draftBlessing,
+  draftSuite,
+  storyFamily,
+  storyFunctions,
+} from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { editorText } from "@/i18n/copy/editor";
 import {
@@ -74,6 +80,7 @@ export function PreviewStage({
   const typeKey = JSON.stringify(pageType(draft.type, [language]));
   const type = useMemo(() => JSON.parse(typeKey) as PageType, [typeKey]);
   const couple = useCouplePhotos(draft, deferredCopy);
+  const blessing = draftBlessing(draft);
   const story = useMemo<InvitationStory>(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
     const family = JSON.parse(familyKey) as ReturnType<typeof storyFamily>;
@@ -85,13 +92,25 @@ export function PreviewStage({
         words: CARD_STORY_WORDS[language],
         family,
         couple,
+        blessing,
       }),
       suite,
       textBox,
       type,
       onTextBox,
     };
-  }, [functionsKey, familyKey, deferredCopy, language, suite, textBox, type, onTextBox, couple]);
+  }, [
+    functionsKey,
+    familyKey,
+    deferredCopy,
+    language,
+    suite,
+    textBox,
+    type,
+    onTextBox,
+    couple,
+    blessing,
+  ]);
 
   const { templateId } = draft;
   const { raga } = draft.music;

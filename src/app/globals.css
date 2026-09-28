@@ -266,6 +266,16 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="dawn"],
 [data-suite="rajwada-bagh"][data-mood="dawn"],
+[data-suite="ivory-arch"] [data-mood="dawn"],
+[data-suite="ivory-arch"][data-mood="dawn"],
+[data-suite="gulaab"] [data-mood="dawn"],
+[data-suite="gulaab"][data-mood="dawn"],
+[data-suite="kaagaz"] [data-mood="dawn"],
+[data-suite="kaagaz"][data-mood="dawn"],
+[data-suite="neel"] [data-mood="dawn"],
+[data-suite="neel"][data-mood="dawn"],
+[data-suite="jungle-party"] [data-mood="dawn"],
+[data-suite="jungle-party"][data-mood="dawn"],
 [data-suite="gubbara"] [data-mood="dawn"],
 [data-suite="gubbara"][data-mood="dawn"],
 [data-suite="saath"] [data-mood="dawn"],
@@ -285,6 +295,16 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="day"],
 [data-suite="rajwada-bagh"][data-mood="day"],
+[data-suite="ivory-arch"] [data-mood="day"],
+[data-suite="ivory-arch"][data-mood="day"],
+[data-suite="gulaab"] [data-mood="day"],
+[data-suite="gulaab"][data-mood="day"],
+[data-suite="kaagaz"] [data-mood="day"],
+[data-suite="kaagaz"][data-mood="day"],
+[data-suite="neel"] [data-mood="day"],
+[data-suite="neel"][data-mood="day"],
+[data-suite="jungle-party"] [data-mood="day"],
+[data-suite="jungle-party"][data-mood="day"],
 [data-suite="gubbara"] [data-mood="day"],
 [data-suite="gubbara"][data-mood="day"],
 [data-suite="saath"] [data-mood="day"],
@@ -304,6 +324,16 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="dusk"],
 [data-suite="rajwada-bagh"][data-mood="dusk"],
+[data-suite="ivory-arch"] [data-mood="dusk"],
+[data-suite="ivory-arch"][data-mood="dusk"],
+[data-suite="gulaab"] [data-mood="dusk"],
+[data-suite="gulaab"][data-mood="dusk"],
+[data-suite="kaagaz"] [data-mood="dusk"],
+[data-suite="kaagaz"][data-mood="dusk"],
+[data-suite="neel"] [data-mood="dusk"],
+[data-suite="neel"][data-mood="dusk"],
+[data-suite="jungle-party"] [data-mood="dusk"],
+[data-suite="jungle-party"][data-mood="dusk"],
 [data-suite="gubbara"] [data-mood="dusk"],
 [data-suite="gubbara"][data-mood="dusk"],
 [data-suite="saath"] [data-mood="dusk"],
@@ -323,6 +353,16 @@
 }
 [data-suite="rajwada-bagh"] [data-mood="night"],
 [data-suite="rajwada-bagh"][data-mood="night"],
+[data-suite="ivory-arch"] [data-mood="night"],
+[data-suite="ivory-arch"][data-mood="night"],
+[data-suite="gulaab"] [data-mood="night"],
+[data-suite="gulaab"][data-mood="night"],
+[data-suite="kaagaz"] [data-mood="night"],
+[data-suite="kaagaz"][data-mood="night"],
+[data-suite="neel"] [data-mood="night"],
+[data-suite="neel"][data-mood="night"],
+[data-suite="jungle-party"] [data-mood="night"],
+[data-suite="jungle-party"][data-mood="night"],
 [data-suite="gubbara"] [data-mood="night"],
 [data-suite="gubbara"][data-mood="night"],
 [data-suite="saath"] [data-mood="night"],
@@ -354,6 +394,8 @@
 }
 [data-suite="shahi-savari"] [data-mood="dawn"],
 [data-suite="shahi-savari"][data-mood="dawn"],
+[data-suite="mitti"] [data-mood="dawn"],
+[data-suite="mitti"][data-mood="dawn"],
 [data-suite="kutch-toran"] [data-mood="dawn"],
 [data-suite="kutch-toran"][data-mood="dawn"],
 [data-suite="phulkari-haveli"] [data-mood="dawn"],
@@ -369,6 +411,8 @@
 }
 [data-suite="shahi-savari"] [data-mood="day"],
 [data-suite="shahi-savari"][data-mood="day"],
+[data-suite="mitti"] [data-mood="day"],
+[data-suite="mitti"][data-mood="day"],
 [data-suite="kutch-toran"] [data-mood="day"],
 [data-suite="kutch-toran"][data-mood="day"],
 [data-suite="phulkari-haveli"] [data-mood="day"],
@@ -384,6 +428,8 @@
 }
 [data-suite="shahi-savari"] [data-mood="dusk"],
 [data-suite="shahi-savari"][data-mood="dusk"],
+[data-suite="mitti"] [data-mood="dusk"],
+[data-suite="mitti"][data-mood="dusk"],
 [data-suite="kutch-toran"] [data-mood="dusk"],
 [data-suite="kutch-toran"][data-mood="dusk"],
 [data-suite="phulkari-haveli"] [data-mood="dusk"],
@@ -399,6 +445,8 @@
 }
 [data-suite="shahi-savari"] [data-mood="night"],
 [data-suite="shahi-savari"][data-mood="night"],
+[data-suite="mitti"] [data-mood="night"],
+[data-suite="mitti"][data-mood="night"],
 [data-suite="kutch-toran"] [data-mood="night"],
 [data-suite="kutch-toran"][data-mood="night"],
 [data-suite="phulkari-haveli"] [data-mood="night"],
@@ -426,6 +474,18 @@
 }
 [data-suite="kayal"] [data-mood="dawn"],
 [data-suite="kayal"][data-mood="dawn"],
+[data-suite="deco-noir"] [data-mood="dawn"],
+[data-suite="deco-noir"][data-mood="dawn"],
+[data-suite="taara"] [data-mood="dawn"],
+[data-suite="taara"][data-mood="dawn"],
+[data-suite="pichwai"] [data-mood="dawn"],
+[data-suite="pichwai"][data-mood="dawn"],
+[data-suite="tanjore"] [data-mood="dawn"],
+[data-suite="tanjore"][data-mood="dawn"],
+[data-suite="kashi"] [data-mood="dawn"],
+[data-suite="kashi"][data-mood="dawn"],
+[data-suite="sagar"] [data-mood="dawn"],
+[data-suite="sagar"][data-mood="dawn"],
 [data-suite="rooftop"] [data-mood="dawn"],
 [data-suite="rooftop"][data-mood="dawn"],
 [data-suite="rajbari"] [data-mood="dawn"],
@@ -441,6 +501,18 @@
 }
 [data-suite="kayal"] [data-mood="day"],
 [data-suite="kayal"][data-mood="day"],
+[data-suite="deco-noir"] [data-mood="day"],
+[data-suite="deco-noir"][data-mood="day"],
+[data-suite="taara"] [data-mood="day"],
+[data-suite="taara"][data-mood="day"],
+[data-suite="pichwai"] [data-mood="day"],
+[data-suite="pichwai"][data-mood="day"],
+[data-suite="tanjore"] [data-mood="day"],
+[data-suite="tanjore"][data-mood="day"],
+[data-suite="kashi"] [data-mood="day"],
+[data-suite="kashi"][data-mood="day"],
+[data-suite="sagar"] [data-mood="day"],
+[data-suite="sagar"][data-mood="day"],
 [data-suite="rooftop"] [data-mood="day"],
 [data-suite="rooftop"][data-mood="day"],
 [data-suite="rajbari"] [data-mood="day"],
@@ -456,6 +528,18 @@
 }
 [data-suite="kayal"] [data-mood="dusk"],
 [data-suite="kayal"][data-mood="dusk"],
+[data-suite="deco-noir"] [data-mood="dusk"],
+[data-suite="deco-noir"][data-mood="dusk"],
+[data-suite="taara"] [data-mood="dusk"],
+[data-suite="taara"][data-mood="dusk"],
+[data-suite="pichwai"] [data-mood="dusk"],
+[data-suite="pichwai"][data-mood="dusk"],
+[data-suite="tanjore"] [data-mood="dusk"],
+[data-suite="tanjore"][data-mood="dusk"],
+[data-suite="kashi"] [data-mood="dusk"],
+[data-suite="kashi"][data-mood="dusk"],
+[data-suite="sagar"] [data-mood="dusk"],
+[data-suite="sagar"][data-mood="dusk"],
 [data-suite="rooftop"] [data-mood="dusk"],
 [data-suite="rooftop"][data-mood="dusk"],
 [data-suite="rajbari"] [data-mood="dusk"],
@@ -471,6 +555,18 @@
 }
 [data-suite="kayal"] [data-mood="night"],
 [data-suite="kayal"][data-mood="night"],
+[data-suite="deco-noir"] [data-mood="night"],
+[data-suite="deco-noir"][data-mood="night"],
+[data-suite="taara"] [data-mood="night"],
+[data-suite="taara"][data-mood="night"],
+[data-suite="pichwai"] [data-mood="night"],
+[data-suite="pichwai"][data-mood="night"],
+[data-suite="tanjore"] [data-mood="night"],
+[data-suite="tanjore"][data-mood="night"],
+[data-suite="kashi"] [data-mood="night"],
+[data-suite="kashi"][data-mood="night"],
+[data-suite="sagar"] [data-mood="night"],
+[data-suite="sagar"][data-mood="night"],
 [data-suite="rooftop"] [data-mood="night"],
 [data-suite="rooftop"][data-mood="night"],
 [data-suite="rajbari"] [data-mood="night"],
@@ -580,6 +676,151 @@
   --suite-gold: #f0b84a;
   --suite-light: #ffd27a;
   --suite-stone: #ece2f5;
+}
+/* The modern and painted themes of Step 12r */
+[data-suite="ivory-arch"] {
+  --suite-plate: #fbf7ef;
+  --suite-ink: #3a2e24;
+  --suite-ink-muted: #6b5d50;
+  --suite-gold-text: #7a5a20;
+  --suite-accent-text: #8a4a3a;
+  --suite-leaf: #6f8a6a;
+  --suite-accent: #b98a6e;
+  --suite-gold: #c9a86a;
+  --suite-light: #ffe6b8;
+  --suite-stone: #efe6d6;
+}
+[data-suite="gulaab"] {
+  --suite-plate: #fffaf7;
+  --suite-ink: #3d1f26;
+  --suite-ink-muted: #6b4a52;
+  --suite-gold-text: #7d5410;
+  --suite-accent-text: #a8324f;
+  --suite-leaf: #5f8a70;
+  --suite-accent: #d9738c;
+  --suite-gold: #d4a64a;
+  --suite-light: #ffd9c7;
+  --suite-stone: #f7e6e4;
+}
+[data-suite="deco-noir"] {
+  --suite-plate: #f7f0e0;
+  --suite-ink: #14110c;
+  --suite-ink-muted: #4a4336;
+  --suite-gold-text: #75561a;
+  --suite-accent-text: #1f5a44;
+  --suite-leaf: #1f5a44;
+  --suite-accent: #0f4d3a;
+  --suite-gold: #d4af37;
+  --suite-light: #ffe39a;
+  --suite-stone: #e8dcc0;
+}
+[data-suite="taara"] {
+  --suite-plate: #f5f3fb;
+  --suite-ink: #1a1f45;
+  --suite-ink-muted: #4a4d70;
+  --suite-gold-text: #7a5a14;
+  --suite-accent-text: #5a3a8a;
+  --suite-leaf: #4f6a8a;
+  --suite-accent: #5b4bb0;
+  --suite-gold: #d9b458;
+  --suite-light: #fff0c2;
+  --suite-stone: #e4e0f2;
+}
+[data-suite="kaagaz"] {
+  --suite-plate: #fff8f4;
+  --suite-ink: #3a2438;
+  --suite-ink-muted: #6a5068;
+  --suite-gold-text: #7d5a14;
+  --suite-accent-text: #a33a6a;
+  --suite-leaf: #5f9a80;
+  --suite-accent: #e38aa8;
+  --suite-gold: #d9b06a;
+  --suite-light: #ffe0c8;
+  --suite-stone: #f5e6ea;
+}
+[data-suite="mitti"] {
+  --suite-plate: #fdf5ec;
+  --suite-ink: #3a1e12;
+  --suite-ink-muted: #6b4a3a;
+  --suite-gold-text: #7d5410;
+  --suite-accent-text: #a3441f;
+  --suite-leaf: #6f7a3a;
+  --suite-accent: #c2552b;
+  --suite-gold: #d19a4a;
+  --suite-light: #ffd49a;
+  --suite-stone: #f2dfc8;
+}
+[data-suite="neel"] {
+  --suite-plate: #f7fafe;
+  --suite-ink: #0f2350;
+  --suite-ink-muted: #3f5075;
+  --suite-gold-text: #6f5410;
+  --suite-accent-text: #1a4fa3;
+  --suite-leaf: #3f7d5c;
+  --suite-accent: #1f5fbf;
+  --suite-gold: #c9a24c;
+  --suite-light: #ffe7a8;
+  --suite-stone: #e3ebf5;
+}
+[data-suite="pichwai"] {
+  --suite-plate: #fbf4e6;
+  --suite-ink: #14204a;
+  --suite-ink-muted: #454a6a;
+  --suite-gold-text: #7a5410;
+  --suite-accent-text: #a3244f;
+  --suite-leaf: #2f6e3c;
+  --suite-accent: #d6457f;
+  --suite-gold: #d4a64a;
+  --suite-light: #ffd9a0;
+  --suite-stone: #efe2cc;
+}
+[data-suite="tanjore"] {
+  --suite-plate: #fdf5e6;
+  --suite-ink: #3a0a0a;
+  --suite-ink-muted: #6a3a32;
+  --suite-gold-text: #7a5410;
+  --suite-accent-text: #a3121f;
+  --suite-leaf: #1f6a3c;
+  --suite-accent: #b3121f;
+  --suite-gold: #d4a02a;
+  --suite-light: #ffd27a;
+  --suite-stone: #f3e2c2;
+}
+[data-suite="kashi"] {
+  --suite-plate: #fdf6ea;
+  --suite-ink: #3a1a0c;
+  --suite-ink-muted: #6b4a38;
+  --suite-gold-text: #7d5410;
+  --suite-accent-text: #a8400f;
+  --suite-leaf: #4f7a3a;
+  --suite-accent: #e07a1a;
+  --suite-gold: #e0a832;
+  --suite-light: #ffd48a;
+  --suite-stone: #f3e2c8;
+}
+[data-suite="sagar"] {
+  --suite-plate: #f7fcfc;
+  --suite-ink: #0f3340;
+  --suite-ink-muted: #3f5f68;
+  --suite-gold-text: #6f5410;
+  --suite-accent-text: #b0384f;
+  --suite-leaf: #2f8a6a;
+  --suite-accent: #f07a6a;
+  --suite-gold: #e0b060;
+  --suite-light: #ffe0b8;
+  --suite-stone: #e6f2f0;
+}
+[data-suite="jungle-party"] {
+  --suite-plate: #fbfdf2;
+  --suite-ink: #1f3a1a;
+  --suite-ink-muted: #4a5f42;
+  --suite-gold-text: #6f5410;
+  --suite-accent-text: #a8480f;
+  --suite-leaf: #3f8a3a;
+  --suite-accent: #f0a020;
+  --suite-gold: #e8b73a;
+  --suite-light: #fff0a8;
+  --suite-stone: #eef3dc;
 }
 [data-suite]:not([data-suite="classic"]) {
   --card-ivory: var(--suite-plate);

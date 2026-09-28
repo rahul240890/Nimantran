@@ -65,6 +65,26 @@ describe("event pages", () => {
     ).not.toContain("couple");
   });
 
+  it("opens with the god's page and moves the blessing and symbol there from the cover", () => {
+    const beats = storyBeats({
+      copy,
+      functions: [fn("wedding")],
+      replies: true,
+      words,
+      blessing: true,
+    });
+    expect(beats.map((b) => b.id).slice(0, 2)).toEqual(["blessing", "cover"]);
+    expect(beats[0]!.scene).toBe("blessing");
+    expect(beats[0]!.lines).toEqual([{ text: "Shri Ganeshaya Namah", style: "script" }]);
+    expect(beats[0]!.seconds).toBeGreaterThanOrEqual(5);
+    expect(beats[1]!.lines.map((l) => l.text)).toEqual(["Aanya", "&", "Vihaan"]);
+    expect(beats[1]!.symbol).toBe(false);
+    // Without it, the cover keeps both
+    const plain = storyBeats({ copy, functions: [fn("wedding")], replies: true, words });
+    expect(plain[0]!.id).toBe("cover");
+    expect(plain[0]!.symbol).toBe(true);
+  });
+
   it("turns through cover, family, each function, then asks for a reply", () => {
     const beats = storyBeats({
       copy,

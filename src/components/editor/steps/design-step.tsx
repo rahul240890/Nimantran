@@ -8,7 +8,14 @@ import { draftCategory, draftTradition } from "@/lib/editor/draft";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import type { StepProps } from "./types";
 import { SuiteThumb } from "@/components/invitation/story/suite-thumb";
-import { SUITES, SUITE_IDS, isSuiteId, suiteFor, suiteSuits } from "@/lib/suites/catalog";
+import {
+  SUITES,
+  SUITE_IDS,
+  hasBlessingPage,
+  isSuiteId,
+  suiteFor,
+  suiteSuits,
+} from "@/lib/suites/catalog";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -150,6 +157,14 @@ export function DesignStep({ draft, update }: StepProps) {
             description={suiteCopy.textBoxHint}
             checked={draft.textBox}
             onCheckedChange={(textBox) => update((current) => ({ ...current, textBox }))}
+          />
+        )}
+        {hasBlessingPage(suite) && (
+          <Switch
+            label={suiteCopy.blessingPage}
+            description={suiteCopy.blessingPageHint}
+            checked={draft.blessingPage}
+            onCheckedChange={(blessingPage) => update((current) => ({ ...current, blessingPage }))}
           />
         )}
       </section>

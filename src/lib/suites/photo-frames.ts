@@ -4,7 +4,7 @@
  * frame openings are cut out of the painting (transparent in the WebP), so the photo sits
  * under the painting and shows through exactly the frame's shape, whatever the shape is:
  * a jharokha, a mirror-work medallion, an oval, a Mughal arch, a diamond, a scalloped
- * gilt frame or a paisley. Boxes are percentages of the painting: [x, y, width, height].
+ * gilt frame or a paisley. A birthday theme has one frame, for the guest of honour. Boxes are percentages of the painting: [x, y, width, height].
  * Themes without these paintings show the photos in plain arch frames instead.
  */
 
@@ -24,7 +24,14 @@ export type PhotoPage = {
 /** The paintings' own size, so photos line up with the frames however the page is cropped. */
 export const PAINTING_ASPECT = 768 / 1365;
 
-type Entry = { one: readonly [FrameBox]; two: readonly [FrameBox, FrameBox]; words: Inset };
+type Entry = {
+  one: readonly [FrameBox];
+  /** Missing on a theme for one person (a birthday): two photos share the one frame. */
+  two?: readonly [FrameBox, FrameBox];
+  words: Inset;
+  /** The painting's file name when it isn't "couple" (a birthday's is "photo"). */
+  image?: string;
+};
 /** Where the names go on the one-photo and two-photo paintings: [top, bottom] insets. */
 type Inset = readonly [one: readonly [number, number], two: readonly [number, number]];
 
@@ -106,17 +113,147 @@ const FRAMES: Partial<Record<SuiteId, Entry>> = {
       [46, 20],
     ],
   },
+  "ivory-arch": {
+    one: [[23.0, 7.2, 53.9, 39.7]],
+    two: [
+      [15.1, 5.6, 33.6, 40.9],
+      [57.3, 20.3, 29.8, 26.2],
+    ],
+    words: [
+      [50, 12],
+      [50, 12],
+    ],
+  },
+  gulaab: {
+    one: [[19.4, 14.6, 61.1, 34.4]],
+    two: [
+      [12.6, 11.9, 38.9, 22.1],
+      [50.0, 24.3, 37.8, 21.7],
+    ],
+    words: [
+      [52, 12],
+      [49, 12],
+    ],
+  },
+  "deco-noir": {
+    one: [[21.4, 9.5, 57.4, 35.8]],
+    two: [
+      [12.2, 11.4, 32.3, 40.4],
+      [55.5, 11.4, 32.3, 40.4],
+    ],
+    words: [
+      [48, 16],
+      [55, 14],
+    ],
+  },
+  taara: {
+    one: [[22.5, 7.3, 59.5, 33.7]],
+    two: [
+      [10.2, 7.8, 35.8, 20.2],
+      [56.1, 25.3, 35.7, 20.2],
+    ],
+    words: [
+      [44, 14],
+      [48, 14],
+    ],
+  },
+  kaagaz: {
+    one: [[15.9, 9.7, 68.2, 32.1]],
+    two: [
+      [10.5, 21.5, 33.7, 28.9],
+      [55.9, 21.6, 33.6, 28.7],
+    ],
+    words: [
+      [45, 20],
+      [53, 16],
+    ],
+  },
+  mitti: {
+    one: [[22.4, 12.4, 54.7, 30.5]],
+    two: [
+      [22.5, 13.3, 25.3, 35.2],
+      [58.7, 23.3, 22.7, 25.3],
+    ],
+    words: [
+      [46, 18],
+      [52, 18],
+    ],
+  },
+  neel: {
+    one: [[22.9, 13.9, 53.9, 30.0]],
+    two: [
+      [12.1, 25.6, 31.5, 34.8],
+      [56.4, 25.6, 31.5, 34.7],
+    ],
+    words: [
+      [47, 22],
+      [63, 12],
+    ],
+  },
+  pichwai: {
+    one: [[24.3, 15.2, 51.3, 28.6]],
+    two: [
+      [10.7, 18.0, 30.5, 17.3],
+      [58.9, 18.0, 30.6, 17.3],
+    ],
+    words: [
+      [47, 18],
+      [38, 20],
+    ],
+  },
+  tanjore: {
+    one: [[26.7, 13.6, 46.7, 31.2]],
+    two: [
+      [11.8, 25.3, 31.1, 26.7],
+      [57.0, 25.3, 31.1, 26.6],
+    ],
+    words: [
+      [48, 16],
+      [55, 14],
+    ],
+  },
+  kashi: {
+    one: [[22.3, 9.8, 54.9, 30.7]],
+    two: [
+      [14.3, 28.1, 27.1, 15.2],
+      [59.5, 28.8, 27.0, 15.1],
+    ],
+    words: [
+      [44, 20],
+      [47, 14],
+    ],
+  },
+  sagar: {
+    one: [[23.7, 12.3, 52.7, 29.7]],
+    two: [
+      [7.9, 22.7, 39.5, 19.6],
+      [52.7, 22.7, 39.3, 19.6],
+    ],
+    words: [
+      [45, 18],
+      [45, 18],
+    ],
+  },
+  // A birthday has one guest of honour, so one frame
+  "jungle-party": {
+    one: [[20.4, 10.3, 58.6, 31.9]],
+    words: [
+      [45, 14],
+      [45, 14],
+    ],
+    image: "photo",
+  },
 };
 
 /** The painting and frames for a theme's photo page with this many photos, if it has one. */
 export function photoPage(suite: SuiteId, count: number): PhotoPage | null {
   const entry = FRAMES[suite];
   if (!entry || count < 1) return null;
-  const two = count >= 2;
+  const two = count >= 2 && entry.two ? entry.two : null;
   const [top, bottom] = entry.words[two ? 1 : 0];
   return {
-    image: `/suites/${suite}/${two ? "couple-two" : "couple"}.webp`,
-    frames: two ? entry.two : entry.one,
+    image: `/suites/${suite}/${two ? "couple-two" : (entry.image ?? "couple")}.webp`,
+    frames: two ?? entry.one,
     area: { top, bottom, left: 6, right: 6 },
   };
 }
