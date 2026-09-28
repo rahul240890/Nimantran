@@ -36,6 +36,10 @@ database keeps every invite. Applied so far after the first setup:
   on conflict (user_id) do nothing;
   ```
 
+- `20260928150000_coupons_invoices_refunds.sql` — coupons and festival offers, GST invoice
+  numbers and refunds (Step 17, part 2): `coupons`, `invoice_counters`, new `orders`
+  columns, `assign_invoice_no()` and `use_coupon()`.
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).

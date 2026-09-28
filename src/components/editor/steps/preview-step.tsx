@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { CategoryIcon } from "@/components/categories/category-icon";
+import { EditionNotice } from "@/components/editions/edition-notice";
 import {
   draftCategory,
   includedFunctions,
@@ -117,6 +118,8 @@ export function PreviewStep({
           </ul>
         </Card>
       )}
+
+      {signedIn && draft.remoteId && <EditionNotice draft={draft} inviteId={draft.remoteId} />}
 
       <Section title={previewCopy.occasionHeading} step="occasion" goTo={goTo}>
         <p className="flex items-center gap-3">

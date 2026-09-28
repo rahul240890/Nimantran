@@ -70,6 +70,8 @@ export const hero = {
 export const homeGallery = {
   deckLabel: "Painted invitation themes",
   showTheme: (name: string) => `Show ${name}`,
+  previousTheme: "Previous theme",
+  nextTheme: "Next theme",
   coverDate: "12 December 2026",
   occasionsEyebrow: "Start here",
   occasionsTitle: "What are you celebrating?",
@@ -87,17 +89,6 @@ export const homeGallery = {
     "Each theme is a set of paintings, one for the cover, the family, haldi, mehendi, sangeet, baraat, the wedding, the reception and the reply. Tap one to see every page.",
   allDesigns: "See all wedding designs",
 };
-
-export const musicDemo = {
-  label: "Hear an invitation",
-  body: "Every design plays its own raga, composed live on your guest's phone. Nothing to download.",
-  play: (design: string) => `Play the music for ${design}`,
-  pause: "Pause the music",
-  choose: "Design",
-  chooseLabel: "Choose whose music to hear",
-  raga: (name: string) => `Raga ${name}`,
-  failed: "This browser can't play the music.",
-} as const;
 
 export const howItWorks = {
   eyebrow: "How it works",

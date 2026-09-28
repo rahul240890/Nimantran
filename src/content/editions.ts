@@ -19,6 +19,7 @@ export const planCopy = {
       "20 photos",
       "2 card languages",
       "1 couple photo",
+      "Video for WhatsApp Status and Reels",
       "No watermark",
     ],
   },
@@ -30,6 +31,7 @@ export const planCopy = {
       "Every photo",
       "2 card languages",
       "Couple photos, one each",
+      "Video for WhatsApp Status and Reels",
       "No watermark",
     ],
   },
@@ -79,6 +81,22 @@ export const upgradeCopy = {
     pay: "Pay (test)",
     cancel: "Cancel",
   },
+  was: "was",
+  offer: (label: string, off: string) => `${label}: ${off} off`,
+  couponLabel: "Coupon code",
+  couponApply: "Apply",
+  couponApplied: (code: string) => `Coupon ${code} applied`,
+  couponRemove: "Remove",
+  couponProblem: {
+    unknown: "That code doesn't exist. Check the spelling.",
+    inactive: "That code has been switched off.",
+    "not-started": "That code hasn't started yet.",
+    ended: "That code has ended.",
+    "used-up": "That code has been used up.",
+    "wrong-plan": "That code doesn't apply to the editions you can choose.",
+  },
+  invoice: "Invoice",
+  refunded: "Refunded",
   refunds: "Full refund within 7 days if the invite hasn't been sent to any guest.",
 } as const;
 
@@ -94,5 +112,8 @@ export const limitCopy = {
   } satisfies Record<keyof PlanLimits, (count: number) => string>,
   choose: "Choose edition",
   edition: (plan: string) => `Edition: ${plan}`,
+  unlockBody: (plan: string, price: string) =>
+    `${plan} covers everything this invite uses, for ${price}. Or trim it to fit your edition.`,
+  unlock: (plan: string) => `Get ${plan}`,
   upgrade: "Upgrade",
 } as const;

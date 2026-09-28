@@ -184,3 +184,31 @@ export const repliesCopy = {
   latest: "Latest replies",
   more: (count: number) => `and ${count} more`,
 } as const;
+
+export const videoCopy = {
+  heading: "Video for WhatsApp Status and Reels",
+  body: "Your invitation's pages as a 30 to 45 second vertical video, with its raga. It's made on this phone or computer, so nothing is uploaded.",
+  poster: "The video's first page",
+  music: "With the raga",
+  make: "Make video",
+  making: (percent: number) => `Making your video: ${percent}%`,
+  stop: "Stop",
+  stopped: "Video stopped",
+  ready: "Your video is ready",
+  player: (names: string) => `Video invitation for ${names}`,
+  share: "Share video",
+  download: "Download MP4",
+  again: "Make it again",
+  failed: "Couldn't make the video. Try again, or try Chrome or Safari.",
+  unsupported:
+    "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",
+  noSound:
+    "This browser can't add music to videos, so the video will be silent. Chrome or Edge add the raga.",
+  locked: "Premium and Royal include this video.",
+  upgrade: "Choose edition",
+  ending: {
+    open: "Open the invitation",
+  },
+  shareText: (names: string) => `${names}: our invitation`,
+  fileName: (slug: string) => `${slug}-invitation.mp4`,
+} as const;

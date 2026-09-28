@@ -74,8 +74,12 @@ export async function writeInvite(page: Page, number: string, names: [string, st
 
 /** Publishes the invite open in the editor under a unique link; ends on the share page. */
 export async function publish(page: Page, base: string): Promise<string> {
-  await page.getByRole("button", { name: "Publish" }).click();
   const dialog = page.getByRole("dialog", { name: "Choose your link" });
+  // A click that lands before the editor has hydrated opens nothing, so try again
+  await expect(async () => {
+    if (!(await dialog.isVisible())) await page.getByRole("button", { name: "Publish" }).click();
+    await expect(dialog).toBeVisible({ timeout: 3_000 });
+  }).toPass({ timeout: 30_000 });
   await dialog.getByRole("textbox", { name: /Invitation link/ }).fill(`${base}-${Date.now()}`);
   await expect(dialog.getByText("This link is free.")).toBeVisible();
   await dialog.getByRole("button", { name: "Publish invitation" }).click();

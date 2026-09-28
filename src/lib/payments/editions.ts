@@ -9,17 +9,20 @@ import {
   isPaidPlanId,
   isPlanId,
   planRank,
-  upgradePricePaise,
   type PaidPlanId,
   type PlanId,
 } from "@/lib/plans/catalog";
+import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
 import { supabasePublic } from "@/lib/supabase/public";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
+import { checkoutCoupons, countCouponUse } from "./coupons";
+import { invoiceNumber } from "./invoice";
 import {
   createRazorpayOrder,
   paymentSignatureValid,
   razorpayKeys,
+  refundRazorpayPayment,
   type RazorpayMode,
 } from "./razorpay";
 
@@ -39,6 +42,12 @@ export type Order = {
   userId: string | null;
   planId: PaidPlanId;
   fromPlanId: PlanId;
+  /** The upgrade's price before any coupon. */
+  listPricePaise: number;
+  discountPaise: number;
+  couponId: string | null;
+  couponCode: string | null;
+  /** What was paid. */
   amountPaise: number;
   status: OrderStatus;
   providerOrderId: string;
@@ -46,14 +55,17 @@ export type Order = {
   mode: RazorpayMode | "preview";
   createdAt: string;
   paidAt: string | null;
+  invoiceNo: string | null;
+  refundedAt: string | null;
 };
 
 /** An order as the admin's list shows it, with the invite it was for. */
 export type AdminOrder = Order & { slug: string | null; names: string };
 
 type PreviewPayments = {
-  plans: Map<string, { planId: PaidPlanId; source: "purchase" | "admin" }>;
+  plans: Map<string, { planId: PaidPlanId; source: "purchase" | "admin"; orderId?: string }>;
   orders: Map<string, Order>;
+  invoices?: number;
 };
 
 const holder = globalThis as unknown as { __shubhPreviewPayments?: PreviewPayments };
@@ -170,28 +182,45 @@ export type StartedCheckout =
     }
   | { ok: false; reason: "off" | "not-found" | "already" | "failed" };
 
-/** Opens an order for the difference between the invite's edition and the one chosen. */
+/**
+ * Opens an order for the difference between the invite's edition and the one chosen, less
+ * the coupon the host typed or the festival offer running.
+ */
 export async function startCheckout(
   account: Account,
   eventId: string,
   planId: PaidPlanId,
+  code: string | null = null,
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
   const current = await invitePlan(account, eventId);
   if (!current) return { ok: false, reason: "not-found" };
-  const amountPaise = upgradePricePaise(current, planId);
-  if (amountPaise === null) return { ok: false, reason: "already" };
+  const price = priceFor(
+    current,
+    planId,
+    await checkoutCoupons(),
+    code ? cleanCouponCode(code) : null,
+    new Date(),
+  );
+  if (!price) return { ok: false, reason: "already" };
+  const { amountPaise } = price;
   const base = {
     eventId,
     userId: account.id,
     planId,
     fromPlanId: current,
+    listPricePaise: price.listPaise,
+    discountPaise: price.discountPaise,
+    couponId: price.coupon?.id ?? null,
+    couponCode: price.coupon?.code ?? null,
     amountPaise,
     status: "created" as const,
     providerPaymentId: null,
     createdAt: new Date().toISOString(),
     paidAt: null,
+    invoiceNo: null,
+    refundedAt: null,
   };
 
   if (provider === "preview") {
@@ -211,7 +240,12 @@ export async function startCheckout(
   const order = await createRazorpayOrder(keys, {
     amountPaise,
     receipt: `inv_${eventId.slice(0, 8)}_${Date.now().toString(36)}`,
-    notes: { event_id: eventId, plan_id: planId, from_plan_id: current },
+    notes: {
+      event_id: eventId,
+      plan_id: planId,
+      from_plan_id: current,
+      coupon: price.coupon?.code ?? "",
+    },
   });
   if (!order || order.amount !== amountPaise) return { ok: false, reason: "failed" };
   const { error } = await service.from("orders").insert({
@@ -219,6 +253,9 @@ export async function startCheckout(
     user_id: account.id,
     plan_id: planId,
     from_plan_id: current,
+    list_price_paise: price.listPaise,
+    discount_paise: price.discountPaise,
+    coupon_id: price.coupon?.id ?? null,
     amount_paise: amountPaise,
     provider_order_id: order.id,
     mode: keys.mode,
@@ -273,8 +310,15 @@ export async function fulfilOrder(
     const order = preview.orders.get(providerOrderId);
     if (!order) return null;
     if (order.status === "created" || order.status === "failed") {
-      Object.assign(order, { status: "paid", providerPaymentId: paymentId, paidAt: now });
-      if (order.eventId) raisePreviewPlan(order.eventId, order.planId, "purchase");
+      preview.invoices = (preview.invoices ?? 0) + 1;
+      Object.assign(order, {
+        status: "paid",
+        providerPaymentId: paymentId,
+        paidAt: now,
+        invoiceNo: invoiceNumber(new Date(now), preview.invoices),
+      });
+      if (order.couponId) await countCouponUse(order.couponId);
+      if (order.eventId) raisePreviewPlan(order.eventId, order.planId, "purchase", order.id);
     }
     return order.planId;
   }
@@ -282,19 +326,26 @@ export async function fulfilOrder(
   if (!service) return null;
   const { data: order } = await service
     .from("orders")
-    .select("id, event_id, plan_id, status")
+    .select("id, event_id, plan_id, status, coupon_id")
     .eq("provider_order_id", providerOrderId)
     .maybeSingle();
   if (!order || !isPaidPlanId(order.plan_id)) return null;
+  // A refunded order stays refunded, whatever arrives late
+  if (order.status === "refunded") return order.plan_id;
   // A failed attempt can still be paid: Razorpay's checkout lets the host try again
   if (order.status === "created" || order.status === "failed") {
-    const { error } = await service
+    const { data: changed, error } = await service
       .from("orders")
       .update({ status: "paid", provider_payment_id: paymentId, paid_at: now })
       .eq("id", order.id)
-      .in("status", ["created", "failed"]);
+      .in("status", ["created", "failed"])
+      .select("id");
     if (error) return null;
+    // Only the call that marked it paid counts the coupon
+    if (changed?.length && order.coupon_id) await countCouponUse(order.coupon_id);
   }
+  // Numbered once; a second call returns the same number
+  await service.rpc("assign_invoice_no", { p_order: order.id });
   if (order.event_id) {
     const raised = await raisePlan(order.event_id, order.plan_id, "purchase", order.id);
     if (!raised) return null;
@@ -316,9 +367,14 @@ export async function markOrderFailed(providerOrderId: string): Promise<void> {
     .eq("status", "created");
 }
 
-function raisePreviewPlan(eventId: string, planId: PaidPlanId, source: "purchase" | "admin") {
+function raisePreviewPlan(
+  eventId: string,
+  planId: PaidPlanId,
+  source: "purchase" | "admin",
+  orderId?: string,
+) {
   const current = preview.plans.get(eventId)?.planId ?? "free";
-  if (planRank(planId) > planRank(current)) preview.plans.set(eventId, { planId, source });
+  if (planRank(planId) > planRank(current)) preview.plans.set(eventId, { planId, source, orderId });
 }
 
 /** Gives an invite an edition, never lowering one it already has. */
@@ -354,6 +410,9 @@ type OrderRow = {
   user_id: string | null;
   plan_id: string;
   from_plan_id: string;
+  list_price_paise: number | null;
+  discount_paise: number;
+  coupon_id: string | null;
   amount_paise: number;
   status: OrderStatus;
   provider_order_id: string;
@@ -361,11 +420,14 @@ type OrderRow = {
   mode: RazorpayMode;
   created_at: string;
   paid_at: string | null;
+  invoice_no: string | null;
+  refunded_at: string | null;
+  coupons?: { code: string } | null;
   events?: { slug: string | null; content: Record<string, string> | null } | null;
 };
 
 const ORDER_COLUMNS =
-  "id, event_id, user_id, plan_id, from_plan_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at";
+  "id, event_id, user_id, plan_id, from_plan_id, list_price_paise, discount_paise, coupon_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at, invoice_no, refunded_at, coupons(code)";
 
 function orderFromRow(row: OrderRow): Order {
   return {
@@ -374,6 +436,10 @@ function orderFromRow(row: OrderRow): Order {
     userId: row.user_id,
     planId: isPaidPlanId(row.plan_id) ? row.plan_id : "premium",
     fromPlanId: isPlanId(row.from_plan_id) ? row.from_plan_id : "free",
+    listPricePaise: row.list_price_paise ?? row.amount_paise + row.discount_paise,
+    discountPaise: row.discount_paise,
+    couponId: row.coupon_id,
+    couponCode: row.coupons?.code ?? null,
     amountPaise: row.amount_paise,
     status: row.status,
     providerOrderId: row.provider_order_id,
@@ -381,6 +447,8 @@ function orderFromRow(row: OrderRow): Order {
     mode: row.mode,
     createdAt: row.created_at,
     paidAt: row.paid_at,
+    invoiceNo: row.invoice_no,
+    refundedAt: row.refunded_at,
   };
 }
 
@@ -390,11 +458,16 @@ function namesOf(content: Record<string, string> | null | undefined): string {
   return [first, second].filter(Boolean).join(" & ");
 }
 
-/** An invite's paid orders, newest first, for the host's receipts. */
+/** An invite's paid and refunded orders, newest first, for the host's receipts. */
 export async function inviteReceipts(account: Account, eventId: string): Promise<Order[]> {
   if (isPreview()) {
     return [...preview.orders.values()]
-      .filter((o) => o.eventId === eventId && o.userId === account.id && o.status === "paid")
+      .filter(
+        (o) =>
+          o.eventId === eventId &&
+          o.userId === account.id &&
+          (o.status === "paid" || o.status === "refunded"),
+      )
       .reverse();
   }
   const supabase = await supabaseServer();
@@ -403,9 +476,9 @@ export async function inviteReceipts(account: Account, eventId: string): Promise
     .from("orders")
     .select(ORDER_COLUMNS)
     .eq("event_id", eventId)
-    .eq("status", "paid")
+    .in("status", ["paid", "refunded"])
     .order("created_at", { ascending: false });
-  return ((data ?? []) as OrderRow[]).map(orderFromRow);
+  return ((data ?? []) as unknown as OrderRow[]).map(orderFromRow);
 }
 
 /** Every order, newest first, for the admin (the page checks the admin first). */
@@ -464,5 +537,171 @@ export async function orderTotals(): Promise<{ paid: number; revenuePaise: numbe
   return {
     paid: orders.length,
     revenuePaise: orders.reduce((sum, order) => sum + order.amountPaise, 0),
+  };
+}
+
+/** One order with its invite, for its invoice; the page checks who may see it. */
+export async function orderWithInvite(orderId: string): Promise<AdminOrder | null> {
+  if (isPreview()) {
+    const order = [...preview.orders.values()].find((item) => item.id === orderId);
+    if (!order) return null;
+    const event = order.eventId ? previewDb.invites.get(order.eventId)?.event : undefined;
+    return { ...order, slug: event?.slug ?? null, names: namesOf(event?.content) };
+  }
+  const service = supabaseService();
+  if (!service) return null;
+  const { data } = await service
+    .from("orders")
+    .select(`${ORDER_COLUMNS}, events(slug, content)`)
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!data) return null;
+  const row = data as unknown as OrderRow;
+  return {
+    ...orderFromRow(row),
+    slug: row.events?.slug ?? null,
+    names: namesOf(row.events?.content),
+  };
+}
+
+export type RefundResult =
+  { ok: true } | { ok: false; reason: "not-found" | "not-paid" | "provider" | "failed" };
+
+/**
+ * Refunds a paid order in full through Razorpay (Admin, Orders) and takes the invite back
+ * to the edition it had before, when this order is what gave it its edition.
+ */
+export async function refundOrder(orderId: string): Promise<RefundResult> {
+  const now = new Date().toISOString();
+  if (isPreview()) {
+    const order = [...preview.orders.values()].find((item) => item.id === orderId);
+    if (!order) return { ok: false, reason: "not-found" };
+    if (order.status !== "paid") return { ok: false, reason: "not-paid" };
+    Object.assign(order, { status: "refunded", refundedAt: now });
+    const plan = order.eventId ? preview.plans.get(order.eventId) : undefined;
+    if (order.eventId && plan?.orderId === order.providerOrderId) {
+      if (order.fromPlanId === "free") preview.plans.delete(order.eventId);
+      else preview.plans.set(order.eventId, { planId: order.fromPlanId, source: "purchase" });
+    }
+    return { ok: true };
+  }
+  const service = supabaseService();
+  if (!service) return { ok: false, reason: "failed" };
+  const { data: order } = await service
+    .from("orders")
+    .select("id, event_id, from_plan_id, amount_paise, status, provider_payment_id, mode")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) return { ok: false, reason: "not-found" };
+  if (order.status !== "paid" || !order.provider_payment_id) {
+    return { ok: false, reason: "not-paid" };
+  }
+  const keys = razorpayKeys();
+  // Test-mode payments refund only with test keys, live with live
+  if (!keys || keys.mode !== order.mode) return { ok: false, reason: "provider" };
+  const refund = await refundRazorpayPayment(
+    keys,
+    order.provider_payment_id as string,
+    order.amount_paise as number,
+  );
+  if (!refund) return { ok: false, reason: "provider" };
+  const { error } = await service
+    .from("orders")
+    .update({ status: "refunded", refund_id: refund.id, refunded_at: now })
+    .eq("id", order.id);
+  if (error) return { ok: false, reason: "failed" };
+  if (order.event_id) {
+    const { data: plan } = await service
+      .from("event_plans")
+      .select("order_id")
+      .eq("event_id", order.event_id)
+      .maybeSingle();
+    if (plan?.order_id === order.id) {
+      if (isPaidPlanId(order.from_plan_id)) {
+        await service
+          .from("event_plans")
+          .update({ plan_id: order.from_plan_id, order_id: null, updated_at: now })
+          .eq("event_id", order.event_id);
+      } else {
+        await service.from("event_plans").delete().eq("event_id", order.event_id);
+      }
+    }
+  }
+  return { ok: true };
+}
+
+/* ---------- Invites, for the admin ---------- */
+
+export type AdminInvite = {
+  id: string;
+  names: string;
+  categoryId: string;
+  status: string;
+  slug: string | null;
+  plan: PlanId;
+  createdAt: string;
+  owner: string;
+};
+
+/** The newest invites and how many accounts there are, for Admin, Invites. */
+export async function adminInvites(
+  limit = 100,
+): Promise<{ invites: AdminInvite[]; accounts: number | null; total: number | null }> {
+  if (isPreview()) {
+    const all = [...previewDb.invites.values()].reverse();
+    return {
+      invites: all.slice(0, limit).map((stored) => ({
+        id: stored.event.id,
+        names: namesOf(stored.event.content),
+        categoryId: stored.event.category_id,
+        status: stored.event.status,
+        slug: stored.event.slug,
+        plan: preview.plans.get(stored.event.id)?.planId ?? "free",
+        createdAt: stored.publishedAt ?? stored.event.updated_at,
+        owner: stored.owner.replace(/^preview-/, ""),
+      })),
+      accounts: new Set(all.map((stored) => stored.owner)).size,
+      total: all.length,
+    };
+  }
+  const service = supabaseService();
+  if (!service) return { invites: [], accounts: null, total: null };
+  const [{ data, count }, { count: accounts }] = await Promise.all([
+    service
+      .from("events")
+      .select(
+        "id, category_id, status, slug, content, created_at, profiles(name), event_plans(plan_id)",
+        { count: "exact" },
+      )
+      .order("created_at", { ascending: false })
+      .limit(limit),
+    service.from("profiles").select("id", { count: "exact", head: true }),
+  ]);
+  type Row = {
+    id: string;
+    category_id: string;
+    status: string;
+    slug: string | null;
+    content: Record<string, string> | null;
+    created_at: string;
+    profiles: { name: string | null } | null;
+    event_plans: { plan_id: string } | { plan_id: string }[] | null;
+  };
+  return {
+    invites: ((data ?? []) as unknown as Row[]).map((row) => {
+      const plan = Array.isArray(row.event_plans) ? row.event_plans[0] : row.event_plans;
+      return {
+        id: row.id,
+        names: namesOf(row.content),
+        categoryId: row.category_id,
+        status: row.status,
+        slug: row.slug,
+        plan: isPlanId(plan?.plan_id) ? plan.plan_id : "free",
+        createdAt: row.created_at,
+        owner: row.profiles?.name || "No name yet",
+      };
+    }),
+    accounts: accounts ?? null,
+    total: count ?? null,
   };
 }

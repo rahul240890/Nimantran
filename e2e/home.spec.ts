@@ -20,6 +20,18 @@ const deckTheme = (page: Page) =>
     pressed: true,
   });
 
+/** Brings a theme to the front: its dot on wider screens, the arrows on a phone. */
+async function showTheme(page: Page, name: string) {
+  if (page.viewportSize()!.width >= 640) {
+    await page.getByRole("button", { name: `Show ${name}` }).click();
+    return;
+  }
+  for (let turns = 0; turns < 12; turns++) {
+    if ((await deckTheme(page).getAttribute("aria-label")) === `Show ${name}`) return;
+    await page.getByRole("button", { name: "Next theme" }).click();
+  }
+}
+
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`landing page, ${colorScheme} theme`, () => {
     test.use({ colorScheme, reducedMotion: "reduce" });
@@ -27,7 +39,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     test("has no horizontal scroll, whichever theme leads the deck", async ({ page }) => {
       await visit(page);
       expect(await noOverflow(page)).toBe(true);
-      await page.getByRole("button", { name: "Show Kayal" }).click();
+      await showTheme(page, "Kayal");
       await expect(deckTheme(page)).toHaveAccessibleName("Show Kayal");
       expect(await noOverflow(page)).toBe(true);
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -61,8 +73,26 @@ test.describe("landing page", () => {
 
   test("the theme dots bring a theme to the front", async ({ page }) => {
     await visit(page);
-    await page.getByRole("button", { name: "Show Rajbari" }).click();
+    await showTheme(page, "Rajbari");
     await expect(page.getByRole("img", { name: /Rajbari$/ })).toBeVisible();
+  });
+
+  test("the arrows step through the themes and wrap around", async ({ page }) => {
+    await visit(page);
+    const first = await deckTheme(page).getAttribute("aria-label");
+    await page.getByRole("button", { name: "Previous theme" }).click();
+    await expect(deckTheme(page)).not.toHaveAttribute("aria-label", first!);
+    await page.getByRole("button", { name: "Next theme" }).click();
+    await expect(deckTheme(page)).toHaveAttribute("aria-label", first!);
+  });
+
+  test("the theme dots stay on one row", async ({ page }) => {
+    await visit(page);
+    const tops = await page
+      .getByRole("list", { name: "Painted invitation themes" })
+      .getByRole("listitem")
+      .evaluateAll((items) => new Set(items.map((item) => item.getBoundingClientRect().top)).size);
+    expect(tops).toBe(1);
   });
 
   test("still mode never turns the deck by itself", async ({ page }) => {
@@ -147,20 +177,6 @@ test.describe("landing page", () => {
       await page.getByRole("menuitemradio", { name: "Dark" }).click();
     }
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  });
-
-  test("the music strip plays a design's raga and pauses", async ({ page }) => {
-    await visit(page);
-    const strip = page.getByRole("region", { name: "Hear an invitation" });
-    await strip.getByRole("button", { name: "Choose whose music to hear" }).click();
-    await page.getByRole("menuitemradio", { name: /Kerala Kasavu/ }).click();
-    await expect(strip).toContainText("Kerala Kasavu · Raga Madhyamavati");
-    const play = strip.getByRole("button", { name: "Play the music for Kerala Kasavu" });
-    await play.click();
-    const pause = strip.getByRole("button", { name: "Pause the music" });
-    await expect(pause).toHaveAttribute("aria-pressed", "true");
-    await pause.click();
-    await expect(play).toHaveAttribute("aria-pressed", "false");
   });
 
   test("FAQ answers open and close", async ({ page }) => {

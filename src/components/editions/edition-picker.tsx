@@ -3,7 +3,10 @@
 import { Check, LockOpen, ShieldCheck, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { beginCheckout, finishCheckout } from "@/actions/checkout";
+import { beginCheckout, finishCheckout, tryCoupon } from "@/actions/checkout";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import type { Price } from "@/lib/plans/offers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -15,7 +18,6 @@ import {
   PLAN_IDS,
   formatRupees,
   planRank,
-  upgradePricePaise,
   type PaidPlanId,
   type PlanId,
 } from "@/lib/plans/catalog";
@@ -68,6 +70,8 @@ export type EditionPickerProps = {
   focus: PlanId | null;
   active: boolean;
   prefill: { name: string; email: string | null; phone: string | null };
+  /** Each edition's price now, with any festival offer running. */
+  prices: Partial<Record<PaidPlanId, Price>>;
 };
 
 type Pending = { plan: PaidPlanId; stage: "opening" | "checking" } | null;
@@ -80,9 +84,15 @@ export function EditionPicker({
   focus,
   active,
   prefill,
+  prices: offerPrices,
 }: EditionPickerProps) {
   const { upgradeCopy, planCopy } = useText(editionsText);
   const router = useRouter();
+  const [coupon, setCoupon] = useState<{
+    code: string;
+    prices: Partial<Record<PaidPlanId, Price>>;
+  } | null>(null);
+  const prices = coupon?.prices ?? offerPrices;
   const [pending, setPending] = useState<Pending>(null);
   const [previewPay, setPreviewPay] = useState<PreviewPay>(null);
 
@@ -109,7 +119,7 @@ export function EditionPicker({
   const buy = async (plan: PaidPlanId) => {
     if (pending) return;
     setPending({ plan, stage: "opening" });
-    const started = await beginCheckout({ inviteId, planId: plan }).catch(
+    const started = await beginCheckout({ inviteId, planId: plan, code: coupon?.code }).catch(
       () => ({ ok: false, reason: "failed" }) as const,
     );
     if (!started.ok) {
@@ -172,8 +182,9 @@ export function EditionPicker({
           const copy = planCopy[id];
           const isCurrent = id === current;
           const below = planRank(id) < planRank(current);
-          const price = id === "free" ? null : upgradePricePaise(current, id);
+          const price = id === "free" ? null : (prices[id] ?? null);
           const isDifference = price !== null && current !== "free";
+          const offer = price?.coupon && price.discountPaise > 0 ? price.coupon : null;
           const highlighted = (focus ?? needed) === id && planRank(id) > planRank(current);
           const busy = pending?.plan === id;
           return (
@@ -203,9 +214,29 @@ export function EditionPicker({
                   </h2>
                   <p className="text-sm text-ink-muted">{copy.bestFor}</p>
                 </div>
-                <p className="font-display text-[2.2rem] leading-none tabular-nums">
-                  {formatRupees(plan.pricePaise)}
-                </p>
+                <div className="flex flex-col gap-1.5">
+                  <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span className="font-display text-[2.2rem] leading-none tabular-nums">
+                      {formatRupees(
+                        offer && price && !isDifference ? price.amountPaise : plan.pricePaise,
+                      )}
+                    </span>
+                    {offer && price && !isDifference && (
+                      <s className="text-lg text-ink-muted tabular-nums">
+                        <span className="sr-only">{upgradeCopy.was} </span>
+                        {formatRupees(price.listPaise)}
+                      </s>
+                    )}
+                  </p>
+                  {offer && (
+                    <p className="text-sm font-semibold text-success">
+                      {upgradeCopy.offer(
+                        offer.label || offer.code,
+                        formatRupees(price!.discountPaise),
+                      )}
+                    </p>
+                  )}
+                </div>
                 <ul className="flex flex-1 flex-col gap-2 text-sm">
                   {copy.highlights.map((line) => (
                     <li key={line} className="flex items-start gap-2">
@@ -234,8 +265,8 @@ export function EditionPicker({
                       className="w-full"
                     >
                       {isDifference
-                        ? upgradeCopy.payDifference(formatRupees(price!))
-                        : upgradeCopy.pay(formatRupees(price!))}
+                        ? upgradeCopy.payDifference(formatRupees(price!.amountPaise))
+                        : upgradeCopy.pay(formatRupees(price!.amountPaise))}
                     </Button>
                     {isDifference && (
                       <p className="text-center text-xs text-ink-muted">{upgradeCopy.difference}</p>
@@ -247,6 +278,9 @@ export function EditionPicker({
           );
         })}
       </ul>
+      {active && current !== "bundle" && (
+        <CouponForm inviteId={inviteId} applied={coupon?.code ?? null} onApply={setCoupon} />
+      )}
       <p role="status" aria-live="polite" className="sr-only">
         {pending?.stage === "opening"
           ? upgradeCopy.opening
@@ -292,5 +326,72 @@ export function EditionPicker({
         )}
       </Dialog>
     </div>
+  );
+}
+
+/** "Have a coupon?": tries the code on the server and shows the new prices. */
+function CouponForm({
+  inviteId,
+  applied,
+  onApply,
+}: {
+  inviteId: string;
+  applied: string | null;
+  onApply: (coupon: { code: string; prices: Partial<Record<PaidPlanId, Price>> } | null) => void;
+}) {
+  const { upgradeCopy } = useText(editionsText);
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  if (applied) {
+    return (
+      <p className="flex flex-wrap items-center gap-3 text-sm" role="status">
+        <Badge tone="success" dot>
+          {upgradeCopy.couponApplied(applied)}
+        </Badge>
+        <Button variant="ghost" size="sm" onClick={() => onApply(null)}>
+          {upgradeCopy.couponRemove}
+        </Button>
+      </p>
+    );
+  }
+
+  return (
+    <form
+      noValidate
+      className="flex max-w-md flex-col gap-3 sm:flex-row sm:items-start"
+      onSubmit={async (event) => {
+        event.preventDefault();
+        if (!code.trim() || busy) return;
+        setBusy(true);
+        setError(null);
+        const result = await tryCoupon({ inviteId, code }).catch(() => null);
+        setBusy(false);
+        if (result?.ok) {
+          onApply({ code: result.code, prices: result.prices });
+          toast({ title: upgradeCopy.couponApplied(result.code), tone: "success" });
+        } else {
+          setError(upgradeCopy.couponProblem[result?.reason ?? "unknown"]);
+        }
+      }}
+    >
+      <Field label={upgradeCopy.couponLabel} error={error ?? undefined} className="flex-1">
+        <Input
+          value={code}
+          onChange={(event) => {
+            setError(null);
+            setCode(event.target.value.toUpperCase());
+          }}
+          autoCapitalize="characters"
+          autoComplete="off"
+          spellCheck={false}
+          maxLength={30}
+        />
+      </Field>
+      <Button type="submit" variant="secondary" loading={busy} className="sm:mt-8">
+        {upgradeCopy.couponApply}
+      </Button>
+    </form>
   );
 }

@@ -185,3 +185,31 @@ export const repliesCopy: Translation<typeof en.repliesCopy> = {
   latest: "ताज़ा जवाब",
   more: (count) => `और ${count}`,
 };
+
+export const videoCopy: Translation<typeof en.videoCopy> = {
+  heading: "WhatsApp स्टेटस और रील्स के लिए वीडियो",
+  body: "आपके निमंत्रण के पन्ने, उसके राग के साथ, 30 से 45 सेकंड के खड़े वीडियो में। यह इसी फ़ोन या कंप्यूटर पर बनता है, कुछ भी अपलोड नहीं होता।",
+  poster: "वीडियो का पहला पन्ना",
+  music: "राग के साथ",
+  make: "वीडियो बनाएँ",
+  making: (percent) => `आपका वीडियो बन रहा है: ${percent}%`,
+  stop: "रोकें",
+  stopped: "वीडियो रोका गया",
+  ready: "आपका वीडियो तैयार है",
+  player: (names) => `${names} का वीडियो निमंत्रण`,
+  share: "वीडियो भेजें",
+  download: "MP4 डाउनलोड करें",
+  again: "फिर से बनाएँ",
+  failed: "वीडियो नहीं बन सका। फिर कोशिश करें, या Chrome या Safari में खोलें।",
+  unsupported:
+    "यह ब्राउज़र वीडियो नहीं बना सकता। यह पन्ना Chrome, Edge या Safari के नए वर्शन में खोलें।",
+  noSound:
+    "यह ब्राउज़र वीडियो में संगीत नहीं जोड़ सकता, इसलिए वीडियो बिना आवाज़ का होगा। Chrome या Edge में राग जुड़ता है।",
+  locked: "प्रीमियम और रॉयल में यह वीडियो शामिल है।",
+  upgrade: "संस्करण चुनें",
+  ending: {
+    open: "निमंत्रण खोलें",
+  },
+  shareText: (names) => `${names}: हमारा निमंत्रण`,
+  fileName: (slug) => `${slug}-invitation.mp4`,
+};

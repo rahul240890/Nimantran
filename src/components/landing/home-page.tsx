@@ -1,7 +1,6 @@
 import { PageTransition } from "@/components/motion/page-transition";
 import { Faq } from "./faq";
 import { Hero } from "./hero";
-import { MusicDemo } from "./music-demo";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
 import { HomeOccasions, HomeThemes } from "./home-gallery";
@@ -21,7 +20,6 @@ export function HomePage({ locale }: { locale: UiLocale }) {
       <div className="relative isolate flex min-h-dvh flex-col">
         <SiteHeader />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
-          <MusicDemo />
           <Hero locale={locale} />
           <HomeOccasions locale={locale} />
           <HowItWorks locale={locale} />

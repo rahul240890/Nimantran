@@ -6,7 +6,7 @@ import { REGION_COOKIE } from "@/lib/categories/regions";
 import { refreshSupabaseSession } from "@/lib/supabase/proxy";
 
 /** Pages that need someone signed in. */
-const PRIVATE = ["/invites", "/account", "/admin"];
+const PRIVATE = ["/invites", "/account", "/admin", "/invoice"];
 
 function isPrivate(pathname: string) {
   return PRIVATE.some((path) => pathname === path || pathname.startsWith(`${path}/`));
@@ -66,6 +66,7 @@ export const config = {
     "/invites/:path*",
     "/account/:path*",
     "/admin/:path*",
+    "/invoice/:path*",
     "/join/:path*",
   ],
 };
