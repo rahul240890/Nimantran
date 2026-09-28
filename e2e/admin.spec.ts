@@ -28,6 +28,8 @@ test.describe("master admin", () => {
       "aria-current",
       "page",
     );
+    // The title can land after the heading, so wait for it before the axe check
+    await expect(page).toHaveTitle(/Overview/);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
