@@ -1,8 +1,8 @@
 "use client";
 
-import { ImageIcon, ImageOff, ImagePlus, Images, X } from "lucide-react";
+import { ImageIcon, ImageOff, ImagePlus, Images, Pause, Play, X } from "lucide-react";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
-import { useRef, useState, type DragEvent } from "react";
+import { useEffect, useRef, useState, type DragEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -18,7 +18,7 @@ import {
 } from "@/lib/editor/couple-photos";
 import { ASKABLE_QUESTIONS, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
-import { RAGAS } from "@/lib/engine/music";
+import type { MusicPlayer } from "@/lib/engine/music-player";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
@@ -301,17 +301,56 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
   const own = TEMPLATES[draft.templateId].music.raga;
   const value = draft.music.raga ?? own;
+  const tempo = TEMPLATES[draft.templateId].music.tempo;
+
+  // Hosts hear a raga before they choose it; the player loads only on the first tap
+  const player = useRef<MusicPlayer | null>(null);
+  const [listening, setListening] = useState(false);
+  useEffect(() => {
+    player.current?.setTrack({ raga: value, tempo });
+  }, [value, tempo]);
+  useEffect(() => () => player.current?.dispose(), []);
+  const listen = async () => {
+    if (listening) {
+      player.current?.pause();
+      setListening(false);
+      return;
+    }
+    try {
+      if (!player.current) {
+        const { MusicPlayer } = await import("@/lib/engine/music-player");
+        player.current = new MusicPlayer({ raga: value, tempo });
+      }
+      await player.current.play();
+      setListening(true);
+    } catch {
+      // No Web Audio: the button simply stays off
+      setListening(false);
+    }
+  };
 
   return (
     <section
       aria-labelledby="music-heading"
       className="flex flex-col gap-4 border-t border-line pt-6"
     >
-      <div className="flex flex-col gap-1">
-        <h2 id="music-heading" className="font-display text-xl">
-          {extrasCopy.musicHeading}
-        </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.musicHint}</p>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
+          <h2 id="music-heading" className="font-display text-xl">
+            {extrasCopy.musicHeading}
+          </h2>
+          <p className="text-sm text-ink-muted">{extrasCopy.musicHint}</p>
+        </div>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          aria-pressed={listening}
+          leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
+          onClick={() => void listen()}
+        >
+          {listening ? extrasCopy.stopListening : extrasCopy.listen(extrasCopy.ragaNames[value])}
+        </Button>
       </div>
       <RadioGroup
         label={extrasCopy.musicHeading}
@@ -332,7 +371,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
             value={raga}
             label={
               <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                Raag {RAGAS[raga].name}
+                {extrasCopy.ragaNames[raga]}
                 {raga === own && <Badge tone="gold">{extrasCopy.designsOwn}</Badge>}
               </span>
             }

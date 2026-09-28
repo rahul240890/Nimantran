@@ -44,8 +44,15 @@ describe.each(TRADITION_LIST)("the $id pack", (pack) => {
       expect(block.title).toMatch(NOT_LATIN);
       expect(block.example.length).toBeLessThanOrEqual(WORDING_MAX);
     }
-    for (const word of pack.doors ?? []) {
-      expect(word.length).toBeLessThanOrEqual(SLOT_RULES.doorLeft.maxLength);
+    if (pack.doors) {
+      for (const word of pack.doors.native) {
+        expect(word).toMatch(NOT_LATIN);
+        expect(word.length).toBeLessThanOrEqual(SLOT_RULES.doorLeft.maxLength);
+      }
+      for (const word of pack.doors.latin) {
+        expect(word).not.toMatch(NOT_LATIN);
+        expect(word.length).toBeLessThanOrEqual(SLOT_RULES.doorLeft.maxLength);
+      }
     }
   });
 

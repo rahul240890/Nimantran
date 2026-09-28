@@ -13,7 +13,7 @@ import {
 } from "@/lib/editor/draft";
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
 import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
-import { formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
+import { formatCardDate, formatCardTime, type CardLanguage } from "@/lib/templates/card-languages";
 import { WORDING_IDS } from "@/lib/traditions/schema";
 import { formatTime } from "@/lib/time";
 
@@ -67,12 +67,14 @@ export function cardFunctions<T extends StoryFunction>(
       : english
         ? (local?.latin ?? siteNames[fn.kind].name)
         : siteNames[fn.kind].name;
-    const date = draft.functions[fn.kind].date;
+    const { date, time, endTime } = draft.functions[fn.kind];
     return {
       ...fn,
       name,
       localName: null,
       date: date ? formatCardDate(date, language) : fn.date,
+      // Only functions that show a time have one here (needsTime), so follow fn.time
+      time: fn.time && time ? formatCardTime(time, endTime || null, language) : fn.time,
       muhurat:
         fn.muhurat && muhurat
           ? { text: own ? muhurat.native : muhurat.latin, lang: language }

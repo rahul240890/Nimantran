@@ -15,7 +15,6 @@ import {
   type EditorStep,
 } from "@/lib/editor/draft";
 import { draftProblems } from "@/lib/editor/draft-checks";
-import { RAGAS } from "@/lib/engine/music";
 import { formatTime } from "@/lib/time";
 import { usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
@@ -79,7 +78,7 @@ export function PreviewStep({
     draft.photos.map((photo) => photo.id),
     draft.remoteId,
   );
-  const raga = RAGAS[templateWithRaga(draft.templateId, draft.music.raga).music.raga];
+  const raga = templateWithRaga(draft.templateId, draft.music.raga).music.raga;
   const [confirming, setConfirming] = useState(false);
 
   return (
@@ -192,7 +191,7 @@ export function PreviewStep({
 
       <Section title={previewCopy.musicHeading} step="extras" goTo={goTo}>
         <p className="text-sm">
-          Raag {raga.name}
+          {extrasCopy.ragaNames[raga]}
           {draft.music.playOnOpen ? ` · ${previewCopy.playsOnOpen}` : ""}
         </p>
       </Section>

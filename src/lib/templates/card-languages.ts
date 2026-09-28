@@ -45,3 +45,58 @@ export function formatCardDate(date: string, language: CardLanguage = "en"): str
     locale: language === "en" ? enIN : DATE_LOCALES[language],
   });
 }
+
+/*
+ * Times the way printed Indian cards write them: the part of the day, then the hour, as in
+ * "शाम 6:30 बजे" or "સાંજે 6:30 વાગ્યે", never "PM" in English letters on a Gujarati card.
+ * Morning runs from 4 to noon, afternoon to 4, evening to 8, then night.
+ */
+const CARD_TIME_WORDS: Record<
+  Exclude<CardLanguage, "en">,
+  { parts: [string, string, string, string]; at: string; range: (a: string, b: string) => string }
+> = {
+  hi: { parts: ["सुबह", "दोपहर", "शाम", "रात"], at: "बजे", range: (a, b) => `${a} से ${b} तक` },
+  mr: {
+    parts: ["सकाळी", "दुपारी", "सायंकाळी", "रात्री"],
+    at: "वाजता",
+    range: (a, b) => `${a} ते ${b}`,
+  },
+  gu: {
+    parts: ["સવારે", "બપોરે", "સાંજે", "રાત્રે"],
+    at: "વાગ્યે",
+    range: (a, b) => `${a} થી ${b}`,
+  },
+  bn: { parts: ["সকাল", "দুপুর", "সন্ধ্যা", "রাত"], at: "", range: (a, b) => `${a} থেকে ${b}` },
+  ta: {
+    parts: ["காலை", "மதியம்", "மாலை", "இரவு"],
+    at: "மணிக்கு",
+    range: (a, b) => `${a} முதல் ${b} வரை`,
+  },
+};
+
+function cardClock(time: string): { part: number; clock: string } {
+  const h = Number(time.slice(0, 2));
+  const m = Number(time.slice(3, 5));
+  const part = h >= 4 && h < 12 ? 0 : h >= 12 && h < 16 ? 1 : h >= 16 && h < 20 ? 2 : 3;
+  return { part, clock: `${h % 12 || 12}:${String(m).padStart(2, "0")}` };
+}
+
+/**
+ * A function's time, or its start and end, in the card's language: "शाम 6:30 बजे",
+ * "सुबह 9:47 से 10:31 तक". Times are stored as 24-hour "HH:mm".
+ */
+export function formatCardTime(time: string, end: string | null, language: CardLanguage): string {
+  if (language === "en") {
+    const clock = (t: string) => format(parseISO(`2000-01-01T${t}`), "p", { locale: enIN });
+    return end ? `${clock(time)} to ${clock(end)}` : clock(time);
+  }
+  const words = CARD_TIME_WORDS[language];
+  const from = cardClock(time);
+  const start = `${words.parts[from.part]} ${from.clock}`;
+  if (!end) return words.at ? `${start} ${words.at}` : start;
+  const to = cardClock(end);
+  return words.range(
+    start,
+    to.part === from.part ? to.clock : `${words.parts[to.part]} ${to.clock}`,
+  );
+}
