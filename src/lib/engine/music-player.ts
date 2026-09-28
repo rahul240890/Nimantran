@@ -64,7 +64,7 @@ export function pluck(ctx: BaseAudioContext, hz: number, voice: Voice, seed: num
 }
 
 /** A soft hall: decaying noise, split into two slightly different ears. */
-function hall(ctx: BaseAudioContext): AudioBuffer {
+export function hall(ctx: BaseAudioContext): AudioBuffer {
   const seconds = 2.6;
   const length = Math.floor(ctx.sampleRate * seconds);
   const buffer = ctx.createBuffer(2, length, ctx.sampleRate);

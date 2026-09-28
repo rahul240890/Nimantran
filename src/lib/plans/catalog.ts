@@ -32,6 +32,8 @@ export type Plan = {
   pricePaise: number;
   /** "Made with Shubh" across the guest's pages. */
   watermark: boolean;
+  /** The story as an MP4 for WhatsApp Status and Reels (Step 17c). */
+  video: boolean;
   limits: PlanLimits;
 };
 
@@ -42,18 +44,21 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     pricePaise: 0,
     watermark: true,
+    video: false,
     limits: { functions: 1, photos: 3, languages: 1, couplePhotos: 1, guests: 50 },
   },
   premium: {
     id: "premium",
     pricePaise: 49_900,
     watermark: false,
+    video: true,
     limits: { functions: 3, photos: 20, languages: 2, couplePhotos: 1, guests: 500 },
   },
   royal: {
     id: "royal",
     pricePaise: 1_99_900,
     watermark: false,
+    video: true,
     limits: {
       functions: UNLIMITED,
       photos: UNLIMITED,
@@ -66,6 +71,7 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "bundle",
     pricePaise: 2_99_900,
     watermark: false,
+    video: true,
     limits: {
       functions: UNLIMITED,
       photos: UNLIMITED,
