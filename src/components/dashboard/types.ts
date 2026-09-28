@@ -1,5 +1,6 @@
 import type { HostFunction, HostGuest } from "@/lib/guests/list";
 import type { Host, HostInvite } from "@/lib/invites/hosts";
+import type { PlanId } from "@/lib/plans/catalog";
 
 /** What the dashboard page hands the browser: no draft, only what the screens show. */
 export type DashboardView = {
@@ -17,4 +18,6 @@ export type DashboardView = {
   hostInvites: HostInvite[];
   /** Where co-host links point: <origin>/join/<token>. */
   origin: string;
+  /** The invite's edition, once payments are on (Steps 15 to 17). */
+  plan: PlanId | null;
 };

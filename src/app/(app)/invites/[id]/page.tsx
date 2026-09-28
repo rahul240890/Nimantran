@@ -6,6 +6,7 @@ import { GuestDashboard } from "@/components/dashboard/guest-dashboard";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { hostStore } from "@/lib/invites/hosts";
+import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
@@ -29,6 +30,7 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
   if (!data) notFound();
 
   const origin = await requestOrigin();
+  const plan = (await editionsActive()) ? await invitePlan(account, id) : null;
   return (
     <PageTransition>
       <AccountShell>
@@ -46,6 +48,7 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
             hosts: data.hosts,
             hostInvites: data.hostInvites,
             origin: origin.replace(/\/+$/, ""),
+            plan,
           }}
         />
       </AccountShell>

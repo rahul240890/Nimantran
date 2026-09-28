@@ -25,6 +25,16 @@ database keeps every invite. Applied so far after the first setup:
 - `20260926200000_host_dashboard.sql` — the host dashboard (Step 11): co-host links
   (`host_invite_preview()`, `accept_host_invite()`, `event_host_list()`), a label on co-host
   invitations and `guests.reminded_at`.
+- `20260928090000_admin_and_editions.sql` — the master admin and editions (Steps 15 to 17):
+  `admins`, `app_settings`, `orders`, `event_plans`, `is_admin()`, `checkout_enabled()` and
+  `published_invite_plan()`. Then make yourself the first admin (use the email or phone you
+  sign in with):
+
+  ```sql
+  insert into public.admins (user_id, role)
+  select id, 'owner' from auth.users where email = 'you@example.com'
+  on conflict (user_id) do nothing;
+  ```
 
 ## Setting up a project
 
