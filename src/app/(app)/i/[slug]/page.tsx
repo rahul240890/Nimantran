@@ -8,6 +8,7 @@ import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
 import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
+import { showsWatermark } from "@/lib/payments/editions";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
   calendarEntries,
@@ -56,6 +57,7 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
   const { functionCopy } = editorText[locale];
   const url = inviteUrl(await requestOrigin(), invite.slug);
   const entries = calendarEntries(draft, { id: invite.id, url }, locale);
+  const watermark = await showsWatermark(invite.slug, invite.id);
 
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
     const { kind } = told;
@@ -90,6 +92,7 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
       allIcsUrl={entries.length > 1 ? `/i/${invite.slug}/calendar` : null}
       rsvpFunctions={rsvpFunctions}
       questions={draftQuestions(draft)}
+      watermark={watermark}
     />
   );
 }

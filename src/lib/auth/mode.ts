@@ -22,3 +22,6 @@ export function authMode(): AuthMode {
 
 /** The code that signs anyone in, in preview mode only. */
 export const PREVIEW_CODE = "123456";
+
+/** In preview mode only, the number that signs in as an admin of /admin. */
+export const PREVIEW_ADMIN_PHONE = "+919999900000";

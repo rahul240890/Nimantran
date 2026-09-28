@@ -1,0 +1,98 @@
+import type { PlanId, PlanLimits } from "@/lib/plans/catalog";
+
+/*
+ * English copy for editions: the plan cards, buying one for an invite, and the watermark
+ * (Steps 15 to 17). Prices come from src/lib/plans/catalog.ts.
+ */
+
+export const planCopy = {
+  free: {
+    name: "Free",
+    bestFor: "Trying it, small gatherings",
+    highlights: ["1 function", "3 photos", "1 card language", "“Made with Shubh” on the invite"],
+  },
+  premium: {
+    name: "Premium",
+    bestFor: "Birthdays, pujas, engagements",
+    highlights: [
+      "Up to 3 functions",
+      "20 photos",
+      "2 card languages",
+      "1 couple photo",
+      "No watermark",
+    ],
+  },
+  royal: {
+    name: "Royal",
+    bestFor: "Big weddings and receptions",
+    highlights: [
+      "Every function",
+      "Every photo",
+      "2 card languages",
+      "Couple photos, one each",
+      "No watermark",
+    ],
+  },
+  bundle: {
+    name: "Wedding bundle",
+    bestFor: "Multi-day Indian weddings",
+    highlights: [
+      "Everything in Royal",
+      "Save-the-date and thank-you cards",
+      "Guest photo album forever",
+      "No watermark",
+    ],
+  },
+} satisfies Record<PlanId, { name: string; bestFor: string; highlights: string[] }>;
+
+export const upgradeCopy = {
+  metaTitle: "Choose your edition",
+  eyebrow: "Edition",
+  title: "Choose your edition",
+  intro: (names: string) =>
+    `One payment for ${names || "this invite"}, with every function and guest on it. Prices include GST.`,
+  current: "Your edition",
+  currentBadge: "Current",
+  needed: "Fits your invite",
+  included: "Included",
+  pay: (price: string) => `Pay ${price}`,
+  payDifference: (price: string) => `Upgrade for ${price}`,
+  difference: "You pay only the difference.",
+  opening: "Opening payment…",
+  checking: "Confirming your payment…",
+  paid: (plan: string) => `${plan} is on. Thank you!`,
+  paidBody: "The watermark is gone and everything in your edition is unlocked.",
+  cancelled: "Payment not completed. Nothing was charged.",
+  failed:
+    "The payment couldn't be confirmed. If money left your account, it comes back within 5 to 7 days, or write to us.",
+  off: "Payments open very soon. Everything is free until then.",
+  loadFailed: "The payment window couldn't open. Check your connection and try again.",
+  receipts: "Receipts",
+  receipt: (plan: string, price: string) => `${plan}, ${price}`,
+  paymentId: "Payment",
+  back: "Back to the invite",
+  secure: "Paid securely through Razorpay: UPI, cards and netbanking.",
+  previewCheckout: {
+    title: "Test payment",
+    body: (price: string) =>
+      `Preview mode: no money moves. Pay ${price} to see the edition unlock as a host would.`,
+    pay: "Pay (test)",
+    cancel: "Cancel",
+  },
+  refunds: "Full refund within 7 days if the invite hasn't been sent to any guest.",
+} as const;
+
+export const limitCopy = {
+  title: "This invite needs a bigger edition",
+  body: (plan: string) => `To publish it as it is, choose ${plan}, or trim it to fit Free.`,
+  used: {
+    functions: (count: number) => `${count} functions`,
+    photos: (count: number) => `${count} photos`,
+    languages: (count: number) => `${count} card languages`,
+    couplePhotos: (count: number) => `${count} couple photos`,
+    guests: (count: number) => `${count} guests`,
+  } satisfies Record<keyof PlanLimits, (count: number) => string>,
+  choose: "Choose edition",
+  edition: (plan: string) => `Edition: ${plan}`,
+  upgrade: "Upgrade",
+} as const;

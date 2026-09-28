@@ -1,10 +1,10 @@
 "use client";
 
-import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send } from "lucide-react";
+import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
-import { checkSlug, publishInvite, type SlugCheck } from "@/actions/invites";
+import { checkSlug, publishInvite, type PublishOutcome, type SlugCheck } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -17,6 +17,7 @@ import { syncDraft } from "@/lib/invites/sync";
 import { cleanSlugInput, isSlug, suggestSlug } from "@/lib/publish/slug";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
+import { editionsText } from "@/i18n/copy/editions";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 
@@ -72,6 +73,8 @@ export function PublishButton({
   );
 }
 
+const remoteIdNow = () => inviteDraft.get().draft.remoteId;
+
 function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => void }) {
   const { publishCopy } = useText(publishText);
   const router = useRouter();
@@ -85,6 +88,10 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
   const [check, setCheck] = useState<SlugState>(null);
   const [busy, setBusy] = useState<"saving" | "publishing" | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needs, setNeeds] = useState<Extract<PublishOutcome, { status: "needs-plan" }> | null>(
+    null,
+  );
+  const { limitCopy, planCopy } = useText(editionsText);
   const statusId = useId();
 
   const valid = isSlug(slug);
@@ -107,6 +114,7 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
   const publish = async () => {
     if (!valid || busy) return;
     setError(null);
+    setNeeds(null);
     setBusy("saving");
     const synced = await syncDraft();
     const remoteId = inviteDraft.get().draft.remoteId;
@@ -125,6 +133,8 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
       toast({ title: publishCopy.published, tone: "success" });
       onClose();
       router.push(`/invites/${remoteId}/share`);
+    } else if (outcome.status === "needs-plan") {
+      setNeeds(outcome);
     } else if (outcome.status === "taken") {
       setCheck({ slug, result: { available: false, suggestions: outcome.suggestions } });
     } else {
@@ -233,6 +243,26 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
           <p className="text-sm text-ink-muted" role="status">
             {publishCopy.saving}
           </p>
+        )}
+        {needs && remoteIdNow() && (
+          <div
+            role="alert"
+            className="flex flex-col gap-3 rounded-md border border-marigold/50 bg-marigold/10 px-4 py-3"
+          >
+            <div className="flex flex-col gap-1">
+              <p className="font-semibold text-ink">{limitCopy.title}</p>
+              <p className="text-sm text-ink-muted">
+                {needs.shortfalls.map((need) => limitCopy.used[need.limit](need.used)).join(" · ")}
+              </p>
+              <p className="text-sm text-ink-muted">{limitCopy.body(planCopy[needs.plan].name)}</p>
+            </div>
+            <Button asChild size="sm" className="self-start">
+              <Link href={`/invites/${remoteIdNow()}/edition?plan=${needs.plan}`}>
+                <Sparkles aria-hidden />
+                {limitCopy.choose}
+              </Link>
+            </Button>
+          </div>
         )}
         {error && (
           <p

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { dashboardText } from "@/i18n/copy/dashboard";
+import { editionsText } from "@/i18n/copy/editions";
 import { editorText } from "@/i18n/copy/editor";
 import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
@@ -27,6 +28,7 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
 export async function GuestDashboard({ view }: { view: DashboardView }) {
   const copy = (await getText(dashboardText)).dashboardCopy;
   const { functionCopy } = await getText(editorText);
+  const { limitCopy, planCopy } = await getText(editionsText);
   const counts = dashboardCounts(view.guests, view.functions);
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
@@ -50,6 +52,11 @@ export async function GuestDashboard({ view }: { view: DashboardView }) {
                 <Badge tone="neutral">{copy.draftBadge}</Badge>
               )}
               {view.role === "cohost" && <Badge tone="gold">{copy.cohostBadge}</Badge>}
+              {view.plan && (
+                <Badge tone={view.plan === "free" ? "neutral" : "gold"}>
+                  {limitCopy.edition(planCopy[view.plan].name)}
+                </Badge>
+              )}
             </p>
             <h1 className="font-display text-[2rem] leading-[1.08] break-words sm:text-[2.6rem]">
               {view.names}
@@ -64,6 +71,14 @@ export async function GuestDashboard({ view }: { view: DashboardView }) {
                 <Link href={`/invites/${view.id}/share`}>
                   <Send aria-hidden className="rtl:-scale-x-100" />
                   {copy.share}
+                </Link>
+              </Button>
+            )}
+            {view.plan && view.plan !== "bundle" && (
+              <Button asChild size="sm" variant="secondary">
+                <Link href={`/invites/${view.id}/edition`}>
+                  <Sparkles aria-hidden />
+                  {limitCopy.upgrade}
                 </Link>
               </Button>
             )}

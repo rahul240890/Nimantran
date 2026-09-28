@@ -10,6 +10,7 @@ import { Doorway } from "@/components/guest/doorway";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
+import { WatermarkLayer } from "@/components/guest/watermark";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
@@ -72,6 +73,8 @@ type GuestViewProps = {
   allIcsUrl: string | null;
   rsvpFunctions: RsvpFunction[];
   questions: RsvpQuestionId[];
+  /** A Free invite once payments are on: "Made with Shubh" across the pages (Step 17). */
+  watermark?: boolean;
 };
 
 export function GuestView({
@@ -85,6 +88,7 @@ export function GuestView({
   allIcsUrl,
   rsvpFunctions,
   questions,
+  watermark = false,
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
@@ -170,6 +174,7 @@ export function GuestView({
         <ThemeMenu labels={uiStrings.theme} />
       </div>
 
+      {watermark && <WatermarkLayer />}
       <main id="main" className="flex flex-1 flex-col">
         {doorway ? (
           <Doorway
