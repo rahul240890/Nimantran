@@ -12,6 +12,7 @@ import type { CategoryId } from "@/lib/categories/catalog";
 import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
+import type { GuestLookChoice } from "./guest-look";
 
 export const SUITE_IDS = [
   "rajwada-bagh",
@@ -95,6 +96,11 @@ export type Suite = {
    * theme has four pages (cover, family, the party itself as its reception, the reply).
    */
   occasions?: readonly CategoryId[];
+  /**
+   * The guest page below the painted pages (guest-look.ts): a style, and any touch picked
+   * differently from it. Missing keeps the plain details page.
+   */
+  guest?: GuestLookChoice;
 };
 
 export const SUITES: Record<SuiteId, Suite> = {
@@ -105,6 +111,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "emerald",
     traditions: ["north-hindu"],
+    guest: { style: "palace" },
     images: {
       cover: "/suites/rajwada-bagh/cover.webp",
       family: "/suites/rajwada-bagh/family.webp",
@@ -143,6 +150,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "kasavu",
     traditions: ["tamil"],
+    guest: { style: "garden" },
     images: {
       cover: "/suites/kayal/cover.webp",
       family: "/suites/kayal/family.webp",

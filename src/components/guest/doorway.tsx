@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import { StoryPlayer } from "@/components/invitation/story/story-player";
-import { musicMuted, useRagaMusic } from "@/components/invitation/use-raga-music";
+import { musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -129,6 +129,7 @@ export function Doorway({
   type,
   main,
   reply,
+  music,
   musicOnOpen,
 }: {
   suite: SuiteId;
@@ -143,12 +144,13 @@ export function Doorway({
   /** The main event's date and start, for the countdown; null without a date. */
   main: { date: string; at: number } | null;
   reply: { href: string; label: string } | null;
+  /** The page's music, shared with the player further down. */
+  music: RagaMusic;
   musicOnOpen: boolean;
 }) {
   const { guestCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
   const still = useReducedMotion();
-  const music = useRagaMusic(template);
   const [open, setOpen] = useState(false);
   const [pages, setPages] = useState(false);
   const theme = SUITES[suite];
