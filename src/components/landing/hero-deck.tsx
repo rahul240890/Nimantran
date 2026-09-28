@@ -1,6 +1,8 @@
 "use client";
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
+import type { ReactNode } from "react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
@@ -9,6 +11,7 @@ import { cn } from "@/lib/cn";
 import { PAINTED_SUITES as ALL_PAINTED } from "@/lib/gallery/catalog";
 import { textArea } from "@/lib/suites/areas";
 import { SUITES } from "@/lib/suites/catalog";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const noSubscribe = () => () => {};
@@ -29,6 +32,8 @@ export function HeroDeck() {
   const { hero, homeGallery } = useText(landingText);
   const { suiteCopy } = useText(editorText);
   const still = useReducedMotion();
+  // Below the sm breakpoint the dots are too small to tap, so they leave the tab order
+  const phone = useMediaQuery("(width < 40rem)");
   const [current, setCurrent] = useState(0);
   const [held, setHeld] = useState(false);
   const total = PAINTED_SUITES.length;
@@ -132,29 +137,70 @@ export function HeroDeck() {
           );
         })}
       </div>
-      <ul aria-label={homeGallery.deckLabel} className="flex flex-wrap justify-center gap-1.5">
-        {PAINTED_SUITES.map((suite, index) => (
-          <li key={suite}>
-            <button
-              type="button"
-              aria-pressed={index === current}
-              aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
-              onClick={() => setCurrent(index)}
-              className="group grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring"
-            >
-              <span
-                aria-hidden
-                className={cn(
-                  "block h-2.5 rounded-full transition-[width,background-color] duration-300 motion-still:transition-none",
-                  index === current
-                    ? "w-7 bg-marigold"
-                    : "w-2.5 bg-line-strong group-hover:bg-ink-faint",
-                )}
-              />
-            </button>
-          </li>
-        ))}
-      </ul>
+      {/*
+        Eight 44px dots do not fit one row on a phone, so phones step through the themes
+        with the arrows and the dots only show where you are; wider screens can tap a dot.
+      */}
+      <div className="flex items-center justify-center gap-1">
+        <DeckArrow
+          label={homeGallery.previousTheme}
+          onClick={() => setCurrent((index) => (index - 1 + total) % total)}
+        >
+          <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
+        </DeckArrow>
+        <ul aria-label={homeGallery.deckLabel} className="flex items-center sm:gap-0.5">
+          {PAINTED_SUITES.map((suite, index) => (
+            <li key={suite} className="flex">
+              <button
+                type="button"
+                aria-pressed={index === current}
+                aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
+                onClick={() => setCurrent(index)}
+                className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-auto max-sm:px-[3px] sm:w-11"
+                tabIndex={phone ? -1 : undefined}
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    "block h-2 rounded-full transition-[width,background-color] duration-300 sm:h-2.5 motion-still:transition-none",
+                    index === current
+                      ? "w-5 bg-marigold sm:w-7"
+                      : "w-2 bg-line-strong group-hover:bg-ink-faint sm:w-2.5",
+                  )}
+                />
+              </button>
+            </li>
+          ))}
+        </ul>
+        <DeckArrow
+          label={homeGallery.nextTheme}
+          onClick={() => setCurrent((index) => (index + 1) % total)}
+        >
+          <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
+        </DeckArrow>
+      </div>
     </div>
+  );
+}
+
+/** A round 44px button beside the dots that steps the deck back or forward. */
+function DeckArrow({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-ring"
+    >
+      {children}
+    </button>
   );
 }

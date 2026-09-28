@@ -75,6 +75,8 @@ export const hero: Translation<typeof en.hero> = {
 export const homeGallery: Translation<typeof en.homeGallery> = {
   deckLabel: "चित्रित निमंत्रण थीम",
   showTheme: (name: string) => `${name} दिखाएँ`,
+  previousTheme: "पिछली थीम",
+  nextTheme: "अगली थीम",
   coverDate: "12 दिसंबर 2026",
   occasionsEyebrow: "यहाँ से शुरू करें",
   occasionsTitle: "आप क्या मना रहे हैं?",
@@ -91,17 +93,6 @@ export const homeGallery: Translation<typeof en.homeGallery> = {
   themesIntro:
     "हर थीम चित्रों का एक सेट है: मुखपृष्ठ, परिवार, हल्दी, मेहँदी, संगीत, बारात, विवाह, स्वागत समारोह और जवाब। किसी पर टैप करके सारे पन्ने देखिए।",
   allDesigns: "शादी के सभी डिज़ाइन देखें",
-};
-
-export const musicDemo: Translation<typeof en.musicDemo> = {
-  label: "एक निमंत्रण सुनिए",
-  body: "हर डिज़ाइन का अपना राग है, जो मेहमान के फ़ोन पर ही रचा जाता है। कुछ डाउनलोड नहीं करना।",
-  play: (design) => `${design} का संगीत चलाएँ`,
-  pause: "संगीत रोकें",
-  choose: "डिज़ाइन",
-  chooseLabel: "किसका संगीत सुनना है, चुनें",
-  raga: (name) => `राग ${name}`,
-  failed: "यह ब्राउज़र संगीत नहीं चला सकता।",
 };
 
 export const howItWorks: Translation<typeof en.howItWorks> = {
