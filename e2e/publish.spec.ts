@@ -217,7 +217,8 @@ test.describe("publish and share", () => {
     await expect(story).toHaveAttribute("data-story-beat", "fn-wedding");
     await expect(story.getByText("5 દિવસ બાકી")).toBeVisible();
     await expect(story.getByText("શુભ મુહૂર્ત")).toBeVisible();
-    await expect(story.getByText("9:47 am to 10:31 am")).toBeVisible();
+    // The card's time is Gujarati too, never "AM" in English letters
+    await expect(story.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
     await guest.keyboard.press("ArrowRight");
     const reply = story.getByRole("link", { name: "Reply to the invitation" });
     await expect(reply).toHaveAttribute("href", "#rsvp");

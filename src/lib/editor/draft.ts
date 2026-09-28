@@ -257,8 +257,10 @@ export function traditionWording(
         : "script";
   wording.blessing = pack.invocation && mode !== "off" ? pack.invocation[mode] : "";
   if (pack.doors && draft.categoryId === "wedding") {
-    wording.doorLeft = pack.doors[0];
-    wording.doorRight = pack.doors[1];
+    // A Hindi card's gates say शुभ विवाह; only its English side says Shubh Vivah
+    const doors = language === "en" ? pack.doors.latin : pack.doors.native;
+    wording.doorLeft = doors[0];
+    wording.doorRight = doors[1];
   }
   return wording;
 }

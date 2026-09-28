@@ -220,6 +220,11 @@ describe("tradition packs", () => {
     expect(copy.blessing).toBe("॥ श्री गणेशाय नमः ॥");
     expect(copy.symbol).toBe("kalash");
     expect(copy.doors).toEqual(["Shubh", "Mangal"]);
+    // A Marathi card writes its gates in Marathi
+    expect(draftCopy({ ...withTradition({ id: "marathi" }), languages: ["mr"] }).doors).toEqual([
+      "शुभ",
+      "मंगल",
+    ]);
   });
 
   it("follow the family's choices", () => {

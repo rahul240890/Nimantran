@@ -71,8 +71,8 @@ export type TraditionPack = {
   muhurat: { native: string; latin: string } | null;
   /** The wording blocks this tradition's cards carry, with their heading in its own script. */
   wording: Partial<Record<WordingId, { title: string; example: string }>>;
-  /** Door words for a wedding card, in English letters. */
-  doors?: readonly [string, string];
+  /** Door words for a wedding card, in the tradition's script and in English letters. */
+  doors?: { native: readonly [string, string]; latin: readonly [string, string] };
   /** "draft" until community reviewers and a proofreader sign off (TRADITIONS.md, section 10). */
   status: "draft" | "reviewed";
   reviewedBy: readonly string[];
