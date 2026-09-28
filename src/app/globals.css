@@ -1549,3 +1549,602 @@
     animation: fx-bob 5.5s ease-in-out var(--fx-delay, 0s) infinite;
   }
 }
+
+/*
+ * The themed guest page below the painted pages (Step 12q). The site's tokens are pointed
+ * at the theme's own colours, so the details, buttons and reply form all wear the theme,
+ * the same in both site themes like card stock. data-guest picks the style's shapes; the
+ * touches move only when motion is allowed.
+ */
+.guest-themed {
+  color-scheme: dark;
+  --paper: var(--suite-near);
+  --surface: color-mix(in oklab, var(--suite-near) 84%, var(--suite-plate));
+  --surface-2: color-mix(in oklab, var(--suite-near) 74%, var(--suite-plate));
+  --line: color-mix(in oklab, var(--suite-gold) 38%, var(--suite-near));
+  --line-strong: color-mix(in oklab, var(--suite-gold) 62%, var(--suite-near));
+  --line-control: color-mix(in oklab, var(--suite-gold) 70%, var(--suite-near));
+  --ink: var(--suite-plate);
+  --ink-muted: color-mix(in oklab, var(--suite-plate) 80%, var(--suite-near));
+  --ink-faint: color-mix(in oklab, var(--suite-plate) 62%, var(--suite-near));
+  --accent-text: var(--suite-light);
+  --marigold: var(--suite-gold);
+  --marigold-strong: color-mix(in oklab, var(--suite-gold) 75%, var(--suite-light));
+  --marigold-edge: color-mix(in oklab, var(--suite-gold) 55%, var(--suite-near));
+  --on-marigold: var(--suite-near);
+  --ring: var(--suite-light);
+  color: var(--ink);
+  background-color: var(--suite-near);
+}
+.guest-themed[data-guest="palace"] {
+  background-image:
+    radial-gradient(
+      120% 48rem at 50% 0%,
+      color-mix(in oklab, var(--suite-sky-top) 72%, var(--suite-near)),
+      transparent 70%
+    ),
+    radial-gradient(
+      90% 40rem at 50% 100%,
+      color-mix(in oklab, var(--suite-accent) 26%, var(--suite-near)),
+      transparent 70%
+    );
+}
+.guest-themed[data-guest="garden"] {
+  background-image:
+    radial-gradient(
+      60rem 30rem at 85% 18%,
+      color-mix(in oklab, var(--suite-glow) 10%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      var(--suite-sky-top),
+      color-mix(in oklab, var(--suite-water) 72%, var(--suite-near)) 55%,
+      var(--suite-near)
+    );
+}
+.guest-themed[data-guest="procession"] {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--suite-sky-top) 55%, var(--suite-near)),
+    var(--suite-near) 70%
+  );
+}
+.guest-themed[data-guest="party"] {
+  background-image: radial-gradient(
+    80rem 40rem at 20% 0%,
+    color-mix(in oklab, var(--suite-accent) 35%, var(--suite-near)),
+    transparent 70%
+  );
+}
+/* Ripples on the water behind a garden page */
+.guest-themed[data-guest="garden"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: repeating-radial-gradient(
+    ellipse 70% 12% at 50% 62%,
+    transparent 0 2.6rem,
+    color-mix(in oklab, var(--suite-glow) 7%, transparent) 2.6rem 2.7rem
+  );
+}
+
+/* The celebrations: palace cards stand under arches, garden cards float along a stream */
+.guest-stop-card {
+  border-radius: 1.5rem;
+}
+.guest-stop-art {
+  aspect-ratio: 4 / 3;
+  border-radius: 1rem;
+}
+[data-guest="palace"] .guest-stop-art {
+  border-radius: 50% 50% 1rem 1rem / 9rem 9rem 1rem 1rem;
+  box-shadow:
+    0 0 0 3px var(--suite-near),
+    0 0 0 4.5px var(--suite-gold);
+  margin: 4.5px;
+}
+[data-guest="palace"] .guest-stop-card {
+  border-radius: 50% 50% 1.5rem 1.5rem / 10rem 10rem 1.5rem 1.5rem;
+}
+@media (min-width: 48rem) {
+  [data-guest="palace"] .guest-trail,
+  [data-guest="party"] .guest-trail {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  [data-guest="palace"] .guest-stop,
+  [data-guest="party"] .guest-stop {
+    flex: 0 1 calc(50% - 1rem);
+  }
+}
+[data-guest="garden"] .guest-trail,
+[data-guest="procession"] .guest-trail {
+  position: relative;
+  max-width: 46rem;
+  padding-inline-start: 1.75rem;
+}
+[data-guest="garden"] .guest-trail::before,
+[data-guest="procession"] .guest-trail::before {
+  content: "";
+  position: absolute;
+  inset-block: 0.5rem;
+  inset-inline-start: 0.5rem;
+  width: 2px;
+  background: linear-gradient(
+    var(--suite-gold),
+    color-mix(in oklab, var(--suite-gold) 20%, transparent)
+  );
+}
+[data-guest="procession"] .guest-trail::before {
+  width: 0;
+  background: none;
+  border-inline-start: 3px dotted var(--suite-gold);
+}
+[data-guest="garden"] .guest-stop,
+[data-guest="procession"] .guest-stop {
+  position: relative;
+}
+[data-guest="garden"] .guest-stop::before,
+[data-guest="procession"] .guest-stop::before {
+  content: "";
+  position: absolute;
+  top: 2rem;
+  inset-inline-start: -1.75rem;
+  width: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: calc(-50% + 0.5rem + 1px) 0;
+  background: var(--suite-light);
+  box-shadow:
+    0 0 0 4px color-mix(in oklab, var(--suite-light) 25%, transparent),
+    0 0 1.2rem var(--suite-light);
+}
+[data-guest="garden"] .guest-stop-card {
+  border-radius: 2rem 0.75rem 2rem 0.75rem;
+}
+[data-guest="garden"] .guest-stop-art {
+  border-radius: 1.6rem 0.5rem 1.6rem 0.5rem;
+  aspect-ratio: 16 / 9;
+}
+@media (min-width: 48rem) {
+  [data-guest="garden"] .guest-stop-card {
+    display: grid;
+    grid-template-columns: 15rem minmax(0, 1fr);
+    align-items: start;
+  }
+  [data-guest="garden"] .guest-stop-art {
+    aspect-ratio: 3 / 4;
+  }
+}
+[data-guest="party"] .guest-stop:nth-child(odd) .guest-stop-card {
+  rotate: -1.2deg;
+}
+[data-guest="party"] .guest-stop:nth-child(even) .guest-stop-card {
+  rotate: 1.2deg;
+}
+
+/* The photo frames */
+.guest-frame {
+  position: relative;
+  overflow: hidden;
+  background: var(--suite-plate);
+}
+.guest-frame[data-frame="jharokha"] {
+  border-radius: 50% 50% 0.75rem 0.75rem / 8rem 8rem 0.75rem 0.75rem;
+  box-shadow:
+    0 0 0 4px var(--suite-near),
+    0 0 0 6px var(--suite-gold),
+    0 24px 40px -18px rgb(0 0 0 / 0.7);
+}
+.guest-frame[data-frame="mirror"] {
+  border-radius: 1.5rem;
+  border: 6px dotted var(--suite-gold);
+  box-shadow: 0 24px 40px -18px rgb(0 0 0 / 0.7);
+}
+.guest-frame[data-frame="lotus"] {
+  border-radius: 50% 50% 46% 46% / 42% 42% 58% 58%;
+  box-shadow:
+    0 0 0 4px var(--suite-near),
+    0 0 0 6px var(--suite-gold),
+    0 0 2.5rem color-mix(in oklab, var(--suite-light) 30%, transparent);
+}
+.guest-frame[data-frame="polaroid"] {
+  padding: 0.6rem 0.6rem 2.6rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 18px 30px -14px rgb(0 0 0 / 0.7);
+}
+.guest-frames li:nth-child(odd) .guest-frame[data-frame="polaroid"] {
+  rotate: -2.5deg;
+}
+.guest-frames li:nth-child(even) .guest-frame[data-frame="polaroid"] {
+  rotate: 2deg;
+}
+.guest-frames {
+  scrollbar-width: thin;
+  scrollbar-color: var(--suite-gold) transparent;
+}
+
+.guest-family-panel {
+  border-radius: 1.25rem;
+}
+[data-guest="palace"] .guest-family-panel {
+  border-radius: 50% 50% 1.25rem 1.25rem / 5rem 5rem 1.25rem 1.25rem;
+  padding-top: 3rem;
+}
+[data-guest="garden"] .guest-family-panel {
+  border-radius: 50% 50% 1.5rem 1.5rem / 3.5rem 3.5rem 1.5rem 1.5rem;
+}
+
+/* The reply sits under the theme's closing painting, fading into the page */
+.guest-reply-art {
+  opacity: 0.55;
+  mask-image: linear-gradient(to bottom, black 20%, transparent);
+}
+
+/* The lights: dim until the guest switches them on */
+.guest-light-string {
+  border-top: 1px solid color-mix(in oklab, var(--suite-gold) 45%, transparent);
+  padding-inline: 0.5rem;
+}
+.guest-light-string li:nth-child(n + 6) {
+  display: none;
+}
+@media (min-width: 40rem) {
+  .guest-light-string li:nth-child(n + 6) {
+    display: block;
+  }
+}
+.guest-light .guest-glass {
+  opacity: 0.35;
+  transition:
+    opacity 400ms ease,
+    filter 400ms ease;
+}
+[data-lit] .guest-light .guest-glass {
+  opacity: 1;
+  filter: drop-shadow(0 0 6px var(--suite-light)) drop-shadow(0 0 14px var(--suite-light));
+}
+
+/* The seal: tapped open, its halves part and the words unfold */
+.guest-seal-left,
+.guest-seal-right,
+.guest-seal-face,
+.guest-petal {
+  transform-box: fill-box;
+}
+.guest-seal[data-open] .guest-seal-left {
+  transform: translateX(-60%) rotate(-30deg) scale(0.6);
+  opacity: 0;
+}
+.guest-seal[data-open] .guest-seal-right {
+  transform: translateX(60%) rotate(30deg) scale(0.6);
+  opacity: 0;
+}
+.guest-seal[data-open] .guest-seal-face {
+  opacity: 0;
+}
+.guest-seal[data-seal="lotus"] .guest-petal {
+  transform-box: view-box;
+  transform: rotate(calc(var(--petal) * 0.2));
+}
+.guest-seal[data-seal="lotus"][data-open] .guest-petal {
+  transform: rotate(var(--petal));
+}
+.guest-seal-band::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 3.5rem;
+  height: 2.6rem;
+  z-index: -1;
+  border-radius: 0.25rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--suite-accent) 55%, var(--suite-near)) 15% 85%,
+    transparent
+  );
+}
+
+/* Save the date: the doors, curtain, ripples or confetti over the date */
+.guest-date-cover {
+  position: absolute;
+  inset-block: 0;
+  width: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+.guest-date-a {
+  inset-inline-start: 0;
+}
+.guest-date-b {
+  inset-inline-end: 0;
+}
+.guest-date[data-kind="doors"] .guest-date-cover,
+.guest-date[data-kind="curtain"] .guest-date-cover {
+  background: color-mix(in oklab, var(--suite-accent) 70%, var(--suite-near));
+}
+.guest-date[data-kind="doors"] .guest-date-cover {
+  box-shadow: inset 0 0 0 0.6rem color-mix(in oklab, var(--suite-gold) 40%, transparent);
+}
+.guest-date[data-kind="ripples"] .guest-date-cover,
+.guest-date[data-kind="confetti"] .guest-date-cover {
+  inset: 0;
+  width: auto;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion="reduce"]) {
+    .guest-reveal[data-reveal="wait"] {
+      opacity: 0;
+    }
+    .guest-seal-left,
+    .guest-seal-right,
+    .guest-seal-face,
+    .guest-petal {
+      transition:
+        transform 700ms cubic-bezier(0.7, 0, 0.25, 1),
+        opacity 500ms ease;
+    }
+    .guest-reveal[data-reveal="in"] {
+      animation: guest-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
+    [data-guest="palace"] .guest-reveal[data-reveal="in"] {
+      animation-name: guest-arch;
+    }
+    [data-guest="garden"] .guest-reveal[data-reveal="in"] {
+      animation-name: guest-float;
+      animation-duration: 1200ms;
+    }
+    [data-guest="party"] .guest-reveal[data-reveal="in"] {
+      animation-name: guest-pop;
+    }
+    [data-guest="procession"] .guest-reveal[data-reveal="in"] {
+      animation-name: guest-march;
+    }
+
+    .guest-player[data-playing] .guest-spin {
+      animation: guest-spin 3.2s linear infinite;
+    }
+    .guest-player[data-playing] .guest-note {
+      animation: guest-note 2.4s ease-out infinite;
+    }
+    .guest-player[data-playing] .guest-string {
+      animation: guest-string 0.18s linear infinite alternate;
+    }
+    .guest-player[data-playing] .guest-thump {
+      animation: guest-thump 0.5s ease-in-out infinite alternate;
+    }
+    .guest-float-music[data-playing] {
+      animation: guest-glow 2.4s ease-in-out infinite;
+    }
+    .guest-light-string li {
+      animation: guest-sway 4s ease-in-out infinite alternate;
+      transform-origin: top center;
+    }
+    [data-lit] .guest-bell {
+      animation: guest-ring 0.9s ease-in-out 3;
+    }
+    [data-lit] .guest-flame {
+      animation: guest-flicker 1.4s ease-in-out infinite alternate;
+      transform-box: fill-box;
+      transform-origin: bottom center;
+    }
+    .guest-unfold:not([hidden]) {
+      animation: guest-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    }
+
+    .guest-date[data-reveal="in"] .guest-date-cover {
+      opacity: 1;
+      animation-duration: 1.6s;
+      animation-timing-function: cubic-bezier(0.7, 0, 0.25, 1);
+      animation-delay: 0.2s;
+      animation-fill-mode: both;
+    }
+    .guest-date[data-kind="doors"][data-reveal="in"] .guest-date-a {
+      transform-origin: left center;
+      animation-name: guest-door-left;
+    }
+    .guest-date[data-kind="doors"][data-reveal="in"] .guest-date-b {
+      transform-origin: right center;
+      animation-name: guest-door-right;
+    }
+    .guest-date[data-kind="curtain"][data-reveal="in"] .guest-date-a {
+      animation-name: guest-curtain-left;
+    }
+    .guest-date[data-kind="curtain"][data-reveal="in"] .guest-date-b {
+      animation-name: guest-curtain-right;
+    }
+    .guest-date[data-kind="ripples"][data-reveal="in"] .guest-date-cover {
+      border-radius: 50%;
+      border: 2px solid var(--suite-light);
+      animation-name: guest-ripple;
+      animation-timing-function: ease-out;
+      animation-duration: 2.2s;
+    }
+    .guest-date[data-kind="ripples"][data-reveal="in"] .guest-date-b {
+      animation-delay: 0.7s;
+    }
+    .guest-date[data-kind="confetti"][data-reveal="in"] .guest-date-cover {
+      background:
+        radial-gradient(circle, var(--suite-light) 0 3px, transparent 4px) 0 0 / 2.2rem 2.6rem,
+        radial-gradient(circle, var(--suite-accent) 0 3px, transparent 4px) 1.1rem 1.3rem / 2.4rem
+          2.2rem;
+      animation-name: guest-confetti;
+    }
+    .guest-date[data-reveal="wait"] > :not(.guest-date-cover) {
+      opacity: 0;
+    }
+    .guest-date[data-reveal="in"] > :not(.guest-date-cover) {
+      animation: guest-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 0.9s both;
+    }
+
+    .guest-reveal[data-reveal="in"] .guest-sparks {
+      position: absolute;
+      top: 0.75rem;
+      left: 50%;
+      width: 4px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      color: var(--suite-light);
+      box-shadow:
+        -3rem -0.5rem 0 1px,
+        3rem -0.6rem 0 1px,
+        -1.8rem 1rem 0 0,
+        2rem 0.9rem 0 0,
+        -4rem 1.4rem 0 0,
+        4.2rem 1.2rem 0 0,
+        0 -1rem 0 1px;
+      animation: guest-sparks 1.8s ease-out 0.4s both;
+    }
+  }
+}
+
+@keyframes guest-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+}
+@keyframes guest-arch {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0 round 50% 50% 0 0);
+    transform: translateY(1rem);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+@keyframes guest-float {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(2rem) scale(0.98);
+  }
+}
+@keyframes guest-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.85) rotate(-3deg);
+  }
+  70% {
+    transform: scale(1.03) rotate(1deg);
+  }
+}
+@keyframes guest-march {
+  from {
+    opacity: 0;
+    transform: translateX(-2rem);
+  }
+}
+@keyframes guest-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes guest-note {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+  }
+}
+@keyframes guest-string {
+  to {
+    transform: translateY(0.6px);
+  }
+}
+@keyframes guest-thump {
+  to {
+    scale: 1.08;
+  }
+}
+@keyframes guest-glow {
+  50% {
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--suite-light) 25%, transparent);
+  }
+}
+@keyframes guest-sway {
+  from {
+    rotate: -3deg;
+  }
+  to {
+    rotate: 3deg;
+  }
+}
+@keyframes guest-ring {
+  25% {
+    rotate: 14deg;
+  }
+  75% {
+    rotate: -14deg;
+  }
+}
+@keyframes guest-flicker {
+  to {
+    transform: scaleY(1.15) scaleX(0.9);
+  }
+}
+@keyframes guest-door-left {
+  to {
+    transform: perspective(60rem) rotateY(-100deg);
+    opacity: 0;
+  }
+}
+@keyframes guest-door-right {
+  to {
+    transform: perspective(60rem) rotateY(100deg);
+    opacity: 0;
+  }
+}
+@keyframes guest-curtain-left {
+  to {
+    transform: translateX(-100%) scaleX(0.3);
+  }
+}
+@keyframes guest-curtain-right {
+  to {
+    transform: translateX(100%) scaleX(0.3);
+  }
+}
+@keyframes guest-ripple {
+  from {
+    transform: scale(0.1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+@keyframes guest-confetti {
+  from {
+    transform: translateY(-40%) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(30%) scale(1.2);
+    opacity: 0;
+  }
+}
+@keyframes guest-sparks {
+  from {
+    opacity: 1;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}

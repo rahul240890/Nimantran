@@ -108,6 +108,33 @@ export const guestCopy = {
   notFoundBody:
     "The link may be mistyped, or the family may have stopped sharing it. Ask them to send it again.",
   home: `Go to ${site.shortName}`,
+  /** The themed page below the painted pages (Step 12q). */
+  themed: {
+    invitedTo: "You are invited to",
+    seal: {
+      wax: "Break the seal",
+      knot: "Untie the knot",
+      lotus: "Open the lotus",
+      ribbon: "Pull the ribbon",
+    },
+    tapToReveal: "Tap to reveal",
+    music: { label: "Our song", play: "Play the music", pause: "Pause the music" },
+    lights: {
+      lanterns: "Light the lanterns",
+      bells: "Ring the bells",
+      diyas: "Light the diyas",
+      bulbs: "Switch on the lights",
+    },
+    tapMe: "Tap me",
+    blessingLabel: "With the blessings of our elders",
+    eventsLabel: "The celebration",
+    saveDateLabel: "Mark your calendar",
+    saveDate: "Save the date",
+    photosLabel: "Memories",
+    familyLabel: "Together with",
+    replyLabel: "Your reply",
+    closing: "Your presence is the greatest gift. We look forward to celebrating with you.",
+  },
 } as const;
 
 export const rsvpCopy = {

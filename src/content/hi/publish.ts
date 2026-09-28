@@ -110,6 +110,32 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   notFoundBody:
     "लिंक शायद ग़लत लिखा है, या परिवार ने इसे भेजना बंद कर दिया है। उनसे दोबारा भेजने को कहें।",
   home: "शुभ इन्विटेशन पर जाएँ",
+  themed: {
+    invitedTo: "आप सादर आमंत्रित हैं",
+    seal: {
+      wax: "मुहर खोलें",
+      knot: "गाँठ खोलें",
+      lotus: "कमल खिलाएँ",
+      ribbon: "रिबन खींचें",
+    },
+    tapToReveal: "खोलने के लिए टैप करें",
+    music: { label: "हमारा गीत", play: "संगीत चलाएँ", pause: "संगीत रोकें" },
+    lights: {
+      lanterns: "कंदील जलाएँ",
+      bells: "घंटियाँ बजाएँ",
+      diyas: "दीये जलाएँ",
+      bulbs: "रोशनी जलाएँ",
+    },
+    tapMe: "टैप करें",
+    blessingLabel: "बड़ों के आशीर्वाद से",
+    eventsLabel: "उत्सव",
+    saveDateLabel: "तारीख़ याद रखें",
+    saveDate: "शुभ तिथि",
+    photosLabel: "यादें",
+    familyLabel: "परिवार के साथ",
+    replyLabel: "आपका जवाब",
+    closing: "आपकी उपस्थिति ही हमारा सबसे बड़ा उपहार है। आपके साथ उत्सव मनाने की प्रतीक्षा है।",
+  },
 };
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {

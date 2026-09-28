@@ -35,6 +35,10 @@ Couple photo pages (Step 12l): each painted theme also has `couple.webp` (one fr
 
 Functions without their own painting use the closest one (garba uses sangeet, a puja uses wedding, mameru uses family). A painting carries its own light, so paint the haldi page in morning light and the sangeet page at night.
 
+## The guest page below the pages (Step 12q)
+
+`guest: { style: "palace" | "procession" | "garden" | "party" }` in a theme's entry gives it the themed guest page below its painted pages. Every touch follows the style (`STYLE_LOOKS` in `src/lib/suites/guest-look.ts`); a theme may pick any one differently, for example `guest: { style: "palace", frame: "mirror", mood: "dusk" }`. The choices are lists, so a theme added later from the admin stores the same small JSON object, checked by `guestLookSchema`. Preview at `/engine/guest?suite=<theme>`.
+
 ## Later
 
 - Faith-specific themes whose art carries the faith: a Nikah garden with jaali and a crescent, a chapel with florals, Anand Karaj. These come with the Muslim, Christian and Sikh packs in Step 23.

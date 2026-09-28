@@ -82,3 +82,6 @@ export function useRagaMusic(template: Template) {
 
   return { playing, play, toggle };
 }
+
+/** The music controls a page shares between its parts (the doorway and the details below). */
+export type RagaMusic = ReturnType<typeof useRagaMusic>;
