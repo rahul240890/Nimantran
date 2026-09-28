@@ -19,22 +19,22 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
     test.describe(`${suite} guest page, ${colorScheme} theme`, () => {
       test.use({ colorScheme, reducedMotion: "reduce" });
 
-      test("wears the theme, opens the seal and lights up", async ({ page }) => {
+      test("walks through the day, showers flowers and lights the lamps", async ({ page }) => {
         await page.goto(`/engine/guest?suite=${suite}`);
         const themed = page.locator(".guest-themed");
         await expect(themed).toHaveAttribute("data-suite", suite);
         await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
+        // Each celebration takes its own hour's light
+        await expect(page.locator("li.guest-hour[data-mood]")).toHaveCount(3);
 
-        const seal = page.getByRole("button", { name: /Break the seal|Open the lotus/ });
-        await expect(seal).toHaveAttribute("aria-expanded", "false");
-        await seal.click();
-        await expect(seal).toHaveAttribute("aria-expanded", "true");
-        await expect(page.getByText("Together with their families")).toBeVisible();
+        await page.getByRole("button", { name: "Shower flowers on the couple" }).click();
+        await expect(page.getByText("Your flowers are on their way")).toBeVisible();
 
-        const lights = page.getByRole("button", { name: /Light the/ });
-        await lights.click();
-        await expect(lights).toHaveAttribute("aria-pressed", "true");
+        const lamps = page.getByRole("button", { name: /Light the/ });
+        await lamps.click();
+        await expect(lamps).toHaveAttribute("aria-pressed", "true");
+        await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
 
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
         await expect(page.getByRole("button", { name: /Play the music/ }).last()).toBeVisible();
