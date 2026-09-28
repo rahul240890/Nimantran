@@ -5,6 +5,8 @@ import { getAccount } from "@/lib/auth/server";
 import { type InviteDraft } from "@/lib/editor/draft";
 import { draftProblems, parseDraft } from "@/lib/editor/draft-checks";
 import { inviteStore } from "@/lib/invites/store";
+import { editionsActive, invitePlan } from "@/lib/payments/editions";
+import { planNeeded, planShortfalls, type PlanId, type PlanNeed } from "@/lib/plans/catalog";
 import { isSlug, slugAlternatives } from "@/lib/publish/slug";
 
 /*
@@ -83,6 +85,8 @@ export async function checkSlug(slug: string): Promise<SlugCheck> {
 export type PublishOutcome =
   | { status: "published"; slug: string }
   | { status: "taken"; suggestions: string[] }
+  /** Payments are on and the invite uses more than its edition covers (Step 17). */
+  | { status: "needs-plan"; plan: PlanId; shortfalls: PlanNeed[] }
   | { status: "not-ready" | "signed-out" | "failed" };
 
 /** Puts an invite live at /i/<slug>. It must be saved and complete. */
@@ -94,6 +98,11 @@ export async function publishInvite(inviteId: string, slug: string): Promise<Pub
   const draft = await store.get(account, inviteId);
   if (!draft) return { status: "failed" };
   if (draftProblems(draft).length > 0) return { status: "not-ready" };
+  if (await editionsActive()) {
+    const plan = (await invitePlan(account, inviteId)) ?? "free";
+    const shortfalls = planShortfalls(draft, plan);
+    if (shortfalls.length > 0) return { status: "needs-plan", plan: planNeeded(draft), shortfalls };
+  }
   const result = await store.publish(account, inviteId, slug);
   if (result.ok) return { status: "published", slug: result.slug };
   if (result.reason === "taken")
