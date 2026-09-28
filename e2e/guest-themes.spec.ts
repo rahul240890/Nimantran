@@ -60,3 +60,17 @@ for (const suite of THEMES) {
     });
   }
 }
+
+test("a Hindi card's guest page reads Hindi on an English site", async ({ page }) => {
+  await page.goto("/engine/guest?suite=rajwada-bagh&lang=hi");
+  const themed = page.locator(".guest-themed");
+  await expect(themed.getByText("आप सादर आमंत्रित हैं")).toBeVisible();
+  await expect(themed.getByText("नवंबर", { exact: true })).toBeVisible();
+  await expect(themed.getByRole("heading", { name: "उत्सव" })).toBeVisible();
+  for (const english of ["You are invited", "Save the date", "The celebrations", "November"]) {
+    await expect(themed.getByText(english, { exact: false })).toHaveCount(0);
+  }
+  // The buttons follow the site's language
+  await expect(page.getByRole("button", { name: "Shower flowers on the couple" })).toBeVisible();
+  expect((await axe(page).analyze()).violations).toEqual([]);
+});

@@ -7,14 +7,15 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import { Button } from "@/components/ui/button";
-import { useLocale, useText } from "@/i18n/client";
-import { dateLocale } from "@/i18n/dates";
+import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { cn } from "@/lib/cn";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
+import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
+import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
 import {
   Balloons,
@@ -68,7 +69,8 @@ export function ThemedDetails({
   look: GuestLook;
   /** The card's words, in the card's language. */
   copy: CardCopy;
-  lang: string;
+  /** The card's language: the page's own words follow it, like the pages above. */
+  lang: CardLanguage;
   functions: readonly GuestFunction[];
   /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
   main: { date: string; venue: string } | null;
@@ -101,10 +103,16 @@ export function ThemedDetails({
         onShower={() => setBurst((was) => was + 1)}
         showered={burst > 0}
       />
-      {main && <SaveTheDate main={main} look={look} />}
-      <Celebrations suite={suite} look={look} functions={functions} allIcsUrl={allIcsUrl} />
+      {main && <SaveTheDate main={main} look={look} lang={lang} />}
+      <Celebrations
+        suite={suite}
+        look={look}
+        lang={lang}
+        functions={functions}
+        allIcsUrl={allIcsUrl}
+      />
       {(photos.length > 0 || family.length > 0) && (
-        <Dusk photos={photos} family={family} familyLang={familyLang} look={look} />
+        <Dusk photos={photos} family={family} familyLang={familyLang} look={look} lang={lang} />
       )}
       <Night copy={copy} lang={lang} look={look} reply={reply} />
       {onScreen && <FloatingMusic music={music} />}
@@ -114,9 +122,19 @@ export function ThemedDetails({
 }
 
 /** A section's small label, a flower and its title. */
-function Heading({ id, label, title }: { id?: string; label: string; title: string }) {
+function Heading({
+  id,
+  lang,
+  label,
+  title,
+}: {
+  id?: string;
+  lang: string;
+  label: string;
+  title: string;
+}) {
   return (
-    <div className="flex flex-col items-center gap-2 text-center">
+    <div lang={lang} className="flex flex-col items-center gap-2 text-center">
       <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">{label}</p>
       <h2
         id={id}
@@ -202,7 +220,7 @@ function Welcome({
   showered,
 }: {
   copy: CardCopy;
-  lang: string;
+  lang: CardLanguage;
   look: GuestLook;
   photo: PublicPhoto | undefined;
   onShower: () => void;
@@ -210,6 +228,7 @@ function Welcome({
 }) {
   const { guestCopy } = useText(publishText);
   const words = guestCopy.themed;
+  const cardWords = CARD_THEMED_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   const welcome = [copy.families, copy.line].filter((text) => text.trim());
   const garden = look.style === "garden";
@@ -237,8 +256,8 @@ function Welcome({
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
         <Reveal className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-start">
-          <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
-            {words.invitedTo}
+          <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+            {cardWords.invitedTo}
           </p>
           <h2
             id="guest-welcome"
@@ -294,10 +313,16 @@ function Welcome({
   );
 }
 
-function SaveTheDate({ main, look }: { main: { date: string; venue: string }; look: GuestLook }) {
-  const { guestCopy } = useText(publishText);
-  const locale = useLocale();
-  const words = guestCopy.themed;
+function SaveTheDate({
+  main,
+  look,
+  lang,
+}: {
+  main: { date: string; venue: string };
+  look: GuestLook;
+  lang: CardLanguage;
+}) {
+  const cardWords = CARD_THEMED_WORDS[lang];
   const day = parseISO(main.date);
   const [ref, seen] = useInView<HTMLDivElement>("0px 0px -20% 0px");
   const mounted = useMounted();
@@ -310,7 +335,12 @@ function SaveTheDate({ main, look }: { main: { date: string; venue: string }; lo
       {look.style === "garden" && (
         <Houseboat className="guest-boat absolute bottom-6 -z-10 w-40 sm:w-56" />
       )}
-      <Heading id="guest-save-date" label={words.saveDateLabel} title={words.saveDate} />
+      <Heading
+        id="guest-save-date"
+        lang={lang}
+        label={cardWords.saveDateLabel}
+        title={cardWords.saveDate}
+      />
       <div
         ref={ref}
         data-reveal={mounted ? (seen ? "in" : "wait") : undefined}
@@ -319,7 +349,7 @@ function SaveTheDate({ main, look }: { main: { date: string; venue: string }; lo
         <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
         <div className="guest-date-disc relative grid aspect-square w-[48%] place-content-center rounded-full text-center">
           <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase sm:text-xs">
-            {format(day, "LLLL", { locale: dateLocale[locale] })}
+            {cardMonth(main.date, lang)}
           </p>
           <p className="font-display text-[3.4rem] leading-none text-ink tabular-nums sm:text-[4.5rem]">
             {format(day, "d")}
@@ -340,23 +370,27 @@ function SaveTheDate({ main, look }: { main: { date: string; venue: string }; lo
 function Celebrations({
   suite,
   look,
+  lang,
   functions,
   allIcsUrl,
 }: {
   suite: SuiteId;
   look: GuestLook;
+  lang: CardLanguage;
   functions: readonly GuestFunction[];
   allIcsUrl: string | null;
 }) {
   const { guestCopy } = useText(publishText);
+  const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
       <div data-mood="day" className="guest-sky guest-sky-flat px-4 pt-4 pb-10 sm:px-6">
         <Heading
           id="guest-functions"
-          label={guestCopy.themed.eventsLabel}
-          title={guestCopy.functions}
+          lang={lang}
+          label={cardWords.eventsLabel}
+          title={cardWords.celebrations}
         />
         {allIcsUrl && (
           <div className="mt-6 flex justify-center">
@@ -425,13 +459,16 @@ function Dusk({
   family,
   familyLang,
   look,
+  lang,
 }: {
   photos: readonly PublicPhoto[];
   family: readonly FamilyBlock[];
   familyLang: string | undefined;
   look: GuestLook;
+  lang: CardLanguage;
 }) {
   const { guestCopy } = useText(publishText);
+  const cardWords = CARD_THEMED_WORDS[lang];
   return (
     <div data-mood="dusk" className="guest-sky relative isolate pb-16">
       <Divider look={look} />
@@ -441,8 +478,9 @@ function Dusk({
           <div className="px-4 sm:px-6">
             <Heading
               id="guest-photos"
-              label={guestCopy.themed.photosLabel}
-              title={guestCopy.photos}
+              lang={lang}
+              label={cardWords.photosLabel}
+              title={cardWords.photos}
             />
           </div>
           {/* Scrolls sideways; focusable so a keyboard can scroll it too */}
@@ -477,8 +515,9 @@ function Dusk({
         <section aria-labelledby="guest-family" className="relative px-4 pt-10 sm:px-6">
           <Heading
             id="guest-family"
-            label={guestCopy.themed.familyLabel}
-            title={guestCopy.family}
+            lang={lang}
+            label={cardWords.familyLabel}
+            title={cardWords.family}
           />
           <Reveal className="mx-auto mt-10 w-full max-w-4xl">
             <dl lang={familyLang} className="flex flex-wrap justify-center gap-6">
@@ -509,12 +548,13 @@ function Night({
   reply,
 }: {
   copy: CardCopy;
-  lang: string;
+  lang: CardLanguage;
   look: GuestLook;
   reply: ReactNode;
 }) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const words = guestCopy.themed;
+  const cardWords = CARD_THEMED_WORDS[lang];
   const [lit, setLit] = useState(false);
   return (
     <div
@@ -525,8 +565,8 @@ function Night({
       <Festoon className="guest-festoon h-12 w-full sm:h-16" />
       <section aria-label={words.lampsLabel} className="relative px-4 pt-10 pb-6 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-          <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
-            {words.blessingLabel}
+          <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+            {cardWords.blessingLabel}
           </p>
           {copy.blessing && (
             <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
@@ -557,14 +597,22 @@ function Night({
           className="relative scroll-mt-4 px-4 pt-6 pb-12 sm:px-6 sm:pb-16"
         >
           <Reveal className="guest-card mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-9 sm:px-10">
-            <Heading id="guest-rsvp" label={words.replyLabel} title={rsvpCopy.heading} />
+            <Heading
+              id="guest-rsvp"
+              lang={lang}
+              label={cardWords.replyLabel}
+              title={cardWords.joinUs}
+            />
             <p className="-mt-3 text-center text-ink-muted">{rsvpCopy.intro}</p>
             {reply}
           </Reveal>
         </section>
       )}
-      <p className="relative px-6 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48">
-        {words.closing}
+      <p
+        lang={lang}
+        className="relative px-6 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
+      >
+        {cardWords.closing}
       </p>
       <Ground look={look} className="absolute inset-x-0 bottom-0 -z-10 h-28 w-full sm:h-36" />
     </div>
