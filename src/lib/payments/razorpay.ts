@@ -136,3 +136,25 @@ export function paymentSignatureValid(
 export function webhookSignatureValid(secret: string, body: string, signature: string): boolean {
   return hmacMatches(secret, body, signature);
 }
+
+/** Refunds a payment in full. Razorpay returns the money to the card, UPI or bank used. */
+export async function refundRazorpayPayment(
+  keys: RazorpayKeys,
+  paymentId: string,
+  amountPaise: number,
+): Promise<{ id: string } | null> {
+  try {
+    const response = await fetch(`${API}/payments/${encodeURIComponent(paymentId)}/refund`, {
+      method: "POST",
+      headers: { Authorization: authHeader(keys), "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: amountPaise, speed: "normal" }),
+      cache: "no-store",
+      signal: AbortSignal.timeout(15_000),
+    });
+    if (!response.ok) return null;
+    const refund = (await response.json()) as { id?: unknown };
+    return typeof refund.id === "string" ? { id: refund.id } : null;
+  } catch {
+    return null;
+  }
+}

@@ -3,7 +3,7 @@
  * under src/app/(app)/admin; the menu, the overview and the tests pick it up.
  */
 
-export type AdminPageIcon = "overview" | "payments" | "orders";
+export type AdminPageIcon = "overview" | "payments" | "orders" | "coupons" | "invites" | "business";
 
 export type AdminPage = {
   href: `/admin${string}`;
@@ -29,8 +29,26 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
   {
     href: "/admin/orders",
     label: "Orders",
-    description: "Every edition bought, and editions given by hand.",
+    description: "Every edition bought, refunds, and editions given by hand.",
     icon: "orders",
+  },
+  {
+    href: "/admin/coupons",
+    label: "Coupons",
+    description: "Coupon codes and festival offers.",
+    icon: "coupons",
+  },
+  {
+    href: "/admin/invites",
+    label: "Invites",
+    description: "Every invite and its edition, newest first.",
+    icon: "invites",
+  },
+  {
+    href: "/admin/business",
+    label: "Business details",
+    description: "The name, address and GSTIN on every invoice.",
+    icon: "business",
   },
 ];
 

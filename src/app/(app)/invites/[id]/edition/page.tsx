@@ -1,15 +1,18 @@
-import { ArrowLeft, ReceiptText } from "lucide-react";
+import { ArrowLeft, FileText, ReceiptText } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { AccountShell } from "@/components/account/account-shell";
 import { EditionPicker } from "@/components/editions/edition-picker";
+import { Badge } from "@/components/ui/badge";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan } from "@/lib/payments/editions";
+import { checkoutCoupons } from "@/lib/payments/coupons";
 import { formatRupees, isPlanId, planNeeded } from "@/lib/plans/catalog";
+import { pricesFor } from "@/lib/plans/offers";
 import { inviteNames } from "@/lib/publish/describe";
 import { editionsText } from "@/i18n/copy/editions";
 import { getLocale, getText } from "@/i18n/server";
@@ -34,11 +37,12 @@ export default async function EditionPage({
     invitePlan(account, id),
   ]);
   if (!draft || !current) notFound();
-  const [active, receipts, locale, { upgradeCopy, planCopy }] = await Promise.all([
+  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons] = await Promise.all([
     editionsActive(),
     inviteReceipts(account, id),
     getLocale(),
     getText(editionsText),
+    checkoutCoupons().catch(() => []),
   ]);
 
   return (
@@ -71,6 +75,7 @@ export default async function EditionPage({
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
+            prices={pricesFor(current, coupons, null, new Date())}
           />
 
           {receipts.length > 0 && (
@@ -91,7 +96,7 @@ export default async function EditionPage({
                         formatRupees(order.amountPaise),
                       )}
                     </span>
-                    <span className="text-sm text-ink-muted">
+                    <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
                       {new Intl.DateTimeFormat(locale === "hi" ? "hi-IN" : "en-IN", {
                         dateStyle: "medium",
                         timeZone: "Asia/Kolkata",
@@ -99,6 +104,17 @@ export default async function EditionPage({
                       {order.providerPaymentId
                         ? ` · ${upgradeCopy.paymentId} ${order.providerPaymentId}`
                         : ""}
+                      {order.status === "refunded" ? (
+                        <Badge tone="warning">{upgradeCopy.refunded}</Badge>
+                      ) : (
+                        <Link
+                          href={`/invoice/${order.id}`}
+                          className="inline-flex min-h-11 items-center gap-1.5 font-semibold text-accent-text underline-offset-4 hover:underline"
+                        >
+                          <FileText aria-hidden className="size-4" />
+                          {upgradeCopy.invoice}
+                        </Link>
+                      )}
                     </span>
                   </li>
                 ))}
