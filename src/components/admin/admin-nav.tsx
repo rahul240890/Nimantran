@@ -1,6 +1,14 @@
 "use client";
 
-import { LayoutDashboard, ReceiptText, WalletCards, type LucideIcon } from "lucide-react";
+import {
+  Building2,
+  LayoutDashboard,
+  Mails,
+  ReceiptText,
+  TicketPercent,
+  WalletCards,
+  type LucideIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ADMIN_PAGES, activeAdminPage, type AdminPageIcon } from "@/lib/admin/pages";
@@ -10,6 +18,9 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   overview: LayoutDashboard,
   payments: WalletCards,
   orders: ReceiptText,
+  coupons: TicketPercent,
+  invites: Mails,
+  business: Building2,
 };
 
 /** The admin's menu: a column beside the page on wide screens, a scrolling row on phones. */

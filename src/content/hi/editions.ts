@@ -77,6 +77,22 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
     pay: "भुगतान करें (टेस्ट)",
     cancel: "रद्द करें",
   },
+  was: "पहले",
+  offer: (label, off) => `${label}: ${off} की छूट`,
+  couponLabel: "कूपन कोड",
+  couponApply: "लगाएँ",
+  couponApplied: (code) => `कूपन ${code} लग गया`,
+  couponRemove: "हटाएँ",
+  couponProblem: {
+    unknown: "यह कोड मौजूद नहीं है। स्पेलिंग जाँचें।",
+    inactive: "यह कोड बंद कर दिया गया है।",
+    "not-started": "यह कोड अभी शुरू नहीं हुआ है।",
+    ended: "यह कोड ख़त्म हो गया है।",
+    "used-up": "यह कोड पूरा इस्तेमाल हो चुका है।",
+    "wrong-plan": "यह कोड आपके चुनने लायक संस्करणों पर लागू नहीं होता।",
+  },
+  invoice: "इनवॉइस",
+  refunded: "पैसा वापस",
   refunds: "अगर निमंत्रण किसी मेहमान को नहीं भेजा गया है, तो 7 दिनों के अंदर पूरा पैसा वापस।",
 };
 
@@ -93,5 +109,8 @@ export const limitCopy: Translation<typeof en.limitCopy> = {
   },
   choose: "संस्करण चुनें",
   edition: (plan) => `संस्करण: ${plan}`,
+  unlockBody: (plan, price) =>
+    `${plan} में इस निमंत्रण की हर चीज़ शामिल है, ${price} में। या इसे अपने संस्करण के हिसाब से छोटा करें।`,
+  unlock: (plan) => `${plan} लें`,
   upgrade: "अपग्रेड करें",
 };

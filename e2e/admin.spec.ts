@@ -121,3 +121,108 @@ test.describe("editions", () => {
     expect((await axe(page).analyze()).violations).toEqual([]);
   });
 });
+
+test.describe("coupons, invoices and refunds", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("an admin makes a coupon, a host pays less with it, and the admin refunds", async ({
+    page,
+    context,
+    browser,
+  }, info) => {
+    test.setTimeout(120_000);
+    const baseURL = info.project.use.baseURL!;
+    const code = `TEST${Date.now().toString().slice(-8)}`;
+
+    // The admin, in a browser of their own
+    const adminContext = await browser.newContext({
+      ...info.project.use,
+      baseURL,
+      reducedMotion: "reduce",
+    });
+    const admin = await adminContext.newPage();
+    await admin.goto("/sign-in?next=%2Fadmin%2Fbusiness");
+    await signIn(admin, ADMIN);
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Business details");
+    await admin.getByRole("textbox", { name: "Legal name" }).fill("Shubh Test Pvt Ltd");
+    await admin.getByRole("textbox", { name: "Address" }).fill("1 MG Road, Ahmedabad, Gujarat");
+    await admin.getByRole("textbox", { name: /GSTIN/ }).fill("24ABCDE1234F1Z");
+    await admin.getByRole("button", { name: "Save details" }).click();
+    await expect(admin.getByText(/A GSTIN has 15 letters/)).toBeVisible();
+    await admin.getByRole("textbox", { name: /GSTIN/ }).fill("24ABCDE1234F1Z5");
+    await admin.getByRole("button", { name: "Save details" }).click();
+    await expect(admin.getByText("Business details saved").first()).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    await admin
+      .getByRole("navigation", { name: "Admin" })
+      .getByRole("link", { name: "Coupons" })
+      .click();
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Coupons");
+    await admin.getByRole("textbox", { name: "Code" }).fill(code.toLowerCase());
+    await admin.getByRole("textbox", { name: "Percent off" }).fill("20");
+    await admin.getByRole("button", { name: "Make coupon" }).click();
+    await expect(admin.getByText(`${code} is ready`).first()).toBeVisible();
+    await expect(admin.getByText(code, { exact: true })).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    // The host, with checkout on
+    await context.addCookies([{ name: "shubh-preview-checkout", value: "on", url: baseURL }]);
+    await writeInvite(page, numberFor(info), ["Rohan", "Tara"]);
+    const notice = page.locator("[data-edition-notice]");
+    await expect(notice.getByText("This invite needs a bigger edition")).toBeVisible();
+    await notice.getByRole("link", { name: "Get Premium" }).click();
+    await expect(page).toHaveURL(/\/edition\?plan=premium$/);
+
+    await page.getByRole("textbox", { name: "Coupon code" }).fill("NOPE123");
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page.getByRole("textbox", { name: "Coupon code" })).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    await page.getByRole("textbox", { name: "Coupon code" }).fill(code);
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page.getByText(`Coupon ${code} applied`).first()).toBeVisible();
+    const premium = page.getByRole("article", { name: "Premium" });
+    await premium.getByRole("button", { name: "Pay ₹399" }).click();
+    await page
+      .getByRole("dialog", { name: "Test payment" })
+      .getByRole("button", { name: "Pay (test)" })
+      .click();
+    await expect(page.getByText("Premium is on. Thank you!").first()).toBeVisible();
+
+    await page.getByRole("link", { name: "Invoice" }).first().click();
+    await expect(page.getByRole("heading", { name: "Tax invoice" })).toBeVisible();
+    await expect(page.getByText("Shubh Test Pvt Ltd").first()).toBeVisible();
+    await expect(page.getByText(/SHUBH\/\d{4}-\d{2}\/\d{5}/).first()).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Back to the admin: the order, its coupon and a refund
+    await admin.goto("/admin/orders");
+    const row = admin.getByRole("row").filter({ hasText: code });
+    await expect(row.getByText("₹399")).toBeVisible();
+    await row.getByRole("button", { name: "Refund" }).click();
+    const confirm = admin.getByRole("dialog", { name: "Refund ₹399?" });
+    await confirm.getByRole("button", { name: "Refund ₹399" }).click();
+    await expect(admin.getByText("₹399 refunded").first()).toBeVisible();
+    await expect(row.getByText("Refunded")).toBeVisible();
+    await expect(row.getByRole("button", { name: "Refund" })).toHaveCount(0);
+
+    await admin
+      .getByRole("navigation", { name: "Admin" })
+      .getByRole("link", { name: "Invites" })
+      .click();
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Invites");
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+    await adminContext.close();
+
+    // The host's invite is back on Free
+    await page.goBack();
+    await page.reload();
+    await expect(page.getByText("Refunded").first()).toBeVisible();
+  });
+});
