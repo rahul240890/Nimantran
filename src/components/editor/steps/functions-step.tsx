@@ -1,9 +1,10 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CircleAlert, MapPin, Shirt } from "lucide-react";
-import { useMemo } from "react";
+import { ChevronDown, CircleAlert, MapPin, Shirt } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
@@ -185,6 +186,9 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
   const locale = useLocale();
   const { suggested, more } = functionOrder(draft);
   const withTime = needsTime(draft);
+  // The rarer functions stay folded on a short list until the host asks, unless one is planned
+  const [moreOpen, setMoreOpen] = useState(false);
+  const showMore = moreOpen || more.some((id) => draft.functions[id].included);
 
   const setFunction = (id: FunctionId, change: Partial<EventFunction>) =>
     update((current) => ({
@@ -281,9 +285,22 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
             </h2>
             <p className="text-sm text-ink-muted">{functionFields.moreHint}</p>
           </div>
-          <ul aria-label={functionFields.more} className="flex flex-col gap-4">
-            {more.map(item)}
-          </ul>
+          {showMore ? (
+            <ul aria-label={functionFields.more} className="flex flex-col gap-4">
+              {more.map(item)}
+            </ul>
+          ) : (
+            <Button
+              type="button"
+              variant="secondary"
+              aria-expanded={false}
+              trailingIcon={<ChevronDown aria-hidden />}
+              onClick={() => setMoreOpen(true)}
+              className="self-start"
+            >
+              {functionFields.showMore(more.length)}
+            </Button>
+          )}
         </section>
       )}
     </div>

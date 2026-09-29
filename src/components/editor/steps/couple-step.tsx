@@ -18,6 +18,7 @@ import {
 } from "@/lib/editor/draft";
 import type { CardCopy } from "@/lib/templates/content";
 import { TEMPLATES } from "@/lib/templates/catalog";
+import { CARD_SAMPLES } from "@/lib/templates/story-words";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
@@ -165,6 +166,17 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       translation: { ...current.translation, [id]: value },
     }));
 
+  // A card in an Indian language suggests names in its own script, and says so when a name
+  // is typed in English letters only, since guests will read it exactly as typed
+  const ownSamples = main === "en" ? null : CARD_SAMPLES[main];
+  const scriptNote = (id: SlotId): string | undefined => {
+    if (main === "en" || !NAME_SLOTS.includes(id)) return undefined;
+    const value = coupleValue(draft, template, id);
+    return /[A-Za-z]/.test(value) && !/[^ -~]/.test(value)
+      ? coupleCopy.latinOnCard(languageName(main))
+      : undefined;
+  };
+
   const field = (id: SlotId) => (
     <SlotField
       key={id}
@@ -176,6 +188,8 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       {...(id === "first" && one
         ? { label: one.label, example: one.example, hint: namesCopy.oneHint }
         : {})}
+      {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
+      {...(scriptNote(id) ? { hint: scriptNote(id) } : {})}
     />
   );
 

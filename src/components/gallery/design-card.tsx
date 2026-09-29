@@ -7,7 +7,7 @@ import { Dialog as DialogPrimitive } from "radix-ui";
 import { useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { Button } from "@/components/ui/button";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
@@ -39,6 +39,7 @@ function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
  */
 export function DesignCard({ design, name, description, href, priority, cover }: DesignCardProps) {
   const { galleryCopy } = useText(galleryText);
+  const locale = useLocale();
   const pages = paintedPages(design);
   const painted = pages.length > 0;
   const [open, setOpen] = useState(false);
@@ -80,7 +81,9 @@ export function DesignCard({ design, name, description, href, priority, cover }:
                   "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 28%, transparent), transparent)",
               }}
             />
-            {cover ?? <TemplateCover id={design.template} className="max-w-[16rem]" />}
+            {cover ?? (
+              <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
+            )}
           </span>
         )}
         <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-card-ivory uppercase backdrop-blur-sm">
@@ -144,6 +147,7 @@ function DesignPreview({
   pages: { page: PageArt; src: string }[];
 }) {
   const { galleryCopy } = useText(galleryText);
+  const locale = useLocale();
   const [index, setIndex] = useState(0);
   const total = pages.length;
   const current = pages[index];
@@ -190,7 +194,7 @@ function DesignPreview({
                 />
               ) : (
                 <span className="absolute inset-0 grid place-items-center bg-card-ivory p-[14%]">
-                  <TemplateCover id={design.template} />
+                  <TemplateCover id={design.template} locale={locale} />
                 </span>
               )}
               {total > 1 && (

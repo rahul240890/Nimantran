@@ -45,6 +45,15 @@ export const signInCopy = {
     after: ". We never share your number.",
   },
   success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubh"),
+  nameStep: {
+    title: "What should we call you?",
+    intro:
+      "Co-hosts see this name, and we greet you with it. Guests only see the names on the invitation.",
+    label: "Your name",
+    placeholder: "Priya Sharma",
+    save: "Continue",
+    skip: "Skip for now",
+  },
   side: {
     eyebrow: "Your invites, everywhere",
     title: "Start on your phone, finish on the laptop",

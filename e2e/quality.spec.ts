@@ -91,7 +91,7 @@ test.describe("keyboard only", () => {
     await expect(
       form
         .getByRole("radiogroup", { name: "Your reply for the Wedding" })
-        .getByRole("radio", { name: /Joyfully accept/ }),
+        .getByRole("radio", { name: /^Coming$/ }),
     ).toBeChecked();
     await tabTo(guest, form.getByRole("button", { name: "Send reply" }));
     await guest.keyboard.press("Enter");

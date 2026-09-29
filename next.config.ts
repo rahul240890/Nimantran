@@ -28,6 +28,7 @@ const nextConfig: NextConfig = {
       "./src/app/globals.css",
       "./node_modules/@fontsource/rozha-one/files/rozha-one-{latin,devanagari}-400-normal.woff",
       "./node_modules/@fontsource/tenor-sans/files/tenor-sans-latin-400-normal.woff",
+      "./public/suites/*/preview.jpg",
     ],
   },
 };

@@ -34,7 +34,7 @@ test.describe("guest RSVP", () => {
       await form.getByRole("textbox", { name: /Your name/ }).fill("Rohan Mehta");
       await form.getByRole("button", { name: "Coming to everything" }).click();
       const wedding = form.getByRole("radiogroup", { name: "Your reply for the Wedding" });
-      await expect(wedding.getByRole("radio", { name: /Joyfully accept/ })).toBeChecked();
+      await expect(wedding.getByRole("radio", { name: /^Coming$/ })).toBeChecked();
       await form.getByRole("button", { name: "More children" }).last().click();
       await form.getByRole("combobox", { name: /Meal/ }).click();
       await guest.getByRole("option", { name: "Jain" }).click();
@@ -55,7 +55,7 @@ test.describe("guest RSVP", () => {
       await form.getByRole("button", { name: "Change my reply" }).click();
       await form
         .getByRole("radiogroup", { name: "Your reply for the Haldi" })
-        .getByRole("radio", { name: /Regretfully decline/ })
+        .getByRole("radio", { name: /^Can't come$/ })
         .click();
       await form.getByRole("button", { name: "Update reply" }).click();
       await expect(form.getByRole("listitem").filter({ hasText: "Haldi" })).toContainText(

@@ -4,7 +4,7 @@ import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { createContext, useContext, useId, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "list" | "card";
+type Variant = "list" | "card" | "segment";
 const VariantContext = createContext<Variant>("list");
 
 type RadioGroupProps = {
@@ -13,7 +13,10 @@ type RadioGroupProps = {
   value?: string;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  /** "card" shows each choice as a raised tile, good for 2–4 big choices like RSVP. */
+  /**
+   * "card" shows each choice as a raised tile, good for 2–4 big choices.
+   * "segment" puts 2–3 short choices side by side in one row, like a reply.
+   */
   variant?: Variant;
   orientation?: "vertical" | "horizontal";
   disabled?: boolean;
@@ -42,7 +45,9 @@ export function RadioGroup({
         className={cn(
           variant === "card"
             ? "grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]"
-            : cn("flex", orientation === "vertical" ? "flex-col" : "flex-wrap gap-x-6"),
+            : variant === "segment"
+              ? "flex gap-1 rounded-lg border border-line-strong bg-surface-2 p-1 aria-invalid:border-danger"
+              : cn("flex", orientation === "vertical" ? "flex-col" : "flex-wrap gap-x-6"),
           className,
         )}
         {...props}
@@ -57,7 +62,7 @@ type RadioItemProps = {
   value: string;
   label: ReactNode;
   description?: ReactNode;
-  /** Card variant only: an icon above the label. */
+  /** Card variant: an icon above the label. Segment variant: an icon before it. */
   icon?: ReactNode;
   /** Card variant only: a short tag beside the icon, such as a Badge. */
   badge?: ReactNode;
@@ -79,6 +84,33 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
   const variant = useContext(VariantContext);
   const id = useId();
 
+  if (variant === "segment") {
+    return (
+      <RadioPrimitive.Item
+        value={value}
+        disabled={disabled}
+        className={cn(
+          // On the narrowest phones the icon sits above the word, so words never break apart
+          "group/radio flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-md border border-transparent px-1 py-1.5 text-center text-sm leading-tight font-semibold text-ink-muted min-[400px]:flex-row min-[400px]:gap-1.5 min-[400px]:px-2",
+          "transition-[background-color,border-color,color,box-shadow] duration-200",
+          "hover:bg-surface hover:text-ink",
+          "data-[state=checked]:border-marigold data-[state=checked]:bg-[color-mix(in_srgb,var(--marigold)_16%,var(--surface))] data-[state=checked]:text-ink data-[state=checked]:shadow-raised",
+          "disabled:cursor-not-allowed disabled:opacity-60",
+        )}
+      >
+        {icon ? (
+          <span
+            aria-hidden
+            className="shrink-0 group-data-[state=checked]/radio:text-accent-text [&_svg]:size-[18px]"
+          >
+            {icon}
+          </span>
+        ) : null}
+        <span className="min-w-0">{label}</span>
+      </RadioPrimitive.Item>
+    );
+  }
+
   if (variant === "card") {
     return (
       <RadioPrimitive.Item
@@ -94,28 +126,36 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
           "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0",
         )}
       >
-        <span className="flex w-full items-center justify-between gap-3">
-          {icon ? (
-            <span
-              aria-hidden
-              className="text-ink-muted group-data-[state=checked]/radio:text-accent-text [&_svg]:size-6"
-            >
-              {icon}
+        {icon || badge ? (
+          <span className="flex w-full items-center justify-between gap-3">
+            {icon ? (
+              <span
+                aria-hidden
+                className="text-ink-muted group-data-[state=checked]/radio:text-accent-text [&_svg]:size-6"
+              >
+                {icon}
+              </span>
+            ) : (
+              <span />
+            )}
+            <span className="flex min-w-0 items-center gap-2">
+              {badge}
+              <Dot />
             </span>
-          ) : (
-            <span />
-          )}
-          <span className="flex min-w-0 items-center gap-2">
-            {badge}
-            <Dot />
-          </span>
-        </span>
-        <span className="font-semibold text-ink">{label}</span>
-        {description ? (
-          <span id={`${id}-d`} className="text-sm text-ink-muted">
-            {description}
           </span>
         ) : null}
+        {/* With no icon or badge above, the dot sits beside the words, so the tile stays short */}
+        <span className="flex w-full items-start justify-between gap-3">
+          <span className="flex min-w-0 flex-col gap-1">
+            <span className="font-semibold text-ink">{label}</span>
+            {description ? (
+              <span id={`${id}-d`} className="text-sm text-ink-muted">
+                {description}
+              </span>
+            ) : null}
+          </span>
+          {icon || badge ? null : <Dot />}
+        </span>
       </RadioPrimitive.Item>
     );
   }

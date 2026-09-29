@@ -24,7 +24,7 @@ export const shell = {
   primaryNav: "Main",
   openMenu: "Open menu",
   menuTitle: "Menu",
-  joinWaitlist: "Join the waitlist",
+  joinWaitlist: "Launch news",
   createInvite: "Start your invite",
   createInviteShort: "Create invite",
   language: {
@@ -45,8 +45,8 @@ export const shell = {
 } as const;
 
 export const hero = {
-  eyebrow: "Shubh aarambh · early access",
-  title: "Invitations your guests open, turn and keep.",
+  eyebrow: "Create · Invite · Celebrate",
+  title: "Invitations that come alive.",
   body: "Pick a painted theme made for your family's tradition, add your names and functions, share it on WhatsApp and collect replies in one tap.",
   primary: "Start your invite",
   secondary: "See how it works",
@@ -163,8 +163,8 @@ export const pricing = {
       "Guest list export and reminders",
     ],
   },
-  note: "Final prices are confirmed before launch. Waitlist members hear first.",
-  cta: "Join the waitlist",
+  note: "Making and sharing your invite is free while we launch. Paid editions come later, with the price shown before you pay.",
+  cta: "Start your invite",
 } as const;
 
 export const faq = {
@@ -203,19 +203,19 @@ export const faq = {
 } as const;
 
 export const waitlist = {
-  eyebrow: "Early access",
-  title: "Be first to send one",
+  eyebrow: "Launch news",
+  title: "Hear first when we launch",
   intro:
-    "We are opening Shubh to couples in small groups. Leave your details and we will write when your spot opens.",
+    "You can make and send invites today. Leave your details and we will write once when Shubh launches publicly, with your first-event offer.",
   perks: [
-    "An early spot before public launch",
+    "One email on launch day",
     "Premium free for your first event",
     "A say in the designs we make next",
   ],
   form: {
     name: "Your name",
     email: "Email",
-    emailHint: "We only use it to tell you when your spot opens.",
+    emailHint: "We only use it to tell you when we launch.",
     phone: "WhatsApp number",
     phoneHint: "Include the country code if you are outside India.",
     optional: "Optional",
@@ -227,9 +227,9 @@ export const waitlist = {
       { value: "family", label: "Another family celebration" },
       { value: "business", label: "I plan events for others" },
     ],
-    submit: "Join the waitlist",
-    sending: "Joining…",
-    privacy: "No spam. One email when your spot opens, and you can ask us to delete your details.",
+    submit: "Keep me posted",
+    sending: "Saving…",
+    privacy: "No spam. One email when we launch, and you can ask us to delete your details.",
   },
   errors: {
     name: "Enter your name.",
