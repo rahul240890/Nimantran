@@ -27,6 +27,8 @@ export const categoryTaglines: Translation<typeof en.categoryTaglines> = {
   birthday: "केक, गुब्बारे और सारे अपने",
   anniversary: "साथ के बरस, परिवार के साथ जश्न",
   party: "तारों भरी रात में संगीत, खाना और दोस्त",
+  "baby-shower": "होने वाली माँ के लिए आशीर्वाद, गीत और मिठाई",
+  diwali: "दीये, मिठाई और सबके साथ लक्ष्मी पूजा",
 };
 
 export const questionLabels: Translation<typeof en.questionLabels> = {

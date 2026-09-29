@@ -45,6 +45,13 @@ const THEMES = [
   "chai-bagan",
   "sufi-raat",
   "chapel",
+  "sakura",
+  "vigna",
+  "himani",
+  "van",
+  "riad",
+  "palna",
+  "deepotsav",
   "jungle-party",
 ] as const;
 

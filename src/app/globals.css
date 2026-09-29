@@ -276,6 +276,8 @@
 [data-suite="neel"][data-mood="dawn"],
 [data-suite="jungle-party"] [data-mood="dawn"],
 [data-suite="jungle-party"][data-mood="dawn"],
+[data-suite="palna"] [data-mood="dawn"],
+[data-suite="palna"][data-mood="dawn"],
 [data-suite="gubbara"] [data-mood="dawn"],
 [data-suite="gubbara"][data-mood="dawn"],
 [data-suite="saath"] [data-mood="dawn"],
@@ -305,6 +307,8 @@
 [data-suite="neel"][data-mood="day"],
 [data-suite="jungle-party"] [data-mood="day"],
 [data-suite="jungle-party"][data-mood="day"],
+[data-suite="palna"] [data-mood="day"],
+[data-suite="palna"][data-mood="day"],
 [data-suite="gubbara"] [data-mood="day"],
 [data-suite="gubbara"][data-mood="day"],
 [data-suite="saath"] [data-mood="day"],
@@ -334,6 +338,8 @@
 [data-suite="neel"][data-mood="dusk"],
 [data-suite="jungle-party"] [data-mood="dusk"],
 [data-suite="jungle-party"][data-mood="dusk"],
+[data-suite="palna"] [data-mood="dusk"],
+[data-suite="palna"][data-mood="dusk"],
 [data-suite="gubbara"] [data-mood="dusk"],
 [data-suite="gubbara"][data-mood="dusk"],
 [data-suite="saath"] [data-mood="dusk"],
@@ -363,6 +369,8 @@
 [data-suite="neel"][data-mood="night"],
 [data-suite="jungle-party"] [data-mood="night"],
 [data-suite="jungle-party"][data-mood="night"],
+[data-suite="palna"] [data-mood="night"],
+[data-suite="palna"][data-mood="night"],
 [data-suite="gubbara"] [data-mood="night"],
 [data-suite="gubbara"][data-mood="night"],
 [data-suite="saath"] [data-mood="night"],
@@ -484,6 +492,18 @@
 [data-suite="tanjore"][data-mood="dawn"],
 [data-suite="kashi"] [data-mood="dawn"],
 [data-suite="kashi"][data-mood="dawn"],
+[data-suite="sakura"] [data-mood="dawn"],
+[data-suite="sakura"][data-mood="dawn"],
+[data-suite="vigna"] [data-mood="dawn"],
+[data-suite="vigna"][data-mood="dawn"],
+[data-suite="himani"] [data-mood="dawn"],
+[data-suite="himani"][data-mood="dawn"],
+[data-suite="van"] [data-mood="dawn"],
+[data-suite="van"][data-mood="dawn"],
+[data-suite="riad"] [data-mood="dawn"],
+[data-suite="riad"][data-mood="dawn"],
+[data-suite="deepotsav"] [data-mood="dawn"],
+[data-suite="deepotsav"][data-mood="dawn"],
 [data-suite="mysuru"] [data-mood="dawn"],
 [data-suite="mysuru"][data-mood="dawn"],
 [data-suite="kalamkari"] [data-mood="dawn"],
@@ -525,6 +545,18 @@
 [data-suite="tanjore"][data-mood="day"],
 [data-suite="kashi"] [data-mood="day"],
 [data-suite="kashi"][data-mood="day"],
+[data-suite="sakura"] [data-mood="day"],
+[data-suite="sakura"][data-mood="day"],
+[data-suite="vigna"] [data-mood="day"],
+[data-suite="vigna"][data-mood="day"],
+[data-suite="himani"] [data-mood="day"],
+[data-suite="himani"][data-mood="day"],
+[data-suite="van"] [data-mood="day"],
+[data-suite="van"][data-mood="day"],
+[data-suite="riad"] [data-mood="day"],
+[data-suite="riad"][data-mood="day"],
+[data-suite="deepotsav"] [data-mood="day"],
+[data-suite="deepotsav"][data-mood="day"],
 [data-suite="mysuru"] [data-mood="day"],
 [data-suite="mysuru"][data-mood="day"],
 [data-suite="kalamkari"] [data-mood="day"],
@@ -566,6 +598,18 @@
 [data-suite="tanjore"][data-mood="dusk"],
 [data-suite="kashi"] [data-mood="dusk"],
 [data-suite="kashi"][data-mood="dusk"],
+[data-suite="sakura"] [data-mood="dusk"],
+[data-suite="sakura"][data-mood="dusk"],
+[data-suite="vigna"] [data-mood="dusk"],
+[data-suite="vigna"][data-mood="dusk"],
+[data-suite="himani"] [data-mood="dusk"],
+[data-suite="himani"][data-mood="dusk"],
+[data-suite="van"] [data-mood="dusk"],
+[data-suite="van"][data-mood="dusk"],
+[data-suite="riad"] [data-mood="dusk"],
+[data-suite="riad"][data-mood="dusk"],
+[data-suite="deepotsav"] [data-mood="dusk"],
+[data-suite="deepotsav"][data-mood="dusk"],
 [data-suite="mysuru"] [data-mood="dusk"],
 [data-suite="mysuru"][data-mood="dusk"],
 [data-suite="kalamkari"] [data-mood="dusk"],
@@ -607,6 +651,18 @@
 [data-suite="tanjore"][data-mood="night"],
 [data-suite="kashi"] [data-mood="night"],
 [data-suite="kashi"][data-mood="night"],
+[data-suite="sakura"] [data-mood="night"],
+[data-suite="sakura"][data-mood="night"],
+[data-suite="vigna"] [data-mood="night"],
+[data-suite="vigna"][data-mood="night"],
+[data-suite="himani"] [data-mood="night"],
+[data-suite="himani"][data-mood="night"],
+[data-suite="van"] [data-mood="night"],
+[data-suite="van"][data-mood="night"],
+[data-suite="riad"] [data-mood="night"],
+[data-suite="riad"][data-mood="night"],
+[data-suite="deepotsav"] [data-mood="night"],
+[data-suite="deepotsav"][data-mood="night"],
 [data-suite="mysuru"] [data-mood="night"],
 [data-suite="mysuru"][data-mood="night"],
 [data-suite="kalamkari"] [data-mood="night"],
@@ -937,6 +993,90 @@
   --suite-gold: #c9b27a;
   --suite-light: #fff0c2;
   --suite-stone: #f1efe6;
+}
+[data-suite="sakura"] {
+  --suite-plate: #fdf6f6;
+  --suite-ink: #3a1f2a;
+  --suite-ink-muted: #6a4a55;
+  --suite-gold-text: #7a5520;
+  --suite-accent-text: #a0304a;
+  --suite-leaf: #6f8a5a;
+  --suite-accent: #e89aaa;
+  --suite-gold: #d4b27a;
+  --suite-light: #ffe9ef;
+  --suite-stone: #f6ecee;
+}
+[data-suite="vigna"] {
+  --suite-plate: #fbf5ea;
+  --suite-ink: #2e1f14;
+  --suite-ink-muted: #5c4a3a;
+  --suite-gold-text: #74541a;
+  --suite-accent-text: #6e2440;
+  --suite-leaf: #5f7a3a;
+  --suite-accent: #8a3a4a;
+  --suite-gold: #c9a052;
+  --suite-light: #ffe4b0;
+  --suite-stone: #efe6d6;
+}
+[data-suite="himani"] {
+  --suite-plate: #f6f8fb;
+  --suite-ink: #1a2433;
+  --suite-ink-muted: #4a5566;
+  --suite-gold-text: #6b5520;
+  --suite-accent-text: #8a2a2a;
+  --suite-leaf: #2f5a45;
+  --suite-accent: #6f8fb0;
+  --suite-gold: #c9ac6a;
+  --suite-light: #fff0c8;
+  --suite-stone: #e8edf2;
+}
+[data-suite="van"] {
+  --suite-plate: #f4f7ee;
+  --suite-ink: #1a2a1c;
+  --suite-ink-muted: #455a48;
+  --suite-gold-text: #6b5a1a;
+  --suite-accent-text: #3f6a3a;
+  --suite-leaf: #3f7a45;
+  --suite-accent: #8fae5a;
+  --suite-gold: #d6c07a;
+  --suite-light: #fff6c0;
+  --suite-stone: #e6ecdd;
+}
+[data-suite="riad"] {
+  --suite-plate: #fbf3e8;
+  --suite-ink: #2a1a14;
+  --suite-ink-muted: #5a4436;
+  --suite-gold-text: #7a5410;
+  --suite-accent-text: #1f4f7a;
+  --suite-leaf: #1f6a55;
+  --suite-accent: #c0603a;
+  --suite-gold: #c99a3a;
+  --suite-light: #ffe0a0;
+  --suite-stone: #f0e2cf;
+}
+[data-suite="palna"] {
+  --suite-plate: #fdf9f6;
+  --suite-ink: #3a2a3a;
+  --suite-ink-muted: #6a5a6a;
+  --suite-gold-text: #7a6020;
+  --suite-accent-text: #a04a6a;
+  --suite-leaf: #3f8a70;
+  --suite-accent: #9ec8e8;
+  --suite-gold: #e8c86a;
+  --suite-light: #fff4d0;
+  --suite-stone: #f3eef3;
+}
+[data-suite="deepotsav"] {
+  --suite-plate: #fff8ec;
+  --suite-ink: #2a140c;
+  --suite-ink-muted: #5a3a2a;
+  --suite-gold-text: #7a4a08;
+  --suite-accent-text: #a02a1a;
+  --suite-leaf: #6a7a2a;
+  --suite-accent: #e0701a;
+  --suite-gold: #e0a82a;
+  --suite-light: #ffd98a;
+  --suite-stone: #f5e6cc;
 }
 [data-suite="sagar"] {
   --suite-plate: #f7fcfc;
@@ -1990,6 +2130,11 @@
 }
 .guest-themed[data-suite="jungle-party"] {
   --guest-jewel: var(--flower-leaf-deep);
+}
+/* Sakura's blossom pink and Palna's baby blue are pale, so their buttons wear the deeper rose */
+.guest-themed[data-suite="sakura"],
+.guest-themed[data-suite="palna"] {
+  --guest-jewel: var(--suite-accent-text);
 }
 
 /* Dark words on the morning and daytime light, and on the cloth cards */
