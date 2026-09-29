@@ -3,6 +3,7 @@ import { SUITES, SUITE_IDS } from "./catalog";
 import {
   GUEST_STYLES,
   STYLE_LOOKS,
+  defaultGuestLook,
   guestLook,
   guestLookSchema,
   resolveGuestLook,
@@ -28,6 +29,19 @@ describe("guest page looks", () => {
     expect(guestLookSchema.safeParse({ style: "castle" }).success).toBe(false);
     expect(guestLookSchema.safeParse({ style: "party", lamp: "neon" }).success).toBe(false);
     expect(guestLookSchema.safeParse({ style: "party", extra: 1 }).success).toBe(false);
+  });
+
+  it("gives every painted theme a look, its own or the default", () => {
+    for (const id of SUITE_IDS) {
+      const painted = SUITES[id].art !== "card" && Boolean(SUITES[id].images.cover);
+      expect(guestLook(id) !== null).toBe(painted);
+    }
+    expect(defaultGuestLook("jungle-party")).toEqual({ style: "party" });
+    expect(defaultGuestLook("ivory-arch")).toEqual({
+      style: "palace",
+      lamp: "lanterns",
+      pattern: "jaali",
+    });
   });
 
   it("switches on painted themes only", () => {

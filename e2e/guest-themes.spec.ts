@@ -14,7 +14,7 @@ const axe = (page: Page) =>
   ]);
 
 /* The themed guest page below the painted pages (Step 12q), on the sample review page */
-// Every theme with a guest look (SUITES[id].guest in src/lib/suites/catalog.ts)
+// Every painted theme, each with its own guest look (SUITES[id].guest in src/lib/suites/catalog.ts)
 const THEMES = [
   "rajwada-bagh",
   "shahi-savari",
@@ -27,6 +27,18 @@ const THEMES = [
   "gubbara",
   "saath",
   "rooftop",
+  "ivory-arch",
+  "gulaab",
+  "deco-noir",
+  "taara",
+  "kaagaz",
+  "mitti",
+  "neel",
+  "pichwai",
+  "tanjore",
+  "kashi",
+  "sagar",
+  "jungle-party",
 ] as const;
 
 for (const suite of THEMES) {
