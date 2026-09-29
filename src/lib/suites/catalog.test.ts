@@ -9,6 +9,7 @@ import {
   PAGE_ARTS,
   SUITES,
   SUITE_IDS,
+  hasGodAtTop,
   pageLook,
   suiteFor,
   suitePreview,
@@ -81,6 +82,15 @@ describe("text areas", () => {
         expect(100 - area.left - area.right, `${id} ${art}`).toBeGreaterThanOrEqual(60);
       }
     }
+  });
+
+  it("keeps painted gods clear of the page controls", () => {
+    for (const id of ["pichwai", "tanjore", "kashi"] as const) {
+      expect(hasGodAtTop(id, "blessing")).toBe(true);
+      expect(hasGodAtTop(id, "wedding")).toBe(true);
+      expect(hasGodAtTop(id, "cover")).toBe(false);
+    }
+    expect(hasGodAtTop("ivory-arch", "wedding")).toBe(false);
   });
 });
 

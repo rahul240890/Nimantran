@@ -103,6 +103,8 @@ export type Suite = {
   traditions: readonly TraditionId[];
   /** Painted backgrounds under /public, by page. Pages without one draw the vector landscape. */
   images: Partial<Record<PageArt, string>>;
+  /** Pages with a god painted near the top, beyond the blessing page (a wedding's canopy). */
+  gods?: readonly PageArt[];
   /** Pages painted in a different light from most themes' (a dusk baraat, a lit reception). */
   tones?: Partial<Record<PageArt, "light" | "dark">>;
   /**
@@ -588,6 +590,7 @@ export const SUITES: Record<SuiteId, Suite> = {
       reception: "/suites/pichwai/reception.webp",
       reply: "/suites/pichwai/reply.webp",
     },
+    gods: ["wedding"],
     tones: { blessing: "dark", cover: "dark" },
   },
   // A Thanjavur painting in gold leaf and gems, with Ganesha and Lakshmi
@@ -617,6 +620,7 @@ export const SUITES: Record<SuiteId, Suite> = {
       reception: "/suites/tanjore/reception.webp",
       reply: "/suites/tanjore/reply.webp",
     },
+    gods: ["wedding"],
     tones: { blessing: "dark", cover: "dark", mehendi: "dark", baraat: "dark", wedding: "dark" },
   },
   // The ghats of Banaras at dawn, with Ganesha's blessing and lamps on the Ganga
@@ -646,6 +650,7 @@ export const SUITES: Record<SuiteId, Suite> = {
       reception: "/suites/kashi/reception.webp",
       reply: "/suites/kashi/reply.webp",
     },
+    gods: ["wedding"],
     tones: { reception: "light" },
   },
   // A beach wedding: white drapes, palms and a pastel sunset over the sea
@@ -776,6 +781,14 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   anniversary: { art: "reception", mood: "dusk" },
   party: { art: "reception", mood: "night" },
 };
+
+/**
+ * Whether a page's painting has a god near its top, which must stay clear of the controls:
+ * every blessing page, and the pages a theme lists.
+ */
+export function hasGodAtTop(suite: SuiteId, art: PageArt): boolean {
+  return art === "blessing" || Boolean(SUITES[suite].gods?.includes(art));
+}
 
 /** Whether a theme opens with a god's own page before the cover. */
 export function hasBlessingPage(suite: SuiteId): boolean {

@@ -1,5 +1,6 @@
 import { useId, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import type { Suite } from "@/lib/suites/catalog";
 
 /*
@@ -583,6 +584,7 @@ export function SuiteBackdrop({
   className,
   under,
   contain = false,
+  lifted = false,
   children,
 }: {
   suite: Suite;
@@ -596,6 +598,8 @@ export function SuiteBackdrop({
   under?: ReactNode;
   /** Show the whole painting (its frames must not be cropped), a blurred copy filling round it. */
   contain?: boolean;
+  /** With contain: the painting stands at the foot of the page, clear of the controls above. */
+  lifted?: boolean;
   children?: ReactNode;
 }) {
   const raw = useId();
@@ -618,7 +622,18 @@ export function SuiteBackdrop({
           />
         )}
         {under}
-        {image ? (
+        {image && lifted ? (
+          <div className="absolute inset-x-0 bottom-0" style={{ top: CONTROLS_CLEAR }}>
+            {/* eslint-disable-next-line @next/next/no-img-element -- decorative, sized by the page */}
+            <img
+              src={image}
+              alt=""
+              decoding="async"
+              draggable={false}
+              className="pointer-events-none size-full [mask-image:linear-gradient(to_bottom,transparent,black_4%)] object-contain object-bottom select-none"
+            />
+          </div>
+        ) : image ? (
           // eslint-disable-next-line @next/next/no-img-element -- decorative, sized by the page
           <img
             src={image}
