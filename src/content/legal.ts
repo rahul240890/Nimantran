@@ -95,6 +95,8 @@ export const privacy: LegalDoc = {
             "Supabase stores accounts, invitations, guest lists, replies and photos, in its Mumbai data centre in India.",
             "Vercel serves the website from data centres around the world and counts anonymous visits.",
             "Google signs you in if you choose Google.",
+            "Google's typing service spells a name typed in English letters in your card's script, when you make a card in an Indian language. Only that name is sent, from our server, and nothing that identifies you.",
+            "Anthropic writes suggested wording when you ask for it. Only the words on the invitation's pages, with the names on them, and the occasion are sent; never your account, phone number or guest list.",
             "A text message provider sends sign-in codes to your phone.",
           ],
         },
