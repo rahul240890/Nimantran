@@ -16,6 +16,7 @@ import {
   suiteFor,
   suiteSuits,
 } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -151,7 +152,17 @@ export function DesignStep({ draft, update }: StepProps) {
             );
           })}
         </RadioGroup>
-        {SUITES[suite].art !== "card" && (
+        {hasScene(suite) && (
+          <Switch
+            label={suiteCopy.scene}
+            description={suiteCopy.sceneHint}
+            checked={draft.format === "scene"}
+            onCheckedChange={(on) =>
+              update((current) => ({ ...current, format: on ? "scene" : "story" }))
+            }
+          />
+        )}
+        {SUITES[suite].art !== "card" && draft.format !== "scene" && (
           <Switch
             label={suiteCopy.textBox}
             description={suiteCopy.textBoxHint}

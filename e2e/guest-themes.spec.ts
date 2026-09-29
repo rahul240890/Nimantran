@@ -93,3 +93,30 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
   await expect(page.getByRole("button", { name: "Shower flowers on the couple" })).toBeVisible();
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
+
+for (const suite of ["rajwada-bagh", "kayal"] as const) {
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`${suite} as One Scene, ${colorScheme} theme`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(`/engine/guest?suite=${suite}&format=scene&photos=2`);
+      const scene = page.locator("section[data-scene-mood]");
+      await expect(page.getByRole("heading", { level: 1, name: /Arjun/ })).toBeVisible();
+      // Still with reduced motion: the arrows step through the celebrations
+      const slot = page.getByRole("group", { name: "The celebrations, one by one" });
+      const first = await slot.innerText();
+      await page.getByRole("button", { name: "Next celebration" }).click();
+      await expect(slot).not.toHaveText(first);
+      await expect(page.getByRole("link", { name: /^Directions:/ })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Reply to the invitation" })).toBeVisible();
+      // The painting's light follows the celebration in the slot
+      const moods = new Set<string | null>([await scene.getAttribute("data-scene-mood")]);
+      for (let i = 0; i < 4; i++) {
+        await page.getByRole("button", { name: "Next celebration" }).click();
+        moods.add(await scene.getAttribute("data-scene-mood"));
+      }
+      expect(moods.size).toBeGreaterThan(1);
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+    });
+  }
+}

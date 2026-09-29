@@ -108,6 +108,17 @@ export const guestCopy = {
   notFoundBody:
     "The link may be mistyped, or the family may have stopped sharing it. Ask them to send it again.",
   home: `Go to ${site.shortName}`,
+  /** One Scene (pilot): the whole invitation on one painting. */
+  scene: {
+    label: "The celebrations, one by one",
+    previous: "Previous celebration",
+    next: "Next celebration",
+    pause: "Pause the celebrations",
+    play: "Play the celebrations",
+    position: (n: number, total: number) => `${n} of ${total}`,
+    details: "All the details",
+    initials: "Your photo goes here",
+  },
   /** The themed page below the painted pages (Step 12q). */
   themed: {
     invitedTo: "With joy, we invite you to celebrate",

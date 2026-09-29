@@ -111,6 +111,7 @@ export function newDraft(
     type: defaultType,
     couplePhotos: noCouplePhotos,
     blessingPage: true,
+    format: "story",
     family: noFamily,
     pages: noPages,
   };
