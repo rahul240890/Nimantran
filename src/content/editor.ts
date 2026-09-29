@@ -244,7 +244,9 @@ export const coupleCopy = {
   doorsHint: "Two short words painted on the gates.",
   anyScript: "Type in any script. Hindi, Tamil, Bengali and more all fit the card.",
   latinOnCard: (language: string) =>
-    `Your card is in ${language}, so guests will see this name in English letters. To write it in ${language}, switch your phone's keyboard to ${language} and type the name as it sounds.`,
+    `Your card is in ${language}, so guests will see this name in English letters. Pick a ${language} spelling below, or type it with a ${language} keyboard.`,
+  spellings: (language: string) => `In ${language} letters`,
+  useSpelling: (name: string) => `Use ${name}`,
   languagesHeading: "Card language",
   languagesHint: "With two languages, guests switch between them on the invitation.",
   bothLanguages: (main: string, second: string) => `${main} and ${second}`,

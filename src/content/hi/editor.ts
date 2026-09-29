@@ -229,7 +229,9 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   doorsHint: "द्वारों पर लिखे दो छोटे शब्द।",
   anyScript: "किसी भी लिपि में लिखें। हिन्दी, तमिल, बांग्ला और बाक़ी सब कार्ड पर आ जाती हैं।",
   latinOnCard: (language) =>
-    `आपका कार्ड ${language} में है, इसलिए मेहमान यह नाम अंग्रेज़ी अक्षरों में देखेंगे। ${language} में लिखने के लिए फ़ोन का कीबोर्ड ${language} पर करें और नाम जैसा बोलते हैं वैसा टाइप करें।`,
+    `आपका कार्ड ${language} में है, इसलिए मेहमान यह नाम अंग्रेज़ी अक्षरों में देखेंगे। नीचे ${language} में लिखा नाम चुनें, या ${language} कीबोर्ड से टाइप करें।`,
+  spellings: (language) => `${language} अक्षरों में`,
+  useSpelling: (name) => `${name} लिखें`,
   languagesHeading: "कार्ड की भाषा",
   languagesHint: "दो भाषाएँ चुनने पर मेहमान निमंत्रण पर उनके बीच बदल सकते हैं।",
   bothLanguages: (main, second) => `${main} और ${second}`,
