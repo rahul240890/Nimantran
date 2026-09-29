@@ -38,6 +38,13 @@ const THEMES = [
   "tanjore",
   "kashi",
   "sagar",
+  "mysuru",
+  "kalamkari",
+  "pattachitra",
+  "chinar",
+  "chai-bagan",
+  "sufi-raat",
+  "chapel",
   "jungle-party",
 ] as const;
 
