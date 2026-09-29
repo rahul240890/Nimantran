@@ -29,7 +29,9 @@ import { applyPages, type DraftPages } from "@/lib/editor/pages";
 import { pageType, type PageType } from "@/lib/editor/type";
 import { Mail, Smartphone } from "lucide-react";
 import { PagePreview } from "./page-preview";
+import { AiWording } from "./ai-wording";
 import { PageWords } from "./page-words";
+import type { FunctionId } from "@/lib/events/functions";
 import type { StepProps } from "./steps/types";
 import { useCouplePhotos } from "./use-couple-photos";
 
@@ -65,7 +67,11 @@ export function PreviewStage({
   update,
   className,
 }: PreviewStageProps) {
-  const { coupleCopy, studioCopy } = useText(editorText);
+  const { coupleCopy, studioCopy, functionCopy } = useText(editorText);
+  const pageName = (id: string) =>
+    id.startsWith("fn-")
+      ? functionCopy[id.slice(3) as FunctionId].name
+      : (studioCopy.pageNames[id as keyof typeof studioCopy.pageNames] ?? id);
   const [view, setView] = useState<View>("pages");
   const languages = cardLanguages(draft);
   const [chosen, setChosen] = useState<CardLanguage | null>(null);
@@ -208,18 +214,30 @@ export function PreviewStage({
           className="min-h-0 flex-1"
         >
           {update && listed[shownIndex] && written[shownIndex] && (
-            <PageWords
-              draft={draft}
-              update={update}
-              written={written.find((b) => b.id === listed[shownIndex]!.id) ?? written[shownIndex]!}
-              shown={listed[shownIndex]!}
-              language={language}
-              copy={deferredCopy}
-              template={template}
-              suite={suite}
-              textBox={textBox}
-              type={type}
-            />
+            <div className="flex shrink-0 flex-wrap justify-center gap-2">
+              <PageWords
+                draft={draft}
+                update={update}
+                written={
+                  written.find((b) => b.id === listed[shownIndex]!.id) ?? written[shownIndex]!
+                }
+                shown={listed[shownIndex]!}
+                language={language}
+                copy={deferredCopy}
+                template={template}
+                suite={suite}
+                textBox={textBox}
+                type={type}
+              />
+              <AiWording
+                draft={draft}
+                update={update}
+                beats={story.beats}
+                page={listed[shownIndex]!}
+                pageName={pageName(listed[shownIndex]!.id)}
+                language={language}
+              />
+            </div>
           )}
         </PagePreview>
       ) : (

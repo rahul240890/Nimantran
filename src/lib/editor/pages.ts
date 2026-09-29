@@ -80,7 +80,11 @@ export function applyPages(
           .map((line) => ({ text: line.text.trim(), style: line.style }))
           .filter((line) => line.text);
         const seconds = beatSeconds(shown, beat.symbol);
-        next = { ...next, lines: shown, seconds: Math.max(seconds, beat.photos ? 6 : beat.id === "blessing" ? 5 : 0) };
+        next = {
+          ...next,
+          lines: shown,
+          seconds: Math.max(seconds, beat.photos ? 6 : beat.id === "blessing" ? 5 : 0),
+        };
       }
       if (layout) next = { ...next, layout: beatLayout(layout) };
       return next;

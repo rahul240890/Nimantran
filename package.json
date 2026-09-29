@@ -17,6 +17,7 @@
     "db:seed": "tsx scripts/write-seed.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.129.0",
     "@fontsource-variable/karla": "^5.3.0",
     "@fontsource-variable/noto-sans-devanagari": "^5.3.0",
     "@fontsource/alex-brush": "^5.3.0",

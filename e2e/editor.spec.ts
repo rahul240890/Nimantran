@@ -295,6 +295,15 @@ test.describe("invite editor", () => {
     await expect(again.getByRole("radio", { name: "Top" })).toBeChecked();
     await again.getByRole("button", { name: "Back to the suggested words" }).click();
     await expect(again.locator(".story-line", { hasText: "Together forever" })).toHaveCount(0);
+    await again.getByRole("button", { name: "Done" }).click();
+
+    // AI writes only for an invite saved to an account
+    await page.getByRole("button", { name: "Write with AI" }).click();
+    const ai = page.getByRole("dialog", { name: "Write the words with AI" });
+    await expect(ai.getByRole("radio", { name: "Traditional" })).toBeChecked();
+    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
+    await ai.getByRole("button", { name: "Write", exact: true }).click();
+    await expect(ai.getByRole("status")).toHaveText(/Sign in so your invite is saved/);
   });
 
   test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {

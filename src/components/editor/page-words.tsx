@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, PenLine, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, PenLine, Plus, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { languageName } from "@/components/invitation/card-language-toggle";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ import type { FunctionId } from "@/lib/events/functions";
 import type { SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
+import { useWording, WordingStatus } from "./ai-wording";
 import { PagePreview } from "./page-preview";
 import type { StepProps } from "./steps/types";
 
@@ -62,6 +63,8 @@ export function PageWords(props: PageWordsProps) {
   const { draft, update, written, shown, language } = props;
   const { pageWordsCopy: t, studioCopy, functionCopy } = useText(editorText);
   const [overflow, setOverflow] = useState(false);
+  const { aiCopy } = useText(editorText);
+  const wording = useWording(draft, update);
   const id = written.id;
   const name = id.startsWith("fn-")
     ? functionCopy[id.slice(3) as FunctionId].name
@@ -145,12 +148,22 @@ export function PageWords(props: PageWordsProps) {
 
           <div className="flex min-w-0 flex-col gap-6">
             {overflow && (
-              <p
-                role="status"
-                className="rounded-md border border-danger/40 bg-danger/10 px-3 py-2 text-sm text-ink"
-              >
-                {t.overflow}
-              </p>
+              <div className="flex flex-col gap-2 rounded-md border border-danger/40 bg-danger/10 px-3 py-2">
+                <p role="status" className="text-sm text-ink">
+                  {t.overflow}
+                </p>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="self-start"
+                  loading={wording.pending}
+                  onClick={() => wording.ask([shown], language, "traditional", "shorten")}
+                >
+                  <Sparkles aria-hidden />
+                  {aiCopy.shorten}
+                </Button>
+                <WordingStatus wording={wording} />
+              </div>
             )}
 
             <section aria-labelledby="page-words-heading" className="flex flex-col gap-3">

@@ -628,7 +628,8 @@ export const pageWordsCopy = {
   reset: "Back to the suggested words",
   own: "You've written this page yourself. Names, dates and places you change later won't show here until you go back to the suggested words.",
   inLanguage: (language: string) => `These words are for the ${language} card.`,
-  overflow: "Too many words for this painting, even at the smallest size. Shorten a line or remove one.",
+  overflow:
+    "Too many words for this painting, even at the smallest size. Shorten a line or remove one.",
   placement: "Placement",
   place: "Position",
   places: { top: "Top", middle: "Middle", bottom: "Bottom" },
@@ -639,4 +640,34 @@ export const pageWordsCopy = {
   hide: "Leave this page out",
   hideHint: "Guests won't see it. Turn it back on any time.",
   hidden: "Left out",
+} as const;
+
+/** Writing the pages with AI (Step 12s part 4). */
+export const aiCopy = {
+  open: "Write with AI",
+  title: "Write the words with AI",
+  description:
+    "AI writes the pages in the card's language from your names, family and functions. Change anything afterwards.",
+  close: "Close",
+  tone: "Tone",
+  tones: { traditional: "Traditional", warm: "Warm", fun: "Fun" },
+  scope: "Pages",
+  scopes: { all: "Every page", page: (page: string) => `Only the ${page} page` },
+  write: "Write",
+  again: "Write again",
+  shorten: "Shorten with AI",
+  busy: "Writing…",
+  done: "Written. Open any page to change its words.",
+  left: (n: number) =>
+    n === 1 ? "1 free draft left on this invite." : `${n} free drafts left on this invite.`,
+  languages: (language: string) =>
+    `Written for the ${language} card. Switch the card's language above to write the other.`,
+  errors: {
+    "sign-in": "Sign in so your invite is saved, then AI can write for it.",
+    off: "AI wording isn't switched on yet.",
+    "not-found": "Sign in so your invite is saved, then AI can write for it.",
+    "used-up":
+      "This invite has used its 3 free drafts. Premium, Royal and the Wedding bundle can write as often as you like.",
+    failed: "The words couldn't be written just now. Try again.",
+  },
 } as const;
