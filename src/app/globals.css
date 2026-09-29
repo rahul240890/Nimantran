@@ -1833,6 +1833,14 @@
   --guest-gilt: var(--tpl-kasavu-ornament);
   --guest-cloth: var(--tpl-kasavu-paper);
 }
+/* Kaagaz's pastel jewel goes a shade deeper, and the jungle wears its leaves, so a button's
+   pale words read on them */
+.guest-themed[data-suite="kaagaz"] {
+  --guest-jewel: color-mix(in oklab, var(--suite-accent) 82%, black);
+}
+.guest-themed[data-suite="jungle-party"] {
+  --guest-jewel: var(--flower-leaf-deep);
+}
 
 /* Dark words on the morning and daytime light, and on the cloth cards */
 .guest-sky[data-mood="dawn"],
@@ -1851,8 +1859,8 @@
   --ink-faint: color-mix(in oklab, var(--suite-ink-muted) 85%, var(--guest-cloth));
   --accent-text: var(--suite-accent-text);
   /* The jewel deepened toward the ink, so pale words on a button read on every theme */
-  --marigold: color-mix(in oklab, var(--guest-jewel) 76%, var(--suite-ink));
-  --marigold-strong: color-mix(in oklab, var(--guest-jewel) 64%, var(--suite-ink));
+  --marigold: color-mix(in oklab, var(--guest-jewel) 62%, var(--suite-ink));
+  --marigold-strong: color-mix(in oklab, var(--guest-jewel) 50%, var(--suite-ink));
   --marigold-edge: color-mix(in oklab, var(--guest-jewel) 55%, black);
   --on-marigold: var(--guest-cloth);
   --success: var(--flower-leaf-deep);
@@ -1864,7 +1872,7 @@
 /* On the open sky the accent words go a shade deeper, to read on the blue and peach */
 .guest-sky[data-mood="dawn"],
 .guest-sky[data-mood="day"] {
-  --accent-text: color-mix(in oklab, var(--suite-accent-text) 70%, var(--suite-ink));
+  --accent-text: color-mix(in oklab, var(--suite-accent-text) 55%, var(--suite-ink));
 }
 .guest-sky .guest-card,
 .guest-sky .guest-date-disc {

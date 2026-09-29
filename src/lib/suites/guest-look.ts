@@ -6,7 +6,8 @@
  *
  * A theme only names its choices from the lists below, so a new theme, including one added
  * later from the admin, gets a whole guest page by picking a style; every other choice
- * follows the style unless the theme says otherwise. Colours come from the theme's own
+ * follows the style unless the theme says otherwise. A painted theme that picks nothing
+ * still gets one (`defaultGuestLook`). Colours come from the theme's own
  * palette. The shape is plain JSON checked by `guestLookSchema`, ready to be stored with a
  * theme row.
  */
@@ -103,10 +104,22 @@ export function resolveGuestLook(choice: GuestLookChoice): GuestLook {
 }
 
 /**
- * The guest page look for a theme, or null for a theme that keeps the plain details page
- * (the card-colour themes, and painted themes not switched on yet).
+ * The look a painted theme gets when it names none, such as one just added: a party for a
+ * birthday or a party, else a palace with lanterns and a jaali star, which suit any faith.
+ */
+export function defaultGuestLook(suite: SuiteId): GuestLookChoice {
+  const { occasions } = SUITES[suite];
+  if (occasions?.some((occasion) => occasion === "birthday" || occasion === "party"))
+    return { style: "party" };
+  return { style: "palace", lamp: "lanterns", pattern: "jaali" };
+}
+
+/**
+ * The guest page look for a theme: its own, or the default for a painted theme that names
+ * none. Null for the card-colour themes, which keep the plain details page.
  */
 export function guestLook(suite: SuiteId): GuestLook | null {
-  const choice = SUITES[suite].guest;
-  return choice ? resolveGuestLook(choice) : null;
+  const theme = SUITES[suite];
+  if (theme.art === "card" || !theme.images.cover) return null;
+  return resolveGuestLook(theme.guest ?? defaultGuestLook(suite));
 }
