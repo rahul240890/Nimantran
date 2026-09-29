@@ -30,6 +30,7 @@ import type { FunctionId } from "@/lib/events/functions";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
+import { applyPages } from "@/lib/editor/pages";
 import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
@@ -108,29 +109,33 @@ export function GuestView({
   const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
   const story = useMemo<InvitationStory>(
     () => ({
-      beats: storyBeats({
-        copy,
-        // The pages speak the card's language, not the site's
-        functions: cardFunctions(functions, draft, language).map((fn) => ({
-          ...fn,
-          countdown: today
-            ? daysAway(
-                daysBetween(today, draft.functions[fn.kind].date),
-                CARD_COUNTDOWN_WORDS[language],
-              )
-            : undefined,
-        })),
-        replies,
-        words: CARD_STORY_WORDS[language],
-        family: storyFamily(draft, language),
-        couple: couplePagePhotos(
-          draft.couplePhotos,
-          photos.map((photo) => photo.id),
-          (id) => photos.find((photo) => photo.id === id)?.url,
+      beats: applyPages(
+        storyBeats({
           copy,
-        ),
-        blessing: draftBlessing(draft),
-      }),
+          // The pages speak the card's language, not the site's
+          functions: cardFunctions(functions, draft, language).map((fn) => ({
+            ...fn,
+            countdown: today
+              ? daysAway(
+                  daysBetween(today, draft.functions[fn.kind].date),
+                  CARD_COUNTDOWN_WORDS[language],
+                )
+              : undefined,
+          })),
+          replies,
+          words: CARD_STORY_WORDS[language],
+          family: storyFamily(draft, language),
+          couple: couplePagePhotos(
+            draft.couplePhotos,
+            photos.map((photo) => photo.id),
+            (id) => photos.find((photo) => photo.id === id)?.url,
+            copy,
+          ),
+          blessing: draftBlessing(draft),
+        }),
+        draft.pages,
+        language,
+      ),
       suite: draftSuite(draft),
       textBox: draft.textBox,
       type: pageType(draft.type, [language]),

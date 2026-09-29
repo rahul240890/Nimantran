@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { StoryPage } from "@/components/invitation/story/story-player";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
@@ -32,6 +32,10 @@ export function PagePreview({
   lang,
   page,
   onPage,
+  hidden,
+  list: showList = true,
+  onOverflow,
+  children,
   className,
 }: {
   beats: readonly StoryBeat[];
@@ -45,9 +49,16 @@ export function PagePreview({
   /** The page to show, by its id ("cover", "fn-sangeet"); an unknown one shows the cover. */
   page: string;
   onPage: (page: string) => void;
+  /** Pages the host left out: still listed here, marked, so they can be brought back. */
+  hidden?: ReadonlySet<string>;
+  /** Off shows the phone alone, as the page editor does. */
+  list?: boolean;
+  onOverflow?: (overflow: boolean) => void;
+  /** Shown under the phone, above the list of pages. */
+  children?: ReactNode;
   className?: string;
 }) {
-  const { studioCopy, functionCopy } = useText(editorText);
+  const { studioCopy, functionCopy, pageWordsCopy } = useText(editorText);
   const { uiStrings } = useText(uiText);
   const still = useReducedMotion();
   const beat = beats.find((b) => b.id === page) ?? beats[0]!;
@@ -96,6 +107,7 @@ export function PagePreview({
             reply={null}
             labels={uiStrings.invitation.story}
             onReply={noop}
+            onOverflow={onOverflow}
             inert
           />
         </div>
@@ -105,31 +117,37 @@ export function PagePreview({
         />
       </div>
 
-      <ul
-        ref={list}
-        aria-label={studioCopy.pageList}
-        className="flex max-w-full shrink-0 [scrollbar-width:none] gap-1.5 overflow-x-auto px-1 py-1 [&::-webkit-scrollbar]:hidden"
-      >
-        {beats.map((b) => (
-          <li key={b.id} className="shrink-0">
-            <button
-              type="button"
-              aria-pressed={b.id === beat.id}
-              aria-label={studioCopy.showPage(name(b))}
-              onClick={() => onPage(b.id)}
-              className={cn(
-                "inline-flex min-h-11 cursor-pointer items-center rounded-full border px-3.5 text-sm whitespace-nowrap transition-colors duration-200",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                b.id === beat.id
-                  ? "border-marigold bg-[color-mix(in_srgb,var(--marigold)_14%,var(--surface))] font-semibold text-ink"
-                  : "border-line bg-surface text-ink-muted hover:border-line-control hover:text-ink",
-              )}
-            >
-              {name(b)}
-            </button>
-          </li>
-        ))}
-      </ul>
+      {children}
+      {showList && (
+        <ul
+          ref={list}
+          aria-label={studioCopy.pageList}
+          className="flex max-w-full shrink-0 [scrollbar-width:none] gap-1.5 overflow-x-auto px-1 py-1 [&::-webkit-scrollbar]:hidden"
+        >
+          {beats.map((b) => (
+            <li key={b.id} className="shrink-0">
+              <button
+                type="button"
+                aria-pressed={b.id === beat.id}
+                aria-label={studioCopy.showPage(name(b))}
+                onClick={() => onPage(b.id)}
+                className={cn(
+                  "inline-flex min-h-11 cursor-pointer items-center rounded-full border px-3.5 text-sm whitespace-nowrap transition-colors duration-200",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  b.id === beat.id
+                    ? "border-marigold bg-[color-mix(in_srgb,var(--marigold)_14%,var(--surface))] font-semibold text-ink"
+                    : "border-line bg-surface text-ink-muted hover:border-line-control hover:text-ink",
+                )}
+              >
+                <span className={cn(hidden?.has(b.id) && "line-through decoration-ink-faint")}>
+                  {name(b)}
+                </span>
+                {hidden?.has(b.id) && <span className="sr-only">, {pageWordsCopy.hidden}</span>}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

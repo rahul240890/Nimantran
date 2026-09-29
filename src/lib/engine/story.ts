@@ -54,6 +54,16 @@ export type StoryBeat = {
   links?: { maps: string | null; calendar: string | null };
   /** The couple's photos on their photo page: one of them together, or one each. */
   photos?: readonly StoryPhoto[];
+  /** Where the host placed the words on this page (Step 12s); left out, the theme's own. */
+  layout?: BeatLayout;
+};
+
+/** Where a page's words sit in its painting's calm area, and whether they have a box. */
+export type BeatLayout = {
+  place: "top" | "middle" | "bottom";
+  align: "center" | "start";
+  /** Null follows the invitation's own choice. */
+  box: boolean | null;
 };
 
 /** A photo on the couple's page: where it loads from and what it shows. */

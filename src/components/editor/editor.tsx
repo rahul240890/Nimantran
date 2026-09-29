@@ -353,6 +353,7 @@ export function Editor({
       onTextBox={(textBox) => update((current) => ({ ...current, textBox }))}
       page={page}
       onPage={setPage}
+      update={update}
       className={className}
     />
   );

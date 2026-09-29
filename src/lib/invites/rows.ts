@@ -102,6 +102,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         couplePhotos: draft.couplePhotos,
         blessingPage: draft.blessingPage,
         family: draft.family,
+        pages: draft.pages,
       },
       languages: draft.languages,
     },
@@ -162,6 +163,7 @@ export function rowsToDraft(
     couplePhotos: event.religious?.couplePhotos,
     blessingPage: event.religious?.blessingPage,
     family: event.religious?.family,
+    pages: event.religious?.pages,
   });
   return draft ?? { ...base, remoteId: event.id };
 }

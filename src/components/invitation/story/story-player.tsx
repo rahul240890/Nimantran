@@ -506,6 +506,7 @@ export function StoryPage({
   onReply,
   inert,
   className,
+  onOverflow,
 }: {
   beat: StoryBeat;
   copy: CardCopy;
@@ -518,6 +519,8 @@ export function StoryPage({
   onReply: () => void;
   inert: boolean;
   className?: string;
+  /** Told whether the words still overflow at the smallest size, so the editor can say so. */
+  onOverflow?: (overflow: boolean) => void;
 }) {
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
@@ -529,8 +532,9 @@ export function StoryPage({
   const painted = themed && Boolean(image);
   // Themes without one hang the photos in plain arches over the page instead
   const arches = photos.length > 0 && !frames;
-  // Words print straight onto a painting unless the host asked for the box
-  const printed = painted && !textBox;
+  // Words print straight onto a painting unless the host asked for the box, here or for all
+  const layout = beat.layout;
+  const printed = painted && !(layout?.box ?? textBox);
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
   const delay = (i: number) =>
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
@@ -542,12 +546,16 @@ export function StoryPage({
   const whole = Boolean(frames);
   // A blessing nobody wrote leaves the god's page to itself, with no empty glow
   const empty = beat.lines.length === 0 && !sacred;
+  const overflowed = useRef(onOverflow);
+  useEffect(() => {
+    overflowed.current = onOverflow;
+  });
   const fitArea = useRef<HTMLDivElement>(null);
   const fitWords = useRef<HTMLDivElement>(null);
   const fitKey = JSON.stringify([
     beat.lines,
     type,
-    textBox,
+    printed,
     reply?.label,
     Boolean(beat.links),
     suiteId,
@@ -577,6 +585,7 @@ export function StoryPage({
       const { scale, overflow } = fitScale(fits);
       inner.style.setProperty("--story-fit", String(scale));
       if (overflow) inner.dataset.overflow = "true";
+      overflowed.current?.(overflow);
     };
     fit();
     const observer = new ResizeObserver(fit);
@@ -617,7 +626,12 @@ export function StoryPage({
       <div
         ref={fitArea}
         className={cn(
-          "absolute flex items-center justify-center",
+          "absolute flex justify-center",
+          layout?.place === "top"
+            ? "items-start"
+            : layout?.place === "bottom"
+              ? "items-end"
+              : "items-center",
           empty && "invisible",
           arches
             ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
@@ -637,7 +651,8 @@ export function StoryPage({
           ref={fitWords}
           data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
           className={cn(
-            "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
+            "relative flex max-h-full w-[min(100%,36rem)] flex-col gap-[2cqmin]",
+            layout?.align === "start" ? "items-start text-start" : "items-center text-center",
             printed
               ? "story-print isolate px-[4cqmin] py-[6cqmin]"
               : themed &&

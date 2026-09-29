@@ -19,6 +19,7 @@ import type { Template } from "@/lib/templates/schema";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
+import { noPages } from "./pages";
 import { defaultType } from "./type";
 import type {
   DraftTradition,
@@ -111,6 +112,7 @@ export function newDraft(
     couplePhotos: noCouplePhotos,
     blessingPage: true,
     family: noFamily,
+    pages: noPages,
   };
 }
 

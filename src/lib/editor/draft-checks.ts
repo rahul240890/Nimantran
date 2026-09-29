@@ -12,6 +12,17 @@ import {
   noFamily,
   noSide,
 } from "./family";
+import {
+  ALIGNS,
+  BOXES,
+  EDIT_STYLES,
+  LINE_MAX,
+  MAX_LINES,
+  PAGE_ID_MAX,
+  PLACES,
+  defaultLayout,
+  noPages,
+} from "./pages";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
@@ -102,6 +113,24 @@ const familySchema = z.object({
     .catch([]),
 });
 
+const pageLineSchema = z.object({
+  text: z.string().max(LINE_MAX),
+  style: z.enum(EDIT_STYLES).catch("body"),
+});
+const pageLayoutSchema = z.object({
+  hidden: z.boolean().catch(false),
+  place: z.enum(PLACES).catch("middle"),
+  align: z.enum(ALIGNS).catch("center"),
+  box: z.enum(BOXES).catch("theme"),
+});
+const pageId = z.string().max(PAGE_ID_MAX);
+const pagesSchema = z.object({
+  layout: z.record(pageId, pageLayoutSchema.catch(defaultLayout)).catch({}),
+  words: z
+    .partialRecord(z.enum(CARD_LANGUAGES), z.record(pageId, z.array(pageLineSchema).max(MAX_LINES)))
+    .catch({}),
+});
+
 /** Saved drafts are read leniently: a bad field falls back to its default, never the whole draft. */
 export const draftSchema = z.object({
   version: z.literal(1),
@@ -155,6 +184,8 @@ export const draftSchema = z.object({
   blessingPage: z.boolean().catch(true),
   /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
   family: familySchema.catch(noFamily),
+  /** The host's own words and placement on each page (Step 12s); see ./pages.ts. */
+  pages: pagesSchema.catch(noPages),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

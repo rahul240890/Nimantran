@@ -265,6 +265,38 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("textbox", { name: "Phone" })).toHaveValue("98765 43210");
   });
 
+  test("a page's words can be rewritten, placed and left out", async ({ page }) => {
+    await page.goto("/create?quality=2d&category=wedding&suite=kayal&template=kasavu");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await page.getByRole("textbox", { name: /First name/ }).fill("Meera");
+    await page.getByRole("textbox", { name: /Second name/ }).fill("Kabir");
+    const wide = page.viewportSize()!.width >= 1024;
+    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+
+    await page.getByRole("button", { name: "Edit this page" }).click();
+    const dialog = page.getByRole("dialog", { name: "The Cover page" });
+    await dialog.getByRole("button", { name: "Add a line" }).click();
+    const added = dialog.getByRole("textbox", { name: /^Line \d+$/ }).last();
+    await added.fill("Together forever");
+    await expect(dialog.locator(".story-line", { hasText: "Together forever" })).toBeAttached();
+    await dialog.getByRole("radio", { name: "Top" }).click();
+    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
+    // The cover can't be left out: it carries the names
+    await expect(dialog.getByRole("switch")).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await page.reload();
+    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+    await page.getByRole("button", { name: "Edit this page" }).click();
+    const again = page.getByRole("dialog", { name: "The Cover page" });
+    await expect(again.getByRole("textbox", { name: /^Line \d+$/ }).last()).toHaveValue(
+      "Together forever",
+    );
+    await expect(again.getByRole("radio", { name: "Top" })).toBeChecked();
+    await again.getByRole("button", { name: "Back to the suggested words" }).click();
+    await expect(again.locator(".story-line", { hasText: "Together forever" })).toHaveCount(0);
+  });
+
   test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {
     await page.goto(
       "/create?quality=2d&category=wedding&tradition=gujarati&suite=shahi-savari&template=bandhani",
