@@ -120,7 +120,7 @@ export const weddingKindCopy: Translation<typeof en.weddingKindCopy> = {
     description: "साखरपुडा, हळद, केळवण और शुभविवाह, मराठी में।",
   },
   bengali: {
-    name: "बंगाली",
+    name: "बंगाली, ओड़िया और असमिया",
     description: "आइबुड़ोभात, गाये होलुद, शुभो बिबाहो और बौ भात, बांग्ला में।",
   },
   tamil: {
