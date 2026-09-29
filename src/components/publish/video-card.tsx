@@ -14,6 +14,7 @@ import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
+import { applyPages } from "@/lib/editor/pages";
 import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { drawFrame, videoImages, type VideoScene } from "@/lib/video/draw";
@@ -73,13 +74,13 @@ export function VideoCard(props: VideoCardProps) {
   const scene = useMemo(() => {
     const copy = draftCopy(draft, language);
     const suite = draftSuite(draft);
-    const beats = storyBeats({
+    const written = storyBeats({
       copy,
       // A video is watched days later, so the pages leave out "In 5 days"
       functions: cardFunctions(functions, draft, language),
       replies: false,
       words: CARD_STORY_WORDS[language],
-      family: storyFamily(draft),
+      family: storyFamily(draft, language),
       couple: couplePagePhotos(
         draft.couplePhotos,
         photos.map((photo) => photo.id),
@@ -88,6 +89,7 @@ export function VideoCard(props: VideoCardProps) {
       ),
       blessing: draftBlessing(draft),
     });
+    const beats = applyPages(written, draft.pages, language);
     return {
       copy,
       suite,

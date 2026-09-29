@@ -98,7 +98,8 @@ function drawPage(
   const src = paintingFor(scene.suite, beat);
   const painting = src ? scene.images.get(src) : undefined;
   const painted = suite.art !== "card" && Boolean(painting);
-  const printed = painted && !scene.textBox;
+  // A page the host gave its own box setting (Step 12s) keeps it
+  const printed = painted && !(beat.layout?.box ?? scene.textBox);
   const tone = printed ? paintedTone(look.art, scene.suite) : null;
   const colours = scene.palette(look.mood, tone);
   const progress = Math.min(1, Math.max(0, (seconds - entry.start) / entry.seconds));
@@ -436,7 +437,10 @@ function drawWords(
 
   const gap = 2 * cq * fit;
   const x = left + areaW / 2;
-  let y = top + Math.max(0, (areaH - height) / 2);
+  // The host may have lifted the words to the top of the calm area, or set them low
+  const room = Math.max(0, areaH - height);
+  const place = beat.layout?.place;
+  let y = top + (place === "top" ? 0 : place === "bottom" ? room : room / 2);
   const boxTop = y;
   const intro = lineProgress(entry, 0, seconds);
 

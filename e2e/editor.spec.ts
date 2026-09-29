@@ -53,7 +53,7 @@ for (const colorScheme of ["light", "dark"] as const) {
         "Whose tradition should the card follow?",
       );
       await page.getByRole("radio", { name: /Marathi/ }).click();
-      await expect(page.getByRole("heading", { name: "Family wording" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Ceremony names" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 
@@ -225,17 +225,87 @@ test.describe("invite editor", () => {
     await page.getByRole("radio", { name: /Leave it off/ }).click();
     if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toHaveCount(0);
 
-    await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
     await page.reload();
-    await expect(page.getByRole("textbox", { name: /Hosted by/ })).toHaveValue(
-      "ஐயர் குடும்பத்தினர்",
-    );
     await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
 
     // The tradition's designs lead the list
     await next(page);
     const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
+  });
+
+  test("the family section keeps parents, the tradition's hosts line and whom to call", async ({
+    page,
+  }) => {
+    await page.goto(
+      "/create?quality=2d&category=wedding&tradition=tamil&suite=kayal&template=gopuram",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
+    await page.locator("summary", { hasText: "Add family details" }).click();
+    await expect(page.getByRole("group", { name: "Arjun's family" })).toBeVisible();
+    const arjun = page.getByRole("group", { name: "Arjun's family" });
+    await arjun.getByRole("radio", { name: "Son of" }).click();
+    await arjun.getByRole("textbox", { name: /Parents' names/ }).fill("Smt. Lakshmi & Shri Raman");
+    // The tradition's own heading sits beside the hosts line
+    await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
+    await page.getByRole("button", { name: "Add a number" }).click();
+    await page.getByRole("textbox", { name: "Phone" }).fill("98765 43210");
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+
+    await page.reload();
+    // Filled in, it opens by itself
+    const family = page.getByRole("group", { name: "Arjun's family" });
+    await expect(family.getByRole("textbox", { name: /Parents' names/ })).toHaveValue(
+      "Smt. Lakshmi & Shri Raman",
+    );
+    await expect(family.getByRole("radio", { name: "Son of" })).toBeChecked();
+    await expect(page.getByRole("textbox", { name: /Hosted by/ })).toHaveValue(
+      "ஐயர் குடும்பத்தினர்",
+    );
+    await expect(page.getByRole("textbox", { name: "Phone" })).toHaveValue("98765 43210");
+  });
+
+  test("a page's words can be rewritten, placed and left out", async ({ page }) => {
+    await page.goto("/create?quality=2d&category=wedding&suite=kayal&template=kasavu");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await page.getByRole("textbox", { name: /First name/ }).fill("Meera");
+    await page.getByRole("textbox", { name: /Second name/ }).fill("Kabir");
+    const wide = page.viewportSize()!.width >= 1024;
+    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+
+    await page.getByRole("button", { name: "Edit this page" }).click();
+    const dialog = page.getByRole("dialog", { name: "The Cover page" });
+    await dialog.getByRole("button", { name: "Add a line" }).click();
+    const added = dialog.getByRole("textbox", { name: /^Line \d+$/ }).last();
+    await added.fill("Together forever");
+    await expect(dialog.locator(".story-line", { hasText: "Together forever" })).toBeAttached();
+    await dialog.getByRole("radio", { name: "Top" }).click();
+    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
+    // The cover can't be left out: it carries the names
+    await expect(dialog.getByRole("switch")).toHaveCount(0);
+    await dialog.getByRole("button", { name: "Done" }).click();
+
+    await page.reload();
+    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+    await page.getByRole("button", { name: "Edit this page" }).click();
+    const again = page.getByRole("dialog", { name: "The Cover page" });
+    await expect(again.getByRole("textbox", { name: /^Line \d+$/ }).last()).toHaveValue(
+      "Together forever",
+    );
+    await expect(again.getByRole("radio", { name: "Top" })).toBeChecked();
+    await again.getByRole("button", { name: "Back to the suggested words" }).click();
+    await expect(again.locator(".story-line", { hasText: "Together forever" })).toHaveCount(0);
+    await again.getByRole("button", { name: "Done" }).click();
+
+    // AI writes only for an invite saved to an account
+    await page.getByRole("button", { name: "Write with AI" }).click();
+    const ai = page.getByRole("dialog", { name: "Write the words with AI" });
+    await expect(ai.getByRole("radio", { name: "Traditional" })).toBeChecked();
+    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
+    await ai.getByRole("button", { name: "Write", exact: true }).click();
+    await expect(ai.getByRole("status")).toHaveText(/Sign in so your invite is saved/);
   });
 
   test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {

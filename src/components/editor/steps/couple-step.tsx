@@ -23,6 +23,7 @@ import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
+import { FamilySection } from "./family-section";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -262,6 +263,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           {wording.length > 0 && wordingGrid(translatedField)}
         </section>
       )}
+      <FamilySection draft={draft} update={update} />
       <Lettering draft={draft} update={update} />
     </div>
   );

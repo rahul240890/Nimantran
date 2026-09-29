@@ -25,9 +25,14 @@ import {
 } from "@/lib/editor/draft";
 import type { CardCopy } from "@/lib/templates/content";
 import { cn } from "@/lib/cn";
+import { applyPages, type DraftPages } from "@/lib/editor/pages";
 import { pageType, type PageType } from "@/lib/editor/type";
 import { Mail, Smartphone } from "lucide-react";
 import { PagePreview } from "./page-preview";
+import { AiWording } from "./ai-wording";
+import { PageWords } from "./page-words";
+import type { FunctionId } from "@/lib/events/functions";
+import type { StepProps } from "./steps/types";
 import { useCouplePhotos } from "./use-couple-photos";
 
 type PreviewStageProps = {
@@ -40,6 +45,8 @@ type PreviewStageProps = {
   /** The page being edited, shown in the phone ("cover", "fn-sangeet"). */
   page: string;
   onPage: (page: string) => void;
+  /** Lets the host edit the shown page's words and placement (Step 12s); left out, view only. */
+  update?: StepProps["update"];
   className?: string;
 };
 
@@ -57,9 +64,14 @@ export function PreviewStage({
   onTextBox,
   page,
   onPage,
+  update,
   className,
 }: PreviewStageProps) {
-  const { coupleCopy, studioCopy } = useText(editorText);
+  const { coupleCopy, studioCopy, functionCopy } = useText(editorText);
+  const pageName = (id: string) =>
+    id.startsWith("fn-")
+      ? functionCopy[id.slice(3) as FunctionId].name
+      : (studioCopy.pageNames[id as keyof typeof studioCopy.pageNames] ?? id);
   const [view, setView] = useState<View>("pages");
   const languages = cardLanguages(draft);
   const [chosen, setChosen] = useState<CardLanguage | null>(null);
@@ -74,43 +86,59 @@ export function PreviewStage({
   const functionsKey = JSON.stringify(
     cardFunctions(storyFunctions(draft, locale), draft, language),
   );
-  const familyKey = JSON.stringify(storyFamily(draft));
+  const familyKey = JSON.stringify(storyFamily(draft, language));
   const suite = draftSuite(draft);
   const { textBox } = draft;
   const typeKey = JSON.stringify(pageType(draft.type, [language]));
   const type = useMemo(() => JSON.parse(typeKey) as PageType, [typeKey]);
   const couple = useCouplePhotos(draft, deferredCopy);
   const blessing = draftBlessing(draft);
-  const story = useMemo<InvitationStory>(() => {
+  // The pages as the invite writes them, then with the host's own words and placement
+  const written = useMemo(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
     const family = JSON.parse(familyKey) as ReturnType<typeof storyFamily>;
+    return storyBeats({
+      copy: deferredCopy,
+      functions,
+      replies: true,
+      words: CARD_STORY_WORDS[language],
+      family,
+      couple,
+      blessing,
+    });
+  }, [functionsKey, familyKey, deferredCopy, language, couple, blessing]);
+  const pagesKey = JSON.stringify(draft.pages);
+  // The editor lists every page, the ones left out too, so they can be brought back
+  const listed = useMemo(() => {
+    const pages = JSON.parse(pagesKey) as DraftPages;
+    const layout = Object.fromEntries(
+      Object.entries(pages.layout).map(([id, page]) => [id, { ...page, hidden: false }]),
+    );
+    return applyPages(written, { ...pages, layout }, language);
+  }, [written, pagesKey, language]);
+  const hidden = useMemo(
+    () =>
+      new Set(
+        Object.entries((JSON.parse(pagesKey) as DraftPages).layout)
+          .filter(([, page]) => page.hidden)
+          .map(([id]) => id),
+      ),
+    [pagesKey],
+  );
+  const shownIndex = Math.max(
+    0,
+    listed.findIndex((b) => b.id === page),
+  );
+  const story = useMemo<InvitationStory>(() => {
+    const pages = JSON.parse(pagesKey) as DraftPages;
     return {
-      beats: storyBeats({
-        copy: deferredCopy,
-        functions,
-        replies: true,
-        words: CARD_STORY_WORDS[language],
-        family,
-        couple,
-        blessing,
-      }),
+      beats: applyPages(written, pages, language),
       suite,
       textBox,
       type,
       onTextBox,
     };
-  }, [
-    functionsKey,
-    familyKey,
-    deferredCopy,
-    language,
-    suite,
-    textBox,
-    type,
-    onTextBox,
-    couple,
-    blessing,
-  ]);
+  }, [written, pagesKey, language, suite, textBox, type, onTextBox]);
 
   const { templateId } = draft;
   const { raga } = draft.music;
@@ -173,7 +201,7 @@ export function PreviewStage({
       </div>
       {view === "pages" ? (
         <PagePreview
-          beats={story.beats}
+          beats={listed}
           copy={deferredCopy}
           template={template}
           suite={suite}
@@ -182,8 +210,36 @@ export function PreviewStage({
           lang={language}
           page={page}
           onPage={onPage}
+          hidden={hidden}
           className="min-h-0 flex-1"
-        />
+        >
+          {update && listed[shownIndex] && written[shownIndex] && (
+            <div className="flex shrink-0 flex-wrap justify-center gap-2">
+              <PageWords
+                draft={draft}
+                update={update}
+                written={
+                  written.find((b) => b.id === listed[shownIndex]!.id) ?? written[shownIndex]!
+                }
+                shown={listed[shownIndex]!}
+                language={language}
+                copy={deferredCopy}
+                template={template}
+                suite={suite}
+                textBox={textBox}
+                type={type}
+              />
+              <AiWording
+                draft={draft}
+                update={update}
+                beats={story.beats}
+                page={listed[shownIndex]!}
+                pageName={pageName(listed[shownIndex]!.id)}
+                language={language}
+              />
+            </div>
+          )}
+        </PagePreview>
       ) : (
         <Invitation
           copy={deferredCopy}

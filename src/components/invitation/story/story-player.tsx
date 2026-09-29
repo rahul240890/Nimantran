@@ -15,6 +15,7 @@ import {
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   useSyncExternalStore,
@@ -29,6 +30,7 @@ import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
+import { fitScale } from "@/lib/suites/fit";
 import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
@@ -82,20 +84,20 @@ type StoryPlayerProps = {
 const LINE_CLASS: Record<LineStyle, string> = {
   symbol: "",
   label:
-    "font-label text-[length:calc(clamp(0.85rem,3.6cqmin,1.15rem)*var(--story-scale,1))] tracking-[0.26em] text-card-gold-text uppercase",
+    "font-label text-[length:calc(clamp(0.85rem,3.6cqmin,1.15rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] tracking-[0.26em] text-card-gold-text uppercase",
   script:
-    "font-display text-[length:calc(clamp(1.35rem,6.4cqmin,2.4rem)*var(--story-scale,1))] leading-tight text-card-accent-text",
+    "font-display text-[length:calc(clamp(1.35rem,6.4cqmin,2.4rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-tight text-card-accent-text",
   display:
-    "font-display text-[length:calc(clamp(1.7rem,8.4cqmin,3.2rem)*var(--story-scale,1))] leading-[1.08] text-card-ink",
+    "font-display text-[length:calc(clamp(1.7rem,8.4cqmin,3.2rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-[1.08] text-card-ink",
   joiner:
-    "font-display text-[length:calc(clamp(1.3rem,6.4cqmin,2.4rem)*var(--story-scale,1))] leading-none text-card-accent-text",
-  body: "font-sans text-[length:calc(clamp(1.05rem,4.6cqmin,1.45rem)*var(--story-scale,1))] text-card-ink-muted",
+    "font-display text-[length:calc(clamp(1.3rem,6.4cqmin,2.4rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-none text-card-accent-text",
+  body: "font-sans text-[length:calc(clamp(1.05rem,4.6cqmin,1.45rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] text-card-ink-muted",
   small:
-    "font-sans text-[length:calc(clamp(1rem,4.1cqmin,1.25rem)*var(--story-scale,1))] text-card-ink-muted",
+    "font-sans text-[length:calc(clamp(1rem,4.1cqmin,1.25rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] text-card-ink-muted",
 };
 /** The couple's names are the largest words of all. */
 const NAME_CLASS =
-  "font-display text-[length:calc(clamp(2.4rem,12cqmin,4.6rem)*var(--story-scale,1))] leading-[1.02] text-card-ink";
+  "font-display text-[length:calc(clamp(2.4rem,12cqmin,4.6rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-[1.02] text-card-ink";
 
 const TURN_CLASS = {
   fade: "suite-turn-fade",
@@ -437,13 +439,13 @@ export function StoryPlayer({
   );
 }
 
-/** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
 /** The painting behind a page: the couple's framed one on their photo page. */
 function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
   const frames = beat.photos?.length ? photoPage(suiteId, beat.photos.length) : null;
   return frames?.image ?? SUITES[suiteId].images[pageLook(beat.scene).art];
 }
 
+/** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
 function areaStyle(area: TextArea, whole = false, lifted = false): CSSProperties {
   if (lifted) {
     // The whole painting sits at the foot of the page, below the controls
@@ -504,6 +506,7 @@ export function StoryPage({
   onReply,
   inert,
   className,
+  onOverflow,
 }: {
   beat: StoryBeat;
   copy: CardCopy;
@@ -516,6 +519,8 @@ export function StoryPage({
   onReply: () => void;
   inert: boolean;
   className?: string;
+  /** Told whether the words still overflow at the smallest size, so the editor can say so. */
+  onOverflow?: (overflow: boolean) => void;
 }) {
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
@@ -527,8 +532,9 @@ export function StoryPage({
   const painted = themed && Boolean(image);
   // Themes without one hang the photos in plain arches over the page instead
   const arches = photos.length > 0 && !frames;
-  // Words print straight onto a painting unless the host asked for the box
-  const printed = painted && !textBox;
+  // Words print straight onto a painting unless the host asked for the box, here or for all
+  const layout = beat.layout;
+  const printed = painted && !(layout?.box ?? textBox);
   const sacred = beat.symbol && copy.symbol ? SYMBOLS[copy.symbol] : null;
   const delay = (i: number) =>
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
@@ -540,6 +546,58 @@ export function StoryPage({
   const whole = Boolean(frames);
   // A blessing nobody wrote leaves the god's page to itself, with no empty glow
   const empty = beat.lines.length === 0 && !sacred;
+  const overflowed = useRef(onOverflow);
+  useEffect(() => {
+    overflowed.current = onOverflow;
+  });
+  const fitArea = useRef<HTMLDivElement>(null);
+  const fitWords = useRef<HTMLDivElement>(null);
+  const fitKey = JSON.stringify([
+    beat.lines,
+    type,
+    printed,
+    reply?.label,
+    Boolean(beat.links),
+    suiteId,
+  ]);
+  /*
+   * Sizes the words to fit the area: tries sizes until they fit its height and no word runs
+   * past the width, then keeps the largest. Runs again when the words, the area or the fonts
+   * change. Too many words even at the smallest size mark the page as overflowing, and only
+   * then may a long word break.
+   */
+  useLayoutEffect(() => {
+    const outer = fitArea.current;
+    const inner = fitWords.current;
+    if (!outer || !inner) return;
+    const fit = () => {
+      if (outer.clientHeight === 0) return;
+      const lines = [...inner.querySelectorAll<HTMLElement>(".story-line")];
+      const fits = (scale: number) => {
+        inner.style.setProperty("--story-fit", String(scale));
+        // Each line on its own: the glow behind printed words reaches past the edges on purpose
+        return (
+          inner.scrollHeight <= outer.clientHeight + 1 &&
+          lines.every((line) => line.scrollWidth <= line.clientWidth + 1)
+        );
+      };
+      delete inner.dataset.overflow;
+      const { scale, overflow } = fitScale(fits);
+      inner.style.setProperty("--story-fit", String(scale));
+      if (overflow) inner.dataset.overflow = "true";
+      overflowed.current?.(overflow);
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(outer);
+    // Web fonts arrive after the first layout, and Indian scripts' fonts load on demand
+    document.fonts?.addEventListener("loadingdone", fit);
+    void document.fonts?.ready.then(fit);
+    return () => {
+      observer.disconnect();
+      document.fonts?.removeEventListener("loadingdone", fit);
+    };
+  }, [fitKey]);
 
   return (
     <div
@@ -566,8 +624,14 @@ export function StoryPage({
       {arches && <PhotoArches photos={photos} />}
 
       <div
+        ref={fitArea}
         className={cn(
-          "absolute flex items-center justify-center",
+          "absolute flex justify-center",
+          layout?.place === "top"
+            ? "items-start"
+            : layout?.place === "bottom"
+              ? "items-end"
+              : "items-center",
           empty && "invisible",
           arches
             ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
@@ -584,9 +648,11 @@ export function StoryPage({
         }
       >
         <div
+          ref={fitWords}
           data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
           className={cn(
-            "relative flex max-h-full w-[min(100%,36rem)] flex-col items-center gap-[2cqmin] text-center",
+            "relative flex max-h-full w-[min(100%,36rem)] flex-col gap-[2cqmin]",
+            layout?.align === "start" ? "items-start text-start" : "items-center text-center",
             printed
               ? "story-print isolate px-[4cqmin] py-[6cqmin]"
               : themed &&
@@ -601,7 +667,7 @@ export function StoryPage({
           )}
           {sacred && (
             <span
-              className="story-line mb-[1cqmin] block size-[clamp(4rem,22cqmin,7.5rem)] shrink-0"
+              className="story-line mb-[1cqmin] block size-[calc(clamp(4rem,22cqmin,7.5rem)*var(--story-fit,1))] shrink-0"
               style={delay(0)}
             >
               {sacred.kind === "art" ? (
@@ -615,7 +681,7 @@ export function StoryPage({
                 <span
                   aria-hidden
                   className={cn(
-                    "block text-center text-[clamp(3.4rem,20cqmin,6.5rem)] leading-none text-card-accent-text",
+                    "block text-center text-[length:calc(clamp(3.4rem,20cqmin,6.5rem)*var(--story-fit,1))] leading-none text-card-accent-text",
                     sacred.font === "display" ? "font-display" : "font-sans",
                   )}
                 >
@@ -634,7 +700,7 @@ export function StoryPage({
                 key={i}
                 lang={line.lang}
                 className={cn(
-                  "story-line max-w-full text-balance break-words",
+                  "story-line max-w-full text-balance",
                   name ? NAME_CLASS : LINE_CLASS[line.style],
                 )}
                 style={{ ...delay(i + offset), ...lineType(type, line.style, name) }}

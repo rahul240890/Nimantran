@@ -3,8 +3,11 @@ import { dateLocale } from "@/i18n/dates";
 import type { UiLocale } from "@/i18n/locales";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
+import { familyBlocks } from "@/lib/editor/family";
 import {
+  cardLanguages,
   ceremonyName,
+  draftCopy,
   draftTradition,
   includedFunctions,
   muhuratName,
@@ -14,7 +17,6 @@ import {
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
 import { hasBlessingPage, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { formatCardDate, formatCardTime, type CardLanguage } from "@/lib/templates/card-languages";
-import { WORDING_IDS } from "@/lib/traditions/schema";
 import { formatTime } from "@/lib/time";
 
 /**
@@ -83,14 +85,21 @@ export function cardFunctions<T extends StoryFunction>(
   });
 }
 
-/** The tradition's family wording the host wrote, for the family page (Step 12e). */
-export function storyFamily(draft: InviteDraft): FamilyLine[] {
-  const pack = draftTradition(draft);
-  if (!pack) return [];
-  return WORDING_IDS.flatMap((id) => {
-    const text = draft.tradition.wording[id]?.trim();
-    const block = pack.wording[id];
-    return text && block ? [{ title: block.title, text, lang: pack.language }] : [];
+/**
+ * The family page's blocks in one of the card's languages (Step 12s): blessings, each
+ * side's parents, a line in memory, the hosts and whom to call, as the family wrote them.
+ */
+export function storyFamily(
+  draft: InviteDraft,
+  language: CardLanguage = cardLanguages(draft)[0],
+): (FamilyLine & { id: string })[] {
+  const copy = draftCopy(draft, language);
+  return familyBlocks({
+    family: draft.family,
+    wording: draft.tradition.wording,
+    names: [copy.first, copy.second],
+    pack: draftTradition(draft),
+    language,
   });
 }
 

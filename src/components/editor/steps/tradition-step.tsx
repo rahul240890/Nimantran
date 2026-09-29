@@ -2,8 +2,6 @@
 
 import { Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Field } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { NO_SYMBOL, SYMBOLS } from "@/components/invitation/art/symbols";
@@ -20,8 +18,6 @@ import { stockStyle } from "@/lib/templates/stock";
 import { allowsTradition, isTraditionId, rankTraditions } from "@/lib/traditions/catalog";
 import {
   INVOCATION_MODES,
-  WORDING_IDS,
-  WORDING_MAX,
   type InvocationMode,
   type SymbolId,
   type TraditionPack,
@@ -152,64 +148,6 @@ function ReligiousElements({ draft, update, pack }: StepProps & { pack: Traditio
   );
 }
 
-function FamilyWording({ draft, update, pack }: StepProps & { pack: TraditionPack }) {
-  const { editor, traditionCopy } = useText(editorText);
-  const blocks = WORDING_IDS.filter((id) => pack.wording[id]);
-  if (blocks.length === 0) return null;
-  return (
-    <section
-      aria-labelledby="family-wording-heading"
-      className="flex flex-col gap-5 border-t border-line pt-6"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 id="family-wording-heading" className="font-display text-xl">
-          {traditionCopy.wording}
-        </h2>
-        <p className="text-sm text-ink-muted">{traditionCopy.wordingIntro}</p>
-      </div>
-      <div className="grid gap-5 sm:grid-cols-2">
-        {blocks.map((id) => {
-          const block = pack.wording[id]!;
-          return (
-            <Field
-              key={id}
-              label={
-                <>
-                  {traditionCopy.wordingLabels[id]}
-                  <span lang={pack.language} className="font-normal text-accent-text">
-                    {" · "}
-                    {block.title}
-                  </span>
-                </>
-              }
-              optionalLabel={editor.optional}
-            >
-              <Input
-                value={draft.tradition.wording[id] ?? ""}
-                maxLength={WORDING_MAX}
-                placeholder={block.example}
-                lang={pack.language}
-                autoComplete="off"
-                data-wording={id}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  update((current) => ({
-                    ...current,
-                    tradition: {
-                      ...current.tradition,
-                      wording: { ...current.tradition.wording, [id]: value },
-                    },
-                  }));
-                }}
-              />
-            </Field>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
 function Ceremonies({ draft, pack }: Pick<StepProps, "draft"> & { pack: TraditionPack }) {
   const { functionCopy, traditionCopy } = useText(editorText);
   const named = includedFunctions(draft).flatMap((id) => {
@@ -319,7 +257,6 @@ export function TraditionStep(props: StepProps) {
       {pack && pack.community !== "modern" && (
         <>
           <ReligiousElements {...props} pack={pack} />
-          <FamilyWording {...props} pack={pack} />
           <Ceremonies draft={draft} pack={pack} />
         </>
       )}
