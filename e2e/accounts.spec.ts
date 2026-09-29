@@ -17,6 +17,8 @@ async function signInWithPhone(page: Page, number = "98765 43210") {
   const last4 = number.replace(/\D/g, "").slice(-4);
   await expect(page.getByText(`We sent a 6-digit code to +91 ••••• •${last4}.`)).toBeVisible();
   await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
+  // A new account is asked its name first
+  await page.getByRole("button", { name: "Skip for now" }).click();
 }
 
 for (const colorScheme of ["light", "dark"] as const) {
@@ -45,6 +47,10 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect((await axe(page).analyze()).violations).toEqual([]);
 
       await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
+      await expect(page.getByRole("heading", { name: "What should we call you?" })).toBeVisible();
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+      await page.getByRole("button", { name: "Skip for now" }).click();
       await expect(page).toHaveURL(/\/invites$/);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("Namaste");
       await expect(page.getByText("Add your name")).toBeVisible();
@@ -71,6 +77,21 @@ test.describe("accounts", () => {
     await signInWithPhone(page);
     await expect(page).toHaveURL(/\/account$/);
     await expect(page.getByRole("main")).toContainText("Signed in with+91 98765 43210");
+  });
+
+  test("a new account gives its name once, and is greeted by it", async ({ page }) => {
+    await page.goto("/sign-in?next=/invites");
+    await page.getByRole("textbox", { name: /Mobile number/ }).fill("98765 43210");
+    await page.getByRole("button", { name: "Send code" }).click();
+    await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
+    const name = page.getByRole("textbox", { name: /Your name/ });
+    await expect(name).toBeFocused();
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page.getByText("Please enter your name")).toBeVisible();
+    await name.fill("Priya Sharma");
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(page).toHaveURL(/\/invites$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Namaste, Priya");
   });
 
   test("a wrong code says so and lets the host try again", async ({ page }) => {

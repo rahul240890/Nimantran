@@ -26,6 +26,8 @@ export async function signIn(page: Page, number: string) {
   await page.getByRole("textbox", { name: /Mobile number/ }).fill(number);
   await page.getByRole("button", { name: "Send code" }).click();
   await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
+  // A new account is asked its name first
+  await page.getByRole("button", { name: "Skip for now" }).click();
 }
 
 /** Signs in and writes a complete wedding invite with one photo, ending on the preview step. */

@@ -12,6 +12,7 @@ import {
   hasGodAtTop,
   pageLook,
   suiteFor,
+  suitePreview,
   type PageArt,
 } from "./catalog";
 import { DEFAULT_AREA, textArea } from "./areas";
@@ -90,5 +91,19 @@ describe("text areas", () => {
       expect(hasGodAtTop(id, "cover")).toBe(false);
     }
     expect(hasGodAtTop("ivory-arch", "wedding")).toBe(false);
+  });
+});
+
+describe("link previews", () => {
+  it("have a JPEG copy of every painted cover (run scripts/suite-previews.mjs)", () => {
+    for (const suite of SUITE_IDS) {
+      const preview = suitePreview(suite);
+      if (!SUITES[suite].images.cover) {
+        expect(preview).toBeNull();
+        continue;
+      }
+      expect(preview).toMatch(/\/preview\.jpg$/);
+      expect(existsSync(join(process.cwd(), "public", preview!))).toBe(true);
+    }
   });
 });

@@ -214,7 +214,7 @@ export function DesignGrid({ locale, ids }: { locale: UiLocale; ids: readonly Te
               className="group flex flex-col gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
             >
               <TiltCard className="rounded-md" maxTilt={6}>
-                <TemplateCover id={id} />
+                <TemplateCover id={id} locale={locale} />
               </TiltCard>
               <span className="flex flex-col">
                 <span className="font-display text-lg leading-tight transition-colors group-hover:text-accent-text sm:text-xl">

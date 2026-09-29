@@ -86,11 +86,11 @@ function homeCrumb(locale: UiLocale): Crumb {
   return { name: seoText[locale].seoCopy.home, path: pagePath({ kind: "home" }, locale) };
 }
 
-function Cover({ id }: { id: TemplateId }) {
+function Cover({ id, locale }: { id: TemplateId; locale: UiLocale }) {
   return (
     <div className="mx-auto w-full max-w-sm lg:max-w-md">
       <TiltCard className="rounded-md" maxTilt={8}>
-        <TemplateCover id={id} />
+        <TemplateCover id={id} locale={locale} />
       </TiltCard>
     </div>
   );
@@ -135,7 +135,7 @@ export function TraditionPage({ id, locale }: { id: TraditionId; locale: UiLocal
         heading={words.heading}
         intro={words.intro}
         createHref={`/create?category=wedding&tradition=${id}`}
-        aside={<Cover id={pack.templates[0]!} />}
+        aside={<Cover id={pack.templates[0]!} locale={locale} />}
       >
         {pack.invocation && (
           <p
@@ -242,7 +242,7 @@ export function DesignPage({ id, locale }: { id: TemplateId; locale: UiLocale })
         intro={design.description}
         createHref={`/create?template=${id}`}
         createLabel={seoCopy.useDesign}
-        aside={<Cover id={id} />}
+        aside={<Cover id={id} locale={locale} />}
       >
         {raga && (
           <p className="text-ink-muted">

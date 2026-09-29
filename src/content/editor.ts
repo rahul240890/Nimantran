@@ -224,6 +224,7 @@ export const functionFields = {
   suggested: (occasion: string) => `${occasion} functions`,
   more: "More functions",
   moreHint: "Add any other function you're inviting guests to.",
+  showMore: (count: number) => `Show ${count} more functions`,
   address: "Address or map link",
   addressHint: "Guests get a directions button on the invitation.",
   dressCode: "Dress code",
@@ -242,6 +243,8 @@ export const coupleCopy = {
   joinerHint: "The word between the names, like &, weds or संग.",
   doorsHint: "Two short words painted on the gates.",
   anyScript: "Type in any script. Hindi, Tamil, Bengali and more all fit the card.",
+  latinOnCard: (language: string) =>
+    `Your card is in ${language}, so guests will see this name in English letters. To write it in ${language}, switch your phone's keyboard to ${language} and type the name as it sounds.`,
   languagesHeading: "Card language",
   languagesHint: "With two languages, guests switch between them on the invitation.",
   bothLanguages: (main: string, second: string) => `${main} and ${second}`,

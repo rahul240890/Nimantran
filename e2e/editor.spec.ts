@@ -177,6 +177,8 @@ test.describe("invite editor", () => {
 
     await expect(page.getByRole("heading", { name: "Roka functions" })).toBeVisible();
     await expect(page.getByRole("checkbox", { name: /Roka/ })).toBeChecked();
+    // The wedding is one of the roka's rarer functions, folded until asked for
+    await page.getByRole("button", { name: /^Show \d+ more functions$/ }).click();
     await expect(page.getByRole("checkbox", { name: /Wedding/ })).not.toBeChecked();
     // The card announces the roka in the occasion's own words (in a sheet on phones)
     if (page.viewportSize()!.width < 1024) {

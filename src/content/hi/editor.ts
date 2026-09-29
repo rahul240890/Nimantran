@@ -210,6 +210,7 @@ export const functionFields: Translation<typeof en.functionFields> = {
   suggested: (occasion) => `${occasion} की रस्में`,
   more: "और रस्में",
   moreHint: "कोई और रस्म जोड़ें जिसमें मेहमानों को बुला रहे हैं।",
+  showMore: (count) => `${count} और रस्में दिखाएँ`,
   address: "पता या नक़्शे का लिंक",
   addressHint: "निमंत्रण पर मेहमानों को रास्ता दिखाने वाला बटन मिलेगा।",
   dressCode: "ड्रेस कोड",
@@ -227,6 +228,8 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   joinerHint: "नामों के बीच का शब्द, जैसे &, संग या weds।",
   doorsHint: "द्वारों पर लिखे दो छोटे शब्द।",
   anyScript: "किसी भी लिपि में लिखें। हिन्दी, तमिल, बांग्ला और बाक़ी सब कार्ड पर आ जाती हैं।",
+  latinOnCard: (language) =>
+    `आपका कार्ड ${language} में है, इसलिए मेहमान यह नाम अंग्रेज़ी अक्षरों में देखेंगे। ${language} में लिखने के लिए फ़ोन का कीबोर्ड ${language} पर करें और नाम जैसा बोलते हैं वैसा टाइप करें।`,
   languagesHeading: "कार्ड की भाषा",
   languagesHint: "दो भाषाएँ चुनने पर मेहमान निमंत्रण पर उनके बीच बदल सकते हैं।",
   bothLanguages: (main, second) => `${main} और ${second}`,

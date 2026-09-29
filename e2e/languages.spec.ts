@@ -24,7 +24,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(
         page.getByRole("heading", {
           level: 1,
-          name: "निमंत्रण, जिन्हें मेहमान खोलें, घुमाएँ और सहेजें।",
+          name: "निमंत्रण, जो जीवंत हो उठें।",
         }),
       ).toBeVisible();
       await expect(page.getByRole("heading", { name: "जोड़े अक्सर पूछते हैं" })).toBeAttached();

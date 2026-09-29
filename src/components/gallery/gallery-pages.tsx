@@ -163,7 +163,7 @@ function DesignGallery({
               priority={index < 4}
               cover={
                 design.suite === "classic" ? (
-                  <TemplateCover id={design.template} className="max-w-[16rem]" />
+                  <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
                 ) : undefined
               }
             />

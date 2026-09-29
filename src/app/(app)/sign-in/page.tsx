@@ -12,7 +12,8 @@ import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
-import { getText } from "@/i18n/server";
+import { getLocale, getText } from "@/i18n/server";
+import type { UiLocale } from "@/i18n/locales";
 import { accountText } from "@/i18n/copy/account";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** Three designs fanned out like cards in a hand, beside the form on wide screens. */
-function CardFan() {
+function CardFan({ locale }: { locale: UiLocale }) {
   const cards = [
     { id: "rose", className: "-rotate-12 -translate-x-[58%] translate-y-6" },
     { id: "emerald", className: "rotate-12 translate-x-[58%] translate-y-6" },
@@ -36,7 +37,7 @@ function CardFan() {
       {cards.map((card) => (
         <div key={card.id} className={`absolute w-44 ${card.className}`}>
           <TiltCard maxTilt={6} className="rounded-md shadow-float">
-            <TemplateCover id={card.id} className="rounded-md" />
+            <TemplateCover id={card.id} locale={locale} className="rounded-md" />
           </TiltCard>
         </div>
       ))}
@@ -49,7 +50,9 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
   const params = await searchParams;
   const next = safeNext(params.next);
   const mode = authMode();
-  if (mode !== "off" && (await getAccount())) redirect(next);
+  const account = mode === "off" ? null : await getAccount();
+  // Signed in already: go on, unless the account has no name yet, which the form asks for
+  if (account?.name) redirect(next);
   const error = params.error === "google" ? "google" : undefined;
 
   return (
@@ -60,7 +63,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
             aria-hidden
             className="relative hidden flex-col items-center gap-10 overflow-hidden rounded-xl border border-line bg-surface-2/60 px-8 py-12 text-center lg:flex"
           >
-            <CardFan />
+            <CardFan locale={await getLocale()} />
             <div className="flex max-w-sm flex-col gap-3">
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {signInCopy.side.eyebrow}
@@ -83,10 +86,18 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
                 {signInCopy.eyebrow}
               </p>
               <h1 className="font-display text-[2rem] leading-[1.08] sm:text-[2.4rem]">
-                {mode === "off" ? signInCopy.off.title : signInCopy.title}
+                {mode === "off"
+                  ? signInCopy.off.title
+                  : account
+                    ? signInCopy.nameStep.title
+                    : signInCopy.title}
               </h1>
               <p className="text-ink-muted">
-                {mode === "off" ? signInCopy.off.body : signInCopy.intro}
+                {mode === "off"
+                  ? signInCopy.off.body
+                  : account
+                    ? signInCopy.nameStep.intro
+                    : signInCopy.intro}
               </p>
             </div>
             {mode === "off" ? (
@@ -97,7 +108,12 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
                 </Link>
               </Button>
             ) : (
-              <SignInForm next={next} preview={mode === "preview"} initialError={error} />
+              <SignInForm
+                next={next}
+                preview={mode === "preview"}
+                initialError={error}
+                askName={account ? { language: account.language } : undefined}
+              />
             )}
           </Card>
         </div>

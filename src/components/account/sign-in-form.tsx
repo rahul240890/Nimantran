@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight, FlaskConical, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
-import { sendCode, startGoogle, verifyCode } from "@/actions/auth";
+import { saveProfile, sendCode, startGoogle, verifyCode } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -12,7 +12,7 @@ import { toast } from "@/components/ui/toast";
 import { accountText } from "@/i18n/copy/account";
 import { useLocale, useText } from "@/i18n/client";
 import { homePath } from "@/i18n/locales";
-import { firstName } from "@/lib/auth/account";
+import { PROFILE_RULES, firstName, type Account } from "@/lib/auth/account";
 import { OTP_LENGTH, maskPhone, normalizePhone } from "@/lib/auth/phone";
 import { CodeInput } from "./code-input";
 import { refreshAccountHint } from "./use-account-hint";
@@ -67,13 +67,16 @@ export function SignInForm({
   next,
   preview,
   initialError,
+  askName,
 }: {
   next: string;
   /** Preview mode: any number, code 123456. */
   preview: boolean;
   initialError?: ErrorKey;
+  /** Signed in, with no name yet: the form opens on the name step. */
+  askName?: { language: Account["language"] };
 }) {
-  const { signInCopy } = useText(accountText);
+  const { signInCopy, profileCopy } = useText(accountText);
   const locale = useLocale();
   const legalPath = (kind: "privacy" | "terms") =>
     locale === "en" ? `/${kind}` : `${homePath(locale)}/${kind}`;
@@ -91,12 +94,27 @@ export function SignInForm({
   const [sending, startSending] = useTransition();
   const [verifying, startVerifying] = useTransition();
   const [googling, startGoogling] = useTransition();
+  // A new account has no name yet: ask for it once, before going on
+  const [signedIn, setSignedIn] = useState<{
+    next: string;
+    language: Account["language"];
+  } | null>(null);
+  const welcome = signedIn ?? (askName ? { next, language: askName.language } : null);
+  const [name, setName] = useState("");
+  const [nameError, setNameError] = useState<"required" | "too-long" | null>(null);
+  const [naming, startNaming] = useTransition();
+  const nameRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
   }, [step]);
+
+  const asking = Boolean(welcome);
+  useEffect(() => {
+    if (asking) nameRef.current?.focus();
+  }, [asking]);
 
   // The resend countdown
   useEffect(() => {
@@ -152,9 +170,39 @@ export function SignInForm({
         // Nothing to clear
       }
       refreshAccountHint();
-      toast({ title: signInCopy.success(firstName(result)), tone: "success" });
-      router.replace(result.next);
-      router.refresh();
+      if (!result.name) {
+        setSignedIn({ next: result.next, language: result.language });
+        return;
+      }
+      finish(result.next, result.name);
+    });
+
+  const finish = (to: string, who: string) => {
+    toast({ title: signInCopy.success(firstName({ name: who })), tone: "success" });
+    router.replace(to);
+    router.refresh();
+  };
+
+  const saveName = () =>
+    startNaming(async () => {
+      if (!welcome) return;
+      const trimmed = name.trim();
+      if (!trimmed) {
+        setNameError("required");
+        nameRef.current?.focus();
+        return;
+      }
+      // A new account's language is the default; the site's own language is a better guess
+      const language = welcome.language === "en" ? locale : welcome.language;
+      const result = await saveProfile({ name: trimmed, language });
+      if (result.status === "invalid") {
+        setNameError(result.errors.name === "too-long" ? "too-long" : "required");
+        nameRef.current?.focus();
+        return;
+      }
+      // A failed save only means the name waits for the profile page
+      refreshAccountHint();
+      finish(welcome.next, result.status === "saved" ? result.account.name : "");
     });
 
   const google = () =>
@@ -182,6 +230,53 @@ export function SignInForm({
 
   const message = error ? signInCopy.errors[error] : undefined;
   const phoneError = step === "phone" && (error === "required" || error === "invalid");
+
+  if (welcome) {
+    return (
+      <form
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          saveName();
+        }}
+        className="flex animate-rise flex-col gap-5"
+      >
+        <Field
+          label={signInCopy.nameStep.label}
+          required
+          error={nameError ? profileCopy.errors[nameError] : undefined}
+        >
+          <Input
+            ref={nameRef}
+            value={name}
+            maxLength={PROFILE_RULES.name}
+            autoComplete="name"
+            placeholder={signInCopy.nameStep.placeholder}
+            onChange={(event) => {
+              setName(event.target.value);
+              if (nameError) setNameError(null);
+            }}
+          />
+        </Field>
+        <Button
+          type="submit"
+          fullWidth
+          loading={naming}
+          trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
+        >
+          {signInCopy.nameStep.save}
+        </Button>
+        <Button
+          variant="ghost"
+          fullWidth
+          disabled={naming}
+          onClick={() => finish(welcome.next, "")}
+        >
+          {signInCopy.nameStep.skip}
+        </Button>
+      </form>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">

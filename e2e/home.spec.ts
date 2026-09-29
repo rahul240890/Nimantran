@@ -240,7 +240,7 @@ test.describe("waitlist", () => {
   }) => {
     await visit(page, "/#waitlist");
     const form = page.locator("#waitlist form");
-    await form.getByRole("button", { name: "Join the waitlist" }).click();
+    await form.getByRole("button", { name: "Keep me posted" }).click();
 
     const name = form.getByRole("textbox", { name: /Your name/ });
     await expect(name).toBeFocused();
@@ -253,7 +253,7 @@ test.describe("waitlist", () => {
 
     await form.getByRole("textbox", { name: /Email/ }).fill("meera@");
     await form.getByRole("textbox", { name: /WhatsApp/ }).fill("12345");
-    await form.getByRole("button", { name: "Join the waitlist" }).click();
+    await form.getByRole("button", { name: "Keep me posted" }).click();
     await expect(form.getByText("Enter an email like name@example.com.")).toBeVisible();
     await expect(form.getByText("Enter a phone number with 10 to 15 digits.")).toBeVisible();
   });
@@ -277,7 +277,7 @@ test.describe("waitlist", () => {
     await form.getByRole("textbox", { name: /WhatsApp/ }).fill("+91 98765 43210");
     await form.getByRole("combobox", { name: /What are you celebrating/ }).click();
     await page.getByRole("option", { name: "A wedding" }).click();
-    await form.getByRole("button", { name: "Join the waitlist" }).click();
+    await form.getByRole("button", { name: "Keep me posted" }).click();
 
     const thanks = page.getByRole("heading", { name: "You're on the list, Meera" });
     await expect(thanks).toBeVisible();
