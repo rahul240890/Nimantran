@@ -29,7 +29,8 @@ import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
-import { SUITES, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
@@ -443,7 +444,18 @@ function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
   return frames?.image ?? SUITES[suiteId].images[pageLook(beat.scene).art];
 }
 
-function areaStyle(area: TextArea, whole = false): CSSProperties {
+function areaStyle(area: TextArea, whole = false, lifted = false): CSSProperties {
+  if (lifted) {
+    // The whole painting sits at the foot of the page, below the controls
+    const height = `min(calc(100cqh - ${CONTROLS_CLEAR}), calc(100cqw / ${PAINTING_ASPECT}))`;
+    const at = (percent: number) => `calc(100cqh - ${height} + ${height} * ${percent / 100})`;
+    return {
+      top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${at(area.top)})`,
+      bottom: `max(calc(${height} * ${area.bottom / 100}), env(safe-area-inset-bottom))`,
+      left: `${area.left}%`,
+      right: `${area.right}%`,
+    };
+  }
   if (whole) {
     // The whole painting shows, centred: place the area on it rather than on the page
     const height = `min(100cqh, calc(100cqw / ${PAINTING_ASPECT}))`;
@@ -522,8 +534,10 @@ export function StoryPage({
     still ? undefined : ({ "--story-delay": `${lineDelay(i) + 0.3}s` } as CSSProperties);
   const offset = sacred ? 1 : 0;
   const after = beat.lines.length + offset;
-  // A god's page shows the whole painting, so the crown stays clear of the controls above
-  const whole = Boolean(frames) || look.art === "blessing";
+  // A page painted with a god near its top shows the whole painting below the controls, so
+  // the buttons never cover the god
+  const lifted = !frames && painted && hasGodAtTop(suiteId, look.art);
+  const whole = Boolean(frames);
   // A blessing nobody wrote leaves the god's page to itself, with no empty glow
   const empty = beat.lines.length === 0 && !sacred;
 
@@ -541,7 +555,8 @@ export function StoryPage({
           image={image}
           seconds={still ? undefined : beat.seconds}
           className="absolute inset-0 overflow-hidden"
-          contain={whole}
+          contain={whole || lifted}
+          lifted={lifted}
           under={frames ? <PhotoWindows frames={frames.frames} photos={photos} /> : undefined}
         />
       )}
@@ -564,7 +579,7 @@ export function StoryPage({
           frames
             ? areaStyle(frames.area, true)
             : painted && !arches
-              ? areaStyle(textArea(suiteId, look.art), whole)
+              ? areaStyle(textArea(suiteId, look.art), whole, lifted)
               : undefined
         }
       >
