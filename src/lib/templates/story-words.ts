@@ -293,3 +293,16 @@ export function daysAway(days: number, words: CountdownWords): string {
   if (days === 1) return words.tomorrow;
   return words.inDays(days);
 }
+
+/**
+ * The line that greets a guest by name on the first screen when they come by their own
+ * link, in the card's language. Drafts for a native proofreader.
+ */
+export const CARD_GREETING_WORDS: Record<CardLanguage, { dear: string; invited: string }> = {
+  en: { dear: "Dear", invited: "You are warmly invited" },
+  hi: { dear: "प्रिय", invited: "आपको सादर आमंत्रित करते हैं" },
+  mr: { dear: "प्रिय", invited: "आपणास सस्नेह आमंत्रण" },
+  gu: { dear: "પ્રિય", invited: "આપને સ્નેહભર્યું આમંત્રણ" },
+  bn: { dear: "প্রিয়", invited: "আপনাকে সাদর আমন্ত্রণ" },
+  ta: { dear: "அன்புள்ள", invited: "உங்களை அன்புடன் அழைக்கிறோம்" },
+};

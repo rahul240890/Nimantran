@@ -19,6 +19,9 @@ const noSubscribe = () => () => {};
 /** The deck prints a couple's names, so it deals only the wedding themes. */
 const PAINTED_SUITES = ALL_PAINTED.filter((suite) => !SUITES[suite].occasions);
 
+/** At most this many dots show, a window that slides along with the deck. */
+const MAX_DOTS = 7;
+
 /** How long each theme leads the deck before the next comes forward. */
 const TURN_MS = 4500;
 
@@ -51,12 +54,16 @@ export function HeroDeck() {
   }, [still, held, total]);
 
   const front = PAINTED_SUITES[current]!;
+  // The dots' window keeps the front theme near its middle
+  const dots = Math.min(MAX_DOTS, total);
+  const first = Math.min(Math.max(current - Math.floor(dots / 2), 0), total - dots);
+  const windowed = PAINTED_SUITES.slice(first, first + dots);
   const area = textArea(front, "cover");
 
   return (
     <div
       data-deck-live={live}
-      className="flex flex-col items-center gap-6"
+      className="flex w-full min-w-0 flex-col items-center gap-6"
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => setHeld(false)}
       onFocus={() => setHeld(true)}
@@ -87,6 +94,7 @@ export function HeroDeck() {
               key={suite}
               data-suite={suite}
               data-mood="dusk"
+              data-front={offset === 0 || undefined}
               className={cn(
                 "absolute top-[4%] left-1/2 aspect-[9/16] h-[92%] overflow-hidden rounded-[1.4rem] border border-card-ivory/40 bg-night shadow-overlay",
                 "transition-[transform,opacity] duration-700 ease-out-expo motion-still:transition-none",
@@ -138,10 +146,11 @@ export function HeroDeck() {
         })}
       </div>
       {/*
-        Eight 44px dots do not fit one row on a phone, so phones step through the themes
+        Seven 44px dots do not fit one row on a phone, so phones step through the themes
         with the arrows and the dots only show where you are; wider screens can tap a dot.
+        With more themes than dots, the row slides and the end dots shrink to say so.
       */}
-      <div className="flex items-center justify-center gap-1">
+      <div className="flex max-w-full items-center justify-center gap-1">
         <DeckArrow
           label={homeGallery.previousTheme}
           onClick={() => setCurrent((index) => (index - 1 + total) % total)}
@@ -149,28 +158,35 @@ export function HeroDeck() {
           <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
         </DeckArrow>
         <ul aria-label={homeGallery.deckLabel} className="flex items-center sm:gap-0.5">
-          {PAINTED_SUITES.map((suite, index) => (
-            <li key={suite} className="flex">
-              <button
-                type="button"
-                aria-pressed={index === current}
-                aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
-                onClick={() => setCurrent(index)}
-                className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-auto max-sm:px-[3px] sm:w-11"
-                tabIndex={phone ? -1 : undefined}
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "block h-2 rounded-full transition-[width,background-color] duration-300 sm:h-2.5 motion-still:transition-none",
-                    index === current
-                      ? "w-5 bg-marigold sm:w-7"
-                      : "w-2 bg-line-strong group-hover:bg-ink-faint sm:w-2.5",
-                  )}
-                />
-              </button>
-            </li>
-          ))}
+          {windowed.map((suite, slot) => {
+            const index = first + slot;
+            // An end dot with more themes beyond it
+            const edge = (slot === 0 && first > 0) || (slot === dots - 1 && first + dots < total);
+            return (
+              <li key={suite} className="flex">
+                <button
+                  type="button"
+                  aria-pressed={index === current}
+                  aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
+                  onClick={() => setCurrent(index)}
+                  className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-auto max-sm:px-[3px] sm:w-11"
+                  tabIndex={phone ? -1 : undefined}
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "block rounded-full transition-[width,height,background-color] duration-300 motion-still:transition-none",
+                      index === current
+                        ? "h-2 w-5 bg-marigold sm:h-2.5 sm:w-7"
+                        : edge
+                          ? "size-1.5 bg-line-strong group-hover:bg-ink-faint"
+                          : "size-2 bg-line-strong group-hover:bg-ink-faint sm:size-2.5",
+                    )}
+                  />
+                </button>
+              </li>
+            );
+          })}
         </ul>
         <DeckArrow
           label={homeGallery.nextTheme}

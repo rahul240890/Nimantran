@@ -81,7 +81,7 @@ test.describe("finding a design", () => {
     await page.getByLabel(/^Birthday name/).fill("Aarav");
     // Phones show the live page behind a Preview button
     if (page.viewportSize()!.width < 1024)
-      await page.getByRole("button", { name: "Preview" }).click();
+      await page.getByRole("button", { name: "Preview", exact: true }).click();
     const cover = page.locator('[data-suite="gubbara"]').first();
     await expect(cover).toContainText("Happy birthday");
     await expect(cover).toContainText("Aarav");

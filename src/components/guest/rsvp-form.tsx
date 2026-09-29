@@ -12,7 +12,8 @@ import {
   Send,
 } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
-import { loadReply, sendReply } from "@/actions/rsvp";
+import { sendReply } from "@/actions/rsvp";
+import { guestReply, knownToken, storeToken } from "@/components/guest/guest-reply";
 import { Button } from "@/components/ui/button";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
@@ -41,24 +42,7 @@ export type RsvpFunction = {
 
 type Choice = { status: ReplyStatus | null; adults: number; children: number };
 
-const STORAGE_PREFIX = "shubhdwar-rsvp:";
 const MAX_PEOPLE = 20;
-
-function storedToken(slug: string): string | null {
-  try {
-    return localStorage.getItem(STORAGE_PREFIX + slug);
-  } catch {
-    return null;
-  }
-}
-
-function storeToken(slug: string, token: string) {
-  try {
-    localStorage.setItem(STORAGE_PREFIX + slug, token);
-  } catch {
-    // Storage blocked: the reply is saved; changing it later needs the same page open
-  }
-}
 
 const statusIcons = {
   attending: <CircleCheck />,
@@ -154,11 +138,10 @@ export function RsvpForm({
 
   // A personal link (?g=) or an earlier reply on this device fills the form back in
   useEffect(() => {
-    const fromLink = new URLSearchParams(window.location.search).get("g");
-    const known = fromLink ?? storedToken(slug);
+    const known = knownToken(slug);
     if (!known) return;
     let cancelled = false;
-    void loadReply(slug, known).then((reply: GuestReply | null) => {
+    void guestReply(slug, known).then((reply: GuestReply | null) => {
       if (cancelled || !reply) return;
       setToken(known);
       setInvitedTo(reply.functionIds);

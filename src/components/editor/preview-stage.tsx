@@ -47,6 +47,8 @@ type PreviewStageProps = {
   onPage: (page: string) => void;
   /** Lets the host edit the shown page's words and placement (Step 12s); left out, view only. */
   update?: StepProps["update"];
+  /** Only the phone showing the page being edited: the floating live preview on phones. */
+  mini?: boolean;
   className?: string;
 };
 
@@ -65,6 +67,7 @@ export function PreviewStage({
   page,
   onPage,
   update,
+  mini = false,
   className,
 }: PreviewStageProps) {
   const { coupleCopy, studioCopy, functionCopy } = useText(editorText);
@@ -143,6 +146,24 @@ export function PreviewStage({
   const { templateId } = draft;
   const { raga } = draft.music;
   const template = useMemo(() => templateWithRaga(templateId, raga), [templateId, raga]);
+
+  if (mini) {
+    return (
+      <PagePreview
+        beats={listed}
+        copy={deferredCopy}
+        template={template}
+        suite={suite}
+        textBox={textBox}
+        type={type}
+        lang={language}
+        page={page}
+        onPage={onPage}
+        list={false}
+        className={className}
+      />
+    );
+  }
 
   return (
     <div

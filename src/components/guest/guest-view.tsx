@@ -7,6 +7,7 @@ import { BrandMark } from "@/components/brand/brand-mark";
 import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import { DiyaCountdown } from "@/components/guest/diya-countdown";
 import { Doorway } from "@/components/guest/doorway";
+import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
@@ -32,8 +33,14 @@ import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
 import { applyPages } from "@/lib/editor/pages";
 import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
-import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
+import {
+  CARD_COUNTDOWN_WORDS,
+  CARD_GREETING_WORDS,
+  CARD_STORY_WORDS,
+  daysAway,
+} from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
+import { cn } from "@/lib/cn";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { couplePagePhotos } from "@/lib/editor/couple-photos";
@@ -104,6 +111,8 @@ export function GuestView({
     [draft.templateId, draft.music.raga],
   );
   const [open, setOpen] = useState(false);
+  // A guest who came by their own link is greeted by name before the invitation opens
+  const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
   const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
@@ -190,6 +199,7 @@ export function GuestView({
             reply={story.reply ?? null}
             music={music}
             musicOnOpen={draft.music.playOnOpen}
+            guest={guestName}
           />
         ) : (
           <>
@@ -206,9 +216,28 @@ export function GuestView({
                     "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
                 }}
               />
-              <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
-                {guestCopy.invited}
-              </p>
+              {guestName ? (
+                <p lang={language} className="flex flex-col items-center gap-1 text-center">
+                  <span
+                    className={cn(
+                      "text-sm text-accent-text",
+                      language === "en" && "font-label tracking-[0.32em] uppercase",
+                    )}
+                  >
+                    {CARD_GREETING_WORDS[language].dear}
+                  </span>
+                  <span className="max-w-[22ch] font-display text-2xl leading-tight break-words text-ink">
+                    {guestName}
+                  </span>
+                  <span className="text-sm text-ink-muted">
+                    {CARD_GREETING_WORDS[language].invited}
+                  </span>
+                </p>
+              ) : (
+                <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
+                  {guestCopy.invited}
+                </p>
+              )}
               <h1
                 id="guest-names"
                 className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
