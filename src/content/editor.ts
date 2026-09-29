@@ -530,8 +530,11 @@ export const studioCopy = {
   card: "Card",
   pagesHint: "The page you're editing comes up here as you type.",
   pageNames: {
+    blessing: "Blessing",
     cover: "Cover",
+    couple: "Photo",
     family: "Family",
+    "family-more": "Family, more",
     invite: "Invitation",
     reply: "Reply",
   },
@@ -567,4 +570,37 @@ export const studioCopy = {
     handwritten: "Handwritten",
   },
   reset: "Back to the theme's lettering",
+} as const;
+
+/** The family section of the names step (Step 12s): parents, blessings and whom to call. */
+export const familyCopy = {
+  heading: "Family",
+  intro:
+    "Parents, blessings and whom guests can call. All optional: what you fill in appears on the family page.",
+  open: "Add family details",
+  sideHeading: (name: string) => `${name}'s family`,
+  sideFallback: { first: "First family", second: "Second family" },
+  relation: "Printed as",
+  relations: { child: "Child of", daughter: "Daughter of", son: "Son of" },
+  parents: "Parents' names",
+  parentsExample: "Smt. Sunita & Shri Ramesh Patel",
+  parentsHint: "Write them as you want them printed, with Shri, Smt. or Late.",
+  town: "Home town",
+  townExample: "Ahmedabad",
+  more: "Blessings and hosts",
+  examples: {
+    blessingsFrom: "Smt. Kamla & Shri Ramprasad Sharma",
+    requesters: "The Sharma family",
+    welcome: "Rahul, Priya and Ankit",
+    children: "Don't miss our chachu's wedding!",
+  },
+  memory: "In loving memory",
+  memoryExample: "Late Shri Mohanlal Patel",
+  memoryHint: "Late relatives whose blessings the family remembers.",
+  contacts: "Whom guests can call",
+  contactName: "Name",
+  contactNameExample: "Ramesh Patel",
+  phone: "Phone",
+  addContact: "Add a number",
+  removeContact: (n: number) => `Remove number ${n}`,
 } as const;

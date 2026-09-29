@@ -87,6 +87,9 @@ export type StoryWords = {
   and: string;
 };
 
+/** The family's labelled blocks one page holds before they spill onto a second. */
+export const FAMILY_PER_PAGE = 3;
+
 /** Each line after the first waits this long before it rises in. */
 export const LINE_STAGGER = 0.45;
 /** How long a line takes to arrive. */
@@ -176,13 +179,15 @@ export function storyBeats({
   }
 
   // The family page: who invites, their words, and the day itself
-  const blessings = [
-    ...line(copy.families, "small"),
-    ...family.flatMap((block) => [
+  const lines = (blocks: readonly FamilyLine[]) =>
+    blocks.flatMap((block) => [
       ...line(block.title, "label", block.lang),
       ...line(block.text, "body", block.lang),
-    ]),
-  ];
+    ]);
+  // More than three blocks (blessings, both sides' parents, hosts…) share two pages
+  const half = family.length > FAMILY_PER_PAGE ? Math.ceil(family.length / 2) : family.length;
+  const blessings = [...line(copy.families, "small"), ...lines(family.slice(0, half))];
+  const more = lines(family.slice(half));
   const invite = [
     ...line(copy.line, "body"),
     ...(single || !copy.date
@@ -192,7 +197,12 @@ export function storyBeats({
   ];
   // A family's own blessings fill a page, so the invitation and the day turn to the next
   if (family.length > 0 && invite.length > 0) {
-    beats.push(beat("family", "family", blessings), beat("invite", "family", invite));
+    beats.push(beat("family", "family", blessings));
+    if (more.length > 0) beats.push(beat("family-more", "family", more));
+    beats.push(beat("invite", "family", invite));
+  } else if (family.length > 0) {
+    beats.push(beat("family", "family", blessings));
+    if (more.length > 0) beats.push(beat("family-more", "family", more));
   } else if (blessings.length + invite.length > 0) {
     beats.push(beat("family", "family", [...blessings, ...invite]));
   }

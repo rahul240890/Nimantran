@@ -53,7 +53,7 @@ for (const colorScheme of ["light", "dark"] as const) {
         "Whose tradition should the card follow?",
       );
       await page.getByRole("radio", { name: /Marathi/ }).click();
-      await expect(page.getByRole("heading", { name: "Family wording" })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Ceremony names" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 
@@ -223,17 +223,46 @@ test.describe("invite editor", () => {
     await page.getByRole("radio", { name: /Leave it off/ }).click();
     if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toHaveCount(0);
 
-    await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
     await page.reload();
-    await expect(page.getByRole("textbox", { name: /Hosted by/ })).toHaveValue(
-      "ஐயர் குடும்பத்தினர்",
-    );
     await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
 
     // The tradition's designs lead the list
     await next(page);
     const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
+  });
+
+  test("the family section keeps parents, the tradition's hosts line and whom to call", async ({
+    page,
+  }) => {
+    await page.goto(
+      "/create?quality=2d&category=wedding&tradition=tamil&suite=kayal&template=gopuram",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
+    await page.locator("summary", { hasText: "Add family details" }).click();
+    await expect(page.getByRole("group", { name: "Arjun's family" })).toBeVisible();
+    const arjun = page.getByRole("group", { name: "Arjun's family" });
+    await arjun.getByRole("radio", { name: "Son of" }).click();
+    await arjun.getByRole("textbox", { name: /Parents' names/ }).fill("Smt. Lakshmi & Shri Raman");
+    // The tradition's own heading sits beside the hosts line
+    await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
+    await page.getByRole("button", { name: "Add a number" }).click();
+    await page.getByRole("textbox", { name: "Phone" }).fill("98765 43210");
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+
+    await page.reload();
+    // Filled in, it opens by itself
+    const family = page.getByRole("group", { name: "Arjun's family" });
+    await expect(family.getByRole("textbox", { name: /Parents' names/ })).toHaveValue(
+      "Smt. Lakshmi & Shri Raman",
+    );
+    await expect(family.getByRole("radio", { name: "Son of" })).toBeChecked();
+    await expect(page.getByRole("textbox", { name: /Hosted by/ })).toHaveValue(
+      "ஐயர் குடும்பத்தினர்",
+    );
+    await expect(page.getByRole("textbox", { name: "Phone" })).toHaveValue("98765 43210");
   });
 
   test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {

@@ -550,8 +550,11 @@ export const studioCopy: Translation<typeof en.studioCopy> = {
   card: "कार्ड",
   pagesHint: "आप जो पन्ना भर रहे हैं, वह लिखते-लिखते यहाँ दिखता है।",
   pageNames: {
+    blessing: "आशीर्वाद",
     cover: "मुखपृष्ठ",
+    couple: "फ़ोटो",
     family: "परिवार",
+    "family-more": "परिवार, आगे",
     invite: "निमंत्रण",
     reply: "जवाब",
   },
@@ -587,4 +590,36 @@ export const studioCopy: Translation<typeof en.studioCopy> = {
     handwritten: "हाथ से लिखा",
   },
   reset: "थीम के अक्षर वापस लाएँ",
+};
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  heading: "परिवार",
+  intro:
+    "माता-पिता, आशीर्वाद और मेहमान किसे फ़ोन करें। सब वैकल्पिक है: जो भरेंगे वह परिवार वाले पन्ने पर दिखेगा।",
+  open: "परिवार की जानकारी जोड़ें",
+  sideHeading: (name) => `${name} का परिवार`,
+  sideFallback: { first: "पहला परिवार", second: "दूसरा परिवार" },
+  relation: "कार्ड पर ऐसे छपेगा",
+  relations: { child: "संतान", daughter: "सुपुत्री", son: "सुपुत्र" },
+  parents: "माता-पिता के नाम",
+  parentsExample: "श्रीमती सुनीता एवं श्री रमेश पटेल",
+  parentsHint: "जैसे छपवाना चाहें वैसे लिखें, श्री, श्रीमती या स्व. के साथ।",
+  town: "शहर या गाँव",
+  townExample: "अहमदाबाद",
+  more: "आशीर्वाद और निमंत्रक",
+  examples: {
+    blessingsFrom: "श्रीमती कमला देवी एवं श्री रामप्रसाद शर्मा",
+    requesters: "समस्त शर्मा परिवार",
+    welcome: "राहुल, प्रिया, अंकित",
+    children: "मेरे चाचू की शादी में ज़रूर आना",
+  },
+  memory: "पुण्य स्मृति",
+  memoryExample: "स्व. श्री मोहनलाल पटेल",
+  memoryHint: "दिवंगत परिजन जिनका आशीर्वाद परिवार याद करता है।",
+  contacts: "मेहमान किसे फ़ोन करें",
+  contactName: "नाम",
+  contactNameExample: "रमेश पटेल",
+  phone: "फ़ोन",
+  addContact: "नंबर जोड़ें",
+  removeContact: (n) => `नंबर ${n} हटाएँ`,
 };

@@ -25,7 +25,6 @@ import {
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
-import { WORDING_IDS } from "@/lib/traditions/schema";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import { pageType } from "@/lib/editor/type";
@@ -123,7 +122,7 @@ export function GuestView({
         })),
         replies,
         words: CARD_STORY_WORDS[language],
-        family: storyFamily(draft),
+        family: storyFamily(draft, language),
         couple: couplePagePhotos(
           draft.couplePhotos,
           photos.map((photo) => photo.id),
@@ -149,14 +148,8 @@ export function GuestView({
   const music = useRagaMusic(template);
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
-  const pack = draftTradition(draft);
-  const family = pack
-    ? WORDING_IDS.flatMap((id) => {
-        const text = draft.tradition.wording[id]?.trim();
-        const block = pack.wording[id];
-        return text && block ? [{ id, title: block.title, text }] : [];
-      })
-    : [];
+  // The family's blocks in the language the guest is reading
+  const family = storyFamily(draft, language);
   const rsvp =
     rsvpFunctions.length > 0 ? (
       <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} />
@@ -269,14 +262,14 @@ export function GuestView({
             }
             photos={photos}
             family={family}
-            familyLang={pack?.language}
+            familyLang={language}
             allIcsUrl={allIcsUrl}
             music={music}
             reply={rsvp}
           />
         ) : (
           <>
-            <FamilyWording draft={draft} />
+            <FamilyWording family={family} lang={language} />
 
             <section
               aria-labelledby="guest-functions"
@@ -379,25 +372,24 @@ export function GuestView({
   );
 }
 
-/** The tradition's labelled wording (blessings, hosts, the children's line), when written. */
-function FamilyWording({ draft }: { draft: InviteDraft }) {
+/** The family's labelled wording (blessings, parents, hosts, whom to call), when written. */
+function FamilyWording({
+  family,
+  lang,
+}: {
+  family: readonly { id: string; title: string; text: string }[];
+  lang: string;
+}) {
   const { guestCopy } = useText(publishText);
-  const pack = draftTradition(draft);
-  if (!pack) return null;
-  const blocks = WORDING_IDS.flatMap((id) => {
-    const text = draft.tradition.wording[id]?.trim();
-    const block = pack.wording[id];
-    return text && block ? [{ id, title: block.title, text }] : [];
-  });
-  if (blocks.length === 0) return null;
+  if (family.length === 0) return null;
   return (
     <section aria-labelledby="guest-family" className="px-4 pb-12 sm:px-6">
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl border border-line bg-surface px-5 py-8 text-center shadow-raised sm:px-10">
         <h2 id="guest-family" className="font-display text-2xl leading-tight">
           {guestCopy.family}
         </h2>
-        <dl lang={pack.language} className="grid w-full gap-5 sm:grid-cols-2">
-          {blocks.map((block) => (
+        <dl lang={lang} className="grid w-full gap-5 sm:grid-cols-2">
+          {family.map((block) => (
             <div key={block.id} className="flex flex-col gap-1">
               <dt className="text-sm text-accent-text">{block.title}</dt>
               <dd className="text-lg break-words">{block.text}</dd>

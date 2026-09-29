@@ -79,7 +79,7 @@ export function VideoCard(props: VideoCardProps) {
       functions: cardFunctions(functions, draft, language),
       replies: false,
       words: CARD_STORY_WORDS[language],
-      family: storyFamily(draft),
+      family: storyFamily(draft, language),
       couple: couplePagePhotos(
         draft.couplePhotos,
         photos.map((photo) => photo.id),

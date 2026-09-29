@@ -74,7 +74,7 @@ export function PreviewStage({
   const functionsKey = JSON.stringify(
     cardFunctions(storyFunctions(draft, locale), draft, language),
   );
-  const familyKey = JSON.stringify(storyFamily(draft));
+  const familyKey = JSON.stringify(storyFamily(draft, language));
   const suite = draftSuite(draft);
   const { textBox } = draft;
   const typeKey = JSON.stringify(pageType(draft.type, [language]));

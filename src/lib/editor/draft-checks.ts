@@ -2,6 +2,16 @@ import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { defaultType, typeSchema } from "./type";
+import {
+  CONTACT_NAME_MAX,
+  FAMILY_MAX,
+  MAX_CONTACTS,
+  PHONE_MAX,
+  RELATIONS,
+  TOWN_MAX,
+  noFamily,
+  noSide,
+} from "./family";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
@@ -73,6 +83,25 @@ const traditionSchema = z.object({
 });
 export type DraftTradition = z.infer<typeof traditionSchema>;
 
+const sideSchema = z.object({
+  relation: z.enum(RELATIONS).catch("child"),
+  parents: z.string().max(FAMILY_MAX).catch(""),
+  town: z.string().max(TOWN_MAX).catch(""),
+});
+const contactSchema = z.object({
+  name: z.string().max(CONTACT_NAME_MAX).catch(""),
+  phone: z.string().max(PHONE_MAX).catch(""),
+});
+const familySchema = z.object({
+  first: sideSchema.catch(noSide),
+  second: sideSchema.catch(noSide),
+  memory: z.string().max(FAMILY_MAX).catch(""),
+  contacts: z
+    .array(contactSchema.catch({ name: "", phone: "" }))
+    .max(MAX_CONTACTS)
+    .catch([]),
+});
+
 /** Saved drafts are read leniently: a bad field falls back to its default, never the whole draft. */
 export const draftSchema = z.object({
   version: z.literal(1),
@@ -124,6 +153,8 @@ export const draftSchema = z.object({
   couplePhotos: couplePhotosSchema.catch(noCouplePhotos),
   /** Open with the theme's painted god, where it has one (Step 12r). */
   blessingPage: z.boolean().catch(true),
+  /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
+  family: familySchema.catch(noFamily),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 
