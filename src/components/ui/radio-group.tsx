@@ -90,7 +90,8 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
         value={value}
         disabled={disabled}
         className={cn(
-          "group/radio flex min-h-12 min-w-0 flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-transparent px-2 py-1.5 text-center text-sm leading-tight font-semibold text-ink-muted",
+          // On the narrowest phones the icon sits above the word, so words never break apart
+          "group/radio flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-md border border-transparent px-1 py-1.5 text-center text-sm leading-tight font-semibold text-ink-muted min-[400px]:flex-row min-[400px]:gap-1.5 min-[400px]:px-2",
           "transition-[background-color,border-color,color,box-shadow] duration-200",
           "hover:bg-surface hover:text-ink",
           "data-[state=checked]:border-marigold data-[state=checked]:bg-[color-mix(in_srgb,var(--marigold)_16%,var(--surface))] data-[state=checked]:text-ink data-[state=checked]:shadow-raised",
@@ -105,7 +106,7 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
             {icon}
           </span>
         ) : null}
-        <span className="min-w-0 break-words">{label}</span>
+        <span className="min-w-0">{label}</span>
       </RadioPrimitive.Item>
     );
   }
