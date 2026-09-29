@@ -182,7 +182,7 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("checkbox", { name: /Wedding/ })).not.toBeChecked();
     // The card announces the roka in the occasion's own words (in a sheet on phones)
     if (page.viewportSize()!.width < 1024) {
-      await page.getByRole("button", { name: "Preview" }).click();
+      await page.getByRole("button", { name: "Preview", exact: true }).click();
     }
     await page.getByRole("button", { name: "Card", exact: true }).click();
     const card = page.locator("[data-engine-state]");
@@ -273,7 +273,7 @@ test.describe("invite editor", () => {
     await page.getByRole("textbox", { name: /First name/ }).fill("Meera");
     await page.getByRole("textbox", { name: /Second name/ }).fill("Kabir");
     const wide = page.viewportSize()!.width >= 1024;
-    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+    if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
 
     await page.getByRole("button", { name: "Edit this page" }).click();
     const dialog = page.getByRole("dialog", { name: "The Cover page" });
@@ -288,7 +288,7 @@ test.describe("invite editor", () => {
     await dialog.getByRole("button", { name: "Done" }).click();
 
     await page.reload();
-    if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+    if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
     await page.getByRole("button", { name: "Edit this page" }).click();
     const again = page.getByRole("dialog", { name: "The Cover page" });
     await expect(again.getByRole("textbox", { name: /^Line \d+$/ }).last()).toHaveValue(
@@ -315,7 +315,7 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
     const wide = page.viewportSize()!.width >= 1024;
     const showPhone = async () => {
-      if (!wide) await page.getByRole("button", { name: "Preview" }).click();
+      if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
     };
     const hidePhone = async () => {
       if (!wide) await page.keyboard.press("Escape");

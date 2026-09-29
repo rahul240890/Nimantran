@@ -20,13 +20,14 @@ const deckTheme = (page: Page) =>
     pressed: true,
   });
 
-/** Brings a theme to the front: its dot on wider screens, the arrows on a phone. */
+/** Brings a theme to the front: its dot when it is in the row on wider screens, else the arrows. */
 async function showTheme(page: Page, name: string) {
-  if (page.viewportSize()!.width >= 640) {
-    await page.getByRole("button", { name: `Show ${name}` }).click();
+  const dot = page.getByRole("button", { name: `Show ${name}` });
+  if (page.viewportSize()!.width >= 640 && (await dot.count())) {
+    await dot.click();
     return;
   }
-  for (let turns = 0; turns < 12; turns++) {
+  for (let turns = 0; turns < 30; turns++) {
     if ((await deckTheme(page).getAttribute("aria-label")) === `Show ${name}`) return;
     await page.getByRole("button", { name: "Next theme" }).click();
   }
@@ -93,6 +94,18 @@ test.describe("landing page", () => {
       .getByRole("listitem")
       .evaluateAll((items) => new Set(items.map((item) => item.getBoundingClientRect().top)).size);
     expect(tops).toBe(1);
+  });
+
+  test("at most seven theme dots show, and the front card sits in the middle", async ({ page }) => {
+    await visit(page);
+    const dots = page
+      .getByRole("list", { name: "Painted invitation themes" })
+      .getByRole("listitem");
+    await expect(dots).toHaveCount(7);
+    const front = page.locator("[data-deck-live] [data-front]");
+    const box = (await front.boundingBox())!;
+    const width = page.viewportSize()!.width;
+    if (width < 1024) expect(Math.abs(box.x + box.width / 2 - width / 2)).toBeLessThan(4);
   });
 
   test("still mode never turns the deck by itself", async ({ page }) => {

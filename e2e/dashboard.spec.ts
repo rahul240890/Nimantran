@@ -66,6 +66,9 @@ test.describe("host dashboard", () => {
     });
     const guest = await guestContext.newPage();
     await guest.goto(`${new URL(personal).pathname}${new URL(personal).search}&quality=2d`);
+    // Her own link greets her by name before the invitation opens
+    const greeting = guest.locator("#main p").filter({ hasText: /^Dear/ }).first();
+    await expect(greeting).toContainText("Nani");
     const form = guest.locator("#rsvp");
     await form.getByRole("textbox", { name: /Your name/ }).fill("Nani ji");
     await form.getByRole("button", { name: "Coming to everything" }).click();

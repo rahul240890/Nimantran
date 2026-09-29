@@ -10,6 +10,8 @@ import {
   Eye,
   HardDrive,
   LoaderCircle,
+  Smartphone,
+  X,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -38,6 +40,7 @@ import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites
 import type { SuiteId } from "@/lib/suites/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { TemplateId } from "@/lib/templates/schema";
+import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PublishButton } from "@/components/publish/publish-button";
@@ -57,6 +60,42 @@ import { publishText } from "@/i18n/copy/publish";
 import { uiText } from "@/i18n/copy/ui";
 
 const WIDE = "(min-width: 64rem)";
+
+/** The steps where words are typed, which get the floating live preview on phones. */
+const MINI_STEPS = new Set<EditorStep>(["couple", "functions", "extras"]);
+const MINI_HIDDEN_KEY = "shubhdwar-editor-mini-hidden";
+
+/** Whether the floating preview is hidden, remembered on this device. */
+const miniStore = (() => {
+  const listeners = new Set<() => void>();
+  // Kept here too, so hiding still works for the visit when storage is blocked
+  let hidden: boolean | null = null;
+  return {
+    subscribe(listener: () => void) {
+      listeners.add(listener);
+      return () => void listeners.delete(listener);
+    },
+    get(): boolean {
+      if (hidden === null) {
+        try {
+          hidden = localStorage.getItem(MINI_HIDDEN_KEY) === "1";
+        } catch {
+          hidden = false;
+        }
+      }
+      return hidden;
+    },
+    set(next: boolean) {
+      hidden = next;
+      try {
+        localStorage.setItem(MINI_HIDDEN_KEY, next ? "1" : "0");
+      } catch {
+        // Storage blocked: it stays as chosen for this visit
+      }
+      listeners.forEach((listener) => listener());
+    },
+  };
+})();
 
 /** The card opens on the steps where the host is writing what's inside it. */
 const opensOn: Record<EditorStep, boolean> = {
@@ -184,6 +223,10 @@ export function Editor({
   const [cardOpen, setCardOpen] = useState(opensOn[step]);
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
+  const [sheet, setSheet] = useState(false);
+  const miniHidden = useSyncExternalStore(miniStore.subscribe, miniStore.get, () => false);
+  const mini = !wide && MINI_STEPS.has(step) && !sheet;
+  const miniShown = mini && !miniHidden;
   const errors = checking === step ? stepErrors(draft, step) : {};
   const errorCount = Object.keys(errors).length;
 
@@ -344,8 +387,9 @@ export function Editor({
 
   const props = { draft, update, errors, goTo };
   const copy = stepCopy[step];
-  const preview = (className: string) => (
+  const preview = (className: string, mini = false) => (
     <PreviewStage
+      mini={mini}
       draft={draft}
       quality={quality}
       open={cardOpen}
@@ -383,17 +427,26 @@ export function Editor({
       </header>
 
       <main className="mx-auto flex w-full max-w-[90rem] flex-1 flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        <Stepper
-          steps={EDITOR_STEPS.map((id) => ({ id, label: stepCopy[id].label }))}
-          current={index}
-          label={editor.progressLabel}
-          progressText={editor.progress(index + 1, EDITOR_STEPS.length)}
-          doneLabel={editor.done}
-        />
+        {/* On phones the floating preview sits beside the progress and the step's title */}
+        <div className={cn(miniShown && "max-lg:pe-[6.5rem]")}>
+          <Stepper
+            steps={EDITOR_STEPS.map((id) => ({ id, label: stepCopy[id].label }))}
+            current={index}
+            label={editor.progressLabel}
+            progressText={editor.progress(index + 1, EDITOR_STEPS.length)}
+            doneLabel={editor.done}
+          />
+        </div>
 
         <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
           <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
-            <div key={step} className="flex animate-rise flex-col gap-2 pb-6">
+            <div
+              key={step}
+              className={cn(
+                "flex animate-rise flex-col gap-2 pb-6",
+                miniShown && "max-lg:pe-[6.5rem]",
+              )}
+            >
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {copy.eyebrow}
               </p>
@@ -470,7 +523,7 @@ export function Editor({
                 ) : null}
                 <div className="ms-auto flex min-w-0 items-center gap-2 sm:gap-3">
                   {!wide && !last && (
-                    <Sheet>
+                    <Sheet open={sheet} onOpenChange={setSheet}>
                       <SheetTrigger asChild>
                         <Button
                           variant="ghost"
@@ -517,6 +570,47 @@ export function Editor({
               </div>
             </form>
           </div>
+
+          {/*
+            Phones: while the words are being typed, a small live phone floats at the top
+            corner showing the page being edited; tapping it opens the preview large
+          */}
+          {mini && (
+            <div className="fixed end-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-30 animate-fade-in lg:hidden">
+              {miniHidden ? (
+                <button
+                  type="button"
+                  aria-label={editor.showLivePreview}
+                  onClick={() => miniStore.set(false)}
+                  className="grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <Smartphone aria-hidden className="size-5" />
+                </button>
+              ) : (
+                <div className="relative">
+                  <button
+                    type="button"
+                    aria-label={editor.livePreview}
+                    onClick={() => setSheet(true)}
+                    className="block h-[11.4rem] w-[5.4rem] cursor-pointer overflow-hidden rounded-[1rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    {/* A guest-sized phone, shrunk, so the words wrap as they will for guests */}
+                    <span className="block h-[25.35rem] w-48 origin-top-left scale-[0.45]">
+                      {preview("h-full", true)}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={editor.hideLivePreview}
+                    onClick={() => miniStore.set(true)}
+                    className="absolute -start-2.5 -top-2.5 grid size-7 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised before:absolute before:-inset-2 before:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                  >
+                    <X aria-hidden className="size-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Desktop: the card stays beside the form, live */}
           <aside

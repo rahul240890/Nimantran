@@ -19,7 +19,7 @@ import { SUITES, paintedTone, type SuiteId } from "@/lib/suites/catalog";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
-import { CARD_COUNTDOWN_WORDS, daysAway } from "@/lib/templates/story-words";
+import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
 import { daysBetween } from "@/lib/publish/countdown";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
@@ -111,6 +111,30 @@ function Countdown({
   );
 }
 
+/** "Dear Sharma family", in the card's language, for a guest who came by their own link. */
+function GuestGreeting({ name, lang }: { name: string; lang: CardLanguage }) {
+  const words = CARD_GREETING_WORDS[lang];
+  return (
+    <p
+      lang={lang}
+      className="flex max-w-full animate-[pop-in_900ms_ease-out_both] flex-col items-center gap-1 text-center text-card-ivory motion-still:animate-none"
+    >
+      <span
+        className={cn(
+          "text-sm text-card-ivory/85",
+          lang === "en" && "font-label tracking-[0.24em] uppercase",
+        )}
+      >
+        {words.dear}
+      </span>
+      <span className="max-w-[20ch] font-display text-[clamp(1.6rem,8vw,2.4rem)] leading-tight break-words">
+        {name}
+      </span>
+      <span className="text-sm text-card-ivory/85">{words.invited}</span>
+    </p>
+  );
+}
+
 /**
  * The guest's first screen for a painted theme (Step 12o): the theme's cover painting as a
  * doorway, the couple's names printed on it in the card's language, and a countdown to the
@@ -131,6 +155,7 @@ export function Doorway({
   reply,
   music,
   musicOnOpen,
+  guest,
 }: {
   suite: SuiteId;
   template: Template;
@@ -147,6 +172,8 @@ export function Doorway({
   /** The page's music, shared with the player further down. */
   music: RagaMusic;
   musicOnOpen: boolean;
+  /** The guest's name when they came by their own link: the doorway greets them first. */
+  guest: string | null;
 }) {
   const { guestCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
@@ -325,6 +352,7 @@ export function Doorway({
 
           {/* The countdown and the way in, over the painting's ground */}
           <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 bg-linear-to-t from-night/90 via-night/60 to-transparent px-4 pt-20 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+            {guest && <GuestGreeting name={guest} lang={lang} />}
             {main && (
               <Countdown
                 target={main.at}
