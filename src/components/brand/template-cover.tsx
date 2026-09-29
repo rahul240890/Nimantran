@@ -1,27 +1,68 @@
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { MOTIFS } from "@/components/invitation/art/motifs";
 import { templates, type TemplateId } from "@/content/landing";
+import { templates as templatesHi } from "@/content/hi/landing";
+import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
+import { CARD_SAMPLES } from "@/lib/templates/story-words";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
 import { Mandala } from "./mandala";
 
-const s = templates.sample;
+/**
+ * The sample words on each cover. A Hindi page shows Hindi samples, and a card in one
+ * language shows only that language, so the small headings change too.
+ */
+type Words = {
+  sample: { first: string; second: string; date: string; place: string };
+  and: string;
+  rose: { eyebrow: string; and: string };
+  marigold: string;
+  emerald: string;
+  scroll: { eyebrow: string; and: string };
+  kasavu: string;
+  /** The cover's small heading on motif designs; null keeps the design's own. */
+  doors: string | null;
+};
+
+const WORDS: Record<UiLocale, Words> = {
+  en: {
+    sample: templates.sample,
+    and: "&",
+    rose: { eyebrow: "WITH LOVE", and: "and" },
+    marigold: "SHUBH VIVAH",
+    emerald: "THE WEDDING OF",
+    scroll: { eyebrow: "SHRI GANESHAYA NAMAH", and: "weds" },
+    kasavu: "KALYANAM",
+    doors: null,
+  },
+  hi: {
+    sample: { ...templatesHi.sample, date: "12 दिसंबर 2026" },
+    and: CARD_SAMPLES.hi.joiner!,
+    rose: { eyebrow: "प्रेम सहित", and: CARD_SAMPLES.hi.joiner! },
+    marigold: "शुभ विवाह",
+    emerald: "शुभ विवाह",
+    scroll: { eyebrow: "श्री गणेशाय नमः", and: CARD_SAMPLES.hi.joiner! },
+    kasavu: "शुभ विवाह",
+    doors: `${CARD_SAMPLES.hi.doorLeft} ${CARD_SAMPLES.hi.doorRight}`,
+  },
+};
 
 /* Every cover uses container units, so it scales with the card it sits in */
 
-function MarigoldGate() {
+function MarigoldGate({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-card-ivory text-center text-card-ink">
       <span className="absolute inset-[4%] rounded-[4px] border-2 border-card-gold" />
       <span className="absolute inset-[6.5%] rounded-[2px] border border-card-gold/60" />
       <Mandala className="absolute top-[9%] left-1/2 w-[30%] -translate-x-1/2 text-card-gold" />
       <span className="relative mt-[30%] font-label text-[4cqw] tracking-[0.3em] text-card-gold-text">
-        SHUBH VIVAH
+        {w.marigold}
       </span>
       <span className="relative mt-[4%] font-display text-[12cqw] leading-none">{s.first}</span>
       <span className="relative font-display text-[7cqw] leading-none text-card-accent-text">
-        &amp;
+        {w.and}
       </span>
       <span className="relative font-display text-[12cqw] leading-none">{s.second}</span>
       <span className="relative mt-[6%] font-label text-[4.2cqw] tracking-[0.14em]">{s.date}</span>
@@ -29,7 +70,8 @@ function MarigoldGate() {
   );
 }
 
-function RoseGarden() {
+function RoseGarden({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-rose-paper text-center text-tpl-rose-ink">
       {/* Rose buds climbing the corners */}
@@ -66,13 +108,13 @@ function RoseGarden() {
         </svg>
       ))}
       <span className="relative font-label text-[4cqw] tracking-[0.3em] text-tpl-rose-accent">
-        WITH LOVE
+        {w.rose.eyebrow}
       </span>
       <span className="relative mt-[5%] font-display text-[13cqw] leading-none italic">
         {s.first}
       </span>
       <span className="relative my-[2%] font-display text-[6cqw] leading-none text-tpl-rose-accent">
-        and
+        {w.rose.and}
       </span>
       <span className="relative font-display text-[13cqw] leading-none italic">{s.second}</span>
       <span className="relative mt-[7%] text-[4.4cqw]">{s.date}</span>
@@ -80,7 +122,8 @@ function RoseGarden() {
   );
 }
 
-function EmeraldPalace() {
+function EmeraldPalace({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-end bg-tpl-emerald-paper pb-[14%] text-center text-tpl-emerald-ink">
       {/* A palace arch framing the names */}
@@ -108,11 +151,11 @@ function EmeraldPalace() {
         className="absolute top-[15%] left-1/2 w-[18%] -translate-x-1/2 text-tpl-emerald-ornament"
       />
       <span className="relative font-label text-[4cqw] tracking-[0.3em] text-tpl-emerald-accent">
-        THE WEDDING OF
+        {w.emerald}
       </span>
       <span className="relative mt-[5%] font-display text-[12.5cqw] leading-none">{s.first}</span>
       <span className="relative font-display text-[6cqw] leading-none text-tpl-emerald-accent">
-        &amp;
+        {w.and}
       </span>
       <span className="relative font-display text-[12.5cqw] leading-none">{s.second}</span>
       <span className="relative mt-[6%] font-label text-[4cqw] tracking-[0.16em] text-tpl-emerald-accent">
@@ -122,7 +165,8 @@ function EmeraldPalace() {
   );
 }
 
-function RoyalScroll() {
+function RoyalScroll({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-scroll-paper px-[12%] text-center text-tpl-scroll-ink">
       {/* Wooden rods at the top and bottom of the scroll */}
@@ -136,11 +180,11 @@ function RoyalScroll() {
       ))}
       <span className="absolute inset-x-[8%] top-[8%] bottom-[8%] border-x border-tpl-scroll-ornament/40" />
       <span className="relative font-label text-[4cqw] tracking-[0.3em] text-tpl-scroll-accent">
-        SHRI GANESHAYA NAMAH
+        {w.scroll.eyebrow}
       </span>
       <span className="relative mt-[8%] font-display text-[12cqw] leading-none">{s.first}</span>
       <span className="relative font-display text-[6cqw] leading-none text-tpl-scroll-accent">
-        weds
+        {w.scroll.and}
       </span>
       <span className="relative font-display text-[12cqw] leading-none">{s.second}</span>
       <span className="relative mt-[8%] h-px w-[40%] bg-tpl-scroll-ornament/60" />
@@ -149,7 +193,8 @@ function RoyalScroll() {
   );
 }
 
-function MinimalMonogram() {
+function MinimalMonogram({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-monogram-paper text-center text-tpl-monogram-ink">
       <span className="absolute inset-[7%] border border-tpl-monogram-ornament" />
@@ -159,14 +204,15 @@ function MinimalMonogram() {
         {s.second.charAt(0)}
       </span>
       <span className="relative mt-[10%] font-label text-[4.2cqw] tracking-[0.34em]">
-        {`${s.first} & ${s.second}`.toUpperCase()}
+        {`${s.first} ${w.and} ${s.second}`.toUpperCase()}
       </span>
       <span className="relative mt-[4%] text-[4.2cqw] text-tpl-monogram-accent">{s.date}</span>
     </div>
   );
 }
 
-function KeralaKasavu() {
+function KeralaKasavu({ w }: { w: Words }) {
+  const s = w.sample;
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-kasavu-paper text-center text-tpl-kasavu-ink">
       {/* The gold kasavu border of a Kerala saree, woven along both edges */}
@@ -187,11 +233,11 @@ function KeralaKasavu() {
         </span>
       ))}
       <span className="relative font-label text-[4cqw] tracking-[0.3em] text-tpl-kasavu-accent">
-        KALYANAM
+        {w.kasavu}
       </span>
       <span className="relative mt-[6%] font-display text-[12cqw] leading-none">{s.first}</span>
       <span className="relative font-display text-[6cqw] leading-none text-tpl-kasavu-accent">
-        &amp;
+        {w.and}
       </span>
       <span className="relative font-display text-[12cqw] leading-none">{s.second}</span>
       <span className="relative mt-[7%] font-label text-[4cqw] tracking-[0.14em]">{s.date}</span>
@@ -201,11 +247,12 @@ function KeralaKasavu() {
 
 /** A cover drawn from the design's own ornament data, for designs that carry one. */
 function motifCover(id: TemplateId) {
-  function MotifCover() {
+  function MotifCover({ w }: { w: Words }) {
+    const s = w.sample;
     const template = TEMPLATES[id];
     const cover = MOTIFS[template.scene.motif].cover!;
     const sample = (slot: string) => template.slots.find((item) => item.id === slot)?.sample ?? "";
-    const eyebrow = [sample("doorLeft"), sample("doorRight")].filter(Boolean).join(" ");
+    const eyebrow = w.doors ?? [sample("doorLeft"), sample("doorRight")].filter(Boolean).join(" ");
     return (
       <div
         className="absolute inset-0"
@@ -238,7 +285,7 @@ function motifCover(id: TemplateId) {
             className="font-display text-[6.5cqw] leading-none"
             style={{ color: "var(--card-accent-text)" }}
           >
-            &amp;
+            {w.and}
           </span>
           <span className="font-display text-[11cqw] leading-none">{s.second}</span>
           <span className="mt-[6%] font-label text-[4cqw] tracking-[0.14em]">{s.date}</span>
@@ -249,7 +296,7 @@ function motifCover(id: TemplateId) {
   return MotifCover;
 }
 
-const covers: Record<TemplateId, () => React.JSX.Element> = {
+const covers: Record<TemplateId, (props: { w: Words }) => React.JSX.Element> = {
   marigold: MarigoldGate,
   rose: RoseGarden,
   emerald: EmeraldPalace,
@@ -264,18 +311,30 @@ const covers: Record<TemplateId, () => React.JSX.Element> = {
   phulkari: motifCover("phulkari"),
 };
 
-/** A flat preview of a design, drawn on its own card stock. Decorative: name it nearby. */
-export function TemplateCover({ id, className }: { id: TemplateId; className?: string }) {
+/**
+ * A flat preview of a design, drawn on its own card stock, with sample words in the
+ * page's language. Decorative: name it nearby.
+ */
+export function TemplateCover({
+  id,
+  locale = "en",
+  className,
+}: {
+  id: TemplateId;
+  locale?: UiLocale;
+  className?: string;
+}) {
   const Cover = covers[id];
   return (
     <div
       aria-hidden
+      lang={locale}
       className={cn(
         "[container-type:inline-size] relative aspect-[4/5] w-full overflow-hidden rounded-md shadow-float",
         className,
       )}
     >
-      <Cover />
+      <Cover w={WORDS[locale]} />
     </div>
   );
 }

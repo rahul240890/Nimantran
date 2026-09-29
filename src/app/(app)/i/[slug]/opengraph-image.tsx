@@ -1,9 +1,13 @@
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { draftCopy, draftTemplate } from "@/lib/editor/draft";
 import { initialOf } from "@/lib/templates/content";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
+import { draftSuite } from "@/lib/publish/story";
+import { suitePreview } from "@/lib/suites/catalog";
 import { site } from "@/lib/site";
 
 export const alt = "The invitation's cover";
@@ -53,6 +57,8 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const when = inviteWhen(draft);
   const where = inviteWhere(draft);
   const monogram = [copy.first, copy.second].filter(Boolean).map(initialOf).join(" · ");
+  // A painted theme shows its own cover painting, the first thing guests will open
+  const painting = await paintedCover(draftSuite(draft));
 
   return new ImageResponse(
     <div
@@ -86,64 +92,91 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         )}
       </div>
 
-      <div
-        style={{
-          width: 330,
-          height: 440,
-          display: "flex",
-          padding: 12,
-          background: paper,
-          borderRadius: 12,
-          boxShadow: "0 30px 60px rgba(0,0,0,0.35)",
-        }}
-      >
+      {painting ? (
+        <img
+          src={painting}
+          alt=""
+          width={318}
+          height={566}
+          style={{
+            borderRadius: 18,
+            border: `4px solid ${gold}`,
+            boxShadow: "0 30px 60px rgba(0,0,0,0.4)",
+            objectFit: "cover",
+          }}
+        />
+      ) : (
         <div
           style={{
-            flex: 1,
+            width: 330,
+            height: 440,
             display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 18,
-            border: `3px solid ${gold}`,
-            borderRadius: 6,
-            color: ink,
+            padding: 12,
+            background: paper,
+            borderRadius: 12,
+            boxShadow: "0 30px 60px rgba(0,0,0,0.35)",
           }}
         >
-          {copy.doors[0] && (
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 18,
+              border: `3px solid ${gold}`,
+              borderRadius: 6,
+              color: ink,
+            }}
+          >
+            {copy.doors[0] && (
+              <div
+                style={{
+                  fontFamily: "Tenor Sans",
+                  fontSize: 22,
+                  letterSpacing: 6,
+                  color: accentText,
+                }}
+              >
+                {`${copy.doors[0]} ${copy.doors[1]}`.trim().toUpperCase()}
+              </div>
+            )}
             <div
               style={{
-                fontFamily: "Tenor Sans",
-                fontSize: 22,
-                letterSpacing: 6,
+                width: 150,
+                height: 150,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 999,
+                border: `3px solid ${gold}`,
+                fontFamily: "Rozha One",
+                fontSize: monogram.length > 5 ? 44 : 60,
                 color: accentText,
               }}
             >
-              {`${copy.doors[0]} ${copy.doors[1]}`.trim().toUpperCase()}
+              {monogram}
             </div>
-          )}
-          <div
-            style={{
-              width: 150,
-              height: 150,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 999,
-              border: `3px solid ${gold}`,
-              fontFamily: "Rozha One",
-              fontSize: monogram.length > 5 ? 44 : 60,
-              color: accentText,
-            }}
-          >
-            {monogram}
-          </div>
-          <div style={{ fontFamily: "Tenor Sans", fontSize: 18, letterSpacing: 4, color: gold }}>
-            {site.name.toUpperCase()}
+            <div style={{ fontFamily: "Tenor Sans", fontSize: 18, letterSpacing: 4, color: gold }}>
+              {site.name.toUpperCase()}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>,
     { ...size, fonts },
   );
+}
+
+/** The theme's cover as a data URL, or null for the card-colours theme. */
+async function paintedCover(suite: Parameters<typeof suitePreview>[0]): Promise<string | null> {
+  const path = suitePreview(suite);
+  if (!path) return null;
+  try {
+    const file = await readFile(join(process.cwd(), "public", path));
+    return `data:image/jpeg;base64,${file.toString("base64")}`;
+  } catch {
+    return null;
+  }
 }

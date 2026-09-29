@@ -4,7 +4,16 @@ import { describe, expect, it } from "vitest";
 import { FUNCTION_IDS } from "@/lib/events/functions";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
-import { MOODS, PAGE_ARTS, SUITES, SUITE_IDS, pageLook, suiteFor, type PageArt } from "./catalog";
+import {
+  MOODS,
+  PAGE_ARTS,
+  SUITES,
+  SUITE_IDS,
+  pageLook,
+  suiteFor,
+  suitePreview,
+  type PageArt,
+} from "./catalog";
 import { DEFAULT_AREA, textArea } from "./areas";
 
 describe("event suites", () => {
@@ -71,6 +80,20 @@ describe("text areas", () => {
         expect(100 - area.top - area.bottom, `${id} ${art}`).toBeGreaterThanOrEqual(24);
         expect(100 - area.left - area.right, `${id} ${art}`).toBeGreaterThanOrEqual(60);
       }
+    }
+  });
+});
+
+describe("link previews", () => {
+  it("have a JPEG copy of every painted cover (run scripts/suite-previews.mjs)", () => {
+    for (const suite of SUITE_IDS) {
+      const preview = suitePreview(suite);
+      if (!SUITES[suite].images.cover) {
+        expect(preview).toBeNull();
+        continue;
+      }
+      expect(preview).toMatch(/\/preview\.jpg$/);
+      expect(existsSync(join(process.cwd(), "public", preview!))).toBe(true);
     }
   });
 });

@@ -34,7 +34,7 @@ export async function sendCode(input: string): Promise<SendCodeResult> {
 }
 
 export type VerifyCodeResult =
-  | { status: "signed-in"; name: string; next: string }
+  | { status: "signed-in"; name: string; language: Account["language"]; next: string }
   | { status: "invalid" }
   | { status: "failed"; error: AuthFailure };
 
@@ -47,7 +47,12 @@ export async function verifyCode(
   if ("error" in phone || !isOtp(String(code ?? ""))) return { status: "invalid" };
   const result = await verifyPhoneCode(phone.phone, code);
   if (!result.ok) return { status: "failed", error: result.error };
-  return { status: "signed-in", name: result.value.name, next: safeNext(next) };
+  return {
+    status: "signed-in",
+    name: result.value.name,
+    language: result.value.language,
+    next: safeNext(next),
+  };
 }
 
 /** The address to send the browser to for Google. */

@@ -345,7 +345,7 @@ export function RsvpForm({
             <li
               key={fn.id}
               className={cn(
-                "flex flex-col gap-4 rounded-lg border bg-surface p-4 shadow-raised sm:p-5",
+                "flex flex-col gap-3 rounded-lg border bg-surface p-4 shadow-raised sm:p-5",
                 missing ? "border-danger" : "border-line",
               )}
             >
@@ -361,18 +361,18 @@ export function RsvpForm({
               </div>
               <RadioGroup
                 label={rsvpCopy.statusGroup(fn.name)}
-                variant="card"
+                variant="segment"
+                orientation="horizontal"
                 value={choice.status ?? ""}
                 invalid={missing}
                 onValueChange={(status) => set(fn.id, { status: status as ReplyStatus })}
-                className="grid-cols-1 min-[420px]:grid-cols-3 sm:grid-cols-3"
               >
                 {(["attending", "maybe", "declined"] as const).map((status) => (
                   <RadioItem
                     key={status}
                     value={status}
                     icon={statusIcons[status]}
-                    label={rsvpCopy.statuses[status].label}
+                    label={rsvpCopy.statuses[status].short}
                   />
                 ))}
               </RadioGroup>

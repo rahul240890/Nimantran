@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
+import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { pagePath } from "@/lib/seo/paths";
 import { Section } from "./section";
 
 type Plan = {
@@ -68,7 +70,7 @@ export function Pricing({ locale }: { locale: UiLocale }) {
       <div className="mt-10 flex flex-col items-center gap-5 text-center">
         <p className="max-w-md text-ink-muted">{pricing.note}</p>
         <Button asChild>
-          <a href="#waitlist">{pricing.cta}</a>
+          <Link href={pagePath({ kind: "gallery" }, locale)}>{pricing.cta}</Link>
         </Button>
       </div>
     </Section>

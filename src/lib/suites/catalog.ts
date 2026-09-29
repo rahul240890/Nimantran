@@ -790,3 +790,12 @@ export function pageLook(kind: PageKind): { art: PageArt; mood: Mood } {
   if (kind === "reply") return { art: "reply", mood: "night" };
   return FUNCTION_PAGES[kind];
 }
+
+/**
+ * The JPEG copy of a painted theme's cover that link previews draw (next/og can't read
+ * WebP; scripts/suite-previews.mjs makes it). Null for themes without a painted cover.
+ */
+export function suitePreview(suite: SuiteId): string | null {
+  const cover = SUITES[suite].images.cover;
+  return cover ? cover.replace(/[^/]+$/, "preview.jpg") : null;
+}
