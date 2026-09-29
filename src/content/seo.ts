@@ -161,6 +161,22 @@ export const seoCopy = {
       intro:
         "Name the party, add the time and place, and send one link. Guests see the evening's page, directions and a reply button.",
     },
+    "baby-shower": {
+      title: "Baby shower invitation card online",
+      description:
+        "Create a baby shower or godh bharai invitation with soft painted pages, music and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Baby shower invitations as gentle as a cradle",
+      intro:
+        "Write the mother-to-be's name, add the time and place, and send one link. Family open pastel pages with her photo and reply in a tap.",
+    },
+    diwali: {
+      title: "Diwali party invitation card online",
+      description:
+        "Create a Diwali invitation with painted pages of diyas and rangoli, Lakshmi and Ganesha's blessing, music and one-tap RSVP.",
+      heading: "Diwali invitations that glow like a row of diyas",
+      intro:
+        "Invite family and friends to Lakshmi puja and dinner with one link. Guests see the evening, directions and a reply button.",
+    },
   } satisfies Record<CategoryId, PageWords>,
   traditionPages: {
     "north-hindu": {

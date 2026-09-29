@@ -28,11 +28,19 @@ export const FUNCTION_IDS = [
   "birthday",
   "anniversary",
   "party",
+  "baby-shower",
+  "diwali",
 ] as const;
 export type FunctionId = (typeof FUNCTION_IDS)[number];
 
-/** The functions of a birthday, an anniversary or a party, which weddings don't offer. */
-export const OCCASION_FUNCTIONS: readonly FunctionId[] = ["birthday", "anniversary", "party"];
+/** The functions of the occasions beyond weddings, which weddings don't offer. */
+export const OCCASION_FUNCTIONS: readonly FunctionId[] = [
+  "birthday",
+  "anniversary",
+  "party",
+  "baby-shower",
+  "diwali",
+];
 
 export function isFunctionId(value: unknown): value is FunctionId {
   return typeof value === "string" && (FUNCTION_IDS as readonly string[]).includes(value);

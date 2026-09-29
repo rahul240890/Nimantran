@@ -825,6 +825,26 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
         </>
       );
       break;
+    // A baby shower: a garland of flowers and petals drifting down
+    case "baby-shower":
+      art = (
+        <>
+          <Toran />
+          <Falling count={14} seed={22} colours={PETALS} shape="petal" />
+        </>
+      );
+      break;
+    // Diwali: a row of lit diyas under a sky of sparks
+    case "diwali":
+      art = (
+        <>
+          <Diyas />
+          <Band edge="top">
+            <Sparkles count={10} seed={24} area={[8, 4, 84, 30]} />
+          </Band>
+        </>
+      );
+      break;
     case "reply":
       art = (
         <>

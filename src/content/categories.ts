@@ -31,6 +31,8 @@ export const categoryTaglines: Record<CategoryId, string> = {
   birthday: "Cake, balloons and everyone they love",
   anniversary: "Years together, celebrated with family",
   party: "Music, food and friends on a starry night",
+  "baby-shower": "Blessings, songs and sweets for the mother-to-be",
+  diwali: "Diyas, sweets and Lakshmi puja with everyone",
 };
 
 export const questionLabels: Record<RsvpQuestionId, string> = {

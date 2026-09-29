@@ -12,7 +12,7 @@ After the doors open, an invitation turns into full-screen pages: the cover, the
 
 Without a tradition, the design decides (Kasavu, Gopuram and Alpona suggest Kayal; Rang Mahal suggests Shahi Savari, Bandhani suggests Kutch Toran), and otherwise Rajwada Bagh. The host can pick any theme in the editor's design step.
 
-Occasions beyond weddings (Step 12p) have their own four-page themes: **Gubbara** (birthday, balloons and a cake table), **Saath** (anniversary, roses and candlelight at sunset) and **Rooftop** (party, a city rooftop at night). Their event painting is stored as `reception`, which is the page art their one function uses. A theme's `occasions` lists what it is painted for; themes without it belong to the wedding journey.
+Occasions beyond weddings (Step 12p) have their own four-page themes: **Gubbara** (birthday, balloons and a cake table), **Saath** (anniversary, roses and candlelight at sunset) and **Rooftop** (party, a city rooftop at night). Step 12u adds **Palna** (baby shower, a flower swing cradle) and **Deepotsav** (Diwali, with a Lakshmi and Ganesha blessing page). Their event painting is stored as `reception`, which is the page art their one function uses. A theme's `occasions` lists what it is painted for; themes without it belong to the wedding journey.
 
 ## Light per page
 
