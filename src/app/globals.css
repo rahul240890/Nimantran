@@ -2131,6 +2131,11 @@
 .guest-themed[data-suite="jungle-party"] {
   --guest-jewel: var(--flower-leaf-deep);
 }
+/* Sakura's blossom pink and Palna's baby blue are pale, so their buttons wear the deeper rose */
+.guest-themed[data-suite="sakura"],
+.guest-themed[data-suite="palna"] {
+  --guest-jewel: var(--suite-accent-text);
+}
 
 /* Dark words on the morning and daytime light, and on the cloth cards */
 .guest-sky[data-mood="dawn"],
