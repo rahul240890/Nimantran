@@ -123,7 +123,7 @@ export const weddingKindCopy: Record<WeddingKind, { name: string; description: s
     description: "Sakharpuda, halad, kelvan and Shubhvivah, in Marathi.",
   },
   bengali: {
-    name: "Bengali",
+    name: "Bengali, Odia and Assamese",
     description: "Aiburobhat, gaye holud, Shubho Bibaho and bou bhaat, in Bengali.",
   },
   tamil: {

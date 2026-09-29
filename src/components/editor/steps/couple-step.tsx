@@ -1,11 +1,13 @@
 "use client";
 
+import { spellName } from "@/actions/transliterate";
 import { languageName } from "@/components/invitation/card-language-toggle";
+import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { slotLabels } from "@/content/templates-review";
 import {
   cardLanguages,
@@ -21,6 +23,7 @@ import { TEMPLATES } from "@/lib/templates/catalog";
 import { CARD_SAMPLES } from "@/lib/templates/story-words";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
+import { isLatinName, type ScriptLanguage } from "@/lib/names/transliterate";
 import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
 import { FamilySection } from "./family-section";
@@ -35,6 +38,67 @@ function shownOn(copy: CardCopy, id: SlotId): string {
   if (id === "doorRight") return copy.doors[1];
   if (id === "date" || id === "venue") return "";
   return copy[id];
+}
+
+/**
+ * A name typed in English letters, offered back in the card's script: tapping a spelling
+ * puts it in the field. Shows nothing while typing, or when no spelling comes back.
+ */
+function ScriptChoices({
+  value,
+  language,
+  onPick,
+}: {
+  value: string;
+  language: ScriptLanguage;
+  onPick: (name: string) => void;
+}) {
+  const { coupleCopy } = useText(editorText);
+  const [found, setFound] = useState<{ name: string; spellings: string[] }>({
+    name: "",
+    spellings: [],
+  });
+  const latin = isLatinName(value);
+
+  useEffect(() => {
+    if (!latin) return;
+    let live = true;
+    const timer = setTimeout(() => {
+      void spellName({ name: value, language }).then((spellings) => {
+        if (live) setFound({ name: value, spellings });
+      });
+    }, 450);
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
+  }, [latin, value, language]);
+
+  const spellings = latin && found.name === value ? found.spellings : [];
+  return (
+    <div aria-live="polite" className="empty:hidden">
+      {spellings.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-ink-muted">
+            {coupleCopy.spellings(languageName(language))}
+          </span>
+          {spellings.map((spelling) => (
+            <Button
+              key={spelling}
+              size="sm"
+              variant="secondary"
+              lang={language}
+              aria-label={coupleCopy.useSpelling(spelling)}
+              onClick={() => onPick(spelling)}
+              className="font-display text-lg"
+            >
+              {spelling}
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function SlotField({
@@ -178,21 +242,34 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       : undefined;
   };
 
-  const field = (id: SlotId) => (
-    <SlotField
-      key={id}
-      id={id}
-      template={template}
-      value={coupleValue(draft, template, id)}
-      error={errors[id]}
-      onChange={(value) => set(id, value)}
-      {...(id === "first" && one
-        ? { label: one.label, example: one.example, hint: namesCopy.oneHint }
-        : {})}
-      {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
-      {...(scriptNote(id) ? { hint: scriptNote(id) } : {})}
-    />
-  );
+  const field = (id: SlotId) => {
+    const slot = (
+      <SlotField
+        key={id}
+        id={id}
+        template={template}
+        value={coupleValue(draft, template, id)}
+        error={errors[id]}
+        onChange={(value) => set(id, value)}
+        {...(id === "first" && one
+          ? { label: one.label, example: one.example, hint: namesCopy.oneHint }
+          : {})}
+        {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
+        {...(scriptNote(id) ? { hint: scriptNote(id) } : {})}
+      />
+    );
+    if (main === "en" || id === "joiner" || !NAME_SLOTS.includes(id)) return slot;
+    return (
+      <div key={id} className="flex flex-col gap-2">
+        {slot}
+        <ScriptChoices
+          value={coupleValue(draft, template, id)}
+          language={main}
+          onPick={(name) => set(id, name)}
+        />
+      </div>
+    );
+  };
 
   const translatedField = (id: SlotId) =>
     second && secondCopy ? (
