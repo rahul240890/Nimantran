@@ -227,9 +227,9 @@ test.describe("publish and share", () => {
     await expect(story).toHaveCount(0);
     await expect(guest).toHaveURL(/#rsvp$/);
 
-    const article = guest.getByRole("article", { name: /Wedding/ });
+    const article = guest.getByRole("article", { name: "હસ્તમેળાપ" });
     await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
-    await expect(article.getByText("9:47 am to 10:31 am")).toBeVisible();
+    await expect(article.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
     await article.getByRole("button", { name: "Add to calendar" }).click();
     const ics = await guest.getByRole("menuitem", { name: /Apple/ }).getAttribute("href");
     const calendar = await (await guest.request.get(ics!)).text();

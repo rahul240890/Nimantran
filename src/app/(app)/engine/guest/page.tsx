@@ -23,7 +23,7 @@ const SAMPLE_PHOTOS = [
   "/suites/rajwada-bagh/sangeet.webp",
 ].map((url, index) => ({ id: `sample-${index}`, url, width: 768, height: 1365 }));
 
-function sampleDraft(suite: SuiteId): InviteDraft {
+function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
   const draft = newDraft(SUITES[suite].template ?? "marigold");
   const at = (date: string, time: string, venue: string, address = "") => ({
     included: true,
@@ -37,6 +37,7 @@ function sampleDraft(suite: SuiteId): InviteDraft {
   return {
     ...draft,
     suite,
+    languages: hindi ? ["hi"] : draft.languages,
     tradition: {
       ...draft.tradition,
       id: SUITES[suite].traditions[0] ?? null,
@@ -68,13 +69,13 @@ function sampleDraft(suite: SuiteId): InviteDraft {
 
 /*
  * A review page for the themed guest page (Step 12q), not a product screen: the guest page
- * for ?suite=<theme> with made-up names, dates and pictures, and nothing saved.
+ * for ?suite=<theme> (and ?lang=hi for a Hindi card) with made-up names, dates and pictures, and nothing saved.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
-  const { suite: asked } = await searchParams;
+  const { suite: asked, lang } = await searchParams;
   const suite: SuiteId = isSuiteId(asked) ? asked : "rajwada-bagh";
   const locale = await getLocale();
-  const draft = sampleDraft(suite);
+  const draft = sampleDraft(suite, lang === "hi");
   const { functionCopy } = editorText[locale];
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
     const fn = draft.functions[told.kind];

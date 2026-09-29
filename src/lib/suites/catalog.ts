@@ -145,6 +145,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "rangmahal",
     traditions: ["rajasthani"],
+    guest: { style: "procession", flower: "marigold", secondFlower: "jasmine", lamp: "lanterns" },
     images: {
       cover: "/suites/shahi-savari/cover.webp",
       family: "/suites/shahi-savari/family.webp",
@@ -185,6 +186,13 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["muslim", "all"],
     template: "emerald",
     traditions: [],
+    guest: {
+      style: "palace",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "lanterns",
+      pattern: "jaali",
+    },
     images: {
       cover: "/suites/noor-bagh/cover.webp",
       family: "/suites/noor-bagh/family.webp",
@@ -205,6 +213,13 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["sikh", "all"],
     template: "phulkari",
     traditions: [],
+    guest: {
+      style: "procession",
+      flower: "marigold",
+      secondFlower: "rose",
+      lamp: "fairy",
+      pattern: "jaali",
+    },
     images: {
       cover: "/suites/phulkari-haveli/cover.webp",
       family: "/suites/phulkari-haveli/family.webp",
@@ -224,6 +239,13 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "alpona",
     traditions: ["bengali"],
+    guest: {
+      style: "garden",
+      flower: "jasmine",
+      secondFlower: "rose",
+      lamp: "diyas",
+      pattern: "alpona",
+    },
     images: {
       cover: "/suites/rajbari/cover.webp",
       family: "/suites/rajbari/family.webp",
@@ -243,6 +265,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "paithani",
     traditions: ["marathi"],
+    guest: { style: "palace", flower: "marigold", secondFlower: "jasmine" },
     images: {
       cover: "/suites/peshwai-wada/cover.webp",
       family: "/suites/peshwai-wada/family.webp",
@@ -263,6 +286,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "bandhani",
     traditions: ["gujarati"],
+    guest: { style: "procession", flower: "marigold", secondFlower: "rose", lamp: "diyas" },
     images: {
       cover: "/suites/kutch-toran/cover.webp",
       family: "/suites/kutch-toran/family.webp",
@@ -284,6 +308,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "rose",
     traditions: [],
+    guest: { style: "party" },
     images: {
       cover: "/suites/gubbara/cover.webp",
       family: "/suites/gubbara/family.webp",
@@ -301,6 +326,12 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "rose",
     traditions: [],
+    guest: {
+      style: "palace",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "fairy",
+    },
     images: {
       cover: "/suites/saath/cover.webp",
       family: "/suites/saath/family.webp",
@@ -318,6 +349,7 @@ export const SUITES: Record<SuiteId, Suite> = {
     faiths: ["all"],
     template: "monogram",
     traditions: [],
+    guest: { style: "party", flower: "marigold", secondFlower: "lotus" },
     images: {
       cover: "/suites/rooftop/cover.webp",
       family: "/suites/rooftop/family.webp",

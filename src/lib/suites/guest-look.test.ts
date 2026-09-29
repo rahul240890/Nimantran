@@ -5,16 +5,15 @@ import {
   STYLE_LOOKS,
   guestLook,
   guestLookSchema,
-  monogram,
   resolveGuestLook,
 } from "./guest-look";
 
 describe("guest page looks", () => {
   it("fills a theme's choice out from its style", () => {
     expect(resolveGuestLook({ style: "garden" })).toEqual(STYLE_LOOKS.garden);
-    expect(resolveGuestLook({ style: "palace", frame: "polaroid" })).toEqual({
+    expect(resolveGuestLook({ style: "palace", lamp: "lanterns" })).toEqual({
       ...STYLE_LOOKS.palace,
-      frame: "polaroid",
+      lamp: "lanterns",
     });
   });
 
@@ -25,9 +24,9 @@ describe("guest page looks", () => {
   });
 
   it("checks what a theme stores, as the admin will save it", () => {
-    expect(guestLookSchema.safeParse({ style: "party", lights: "bulbs" }).success).toBe(true);
+    expect(guestLookSchema.safeParse({ style: "party", flower: "lotus" }).success).toBe(true);
     expect(guestLookSchema.safeParse({ style: "castle" }).success).toBe(false);
-    expect(guestLookSchema.safeParse({ style: "party", lights: "neon" }).success).toBe(false);
+    expect(guestLookSchema.safeParse({ style: "party", lamp: "neon" }).success).toBe(false);
     expect(guestLookSchema.safeParse({ style: "party", extra: 1 }).success).toBe(false);
   });
 
@@ -41,11 +40,5 @@ describe("guest page looks", () => {
       expect(guestLookSchema.safeParse(choice).success).toBe(true);
       expect(SUITES[id].images.cover).toBeTruthy();
     }
-  });
-
-  it("makes a monogram from the names", () => {
-    expect(monogram("Arjun", "Sia")).toBe("A & S");
-    expect(monogram(" riya ", "")).toBe("R");
-    expect(monogram("", "")).toBe("");
   });
 });

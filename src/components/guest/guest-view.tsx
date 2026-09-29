@@ -261,7 +261,7 @@ export function GuestView({
             look={look}
             copy={copy}
             lang={language}
-            functions={functions}
+            functions={cardFunctions(functions, draft, language)}
             main={
               mainKind && mainDate
                 ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
