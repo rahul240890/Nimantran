@@ -4,7 +4,16 @@ import { describe, expect, it } from "vitest";
 import { FUNCTION_IDS } from "@/lib/events/functions";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
-import { MOODS, PAGE_ARTS, SUITES, SUITE_IDS, pageLook, suiteFor, type PageArt } from "./catalog";
+import {
+  MOODS,
+  PAGE_ARTS,
+  SUITES,
+  SUITE_IDS,
+  hasGodAtTop,
+  pageLook,
+  suiteFor,
+  type PageArt,
+} from "./catalog";
 import { DEFAULT_AREA, textArea } from "./areas";
 
 describe("event suites", () => {
@@ -72,5 +81,14 @@ describe("text areas", () => {
         expect(100 - area.left - area.right, `${id} ${art}`).toBeGreaterThanOrEqual(60);
       }
     }
+  });
+
+  it("keeps painted gods clear of the page controls", () => {
+    for (const id of ["pichwai", "tanjore", "kashi"] as const) {
+      expect(hasGodAtTop(id, "blessing")).toBe(true);
+      expect(hasGodAtTop(id, "wedding")).toBe(true);
+      expect(hasGodAtTop(id, "cover")).toBe(false);
+    }
+    expect(hasGodAtTop("ivory-arch", "wedding")).toBe(false);
   });
 });
