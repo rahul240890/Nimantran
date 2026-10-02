@@ -184,6 +184,36 @@ describe("guest replies", () => {
     expect(guest!.name).toBe("Nani");
   });
 
+  it("counts each visit to a personal link once per half hour", async () => {
+    const token = await t.as(priya, async () => {
+      const [row] = await q<{ token: string }>(
+        "insert into guests (event_id, name) values ($1, 'Mama ji') returning token",
+        [event],
+      );
+      return row!.token;
+    });
+    const open = () =>
+      t.as(null, () => q("select public.guest_reply('priya-weds-arjun', $1)", [token]));
+    const opens = () =>
+      t.as(priya, () =>
+        q<{ open_count: number; opened: boolean; last: boolean }>(
+          `select open_count, opened_at is not null as opened, last_opened_at is not null as last
+           from guests where token = $1`,
+          [token],
+        ),
+      );
+    expect(await opens()).toEqual([{ open_count: 0, opened: false, last: false }]);
+    await open();
+    await open();
+    expect(await opens()).toEqual([{ open_count: 1, opened: true, last: true }]);
+    // An hour later is a second visit
+    await t.as(priya, () =>
+      q("update guests set last_opened_at = now() - interval '1 hour' where token = $1", [token]),
+    );
+    await open();
+    expect((await opens())[0]!.open_count).toBe(2);
+  });
+
   it("never lets guests read the replies or the guest list", async () => {
     expect(await t.as(null, () => q("select id from rsvps"))).toEqual([]);
     expect(await t.as(null, () => q("select id from guests"))).toEqual([]);

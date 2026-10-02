@@ -153,6 +153,82 @@ test.describe("host dashboard", () => {
     expect(await noOverflow(page)).toBe(true);
   });
 
+  test("hosts import guests from a sheet and see who opened their link", async ({
+    page,
+    browser,
+  }, info) => {
+    test.slow();
+    await writeInvite(page, numberFor(info), ["Dev", "Tara"]);
+    await publish(page, "dev-weds-tara");
+    await page.getByRole("link", { name: "Open guest list" }).click();
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    const dialog = page.getByRole("dialog", { name: "Add guests" });
+    await dialog.getByRole("textbox", { name: /^Name/ }).fill("Masi");
+    await dialog.getByRole("textbox", { name: /WhatsApp number/ }).fill("98111 22222");
+    await dialog.getByRole("button", { name: "Add guest" }).click();
+    await expect(page.getByText("Guest added", { exact: true })).toBeVisible();
+
+    // A sheet from Excel or Google Sheets, saved as CSV
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    await dialog.getByRole("tab", { name: "Import" }).click();
+    await expect(dialog.getByRole("button", { name: "Choose a file" })).toBeVisible();
+    await dialog.locator('input[type="file"]').setInputFiles({
+      name: "guests.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(
+        "Guest Name,Mobile,Side,People\nSharma uncle,98765 43210,Bride,4\nMasi ji,+91 98111 22222,Bride,2\nDadi,,Groom,1\n",
+      ),
+    });
+    await expect(dialog.getByText("From guests.csv")).toBeVisible();
+    const rows = dialog.getByTestId("import-rows");
+    await expect(rows.getByRole("listitem")).toHaveCount(3);
+    // Masi's number is on the list already, so she starts unticked
+    await expect(rows.getByRole("listitem").filter({ hasText: "Masi ji" })).toContainText(
+      "Already on your list",
+    );
+    await expect(dialog.getByText("2 of 3 selected")).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await dialog.getByRole("button", { name: "Add 2 guests" }).click();
+    await expect(
+      page.getByText("2 guests added, each with a personal link", { exact: true }),
+    ).toBeVisible();
+    const list = page.getByTestId("guest-list");
+    await expect(list.getByRole("listitem").filter({ hasText: /^Sharma uncle/ })).toContainText(
+      "Bride",
+    );
+
+    const opens = page.getByRole("region", { name: "Who's opened it" });
+    await expect(opens).toContainText("Nobody has opened their personal link yet");
+
+    // Sharma uncle opens his personal link
+    await page.getByRole("button", { name: "Actions for Sharma uncle" }).click();
+    const send = page.getByRole("menuitem", { name: "Send invitation" });
+    const wa = new URL((await send.getAttribute("href"))!);
+    const personal = new URL(/https?:\/\/\S+\?g=[0-9a-f]+/.exec(wa.searchParams.get("text")!)![0]);
+    await page.keyboard.press("Escape");
+    const guestContext = await browser.newContext({
+      baseURL: info.project.use.baseURL,
+      viewport: info.project.use.viewport,
+      reducedMotion: "reduce",
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(`${personal.pathname}${personal.search}&quality=2d`);
+    await expect(guest.locator("#main p").filter({ hasText: /^Dear/ }).first()).toContainText(
+      "Sharma uncle",
+    );
+    await guestContext.close();
+
+    await page.reload();
+    await expect(opens.getByTestId("recent-opens")).toContainText("Sharma uncle");
+    await expect(opens).toContainText("No reply yet");
+    await page.getByRole("button", { name: /^Opened, no reply/ }).click();
+    await expect(page.getByText("1 of 3 guests")).toBeVisible();
+    await expect(list.getByRole("listitem").first()).toContainText(/Opened .*ago/);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
   for (const colorScheme of ["light", "dark"] as const) {
     test(`the dashboard passes accessibility checks (${colorScheme})`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme });

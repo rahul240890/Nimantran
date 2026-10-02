@@ -9,6 +9,7 @@ import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
+import { Opens } from "./opens";
 import { Reminders } from "./reminders";
 import type { DashboardView } from "./types";
 
@@ -24,7 +25,7 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
   );
 }
 
-/** The host's home for one invite: counts, the guest list, reminders and co-hosts. */
+/** The host's home for one invite: counts, the guest list, who opened it, reminders and co-hosts. */
 export async function GuestDashboard({ view }: { view: DashboardView }) {
   const copy = (await getText(dashboardText)).dashboardCopy;
   const { functionCopy } = await getText(editorText);
@@ -176,6 +177,7 @@ export async function GuestDashboard({ view }: { view: DashboardView }) {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-start">
         <GuestList view={view} />
         <div className="flex min-w-0 flex-col gap-6">
+          <Opens view={view} />
           <Reminders view={view} />
           <Cohosts view={view} />
         </div>

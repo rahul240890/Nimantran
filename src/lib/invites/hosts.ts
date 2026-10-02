@@ -82,6 +82,8 @@ const FUNCTION_COLUMNS =
   "id, kind, position, date, start_time, end_time, venue, address, dress_code";
 const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
+/** Visit counts arrive with 20261002160000_guest_opens.sql; until it runs the list reads without them. */
+const OPEN_COLUMNS = ", last_opened_at, open_count";
 const REPLY_COLUMNS =
   "guest_id, function_id, status, adults, children, message, answers, responded_at";
 
@@ -106,6 +108,8 @@ type GuestRow = {
   function_ids: string[];
   self_added: boolean;
   opened_at: string | null;
+  last_opened_at?: string | null;
+  open_count?: number;
   reminded_at: string | null;
   created_at: string;
 };
@@ -140,13 +144,16 @@ const supabaseStore: HostStore = {
   async dashboard(account, id) {
     const supabase = await supabaseServer();
     if (!supabase) return null;
-    const { data, error } = await supabase
-      .from("events")
-      .select(
-        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${GUEST_COLUMNS}), rsvps(${REPLY_COLUMNS})`,
-      )
-      .eq("id", id)
-      .maybeSingle();
+    const read = (guestColumns: string) =>
+      supabase
+        .from("events")
+        .select(
+          `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${guestColumns}), rsvps(${REPLY_COLUMNS})`,
+        )
+        .eq("id", id)
+        .maybeSingle();
+    let { data, error } = await read(GUEST_COLUMNS + OPEN_COLUMNS);
+    if (error) ({ data, error } = await read(GUEST_COLUMNS));
     if (error || !data) return null;
     const row = data as unknown as EventRow & {
       owner_id: string;
@@ -195,6 +202,8 @@ const supabaseStore: HostStore = {
             functionIds: guest.function_ids ?? [],
             selfAdded: guest.self_added,
             openedAt: guest.opened_at,
+            lastOpenedAt: guest.last_opened_at ?? guest.opened_at,
+            openCount: guest.open_count ?? (guest.opened_at ? 1 : 0),
             remindedAt: guest.reminded_at,
             createdAt: guest.created_at,
           },
@@ -359,6 +368,8 @@ function previewGuestView(guest: PreviewGuest): HostGuest {
       functionIds: guest.functionIds,
       selfAdded: guest.selfAdded,
       openedAt: guest.openedAt ?? null,
+      lastOpenedAt: guest.lastOpenedAt ?? guest.openedAt ?? null,
+      openCount: guest.openCount ?? (guest.openedAt ? 1 : 0),
       remindedAt: guest.remindedAt ?? null,
       createdAt: guest.createdAt ?? new Date(0).toISOString(),
     },

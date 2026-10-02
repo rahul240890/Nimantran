@@ -39,6 +39,9 @@ database keeps every invite. Applied so far after the first setup:
 - `20260928150000_coupons_invoices_refunds.sql` — coupons and festival offers, GST invoice
   numbers and refunds (Step 17, part 2): `coupons`, `invoice_counters`, new `orders`
   columns, `assign_invoice_no()` and `use_coupon()`.
+- `20261002160000_guest_opens.sql` — guest list import and opens: `guests.last_opened_at`
+  and `guests.open_count`, and `guest_reply()` counting each visit to a personal link once
+  per half hour. The guest list still loads before it runs, without visit times.
 
 ## Setting up a project
 
