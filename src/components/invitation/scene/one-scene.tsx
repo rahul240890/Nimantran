@@ -38,6 +38,7 @@ import {
   entranceFor,
   sceneLight,
   type Entrance,
+  type PaintedCard,
   type ScenePage,
 } from "@/lib/suites/scene";
 import { isCardLanguage } from "@/lib/templates/card-languages";
@@ -63,9 +64,11 @@ const FACES = "50% 30%";
 
 /**
  * Shrinks (or grows a little) the words in `box` until `words` fits inside it, by setting
- * `--scene-fit` on `box`. Words too long to fit even at the smallest size may break.
+ * `--scene-fit` on `box`. When the words would have to set small, lines marked
+ * `data-fit-optional` (a painted card's countdown) step aside first. Words too long to
+ * fit even at the smallest size may break.
  */
-function fitWords(box: HTMLElement, words: HTMLElement, max: number) {
+function fitWords(box: HTMLElement, words: HTMLElement, max: number, min: number) {
   const pad = getComputedStyle(box);
   const room =
     box.clientHeight - parseFloat(pad.paddingTop || "0") - parseFloat(pad.paddingBottom || "0");
@@ -73,7 +76,13 @@ function fitWords(box: HTMLElement, words: HTMLElement, max: number) {
     box.style.setProperty("--scene-fit", String(scale));
     return words.offsetHeight <= room + 1 && words.scrollWidth <= words.clientWidth + 1;
   };
-  const { scale, overflow } = fitScale(fits, { min: 0.6, max });
+  const optional = [...words.querySelectorAll<HTMLElement>("[data-fit-optional]")];
+  for (const line of optional) line.hidden = false;
+  let { scale, overflow } = fitScale(fits, { min, max });
+  if (optional.length && scale < 0.9) {
+    for (const line of optional) line.hidden = true;
+    ({ scale, overflow } = fitScale(fits, { min, max }));
+  }
   box.style.setProperty("--scene-fit", String(scale));
   if (overflow) box.dataset.overflow = "";
   else delete box.dataset.overflow;
@@ -85,12 +94,13 @@ function useFit(
   inner: RefObject<HTMLElement | null>,
   key: string,
   max = 1.1,
+  min = 0.6,
 ) {
   useLayoutEffect(() => {
     const box = outer.current;
     const words = inner.current;
     if (!box || !words) return;
-    const measure = () => fitWords(box, words, max);
+    const measure = () => fitWords(box, words, max, min);
     measure();
     const resize = new ResizeObserver(measure);
     resize.observe(box);
@@ -100,7 +110,7 @@ function useFit(
       live = false;
       resize.disconnect();
     };
-  }, [outer, inner, key, max]);
+  }, [outer, inner, key, max, min]);
 }
 
 const box = ([x, y, width, height]: FrameBox): CSSProperties => ({
@@ -347,6 +357,7 @@ export function OneScene({
                 voice={voice}
                 type={type}
                 style={page.style}
+                card={page.card}
                 lang={lang}
                 motion="out"
                 side={shown.from}
@@ -366,6 +377,7 @@ export function OneScene({
                   voice={voice}
                   type={type}
                   style={page.style}
+                  card={page.card}
                   lang={lang}
                   motion="in"
                   side={shown.from}
@@ -508,6 +520,7 @@ function SlotCard({
   voice,
   type,
   style,
+  card: painted,
   lang,
   motion,
   side,
@@ -517,18 +530,29 @@ function SlotCard({
   voice: Voice;
   type: PageType | undefined;
   style: ScenePage["style"];
+  /** The theme's own painted card, whose writing area holds the words. */
+  card: PaintedCard | null;
   lang: string;
   motion: "in" | "out";
   side: Entrance;
   reduced: boolean;
 }) {
   const card = useRef<HTMLDivElement>(null);
+  const face = useRef<HTMLDivElement>(null);
   const words = useRef<HTMLDivElement>(null);
   const key =
     item.kind === "line"
       ? item.text
       : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
-  useFit(card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, 1.15);
+  // A painted card's words fit its writing area; a drawn card's, the card inside its padding
+  // A painted card's writing area is fixed by its painting, so its words may set a little smaller
+  useFit(
+    painted ? face : card,
+    words,
+    `${key}${lang}${JSON.stringify(type ?? null)}`,
+    1.15,
+    painted ? 0.5 : 0.6,
+  );
   const fn = item.kind === "function" ? item.fn : null;
   const labels = CARD_STORY_WORDS[isCardLanguage(lang) ? lang : "en"];
   const when = Boolean(fn && (fn.date || fn.time));
@@ -542,102 +566,123 @@ function SlotCard({
       className="scene-slot scene-words absolute inset-0 flex flex-col items-center justify-center text-center text-card-ink [font-variant-numeric:lining-nums]"
       style={{ "--swap": `${SCENE_SWAP_MS}ms` } as CSSProperties}
     >
-      <div ref={words} className="flex w-full flex-col items-center">
-        {item.kind === "line" ? (
-          <p lang={lang} className="text-balance" style={sceneLine(voice, "line", lang, type)}>
-            {item.text}
-          </p>
-        ) : (
-          fn && (
-            <>
-              {/* As on a printed card: how soon, the name, a rule, then the day and the place, each under its label */}
-              {fn.countdown && (
+      {painted && (
+        // eslint-disable-next-line @next/next/no-img-element -- the theme's painted card, cut out
+        <img
+          src={painted.image}
+          alt=""
+          aria-hidden
+          draggable={false}
+          className="absolute inset-0 size-full select-none"
+        />
+      )}
+      <div
+        ref={face}
+        className={cn(
+          "flex flex-col items-center justify-center",
+          // A margin inside the painted border, so the words never touch it
+          painted ? "absolute px-[2.5%] py-[2.5%]" : "contents",
+        )}
+        style={painted ? box(painted.text) : undefined}
+      >
+        <div ref={words} className="flex w-full flex-col items-center">
+          {item.kind === "line" ? (
+            <p lang={lang} className="text-balance" style={sceneLine(voice, "line", lang, type)}>
+              {item.text}
+            </p>
+          ) : (
+            fn && (
+              <>
+                {/* As on a printed card: how soon, the name, a rule, then the day and the place, each under its label */}
+                {fn.countdown && (
+                  <p
+                    lang={lang}
+                    data-fit-optional={painted ? "" : undefined}
+                    className="mb-[0.45em] text-card-gold-text"
+                    style={sceneLine(voice, "countdown", lang, type)}
+                  >
+                    {fn.countdown}
+                  </p>
+                )}
                 <p
                   lang={lang}
-                  className="mb-[0.45em] text-card-gold-text"
-                  style={sceneLine(voice, "countdown", lang, type)}
+                  className="max-w-full text-balance"
+                  style={sceneLine(voice, "function", lang, type)}
                 >
-                  {fn.countdown}
+                  {fn.name}
                 </p>
-              )}
-              <p
-                lang={lang}
-                className="max-w-full text-balance"
-                style={sceneLine(voice, "function", lang, type)}
-              >
-                {fn.name}
-              </p>
-              {fn.localName && (
-                <p
-                  lang={fn.localName.lang}
-                  className="text-card-accent-text"
-                  style={sceneLine(voice, "detail", fn.localName.lang, type)}
-                >
-                  {fn.localName.text}
-                </p>
-              )}
-              {(fn.date || fn.time || fn.venue) && (
-                <span aria-hidden className="story-rule scene-rule" />
-              )}
-              {/* The day and the place side by side, a fine gold line between, so the
-                  card stays short enough to set every line at a comfortable size */}
-              <div
-                className={cn(
-                  "grid w-full items-start gap-x-[0.9em]",
-                  when && fn.venue ? "grid-cols-[1fr_auto_1fr]" : "grid-cols-1",
+                {fn.localName && (
+                  <p
+                    lang={fn.localName.lang}
+                    className="text-card-accent-text"
+                    style={sceneLine(voice, "detail", fn.localName.lang, type)}
+                  >
+                    {fn.localName.text}
+                  </p>
                 )}
-              >
-                {when && (
-                  <div className="flex flex-col items-center">
-                    <SlotLabel voice={voice} lang={lang} type={type}>
-                      {labels.when}
-                    </SlotLabel>
-                    {fn.date && (
+                {(fn.date || fn.time || fn.venue) && (
+                  <span aria-hidden className="story-rule scene-rule" />
+                )}
+                {/* The day and the place side by side, a fine gold line between, so the
+                    card stays short enough to set every line at a comfortable size */}
+                <div
+                  className={cn(
+                    "grid w-full items-start gap-x-[0.9em]",
+                    when && fn.venue ? "grid-cols-[1fr_auto_1fr]" : "grid-cols-1",
+                  )}
+                >
+                  {when && (
+                    <div className="flex flex-col items-center">
+                      <SlotLabel voice={voice} lang={lang} type={type}>
+                        {labels.when}
+                      </SlotLabel>
+                      {fn.date && (
+                        <p
+                          lang={lang}
+                          className="text-balance"
+                          style={sceneLine(voice, "date", lang, type)}
+                        >
+                          {fn.date}
+                        </p>
+                      )}
+                      {fn.time && (
+                        <p
+                          lang={lang}
+                          className="mt-[0.15em] text-card-ink-muted"
+                          style={sceneLine(voice, "detail", lang, type)}
+                        >
+                          {fn.muhurat && (
+                            <span lang={fn.muhurat.lang} className="text-card-accent-text">
+                              {fn.muhurat.text} ·{" "}
+                            </span>
+                          )}
+                          {fn.time}
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {when && fn.venue && (
+                    <span aria-hidden className="w-px self-stretch bg-card-gold/45" />
+                  )}
+                  {fn.venue && (
+                    <div className="flex flex-col items-center">
+                      <SlotLabel voice={voice} lang={lang} type={type}>
+                        {labels.where}
+                      </SlotLabel>
                       <p
                         lang={lang}
-                        className="text-balance"
+                        className="max-w-full text-balance"
                         style={sceneLine(voice, "date", lang, type)}
                       >
-                        {fn.date}
+                        {fn.venue}
                       </p>
-                    )}
-                    {fn.time && (
-                      <p
-                        lang={lang}
-                        className="mt-[0.15em] text-card-ink-muted"
-                        style={sceneLine(voice, "detail", lang, type)}
-                      >
-                        {fn.muhurat && (
-                          <span lang={fn.muhurat.lang} className="text-card-accent-text">
-                            {fn.muhurat.text} ·{" "}
-                          </span>
-                        )}
-                        {fn.time}
-                      </p>
-                    )}
-                  </div>
-                )}
-                {when && fn.venue && (
-                  <span aria-hidden className="w-px self-stretch bg-card-gold/45" />
-                )}
-                {fn.venue && (
-                  <div className="flex flex-col items-center">
-                    <SlotLabel voice={voice} lang={lang} type={type}>
-                      {labels.where}
-                    </SlotLabel>
-                    <p
-                      lang={lang}
-                      className="max-w-full text-balance"
-                      style={sceneLine(voice, "date", lang, type)}
-                    >
-                      {fn.venue}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </>
-          )
-        )}
+                    </div>
+                  )}
+                </div>
+              </>
+            )
+          )}
+        </div>
       </div>
     </div>
   );

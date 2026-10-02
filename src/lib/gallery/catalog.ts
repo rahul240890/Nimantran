@@ -1,5 +1,5 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { SUITES, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, isSceneTheme, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
@@ -211,12 +211,15 @@ export function sceneDesign(suite: SuiteId): GalleryDesign {
   return { ...paintedDesign(suite), id: `${suite}-scene`, format: "scene" };
 }
 
-/** Each painted design, with its Scene first where the theme has one. */
+/**
+ * Each painted design, with its Scene first where the theme has one. A Scene theme has
+ * no pages of its own, so it is listed as its Scene alone.
+ */
 function withScenes(designs: GalleryDesign[]): GalleryDesign[] {
   const scenes = designs
     .filter((design) => design.suite !== "classic" && hasScene(design.suite))
     .map((design) => ({ ...design, id: `${design.suite}-scene`, format: "scene" as const }));
-  return [...scenes, ...designs];
+  return [...scenes, ...designs.filter((design) => !isSceneTheme(design.suite))];
 }
 
 export function cardDesign(template: TemplateId): GalleryDesign {
@@ -246,7 +249,16 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "north-indian",
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
-    suites: ["rajwada-bagh", "kashi", "chinar", "gulaab", "ivory-arch"],
+    suites: [
+      "kashi-ghat",
+      "chinar-dal",
+      "char-bagh",
+      "rajwada-bagh",
+      "kashi",
+      "chinar",
+      "gulaab",
+      "ivory-arch",
+    ],
     cards: ["marigold", "scroll"],
     keywords: ["hindi", "up", "delhi", "bihar", "punjabi hindu", "kashmiri", "kashmir"],
   },
@@ -254,7 +266,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "gujarati",
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
-    suites: ["kutch-toran", "shahi-savari", "pichwai"],
+    suites: ["kutch-bhunga", "kutch-toran", "shahi-savari", "pichwai"],
     cards: ["bandhani"],
     keywords: ["gujrati", "kutch", "kathiawadi", "patel", "kankotri", "hast melap"],
   },
@@ -262,7 +274,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "rajasthani",
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
-    suites: ["shahi-savari", "pichwai", "neel", "mitti"],
+    suites: ["udaipur-lake", "pink-haveli", "shahi-savari", "pichwai", "neel", "mitti"],
     cards: ["rangmahal", "scroll"],
     keywords: ["marwari", "rajput", "jaipur", "udaipur"],
   },
@@ -270,7 +282,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "marathi",
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
-    suites: ["peshwai-wada"],
+    suites: ["pune-wada", "peshwai-wada"],
     cards: ["paithani"],
     keywords: ["maharashtrian", "lagna", "mumbai", "pune"],
   },
@@ -278,7 +290,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "bengali",
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
-    suites: ["rajbari", "pattachitra", "chai-bagan"],
+    suites: ["zamindar-bari", "rajbari", "pattachitra", "chai-bagan"],
     cards: ["alpona"],
     keywords: [
       "bangali",
@@ -296,7 +308,15 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "tamil",
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
-    suites: ["kayal", "tanjore", "mysuru", "kalamkari"],
+    suites: [
+      "temple-pond",
+      "kovil-corridor",
+      "arati-mandap",
+      "kayal",
+      "tanjore",
+      "mysuru",
+      "kalamkari",
+    ],
     cards: ["gopuram", "kasavu"],
     keywords: [
       "south indian",
@@ -316,7 +336,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     tradition: null,
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
-    suites: ["phulkari-haveli"],
+    suites: ["punjab-haveli", "phulkari-haveli"],
     cards: ["phulkari"],
     keywords: ["sikh", "anand karaj", "punjab", "sardar"],
   },
@@ -325,7 +345,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     tradition: null,
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
-    suites: ["noor-bagh", "sufi-raat", "riad"],
+    suites: ["char-bagh", "noor-bagh", "sufi-raat", "riad"],
     cards: ["emerald"],
     keywords: ["nikah", "walima", "shaadi", "islamic", "moroccan"],
   },

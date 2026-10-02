@@ -4,7 +4,7 @@ import Image from "next/image";
 import { OneScene } from "@/components/invitation/scene/one-scene";
 import { cn } from "@/lib/cn";
 import type { StoryPhoto } from "@/lib/engine/story";
-import type { SuiteId } from "@/lib/suites/catalog";
+import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { PAINTING_ASPECT } from "@/lib/suites/photo-frames";
 import { scenePage } from "@/lib/suites/scene";
 import { useSampleInvite } from "./sample";
@@ -54,8 +54,9 @@ export function ScenePoster({
           }}
         />
       ))}
+      {/* A Scene theme shows its painting with the card in place */}
       <Image
-        src={page.image}
+        src={(page.card && SUITES[suite].images.cover) || page.image}
         alt=""
         fill
         priority={priority}
