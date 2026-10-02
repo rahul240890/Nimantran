@@ -312,6 +312,212 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     line: null,
     card: [11.11, 57.81, 76.67, 26.15],
     text: [11.6, 29.4, 80.9, 51.6],
+  }, // A silk banner hung between two brass poles
+  "baraat-band": {
+    frame: [23.3, 6, 53.3, 28.9],
+    names: [28, 49.4, 44, 6.5],
+    line: null,
+    card: [12.11, 57.66, 77.68, 28.83],
+    text: [15.3, 20.3, 70.8, 43.4],
+  },
+  // A gold-edged card on a red wall
+  "roka-shagun": {
+    frame: [21.8, 6.4, 56.3, 31.4],
+    names: [10, 45.3, 80, 3.8],
+    line: null,
+    card: [9.99, 50.3, 81.3, 27.99],
+    text: [11.1, 13.2, 77.5, 73.2],
+    dark: true,
+  },
+  // A card edged with chooda bangles
+  "chooda-ceremony": {
+    frame: [24, 7.2, 52, 28.6],
+    names: [26, 43.6, 48, 6.5],
+    line: null,
+    card: [9.99, 52.15, 77.05, 27.15],
+    text: [14.3, 14.2, 75.3, 71.8],
+  },
+  // A cotton canopy framed in marigolds by the river
+  "rishikesh-ganga": {
+    frame: [22.7, 8, 54.5, 29.5],
+    names: [28, 45.1, 44, 3.6],
+    line: null,
+    card: [5.74, 49.88, 88.42, 34.27],
+    text: [12.7, 19.3, 75.8, 65.7],
+  },
+  // A sandstone-gold card in the dunes
+  "jaisalmer-dunes": {
+    frame: [26.9, 4, 46.2, 32.5],
+    names: [10, 43.3, 80, 5.3],
+    line: null,
+    card: [5.63, 49.76, 88.84, 30.92],
+    text: [11.7, 12.1, 76.5, 77.6],
+  },
+  // A jewelled card under the lit fort
+  "fort-night": {
+    frame: [23.2, 10.3, 53.6, 34.4],
+    names: [10, 47.5, 80, 6.5],
+    line: null,
+    card: [14.24, 56.7, 71.31, 25.48],
+    text: [9.5, 13, 82, 74.6],
+    dark: true,
+  },
+  // A mirror-work card in the hall of mirrors
+  "sheesh-mahal": {
+    frame: [24, 7.3, 52, 38.3],
+    names: [15, 46.8, 70, 5.5],
+    line: null,
+    card: [10.31, 53.47, 80.98, 30.2],
+    text: [10.7, 15, 77.8, 71.2],
+  },
+  // A mirror-work card on the white salt
+  "white-rann": {
+    frame: [20.7, 9.7, 58.6, 32.8],
+    names: [10, 48, 80, 6.5],
+    line: null,
+    card: [11.05, 55.86, 77.9, 24.1],
+    text: [8.9, 15.1, 82.2, 72.6],
+  },
+  // A bandhani-bordered card over the mameru gifts
+  "mameru-bandhani": {
+    frame: [23.9, 7.6, 52.1, 28.3],
+    names: [15, 42.5, 70, 6.5],
+    line: null,
+    card: [9.99, 51.08, 79.81, 27.21],
+    text: [9.4, 16.3, 82.1, 69.8],
+  },
+  // An ajrak-bordered card on indigo
+  "sindhi-ajrak": {
+    frame: [25.3, 11.1, 49.1, 26.4],
+    names: [10, 47.3, 80, 3.8],
+    line: null,
+    card: [9.99, 52.27, 80.13, 32.83],
+    text: [11.2, 15.9, 77.4, 67],
+    dark: true,
+  },
+  // A stone-framed card on the temple steps
+  "hampi-ruins": {
+    frame: [29.5, 8, 40.9, 33],
+    names: [22, 42.7, 56, 6.5],
+    line: [24, 49.5, 52, 4.5],
+    card: [10.73, 56.1, 78.53, 26.26],
+    text: [9.9, 18.7, 80.2, 66.7],
+  },
+  // A carved wooden card among coffee leaves
+  "coorg-estate": {
+    frame: [22.8, 7.8, 52.7, 29.4],
+    names: [10, 48.3, 80, 6.5],
+    line: null,
+    card: [10.73, 57, 78.96, 25.48],
+    text: [11.7, 15.7, 77.3, 68.7],
+  },
+  // A carved wooden card with frangipani
+  "bali-garden": {
+    frame: [30.6, 9.9, 38.6, 34.4],
+    names: [15, 48.5, 70, 6.5],
+    line: null,
+    card: [9.46, 56.88, 80.66, 27.87],
+    text: [13.1, 14.8, 74.4, 68.2],
+  },
+  // A blue-tiled card by the sea
+  "santorini-white": {
+    frame: [24, 6.3, 51.9, 34.6],
+    names: [20, 42.3, 60, 6.5],
+    line: [22, 49.1, 56, 4.5],
+    card: [14.15, 55.26, 71.81, 25.84],
+    text: [9.5, 16.4, 80.8, 67.7],
+    dark: true,
+  },
+  // A pale card trailed with eucalyptus
+  "glass-house": {
+    frame: [20.7, 8.5, 58, 31.8],
+    names: [22, 48.8, 56, 5.9],
+    line: null,
+    card: [9.78, 55.86, 78.43, 27.03],
+    text: [15.6, 22.7, 74, 55.5],
+  },
+  // A deckled white card with fern corners
+  "minimal-white": {
+    frame: [19.5, 8.5, 60.5, 34.4],
+    names: [10, 47.9, 80, 6.5],
+    line: null,
+    card: [12.34, 55.8, 76.28, 25.78],
+    text: [10, 16.3, 78.7, 65.9],
+  },
+  // A wooden card edged with vines
+  "fairy-forest": {
+    frame: [21.5, 8, 56.3, 31],
+    names: [12, 45.8, 76, 6.5],
+    line: null,
+    card: [10.73, 55.26, 78.96, 28.83],
+    text: [9.2, 13, 81.1, 72.8],
+  },
+  // An envelope closed with a wax seal
+  "love-letter": {
+    frame: [27.7, 8.9, 45.1, 34.3],
+    names: [20, 47.3, 60, 6.5],
+    line: null,
+    card: [14.24, 55.98, 72.37, 23.62],
+    text: [5.2, 4.3, 88.4, 91],
+  },
+  // A lace-edged card with rose sprigs
+  "parsi-chalk": {
+    frame: [29.8, 7, 40.4, 29.4],
+    names: [10, 44.8, 80, 4.7],
+    line: null,
+    card: [15.09, 50.66, 69.61, 28.71],
+    text: [8.5, 13.4, 83.3, 73.1],
+  },
+  // An art deco card with brass fans
+  "jazz-lounge": {
+    frame: [20.5, 6.9, 59, 33.1],
+    names: [20, 49, 60, 6.5],
+    line: null,
+    card: [10.31, 57.18, 79.6, 20.93],
+    text: [7.2, 20.7, 85.4, 62.1],
+    dark: true,
+  },
+  // A scalloped blush card
+  "bride-squad": {
+    frame: [22.7, 7.5, 54.7, 30.1],
+    names: [10, 46.8, 80, 6.1],
+    line: null,
+    card: [11.69, 54.07, 77.26, 26.5],
+    text: [12.1, 22.4, 75.1, 62.3],
+  },
+  // A green-and-pink card hung with flowers
+  "teej-jhoola": {
+    frame: [27, 6.8, 45.9, 24.8],
+    names: [22, 45.2, 56, 6.5],
+    line: null,
+    card: [9.99, 53.47, 80.13, 27.45],
+    text: [9.4, 5.6, 81.7, 76.5],
+  },
+  // A scoreboard card on the pitch
+  "cricket-stadium": {
+    frame: [19, 7.3, 61.5, 35],
+    names: [10, 45.4, 80, 6.5],
+    line: null,
+    card: [6.38, 53.47, 87.25, 22.61],
+    text: [9.9, 15.6, 80.2, 68.6],
+  },
+  // A neon-lit card in the arcade
+  "neon-arcade": {
+    frame: [20.9, 5.2, 58.1, 32.2],
+    names: [10, 42.1, 80, 5.9],
+    line: null,
+    card: [8.08, 49.16, 85.23, 33.43],
+    text: [8.1, 11.5, 83.3, 77.8],
+    dark: true,
+  },
+  // A marquee card under the red curtain
+  "retro-bollywood": {
+    frame: [21, 8.2, 58, 31.5],
+    names: [10, 46.1, 80, 4.2],
+    line: null,
+    card: [9.99, 51.5, 80.66, 26.67],
+    text: [9.9, 16.9, 79.3, 73.1],
+    dark: true,
   },
 };
 
