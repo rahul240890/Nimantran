@@ -18,7 +18,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       ["/invitations/haldi", "Haldi invitations as bright as the day"],
       ["/traditions/bengali", "Bengali biye cards with Prajapati's blessing"],
       ["/designs/gopuram", "Gopuram Pon"],
-      ["/designs", "Invitation designs that open like a gate"],
+      ["/designs", "Find your invitation design"],
       ["/hi/invitations/wedding", "द्वार की तरह खुलने वाला शादी का कार्ड"],
       ["/hi/traditions/tamil", "मुहूर्तम के साथ तमिल कल्याण पत्रिकै"],
     ] as const) {

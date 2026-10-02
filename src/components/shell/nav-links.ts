@@ -7,7 +7,7 @@ import { pagePath } from "@/lib/seo/paths";
  */
 
 const PAGES = {
-  designs: { kind: "gallery" },
+  designs: { kind: "designs" },
   weddings: { kind: "occasion", id: "wedding" },
 } as const;
 

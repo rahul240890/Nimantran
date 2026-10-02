@@ -88,7 +88,7 @@ export function Hero({ locale }: { locale: UiLocale }) {
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
             <Button asChild variant="secondary">
-              <Link href={pagePath({ kind: "gallery" }, locale)}>
+              <Link href={pagePath({ kind: "designs" }, locale)}>
                 {hero.primary}
                 <ArrowRight aria-hidden className="rtl:rotate-180" />
               </Link>
