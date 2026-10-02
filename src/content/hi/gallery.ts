@@ -166,3 +166,15 @@ export const weddingKindCopy: Translation<typeof en.weddingKindCopy> = {
     description: "हर परिवार के लिए सादे कार्ड, अंग्रेज़ी या हिन्दी में।",
   },
 };
+
+export const catalogCopy: Translation<typeof en.catalogCopy> = {
+  searchLabel: "डिज़ाइन खोजें",
+  searchPlaceholder: "नाम, जगह या परंपरा से खोजें…",
+  occasionLabel: "अवसर",
+  allOccasions: "सभी अवसर",
+  traditionLabel: "शादी की परंपरा",
+  allTraditions: "सभी परंपराएँ",
+  count: (count: number) => `${count} डिज़ाइन`,
+  clear: "फ़िल्टर हटाएँ",
+  empty: "इन सब से मेल खाता कोई डिज़ाइन अभी नहीं है। कम फ़िल्टर आज़माइए।",
+};

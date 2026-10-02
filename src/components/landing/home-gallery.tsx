@@ -168,7 +168,7 @@ export function HomeThemes({ locale }: { locale: UiLocale }) {
           </FormatFilter>
         </div>
         <Button asChild>
-          <Link href={pagePath({ kind: "gallery" }, locale)}>
+          <Link href={pagePath({ kind: "designs" }, locale)}>
             {homeGallery.allDesigns}
             <ArrowRight aria-hidden className="rtl:rotate-180" />
           </Link>
