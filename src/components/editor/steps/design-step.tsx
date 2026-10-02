@@ -14,6 +14,7 @@ import {
   SUITES,
   SUITE_IDS,
   hasBlessingPage,
+  isSceneTheme,
   isSuiteId,
   suiteFor,
   suiteSuits,
@@ -43,6 +44,9 @@ export function DesignStep({ draft, update }: StepProps) {
     category: draft.categoryId,
   });
   const suite = draft.suite ?? suggestedSuite;
+  // A Scene theme only shows as a Scene, so there is no choice of kind to make
+  const sceneOnly = isSceneTheme(suite);
+  const offersFormats = hasScene(suite) && !sceneOnly;
 
   return (
     <div className="flex flex-col gap-10">
@@ -154,10 +158,10 @@ export function DesignStep({ draft, update }: StepProps) {
             );
           })}
         </RadioGroup>
-        {hasScene(suite) && (
+        {offersFormats && (
           <h4 className="font-display text-xl leading-tight">{suiteCopy.formatHeading}</h4>
         )}
-        {hasScene(suite) && (
+        {offersFormats && (
           <RadioGroup
             label={suiteCopy.formatHeading}
             variant="card"
@@ -184,7 +188,7 @@ export function DesignStep({ draft, update }: StepProps) {
             ))}
           </RadioGroup>
         )}
-        {SUITES[suite].art !== "card" && draft.format !== "scene" && (
+        {SUITES[suite].art !== "card" && draft.format !== "scene" && !sceneOnly && (
           <Switch
             label={suiteCopy.textBox}
             description={suiteCopy.textBoxHint}

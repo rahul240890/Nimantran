@@ -15,6 +15,27 @@ import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { GuestLookChoice } from "./guest-look";
 
+/**
+ * Scene themes: one painting each, with a painted card that flies in with each celebration
+ * (scene.ts). They have no pages of their own, so they only show as a Scene, and take the
+ * rest of their look (colours, lettering, guest page) from the painted theme they're kin to.
+ */
+export const SCENE_THEME_IDS = [
+  "udaipur-lake",
+  "pink-haveli",
+  "char-bagh",
+  "kashi-ghat",
+  "temple-pond",
+  "kovil-corridor",
+  "arati-mandap",
+  "zamindar-bari",
+  "kutch-bhunga",
+  "punjab-haveli",
+  "pune-wada",
+  "chinar-dal",
+] as const;
+export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
+
 export const SUITE_IDS = [
   "rajwada-bagh",
   "shahi-savari",
@@ -53,6 +74,7 @@ export const SUITE_IDS = [
   "palna",
   "deepotsav",
   "jungle-party",
+  ...SCENE_THEME_IDS,
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -136,7 +158,7 @@ export type Suite = {
   voice?: Voice;
 };
 
-export const SUITES: Record<SuiteId, Suite> = {
+const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "rajwada-bagh": {
     id: "rajwada-bagh",
     art: "bagh",
@@ -1123,6 +1145,51 @@ export const SUITES: Record<SuiteId, Suite> = {
     images: {},
   },
 };
+
+/** The painted theme each Scene theme takes its colours, lettering and guest page from. */
+const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
+  "udaipur-lake": "rajwada-bagh",
+  "pink-haveli": "shahi-savari",
+  "char-bagh": "noor-bagh",
+  "kashi-ghat": "kashi",
+  "temple-pond": "kayal",
+  "kovil-corridor": "mysuru",
+  "arati-mandap": "kalamkari",
+  "zamindar-bari": "rajbari",
+  "kutch-bhunga": "kutch-toran",
+  "punjab-haveli": "phulkari-haveli",
+  "pune-wada": "peshwai-wada",
+  "chinar-dal": "chinar",
+};
+
+/** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
+function sceneTheme(id: SceneThemeId): Suite {
+  const { art, turn, faiths, template, guest, voice } = PAINTED[SCENE_KIN[id]];
+  return {
+    id,
+    art,
+    turn,
+    faiths,
+    template,
+    traditions: [],
+    guest,
+    voice,
+    images: { cover: `/suites/${id}/cover.webp` },
+  };
+}
+
+export const SUITES: Record<SuiteId, Suite> = {
+  ...PAINTED,
+  ...(Object.fromEntries(SCENE_THEME_IDS.map((id) => [id, sceneTheme(id)])) as Record<
+    SceneThemeId,
+    Suite
+  >),
+};
+
+/** Whether a theme is one of the Scene themes, which only show as a Scene. */
+export function isSceneTheme(suite: SuiteId): suite is SceneThemeId {
+  return (SCENE_THEME_IDS as readonly SuiteId[]).includes(suite);
+}
 
 /** Designs whose own look already says where they are from. */
 const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
