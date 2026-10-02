@@ -36,12 +36,12 @@ const SCENES: Partial<Record<SuiteId, SceneEntry>> = {
     one: {
       names: [14, 49.5, 72, 6.5],
       line: [16, 56, 68, 5],
-      slot: [17, 62, 66, 20.5],
+      slot: [17, 61.5, 66, 24.5],
     },
     two: {
       names: [12, 45, 76, 6.5],
       line: [14, 51.5, 72, 5],
-      slot: [16, 58, 68, 22],
+      slot: [16, 57.5, 68, 26],
     },
   },
   // Below the houseboat the backwater is calm mist down to the lotuses
@@ -50,13 +50,13 @@ const SCENES: Partial<Record<SuiteId, SceneEntry>> = {
     one: {
       names: [8, 58.5, 84, 6],
       line: [12, 64.5, 76, 4.8],
-      slot: [13, 69.5, 74, 19.5],
+      slot: [13, 69.5, 74, 23],
     },
     // The carved panel runs down to 70%, so the line opens the slot instead
     two: {
       names: [6, 70, 88, 5.6],
       line: null,
-      slot: [12, 76, 76, 18.5],
+      slot: [12, 76, 76, 21.5],
     },
   },
 };

@@ -241,7 +241,7 @@ export function roleSizeCss(role: TypeRole): string {
 /** Space above a line, in cqmin: groups breathe, a heading stays close to what it heads. */
 export function spaceBefore(role: TypeRole, previous: TypeRole | null): number {
   if (previous === null) return 0;
-  if (role === "label") return 3.6;
+  if (role === "label") return 4.4;
   if (previous === "label") return 0.8;
   if (role === "joiner" || previous === "joiner") return 0.4;
   if (previous === "display" || previous === "names" || role === "display") return 2.2;

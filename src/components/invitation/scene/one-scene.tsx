@@ -40,7 +40,9 @@ import {
   type Entrance,
   type ScenePage,
 } from "@/lib/suites/scene";
+import { isCardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
+import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import "@/components/invitation/type/fonts.css";
 
 /*
@@ -477,6 +479,29 @@ export function SceneButton({
   );
 }
 
+/** A small gold label over a group of the slot's details: "Date & time", "शुभ स्थान". */
+function SlotLabel({
+  voice,
+  lang,
+  type,
+  children,
+}: {
+  voice: Voice;
+  lang: string;
+  type: PageType | undefined;
+  children: ReactNode;
+}) {
+  return (
+    <p
+      lang={lang}
+      className="mb-[0.35em] text-card-gold-text"
+      style={sceneLine(voice, "countdown", lang, type)}
+    >
+      {children}
+    </p>
+  );
+}
+
 /** One function (or the opening line) on the slot's own card, arriving or leaving. */
 function SlotCard({
   item,
@@ -505,6 +530,8 @@ function SlotCard({
       : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
   useFit(card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, 1.15);
   const fn = item.kind === "function" ? item.fn : null;
+  const labels = CARD_STORY_WORDS[isCardLanguage(lang) ? lang : "en"];
+  const when = Boolean(fn && (fn.date || fn.time));
   return (
     <div
       ref={card}
@@ -523,7 +550,7 @@ function SlotCard({
         ) : (
           fn && (
             <>
-              {/* As on a printed card: how soon, then the name, a rule, the day, and when and where */}
+              {/* As on a printed card: how soon, the name, a rule, then the day and the place, each under its label */}
               {fn.countdown && (
                 <p
                   lang={lang}
@@ -552,25 +579,62 @@ function SlotCard({
               {(fn.date || fn.time || fn.venue) && (
                 <span aria-hidden className="story-rule scene-rule" />
               )}
-              {fn.date && (
-                <p lang={lang} style={sceneLine(voice, "date", lang, type)}>
-                  {fn.date}
-                </p>
-              )}
-              {(fn.time || fn.venue) && (
-                <p
-                  lang={lang}
-                  className="mt-[0.2em] max-w-full text-balance text-card-ink-muted"
-                  style={sceneLine(voice, "detail", lang, type)}
-                >
-                  {fn.muhurat && fn.time && (
-                    <span lang={fn.muhurat.lang} className="text-card-accent-text">
-                      {fn.muhurat.text} ·{" "}
-                    </span>
-                  )}
-                  {[fn.time, fn.venue].filter(Boolean).join(" · ")}
-                </p>
-              )}
+              {/* The day and the place side by side, a fine gold line between, so the
+                  card stays short enough to set every line at a comfortable size */}
+              <div
+                className={cn(
+                  "grid w-full items-start gap-x-[0.9em]",
+                  when && fn.venue ? "grid-cols-[1fr_auto_1fr]" : "grid-cols-1",
+                )}
+              >
+                {when && (
+                  <div className="flex flex-col items-center">
+                    <SlotLabel voice={voice} lang={lang} type={type}>
+                      {labels.when}
+                    </SlotLabel>
+                    {fn.date && (
+                      <p
+                        lang={lang}
+                        className="text-balance"
+                        style={sceneLine(voice, "date", lang, type)}
+                      >
+                        {fn.date}
+                      </p>
+                    )}
+                    {fn.time && (
+                      <p
+                        lang={lang}
+                        className="mt-[0.15em] text-card-ink-muted"
+                        style={sceneLine(voice, "detail", lang, type)}
+                      >
+                        {fn.muhurat && (
+                          <span lang={fn.muhurat.lang} className="text-card-accent-text">
+                            {fn.muhurat.text} ·{" "}
+                          </span>
+                        )}
+                        {fn.time}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {when && fn.venue && (
+                  <span aria-hidden className="w-px self-stretch bg-card-gold/45" />
+                )}
+                {fn.venue && (
+                  <div className="flex flex-col items-center">
+                    <SlotLabel voice={voice} lang={lang} type={type}>
+                      {labels.where}
+                    </SlotLabel>
+                    <p
+                      lang={lang}
+                      className="max-w-full text-balance"
+                      style={sceneLine(voice, "date", lang, type)}
+                    >
+                      {fn.venue}
+                    </p>
+                  </div>
+                )}
+              </div>
             </>
           )
         )}
