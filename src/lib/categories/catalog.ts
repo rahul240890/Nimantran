@@ -15,6 +15,8 @@ const WEDDING_SEASON = [9, 10, 11, 12, 1, 2, 3, 4, 5];
 const EARLY_SEASON = [6, 7, 8, 9, 10];
 /** Birthdays, anniversaries and parties happen all year. */
 const ALL_YEAR = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+/** Diwali falls in October or November; its invites go out from September. */
+const DIWALI_SEASON = [9, 10, 11];
 
 const NORTH = ["PB", "HR", "DL", "CH", "HP", "JK", "UP", "UT"] as const;
 
@@ -362,6 +364,73 @@ export const CATEGORIES = {
       doorRight: "Invited",
       families: "Hosted by friends",
       line: "invite you to an evening of music, food and friends",
+    },
+    people: "one",
+  },
+  // A baby shower and Diwali (Step 12u): one function each, with their own painted theme
+  "baby-shower": {
+    id: "baby-shower",
+    group: "baby",
+    names: {
+      en: "Baby shower",
+      hi: "गोद भराई",
+      mr: "डोहाळे जेवण",
+      gu: "સીમંત",
+      bn: "সাধ",
+      ta: "வளைகாப்பு",
+      te: "సీమంతం",
+      kn: "ಸೀಮಂತ",
+      ml: "സീമന്തം",
+      pa: "ਗੋਦ ਭਰਾਈ",
+    },
+    icon: "flower",
+    priority: 30,
+    season: ALL_YEAR,
+    regions: [],
+    functions: { planned: ["baby-shower"], suggested: ["baby-shower"], primary: "baby-shower" },
+    schedule: "full",
+    rsvpQuestions: ["meal"],
+    templates: ["rose", "marigold", "monogram"],
+    wording: {
+      doorLeft: "Godh",
+      doorRight: "Bharai",
+      first: "Priya",
+      blessing: "Blessings for the little one",
+      families: "With love from both families",
+      line: "invite you to shower blessings on the mother-to-be",
+    },
+    people: "one",
+  },
+  diwali: {
+    id: "diwali",
+    group: "festivals",
+    names: {
+      en: "Diwali",
+      hi: "दिवाली",
+      mr: "दिवाळी",
+      gu: "દિવાળી",
+      bn: "দীপাবলি",
+      ta: "தீபாவளி",
+      te: "దీపావళి",
+      kn: "ದೀಪಾವಳಿ",
+      ml: "ദീപാവലി",
+      pa: "ਦੀਵਾਲੀ",
+    },
+    icon: "diya",
+    priority: 25,
+    season: DIWALI_SEASON,
+    regions: [],
+    functions: { planned: ["diwali"], suggested: ["diwali"], primary: "diwali" },
+    schedule: "full",
+    rsvpQuestions: ["meal"],
+    templates: ["marigold", "rose", "emerald"],
+    wording: {
+      doorLeft: "Shubh",
+      doorRight: "Deepavali",
+      first: "Diwali Milan",
+      blessing: "May Lakshmi bless your home",
+      families: "With love from the family",
+      line: "invite you to an evening of diyas, sweets and Lakshmi puja",
     },
     people: "one",
   },

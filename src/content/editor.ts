@@ -210,6 +210,16 @@ export const functionCopy: Record<
     description: "Music, food and friends",
     dressIdeas: ["Smart casual", "Cocktail", "Something that sparkles"],
   },
+  "baby-shower": {
+    name: "Baby shower",
+    description: "Blessings, songs and gifts for the mother-to-be",
+    dressIdeas: ["Pastels", "Festive ethnic", "Greens and yellows"],
+  },
+  diwali: {
+    name: "Diwali party",
+    description: "Lakshmi puja, diyas, sweets and dinner",
+    dressIdeas: ["Festive ethnic", "Reds and golds", "Something that sparkles"],
+  },
 };
 
 export const functionFields = {
@@ -266,10 +276,18 @@ export const namesCopy = {
     birthday: { label: "Birthday", eyebrow: "The birthday", title: "Whose birthday is it?" },
     anniversary: { label: "Couple", eyebrow: "The couple", title: "Who is celebrating?" },
     party: { label: "Party", eyebrow: "The party", title: "What's the party called?" },
+    "baby-shower": {
+      label: "Mother-to-be",
+      eyebrow: "The baby shower",
+      title: "Who is the mother-to-be?",
+    },
+    diwali: { label: "Diwali", eyebrow: "Diwali", title: "What's your Diwali party called?" },
   },
   one: {
     birthday: { label: "Birthday name", example: "Aarav" },
     party: { label: "Party name", example: "Diwali Night" },
+    "baby-shower": { label: "Her name", example: "Priya" },
+    diwali: { label: "Party name", example: "Sharma Family Diwali" },
   },
   oneHint: "It's printed large on the cover. Say who invites and why in the wording below.",
 } as const;
@@ -509,6 +527,13 @@ export const suiteCopy = {
     "chai-bagan": "Chai Bagan",
     "sufi-raat": "Sufi Raat",
     chapel: "Chapel",
+    sakura: "Sakura",
+    vigna: "Vigna",
+    himani: "Himani",
+    van: "Van",
+    riad: "Riad",
+    palna: "Palna",
+    deepotsav: "Deepotsav",
     "jungle-party": "Jungle Party",
     classic: "Card colours",
   },
@@ -544,6 +569,13 @@ export const suiteCopy = {
     "chai-bagan": "Assam's tea gardens in gamosa red and white, with Bihu drums by the river.",
     "sufi-raat": "A moonlit Sufi courtyard of lanterns, roses and still water.",
     chapel: "A white garden chapel with lilies, opening with a stained glass window.",
+    sakura: "Cherry blossoms over a wooden bridge, a still pond and paper lanterns.",
+    vigna: "A Tuscan vineyard at golden hour, with olive trees and a stone villa.",
+    himani: "Snowy mountains, a pine forest and warm winter lights.",
+    van: "An enchanted forest of moss, ferns, fairy lights and fireflies.",
+    riad: "A Moroccan riad of tiled fountains, arches and brass lanterns.",
+    palna: "A flower swing cradle among soft pastel clouds.",
+    deepotsav: "A Diwali night of diyas, rangoli and fireworks, opening with Lakshmi and Ganesha.",
     "jungle-party": "A storybook jungle of friendly animals, balloons and big leaves.",
     classic: "Pages in your card's own paper and colours, with a scene for each function.",
   },
