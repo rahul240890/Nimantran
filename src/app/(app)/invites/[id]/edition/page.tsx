@@ -1,4 +1,4 @@
-import { ArrowLeft, FileText, ReceiptText } from "lucide-react";
+import { ArrowLeft, FileText, ReceiptText, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
-import { editionsActive, inviteReceipts, invitePlan } from "@/lib/payments/editions";
+import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { checkoutCoupons } from "@/lib/payments/coupons";
 import { formatRupees, isPlanId, planNeeded } from "@/lib/plans/catalog";
 import { pricesFor } from "@/lib/plans/offers";
@@ -32,9 +32,10 @@ export default async function EditionPage({
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/edition`)}`);
-  const [draft, current] = await Promise.all([
+  const [draft, current, owner] = await Promise.all([
     inviteStore()?.get(account, id),
     invitePlan(account, id),
+    ownsInvite(account, id),
   ]);
   if (!draft || !current) notFound();
   const [active, receipts, locale, { upgradeCopy, planCopy }, coupons] = await Promise.all([
@@ -68,12 +69,25 @@ export default async function EditionPage({
             </div>
           </div>
 
+          {!owner && (
+            <div
+              role="note"
+              className="flex max-w-2xl items-start gap-3 rounded-lg border border-marigold/45 bg-marigold/10 p-5"
+            >
+              <Users aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />
+              <div className="flex flex-col gap-0.5">
+                <p className="font-semibold">{upgradeCopy.ownerOnly.title}</p>
+                <p className="text-sm text-ink-muted">{upgradeCopy.ownerOnly.body}</p>
+              </div>
+            </div>
+          )}
           <EditionPicker
             inviteId={id}
             current={current}
             needed={planNeeded(draft)}
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
+            canPay={owner}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
             prices={pricesFor(current, coupons, null, new Date())}
           />

@@ -88,6 +88,14 @@ export const PLANS: Record<PlanId, Plan> = {
   },
 };
 
+/**
+ * Co-hosts each edition includes (docs/PRICING.md); null for no limit. Kept apart from
+ * PlanLimits because the database counts them (cohost_limit()), not the invite's draft.
+ */
+const COHOSTS: Record<PlanId, number | null> = { free: 1, premium: 3, royal: null, bundle: null };
+
+export const cohostLimit = (plan: PlanId): number | null => COHOSTS[plan];
+
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === "string" && (PLAN_IDS as readonly string[]).includes(value);
 }

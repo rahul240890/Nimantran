@@ -44,6 +44,11 @@ database keeps every invite. Applied so far after the first setup:
   the server's service role can call. Guests' uploads need `SUPABASE_SERVICE_ROLE_KEY` in
   Vercel.
 
+- `20261002160000_cohost_access.sql` — co-hosts, part 2: what each co-host can do (`access`
+  on `event_hosts` and `event_host_invites`, `can_edit_event()`), the co-hosts each edition
+  includes (`cohost_limit()`), and the new `event_host_list()` and `accept_host_invite()`.
+  Co-hosts who joined earlier keep editing.
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).
