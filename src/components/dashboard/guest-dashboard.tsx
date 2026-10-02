@@ -9,6 +9,7 @@ import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
+import { PhotoWallCard } from "./photo-wall-card";
 import { Reminders } from "./reminders";
 import type { DashboardView } from "./types";
 
@@ -177,6 +178,7 @@ export async function GuestDashboard({ view }: { view: DashboardView }) {
         <GuestList view={view} />
         <div className="flex min-w-0 flex-col gap-6">
           <Reminders view={view} />
+          <PhotoWallCard inviteId={view.id} />
           <Cohosts view={view} />
         </div>
       </div>
