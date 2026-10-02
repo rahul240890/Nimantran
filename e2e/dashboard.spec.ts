@@ -173,6 +173,8 @@ test.describe("host dashboard", () => {
     await plan.getByRole("radio", { name: /Reminder/ }).check();
     await plan.getByRole("combobox", { name: /^For/ }).click();
     await page.getByRole("option", { name: "Haldi" }).click();
+    // The list fades out before it leaves the page
+    await expect(page.getByRole("listbox")).toHaveCount(0);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await plan.getByRole("button", { name: "Schedule", exact: true }).click();
 
