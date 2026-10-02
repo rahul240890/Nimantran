@@ -33,6 +33,21 @@ export const SCENE_THEME_IDS = [
   "punjab-haveli",
   "pune-wada",
   "chinar-dal",
+  "space-voyage",
+  "rainbow-unicorn",
+  "dino-jungle",
+  "ocean-pearl",
+  "boho-onederland",
+  "fairytale-castle",
+  "little-racer",
+  "gold-gala",
+  "amrit-utsav",
+  "silver-jubilee",
+  "golden-jubilee",
+  "oh-baby",
+  "new-year-eve",
+  "kitty-tea",
+  "pool-party",
 ] as const;
 export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
@@ -1160,6 +1175,40 @@ const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "punjab-haveli": "phulkari-haveli",
   "pune-wada": "peshwai-wada",
   "chinar-dal": "chinar",
+  "space-voyage": "rooftop",
+  "rainbow-unicorn": "gubbara",
+  "dino-jungle": "jungle-party",
+  "ocean-pearl": "gubbara",
+  "boho-onederland": "gubbara",
+  "fairytale-castle": "gubbara",
+  "little-racer": "jungle-party",
+  "gold-gala": "rooftop",
+  "amrit-utsav": "saath",
+  "silver-jubilee": "saath",
+  "golden-jubilee": "saath",
+  "oh-baby": "palna",
+  "new-year-eve": "rooftop",
+  "kitty-tea": "gubbara",
+  "pool-party": "gubbara",
+};
+
+/** The occasions a Scene theme is painted for beyond weddings. */
+const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
+  "space-voyage": ["birthday"],
+  "rainbow-unicorn": ["birthday"],
+  "dino-jungle": ["birthday"],
+  "ocean-pearl": ["birthday"],
+  "boho-onederland": ["birthday"],
+  "fairytale-castle": ["birthday"],
+  "little-racer": ["birthday"],
+  "gold-gala": ["birthday", "party"],
+  "amrit-utsav": ["birthday"],
+  "silver-jubilee": ["anniversary"],
+  "golden-jubilee": ["anniversary"],
+  "oh-baby": ["baby-shower"],
+  "new-year-eve": ["party"],
+  "kitty-tea": ["party"],
+  "pool-party": ["party", "birthday"],
 };
 
 /** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
@@ -1175,6 +1224,7 @@ function sceneTheme(id: SceneThemeId): Suite {
     guest,
     voice,
     images: { cover: `/suites/${id}/cover.webp` },
+    ...(SCENE_OCCASIONS[id] && { occasions: SCENE_OCCASIONS[id] }),
   };
 }
 

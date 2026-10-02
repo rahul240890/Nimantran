@@ -88,6 +88,8 @@ type PaintedEntry = {
   line: FrameBox | null;
   card: FrameBox;
   text: FrameBox;
+  /** The painting is dark behind the names, so they print light at every hour. */
+  dark?: true;
 };
 
 const PAINTED: Record<SceneThemeId, PaintedEntry> = {
@@ -187,6 +189,130 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     card: [12.11, 52.87, 75.98, 26.02],
     text: [7.1, 13.9, 85.4, 72.6],
   },
+  // A brass starship plaque among the planets
+  "space-voyage": {
+    frame: [21.4, 8, 57, 31],
+    names: [10, 43.8, 80, 5.9],
+    line: [12, 50, 76, 4],
+    card: [5.28, 55.21, 89.81, 22.14],
+    text: [9.2, 19.4, 81.8, 70],
+    dark: true,
+  },
+  // A cloud card under a rainbow
+  "rainbow-unicorn": {
+    frame: [24, 8.9, 52.2, 29.5],
+    names: [10, 45.5, 80, 6.5],
+    line: null,
+    card: [7.78, 54.37, 84.54, 25.78],
+    text: [8.5, 27.6, 82.8, 62.1],
+  },
+  // A wooden sign wrapped in jungle vines
+  "dino-jungle": {
+    frame: [22.2, 11.3, 55.5, 31.1],
+    names: [10, 47.3, 80, 6.1],
+    line: [12, 53.6, 76, 4],
+    card: [4.81, 58.85, 89.35, 21.25],
+    text: [11.4, 21.9, 78.3, 68.2],
+  },
+  // A shell-and-pearl frame under the sea
+  "ocean-pearl": {
+    frame: [22.3, 9.4, 55.3, 29.9],
+    names: [10, 45.8, 80, 5.9],
+    line: [12, 52, 76, 4],
+    card: [8.24, 57.24, 83.43, 26.35],
+    text: [8.1, 18.1, 83.9, 64.5],
+  },
+  // A linen card in a thin oak frame
+  "boho-onederland": {
+    frame: [26, 5.1, 52.1, 29.1],
+    names: [22, 41.9, 56, 6.5],
+    line: [24, 48.7, 52, 4.5],
+    card: [12.78, 58.02, 76.3, 24.53],
+    text: [5.5, 10.1, 89.1, 81.5],
+  },
+  // A gilded scroll tied with pink ribbon
+  "fairytale-castle": {
+    frame: [29.4, 8, 41, 31.3],
+    names: [10, 45.1, 80, 6.5],
+    line: null,
+    card: [5.74, 53.18, 88.89, 25.1],
+    text: [9.3, 17.2, 81, 67.7],
+  },
+  // A checkered banner between two brass posts
+  "little-racer": {
+    frame: [23.9, 8.7, 52.2, 29.2],
+    names: [10, 43.8, 80, 6.3],
+    line: [12, 50.4, 76, 4],
+    card: [9.63, 55.57, 81.11, 24.9],
+    text: [9.1, 23.8, 82, 58.2],
+  },
+  // An art deco card with gold fans
+  "gold-gala": {
+    frame: [29, 12.3, 42, 32.2],
+    names: [10, 49.9, 80, 6.5],
+    line: null,
+    card: [10.09, 58.65, 80.28, 25.78],
+    text: [9.9, 14.9, 79.7, 69.8],
+    dark: true,
+  },
+  // A gold-bordered silk panel between brass lamps
+  "amrit-utsav": {
+    frame: [25.6, 10.7, 48.6, 27.3],
+    names: [12, 44.4, 76, 6.5],
+    line: [14, 51.2, 72, 4.5],
+    card: [13.52, 59.01, 74.72, 25.26],
+    text: [10.7, 15, 78.3, 67.3],
+  },
+  // A silver-edged card with pearl corners
+  "silver-jubilee": {
+    frame: [28.1, 6.5, 43.6, 33.9],
+    names: [18, 46.8, 64, 6],
+    line: [20, 53.1, 60, 4],
+    card: [10, 58.28, 79.26, 26.2],
+    text: [7.6, 12.3, 85.2, 76.3],
+    dark: true,
+  },
+  // A gold frame with a leaf crest
+  "golden-jubilee": {
+    frame: [27.9, 8.6, 44, 32.8],
+    names: [18, 45.4, 64, 6.5],
+    line: [20, 52.2, 60, 4.5],
+    card: [13.43, 57.92, 73.52, 25.94],
+    text: [14.4, 19.6, 78.9, 69.4],
+  },
+  // A banner hung from a hot air balloon
+  "oh-baby": {
+    frame: [24.3, 9.4, 51.5, 29.3],
+    names: [10, 43.7, 80, 6.5],
+    line: null,
+    card: [16.57, 51.72, 66.67, 27.92],
+    text: [14.1, 44, 72, 48.7],
+  },
+  // A gold-starred card on the rooftop
+  "new-year-eve": {
+    frame: [21.2, 5.6, 57.4, 31.9],
+    names: [10, 43.6, 80, 6.5],
+    line: [12, 50.4, 76, 4.5],
+    card: [7.41, 57.92, 85, 22.45],
+    text: [7.8, 13.7, 84.7, 73.5],
+    dark: true,
+  },
+  // A scalloped pink card tied with a bow
+  "kitty-tea": {
+    frame: [18.9, 7.3, 62.2, 34.2],
+    names: [12, 49.8, 76, 4.9],
+    line: null,
+    card: [13.8, 55.94, 72.87, 28.12],
+    text: [8.5, 30.4, 82.3, 56.9],
+  },
+  // A driftwood board edged with rope
+  "pool-party": {
+    frame: [25.4, 10.7, 50.1, 28],
+    names: [10, 48.5, 80, 6.5],
+    line: null,
+    card: [11.11, 57.81, 76.67, 26.15],
+    text: [11.6, 29.4, 80.9, 51.6],
+  },
 };
 
 export type ScenePage = {
@@ -196,16 +322,19 @@ export type ScenePage = {
   card: PaintedCard | null;
   /** Where each photo shows through: the couple, or the bride then the groom. */
   frames: readonly FrameBox[];
+  /** The names and line print light whatever the hour, on a dark painting. */
+  dark: boolean;
 } & SceneLayout;
 
 /** The painting and places for a theme's scene with this many photos, if it has one. */
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
   if (isSceneTheme(suite)) {
     // One frame: with two photos, the first (the couple, or the bride) shows
-    const { frame, names, line, card, text } = PAINTED[suite];
+    const { frame, names, line, card, text, dark } = PAINTED[suite];
     return {
       image: `/suites/${suite}/scene.webp`,
       style: "painted",
+      dark: Boolean(dark),
       card: { image: `/suites/${suite}/card.webp`, text },
       frames: [frame],
       names,
@@ -218,7 +347,14 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
   const page = entry ? photoPage(suite, Math.max(1, photos)) : null;
   if (!entry || !page) return null;
   const layout = page.frames.length > 1 ? entry.two : entry.one;
-  return { image: page.image, style: entry.style, card: null, frames: page.frames, ...layout };
+  return {
+    image: page.image,
+    style: entry.style,
+    card: null,
+    frames: page.frames,
+    dark: false,
+    ...layout,
+  };
 }
 
 /** Whether a theme can be shown as one scene. */

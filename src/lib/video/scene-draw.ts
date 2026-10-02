@@ -96,7 +96,7 @@ function drawScene(ctx: CanvasRenderingContext2D, film: SceneFilm, seconds: numb
   if (before && change < 1) drawLight(ctx, film, moodOf(film, before), 1 - change);
   drawLight(ctx, film, mood, change);
 
-  const tone = mood === "night" ? "dark" : "light";
+  const tone = page.dark || mood === "night" ? "dark" : "light";
   const printed = film.palette(mood, tone);
   drawNames(ctx, film, voice, printed, rise(seconds, 0.3));
   if (page.line && film.copy.line.trim()) {

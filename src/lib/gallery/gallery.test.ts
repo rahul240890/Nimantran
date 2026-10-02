@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { searchWords } from "@/components/gallery/design-words";
 import { CATEGORY_IDS } from "@/lib/categories/catalog";
 import { newDraft, withGalleryChoice } from "@/lib/editor/draft";
-import { SUITES } from "@/lib/suites/catalog";
+import { SUITES, suiteFor } from "@/lib/suites/catalog";
 import {
   OCCASIONS,
   WEDDING_KINDS,
@@ -11,6 +11,7 @@ import {
   occasionDesigns,
   paintedDesign,
   sceneDesign,
+  suiteOccasion,
 } from "./catalog";
 import { normalize, searchGallery } from "./search";
 
@@ -55,6 +56,25 @@ describe("gallery catalog", () => {
     expect(ids.indexOf("kayal-scene")).toBeLessThan(ids.indexOf("kayal"));
     expect(new Set(ids).size).toBe(ids.length);
     expect(designHref(sceneDesign("kayal"), { category: "wedding" })).toContain("format=scene");
+  });
+
+  it("lists the Scene themes painted for an occasion there, and not for weddings", () => {
+    const birthday = occasionDesigns("birthday").map((design) => design.id);
+    expect(birthday).toContain("space-voyage-scene");
+    expect(birthday).toContain("pool-party-scene");
+    expect(occasionDesigns("party").map((design) => design.id)).toContain("pool-party-scene");
+    expect(occasionDesigns("anniversary").map((design) => design.id)).toContain(
+      "golden-jubilee-scene",
+    );
+    expect(occasionDesigns("baby-shower").map((design) => design.id)).toContain("oh-baby-scene");
+    expect(occasionDesigns("wedding").map((design) => design.id)).not.toContain(
+      "space-voyage-scene",
+    );
+    // It opens the editor on its occasion, while a new birthday still starts on Gubbara
+    expect(suiteOccasion("space-voyage")).toBe("birthday");
+    expect(
+      suiteFor({ suite: null, tradition: null, templateId: "rose", category: "birthday" }),
+    ).toBe("gubbara");
   });
 });
 
