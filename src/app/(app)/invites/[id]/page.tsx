@@ -22,8 +22,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function GuestsPage({ params }: PageProps<"/invites/[id]">) {
+export default async function GuestsPage({ params, searchParams }: PageProps<"/invites/[id]">) {
   const { id } = await params;
+  const { send } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}`)}`);
@@ -36,6 +37,7 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
     <PageTransition>
       <AccountShell>
         <GuestDashboard
+          openSend={typeof send === "string" && z.uuid().safeParse(send).success ? send : undefined}
           view={{
             id,
             role: data.role,
@@ -52,6 +54,8 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
             origin: origin.replace(/\/+$/, ""),
             plan,
             cohostLimit: plan ? cohostLimit(plan) : null,
+            schedules: data.schedules,
+            now: new Date().toISOString(),
           }}
         />
       </AccountShell>

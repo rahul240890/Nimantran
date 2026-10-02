@@ -7,6 +7,12 @@ import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/ids";
 import { isFunctionId } from "@/lib/events/functions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { GuestReplyRow, HostFunction, HostGuest, ReplyStatus } from "@/lib/guests/list";
+import {
+  SCHEDULE_LIMIT,
+  type ScheduledSend,
+  type SendPurpose,
+  type SendStatus,
+} from "@/lib/guests/schedule";
 import { supabaseServer } from "@/lib/supabase/server";
 import { editionsActive, publishedPlan } from "@/lib/payments/editions";
 import { cohostLimit } from "@/lib/plans/catalog";
@@ -66,7 +72,11 @@ export type Dashboard = {
   hosts: Host[];
   /** Co-host links not used yet; only the owner sees them. */
   hostInvites: HostInvite[];
+  /** Invitations and reminders planned for later, sent from the host's WhatsApp. */
+  schedules: ScheduledSend[];
 };
+
+export type NewSend = { purpose: SendPurpose; functionId: string | null; sendAt: string };
 
 export type NewGuest = {
   name: string;
@@ -99,6 +109,13 @@ type HostStore = {
   updateGuest(account: Account, id: string, guestId: string, patch: GuestPatch): Promise<boolean>;
   removeGuests(account: Account, id: string, guestIds: string[]): Promise<boolean>;
   markReminded(account: Account, id: string, guestIds: string[]): Promise<boolean>;
+  scheduleSend(account: Account, id: string, send: NewSend): Promise<string | null>;
+  closeSend(
+    account: Account,
+    id: string,
+    sendId: string,
+    status: Exclude<SendStatus, "scheduled">,
+  ): Promise<boolean>;
   createHostInvite(account: Account, id: string, invite: NewHostInvite): Promise<string | null>;
   withdrawHostInvite(account: Account, id: string, inviteId: string): Promise<boolean>;
   removeHost(account: Account, id: string, userId: string): Promise<boolean>;
@@ -114,6 +131,7 @@ const FUNCTION_COLUMNS =
   "id, kind, position, date, start_time, end_time, venue, address, dress_code";
 const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
+const SEND_COLUMNS = "id, channel, purpose, function_id, send_at, status";
 const REPLY_COLUMNS =
   "guest_id, function_id, status, adults, children, message, answers, responded_at";
 
@@ -136,6 +154,34 @@ type ReplyRow = {
   answers: Record<string, string>;
   responded_at: string;
 };
+
+type SendRow = {
+  id: string;
+  channel: string;
+  purpose: string;
+  function_id: string | null;
+  send_at: string;
+  status: string;
+};
+
+/** WhatsApp sends the dashboard can show; email and SMS rows wait for their providers. */
+function toSends(rows: SendRow[]): ScheduledSend[] {
+  return rows.flatMap((row): ScheduledSend[] =>
+    row.channel === "whatsapp" &&
+    (row.purpose === "invite" || row.purpose === "reminder") &&
+    (row.status === "scheduled" || row.status === "sent" || row.status === "cancelled")
+      ? [
+          {
+            id: row.id,
+            purpose: row.purpose,
+            functionId: row.function_id,
+            sendAt: new Date(row.send_at).toISOString(),
+            status: row.status,
+          },
+        ]
+      : [],
+  );
+}
 
 type GuestRow = {
   id: string;
@@ -184,7 +230,7 @@ const supabaseStore: HostStore = {
     const { data, error } = await supabase
       .from("events")
       .select(
-        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${GUEST_COLUMNS}), rsvps(${REPLY_COLUMNS})`,
+        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${GUEST_COLUMNS}), rsvps(${REPLY_COLUMNS}), scheduled_sends(${SEND_COLUMNS})`,
       )
       .eq("id", id)
       .maybeSingle();
@@ -195,6 +241,7 @@ const supabaseStore: HostStore = {
       rsvp_questions: { preset: string | null }[];
       guests: GuestRow[];
       rsvps: ReplyRow[];
+      scheduled_sends: SendRow[] | null;
     };
     const role = row.owner_id === account.id ? "owner" : "cohost";
     // "*" keeps working on a database that hasn't had the co-host access migration yet
@@ -268,6 +315,7 @@ const supabaseStore: HostStore = {
         phone: invite.phone ?? null,
         createdAt: invite.created_at,
       })),
+      schedules: toSends(row.scheduled_sends ?? []),
     };
   },
 
@@ -323,6 +371,45 @@ const supabaseStore: HostStore = {
       .eq("event_id", id)
       .in("id", guestIds);
     return !error;
+  },
+
+  async scheduleSend(_account, id, send) {
+    const supabase = await supabaseServer();
+    if (!supabase) return null;
+    const { count } = await supabase
+      .from("scheduled_sends")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", id)
+      .eq("status", "scheduled");
+    if ((count ?? 0) >= SCHEDULE_LIMIT) return null;
+    const { data, error } = await supabase
+      .from("scheduled_sends")
+      .insert({
+        event_id: id,
+        function_id: send.functionId,
+        channel: "whatsapp",
+        purpose: send.purpose,
+        audience: send.purpose === "reminder" ? "pending" : "all",
+        send_at: send.sendAt,
+      })
+      .select("id")
+      .single();
+    return error || !data ? null : (data.id as string);
+  },
+
+  async closeSend(_account, id, sendId, status) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { error, count } = await supabase
+      .from("scheduled_sends")
+      .update(
+        { status, sent_at: status === "sent" ? new Date().toISOString() : null },
+        { count: "exact" },
+      )
+      .eq("event_id", id)
+      .eq("id", sendId)
+      .eq("status", "scheduled");
+    return !error && (count ?? 0) > 0;
   },
 
   async createHostInvite(_account, id, { label, access, phone }) {
@@ -511,6 +598,7 @@ const previewStore: HostStore = {
               createdAt: invite.createdAt,
             }))
           : [],
+      schedules: (stored.schedules ?? []).map((send) => ({ ...send })),
     };
   },
   async addGuests(account, id, guests) {
@@ -561,6 +649,24 @@ const previewStore: HostStore = {
     for (const guest of guestsOf(id)) {
       if (guestIds.includes(guest.id ?? guest.token)) guest.remindedAt = now;
     }
+    return true;
+  },
+  async scheduleSend(account, id, send) {
+    const stored = hosted(account, id);
+    if (!stored) return null;
+    const waiting = (stored.schedules ?? []).filter((item) => item.status === "scheduled");
+    if (waiting.length >= SCHEDULE_LIMIT) return null;
+    if (send.functionId && !stored.functions.some((fn) => `${id}:${fn.kind}` === send.functionId)) {
+      return null;
+    }
+    const sendId = randomUUID();
+    stored.schedules = [...(stored.schedules ?? []), { id: sendId, ...send, status: "scheduled" }];
+    return sendId;
+  },
+  async closeSend(account, id, sendId, status) {
+    const send = hosted(account, id)?.schedules?.find((item) => item.id === sendId);
+    if (!send || send.status !== "scheduled") return false;
+    send.status = status;
     return true;
   },
   async createHostInvite(account, id, { label, access, phone }) {

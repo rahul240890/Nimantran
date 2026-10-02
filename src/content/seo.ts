@@ -59,12 +59,12 @@ export const seoCopy = {
   footerInvitations: "Invitations",
   footerMore: "Designs and traditions",
   gallery: {
-    title: "3D wedding invitation designs",
+    title: "Invitation designs: Scenes, Stories, 3D cards",
     description:
-      "Twelve 3D invitation designs, from Rajasthani jharokhas to Tamil temple gold, each with its own raga. Share on WhatsApp and collect RSVPs.",
-    heading: "Invitation designs that open like a gate",
+      "Search every design by occasion, wedding tradition and kind: painted Scenes, Stories and 3D cards. Share on WhatsApp and collect RSVPs.",
+    heading: "Find your invitation design",
     intro:
-      "Six classic designs and six from India's regions, each drawn from geometry and set to its own raga. Pick one and make it yours.",
+      "Every design in one place. Search, or narrow by occasion, wedding tradition and kind, then tap Use this design.",
   } satisfies PageWords,
   design: {
     title: (name: string) => `${name} · 3D invitation design`,

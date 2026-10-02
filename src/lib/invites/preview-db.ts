@@ -1,5 +1,6 @@
 import "server-only";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
+import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { EventRow, FunctionRow, PhotoRow } from "./rows";
 
 /*
@@ -20,6 +21,8 @@ export type PreviewInvite = {
   hosts?: PreviewHost[];
   /** Co-host links not yet used. */
   hostInvites?: PreviewHostInvite[];
+  /** Invitations and reminders planned for later (scheduled sending). */
+  schedules?: ScheduledSend[];
 };
 
 export type PreviewHost = {

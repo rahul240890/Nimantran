@@ -1,4 +1,5 @@
 import type { HostFunction, HostGuest } from "@/lib/guests/list";
+import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { Host, HostInvite } from "@/lib/invites/hosts";
 import type { PlanId } from "@/lib/plans/catalog";
 
@@ -24,4 +25,8 @@ export type DashboardView = {
   plan: PlanId | null;
   /** Co-hosts the edition includes while editions apply; null for no limit. */
   cohostLimit: number | null;
+  /** Planned invitations and reminders (scheduled sending). */
+  schedules: ScheduledSend[];
+  /** The server's clock when the page was made, so "due now" renders the same in the browser. */
+  now: string;
 };

@@ -171,3 +171,16 @@ export const weddingKindCopy: Record<WeddingKind, { name: string; description: s
     description: "Clean cards for any family, in English or Hindi.",
   },
 };
+
+/** The Designs page: every design, with search and filters (src/lib/gallery/filters.ts). */
+export const catalogCopy = {
+  searchLabel: "Search designs",
+  searchPlaceholder: "Search by name, place or tradition…",
+  occasionLabel: "Occasion",
+  allOccasions: "All occasions",
+  traditionLabel: "Wedding tradition",
+  allTraditions: "All traditions",
+  count: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
+  clear: "Clear filters",
+  empty: "No design matches all of these yet. Try fewer filters.",
+};
