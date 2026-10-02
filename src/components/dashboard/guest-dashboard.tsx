@@ -11,6 +11,7 @@ import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
 import { Opens } from "./opens";
 import { Reminders } from "./reminders";
+import { ScheduledSends } from "./scheduled-sends";
 import type { DashboardView } from "./types";
 
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
@@ -26,7 +27,14 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
 }
 
 /** The host's home for one invite: counts, the guest list, who opened it, reminders and co-hosts. */
-export async function GuestDashboard({ view }: { view: DashboardView }) {
+export async function GuestDashboard({
+  view,
+  openSend,
+}: {
+  view: DashboardView;
+  /** A scheduled send to open on arrival, from the host's calendar reminder. */
+  openSend?: string;
+}) {
   const copy = (await getText(dashboardText)).dashboardCopy;
   const { functionCopy } = await getText(editorText);
   const { limitCopy, planCopy } = await getText(editionsText);
@@ -178,6 +186,7 @@ export async function GuestDashboard({ view }: { view: DashboardView }) {
         <GuestList view={view} />
         <div className="flex min-w-0 flex-col gap-6">
           <Opens view={view} />
+          <ScheduledSends view={view} openSend={openSend} />
           <Reminders view={view} />
           <Cohosts view={view} />
         </div>

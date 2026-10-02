@@ -229,6 +229,70 @@ test.describe("host dashboard", () => {
     expect((await axe(page).analyze()).violations).toEqual([]);
   });
 
+  test("hosts schedule a send, their calendar link opens the list, and they mark it sent", async ({
+    page,
+  }, info) => {
+    test.slow();
+    await writeInvite(page, numberFor(info), ["Dev", "Tara"]);
+    await publish(page, "dev-weds-tara");
+    await page.getByRole("link", { name: "Open guest list" }).click();
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    const add = page.getByRole("dialog", { name: "Add guests" });
+    await add.getByRole("textbox", { name: /^Name/ }).fill("Bua");
+    await add.getByRole("textbox", { name: /WhatsApp number/ }).fill("98111 22233");
+    await add.getByRole("button", { name: "Add guest" }).click();
+    await expect(page.getByTestId("guest-list")).toContainText("Bua");
+
+    const schedule = page.getByRole("region", { name: "Scheduled sending" });
+    await schedule.getByRole("button", { name: "Schedule a send" }).click();
+    const plan = page.getByRole("dialog", { name: "Schedule a send" });
+    await plan.getByRole("radio", { name: /Reminder/ }).check();
+    await plan.getByRole("combobox", { name: /^For/ }).click();
+    await page.getByRole("option", { name: "Haldi" }).click();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await plan.getByRole("button", { name: "Schedule", exact: true }).click();
+
+    // The calendar entry points back here with this send's list open
+    const saved = page.getByRole("dialog", { name: "Scheduled" });
+    const google = new URL(
+      (await saved.getByRole("link", { name: "Add to Google Calendar" }).getAttribute("href"))!,
+    );
+    expect(google.searchParams.get("text")).toBe("Send reminders: Dev & Tara");
+    const back = /https?:\/\/\S+\?send=[0-9a-f-]+/.exec(google.searchParams.get("details")!)![0];
+    const download = page.waitForEvent("download");
+    await saved.getByRole("button", { name: "Apple or Outlook calendar" }).click();
+    const ics = await readFile((await (await download).path())!, "utf8");
+    expect(ics).toContain("BEGIN:VALARM");
+    await saved.getByRole("button", { name: "Done" }).click();
+    await expect(schedule).toContainText("Reminder · Haldi");
+    await expect(schedule).toContainText("1 guest");
+    expect(await noOverflow(page)).toBe(true);
+
+    await page.goto(new URL(back).pathname + new URL(back).search);
+    const list = page.getByRole("dialog", { name: "Send: Reminder · Haldi" });
+    await expect(list.getByRole("link", { name: "Remind Bua on WhatsApp" })).toHaveAttribute(
+      "href",
+      /wa\.me\/919811122233/,
+    );
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await list.getByRole("button", { name: "Mark as sent" }).click();
+    await expect(page.getByText("Marked as sent", { exact: true })).toBeVisible();
+    await expect(schedule).not.toContainText("Reminder · Haldi");
+
+    // A second one, cancelled from its menu
+    await schedule.getByRole("button", { name: "Schedule a send" }).click();
+    await plan.getByRole("button", { name: "Schedule", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: "Scheduled" })
+      .getByRole("button", { name: "Done" })
+      .click();
+    await schedule.getByRole("button", { name: "More for Invitations" }).click();
+    await page.getByRole("menuitem", { name: "Cancel this send" }).click();
+    await expect(page.getByText("Send cancelled", { exact: true })).toBeVisible();
+    await expect(schedule).toContainText("Pick a day and time");
+  });
+
   for (const colorScheme of ["light", "dark"] as const) {
     test(`the dashboard passes accessibility checks (${colorScheme})`, async ({ page }, info) => {
       await page.emulateMedia({ colorScheme });

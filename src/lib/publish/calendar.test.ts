@@ -51,6 +51,13 @@ describe("icsCalendar", () => {
     expect(ics.endsWith("END:VCALENDAR\r\n")).toBe(true);
   });
 
+  it("rings at the start only when asked, for the host's own send reminders", () => {
+    expect(ics).not.toContain("BEGIN:VALARM");
+    const alarm = icsCalendar([{ ...wedding, alarm: true }]);
+    expect(alarm).toContain("BEGIN:VALARM\r\nACTION:DISPLAY\r\nTRIGGER:PT0M\r\n");
+    expect(alarm.indexOf("END:VALARM")).toBeLessThan(alarm.indexOf("END:VEVENT"));
+  });
+
   it("folds long lines at 75 bytes", () => {
     const long = icsCalendar([{ ...wedding, description: "शुभ विवाह ".repeat(20) }]);
     for (const line of long.split("\r\n")) {
