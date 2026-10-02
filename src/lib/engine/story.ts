@@ -96,6 +96,10 @@ export type FamilyLine = { title: string; text: string; lang?: string };
 /** The few words the story adds of its own, in the page's language. */
 export type StoryWords = {
   saveTheDate: string;
+  /** The small label over a function's day and time ("Date & time", "शुभ तिथि"). */
+  when: string;
+  /** The small label over its place ("Venue", "शुभ स्थान"). */
+  where: string;
   joinUs: string;
   withLove: string;
   and: string;
@@ -226,10 +230,13 @@ export function storyBeats({
         ...line(fn.countdown ?? "", "label"),
         ...line(fn.name, "display"),
         ...(fn.localName ? line(fn.localName.text, "script", fn.localName.lang) : []),
+        // Then the day and the place, each under its own small label with room between,
+        // as a studio sets a printed card
+        ...(fn.date || fn.time ? line(w.when, "label") : []),
         ...line(fn.date, "date"),
         ...(fn.muhurat && fn.time ? line(fn.muhurat.text, "small", fn.muhurat.lang) : []),
         ...line(fn.time, "body"),
-        ...line(fn.venue, "small"),
+        ...(fn.venue ? [...line(w.where, "label"), ...line(fn.venue, "body")] : []),
       ]),
     );
     const maps = fn.mapsUrl ?? null;
