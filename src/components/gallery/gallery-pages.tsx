@@ -46,7 +46,7 @@ function crumbs(locale: UiLocale, ...rest: Crumb[]): Crumb[] {
   ];
 }
 
-function GalleryHero({
+export function GalleryHero({
   eyebrow,
   heading,
   intro,

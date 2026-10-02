@@ -12,6 +12,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       ["/invitations/wedding/gujarati", "ગુજરાતીGujarati wedding invitations"],
       ["/invitations/birthday", "Birthday invitations full of balloons and cake"],
       ["/hi/invitations", "आप क्या मना रहे हैं?"],
+      ["/designs?occasion=wedding&tradition=gujarati", "Find your invitation design"],
+      ["/hi/designs", "अपने निमंत्रण का डिज़ाइन खोजिए"],
     ] as const) {
       test(`${path} fits the screen and passes an accessibility check`, async ({ page }) => {
         await page.goto(path);
@@ -87,5 +89,57 @@ test.describe("finding a design", () => {
     await expect(cover).toContainText("Happy birthday");
     await expect(cover).toContainText("Aarav");
     await expect(cover).not.toContainText("&");
+  });
+});
+
+test.describe("the Designs page", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("filters narrow every design, follow the address and open the editor set up", async ({
+    page,
+  }) => {
+    await page.goto("/designs");
+    const count = page.getByText(/^\d+ designs?$/);
+    const all = Number((await count.textContent())!.split(" ")[0]);
+
+    const occasions = page.getByRole("group", { name: "Occasion" });
+    await occasions.getByRole("button", { name: "Birthday" }).click();
+    await expect(page).toHaveURL(/occasion=birthday/);
+    await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
+    await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
+    // A birthday has no wedding traditions to choose from
+    await expect(page.getByRole("group", { name: "Wedding tradition" })).toBeHidden();
+
+    await occasions.getByRole("button", { name: "All occasions" }).click();
+    await page
+      .getByRole("group", { name: "Wedding tradition" })
+      .getByRole("button", { name: "Gujarati" })
+      .click();
+    await expect(page).toHaveURL(/tradition=gujarati/);
+    await expect(occasions.getByRole("button", { name: "Wedding" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.locator('[data-design="kayal"]')).toHaveCount(0);
+
+    await page.getByRole("radio", { name: "3D card" }).click();
+    await expect(page.locator("[data-design]")).toHaveCount(1);
+    await expect(page.locator('[data-design="card-bandhani"]')).toBeVisible();
+    await expect(
+      page.locator('[data-design="card-bandhani"]').getByRole("link", { name: /Use this design/ }),
+    ).toHaveAttribute("href", /category=wedding.*tradition=gujarati/);
+
+    await page.getByRole("button", { name: "Clear filters" }).click();
+    await expect(count).toHaveText(`${all} designs`);
+  });
+
+  test("search finds designs by name, and says so when nothing matches", async ({ page }) => {
+    await page.goto("/designs");
+    const search = page.getByRole("searchbox", { name: "Search designs" });
+    await search.fill("kayal");
+    await expect(page.locator('[data-design="kayal"]')).toBeVisible();
+    await expect(page.locator('[data-design="noor-bagh"]')).toHaveCount(0);
+    await search.fill("zzzz");
+    await expect(page.getByText("No design matches all of these yet.")).toBeVisible();
   });
 });

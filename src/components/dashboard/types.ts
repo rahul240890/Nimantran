@@ -1,4 +1,5 @@
 import type { HostFunction, HostGuest } from "@/lib/guests/list";
+import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { Host, HostInvite } from "@/lib/invites/hosts";
 import type { PlanId } from "@/lib/plans/catalog";
 
@@ -20,4 +21,8 @@ export type DashboardView = {
   origin: string;
   /** The invite's edition, once payments are on (Steps 15 to 17). */
   plan: PlanId | null;
+  /** Planned invitations and reminders (scheduled sending). */
+  schedules: ScheduledSend[];
+  /** The server's clock when the page was made, so "due now" renders the same in the browser. */
+  now: string;
 };

@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
+import { DesignCatalog } from "@/components/gallery/design-catalog";
+import { GalleryHero } from "@/components/gallery/gallery-pages";
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
-import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
+import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
@@ -94,13 +96,6 @@ function Cover({ id, locale }: { id: TemplateId; locale: UiLocale }) {
       </TiltCard>
     </div>
   );
-}
-
-function occasionLinks(locale: UiLocale, except?: CategoryId) {
-  return CATEGORY_IDS.filter((id) => id !== except).map((id) => ({
-    label: CATEGORIES[id].names[locale],
-    href: pagePath({ kind: "occasion", id }, locale),
-  }));
 }
 
 function traditionLinks(locale: UiLocale, ids: readonly TraditionId[]) {
@@ -288,19 +283,19 @@ export function DesignsPage({ locale }: { locale: UiLocale }) {
         ),
       ]}
     >
-      <PageHero
-        locale={locale}
+      <GalleryHero
         eyebrow={seoCopy.designs}
         heading={seoCopy.gallery.heading}
         intro={seoCopy.gallery.intro}
-        createHref="/create"
       />
-      <Block id="designs" heading={seoCopy.allDesigns} className="pt-0 sm:pt-4">
-        <DesignGrid locale={locale} ids={TEMPLATE_IDS} />
-      </Block>
-      <Block id="more" heading={seoCopy.moreOccasions} className="pt-0 sm:pt-0">
-        <LinkPills links={occasionLinks(locale)} />
-      </Block>
+      <DesignCatalog
+        covers={Object.fromEntries(
+          TEMPLATE_IDS.map((id) => [
+            id,
+            <TemplateCover key={id} id={id} locale={locale} className="max-w-[16rem]" />,
+          ]),
+        )}
+      />
     </PublicShell>
   );
 }

@@ -10,6 +10,8 @@ export const editor: Translation<typeof en.editor> = {
   progressLabel: "निमंत्रण की प्रगति",
   progress: (step, total) => `${total} में से चरण ${step}`,
   done: "पूरा",
+  designChosen: "आपका डिज़ाइन",
+  changeDesign: "डिज़ाइन बदलें",
   back: "पीछे",
   next: "आगे बढ़ें",
   toPreview: "निमंत्रण देखें",

@@ -1,5 +1,6 @@
 import "server-only";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
+import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { EventRow, FunctionRow, PhotoRow } from "./rows";
 
 /*
@@ -20,6 +21,8 @@ export type PreviewInvite = {
   hosts?: PreviewHost[];
   /** Co-host links not yet used. */
   hostInvites?: PreviewHostInvite[];
+  /** Invitations and reminders planned for later (scheduled sending). */
+  schedules?: ScheduledSend[];
 };
 
 export type PreviewHost = {
@@ -69,12 +72,28 @@ export type PreviewGuest = {
   createdAt?: string;
 };
 
+/** A guest's photo on the shared wall (Step 24); its file is in `files` under `path`. */
+export type PreviewWallPhoto = {
+  id: string;
+  eventId: string;
+  guestToken: string | null;
+  name: string;
+  device: string;
+  path: string;
+  width: number;
+  height: number;
+  hidden: boolean;
+  createdAt: string;
+};
+
 type PreviewDb = {
   invites: Map<string, PreviewInvite>;
   /** Photo files by "<event id>/<photo id>". */
   files: Map<string, PreviewFile>;
   /** Guests by token. */
   guests: Map<string, PreviewGuest>;
+  /** Photo wall photos by id. */
+  wall: Map<string, PreviewWallPhoto>;
 };
 
 const holder = globalThis as unknown as { __shubhdwarPreviewDb?: PreviewDb };
@@ -83,8 +102,10 @@ export const previewDb: PreviewDb = (holder.__shubhdwarPreviewDb ??= {
   invites: new Map(),
   files: new Map(),
   guests: new Map(),
+  wall: new Map(),
 });
 previewDb.guests ??= new Map();
+previewDb.wall ??= new Map();
 
 /** A photo as a data URL: preview mode has no file storage to link to. */
 export function previewPhotoUrl(eventId: string, photoId: string): string | null {
