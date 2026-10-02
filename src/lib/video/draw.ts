@@ -32,9 +32,9 @@ import {
 } from "./timeline";
 
 /** The page is laid out as a 390px-wide phone, then scaled to the video. */
-const PAGE_W = 390;
-const PAGE_H = (PAGE_W * VIDEO_HEIGHT) / VIDEO_WIDTH;
-const SCALE = VIDEO_WIDTH / PAGE_W;
+export const PAGE_W = 390;
+export const PAGE_H = (PAGE_W * VIDEO_HEIGHT) / VIDEO_WIDTH;
+export const SCALE = VIDEO_WIDTH / PAGE_W;
 const REM = 16;
 /** Status and Reels lay their own name, caption and buttons over the top and bottom. */
 const SAFE_TOP = 0.1;
@@ -88,8 +88,9 @@ export function drawFrame(ctx: CanvasRenderingContext2D, scene: VideoScene, seco
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
   const { current, previous, fade } = pagesAt(scene.timeline, seconds);
   if (previous !== null) drawPage(ctx, scene, scene.timeline.beats[previous]!, seconds, 1);
-  if (current === "end") drawEnding(ctx, scene, seconds, previous === null ? 1 : fade);
-  else drawPage(ctx, scene, scene.timeline.beats[current]!, seconds, fade);
+  if (current === "end") {
+    drawEnding(ctx, scene, seconds - scene.timeline.end, previous === null ? 1 : fade);
+  } else drawPage(ctx, scene, scene.timeline.beats[current]!, seconds, fade);
 }
 
 function drawPage(
@@ -160,27 +161,31 @@ function safe(area: TextArea): TextArea {
   };
 }
 
-function zoomAbout(ctx: CanvasRenderingContext2D, zoom: number) {
+export function zoomAbout(ctx: CanvasRenderingContext2D, zoom: number) {
   ctx.translate(PAGE_W / 2, PAGE_H / 2);
   ctx.scale(zoom, zoom);
   ctx.translate(-PAGE_W / 2, -PAGE_H / 2);
 }
 
-/** Draws an image to fill a box, cropping what overflows, like object-fit: cover. */
-function fillWith(
+/**
+ * Draws an image to fill a box, cropping what overflows, like object-fit: cover. `focusY`
+ * is which part of a too-tall image stays, like object-position (0 the top, 1 the bottom).
+ */
+export function fillWith(
   ctx: CanvasRenderingContext2D,
   image: CanvasImageSource,
   x: number,
   y: number,
   w: number,
   h: number,
+  focusY = 0.5,
 ) {
   const { width, height } = sizeOf(image);
   if (!width || !height) return;
   const scale = Math.max(w / width, h / height);
   const sw = w / scale;
   const sh = h / scale;
-  ctx.drawImage(image, (width - sw) / 2, (height - sh) / 2, sw, sh, x, y, w, h);
+  ctx.drawImage(image, (width - sw) / 2, (height - sh) * focusY, sw, sh, x, y, w, h);
 }
 
 function sizeOf(image: CanvasImageSource): { width: number; height: number } {
@@ -219,7 +224,12 @@ function drawPaper(ctx: CanvasRenderingContext2D, colours: Palette, zoom: number
 }
 
 /** A few gold motes drifting up through the page's light. */
-function drawMotes(ctx: CanvasRenderingContext2D, colour: string, seconds: number, alpha: number) {
+export function drawMotes(
+  ctx: CanvasRenderingContext2D,
+  colour: string,
+  seconds: number,
+  alpha: number,
+) {
   const random = seededRandom(17);
   ctx.save();
   for (let i = 0; i < 22; i++) {
@@ -309,7 +319,7 @@ function greedy(ctx: CanvasRenderingContext2D, words: readonly string[], width: 
 }
 
 /** Wraps to the width, then evens the lines out, as text-wrap: balance does on the pages. */
-function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): string[] {
+export function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): string[] {
   const words = text.split(/\s+/).filter(Boolean);
   const lines = greedy(ctx, words, width);
   if (lines.length < 2) return lines;
@@ -556,15 +566,23 @@ function drawSymbol(
   ctx.restore();
 }
 
-/** The last seconds: the cover painting dimmed, the names, and where to open the invitation. */
-function drawEnding(
+/** What the closing card draws from: the theme, its cover, the names and the link. */
+export type EndingScene = Pick<
+  VideoScene,
+  "palette" | "suite" | "images" | "copy" | "fonts" | "ending"
+>;
+
+/**
+ * The last seconds: the cover painting dimmed, the names, and where to open the
+ * invitation. `local` is the time since the closing card began.
+ */
+export function drawEnding(
   ctx: CanvasRenderingContext2D,
-  scene: VideoScene,
-  seconds: number,
+  scene: EndingScene,
+  local: number,
   alpha: number,
 ) {
   const colours = scene.palette("night", "dark");
-  const local = seconds - scene.timeline.end;
   const cover = SUITES[scene.suite].images.cover;
   const painting = cover ? scene.images.get(cover) : undefined;
   ctx.save();
@@ -680,7 +698,7 @@ function drawEnding(
   ctx.restore();
 }
 
-function roundRect(
+export function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
