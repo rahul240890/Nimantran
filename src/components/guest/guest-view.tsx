@@ -10,6 +10,7 @@ import { Doorway } from "@/components/guest/doorway";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
+import { PhotoWall } from "@/components/guest/photo-wall";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
@@ -460,6 +461,7 @@ export function GuestView({
             )}
           </>
         )}
+        <PhotoWall slug={slug} />
       </main>
 
       <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
