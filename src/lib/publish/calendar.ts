@@ -17,6 +17,8 @@ export type CalendarEntry = {
   location: string;
   description: string;
   url?: string;
+  /** Ring at the start time, for the host's own reminders (scheduled sending). */
+  alarm?: boolean;
 };
 
 /** How long a timed function is assumed to last when no end time is given. */
@@ -101,6 +103,15 @@ export function icsCalendar(entries: CalendarEntry[], now: Date = new Date()): s
     if (entry.location) lines.push(`LOCATION:${escapeText(entry.location)}`);
     if (entry.description) lines.push(`DESCRIPTION:${escapeText(entry.description)}`);
     if (entry.url) lines.push(`URL:${entry.url}`);
+    if (entry.alarm) {
+      lines.push(
+        "BEGIN:VALARM",
+        "ACTION:DISPLAY",
+        "TRIGGER:PT0M",
+        `DESCRIPTION:${escapeText(entry.title)}`,
+        "END:VALARM",
+      );
+    }
     lines.push("END:VEVENT");
   }
   lines.push("END:VCALENDAR");

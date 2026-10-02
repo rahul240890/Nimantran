@@ -195,6 +195,64 @@ export const dashboardCopy = {
       "Automatic reminders by SMS and email arrive once text messaging is set up for India.",
   },
 
+  schedule: {
+    heading: "Scheduled sending",
+    body: (count: number) =>
+      count
+        ? `${plural(count, "send is", "sends are")} planned. When the time comes your calendar reminds you, and every message is ready here.`
+        : "Pick a day and time to send your invitations or a reminder. Your calendar reminds you, and every message is ready here.",
+    notLive: "Publish your invite to plan when it goes out.",
+    add: "Schedule a send",
+    limit: "That's as many as can wait at once. Send or cancel one first.",
+    planTitle: "Schedule a send",
+    planDescription:
+      "At this time your phone reminds you, and each guest's WhatsApp message with their personal link is ready to send from your number.",
+    what: "What to send",
+    purposes: {
+      invite: "Invitations",
+      reminder: "Reminder",
+    },
+    purposeHints: {
+      invite: "Everyone on your guest list",
+      reminder: "Only guests who haven't replied yet",
+    },
+    forLabel: "For",
+    everything: "All celebrations",
+    date: "Date",
+    datePlaceholder: "Pick a day",
+    time: "Time",
+    timeHint: "India Standard Time",
+    save: "Schedule",
+    cancel: "Cancel",
+    past: "That time has already passed. Pick a later one.",
+    missing: "Pick a day and a time.",
+    failed: "Couldn't schedule that. Please try again.",
+    savedTitle: "Scheduled",
+    savedBody: (when: string) =>
+      `Planned for ${when}. Add it to your calendar so your phone reminds you when it's time.`,
+    google: "Add to Google Calendar",
+    apple: "Apple or Outlook calendar",
+    done: "Done",
+    label: (purpose: "invite" | "reminder", fn: string | null) =>
+      `${purpose === "invite" ? "Invitations" : "Reminder"}${fn ? ` · ${fn}` : ""}`,
+    audience: (count: number) => plural(count, "guest", "guests"),
+    due: "Due now",
+    sendNow: "Send now",
+    actions: (label: string) => `More for ${label}`,
+    cancelSend: "Cancel this send",
+    cancelled: "Send cancelled",
+    sendTitle: (label: string) => `Send: ${label}`,
+    sendDescription:
+      "Each button opens WhatsApp with the message ready, addressed to that guest. Mark it sent when you've gone through the list.",
+    nobody: "Nobody to send to right now.",
+    markSent: "Mark as sent",
+    notYet: "Not yet",
+    marked: "Marked as sent",
+    calendarTitle: (purpose: "invite" | "reminder", names: string) =>
+      purpose === "invite" ? `Send invitations: ${names}` : `Send reminders: ${names}`,
+    calendarBody: "Open your guest list. Every WhatsApp message is ready to send:",
+  },
+
   hosts: {
     heading: "Co-hosts",
     body: "Both families can run this invite together: edit it, add guests and see every reply.",
