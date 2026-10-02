@@ -40,6 +40,11 @@ export function coupleFrameIds(couple: CouplePhotos, photoIds: readonly string[]
   return chosen;
 }
 
+/** A scene always shows photos: one of the couple if the host picked one, else one each. */
+export function sceneCouple(couple: CouplePhotos): CouplePhotos {
+  return { layout: couple.layout === "one" ? "one" : "two", ids: couple.ids };
+}
+
 /** The photo page's photos for the story, with the names each one shows. */
 export function couplePagePhotos(
   couple: CouplePhotos,

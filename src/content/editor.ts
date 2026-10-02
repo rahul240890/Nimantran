@@ -491,6 +491,18 @@ export const suiteCopy = {
   textBox: "Box behind the words",
   textBoxHint:
     "Off, the words sit straight on the painting. On, they sit in a soft card-coloured box. Play the pages to compare; the same switch is on the pages too.",
+  formatHeading: "Kind of invitation",
+  formats: {
+    scene: {
+      name: "Scene",
+      description:
+        "Everything on one painting: your photos, names and every celebration flying in by turn. Quick for guests to take in.",
+    },
+    story: {
+      name: "Story",
+      description: "A full-screen painted page for every celebration, one after another.",
+    },
+  },
   blessingPage: "Open with the blessing page",
   blessingPageHint:
     "This theme opens with a painting of the god and your blessing beneath it, before your names.",

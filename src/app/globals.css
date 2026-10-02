@@ -2754,3 +2754,212 @@
       0 0 0 10px color-mix(in oklab, var(--guest-gilt) 30%, transparent);
   }
 }
+
+/*
+ * One Scene (pilot): the whole invitation on one painting. Each wash carries its own
+ * data-mood, so it takes that hour's sky from the theme; the one for the function in the
+ * slot shows. The slot's card is drawn in the theme's colours: a jharokha arch for a
+ * palace, kasavu gold bands for Kerala. Each function comes in from its own side and
+ * pushes the last one out the other way.
+ */
+.scene-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+.scene-wash[data-mood="dawn"] {
+  background: linear-gradient(
+    to bottom,
+    var(--suite-sky-top),
+    var(--suite-glow) 45%,
+    transparent 85%
+  );
+  mix-blend-mode: soft-light;
+}
+.scene-wash[data-mood="dusk"] {
+  background: linear-gradient(to bottom, var(--suite-sky-top), var(--suite-sky-bottom));
+  mix-blend-mode: multiply;
+}
+.scene-wash[data-mood="night"] {
+  background: linear-gradient(to bottom, var(--suite-sky-top), var(--suite-near));
+  mix-blend-mode: multiply;
+}
+/* At night the lamps still glow low in the painting */
+.scene-wash[data-mood="night"]::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  background: radial-gradient(
+    60% 50% at 50% 60%,
+    color-mix(in oklab, var(--suite-light) 55%, transparent),
+    transparent
+  );
+  mix-blend-mode: screen;
+}
+[data-scene-mood="dawn"] .scene-wash[data-mood="dawn"] {
+  opacity: 0.7;
+}
+[data-scene-mood="dusk"] .scene-wash[data-mood="dusk"] {
+  opacity: 0.42;
+}
+[data-scene-mood="night"] .scene-wash[data-mood="night"] {
+  opacity: 0.8;
+}
+.scene-print {
+  transition:
+    color 0.9s ease,
+    text-shadow 0.9s ease;
+}
+
+@layer components {
+  .scene-slot {
+    --dx: 0%;
+    --dy: 0%;
+    --rot: 0deg;
+    padding: 3.4cqw 6cqw;
+    background: var(--card-ivory);
+    border-radius: 1.4cqw;
+    box-shadow:
+      0 0.6cqw 1.2cqw -0.4cqw rgb(0 0 0 / 0.35),
+      0 2.4cqw 4cqw -2cqw rgb(0 0 0 / 0.4);
+    will-change: transform, opacity;
+  }
+  /* A palace window: an arched top, a double gilt line and a small dome above */
+  .scene-slot[data-slot="jharokha"] {
+    border: 0.5cqw solid var(--card-gold);
+    border-radius: 50% 50% 1.4cqw 1.4cqw / 26% 26% 1.4cqw 1.4cqw;
+    /* The words stay below the arch's curve */
+    padding: 6.5cqw 7cqw 3.6cqw;
+    box-shadow:
+      inset 0 0 0 1cqw var(--card-ivory),
+      inset 0 0 0 1.3cqw var(--card-gold),
+      0 0.6cqw 1.2cqw -0.4cqw rgb(0 0 0 / 0.35),
+      0 2.4cqw 4cqw -2cqw rgb(0 0 0 / 0.4);
+  }
+  .scene-slot[data-slot="jharokha"]::before {
+    content: "";
+    position: absolute;
+    top: -2.6cqw;
+    left: 50%;
+    width: 4.4cqw;
+    height: 2.6cqw;
+    translate: -50% 0;
+    border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+    background: var(--card-gold);
+  }
+  /* Kerala's kasavu: ivory cloth with gold bands top and bottom */
+  .scene-slot[data-slot="kasavu"] {
+    /* Clear of the gold bands */
+    padding-block: 5cqw;
+    border-radius: 0.8cqw;
+    background: linear-gradient(
+      to bottom,
+      var(--card-gold) 0 5%,
+      var(--card-ivory) 5% 8%,
+      var(--card-gold) 8% 10%,
+      var(--card-ivory) 10% 90%,
+      var(--card-gold) 90% 92%,
+      var(--card-ivory) 92% 95%,
+      var(--card-gold) 95%
+    );
+  }
+  .scene-slot[data-side="right"] {
+    --dx: 135%;
+    --rot: 9deg;
+  }
+  .scene-slot[data-side="left"] {
+    --dx: -135%;
+    --rot: -9deg;
+  }
+  .scene-slot[data-side="bottom"] {
+    --dy: 150%;
+    --rot: -3deg;
+  }
+  .scene-slot[data-side="top"] {
+    --dy: -120%;
+    --rot: 3deg;
+  }
+  .scene-slot[data-motion="in"] {
+    animation: scene-in var(--swap, 900ms) cubic-bezier(0.2, 0.9, 0.25, 1.08) both;
+  }
+  .scene-slot[data-motion="out"] {
+    animation: scene-out var(--swap, 900ms) cubic-bezier(0.5, 0, 0.8, 0.4) both;
+  }
+  .scene-slot[data-motion="in-still"] {
+    animation: scene-fade 0.3s ease both;
+  }
+  .scene-slot[data-motion="out-still"] {
+    animation: scene-fade 0.3s ease reverse both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scene-slot[data-motion] {
+      animation: none;
+    }
+    .scene-slot[data-motion^="out"] {
+      display: none;
+    }
+    .scene-wash,
+    .scene-print {
+      transition: none;
+    }
+  }
+}
+@keyframes scene-in {
+  from {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.8);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+/* Pushed out the way the next one came from, as if it made room */
+@keyframes scene-out {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translate(calc(var(--dx) * -1), calc(var(--dy) * -1)) rotate(calc(var(--rot) * -1))
+      scale(0.8);
+    opacity: 0;
+  }
+}
+@keyframes scene-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* One Scene's words keep whole words, unless even the smallest size can't fit them */
+.scene-words {
+  overflow-wrap: normal;
+}
+.scene-words[data-overflow] * {
+  overflow-wrap: anywhere;
+}
+/*
+ * Fitting measures sizes straight after setting them. In still mode every property
+ * transitions over 0.01ms, which would hand back the old size, so the words never do.
+ */
+.scene-words * {
+  transition-property: none !important;
+}
+.scene-rule {
+  width: calc(clamp(3.5rem, 22cqw, 7rem) * var(--scene-fit, 1));
+  margin-block: 0.5em 0.4em;
+}
+/* The gallery's kind-of-invitation filter hides the other kinds (format-filter.tsx) */
+[data-format-filter="scene"] [data-format-item]:not([data-format-item="scene"]),
+[data-format-filter="story"] [data-format-item]:not([data-format-item="story"]),
+[data-format-filter="card"] [data-format-item]:not([data-format-item="card"]) {
+  display: none;
+}

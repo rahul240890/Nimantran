@@ -26,6 +26,7 @@ import { pagePath } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
 import { DesignCard } from "./design-card";
+import { FormatFilter, type DesignFormat } from "./format-filter";
 import { designWords } from "./design-words";
 import { GallerySearch } from "./gallery-search";
 import { OccasionTile, PaintedTile } from "./occasion-tile";
@@ -149,28 +150,33 @@ function DesignGallery({
   category: CategoryId;
   kind?: WeddingKind | null;
 }) {
+  const formatOf = (design: GalleryDesign): DesignFormat =>
+    design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
+  const formats = [...new Set(designs.map(formatOf))];
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
-      {designs.map((design, index) => {
-        const { name, description } = designWords(design, locale);
-        return (
-          <li key={design.id}>
-            <DesignCard
-              design={design}
-              name={name}
-              description={description}
-              href={designHref(design, { category, kind })}
-              priority={index < 4}
-              cover={
-                design.suite === "classic" ? (
-                  <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
-                ) : undefined
-              }
-            />
-          </li>
-        );
-      })}
-    </ul>
+    <FormatFilter formats={formats}>
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+        {designs.map((design, index) => {
+          const { name, description } = designWords(design, locale);
+          return (
+            <li key={design.id} data-format-item={formatOf(design)}>
+              <DesignCard
+                design={design}
+                name={name}
+                description={description}
+                href={designHref(design, { category, kind })}
+                priority={index < 4}
+                cover={
+                  design.suite === "classic" ? (
+                    <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
+                  ) : undefined
+                }
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </FormatFilter>
   );
 }
 

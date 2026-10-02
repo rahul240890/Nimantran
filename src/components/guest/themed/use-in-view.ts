@@ -38,8 +38,10 @@ export function useOnScreen<T extends Element>() {
   useEffect(() => {
     const node = ref.current;
     if (!node || typeof IntersectionObserver === "undefined") return;
-    const observer = new IntersectionObserver((entries) =>
-      setOnScreen(entries.some((entry) => entry.isIntersecting)),
+    const observer = new IntersectionObserver(
+      (entries) => setOnScreen(entries.some((entry) => entry.isIntersecting)),
+      // A page that starts right at the fold (under One Scene) only touches it, so isn't shown
+      { rootMargin: "0px 0px -1px 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();

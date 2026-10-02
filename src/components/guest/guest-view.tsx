@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarPlus, MailCheck } from "lucide-react";
+import { CalendarPlus, MailCheck, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
@@ -13,6 +13,7 @@ import { FunctionFacts } from "@/components/guest/function-facts";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
+import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
@@ -32,7 +33,13 @@ import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
 import { applyPages } from "@/lib/editor/pages";
-import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
+import {
+  cardFunctions,
+  draftBlessing,
+  draftShowsScene,
+  draftSuite,
+  storyFamily,
+} from "@/lib/publish/story";
 import {
   CARD_COUNTDOWN_WORDS,
   CARD_GREETING_WORDS,
@@ -43,7 +50,8 @@ import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import { cn } from "@/lib/cn";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
-import { couplePagePhotos } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
+import { scenePage } from "@/lib/suites/scene";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -116,21 +124,26 @@ export function GuestView({
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
   const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  // The pages speak the card's language, not the site's
+  const told = useMemo(
+    () =>
+      cardFunctions(functions, draft, language).map((fn) => ({
+        ...fn,
+        countdown: today
+          ? daysAway(
+              daysBetween(today, draft.functions[fn.kind].date),
+              CARD_COUNTDOWN_WORDS[language],
+            )
+          : undefined,
+      })),
+    [functions, draft, language, today],
+  );
   const story = useMemo<InvitationStory>(
     () => ({
       beats: applyPages(
         storyBeats({
           copy,
-          // The pages speak the card's language, not the site's
-          functions: cardFunctions(functions, draft, language).map((fn) => ({
-            ...fn,
-            countdown: today
-              ? daysAway(
-                  daysBetween(today, draft.functions[fn.kind].date),
-                  CARD_COUNTDOWN_WORDS[language],
-                )
-              : undefined,
-          })),
+          functions: told,
           replies,
           words: CARD_STORY_WORDS[language],
           family: storyFamily(draft, language),
@@ -150,7 +163,7 @@ export function GuestView({
       type: pageType(draft.type, [language]),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, language, guestCopy.reply, draft, today, photos],
+    [copy, told, replies, language, guestCopy.reply, draft, photos],
   );
   // A painted theme opens as a doorway with a countdown; the card colours keep the 3D card
   const suite = draftSuite(draft);
@@ -160,6 +173,18 @@ export function GuestView({
   const mainAt = mainKind ? startsAt(mainDate, draft.functions[mainKind].time) : null;
   const main = mainAt === null ? null : { date: mainDate, at: mainAt };
   const music = useRagaMusic(template);
+  // One Scene (pilot): the whole invitation on one painting, in place of the doorway and pages
+  const scenePhotos = useMemo(
+    () =>
+      couplePagePhotos(
+        sceneCouple(draft.couplePhotos),
+        photos.map((photo) => photo.id),
+        (id) => photos.find((photo) => photo.id === id)?.url,
+        copy,
+      ),
+    [draft.couplePhotos, photos, copy],
+  );
+  const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
   // The family's blocks in the language the guest is reading
@@ -184,7 +209,53 @@ export function GuestView({
 
       {watermark && <WatermarkLayer />}
       <main id="main" className="flex flex-1 flex-col">
-        {doorway ? (
+        {scene ? (
+          <OneScene
+            suite={suite}
+            page={scene}
+            copy={copy}
+            lang={language}
+            functions={told}
+            photos={scenePhotos}
+            reply={story.reply ?? null}
+            type={story.type}
+            detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
+            header={
+              (guestName || languages.length > 1) && (
+                <>
+                  {guestName && (
+                    <p
+                      lang={language}
+                      className="rounded-full bg-card-ivory/85 px-4 py-1 text-center text-sm text-card-ink shadow-raised backdrop-blur"
+                    >
+                      {CARD_GREETING_WORDS[language].dear}{" "}
+                      <span className="font-semibold">{guestName}</span>
+                    </p>
+                  )}
+                  {languages.length > 1 && (
+                    <CardLanguageToggle
+                      label={guestCopy.cardLanguage}
+                      languages={languages}
+                      value={language}
+                      onValueChange={setLanguage}
+                    />
+                  )}
+                </>
+              )
+            }
+            extra={
+              <SceneButton
+                label={
+                  music.playing ? uiStrings.invitation.pauseMusic : uiStrings.invitation.playMusic
+                }
+                pressed={music.playing}
+                onClick={music.toggle}
+              >
+                {music.playing ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+              </SceneButton>
+            }
+          />
+        ) : doorway ? (
           <Doorway
             suite={suite}
             template={template}

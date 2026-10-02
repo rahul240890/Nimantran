@@ -23,17 +23,23 @@ const SAMPLE_PHOTOS = [
   "/suites/rajwada-bagh/sangeet.webp",
 ].map((url, index) => ({ id: `sample-${index}`, url, width: 768, height: 1365 }));
 
+/** Stand-ins for the couple's own photos in One Scene's frames. */
+const SCENE_PHOTOS = ["/occasions/engagement.webp", "/occasions/mehendi.webp"].map(
+  (url, index) => ({ id: `scene-${index}`, url, width: 1024, height: 1024 }),
+);
+
+const at = (date: string, time: string, venue: string, address = "") => ({
+  included: true,
+  date,
+  time,
+  endTime: "",
+  venue,
+  address,
+  dressCode: "",
+});
+
 function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
   const draft = newDraft(SUITES[suite].template ?? "marigold");
-  const at = (date: string, time: string, venue: string, address = "") => ({
-    included: true,
-    date,
-    time,
-    endTime: "",
-    venue,
-    address,
-    dressCode: "",
-  });
   return {
     ...draft,
     suite,
@@ -70,12 +76,28 @@ function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
 /*
  * A review page for the themed guest page (Step 12q), not a product screen: the guest page
  * for ?suite=<theme> (and ?lang=hi for a Hindi card) with made-up names, dates and pictures, and nothing saved.
+ * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
-  const { suite: asked, lang } = await searchParams;
+  const { suite: asked, lang, format, photos: count } = await searchParams;
   const suite: SuiteId = isSuiteId(asked) ? asked : "rajwada-bagh";
   const locale = await getLocale();
-  const draft = sampleDraft(suite, lang === "hi");
+  const scene = format === "scene";
+  const sceneCount = count === "0" ? 0 : count === "1" ? 1 : 2;
+  const base = sampleDraft(suite, lang === "hi");
+  const draft: InviteDraft = scene
+    ? {
+        ...base,
+        format: "scene",
+        // Five celebrations, so the slot shows every side they come in from
+        functions: {
+          ...base.functions,
+          mehendi: at("2026-11-18", "16:00", "The courtyard, Ajit Bhawan"),
+          reception: at("2026-11-21", "20:00", "Mehrangarh Fort lawns"),
+        },
+        couplePhotos: { layout: sceneCount === 1 ? "one" : "two", ids: [] },
+      }
+    : base;
   const { functionCopy } = editorText[locale];
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
     const fn = draft.functions[told.kind];
@@ -102,7 +124,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       names={inviteNames(draft)}
       occasion={occasionName(draft, locale)}
       functions={functions}
-      photos={SAMPLE_PHOTOS}
+      photos={scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS}
       allIcsUrl={null}
       rsvpFunctions={rsvpFunctions}
       questions={[]}

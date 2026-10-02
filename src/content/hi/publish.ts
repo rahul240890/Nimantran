@@ -110,6 +110,16 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   notFoundBody:
     "लिंक शायद ग़लत लिखा है, या परिवार ने इसे भेजना बंद कर दिया है। उनसे दोबारा भेजने को कहें।",
   home: "शुभ इन्विटेशन पर जाएँ",
+  scene: {
+    label: "एक-एक करके सारे समारोह",
+    previous: "पिछला समारोह",
+    next: "अगला समारोह",
+    pause: "समारोह रोकें",
+    play: "समारोह चलाएँ",
+    position: (n, total) => `${total} में से ${n}`,
+    details: "पूरा ब्योरा",
+    initials: "यहाँ आपकी फ़ोटो आएगी",
+  },
   themed: {
     invitedTo: "आप सादर आमंत्रित हैं",
     shower: "जोड़े पर फूल बरसाएँ",

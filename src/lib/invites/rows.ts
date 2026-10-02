@@ -101,6 +101,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         type: draft.type,
         couplePhotos: draft.couplePhotos,
         blessingPage: draft.blessingPage,
+        format: draft.format,
         family: draft.family,
         pages: draft.pages,
       },
@@ -162,6 +163,7 @@ export function rowsToDraft(
     type: event.religious?.type,
     couplePhotos: event.religious?.couplePhotos,
     blessingPage: event.religious?.blessingPage,
+    format: event.religious?.format,
     family: event.religious?.family,
     pages: event.religious?.pages,
   });

@@ -10,6 +10,7 @@ import {
   kindDesigns,
   occasionDesigns,
   paintedDesign,
+  sceneDesign,
 } from "./catalog";
 import { normalize, searchGallery } from "./search";
 
@@ -45,6 +46,14 @@ describe("gallery catalog", () => {
     expect(designHref(paintedDesign("rajbari"), { category: "wedding", kind: "bengali" })).toBe(
       "/create?category=wedding&tradition=bengali&suite=rajbari&template=alpona",
     );
+  });
+
+  it("lists a theme's Scene first, and opens the editor on it", () => {
+    const ids = occasionDesigns("haldi").map((design) => design.id);
+    expect(ids.indexOf("kayal-scene")).toBeGreaterThanOrEqual(0);
+    expect(ids.indexOf("kayal-scene")).toBeLessThan(ids.indexOf("kayal"));
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(designHref(sceneDesign("kayal"), { category: "wedding" })).toContain("format=scene");
   });
 });
 
