@@ -9,15 +9,25 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
-import { couplePagePhotos } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
 import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { applyPages } from "@/lib/editor/pages";
-import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
+import {
+  cardFunctions,
+  draftBlessing,
+  draftShowsScene,
+  draftSuite,
+  storyFamily,
+} from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
-import { drawFrame, videoImages, type VideoScene } from "@/lib/video/draw";
+import { drawFrame, videoImages } from "@/lib/video/draw";
+import type { VideoFilm } from "@/lib/video/encode";
+import { drawSceneFrame, sceneVideoImages, type SceneItem } from "@/lib/video/scene-draw";
+import { SCENE_FLY, sceneTimeline } from "@/lib/video/scene-timeline";
+import { scenePage } from "@/lib/suites/scene";
 import { SUITES } from "@/lib/suites/catalog";
 import { voiceFaces } from "@/lib/suites/lettering";
 import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/look";
@@ -38,6 +48,9 @@ type VideoCardProps = {
   /** Preview mode's tests only: codecs open-source Chromium can encode. */
   testCodecs?: boolean;
 };
+
+/** A video ready to make, and the moment its poster shows. */
+type Ready = { film: VideoFilm; poster: number };
 
 type State =
   | { step: "idle" }
@@ -68,69 +81,7 @@ export function VideoCard(props: VideoCardProps) {
     () => false,
   );
 
-  const language = cardLanguages(draft)[0];
-  const template = useMemo(
-    () => templateWithRaga(draft.templateId, draft.music.raga),
-    [draft.templateId, draft.music.raga],
-  );
-  const scene = useMemo(() => {
-    const copy = draftCopy(draft, language);
-    const suite = draftSuite(draft);
-    const written = storyBeats({
-      copy,
-      // A video is watched days later, so the pages leave out "In 5 days"
-      functions: cardFunctions(functions, draft, language),
-      replies: false,
-      words: CARD_STORY_WORDS[language],
-      family: storyFamily(draft, language),
-      couple: couplePagePhotos(
-        draft.couplePhotos,
-        photos.map((photo) => photo.id),
-        (id) => photos.find((photo) => photo.id === id)?.url,
-        copy,
-      ),
-      blessing: draftBlessing(draft),
-    });
-    const beats = applyPages(written, draft.pages, language);
-    return {
-      copy,
-      suite,
-      timeline: videoTimeline(beats),
-      type: pageType(draft.type, [language]),
-    };
-  }, [draft, functions, photos, language]);
-
-  // Everything the frames need: colours, fonts, paintings and photos
-  const prepare = async (): Promise<VideoScene> => {
-    const fonts = readFonts();
-    const words = scene.timeline.beats.flatMap(({ beat }) => beat.lines.map((line) => line.text));
-    const families = [fonts.display, fonts.sans, fonts.label, scene.type.names, scene.type.words];
-    await loadFonts(
-      families.filter((family): family is string => Boolean(family)),
-      `${words.join(" ")} ${scene.copy.first} ${scene.copy.second}`,
-    );
-    // The theme's own lettering in the card's script, which the pages draw with too
-    const sample = `${words.join(" ")} ${scene.copy.first} ${scene.copy.second}`;
-    await Promise.all(
-      voiceFaces(SUITES[scene.suite].voice ?? "regal", language).map((font) =>
-        document.fonts.load(font, sample).catch(() => []),
-      ),
-    );
-    const images = await loadImages(videoImages(scene.timeline, scene.suite));
-    return {
-      ...scene,
-      textBox: draft.textBox,
-      lang: language,
-      fonts,
-      palette: paletteReader(scene.suite, template),
-      images,
-      ending: {
-        brand: site.name,
-        open: videoCopy.ending.open,
-        link: url.replace(/^https?:\/\//, ""),
-      },
-    };
-  };
+  const { template, prepare, look } = useVideoFilm(draft, functions, photos, url);
 
   // The poster: the cover page once its words have risen in
   useEffect(() => {
@@ -140,15 +91,14 @@ export function VideoCard(props: VideoCardProps) {
       const canvas = poster.current;
       const ctx = canvas?.getContext("2d");
       if (!live || !ready || !canvas || !ctx) return;
-      const cover = ready.timeline.beats[0];
-      drawFrame(ctx, ready, cover ? Math.min(cover.seconds - 0.2, 3.2) : 0);
+      ready.film.draw(ctx, ready.poster);
     })();
     return () => {
       live = false;
     };
     // The poster redraws when the pages change, not on every render
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scene]);
+  }, [look]);
 
   useEffect(() => {
     let live = true;
@@ -174,7 +124,7 @@ export function VideoCard(props: VideoCardProps) {
     try {
       const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
       const blob = await makeVideo(
-        ready,
+        ready.film,
         music && !silent ? template.music : null,
         (done) => setState({ step: "making", done }),
         controller.signal,
@@ -336,4 +286,145 @@ export function VideoCard(props: VideoCardProps) {
       </div>
     </Card>
   );
+}
+
+/**
+ * What the video's frames are made from: the story's pages, or a Scene invite's painting
+ * with its flying cards. `prepare` loads fonts and pictures; `look` changes when the
+ * frames would.
+ */
+export function useVideoFilm(
+  draft: InviteDraft,
+  functions: StoryFunction[],
+  photos: PublicPhoto[],
+  url: string,
+) {
+  const { videoCopy } = useText(publishText);
+  const language = cardLanguages(draft)[0];
+  const template = useMemo(
+    () => templateWithRaga(draft.templateId, draft.music.raga),
+    [draft.templateId, draft.music.raga],
+  );
+  const scene = useMemo(() => {
+    const copy = draftCopy(draft, language);
+    const suite = draftSuite(draft);
+    const written = storyBeats({
+      copy,
+      // A video is watched days later, so the pages leave out "In 5 days"
+      functions: cardFunctions(functions, draft, language),
+      replies: false,
+      words: CARD_STORY_WORDS[language],
+      family: storyFamily(draft, language),
+      couple: couplePagePhotos(
+        draft.couplePhotos,
+        photos.map((photo) => photo.id),
+        (id) => photos.find((photo) => photo.id === id)?.url,
+        copy,
+      ),
+      blessing: draftBlessing(draft),
+    });
+    const beats = applyPages(written, draft.pages, language);
+    return {
+      copy,
+      suite,
+      timeline: videoTimeline(beats),
+      type: pageType(draft.type, [language]),
+    };
+  }, [draft, functions, photos, language]);
+
+  // A Scene invite's video is the scene itself: its painting, photo and flying cards
+  const oneScene = useMemo(() => {
+    if (!draftShowsScene(draft)) return null;
+    const copy = draftCopy(draft, language);
+    const suite = draftSuite(draft);
+    const scenePhotos = couplePagePhotos(
+      sceneCouple(draft.couplePhotos),
+      photos.map((photo) => photo.id),
+      (id) => photos.find((photo) => photo.id === id)?.url,
+      copy,
+    );
+    const page = scenePage(suite, scenePhotos.length);
+    if (!page) return null;
+    // A painting without room for the line opens the slot with it, as the live scene does
+    const items: SceneItem[] = [
+      ...(page.line || !copy.line.trim() ? [] : [{ kind: "line" as const, text: copy.line }]),
+      // Watched days later, so no "In 5 days"
+      ...cardFunctions(functions, draft, language).map((fn) => ({
+        kind: "function" as const,
+        fn: { ...fn, countdown: undefined },
+      })),
+    ];
+    const words = CARD_STORY_WORDS[language];
+    return {
+      copy,
+      suite,
+      page,
+      items,
+      photos: scenePhotos,
+      timeline: sceneTimeline(items.length),
+      labels: { when: words.when, where: words.where },
+      type: pageType(draft.type, [language]),
+    };
+  }, [draft, functions, photos, language]);
+
+  // Everything the frames need: colours, fonts, paintings and photos
+  const prepare = async (): Promise<Ready> => {
+    const fonts = readFonts();
+    const copy = oneScene?.copy ?? scene.copy;
+    const suite = oneScene?.suite ?? scene.suite;
+    const type = oneScene?.type ?? scene.type;
+    const words = oneScene
+      ? oneScene.items.map((item) =>
+          item.kind === "line"
+            ? item.text
+            : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue].join(" "),
+        )
+      : scene.timeline.beats.flatMap(({ beat }) => beat.lines.map((line) => line.text));
+    const sample = `${words.join(" ")} ${copy.first} ${copy.second}`;
+    const families = [fonts.display, fonts.sans, fonts.label, type.names, type.words];
+    await loadFonts(
+      families.filter((family): family is string => Boolean(family)),
+      sample,
+    );
+    // The theme's own lettering in the card's script, which the pages draw with too
+    await Promise.all(
+      voiceFaces(SUITES[suite].voice ?? "regal", language).map((font) =>
+        document.fonts.load(font, sample).catch(() => []),
+      ),
+    );
+    const palette = paletteReader(suite, template);
+    const ending = {
+      brand: site.name,
+      open: videoCopy.ending.open,
+      link: url.replace(/^https?:\/\//, ""),
+    };
+    if (oneScene) {
+      const images = await loadImages(sceneVideoImages(oneScene));
+      const film = { ...oneScene, lang: language, fonts, palette, images, ending };
+      const first = oneScene.timeline.shots[0];
+      return {
+        film: { total: film.timeline.total, draw: (ctx, at) => drawSceneFrame(ctx, film, at) },
+        // The first card has landed and the names are in
+        poster: first ? first.start + SCENE_FLY + 0.6 : 2,
+      };
+    }
+    const images = await loadImages(videoImages(scene.timeline, scene.suite));
+    const story = {
+      ...scene,
+      textBox: draft.textBox,
+      lang: language,
+      fonts,
+      palette,
+      images,
+      ending,
+    };
+    const cover = scene.timeline.beats[0];
+    return {
+      film: { total: story.timeline.total, draw: (ctx, at) => drawFrame(ctx, story, at) },
+      poster: cover ? Math.min(cover.seconds - 0.2, 3.2) : 0,
+    };
+  };
+
+  const look = useMemo(() => ({ scene, oneScene }), [scene, oneScene]);
+  return { template, prepare, look };
 }
