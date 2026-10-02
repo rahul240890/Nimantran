@@ -9,7 +9,16 @@ import {
   Pause,
   Play,
 } from "lucide-react";
-import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
 import { PageEffects } from "@/components/invitation/story/page-effects";
 import { Button } from "@/components/ui/button";
 import { useText } from "@/i18n/client";
@@ -17,7 +26,11 @@ import { publishText } from "@/i18n/copy/publish";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
-import type { SuiteId } from "@/lib/suites/catalog";
+import type { PageType } from "@/lib/editor/type";
+import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import { fitScale } from "@/lib/suites/fit";
+import type { Voice } from "@/lib/suites/lettering";
+import { sceneLine } from "@/lib/suites/scene-type";
 import { PAINTING_ASPECT, type FrameBox } from "@/lib/suites/photo-frames";
 import {
   SCENE_HOLD_MS,
@@ -28,6 +41,7 @@ import {
   type ScenePage,
 } from "@/lib/suites/scene";
 import type { CardCopy } from "@/lib/templates/content";
+import "@/components/invitation/type/fonts.css";
 
 /*
  * One Scene (pilot): the whole invitation on one painting. The photos show through the
@@ -44,6 +58,48 @@ type SceneItem = { kind: "line"; text: string } | { kind: "function"; fn: StoryF
 type Shown = { index: number; from: Entrance; turn: number };
 
 const FACES = "50% 30%";
+
+/**
+ * Shrinks (or grows a little) the words in `box` until `words` fits inside it, by setting
+ * `--scene-fit` on `box`. Words too long to fit even at the smallest size may break.
+ */
+function fitWords(box: HTMLElement, words: HTMLElement, max: number) {
+  const pad = getComputedStyle(box);
+  const room =
+    box.clientHeight - parseFloat(pad.paddingTop || "0") - parseFloat(pad.paddingBottom || "0");
+  const fits = (scale: number) => {
+    box.style.setProperty("--scene-fit", String(scale));
+    return words.offsetHeight <= room + 1 && words.scrollWidth <= words.clientWidth + 1;
+  };
+  const { scale, overflow } = fitScale(fits, { min: 0.6, max });
+  box.style.setProperty("--scene-fit", String(scale));
+  if (overflow) box.dataset.overflow = "";
+  else delete box.dataset.overflow;
+}
+
+/** Fits the words now, and again when the painting changes size or the fonts arrive. */
+function useFit(
+  outer: RefObject<HTMLElement | null>,
+  inner: RefObject<HTMLElement | null>,
+  key: string,
+  max = 1.1,
+) {
+  useLayoutEffect(() => {
+    const box = outer.current;
+    const words = inner.current;
+    if (!box || !words) return;
+    const measure = () => fitWords(box, words, max);
+    measure();
+    const resize = new ResizeObserver(measure);
+    resize.observe(box);
+    let live = true;
+    void document.fonts?.ready.then(() => live && measure());
+    return () => {
+      live = false;
+      resize.disconnect();
+    };
+  }, [outer, inner, key, max]);
+}
 
 const box = ([x, y, width, height]: FrameBox): CSSProperties => ({
   left: `${x}%`,
@@ -68,6 +124,8 @@ export type OneSceneProps = {
   detailsHref?: string;
   /** Inside the editor's phone: fills its box instead of the whole screen. */
   framed?: boolean;
+  /** The host's lettering (Step 12n) over the theme's own. */
+  type?: PageType;
   className?: string;
 };
 
@@ -83,6 +141,7 @@ export function OneScene({
   reply,
   detailsHref,
   framed = false,
+  type,
   className,
 }: OneSceneProps) {
   const { guestCopy } = useText(publishText);
@@ -135,6 +194,14 @@ export function OneScene({
   const shownFn = current?.kind === "function" ? current.fn : null;
   // In the editor's phone the page already has its own heading
   const Names = framed ? "p" : "h1";
+  const voice = SUITES[suite].voice ?? "regal";
+  const namesBox = useRef<HTMLHeadingElement>(null);
+  const namesWords = useRef<HTMLSpanElement>(null);
+  const lineBox = useRef<HTMLParagraphElement>(null);
+  const lineWords = useRef<HTMLSpanElement>(null);
+  const typeKey = JSON.stringify(type ?? null);
+  useFit(namesBox, namesWords, `${names.join("|")}${joiner}${lang}${typeKey}`);
+  useFit(lineBox, lineWords, `${copy.line}${lang}${typeKey}`);
 
   return (
     <section
@@ -163,7 +230,7 @@ export function OneScene({
 
       <div className="[container-type:size] relative min-h-0 flex-1">
         <div
-          className="scene-painting [container-type:inline-size] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+          className="scene-painting [container-type:size] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
           style={{
             width: `min(100cqw, calc(100cqh * ${PAINTING_ASPECT}))`,
             aspectRatio: String(PAINTING_ASPECT),
@@ -222,30 +289,44 @@ export function OneScene({
           )}
 
           <Names
+            ref={namesBox}
             id="scene-names"
             lang={lang}
             data-tone={tone}
-            className="story-print scene-print absolute flex items-center justify-center text-center font-display text-[7.4cqw] leading-none text-card-ink"
+            className="story-print scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
-            <span className="break-words">
-              {names[0]}
+            <span ref={namesWords} className="block max-w-full text-balance">
+              <span style={sceneLine(voice, "names", lang, type)}>{names[0]}</span>
               {names[1] && (
                 <>
-                  <span className="mx-[0.3em] text-[0.7em] text-card-accent-text">{joiner}</span>
-                  {names[1]}
+                  {" "}
+                  <span
+                    className="text-card-accent-text"
+                    style={sceneLine(voice, "joiner", lang, type)}
+                  >
+                    {joiner}
+                  </span>{" "}
+                  <span style={sceneLine(voice, "names", lang, type)}>{names[1]}</span>
                 </>
               )}
             </span>
           </Names>
           {page.line && copy.line.trim() && (
             <p
+              ref={lineBox}
               lang={lang}
               data-tone={tone}
-              className="story-print scene-print absolute flex items-start justify-center text-center text-[3.4cqw] leading-snug text-balance text-card-ink"
+              className="story-print scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
-              {copy.line}
+              <span
+                ref={lineWords}
+                className="block max-w-full text-balance"
+                style={sceneLine(voice, "line", lang, type)}
+              >
+                {copy.line}
+              </span>
             </p>
           )}
 
@@ -261,6 +342,8 @@ export function OneScene({
               <SlotCard
                 key={`out-${leaving.turn}`}
                 item={items[leaving.index % count]!}
+                voice={voice}
+                type={type}
                 style={page.style}
                 lang={lang}
                 motion="out"
@@ -278,6 +361,8 @@ export function OneScene({
               >
                 <SlotCard
                   item={current}
+                  voice={voice}
+                  type={type}
                   style={page.style}
                   lang={lang}
                   motion="in"
@@ -395,6 +480,8 @@ export function SceneButton({
 /** One function (or the opening line) on the slot's own card, arriving or leaving. */
 function SlotCard({
   item,
+  voice,
+  type,
   style,
   lang,
   motion,
@@ -402,58 +489,100 @@ function SlotCard({
   reduced,
 }: {
   item: SceneItem;
+  voice: Voice;
+  type: PageType | undefined;
   style: ScenePage["style"];
   lang: string;
   motion: "in" | "out";
   side: Entrance;
   reduced: boolean;
 }) {
+  const card = useRef<HTMLDivElement>(null);
+  const words = useRef<HTMLDivElement>(null);
+  const key =
+    item.kind === "line"
+      ? item.text
+      : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
+  useFit(card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, 1.15);
+  const fn = item.kind === "function" ? item.fn : null;
   return (
     <div
+      ref={card}
       aria-hidden={motion === "out" || undefined}
       data-slot={style}
       data-motion={reduced ? `${motion}-still` : motion}
       data-side={side}
-      className="scene-slot absolute inset-0 flex flex-col items-center justify-center gap-[0.8cqw] px-[5cqw] text-center text-card-ink"
+      className="scene-slot scene-words absolute inset-0 flex flex-col items-center justify-center text-center text-card-ink [font-variant-numeric:lining-nums]"
       style={{ "--swap": `${SCENE_SWAP_MS}ms` } as CSSProperties}
     >
-      {item.kind === "line" ? (
-        <p lang={lang} className="text-[3.6cqw] leading-snug text-balance">
-          {item.text}
-        </p>
-      ) : (
-        <>
-          <p lang={lang} className="font-display text-[6.4cqw] leading-none">
-            {item.fn.name}
+      <div ref={words} className="flex w-full flex-col items-center">
+        {item.kind === "line" ? (
+          <p lang={lang} className="text-balance" style={sceneLine(voice, "line", lang, type)}>
+            {item.text}
           </p>
-          {item.fn.date && (
-            <p
-              lang={lang}
-              className="text-[3.2cqw] leading-tight font-semibold text-card-accent-text"
-            >
-              {item.fn.date}
-              {item.fn.time && (
-                <span className="block font-normal text-card-ink">
-                  {item.fn.muhurat && (
-                    <span lang={item.fn.muhurat.lang}>{item.fn.muhurat.text} · </span>
-                  )}
-                  {item.fn.time}
-                </span>
+        ) : (
+          fn && (
+            <>
+              <p
+                lang={lang}
+                className="max-w-full text-balance"
+                style={sceneLine(voice, "function", lang, type)}
+              >
+                {fn.name}
+              </p>
+              {fn.localName && (
+                <p
+                  lang={fn.localName.lang}
+                  className="text-card-accent-text"
+                  style={sceneLine(voice, "detail", fn.localName.lang, type)}
+                >
+                  {fn.localName.text}
+                </p>
               )}
-            </p>
-          )}
-          {item.fn.venue && (
-            <p lang={lang} className="line-clamp-2 text-[3cqw] leading-tight text-card-ink-muted">
-              {item.fn.venue}
-            </p>
-          )}
-          {item.fn.countdown && (
-            <p className="font-label text-[2.4cqw] tracking-[0.2em] text-card-gold-text uppercase">
-              {item.fn.countdown}
-            </p>
-          )}
-        </>
-      )}
+              {(fn.date || fn.time || fn.venue) && (
+                <span aria-hidden className="story-rule scene-rule" />
+              )}
+              {fn.date && (
+                <p lang={lang} style={sceneLine(voice, "date", lang, type)}>
+                  {fn.date}
+                </p>
+              )}
+              {fn.time && (
+                <p
+                  lang={lang}
+                  className="text-card-ink-muted"
+                  style={sceneLine(voice, "detail", lang, type)}
+                >
+                  {fn.muhurat && (
+                    <span lang={fn.muhurat.lang} className="text-card-accent-text">
+                      {fn.muhurat.text} ·{" "}
+                    </span>
+                  )}
+                  {fn.time}
+                </p>
+              )}
+              {fn.venue && (
+                <p
+                  lang={lang}
+                  className="max-w-full text-balance text-card-ink-muted"
+                  style={sceneLine(voice, "detail", lang, type)}
+                >
+                  {fn.venue}
+                </p>
+              )}
+              {fn.countdown && (
+                <p
+                  lang={lang}
+                  className="mt-[0.35em] text-card-gold-text"
+                  style={sceneLine(voice, "countdown", lang, type)}
+                >
+                  {fn.countdown}
+                </p>
+              )}
+            </>
+          )
+        )}
+      </div>
     </div>
   );
 }

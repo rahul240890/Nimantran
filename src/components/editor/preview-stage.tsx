@@ -113,6 +113,7 @@ export function PreviewStage({
           functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
           photos={scenePhotos}
           reply={null}
+          type={type}
           framed
         />
       </div>

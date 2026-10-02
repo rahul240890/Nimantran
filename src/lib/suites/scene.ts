@@ -54,9 +54,9 @@ const SCENES: Partial<Record<SuiteId, SceneEntry>> = {
     },
     // The carved panel runs down to 70%, so the line opens the slot instead
     two: {
-      names: [6, 70.5, 88, 5.5],
+      names: [6, 70, 88, 5.6],
       line: null,
-      slot: [14, 76.5, 72, 14],
+      slot: [12, 76, 76, 18.5],
     },
   },
 };

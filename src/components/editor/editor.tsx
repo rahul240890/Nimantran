@@ -1,5 +1,6 @@
 "use client";
 
+import type { InviteFormat } from "@/lib/editor/formats";
 import {
   ArrowLeft,
   ArrowRight,
@@ -176,6 +177,7 @@ export function Editor({
   initialCategory,
   initialTradition = null,
   initialSuite = null,
+  initialFormat = null,
   signedIn = false,
   initialInvite = null,
   fresh = false,
@@ -188,6 +190,8 @@ export function Editor({
   initialTradition?: TraditionId | null;
   /** A design chosen in the gallery (?suite=<id>, with its card, occasion and tradition). */
   initialSuite?: SuiteId | null;
+  /** The gallery's Scene or Story version of that design (?format=scene). */
+  initialFormat?: InviteFormat | null;
   /** Drafts save to the account as well as the device. */
   signedIn?: boolean;
   /** An invite opened from My invites (?invite=<id>). */
@@ -253,6 +257,7 @@ export function Editor({
           tradition: initialTradition,
           suite: initialSuite,
           template: initialTemplate,
+          format: initialFormat ?? undefined,
         };
         const current = inviteDraft.get().draft;
         const switched =
@@ -287,6 +292,7 @@ export function Editor({
     initialCategory,
     initialTradition,
     initialSuite,
+    initialFormat,
     update,
     router,
     syncCopy,

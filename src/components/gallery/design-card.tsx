@@ -1,6 +1,15 @@
 "use client";
 
-import { ArrowRight, ChevronLeft, ChevronRight, Eye, Layers, Rotate3d, X } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  Image as ImageIcon,
+  Layers,
+  Rotate3d,
+  X,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
@@ -12,6 +21,7 @@ import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
 import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
+import { ScenePoster, SceneSample } from "./scene-poster";
 
 type DesignCardProps = {
   design: GalleryDesign;
@@ -41,12 +51,14 @@ export function DesignCard({ design, name, description, href, priority, cover }:
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const pages = paintedPages(design);
+  const scene = design.format === "scene";
   const painted = pages.length > 0;
   const [open, setOpen] = useState(false);
 
   return (
     <article
       data-design={design.id}
+      data-format={scene ? "scene" : painted ? "story" : "card"}
       className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float"
     >
       <button
@@ -55,7 +67,19 @@ export function DesignCard({ design, name, description, href, priority, cover }:
         aria-label={galleryCopy.preview(name)}
         className="relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night outline-offset-[-3px] focus-visible:outline-2 focus-visible:outline-ring"
       >
-        {painted ? (
+        {scene ? (
+          <>
+            <ScenePoster
+              suite={design.suite}
+              priority={priority}
+              className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
+            />
+            <span
+              aria-hidden
+              className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
+            />
+          </>
+        ) : painted ? (
           <>
             <Image
               src={pages[0]!.src}
@@ -86,13 +110,19 @@ export function DesignCard({ design, name, description, href, priority, cover }:
             )}
           </span>
         )}
-        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-card-ivory uppercase backdrop-blur-sm">
-          {painted ? (
+        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
+          {scene ? (
+            <ImageIcon aria-hidden className="size-3.5" />
+          ) : painted ? (
             <Layers aria-hidden className="size-3.5" />
           ) : (
             <Rotate3d aria-hidden className="size-3.5" />
           )}
-          {painted ? galleryCopy.pagesCount(pages.length) : galleryCopy.card}
+          {scene
+            ? galleryCopy.sceneBadge
+            : painted
+              ? galleryCopy.storyBadge(pages.length)
+              : galleryCopy.card}
         </span>
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />
@@ -149,7 +179,9 @@ function DesignPreview({
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const [index, setIndex] = useState(0);
-  const total = pages.length;
+  // A Scene plays itself; a Story steps through its pages
+  const scene = design.format === "scene";
+  const total = scene ? 0 : pages.length;
   const current = pages[index];
   const go = (next: number) => setIndex((next + total) % total);
 
@@ -183,7 +215,9 @@ function DesignPreview({
           {/* The page, shaped like a phone screen */}
           <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:p-0">
             <div className="relative aspect-[9/16] h-[min(68dvh,52rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(84dvh,52rem)]">
-              {current ? (
+              {scene ? (
+                <SceneSample suite={design.suite} />
+              ) : current ? (
                 <Image
                   key={current.src}
                   src={current.src}
@@ -234,7 +268,9 @@ function DesignPreview({
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
                 {name}
               </DialogPrimitive.Title>
-              <p className="text-card-ivory/80">{total > 0 ? description : galleryCopy.cardNote}</p>
+              <p className="text-card-ivory/80">
+                {scene ? galleryCopy.sceneNote : total > 0 ? description : galleryCopy.cardNote}
+              </p>
             </div>
             {total > 1 && (
               <ul

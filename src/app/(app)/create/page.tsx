@@ -1,3 +1,4 @@
+import { isInviteFormat } from "@/lib/editor/formats";
 import type { Metadata } from "next";
 import { isTraditionId } from "@/lib/traditions/catalog";
 import { redirect } from "next/navigation";
@@ -34,7 +35,16 @@ const inviteId = z.uuid();
  * ?quality=high|medium|low|2d forces the preview's level (handy for tests without a GPU).
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const { template, category, tradition, suite, quality, invite, new: fresh } = await searchParams;
+  const {
+    template,
+    category,
+    tradition,
+    suite,
+    format,
+    quality,
+    invite,
+    new: fresh,
+  } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -51,6 +61,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     initialCategory: isCategoryId(category) ? category : null,
     initialTradition: isTraditionId(tradition) ? tradition : null,
     initialSuite: isSuiteId(suite) ? suite : null,
+    initialFormat: isInviteFormat(format) ? format : null,
     fresh: fresh === "1",
   };
   return (
@@ -64,6 +75,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
           params.initialTemplate,
           params.initialTradition,
           params.initialSuite,
+          params.initialFormat,
         ].join("|")}
         {...params}
         quality={isQualityChoice(quality) ? quality : "auto"}

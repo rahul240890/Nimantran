@@ -218,6 +218,7 @@ export function GuestView({
             functions={told}
             photos={scenePhotos}
             reply={story.reply ?? null}
+            type={story.type}
             detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
             header={
               (guestName || languages.length > 1) && (

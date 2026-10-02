@@ -12,7 +12,7 @@ export const galleryCopy = {
   eyebrow: "Create an invitation",
   heading: "What are you celebrating?",
   intro:
-    "Pick the occasion, then a design made for it. Every design opens into full-screen painted pages, one for each event, with replies built in.",
+    "Pick the occasion, then a design made for it. A Scene puts everything on one painting, each celebration flying in by turn. A Story gives every celebration its own full-screen painted page. Replies are built into both.",
   searchLabel: "Search occasions and designs",
   searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
   clearSearch: "Clear search",
@@ -33,6 +33,24 @@ export const galleryCopy = {
     "Only designs made for this kind of wedding. The card is written in its own language, and you can add English beside it.",
   card: "3D card",
   pagesCount: (count: number) => `${count} pages`,
+  /** The two kinds of painted invitation (src/lib/editor/formats.ts), and the 3D cards. */
+  formats: {
+    label: "Kind of invitation",
+    all: "All",
+    scene: "Scene",
+    story: "Story",
+    card: "3D card",
+  },
+  sceneBadge: "Scene · 1 page",
+  storyBadge: (count: number) => `Story · ${count} pages`,
+  sceneNote:
+    "One painting with your photos and names. Every celebration flies in by turn, and the painting's light follows it from morning to night.",
+  sceneSample: {
+    first: "Arjun",
+    second: "Sia",
+    line: "invite you to celebrate with them",
+    venues: ["Family home", "The courtyard", "The lawns", "The palace"],
+  },
   preview: (name: string) => `Preview ${name}`,
   useDesign: "Use this design",
   close: "Close preview",

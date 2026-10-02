@@ -1,3 +1,4 @@
+import { INVITE_FORMATS } from "./formats";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { SUITE_IDS } from "@/lib/suites/catalog";
@@ -181,7 +182,7 @@ export const draftSchema = z.object({
   /** The couple's photo page (Step 12l): which of the invite's photos fill its frames. */
   couplePhotos: couplePhotosSchema.catch(noCouplePhotos),
   /** Pages one after another, or the whole invitation on one painting (One Scene pilot). */
-  format: z.enum(["story", "scene"]).catch("story"),
+  format: z.enum(INVITE_FORMATS).catch("story"),
   /** Open with the theme's painted god, where it has one (Step 12r). */
   blessingPage: z.boolean().catch(true),
   /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
