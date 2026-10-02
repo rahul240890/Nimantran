@@ -80,3 +80,46 @@ export function sceneLine(
     color: couple && type?.colour ? type.colour : undefined,
   };
 }
+
+/** One line of the scene as a canvas font (the video), the same choices as `sceneLine`. */
+export type SceneFont = {
+  family: string;
+  /** The CSS font prefix: style and weight. */
+  prefix: string;
+  /** Size in px, before any fitting. */
+  size: number;
+  leading: number;
+  /** Letter spacing in em. */
+  tracking: number;
+  upper: boolean;
+  /** The host's own colour for the names, if they picked one. */
+  colour?: string;
+};
+
+/** The scene's lettering for a line on a painting `width` px wide, for drawing on a canvas. */
+export function sceneFont(
+  voice: Voice,
+  role: SceneRole,
+  lang: string | undefined,
+  width: number,
+  type?: PageType,
+  rem = 16,
+): SceneFont {
+  const { role: typeRole } = SCENE_SIZES[role];
+  const set = lettering(voice, typeRole, lang);
+  const names = ROLES[typeRole].face === "names";
+  const own = names ? type?.names : type?.words;
+  const couple = role === "names";
+  const scale = (own ? set.size / set.faceSize : set.size) * (type?.scale ?? 1);
+  const weight = names && type?.bold ? 700 : own ? undefined : set.weight;
+  const italic = names && type?.italic ? "italic " : "";
+  return {
+    family: own ?? set.family,
+    prefix: `${italic}${weight ? `${weight} ` : ""}`,
+    size: sceneSize(role, width, rem) * scale,
+    leading: set.leading,
+    tracking: couple && type?.capitals ? 0.04 : set.tracking,
+    upper: set.upper || (couple && Boolean(type?.capitals)),
+    colour: couple && type?.colour ? type.colour : undefined,
+  };
+}

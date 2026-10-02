@@ -17,10 +17,15 @@ import {
 } from "mediabunny";
 import { renderRaga } from "@/lib/engine/music-render";
 import type { MusicChoice } from "@/lib/engine/music-player";
-import { drawFrame, type VideoScene } from "./draw";
 import { FRAME_RATE, VIDEO_HEIGHT, VIDEO_WIDTH } from "./timeline";
 
 export type VideoSupport = "ok" | "no-video" | "no-audio";
+
+/** A video to make: how long it runs, and how to draw any moment of it. */
+export type VideoFilm = {
+  total: number;
+  draw: (ctx: CanvasRenderingContext2D, seconds: number) => void;
+};
 
 /**
  * H.264 and AAC: what WhatsApp and Instagram play everywhere. Tests in preview mode pass
@@ -53,7 +58,7 @@ export async function videoSupport(codecs: VideoCodecs = SHARE_CODECS): Promise<
  * when `signal` aborts.
  */
 export async function makeVideo(
-  scene: VideoScene,
+  film: VideoFilm,
   music: MusicChoice | null,
   onProgress: (done: number) => void,
   signal: AbortSignal,
@@ -65,7 +70,7 @@ export async function makeVideo(
   const ctx = canvas.getContext("2d", { alpha: false });
   if (!ctx) throw new Error("No canvas");
 
-  const total = scene.timeline.total;
+  const total = film.total;
   const output = new Output({
     format: new Mp4OutputFormat({ fastStart: "in-memory" }),
     target: new BufferTarget(),
@@ -91,7 +96,7 @@ export async function makeVideo(
     for (let frame = 0; frame < frames; frame++) {
       if (signal.aborted) throw new DOMException("Stopped", "AbortError");
       const at = frame / FRAME_RATE;
-      drawFrame(ctx, scene, at);
+      film.draw(ctx, at);
       await video.add(at, 1 / FRAME_RATE);
       if (frame % 6 === 0) {
         onProgress(0.03 + (0.95 * frame) / frames);
