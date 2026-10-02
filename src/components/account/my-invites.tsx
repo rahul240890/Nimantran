@@ -12,6 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { deleteInvite } from "@/actions/invites";
@@ -42,12 +43,15 @@ import { forgetShelvedPhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft } from "@/lib/editor/store";
 import type { InviteSummary } from "@/lib/invites/rows";
+import { SUITES, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
 
 const noop = () => () => {};
 
 type CardProps = {
   templateId: TemplateId;
+  /** The painted theme, shown in place of the card when it has a cover painting. */
+  theme: SuiteId;
   categoryId: string;
   title: string;
   main: FunctionId | null;
@@ -63,6 +67,7 @@ type CardProps = {
 
 function InviteCard({
   templateId,
+  theme,
   categoryId,
   title,
   main,
@@ -77,18 +82,25 @@ function InviteCard({
   const { functionCopy } = useText(editorText);
   const locale = useLocale();
   const category = CATEGORIES[isCategoryId(categoryId) ? categoryId : "wedding"];
+  const cover = SUITES[theme].images.cover ?? null;
   return (
     <article className="group relative flex h-full gap-4 rounded-lg border border-line bg-surface p-4 shadow-raised transition-[box-shadow,border-color] duration-300 focus-within:border-marigold/60 hover:shadow-float sm:gap-5 sm:p-5">
       <div className="w-16 shrink-0 min-[360px]:w-20 sm:w-24">
         <TiltCard maxTilt={8} className="rounded-sm">
-          <TemplateCover id={templateId} className="rounded-sm shadow-raised" />
+          {cover ? (
+            <span className="relative block aspect-[9/16] overflow-hidden rounded-sm bg-night shadow-raised">
+              <Image src={cover} alt="" fill sizes="6rem" className="object-cover" />
+            </span>
+          ) : (
+            <TemplateCover id={templateId} locale={locale} className="rounded-sm shadow-raised" />
+          )}
         </TiltCard>
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className={cn("flex flex-wrap items-center gap-2", action && "pe-10")}>
           <Badge tone="gold">
             <CategoryIcon icon={category.icon} className="me-1 -mt-0.5 inline size-3.5" />
-            {category.names.en}
+            {category.names[locale]}
           </Badge>
           {badge}
         </div>
@@ -260,6 +272,12 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
     return (
       <InviteCard
         templateId={draft.templateId}
+        theme={suiteFor({
+          suite: draft.suite,
+          tradition: draft.tradition.id,
+          templateId: draft.templateId,
+          category: draft.categoryId,
+        })}
         categoryId={draftCategory(draft).id}
         title={
           named
@@ -325,6 +343,7 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                 <li key={invite.id}>
                   <InviteCard
                     templateId={isTemplateId(invite.templateId) ? invite.templateId : "marigold"}
+                    theme={invite.theme}
                     categoryId={invite.categoryId}
                     title={title}
                     main={invite.mainFunction}

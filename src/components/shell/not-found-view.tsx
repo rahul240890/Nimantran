@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Button } from "@/components/ui/button";
@@ -20,6 +21,12 @@ export function NotFoundView() {
           <p className="font-display text-2xl leading-tight">{hi.title}</p>
           <p className="text-ink-muted">{hi.body}</p>
         </div>
+        <Button asChild>
+          <Link href="/designs">
+            {en.designs}
+            <ArrowRight aria-hidden className="rtl:rotate-180" />
+          </Link>
+        </Button>
         <div className="flex flex-wrap justify-center gap-3">
           <Button asChild variant="secondary">
             <Link href="/">{en.home}</Link>
