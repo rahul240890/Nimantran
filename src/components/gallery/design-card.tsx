@@ -22,6 +22,7 @@ import { cn } from "@/lib/cn";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
 import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
 import { ScenePoster, SceneSample } from "./scene-poster";
+import { StorySample } from "./story-sample";
 
 type DesignCardProps = {
   design: GalleryDesign;
@@ -214,52 +215,52 @@ function DesignPreview({
 
           {/* The page, shaped like a phone screen */}
           <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:p-0">
-            <div className="relative aspect-[9/16] h-[min(68dvh,52rem)] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(84dvh,52rem)]">
+            <div
+              className={cn(
+                "relative aspect-[9/16] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(84dvh,52rem)]",
+                // A Scene keeps its controls under the painting, so it takes more height
+                scene ? "h-[min(76dvh,52rem)]" : "h-[min(68dvh,52rem)]",
+              )}
+            >
               {scene ? (
                 <SceneSample suite={design.suite} />
               ) : current ? (
-                <Image
-                  key={current.src}
-                  src={current.src}
-                  alt=""
-                  fill
-                  sizes="(min-width: 64rem) 30rem, 90vw"
-                  className="animate-fade-in object-cover"
-                />
+                <StorySample key={current.page} suite={design.suite} art={current.page} />
               ) : (
                 <span className="absolute inset-0 grid place-items-center bg-card-ivory p-[14%]">
                   <TemplateCover id={design.template} locale={locale} />
                 </span>
               )}
-              {total > 1 && (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => go(index - 1)}
-                    aria-label={galleryCopy.previous}
-                    className="absolute start-2 top-1/2 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-night/55 text-card-ivory backdrop-blur-sm transition-colors hover:bg-night/75 focus-visible:outline-2 focus-visible:outline-card-ivory"
-                  >
-                    <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => go(index + 1)}
-                    aria-label={galleryCopy.next}
-                    className="absolute end-2 top-1/2 grid size-11 -translate-y-1/2 cursor-pointer place-items-center rounded-full bg-night/55 text-card-ivory backdrop-blur-sm transition-colors hover:bg-night/75 focus-visible:outline-2 focus-visible:outline-card-ivory"
-                  >
-                    <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
-                  </button>
-                  <span className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-0.5 bg-linear-to-t from-night/80 to-transparent px-4 pt-10 pb-4">
-                    <span className="font-label text-xs tracking-[0.2em] uppercase">
-                      {galleryCopy.pageNames[current!.page]}
-                    </span>
-                    <span aria-live="polite" className="text-xs text-card-ivory/75">
-                      {galleryCopy.pageOf(index + 1, total)}
-                    </span>
-                  </span>
-                </>
-              )}
             </div>
+            {/* Which page this is, between its arrows, under the page so they never cover the words */}
+            {total > 1 && (
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => go(index - 1)}
+                  aria-label={galleryCopy.previous}
+                  className="grid size-11 cursor-pointer place-items-center rounded-full bg-card-ivory/10 text-card-ivory transition-colors hover:bg-card-ivory/20 focus-visible:outline-2 focus-visible:outline-card-ivory"
+                >
+                  <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
+                </button>
+                <p className="flex min-w-36 flex-col items-center gap-0.5 text-center">
+                  <span className="font-label text-xs tracking-[0.2em] uppercase">
+                    {galleryCopy.pageNames[current!.page]}
+                  </span>
+                  <span aria-live="polite" className="text-xs text-card-ivory/75">
+                    {galleryCopy.pageOf(index + 1, total)}
+                  </span>
+                </p>
+                <button
+                  type="button"
+                  onClick={() => go(index + 1)}
+                  aria-label={galleryCopy.next}
+                  className="grid size-11 cursor-pointer place-items-center rounded-full bg-card-ivory/10 text-card-ivory transition-colors hover:bg-card-ivory/20 focus-visible:outline-2 focus-visible:outline-card-ivory"
+                >
+                  <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* What it is, every page as a thumbnail, and the way into the editor */}

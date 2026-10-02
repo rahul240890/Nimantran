@@ -1,25 +1,24 @@
 "use client";
 
-import { UserRound } from "lucide-react";
 import Image from "next/image";
-import { useMemo } from "react";
 import { OneScene } from "@/components/invitation/scene/one-scene";
-import { useLocale, useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy/editor";
-import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
-import type { StoryFunction } from "@/lib/engine/story";
-import type { FunctionId } from "@/lib/events/functions";
+import type { StoryPhoto } from "@/lib/engine/story";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { PAINTING_ASPECT } from "@/lib/suites/photo-frames";
 import { scenePage } from "@/lib/suites/scene";
-import { formatCardDate, formatCardTime } from "@/lib/templates/card-languages";
-import type { CardCopy } from "@/lib/templates/content";
+import { useSampleInvite } from "./sample";
 
 /*
- * A Scene design in the gallery: its painting with soft placeholders where the couple's
- * photos go, and, in the preview, the scene itself playing with sample names and days.
+ * A Scene design in the gallery: its painting with sample photos in the couple's frames,
+ * and, in the preview, the scene itself playing with sample names and days.
  */
+
+/** Pictures standing in for the couple's photos, so the frames show how a photo sits. */
+const SAMPLE_PHOTOS: StoryPhoto[] = [
+  { src: "/occasions/engagement.webp", alt: "" },
+  { src: "/occasions/mehendi.webp", alt: "" },
+];
 
 export function ScenePoster({
   suite,
@@ -37,15 +36,23 @@ export function ScenePoster({
       className={cn("absolute inset-x-0 top-0 block", className)}
       style={{ aspectRatio: String(PAINTING_ASPECT) }}
     >
+      {/* The sample photos show through the frames, as the couple's own will */}
       {page.frames.map(([x, y, width, height], i) => (
-        <span
+        // eslint-disable-next-line @next/next/no-img-element -- a small stand-in under the painting
+        <img
           key={i}
+          src={SAMPLE_PHOTOS[i]!.src}
+          alt=""
           aria-hidden
-          className="absolute grid place-items-center bg-linear-to-b from-card-ivory to-marigold/40 text-card-gold-text"
-          style={{ left: `${x}%`, top: `${y}%`, width: `${width}%`, height: `${height}%` }}
-        >
-          <UserRound className="size-1/3" strokeWidth={1.25} />
-        </span>
+          loading={priority ? undefined : "lazy"}
+          className="absolute bg-card-ivory object-cover"
+          style={{
+            left: `${x - 0.8}%`,
+            top: `${y - 0.5}%`,
+            width: `${width + 1.6}%`,
+            height: `${height + 1}%`,
+          }}
+        />
       ))}
       <Image
         src={page.image}
@@ -59,57 +66,21 @@ export function ScenePoster({
   );
 }
 
-/** Sample days for the preview, one per celebration. */
-const SAMPLE: readonly [FunctionId, string, string][] = [
-  ["haldi", "2027-02-12", "10:00"],
-  ["mehendi", "2027-02-12", "16:00"],
-  ["sangeet", "2027-02-12", "20:00"],
-  ["wedding", "2027-02-13", "19:30"],
-];
+const SCENE_DAYS = ["haldi", "mehendi", "sangeet", "wedding"] as const;
 
-/** The scene itself, playing in the preview with sample names and celebrations. */
+/** The scene itself, playing in the preview with sample names, photos and celebrations. */
 export function SceneSample({ suite }: { suite: SuiteId }) {
-  const locale = useLocale();
-  const { galleryCopy } = useText(galleryText);
-  const { functionCopy } = useText(editorText);
-  const sample = galleryCopy.sceneSample;
-  const copy = useMemo<CardCopy>(
-    () => ({
-      doors: ["", ""],
-      blessing: "",
-      families: "",
-      first: sample.first,
-      joiner: locale === "hi" ? "संग" : "&",
-      second: sample.second,
-      line: sample.line,
-      date: "",
-      venue: "",
-    }),
-    [sample, locale],
-  );
-  const functions = useMemo<StoryFunction[]>(
-    () =>
-      SAMPLE.map(([kind, date, time], i) => ({
-        kind,
-        name: functionCopy[kind].name,
-        localName: null,
-        date: formatCardDate(date, locale),
-        time: formatCardTime(time, null, locale),
-        muhurat: null,
-        venue: sample.venues[i] ?? "",
-      })),
-    [functionCopy, locale, sample],
-  );
-  const page = scenePage(suite, 0);
+  const { copy, functions, lang } = useSampleInvite(SCENE_DAYS);
+  const page = scenePage(suite, SAMPLE_PHOTOS.length);
   if (!page) return null;
   return (
     <OneScene
       suite={suite}
       page={page}
       copy={copy}
-      lang={locale}
+      lang={lang}
       functions={functions}
-      photos={[]}
+      photos={SAMPLE_PHOTOS}
       reply={null}
       framed
     />

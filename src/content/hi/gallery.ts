@@ -41,11 +41,20 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:
     "आपकी फ़ोटो और नामों वाला एक चित्र। हर रस्म बारी-बारी से उड़कर आती है, और चित्र की रोशनी सुबह से रात तक उसके साथ बदलती है।",
-  sceneSample: {
+  sample: {
     first: "अर्जुन",
-    second: "राधा",
+    second: "सिया",
+    blessing: "श्री गणेश जी के आशीर्वाद से",
+    families: "अपने परिवारों के साथ",
     line: "आपको सपरिवार सादर आमंत्रित करते हैं",
-    venues: ["घर का आँगन", "हवेली का चौक", "बाग़ का लॉन", "राजमहल"],
+    venues: {
+      haldi: "घर का आँगन, जयपुर",
+      mehendi: "हवेली का चौक, जयपुर",
+      sangeet: "छत का लॉन, जयपुर",
+      baraat: "होटल के द्वार से",
+      wedding: "रामबाग पैलेस, जयपुर",
+      reception: "जय महल, जयपुर",
+    },
   },
   pagesCount: (count: number) => `${count} पन्ने`,
   preview: (name: string) => `${name} की झलक देखें`,

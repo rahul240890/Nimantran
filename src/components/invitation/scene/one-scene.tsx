@@ -523,6 +523,16 @@ function SlotCard({
         ) : (
           fn && (
             <>
+              {/* As on a printed card: how soon, then the name, a rule, the day, and when and where */}
+              {fn.countdown && (
+                <p
+                  lang={lang}
+                  className="mb-[0.45em] text-card-gold-text"
+                  style={sceneLine(voice, "countdown", lang, type)}
+                >
+                  {fn.countdown}
+                </p>
+              )}
               <p
                 lang={lang}
                 className="max-w-full text-balance"
@@ -547,36 +557,18 @@ function SlotCard({
                   {fn.date}
                 </p>
               )}
-              {fn.time && (
+              {(fn.time || fn.venue) && (
                 <p
                   lang={lang}
-                  className="text-card-ink-muted"
+                  className="mt-[0.2em] max-w-full text-balance text-card-ink-muted"
                   style={sceneLine(voice, "detail", lang, type)}
                 >
-                  {fn.muhurat && (
+                  {fn.muhurat && fn.time && (
                     <span lang={fn.muhurat.lang} className="text-card-accent-text">
                       {fn.muhurat.text} ·{" "}
                     </span>
                   )}
-                  {fn.time}
-                </p>
-              )}
-              {fn.venue && (
-                <p
-                  lang={lang}
-                  className="max-w-full text-balance text-card-ink-muted"
-                  style={sceneLine(voice, "detail", lang, type)}
-                >
-                  {fn.venue}
-                </p>
-              )}
-              {fn.countdown && (
-                <p
-                  lang={lang}
-                  className="mt-[0.35em] text-card-gold-text"
-                  style={sceneLine(voice, "countdown", lang, type)}
-                >
-                  {fn.countdown}
+                  {[fn.time, fn.venue].filter(Boolean).join(" · ")}
                 </p>
               )}
             </>
