@@ -9,6 +9,7 @@
  */
 
 import type { CategoryId } from "@/lib/categories/catalog";
+import type { Voice } from "./lettering";
 import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
@@ -131,6 +132,8 @@ export type Suite = {
    * differently from it. Missing keeps the plain details page.
    */
   guest?: GuestLookChoice;
+  /** How its words are lettered (lettering.ts); missing is regal, the palaces' serif. */
+  voice?: Voice;
 };
 
 export const SUITES: Record<SuiteId, Suite> = {
@@ -318,6 +321,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A pastel garden arch of balloons and bunting, the cake table under it
   gubbara: {
+    voice: "playful",
     id: "gubbara",
     art: "bagh",
     turn: "fade",
@@ -359,6 +363,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A city rooftop at night: fairy lights, floor cushions, a DJ and fireworks
   rooftop: {
+    voice: "modern",
     id: "rooftop",
     art: "kayal",
     turn: "sweep",
@@ -377,6 +382,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Modern and minimal: ivory plaster arches, pampas grass and soft sunlight
   "ivory-arch": {
+    voice: "romantic",
     id: "ivory-arch",
     art: "bagh",
     turn: "arch",
@@ -405,6 +411,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Loose watercolour roses and peonies on white paper
   gulaab: {
+    voice: "romantic",
     id: "gulaab",
     art: "bagh",
     turn: "fade",
@@ -433,6 +440,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Black lacquer and gold art deco, like a grand 1920s hotel
   "deco-noir": {
+    voice: "modern",
     id: "deco-noir",
     art: "kayal",
     turn: "sweep",
@@ -468,6 +476,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A midnight sky of gold moons, stars and soft clouds
   taara: {
+    voice: "modern",
     id: "taara",
     art: "kayal",
     turn: "fade",
@@ -496,6 +505,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Layers of cut paper in pastel shades, with real depth
   kaagaz: {
+    voice: "modern",
     id: "kaagaz",
     art: "bagh",
     turn: "arch",
@@ -523,6 +533,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Boho desert: terracotta arches, pampas grass and the dunes at sunset
   mitti: {
+    voice: "romantic",
     id: "mitti",
     art: "savari",
     turn: "sweep",
@@ -669,6 +680,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A beach wedding: white drapes, palms and a pastel sunset over the sea
   sagar: {
+    voice: "romantic",
     id: "sagar",
     art: "kayal",
     turn: "ripple",
@@ -868,6 +880,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A white garden chapel with stained glass and lilies, opening with the window's blessing
   chapel: {
+    voice: "romantic",
     id: "chapel",
     art: "kayal",
     turn: "fade",
@@ -897,6 +910,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Soft cherry blossoms over a wooden bridge, a still pond and paper lanterns
   sakura: {
+    voice: "romantic",
     id: "sakura",
     art: "kayal",
     turn: "fade",
@@ -924,6 +938,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A Tuscan vineyard at golden hour, with olive trees and a rustic stone villa
   vigna: {
+    voice: "romantic",
     id: "vigna",
     art: "kayal",
     turn: "fade",
@@ -952,6 +967,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Snowy mountains, a pine forest and warm winter lights
   himani: {
+    voice: "romantic",
     id: "himani",
     art: "kayal",
     turn: "fade",
@@ -980,6 +996,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // An enchanted forest of moss, ferns, fairy lights and fireflies
   van: {
+    voice: "romantic",
     id: "van",
     art: "kayal",
     turn: "fade",
@@ -1036,6 +1053,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A flower swing cradle among soft pastel clouds, for a baby shower
   palna: {
+    voice: "playful",
     id: "palna",
     art: "bagh",
     turn: "fade",
@@ -1079,6 +1097,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A storybook jungle of friendly animals, balloons and big leaves
   "jungle-party": {
+    voice: "playful",
     id: "jungle-party",
     art: "bagh",
     turn: "fade",

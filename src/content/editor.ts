@@ -676,6 +676,7 @@ export const pageWordsCopy = {
     label: "Small heading",
     script: "Blessing",
     display: "Large",
+    date: "Date",
     body: "Text",
     small: "Small text",
   },

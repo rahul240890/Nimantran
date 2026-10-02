@@ -9,7 +9,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
  */
 
 /** The kinds of line a host can pick, each drawn in the theme's own font and ink. */
-export const EDIT_STYLES = ["label", "script", "display", "body", "small"] as const;
+export const EDIT_STYLES = ["label", "script", "display", "date", "body", "small"] as const;
 export type EditStyle = (typeof EDIT_STYLES)[number];
 export const PLACES = ["top", "middle", "bottom"] as const;
 export const ALIGNS = ["center", "start"] as const;

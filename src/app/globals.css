@@ -1141,15 +1141,34 @@
     transparent
   );
 }
-/* Spaced-out capitals suit Latin letters; in Indic scripts spacing pulls the letters apart */
-.story-line:is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) {
-  letter-spacing: normal;
-  /* Vowel signs rise above and hang below the letters, so Indian scripts need taller lines */
-  line-height: 1.4;
+/*
+ * The fine rule between a function's name and its day: a gold hairline fading out at both
+ * ends, with a small diamond at its centre.
+ */
+.story-rule {
+  position: relative;
+  display: block;
+  width: calc(clamp(4.5rem, 26cqmin, 9rem) * var(--story-fit, 1));
+  height: 0.5rem;
+  flex-shrink: 0;
+  background: linear-gradient(
+      90deg,
+      transparent,
+      var(--card-gold-text) 30%,
+      var(--card-gold-text) 70%,
+      transparent
+    )
+    center / 100% 1px no-repeat;
 }
-/* Tamil words run much longer than English ones at the same size */
-.story-line:lang(ta) {
-  --script-size: 0.88;
+.story-rule::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.4rem;
+  height: 0.4rem;
+  rotate: 45deg;
+  background: var(--card-gold-text);
 }
 /* Words break only when a page is too full to fit them whole even at the smallest size */
 [data-overflow] > .story-line {
