@@ -48,6 +48,8 @@ for (const colorScheme of ["light", "dark"] as const) {
 
       await page.getByRole("textbox", { name: /6-digit code/ }).fill("123456");
       await expect(page.getByRole("heading", { name: "What should we call you?" })).toBeVisible();
+      // Signing in refreshes the page, and the title streams back in after it
+      await expect(page).toHaveTitle(/Sign in/);
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
       await page.getByRole("button", { name: "Skip for now" }).click();
