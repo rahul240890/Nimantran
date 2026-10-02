@@ -35,13 +35,13 @@ const SCENES: Partial<Record<SuiteId, SceneEntry>> = {
     style: "jharokha",
     one: {
       names: [14, 49.5, 72, 6.5],
-      line: [18, 56, 64, 5],
-      slot: [22, 62, 56, 19],
+      line: [16, 56, 68, 5],
+      slot: [17, 62, 66, 20.5],
     },
     two: {
       names: [12, 45, 76, 6.5],
-      line: [16, 51.5, 68, 5],
-      slot: [18, 58, 64, 21],
+      line: [14, 51.5, 72, 5],
+      slot: [16, 58, 68, 22],
     },
   },
   // Below the houseboat the backwater is calm mist down to the lotuses
@@ -50,7 +50,7 @@ const SCENES: Partial<Record<SuiteId, SceneEntry>> = {
     one: {
       names: [8, 58.5, 84, 6],
       line: [12, 64.5, 76, 4.8],
-      slot: [16, 70, 68, 17],
+      slot: [13, 69.5, 74, 19.5],
     },
     // The carved panel runs down to 70%, so the line opens the slot instead
     two: {

@@ -45,11 +45,21 @@ export const galleryCopy = {
   storyBadge: (count: number) => `Story · ${count} pages`,
   sceneNote:
     "One painting with your photos and names. Every celebration flies in by turn, and the painting's light follows it from morning to night.",
-  sceneSample: {
+  /** Made-up names, words and places the previews show the designs with. */
+  sample: {
     first: "Arjun",
     second: "Sia",
-    line: "invite you to celebrate with them",
-    venues: ["Family home", "The courtyard", "The lawns", "The palace"],
+    blessing: "With the blessings of Lord Ganesha",
+    families: "Together with their families",
+    line: "invite you to celebrate their wedding",
+    venues: {
+      haldi: "Family home, Jaipur",
+      mehendi: "The courtyard, Jaipur",
+      sangeet: "Rooftop lawns, Jaipur",
+      baraat: "From the hotel gate",
+      wedding: "Rambagh Palace, Jaipur",
+      reception: "Jai Mahal, Jaipur",
+    },
   },
   preview: (name: string) => `Preview ${name}`,
   useDesign: "Use this design",

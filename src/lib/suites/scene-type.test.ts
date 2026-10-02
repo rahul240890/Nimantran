@@ -4,7 +4,7 @@ import { SCENE_SIZES, sceneLine, sceneSize } from "./scene-type";
 describe("scene lettering", () => {
   it("keeps every line readable on a small phone and in proportion on a large one", () => {
     for (const role of Object.keys(SCENE_SIZES) as (keyof typeof SCENE_SIZES)[]) {
-      expect(sceneSize(role, 200)).toBeGreaterThanOrEqual(11);
+      expect(sceneSize(role, 200)).toBeGreaterThanOrEqual(9);
       expect(sceneSize(role, 1200)).toBeLessThanOrEqual(56);
     }
     // The names lead, the details follow

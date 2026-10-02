@@ -2954,7 +2954,7 @@
   transition-property: none !important;
 }
 .scene-rule {
-  width: calc(clamp(3.5rem, 22cqw, 7rem) * var(--scene-fit, 1));
+  width: calc(clamp(2.5rem, 20cqw, 7rem) * var(--scene-fit, 1));
   margin-block: 0.5em 0.4em;
 }
 /* The gallery's kind-of-invitation filter hides the other kinds (format-filter.tsx) */

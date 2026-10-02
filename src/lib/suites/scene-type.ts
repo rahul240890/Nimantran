@@ -5,8 +5,9 @@ import { ROLES, lettering, type TypeRole, type Voice } from "./lettering";
  * How One Scene's words are set. The faces, leading and spacing are the theme's voice
  * from lettering.ts, the same as on the story pages, so a theme reads the same in both
  * kinds of invitation. Only the sizes are the scene's own: everything shares one
- * painting, so each line is smaller than on a page of its own, but never below what
- * reads comfortably on a phone.
+ * painting, so each line is a share of the painting's width. The whole scene then keeps
+ * its composition at any size, a phone's or the gallery's small preview, and only the
+ * floors and ceilings stop it from getting unreadably small or oversized.
  */
 
 export type SceneRole =
@@ -34,13 +35,13 @@ type SceneSize = {
 };
 
 export const SCENE_SIZES: Record<SceneRole, SceneSize> = {
-  names: { role: "names", min: 1.75, fluid: 9.6, max: 3.4 },
-  joiner: { role: "joiner", min: 1.1, fluid: 5.6, max: 2 },
-  line: { role: "body", min: 0.95, fluid: 4, max: 1.3 },
-  function: { role: "display", min: 1.4, fluid: 7.4, max: 2.5 },
-  date: { role: "date", min: 1, fluid: 4.6, max: 1.45 },
-  detail: { role: "small", min: 0.86, fluid: 3.7, max: 1.12 },
-  countdown: { role: "label", min: 0.72, fluid: 2.8, max: 0.9 },
+  names: { role: "names", min: 1.25, fluid: 9.6, max: 3.4 },
+  joiner: { role: "joiner", min: 0.8, fluid: 5.6, max: 2 },
+  line: { role: "body", min: 0.72, fluid: 3.9, max: 1.3 },
+  function: { role: "display", min: 1.05, fluid: 7, max: 2.4 },
+  date: { role: "date", min: 0.78, fluid: 4.1, max: 1.35 },
+  detail: { role: "small", min: 0.7, fluid: 3.5, max: 1.1 },
+  countdown: { role: "label", min: 0.6, fluid: 2.6, max: 0.85 },
 };
 
 /** A scene line's designed size in px on a painting `width` px wide. */
