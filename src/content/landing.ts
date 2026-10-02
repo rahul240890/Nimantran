@@ -12,11 +12,11 @@ export const homeMeta = {
 } as const;
 
 export const nav = [
-  { id: "how-it-works", label: "How it works" },
+  { id: "designs", label: "Designs" },
+  { id: "weddings", label: "Weddings" },
   { id: "occasions", label: "Occasions" },
-  { id: "templates", label: "Designs" },
+  { id: "how-it-works", label: "How it works" },
   { id: "pricing", label: "Pricing" },
-  { id: "faq", label: "FAQ" },
 ] as const;
 
 export const shell = {
@@ -26,6 +26,7 @@ export const shell = {
   menuTitle: "Menu",
   joinWaitlist: "Launch news",
   createInvite: "Start your invite",
+  faq: "FAQ",
   createInviteShort: "Create invite",
   language: {
     label: "Language",
@@ -47,9 +48,10 @@ export const shell = {
 export const hero = {
   eyebrow: "Create · Invite · Celebrate",
   title: "Invitations that come alive.",
-  body: "Pick a painted theme made for your family's tradition, add your names and functions, share it on WhatsApp and collect replies in one tap.",
-  primary: "Start your invite",
-  secondary: "See how it works",
+  body: "Find a painted design for your occasion, add your names and dates, and share it on WhatsApp. Guests reply in one tap.",
+  primary: "Browse all designs",
+  popular: "Popular",
+  popularSearches: ["Gujarati wedding", "Haldi", "Birthday", "Nikah", "Diwali"],
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
   hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
   proof: ["No app to install", "RSVP in one tap", "In your family's own language"],
@@ -75,33 +77,33 @@ export const homeGallery = {
   coverDate: "12 December 2026",
   occasionsEyebrow: "Start here",
   occasionsTitle: "What are you celebrating?",
-  occasionsIntro:
-    "Pick the occasion, then a design made for it. Weddings open by tradition: Gujarati, Bengali, Marathi, Tamil and more.",
+  occasionsIntro: "Pick the occasion and see only the designs made for it.",
   searchLabel: "Search occasions and designs",
-  searchPlaceholder: "Try Gujarati wedding, haldi, sangeet…",
+  searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
   search: "Search",
-  moreHeading: "Beyond weddings",
+  weddingHeading: "Wedding functions",
+  moreHeading: "More celebrations",
   soonHeading: "Coming next",
-  allOccasions: "See every occasion",
-  themesEyebrow: "Painted themes",
-  themesTitle: "A painted page for every function",
+  allOccasions: "Every occasion",
+  themesEyebrow: "Designs",
+  themesTitle: "Popular designs",
   themesIntro:
-    "Each theme is a set of paintings, one for the cover, the family, haldi, mehendi, sangeet, baraat, the wedding, the reception and the reply. Tap one to see every page.",
-  allDesigns: "See all wedding designs",
+    "A Scene is one painting where every celebration flies in by turn. A Story gives each celebration its own full-screen page.",
+  allDesigns: "See all designs",
 };
 
 export const howItWorks = {
   eyebrow: "How it works",
-  title: "From idea to RSVPs in three steps",
-  intro: "No design skills needed. Most couples finish their invite over one cup of chai.",
+  title: "Ready in three steps",
+  intro: "No design skills needed. Most families finish their invite over one cup of chai.",
   steps: [
     {
       title: "Pick a design",
-      body: "Start from a gate-fold, a royal scroll or a clean monogram. Every design opens in 3D.",
+      body: "Search or browse by occasion and tradition, then tap Use this design.",
     },
     {
       title: "Add your details",
-      body: "Names, functions, dates, venues and dress codes, with a live preview beside the form.",
+      body: "Names, dates and venues, with your invite updating beside the form as you type.",
     },
     {
       title: "Share and track",

@@ -20,8 +20,8 @@ export const galleryCopy = {
     count === 0 ? "Nothing matches yet" : count === 1 ? "1 match" : `${count} matches`,
   noResults: "Nothing matches that yet. Try another word, or browse the occasions below.",
   resultKinds: { occasion: "Occasion", kind: "Wedding", design: "Design" },
+  moreCelebrations: "More celebrations",
   soon: "Coming soon",
-  soonNote: "Designs for this occasion are being painted. Weddings are ready today.",
   designsCount: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
   chooseKind: "Choose your wedding",
   chooseKindIntro:

@@ -18,8 +18,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     count === 0 ? "अभी कुछ नहीं मिला" : count === 1 ? "1 नतीजा" : `${count} नतीजे`,
   noResults: "इससे अभी कुछ नहीं मिला। कोई और शब्द आज़माइए, या नीचे अवसर देखिए।",
   resultKinds: { occasion: "अवसर", kind: "शादी", design: "डिज़ाइन" },
+  moreCelebrations: "और उत्सव",
   soon: "जल्द आ रहा है",
-  soonNote: "इस अवसर के डिज़ाइन बन रहे हैं। शादी के डिज़ाइन आज ही तैयार हैं।",
   designsCount: (count: number) => (count === 1 ? "1 डिज़ाइन" : `${count} डिज़ाइन`),
   chooseKind: "अपनी शादी चुनिए",
   chooseKindIntro:

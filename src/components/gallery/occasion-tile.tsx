@@ -1,4 +1,5 @@
 import {
+  ArrowRight,
   Baby,
   Briefcase,
   Cake,
@@ -142,8 +143,9 @@ export function OccasionTile({
 }
 
 /**
- * A tile that is a painting with its name printed at the foot, leading somewhere, or, with
- * no link yet, marked as coming soon.
+ * A tile that is a painting with its name on a plain strip beneath it, leading somewhere,
+ * or, with no link yet, marked as coming soon. The words never sit on the painting, so they
+ * read the same on a pale haldi morning and a dark sangeet night, in either site theme.
  */
 export function PaintedTile({
   href,
@@ -172,60 +174,73 @@ export function PaintedTile({
   "data-kind"?: string;
 }) {
   const frame = cn(
-    "group relative isolate flex flex-col justify-end overflow-hidden rounded-xl bg-night shadow-float outline-offset-3 focus-visible:outline-2 focus-visible:outline-ring",
-    feature ? "h-full min-h-80 sm:min-h-[26rem]" : "aspect-[4/5]",
+    "group relative flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-[box-shadow,border-color,translate] duration-300 ease-out-expo outline-offset-3 focus-visible:outline-2 focus-visible:outline-ring",
+    href &&
+      "hover:-translate-y-0.5 hover:border-line-strong hover:shadow-float motion-still:hover:translate-y-0",
     className,
   );
   const inside = (
     <>
-      {soonLabel && (
-        <span className="absolute end-2.5 top-2.5 rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-card-ivory uppercase backdrop-blur-sm">
-          {soonLabel}
-        </span>
-      )}
-      <Image
-        src={image}
-        alt=""
-        fill
-        priority={priority}
-        sizes={
-          feature
-            ? "(min-width: 64rem) 40vw, 100vw"
-            : compact
-              ? "(min-width: 64rem) 12vw, (min-width: 40rem) 30vw, 50vw"
-              : "(min-width: 64rem) 20vw, 50vw"
-        }
-        className="-z-10 object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100"
-      />
-      {/* The painting darkens towards the words, whatever the site's theme */}
-      <span
-        aria-hidden
-        className="absolute inset-0 -z-10 bg-linear-to-t from-night/90 via-night/35 to-transparent"
-      />
       <span
         className={cn(
-          "flex flex-col gap-0.5 text-card-ivory",
-          compact ? "p-3 sm:p-3.5" : "p-4 sm:p-5",
+          "relative isolate block w-full overflow-hidden bg-night",
+          feature ? "min-h-56 flex-1 sm:min-h-72" : compact ? "aspect-square" : "aspect-[4/3]",
         )}
       >
-        {otherName && (
-          <span lang={otherName.lang} className="text-sm text-card-ivory/85">
-            {otherName.text}
+        <Image
+          src={image}
+          alt=""
+          fill
+          priority={priority}
+          sizes={
+            feature
+              ? "(min-width: 64rem) 40vw, 100vw"
+              : compact
+                ? "(min-width: 64rem) 14vw, (min-width: 40rem) 30vw, 50vw"
+                : "(min-width: 64rem) 22vw, 50vw"
+          }
+          className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100"
+        />
+        {soonLabel && (
+          <span className="absolute end-2.5 top-2.5 rounded-full bg-night/75 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-card-ivory uppercase backdrop-blur-sm">
+            {soonLabel}
           </span>
         )}
-        <span
-          className={cn(
-            "font-display leading-[1.05]",
-            feature
-              ? "text-[2rem] break-words sm:text-[2.6rem]"
-              : compact
-                ? "text-base sm:text-xl lg:text-base"
-                : "text-[1.35rem] break-words sm:text-2xl",
+      </span>
+      <span
+        className={cn(
+          "flex min-w-0 items-end justify-between gap-2",
+          compact ? "px-3 py-2.5" : feature ? "p-4 sm:p-5" : "p-3 sm:p-4",
+        )}
+      >
+        <span className="flex min-w-0 flex-col gap-0.5">
+          {otherName && (
+            <span lang={otherName.lang} className="text-sm leading-snug text-accent-text">
+              {otherName.text}
+            </span>
           )}
-        >
-          {name}
+          <span
+            className={cn(
+              "font-display leading-[1.1] break-words text-ink",
+              feature
+                ? "text-[1.75rem] sm:text-[2.2rem]"
+                : compact
+                  ? "text-base sm:text-lg"
+                  : "text-[1.2rem] sm:text-[1.35rem]",
+            )}
+          >
+            {name}
+          </span>
+          {tagline && (
+            <span className="line-clamp-2 text-sm leading-snug text-ink-muted">{tagline}</span>
+          )}
         </span>
-        {tagline && <span className="text-sm text-card-ivory/85">{tagline}</span>}
+        {href && !compact && (
+          <ArrowRight
+            aria-hidden
+            className="mb-0.5 size-5 shrink-0 text-accent-text transition-transform duration-300 group-hover:translate-x-0.5 rtl:rotate-180 rtl:group-hover:-translate-x-0.5 motion-still:transition-none"
+          />
+        )}
       </span>
     </>
   );
