@@ -1,6 +1,7 @@
 "use client";
 
-import { CalendarPlus, Clock, MapPin, Navigation, Shirt } from "lucide-react";
+import { CalendarPlus, Car, Clock, Map as MapIcon, MapPin, Navigation, Shirt } from "lucide-react";
+import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,9 +13,14 @@ import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import type { GuestFunction } from "./guest-view";
 
-/** A function's when, where and dress code, with directions and "add to calendar". */
+/**
+ * A function's when, where, dress code and parking, with one-tap directions, a map the
+ * guest opens when they want it (nothing loads from Google before), and "add to calendar".
+ */
 export function FunctionFacts({ fn }: { fn: GuestFunction }) {
   const { guestCopy } = useText(publishText);
+  const [mapOpen, setMapOpen] = useState(false);
+  const mapId = useId();
   return (
     <>
       <dl className="flex flex-col gap-3">
@@ -59,6 +65,15 @@ export function FunctionFacts({ fn }: { fn: GuestFunction }) {
             <dd className="min-w-0 break-words">{fn.dressCode}</dd>
           </div>
         )}
+        {fn.parking && (
+          <div className="flex items-start gap-3">
+            <dt className="mt-0.5 shrink-0">
+              <Car aria-hidden className="size-5 text-accent-text" />
+              <span className="sr-only">{guestCopy.parking}</span>
+            </dt>
+            <dd className="min-w-0 break-words">{fn.parking}</dd>
+          </div>
+        )}
       </dl>
       <div className="mt-auto flex flex-wrap gap-2 pt-1">
         {fn.mapsUrl && (
@@ -67,6 +82,19 @@ export function FunctionFacts({ fn }: { fn: GuestFunction }) {
               <Navigation aria-hidden />
               {guestCopy.directions}
             </a>
+          </Button>
+        )}
+        {fn.mapEmbedUrl && (
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            aria-expanded={mapOpen}
+            aria-controls={mapId}
+            leadingIcon={<MapIcon aria-hidden />}
+            onClick={() => setMapOpen((open) => !open)}
+          >
+            {mapOpen ? guestCopy.hideMap : guestCopy.showMap}
           </Button>
         )}
         {fn.googleCalendarUrl && fn.icsUrl && (
@@ -91,6 +119,19 @@ export function FunctionFacts({ fn }: { fn: GuestFunction }) {
           </DropdownMenu>
         )}
       </div>
+      {fn.mapEmbedUrl && (
+        <div id={mapId} hidden={!mapOpen}>
+          {mapOpen && (
+            <iframe
+              src={fn.mapEmbedUrl}
+              title={guestCopy.mapTitle(fn.venue || fn.name)}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="aspect-[4/3] w-full rounded-md border border-line bg-surface-2"
+            />
+          )}
+        </div>
+      )}
     </>
   );
 }

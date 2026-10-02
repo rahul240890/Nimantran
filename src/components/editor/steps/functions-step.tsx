@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { ChevronDown, CircleAlert, MapPin, Shirt } from "lucide-react";
+import { Car, ChevronDown, CircleAlert, MapPin, MapPinned, Shirt } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,7 @@ import {
   type EventFunction,
   type FunctionId,
 } from "@/lib/editor/draft";
+import { functionGuide, GUIDE_RULES, mapsPin, type FunctionGuide } from "@/lib/editor/guide";
 import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
@@ -34,6 +35,8 @@ function FunctionFields({
   withTime,
   muhurat,
   set,
+  guide,
+  setGuide,
 }: {
   id: FunctionId;
   fn: EventFunction;
@@ -43,6 +46,9 @@ function FunctionFields({
   /** The tradition's name for the wedding's auspicious time, when it has one. */
   muhurat: { name: string; lang: string } | null;
   set: (change: Partial<EventFunction>) => void;
+  /** The map pin and parking guests see on the day. */
+  guide: FunctionGuide;
+  setGuide: (change: Partial<FunctionGuide>) => void;
 }) {
   const { editor } = useText(editorText);
   const message = (error: string | undefined) =>
@@ -138,6 +144,43 @@ function FunctionFields({
         </Field>
       )}
       {withTime && (
+        <Field
+          label={functionFields.pin}
+          optionalLabel={editor.optional}
+          hint={functionFields.pinHint}
+          error={guide.pin.trim() && !mapsPin(guide.pin) ? functionFields.pinInvalid : undefined}
+          className="sm:col-span-2"
+        >
+          <Input
+            type="url"
+            inputMode="url"
+            value={guide.pin}
+            maxLength={GUIDE_RULES.pin}
+            placeholder="https://maps.app.goo.gl/…"
+            autoComplete="off"
+            spellCheck={false}
+            leading={<MapPinned />}
+            onChange={(event) => setGuide({ pin: event.target.value })}
+          />
+        </Field>
+      )}
+      {withTime && (
+        <Field
+          label={functionFields.parking}
+          optionalLabel={editor.optional}
+          className="sm:col-span-2"
+        >
+          <Input
+            value={guide.parking}
+            maxLength={GUIDE_RULES.parking}
+            placeholder={functionFields.parkingPlaceholder}
+            autoComplete="off"
+            leading={<Car />}
+            onChange={(event) => setGuide({ parking: event.target.value })}
+          />
+        </Field>
+      )}
+      {withTime && (
         <div className="flex flex-col gap-3 sm:col-span-2">
           <Field label={functionFields.dressCode} optionalLabel={editor.optional}>
             <Input
@@ -196,6 +239,12 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
       functions: { ...current.functions, [id]: { ...current.functions[id], ...change } },
     }));
 
+  const setGuide = (id: FunctionId, change: Partial<FunctionGuide>) =>
+    update((current) => ({
+      ...current,
+      guide: { ...current.guide, [id]: { ...functionGuide(current.guide, id), ...change } },
+    }));
+
   const item = (id: FunctionId) => {
     const fn = draft.functions[id];
     const copy = functionCopy[id];
@@ -249,6 +298,8 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
               muhurat ? { name: muhurat.native, lang: draftTradition(draft)!.language } : null
             }
             set={(change) => setFunction(id, change)}
+            guide={functionGuide(draft.guide, id)}
+            setGuide={(change) => setGuide(id, change)}
           />
         )}
       </li>
