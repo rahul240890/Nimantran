@@ -13,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import {
+  Fragment,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -28,9 +29,19 @@ import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
-import { lineDelay, type LineStyle, type StoryBeat } from "@/lib/engine/story";
+import { lineDelay, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
 import { fitScale } from "@/lib/suites/fit";
+import {
+  ROLES,
+  lettering,
+  lineSpace,
+  roleOf,
+  ruleAt,
+  roleSizeCss,
+  type TypeRole,
+  type Voice,
+} from "@/lib/suites/lettering";
 import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
@@ -41,6 +52,7 @@ import { StoryScene } from "./story-scenes";
 import { PageEffects } from "./page-effects";
 import { PhotoArches, PhotoWindows } from "./photo-windows";
 import { SuiteBackdrop } from "./suite-backdrop";
+import "@/components/invitation/type/fonts.css";
 
 export type StoryLabels = {
   story: string;
@@ -80,24 +92,17 @@ type StoryPlayerProps = {
   onDone: (hadFocus: boolean) => void;
 };
 
-/* Sizes follow the page (cqmin), within bounds that keep every line readable on a phone */
-const LINE_CLASS: Record<LineStyle, string> = {
-  symbol: "",
-  label:
-    "font-label text-[length:calc(clamp(0.85rem,3.6cqmin,1.15rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] tracking-[0.26em] text-card-gold-text uppercase",
-  script:
-    "font-display text-[length:calc(clamp(1.35rem,6.4cqmin,2.4rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-tight text-card-accent-text",
-  display:
-    "font-display text-[length:calc(clamp(1.7rem,8.4cqmin,3.2rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-[1.08] text-card-ink",
-  joiner:
-    "font-display text-[length:calc(clamp(1.3rem,6.4cqmin,2.4rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-none text-card-accent-text",
-  body: "font-sans text-[length:calc(clamp(1.05rem,4.6cqmin,1.45rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] text-card-ink-muted",
-  small:
-    "font-sans text-[length:calc(clamp(1rem,4.1cqmin,1.25rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] text-card-ink-muted",
+/* Each kind of line's ink; sizes, faces and spacing come from the lettering spec */
+const LINE_COLOUR: Record<TypeRole, string> = {
+  names: "text-card-ink",
+  display: "text-card-ink",
+  date: "text-card-ink",
+  script: "text-card-accent-text",
+  joiner: "text-card-accent-text",
+  body: "text-card-ink-muted",
+  small: "text-card-ink-muted",
+  label: "text-card-gold-text",
 };
-/** The couple's names are the largest words of all. */
-const NAME_CLASS =
-  "font-display text-[length:calc(clamp(2.4rem,12cqmin,4.6rem)*var(--story-scale,1)*var(--story-fit,1)*var(--script-size,1))] leading-[1.02] text-card-ink";
 
 const TURN_CLASS = {
   fade: "suite-turn-fade",
@@ -324,6 +329,7 @@ export function StoryPlayer({
               labels={labels}
               onReply={onDone}
               inert={!current}
+              lang={lang}
               className={cn(
                 current && pages.length > 1 && TURN_CLASS[suite.turn],
                 !current && "pointer-events-none",
@@ -477,16 +483,34 @@ function areaStyle(area: TextArea, whole = false, lifted = false): CSSProperties
   };
 }
 
-/** The styles the host's lettering puts on one line: names get the names' font and colour. */
-function lineType(type: PageType | undefined, style: LineStyle, name: boolean): CSSProperties {
-  if (!type) return {};
-  const names = style === "display" || style === "script" || style === "joiner";
+/**
+ * How one line is set: the theme's voice in the line's own script (lettering.ts), the
+ * host's lettering over it (Step 12n), and the space that groups it with its neighbours.
+ */
+function lineStyle(
+  voice: Voice,
+  role: TypeRole,
+  lang: string | undefined,
+  type: PageType | undefined,
+  space: number,
+): CSSProperties {
+  const set = lettering(voice, role, lang);
+  const names = ROLES[role].face === "names";
+  const own = names ? type?.names : type?.words;
+  const name = role === "names";
+  // A face the host picked has its own proportions, so only the script's size applies
+  const size = own ? set.size / set.faceSize : set.size;
   return {
-    fontFamily: names ? type.names : type.words,
-    ...(names && type.bold ? { fontWeight: 700 } : {}),
-    ...(names && type.italic ? { fontStyle: "italic" } : {}),
-    ...(name && type.capitals ? { textTransform: "uppercase", letterSpacing: "0.04em" } : {}),
-    ...(name && type.colour ? { color: type.colour } : {}),
+    fontFamily: own ?? set.family,
+    fontWeight: names && type?.bold ? 700 : own ? undefined : set.weight,
+    ...(names && type?.italic ? { fontStyle: "italic" } : {}),
+    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * var(--story-fit, 1))`,
+    lineHeight: set.leading,
+    letterSpacing:
+      name && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",
+    ...(set.upper || (name && type?.capitals) ? { textTransform: "uppercase" } : {}),
+    ...(name && type?.colour ? { color: type.colour } : {}),
+    ...(space ? { marginTop: `calc(${space}cqmin * var(--story-fit, 1))` } : {}),
   };
 }
 
@@ -507,6 +531,7 @@ export function StoryPage({
   inert,
   className,
   onOverflow,
+  lang,
 }: {
   beat: StoryBeat;
   copy: CardCopy;
@@ -521,6 +546,8 @@ export function StoryPage({
   className?: string;
   /** Told whether the words still overflow at the smallest size, so the editor can say so. */
   onOverflow?: (overflow: boolean) => void;
+  /** The card language the page is written in; a line in another language says so itself. */
+  lang?: string;
 }) {
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
@@ -546,6 +573,10 @@ export function StoryPage({
   const whole = Boolean(frames);
   // A blessing nobody wrote leaves the god's page to itself, with no empty glow
   const empty = beat.lines.length === 0 && !sacred;
+  const voice = suite.voice ?? "regal";
+  // A function's page sets a fine rule between its name and its day, as a printed card does
+  const rule = ruleAt(beat);
+  const middle = layout?.place !== "top" && layout?.place !== "bottom";
   const overflowed = useRef(onOverflow);
   useEffect(() => {
     overflowed.current = onOverflow;
@@ -559,6 +590,7 @@ export function StoryPage({
     reply?.label,
     Boolean(beat.links),
     suiteId,
+    lang,
   ]);
   /*
    * Sizes the words to fit the area: tries sizes until they fit its height and no word runs
@@ -626,12 +658,12 @@ export function StoryPage({
       <div
         ref={fitArea}
         className={cn(
-          "absolute flex justify-center",
+          "absolute flex flex-col items-center",
           layout?.place === "top"
-            ? "items-start"
+            ? "justify-start"
             : layout?.place === "bottom"
-              ? "items-end"
-              : "items-center",
+              ? "justify-end"
+              : "justify-center",
           empty && "invisible",
           arches
             ? "inset-x-[5%] top-[58%] bottom-[max(4%,env(safe-area-inset-bottom))]"
@@ -647,14 +679,16 @@ export function StoryPage({
               : undefined
         }
       >
+        {/* Centred words sit a little above the middle, where the eye takes the centre to be */}
+        {middle && <span aria-hidden className="min-h-0 grow-[0.8]" />}
         <div
           ref={fitWords}
           data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
           className={cn(
-            "relative flex max-h-full w-[min(100%,36rem)] flex-col gap-[2cqmin]",
+            "relative flex max-h-full w-[min(100%,36rem)] flex-col [font-variant-numeric:lining-nums]",
             layout?.align === "start" ? "items-start text-start" : "items-center text-center",
             printed
-              ? "story-print isolate px-[4cqmin] py-[6cqmin]"
+              ? "story-print isolate px-[5cqmin] py-[6cqmin]"
               : themed &&
                   "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
           )}
@@ -694,19 +728,38 @@ export function StoryPage({
             <p className="sr-only">{photos.map((photo) => photo.alt).join(", ")}</p>
           )}
           {beat.lines.map((line, i) => {
-            const name = beat.scene === "cover" && line.style === "display";
+            const role = roleOf(beat, line.style);
             return (
-              <p
-                key={i}
-                lang={line.lang}
-                className={cn(
-                  "story-line max-w-full text-balance",
-                  name ? NAME_CLASS : LINE_CLASS[line.style],
+              <Fragment key={i}>
+                {i > 0 && i === rule && (
+                  <span
+                    aria-hidden
+                    className="story-line story-rule mt-[calc(2.2cqmin*var(--story-fit,1))]"
+                    style={delay(i + offset)}
+                  />
                 )}
-                style={{ ...delay(i + offset), ...lineType(type, line.style, name) }}
-              >
-                {line.text}
-              </p>
+                <p
+                  lang={line.lang}
+                  className={cn(
+                    "story-line text-balance",
+                    // Names may run the full width; reading lines keep clear of the art's edges
+                    ROLES[role].face === "names" && role !== "date" ? "max-w-full" : "max-w-[88%]",
+                    LINE_COLOUR[role],
+                  )}
+                  style={{
+                    ...delay(i + offset),
+                    ...lineStyle(
+                      voice,
+                      role,
+                      line.lang ?? lang,
+                      type,
+                      lineSpace(beat, i, Boolean(sacred)),
+                    ),
+                  }}
+                >
+                  {line.text}
+                </p>
+              </Fragment>
             );
           })}
           {beat.links && (
@@ -743,6 +796,7 @@ export function StoryPage({
             </span>
           )}
         </div>
+        {middle && <span aria-hidden className="min-h-0 grow-[1.2]" />}
       </div>
     </div>
   );
