@@ -6,6 +6,7 @@ import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
 import { supabaseServer } from "@/lib/supabase/server";
+import { wallFilePaths } from "./photo-wall";
 import { previewDb, previewEdits, previewHosts, previewPhotoUrl } from "./preview-db";
 import {
   draftToRows,
@@ -221,6 +222,11 @@ const supabaseStore: InviteStore = {
     if (files?.length) {
       await supabase.storage.from(BUCKET).remove(files.map((file) => `${id}/${file.name}`));
     }
+    // Guests' photo wall files too, which can be many more than one listing holds
+    const wall = await wallFilePaths(id);
+    for (let start = 0; start < wall.length; start += 500) {
+      await supabase.storage.from(BUCKET).remove(wall.slice(start, start + 500));
+    }
     const { error, count } = await supabase.from("events").delete({ count: "exact" }).eq("id", id);
     return !error && (count ?? 0) > 0;
   },
@@ -376,6 +382,11 @@ const previewStore: InviteStore = {
     const stored = previewDb.invites.get(id);
     if (!stored || stored.owner !== account.id) return false;
     for (const photo of stored.photos) previewDb.files.delete(`${id}/${photo.id}`);
+    for (const row of previewDb.wall.values()) {
+      if (row.eventId !== id) continue;
+      previewDb.files.delete(row.path);
+      previewDb.wall.delete(row.id);
+    }
     return previewDb.invites.delete(id);
   },
   async addPhoto(account, id, photo, file) {

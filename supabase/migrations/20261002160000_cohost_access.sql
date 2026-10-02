@@ -94,10 +94,16 @@ drop policy if exists "Hosts replace their event media" on storage.objects;
 create policy "Hosts replace their event media" on storage.objects
   for update to authenticated
   using (bucket_id = 'event-media' and public.can_edit_event(public.media_event_id(name)));
+-- Any host may delete guests' photo wall files (<event id>/wall-…), which they moderate
 drop policy if exists "Hosts delete their event media" on storage.objects;
 create policy "Hosts delete their event media" on storage.objects
   for delete to authenticated
-  using (bucket_id = 'event-media' and public.can_edit_event(public.media_event_id(name)));
+  using (
+    bucket_id = 'event-media' and (
+      public.can_edit_event(public.media_event_id(name))
+      or (split_part(name, '/', 2) like 'wall-%' and public.is_event_host(public.media_event_id(name)))
+    )
+  );
 
 -- The owner may change what a co-host can do, but never make them an owner (unchanged
 -- from the first migration; repeated here so the rule sits beside the new column)

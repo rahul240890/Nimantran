@@ -242,7 +242,7 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 **Step 21.** Moved to Step 17c (MP4 export of the story reveal).
 **Step 22.** WhatsApp Business reminders and update broadcasts.
 **Step 23.** More categories as data: birthdays, baby (godh bharai, naamkaran, mundan), home and religious (griha pravesh, puja, katha), festivals (Diwali, Eid, Holi, Navratri, Onam, Christmas), parties, dining; 30+ templates. Tradition packs: Telugu, Kerala (Hindu, Christian, Muslim), Punjabi Sikh, Muslim, Christian, Jain and Modern; the colourful Rang template family (6 designs). Regional motion for the remaining packs, their own function scenes (baraat, Nalangu, Gaye Holud, Nikah, Anand Karaj) and seasonal overlays (MOTION.md).
-**Step 24.** Photo sharing album after the event, thank-you cards.
+**Step 24.** Photo sharing album after the event, thank-you cards. The shared photo wall is done (2 October 2026): from the morning of the first function, guests add photos at the bottom of their invitation page through the same link (shrunk to 2048px on the phone, up to 5 MB, 20 at a time, 40 per phone and 1,500 per wall), see everyone's, and can take back their own. It stays open for the edition's album days after the last function (Premium 30, Royal a year, Wedding bundle forever, none on Free; a year for everyone until payments are switched on). Hosts open it from the dashboard at `/invites/<id>/photos` to hide, delete or download one photo, or download them all as ZIP files of 150. Needs migration `20261002160000_photo_wall.sql` and `SUPABASE_SERVICE_ROLE_KEY`. Thank-you cards are still to come.
 **Step 24a.** Greeting Cards line: thank-you, festival greetings, shagun cards, condolence.
 
 ## Phase 4 — Business edition

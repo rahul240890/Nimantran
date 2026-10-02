@@ -39,6 +39,10 @@ database keeps every invite. Applied so far after the first setup:
 - `20260928150000_coupons_invoices_refunds.sql` — coupons and festival offers, GST invoice
   numbers and refunds (Step 17, part 2): `coupons`, `invoice_counters`, new `orders`
   columns, `assign_invoice_no()` and `use_coupon()`.
+- `20261002160000_photo_wall.sql` — the shared photo wall (Step 24): `wall_photos`,
+  `wall_photos_for()` for guests, and `add_wall_photo()` and `remove_wall_photo()`, which only
+  the server's service role can call. Guests' uploads need `SUPABASE_SERVICE_ROLE_KEY` in
+  Vercel.
 
 - `20261002160000_cohost_access.sql` — co-hosts, part 2: what each co-host can do (`access`
   on `event_hosts` and `event_host_invites`, `can_edit_event()`), the co-hosts each edition
