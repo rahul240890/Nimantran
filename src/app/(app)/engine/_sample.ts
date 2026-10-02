@@ -1,6 +1,6 @@
 import { newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, isSceneTheme, type SuiteId } from "@/lib/suites/catalog";
 
 /* Made-up invites for the review pages: names, dates and pictures, nothing saved. */
 
@@ -28,8 +28,9 @@ export const at = (date: string, time: string, venue: string, address = "") => (
 });
 
 export function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
+  // A Scene theme painted for another occasion shows that occasion's own invite
   const occasion = SUITES[suite].occasions?.[0];
-  if (occasion) return occasionDraft(suite, occasion, hindi);
+  if (occasion && isSceneTheme(suite)) return occasionDraft(suite, occasion, hindi);
   const draft = newDraft(SUITES[suite].template ?? "marigold");
   return {
     ...draft,
