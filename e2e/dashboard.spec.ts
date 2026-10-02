@@ -226,6 +226,8 @@ test.describe("host dashboard", () => {
     await expect(page.getByText("1 of 3 guests")).toBeVisible();
     await expect(list.getByRole("listitem").first()).toContainText(/Opened .*ago/);
     expect(await noOverflow(page)).toBe(true);
+    // Clicking the filter scrolls it to just under the sticky header; check from the top
+    await page.evaluate(() => window.scrollTo(0, 0));
     expect((await axe(page).analyze()).violations).toEqual([]);
   });
 
