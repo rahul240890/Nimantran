@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -84,7 +84,7 @@ export async function GuestDashboard({
                 </Link>
               </Button>
             )}
-            {view.plan && view.plan !== "bundle" && (
+            {view.plan && view.plan !== "bundle" && view.role === "owner" && (
               <Button asChild size="sm" variant="secondary">
                 <Link href={`/invites/${view.id}/edition`}>
                   <Sparkles aria-hidden />
@@ -92,12 +92,14 @@ export async function GuestDashboard({
                 </Link>
               </Button>
             )}
-            <Button asChild size="sm" variant="secondary">
-              <Link href={`/create?invite=${view.id}`}>
-                <Pencil aria-hidden />
-                {copy.edit}
-              </Link>
-            </Button>
+            {view.canEdit && (
+              <Button asChild size="sm" variant="secondary">
+                <Link href={`/create?invite=${view.id}`}>
+                  <Pencil aria-hidden />
+                  {copy.edit}
+                </Link>
+              </Button>
+            )}
             {view.url && (
               <Button asChild size="sm" variant="ghost">
                 <a href={view.url} target="_blank" rel="noopener noreferrer">
@@ -110,7 +112,20 @@ export async function GuestDashboard({
         </div>
       </div>
 
-      {!view.live && (
+      {!view.canEdit && (
+        <div
+          role="note"
+          className="flex items-start gap-3 rounded-lg border border-line bg-surface-2/60 p-5"
+        >
+          <Users aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />
+          <div className="flex flex-col gap-0.5">
+            <p className="font-semibold">{copy.guestsOnly.title}</p>
+            <p className="text-sm text-ink-muted">{copy.guestsOnly.body}</p>
+          </div>
+        </div>
+      )}
+
+      {!view.live && view.canEdit && (
         <div className="flex flex-col gap-3 rounded-lg border border-marigold/45 bg-marigold/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <Sparkles aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />

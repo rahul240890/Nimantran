@@ -47,6 +47,11 @@ database keeps every invite. Applied so far after the first setup:
   and `guests.open_count`, and `guest_reply()` counting each visit to a personal link once
   per half hour. The guest list still loads before it runs, without visit times.
 
+- `20261002160000_cohost_access.sql` — co-hosts, part 2: what each co-host can do (`access`
+  on `event_hosts` and `event_host_invites`, `can_edit_event()`), the co-hosts each edition
+  includes (`cohost_limit()`), and the new `event_host_list()` and `accept_host_invite()`.
+  Co-hosts who joined earlier keep editing.
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).
