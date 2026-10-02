@@ -131,6 +131,18 @@ export async function editionsActive(): Promise<boolean> {
 
 /* ---------- Editions ---------- */
 
+/**
+ * Whether this person created the invite. Only they pay for it: co-hosts help run it,
+ * but the receipt, the GST invoice and any refund belong to the owner.
+ */
+export async function ownsInvite(account: Account, eventId: string): Promise<boolean> {
+  if (isPreview()) return previewDb.invites.get(eventId)?.owner === account.id;
+  const supabase = await supabaseServer();
+  if (!supabase) return false;
+  const { data } = await supabase.from("events").select("owner_id").eq("id", eventId).maybeSingle();
+  return data?.owner_id === account.id;
+}
+
 /** The edition a host's invite has; null when this person can't see the invite. */
 export async function invitePlan(account: Account, eventId: string): Promise<PlanId | null> {
   if (isPreview()) {
@@ -194,8 +206,11 @@ export async function startCheckout(
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
-  const current = await invitePlan(account, eventId);
-  if (!current) return { ok: false, reason: "not-found" };
+  const [current, owner] = await Promise.all([
+    invitePlan(account, eventId),
+    ownsInvite(account, eventId),
+  ]);
+  if (!current || !owner) return { ok: false, reason: "not-found" };
   const price = priceFor(
     current,
     planId,

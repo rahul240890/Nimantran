@@ -1,5 +1,6 @@
 import { newDraft, type InviteDraft } from "@/lib/editor/draft";
-import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import { SUITES, isSceneTheme, type SuiteId } from "@/lib/suites/catalog";
 
 /* Made-up invites for the review pages: names, dates and pictures, nothing saved. */
 
@@ -27,6 +28,9 @@ export const at = (date: string, time: string, venue: string, address = "") => (
 });
 
 export function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
+  // A Scene theme painted for another occasion shows that occasion's own invite
+  const occasion = SUITES[suite].occasions?.[0];
+  if (occasion && isSceneTheme(suite)) return occasionDraft(suite, occasion, hindi);
   const draft = newDraft(SUITES[suite].template ?? "marigold");
   return {
     ...draft,
@@ -65,8 +69,43 @@ export function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
   };
 }
 
-/** A Scene invite with five celebrations, so the slot shows every side they come in from. */
+/** A theme painted for another occasion: its one celebration, with names to suit. */
+function occasionDraft(suite: SuiteId, occasion: CategoryId, hindi: boolean): InviteDraft {
+  const draft = newDraft(SUITES[suite].template ?? "marigold", occasion);
+  const category = CATEGORIES[occasion];
+  const one = "people" in category && category.people === "one";
+  const primary = category.functions.primary;
+  return {
+    ...draft,
+    suite,
+    languages: hindi ? ["hi"] : draft.languages,
+    content: {
+      first: one ? "Aarav" : "Arjun",
+      second: one ? "" : "Sia",
+      line: "line" in category.wording ? category.wording.line : "",
+      date: "Saturday, 21 November 2026",
+      venue: "The Garden Terrace, Jodhpur",
+    },
+    functions: {
+      ...draft.functions,
+      [primary]: at("2026-11-21", "18:30", "The Garden Terrace, Jodhpur"),
+    },
+  };
+}
+
+/**
+ * A Scene invite: a wedding gets five celebrations, so the slot shows every side they come
+ * in from.
+ */
 export function sceneDraft(base: InviteDraft, photos: number): InviteDraft {
+  // An occasion's own one celebration stays as it is
+  if (base.categoryId !== "wedding") {
+    return {
+      ...base,
+      format: "scene",
+      couplePhotos: { layout: photos === 1 ? "one" : "two", ids: [] },
+    };
+  }
   return {
     ...base,
     format: "scene",

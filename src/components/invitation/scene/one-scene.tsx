@@ -200,7 +200,7 @@ export function OneScene({
 
   const current = items[index];
   const light = sceneLight(current?.kind === "function" ? current.fn.kind : "line");
-  const tone = light.mood === "night" ? "dark" : "light";
+  const tone = page.dark || light.mood === "night" ? "dark" : "light";
   const names = [copy.first, copy.second].filter((name) => name.trim());
   const joiner = !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   const shownFn = current?.kind === "function" ? current.fn : null;

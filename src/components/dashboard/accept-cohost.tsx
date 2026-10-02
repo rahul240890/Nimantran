@@ -31,7 +31,7 @@ export function AcceptCohost({ token }: { token: string }) {
         router.refresh();
         return;
       }
-      setError(joinCopy.failed);
+      setError(result?.reason === "full" ? joinCopy.full : joinCopy.failed);
     });
 
   return (

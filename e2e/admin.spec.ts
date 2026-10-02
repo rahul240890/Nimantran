@@ -219,6 +219,8 @@ test.describe("coupons, invoices and refunds", () => {
       .click();
     await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Invites");
     expect(await noOverflow(admin)).toBe(true);
+    // After a client navigation the <title> streams in late
+    await expect(admin).toHaveTitle(/\S/);
     expect((await axe(admin).analyze()).violations).toEqual([]);
     await adminContext.close();
 

@@ -68,6 +68,10 @@ export const upgradeCopy = {
   failed:
     "The payment couldn't be confirmed. If money left your account, it comes back within 5 to 7 days, or write to us.",
   off: "Payments open very soon. Everything is free until then.",
+  ownerOnly: {
+    title: "Only the invite's owner can upgrade it",
+    body: "Co-hosts help run the invite, but the payment, receipt and GST invoice belong to the person who created it. Ask them to upgrade from their account.",
+  },
   loadFailed: "The payment window couldn't open. Check your connection and try again.",
   receipts: "Receipts",
   receipt: (plan: string, price: string) => `${plan}, ${price}`,
