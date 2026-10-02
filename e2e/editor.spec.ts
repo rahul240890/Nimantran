@@ -241,10 +241,15 @@ test.describe("invite editor", () => {
       "/create?quality=2d&category=wedding&tradition=tamil&suite=kayal&template=gopuram",
     );
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
-    await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
-    await page.locator("summary", { hasText: "Add family details" }).click();
-    await expect(page.getByRole("group", { name: "Arjun's family" })).toBeVisible();
     const arjun = page.getByRole("group", { name: "Arjun's family" });
+    // Typing or a click that lands before the editor has hydrated is lost, so try again
+    await expect(async () => {
+      await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
+      if (!(await arjun.isVisible())) {
+        await page.locator("summary", { hasText: "Add family details" }).click();
+      }
+      await expect(arjun).toBeVisible({ timeout: 3_000 });
+    }).toPass({ timeout: 30_000 });
     await arjun.getByRole("radio", { name: "Son of" }).click();
     await arjun.getByRole("textbox", { name: /Parents' names/ }).fill("Smt. Lakshmi & Shri Raman");
     // The tradition's own heading sits beside the hosts line
