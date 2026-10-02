@@ -11,6 +11,7 @@ import { pagePath } from "@/lib/seo/paths";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import { navHref } from "./nav-links";
 
 export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { nav, shell } = landingText[locale];
@@ -61,11 +62,16 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           <ul className="-ms-2 mt-3 flex flex-col">
             {nav.map((item) => (
               <li key={item.id}>
-                <a href={`${home}#${item.id}`} className={linkClass}>
+                <Link href={navHref(item.id, locale)} className={linkClass}>
                   {item.label}
-                </a>
+                </Link>
               </li>
             ))}
+            <li>
+              <a href={`${home}#faq`} className={linkClass}>
+                {shell.faq}
+              </a>
+            </li>
             <li>
               <a href={`${home}#waitlist`} className={linkClass}>
                 {shell.joinWaitlist}

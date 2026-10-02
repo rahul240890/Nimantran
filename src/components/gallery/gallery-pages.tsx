@@ -11,7 +11,6 @@ import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import {
   OCCASIONS,
-  OCCASION_SECTIONS,
   WEDDING_KINDS,
   WEDDING_KIND_ENTRIES,
   kindDesigns,
@@ -212,7 +211,7 @@ function AllDesignsTile({ locale }: { locale: UiLocale }) {
   return (
     <Link
       href={`${pagePath({ kind: "occasion", id: "wedding" }, locale)}#designs`}
-      className="group relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-xl border border-line-strong bg-surface-2 p-4 shadow-raised outline-offset-3 focus-visible:outline-2 focus-visible:outline-ring sm:p-5"
+      className="group relative isolate flex h-full min-h-60 flex-col justify-end overflow-hidden rounded-xl border border-line-strong bg-surface-2 p-4 shadow-raised outline-offset-3 focus-visible:outline-2 focus-visible:outline-ring sm:p-5"
     >
       <span aria-hidden className="absolute inset-x-0 top-[12%] -z-10 flex justify-center">
         {fan.map((src, index) => (
@@ -263,11 +262,23 @@ export function GalleryIndexPage({ locale }: { locale: UiLocale }) {
       />
       <GallerySearch>
         <div className="pt-10">
-          {OCCASION_SECTIONS.map((section) => {
-            const occasions = OCCASIONS.filter((occasion) => occasion.section === section);
-            const wedding = section === "wedding";
+          {(["wedding", "more"] as const).map((shelf) => {
+            const wedding = shelf === "wedding";
+            const all = OCCASIONS.filter(
+              (occasion) => (occasion.section === "wedding") === wedding,
+            );
+            // Tiles only for occasions with a painting, ready ones first; the rest wait on one
+            // quiet line, so no shelf is a row of empty cards
+            const occasions = all
+              .filter((occasion) => occasion.tile || occasion.art)
+              .sort((x, y) => Number(Boolean(y.category)) - Number(Boolean(x.category)));
+            const later = all.filter((occasion) => !occasion.tile && !occasion.art);
             return (
-              <Shelf key={section} id={`section-${section}`} heading={sectionNames[section]}>
+              <Shelf
+                key={shelf}
+                id={`section-${shelf}`}
+                heading={wedding ? sectionNames.wedding : galleryCopy.moreCelebrations}
+              >
                 <ul
                   className={cn(
                     "grid gap-3 sm:gap-4",
@@ -290,7 +301,14 @@ export function GalleryIndexPage({ locale }: { locale: UiLocale }) {
                     </li>
                   )}
                 </ul>
-                {!wedding && <p className="mt-4 text-sm text-ink-muted">{galleryCopy.soonNote}</p>}
+                {later.length > 0 && (
+                  <p className="mt-5 text-sm leading-relaxed text-ink-muted">
+                    <span className="font-label text-xs tracking-[0.18em] text-ink uppercase">
+                      {galleryCopy.soon}:
+                    </span>{" "}
+                    {later.map((occasion) => occasion.names[locale]).join(" · ")}
+                  </p>
+                )}
               </Shelf>
             );
           })}

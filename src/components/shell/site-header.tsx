@@ -2,7 +2,7 @@
 
 import { Menu } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Logo } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { AccountMenu } from "@/components/account/account-menu";
 import { LanguageSwitcher } from "./language-switcher";
+import { isPageLink, navHref } from "./nav-links";
 import { useActiveSection } from "./use-active-section";
 
 /**
@@ -34,6 +35,9 @@ function goToSection(id: string, still: boolean, elsewhere: () => void) {
   target.focus({ preventScroll: true });
   history.replaceState(null, "", `#${id}`);
 }
+
+const mobileLink =
+  "flex min-h-12 items-center rounded-md px-2 font-display text-2xl text-ink transition-colors hover:bg-surface-2 hover:text-accent-text";
 
 function MobileMenu() {
   const { nav, shell } = useText(landingText);
@@ -73,17 +77,27 @@ function MobileMenu() {
           <ul className="-mx-2 flex flex-col">
             {nav.map((item) => (
               <li key={item.id}>
-                <a
-                  href={`${home}#${item.id}`}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    pending.current = item.id;
-                    setOpen(false);
-                  }}
-                  className="flex min-h-12 items-center rounded-md px-2 font-display text-2xl text-ink transition-colors hover:bg-surface-2 hover:text-accent-text"
-                >
-                  {item.label}
-                </a>
+                {isPageLink(item.id) ? (
+                  <Link
+                    href={navHref(item.id, locale)}
+                    onClick={() => setOpen(false)}
+                    className={mobileLink}
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <a
+                    href={navHref(item.id, locale)}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      pending.current = item.id;
+                      setOpen(false);
+                    }}
+                    className={mobileLink}
+                  >
+                    {item.label}
+                  </a>
+                )}
               </li>
             ))}
           </ul>
@@ -129,7 +143,7 @@ export function SiteHeader() {
   const active = useActiveSection(useMemo(() => nav.map((item) => item.id), [nav]));
   const [scrolled, setScrolled] = useState(false);
   const locale = useLocale();
-  const home = homePath(locale);
+  const pathname = usePathname();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -161,9 +175,14 @@ export function SiteHeader() {
           <ul className="flex items-center">
             {nav.map((item) => (
               <li key={item.id}>
-                <a
-                  href={`${home}#${item.id}`}
-                  aria-current={active === item.id ? "true" : undefined}
+                <Link
+                  href={navHref(item.id, locale)}
+                  aria-current={
+                    active === item.id ||
+                    (isPageLink(item.id) && pathname === navHref(item.id, locale))
+                      ? "true"
+                      : undefined
+                  }
                   className="relative inline-flex min-h-11 items-center rounded-full px-3 text-[0.95rem] font-semibold whitespace-nowrap text-ink-muted transition-colors hover:text-ink aria-[current=true]:text-ink"
                 >
                   {item.label}
@@ -174,7 +193,7 @@ export function SiteHeader() {
                       active === item.id ? "scale-x-100" : "scale-x-0",
                     )}
                   />
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

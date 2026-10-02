@@ -202,9 +202,19 @@ test.describe("landing page", () => {
     await expect(question).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("a painted theme previews every page", async ({ page }) => {
+  test("a painted theme previews every page, and the Scene and Story switch filters", async ({
+    page,
+  }) => {
     await visit(page);
-    await page.getByRole("button", { name: "Preview Kayal" }).click();
+    const designs = page.locator("#templates");
+    await designs.getByRole("radio", { name: "Scene" }).click();
+    await expect(designs.locator('[data-format="story"]').first()).toBeHidden();
+    await designs.getByRole("radio", { name: "Story" }).click();
+    await expect(designs.locator('[data-format="scene"]').first()).toBeHidden();
+    await page
+      .locator('article[data-design="kayal"]')
+      .getByRole("button", { name: "Preview Kayal" })
+      .click();
     await expect(
       page.getByRole("dialog", { name: "Kayal" }).getByText("Page 1 of 9"),
     ).toBeVisible();

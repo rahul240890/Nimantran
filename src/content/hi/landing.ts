@@ -14,11 +14,11 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "how-it-works", label: "कैसे काम करता है" },
+  { id: "designs", label: "डिज़ाइन" },
+  { id: "weddings", label: "शादी" },
   { id: "occasions", label: "अवसर" },
-  { id: "templates", label: "डिज़ाइन" },
+  { id: "how-it-works", label: "कैसे काम करता है" },
   { id: "pricing", label: "क़ीमत" },
-  { id: "faq", label: "सवाल-जवाब" },
 ];
 
 export const shell: Translation<typeof en.shell> = {
@@ -28,6 +28,7 @@ export const shell: Translation<typeof en.shell> = {
   menuTitle: "मेन्यू",
   joinWaitlist: "लॉन्च की ख़बर",
   createInvite: "अपना निमंत्रण बनाएँ",
+  faq: "सवाल-जवाब",
   createInviteShort: "निमंत्रण बनाएँ",
   language: {
     label: "भाषा",
@@ -49,9 +50,10 @@ export const shell: Translation<typeof en.shell> = {
 export const hero: Translation<typeof en.hero> = {
   eyebrow: "बनाइए · बुलाइए · मनाइए",
   title: "निमंत्रण, जो जीवंत हो उठें।",
-  body: "अपने परिवार की परंपरा के लिए बनी चित्रित थीम चुनिए, नाम और रस्में जोड़िए, WhatsApp पर भेजिए और एक टैप में जवाब पाइए।",
-  primary: "अपना निमंत्रण बनाएँ",
-  secondary: "देखें कैसे काम करता है",
+  body: "अपने अवसर के लिए चित्रित डिज़ाइन खोजिए, नाम और तारीख़ें जोड़िए और WhatsApp पर भेजिए। मेहमान एक टैप में जवाब देते हैं।",
+  primary: "सभी डिज़ाइन देखें",
+  popular: "लोकप्रिय",
+  popularSearches: ["गुजराती शादी", "हल्दी", "जन्मदिन", "निकाह", "दिवाली"],
   cardLabel: { closed: "नमूना निमंत्रण खोलें", open: "नमूना निमंत्रण बंद करें" },
   hint: {
     scroll: "खोलने के लिए स्क्रॉल करें",
@@ -80,34 +82,34 @@ export const homeGallery: Translation<typeof en.homeGallery> = {
   coverDate: "12 दिसंबर 2026",
   occasionsEyebrow: "यहाँ से शुरू करें",
   occasionsTitle: "आप क्या मना रहे हैं?",
-  occasionsIntro:
-    "अवसर चुनिए, फिर उसी के लिए बना डिज़ाइन। शादी परंपरा के हिसाब से खुलती है: गुजराती, बंगाली, मराठी, तमिल और भी।",
+  occasionsIntro: "अवसर चुनिए और सिर्फ़ उसी के लिए बने डिज़ाइन देखिए।",
   searchLabel: "अवसर और डिज़ाइन खोजें",
-  searchPlaceholder: "जैसे गुजराती शादी, हल्दी, संगीत…",
+  searchPlaceholder: "जैसे गुजराती शादी, हल्दी, जन्मदिन…",
   search: "खोजें",
-  moreHeading: "शादी के अलावा",
+  weddingHeading: "शादी की रस्में",
+  moreHeading: "और उत्सव",
   soonHeading: "जल्द आ रहे हैं",
-  allOccasions: "सभी अवसर देखें",
-  themesEyebrow: "चित्रित थीम",
-  themesTitle: "हर रस्म का अपना चित्रित पन्ना",
+  allOccasions: "सभी अवसर",
+  themesEyebrow: "डिज़ाइन",
+  themesTitle: "लोकप्रिय डिज़ाइन",
   themesIntro:
-    "हर थीम चित्रों का एक सेट है: मुखपृष्ठ, परिवार, हल्दी, मेहँदी, संगीत, बारात, विवाह, स्वागत समारोह और जवाब। किसी पर टैप करके सारे पन्ने देखिए।",
-  allDesigns: "शादी के सभी डिज़ाइन देखें",
+    "सीन एक चित्र है जिसमें हर रस्म बारी-बारी से आती है। स्टोरी में हर रस्म का अपना पूरा पन्ना होता है।",
+  allDesigns: "सभी डिज़ाइन देखें",
 };
 
 export const howItWorks: Translation<typeof en.howItWorks> = {
   eyebrow: "कैसे काम करता है",
-  title: "विचार से जवाबों तक, तीन क़दम",
+  title: "तीन क़दम में तैयार",
   intro:
-    "डिज़ाइन का कोई हुनर नहीं चाहिए। ज़्यादातर जोड़े एक कप चाय में अपना निमंत्रण बना लेते हैं।",
+    "डिज़ाइन का कोई हुनर नहीं चाहिए। ज़्यादातर परिवार एक कप चाय में अपना निमंत्रण बना लेते हैं।",
   steps: [
     {
       title: "डिज़ाइन चुनें",
-      body: "द्वार वाला कार्ड, शाही स्क्रॉल या सादा मोनोग्राम। हर डिज़ाइन 3D में खुलता है।",
+      body: "अवसर और परंपरा से खोजिए या देखिए, फिर ‘यह डिज़ाइन चुनें’ पर टैप कीजिए।",
     },
     {
       title: "अपना ब्योरा जोड़ें",
-      body: "नाम, रस्में, तारीख़, जगह और ड्रेस कोड, साथ में लाइव झलक।",
+      body: "नाम, तारीख़ें और जगह, और लिखते-लिखते बगल में निमंत्रण बदलता दिखता है।",
     },
     {
       title: "भेजें और देखें",
