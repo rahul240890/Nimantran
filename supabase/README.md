@@ -40,6 +40,11 @@ database keeps every invite. Applied so far after the first setup:
   numbers and refunds (Step 17, part 2): `coupons`, `invoice_counters`, new `orders`
   columns, `assign_invoice_no()` and `use_coupon()`.
 
+- `20261002160000_cohost_access.sql` — co-hosts, part 2: what each co-host can do (`access`
+  on `event_hosts` and `event_host_invites`, `can_edit_event()`), the co-hosts each edition
+  includes (`cohost_limit()`), and the new `event_host_list()` and `accept_host_invite()`.
+  Co-hosts who joined earlier keep editing.
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).

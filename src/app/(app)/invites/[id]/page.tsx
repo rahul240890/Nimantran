@@ -7,6 +7,7 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { hostStore } from "@/lib/invites/hosts";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
+import { cohostLimit } from "@/lib/plans/catalog";
 import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
@@ -38,6 +39,7 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
           view={{
             id,
             role: data.role,
+            canEdit: data.canEdit,
             live: data.status === "published" && Boolean(data.slug),
             url: data.status === "published" && data.slug ? inviteUrl(origin, data.slug) : null,
             names: inviteNames(data.draft),
@@ -49,6 +51,7 @@ export default async function GuestsPage({ params }: PageProps<"/invites/[id]">)
             hostInvites: data.hostInvites,
             origin: origin.replace(/\/+$/, ""),
             plan,
+            cohostLimit: plan ? cohostLimit(plan) : null,
           }}
         />
       </AccountShell>

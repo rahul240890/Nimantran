@@ -27,6 +27,8 @@ export type PreviewHost = {
   name: string;
   role: "owner" | "cohost";
   side: string;
+  /** What a co-host may do (co-hosts, part 2); missing means edit. */
+  access?: "edit" | "guests";
   createdAt: string;
 };
 
@@ -34,6 +36,8 @@ export type PreviewHostInvite = {
   id: string;
   label: string;
   token: string;
+  access?: "edit" | "guests";
+  phone?: string | null;
   invitedBy: string;
   invitedByName: string;
   createdAt: string;
@@ -97,4 +101,11 @@ export function previewHosts(stored: PreviewInvite, accountId: string): boolean 
   return (
     stored.owner === accountId || (stored.hosts ?? []).some((host) => host.userId === accountId)
   );
+}
+
+/** Whether this person may change a preview invite itself: not a guests-only co-host. */
+export function previewEdits(stored: PreviewInvite, accountId: string): boolean {
+  if (stored.owner === accountId) return true;
+  const host = (stored.hosts ?? []).find((item) => item.userId === accountId);
+  return Boolean(host) && host!.access !== "guests";
 }

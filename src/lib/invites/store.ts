@@ -6,7 +6,7 @@ import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
 import { supabaseServer } from "@/lib/supabase/server";
-import { previewDb, previewHosts, previewPhotoUrl } from "./preview-db";
+import { previewDb, previewEdits, previewHosts, previewPhotoUrl } from "./preview-db";
 import {
   draftToRows,
   photoPath,
@@ -122,8 +122,16 @@ const supabaseStore: InviteStore = {
           .select("id, updated_at")
           .maybeSingle()
       : await supabase.from("events").insert(event).select("id, updated_at").single();
-    // A draft pointing at an event that's gone (deleted, or a co-host was removed) starts a new one
+    // A draft pointing at an event that's gone (deleted, or a co-host was removed) starts a
+    // new one. One this person can still see but not change (a co-host who runs only the
+    // guests) is left alone rather than copied.
     if (!saved.error && !saved.data && draft.remoteId) {
+      const { data: visible } = await supabase
+        .from("events")
+        .select("id")
+        .eq("id", draft.remoteId)
+        .maybeSingle();
+      if (visible) return { ok: false };
       return supabaseStore.save(account, { ...draft, remoteId: null, slug: null });
     }
     if (saved.error || !saved.data) return { ok: false };
@@ -321,6 +329,7 @@ const previewStore: InviteStore = {
   async save(account, draft) {
     const existing = draft.remoteId ? previewDb.invites.get(draft.remoteId) : undefined;
     const mine = existing && previewHosts(existing, account.id) ? existing : undefined;
+    if (mine && !previewEdits(mine, account.id)) return { ok: false };
     const id = mine ? mine.event.id : crypto.randomUUID();
     const { event, functions } = draftToRows(draft);
     const updated = new Date();
@@ -371,7 +380,7 @@ const previewStore: InviteStore = {
   },
   async addPhoto(account, id, photo, file) {
     const stored = previewDb.invites.get(id);
-    if (!stored || !previewHosts(stored, account.id)) return false;
+    if (!stored || !previewEdits(stored, account.id)) return false;
     previewDb.files.set(`${id}/${photo.id}`, {
       type: file.type,
       data: new Uint8Array(await file.arrayBuffer()),
@@ -397,7 +406,7 @@ const previewStore: InviteStore = {
   },
   async publish(account, id, slug) {
     const stored = previewDb.invites.get(id);
-    if (!stored || !previewHosts(stored, account.id)) return { ok: false, reason: "missing" };
+    if (!stored || !previewEdits(stored, account.id)) return { ok: false, reason: "missing" };
     const keep = stored.publishedAt && stored.event.slug ? stored.event.slug : slug;
     const taken = [...previewDb.invites.values()].some(
       (other) => other !== stored && other.event.slug === keep,
@@ -409,7 +418,7 @@ const previewStore: InviteStore = {
   },
   async unpublish(account, id) {
     const stored = previewDb.invites.get(id);
-    if (!stored || !previewHosts(stored, account.id)) return false;
+    if (!stored || !previewEdits(stored, account.id)) return false;
     stored.event = { ...stored.event, status: "draft" };
     return true;
   },

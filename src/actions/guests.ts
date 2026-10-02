@@ -4,7 +4,9 @@ import { z } from "zod";
 import { normalizePhone } from "@/lib/auth/phone";
 import { getAccount } from "@/lib/auth/server";
 import { GUEST_RULES } from "@/lib/guests/list";
-import { hostStore, type AcceptResult, type NewGuest } from "@/lib/invites/hosts";
+import { HOST_ACCESS, hostStore, type AcceptResult, type NewGuest } from "@/lib/invites/hosts";
+import { editionsActive, invitePlan } from "@/lib/payments/editions";
+import { cohostLimit } from "@/lib/plans/catalog";
 
 /*
  * The host dashboard's changes (Step 11). Every call checks who is signed in; the
@@ -79,12 +81,73 @@ export async function markReminded(inviteId: string, ids: unknown): Promise<bool
   return ctx.store.markReminded(ctx.account, inviteId, parsed.data).catch(() => false);
 }
 
-/** A private link that makes whoever opens it (and signs in) a co-host. */
-export async function createHostInvite(inviteId: string, label: unknown): Promise<string | null> {
-  const parsed = z.string().trim().max(40).safeParse(label);
+const hostInviteSchema = z.object({
+  label: z.string().trim().max(40),
+  access: z.enum(HOST_ACCESS),
+  phone: z
+    .string()
+    .trim()
+    .max(24)
+    .transform((value, ctx) => {
+      if (!value) return null;
+      const parsed = normalizePhone(value);
+      if ("phone" in parsed) return parsed.phone;
+      ctx.addIssue({ code: "custom", message: "phone" });
+      return z.NEVER;
+    }),
+});
+
+export type HostInviteInput = z.input<typeof hostInviteSchema>;
+
+export type HostInviteResult =
+  | { ok: true; token: string }
+  /** full: the edition's co-hosts are all taken or invited; phone: the number isn't valid. */
+  | { ok: false; reason: "full" | "phone" | "failed" };
+
+/**
+ * A private link that makes whoever opens it (and signs in) a co-host, with the access
+ * the owner chose. While editions apply, links stop at the co-hosts the edition includes,
+ * counting links not used yet; the database checks again when one is accepted.
+ */
+export async function createHostInvite(
+  inviteId: string,
+  input: unknown,
+): Promise<HostInviteResult> {
+  const parsed = hostInviteSchema.safeParse(input);
   const ctx = await context(inviteId);
-  if (!ctx || !parsed.success) return null;
-  return ctx.store.createHostInvite(ctx.account, inviteId, parsed.data).catch(() => null);
+  if (!ctx) return { ok: false, reason: "failed" };
+  if (!parsed.success) {
+    const phone = parsed.error.issues.some((issue) => issue.path[0] === "phone");
+    return { ok: false, reason: phone ? "phone" : "failed" };
+  }
+  if (await editionsActive()) {
+    const [plan, dashboard] = await Promise.all([
+      invitePlan(ctx.account, inviteId),
+      ctx.store.dashboard(ctx.account, inviteId),
+    ]);
+    const room = plan ? cohostLimit(plan) : null;
+    const taken = dashboard
+      ? dashboard.hosts.filter((host) => host.role === "cohost").length +
+        dashboard.hostInvites.length
+      : 0;
+    if (room !== null && taken >= room) return { ok: false, reason: "full" };
+  }
+  const token = await ctx.store
+    .createHostInvite(ctx.account, inviteId, parsed.data)
+    .catch(() => null);
+  return token ? { ok: true, token } : { ok: false, reason: "failed" };
+}
+
+/** The owner lets a co-host edit the invite, or keeps them to the guests and replies. */
+export async function setHostAccess(
+  inviteId: string,
+  userId: string,
+  access: unknown,
+): Promise<boolean> {
+  const ctx = await context(inviteId);
+  const parsed = z.enum(HOST_ACCESS).safeParse(access);
+  if (!ctx || !parsed.success || !z.string().min(1).max(80).safeParse(userId).success) return false;
+  return ctx.store.setHostAccess(ctx.account, inviteId, userId, parsed.data).catch(() => false);
 }
 
 export async function withdrawHostInvite(inviteId: string, linkId: string): Promise<boolean> {

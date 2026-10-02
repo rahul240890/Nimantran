@@ -15,6 +15,10 @@ export const dashboardCopy = {
   share: "Share",
   edit: "Edit invite",
   open: "Open invitation",
+  guestsOnly: {
+    title: "You're looking after the guests",
+    body: "The family asked you to run the guest list and replies. Only they, or a co-host who edits, can change the card itself.",
+  },
   notLive: {
     title: "This invite isn't live yet",
     body: "You can build your guest list now. Personal links and reminders work once it's published.",
@@ -197,7 +201,7 @@ export const dashboardCopy = {
 
   hosts: {
     heading: "Co-hosts",
-    body: "Both families can run this invite together: edit it, add guests and see every reply.",
+    body: "Family can run this invite with you. Choose what each person can do.",
     you: "You",
     owner: "Created the invite",
     cohost: "Co-host",
@@ -209,12 +213,35 @@ export const dashboardCopy = {
     label: "Who is it for?",
     labelPlaceholder: "Meera's family, Arjun's brother…",
     labelHint: "Shown beside their name.",
+    accessLabel: "What can they do?",
+    access: {
+      edit: {
+        name: "Invite and guests",
+        hint: "Change the card, functions and photos, publish, and run the guest list.",
+        short: "Edits the invite",
+      },
+      guests: {
+        name: "Guests and replies",
+        hint: "Add guests, send reminders and see every reply. The card stays as you made it.",
+        short: "Guests and replies",
+      },
+    },
+    changeAccess: (name: string) => `What ${name} can do`,
+    accessChanged: "Updated",
+    phone: "Their WhatsApp number",
+    phoneHint: "The link opens in a chat with them. Leave it empty to choose the chat yourself.",
+    phoneInvalid: "That doesn't look like a phone number",
+    seats: (used: number, limit: number) => `${used} of ${limit} co-host${limit === 1 ? "" : "s"}`,
+    fullTitle: (limit: number) => `This edition includes ${limit} co-host${limit === 1 ? "" : "s"}`,
+    fullBody: "Upgrade the invite for more, or withdraw a link you no longer need.",
+    upgrade: "See editions",
     create: "Make link",
     creating: "Making link…",
     createFailed: "Couldn't make a link. Try again.",
     pending: "Waiting to join",
     pendingFor: (label: string) => (label ? `Link for ${label}` : "Co-host link"),
     whatsapp: "Send on WhatsApp",
+    sentTo: (phone: string) => `For ${phone}`,
     copy: "Copy link",
     copied: "Link copied",
     withdraw: "Withdraw",
@@ -264,14 +291,19 @@ export const joinCopy = {
   metaTitle: "Join as co-host",
   eyebrow: "Co-host invitation",
   title: (names: string) => `Help run ${names}'s invitation`,
-  body: (who: string, occasion: string) =>
-    `${who || "The family"} asked you to help with the ${occasion.toLowerCase()} invitation. As a co-host you can edit the invite, add guests, send reminders and see every reply.`,
+  body: (who: string, occasion: string, access: "edit" | "guests") =>
+    `${who || "The family"} asked you to help with the ${occasion.toLowerCase()} invitation. ${
+      access === "edit"
+        ? "As a co-host you can edit the invite, add guests, send reminders and see every reply."
+        : "As a co-host you can add guests, send reminders and see every reply. The card stays as they made it."
+    }`,
   forLabel: (label: string) => `Added as: ${label}`,
   accept: "Accept and open guest list",
   signIn: "Sign in to accept",
   signInNote: "Use your mobile number or Google. It takes a moment.",
   accepting: "Joining…",
   failed: "Couldn't accept just now. Try again.",
+  full: "This invite already has all the co-hosts its edition includes. Ask the family to upgrade it or remove someone, then open this link again.",
   usedTitle: "This link has already been used",
   usedBody:
     "Co-host links work once. If you've already joined, the invite is in My invites. Otherwise ask the family for a new link.",

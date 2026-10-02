@@ -113,10 +113,22 @@ test.describe("host dashboard", () => {
     await cohosts.getByRole("button", { name: "Invite a co-host" }).click();
     const inviteDialog = page.getByRole("dialog", { name: "Invite a co-host" });
     await inviteDialog.getByRole("textbox", { name: /Who is it for/ }).fill("Anaya's family");
+    // This one looks after the guests only, and the link goes straight to their WhatsApp
+    await inviteDialog.getByRole("radio", { name: "Guests and replies" }).check();
+    await inviteDialog.getByRole("textbox", { name: /Their WhatsApp number/ }).fill("123");
     await inviteDialog.getByRole("button", { name: "Make link" }).click();
+    await expect(inviteDialog.getByText("That doesn't look like a phone number")).toBeVisible();
+    await inviteDialog.getByRole("textbox", { name: /Their WhatsApp number/ }).fill("98765 43210");
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await inviteDialog.getByRole("button", { name: "Make link" }).click();
+    await expect(inviteDialog.getByRole("link", { name: "Send on WhatsApp" })).toHaveAttribute(
+      "href",
+      /^https:\/\/wa\.me\/919876543210\?text=/,
+    );
     const joinLink = (await inviteDialog.getByTestId("cohost-link").textContent())!.trim();
     await inviteDialog.getByRole("button", { name: "Close" }).click();
     await expect(cohosts.getByText("Link for Anaya's family")).toBeVisible();
+    await expect(cohosts.getByText("Guests and replies · For +919876543210")).toBeVisible();
 
     const cohostContext = await browser.newContext({
       baseURL: info.project.use.baseURL,
@@ -128,6 +140,7 @@ test.describe("host dashboard", () => {
     await expect(
       cohost.getByRole("heading", { name: "Help run Kabir & Anaya's invitation" }),
     ).toBeVisible();
+    await expect(cohost.getByText(/The card stays as they made it/)).toBeVisible();
     expect(await noOverflow(cohost)).toBe(true);
     await cohost.getByRole("link", { name: "Sign in to accept" }).click();
     await signIn(cohost, numberFor(info).replace(/^8/, "7"));
@@ -138,6 +151,12 @@ test.describe("host dashboard", () => {
     await expect(
       cohost.getByText("Only the person who created the invite can add co-hosts."),
     ).toBeVisible();
+    // Guests only: the guest list, but not the card
+    await expect(cohost.getByText("You're looking after the guests")).toBeVisible();
+    await expect(cohost.getByRole("link", { name: "Edit invite" })).toHaveCount(0);
+    const dashboardUrl = cohost.url();
+    await cohost.goto(`/create?invite=${dashboardUrl.split("/").pop()}`);
+    await expect(cohost).toHaveURL(dashboardUrl);
     expect(await noOverflow(cohost)).toBe(true);
     expect((await axe(cohost).analyze()).violations).toEqual([]);
 
@@ -146,11 +165,20 @@ test.describe("host dashboard", () => {
     await expect(cohost.getByText("This link has already been used")).toBeVisible();
     await cohost.goto("/invites");
     await expect(cohost.getByText("Co-host", { exact: true })).toBeVisible();
-    await cohostContext.close();
 
+    // The owner lets them edit the invite too
     await page.reload();
     await expect(cohosts.getByText("Anaya's family")).toBeVisible();
+    const access = cohosts.getByRole("combobox", { name: /can do/ });
+    await expect(access).toHaveText(/Guests and replies/);
+    await access.click();
+    await page.getByRole("option", { name: "Edits the invite" }).click();
+    await expect(page.getByText("Updated", { exact: true })).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
+    await cohost.goto(dashboardUrl);
+    await expect(cohost.getByRole("link", { name: "Edit invite" })).toBeVisible();
+    await expect(cohost.getByText("You're looking after the guests")).toHaveCount(0);
+    await cohostContext.close();
   });
 
   for (const colorScheme of ["light", "dark"] as const) {
