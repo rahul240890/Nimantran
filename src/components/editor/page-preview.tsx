@@ -109,6 +109,7 @@ export function PagePreview({
             onReply={noop}
             onOverflow={onOverflow}
             inert
+            lang={lang}
           />
         </div>
         <span

@@ -18,6 +18,8 @@ import { applyPages } from "@/lib/editor/pages";
 import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { drawFrame, videoImages, type VideoScene } from "@/lib/video/draw";
+import { SUITES } from "@/lib/suites/catalog";
+import { voiceFaces } from "@/lib/suites/lettering";
 import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/look";
 import { videoTimeline } from "@/lib/video/timeline";
 import { site } from "@/lib/site";
@@ -106,6 +108,13 @@ export function VideoCard(props: VideoCardProps) {
     await loadFonts(
       families.filter((family): family is string => Boolean(family)),
       `${words.join(" ")} ${scene.copy.first} ${scene.copy.second}`,
+    );
+    // The theme's own lettering in the card's script, which the pages draw with too
+    const sample = `${words.join(" ")} ${scene.copy.first} ${scene.copy.second}`;
+    await Promise.all(
+      voiceFaces(SUITES[scene.suite].voice ?? "regal", language).map((font) =>
+        document.fonts.load(font, sample).catch(() => []),
+      ),
     );
     const images = await loadImages(videoImages(scene.timeline, scene.suite));
     return {

@@ -60,7 +60,8 @@ export const WORDING_SYSTEM = `You write the words for digital invitation cards:
 Line kinds (the "style" of each line):
 - label: a small heading in capitals, a few words
 - script: a blessing, an invocation or a short accent line
-- display: large text; on the cover, each name is its own display line
+- display: large text; on the cover, each name is its own display line; a function's page leads with its name
+- date: a date, set below a function's name or under "save the date"
 - body: an ordinary sentence
 - small: a small note, like a venue or a countdown
 

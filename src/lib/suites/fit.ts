@@ -6,8 +6,8 @@
 
 /** Words never shrink below this share of their designed size, so they stay readable. */
 export const FIT_MIN = 0.6;
-/** Nor grow past this, so a short page keeps the theme's proportions. */
-export const FIT_MAX = 1.1;
+/** Nor grow past this: a short page fills its calm space a little, keeping the theme's proportions. */
+export const FIT_MAX = 1.25;
 
 /**
  * The largest scale between `min` and `max` at which `fits` holds, to within a few

@@ -10,6 +10,14 @@ import type { PageType } from "@/lib/editor/type";
 import type { LineStyle, StoryBeat } from "@/lib/engine/story";
 import { seededRandom } from "@/lib/engine/particles";
 import { DEFAULT_AREA, textArea, type TextArea } from "@/lib/suites/areas";
+import {
+  ROLES,
+  lettering,
+  lineSpace,
+  roleSize,
+  ruleAt,
+  type TypeRole,
+} from "@/lib/suites/lettering";
 import { SUITES, pageLook, paintedTone, type Mood, type SuiteId } from "@/lib/suites/catalog";
 import { photoPage } from "@/lib/suites/photo-frames";
 import type { CardCopy } from "@/lib/templates/content";
@@ -238,9 +246,10 @@ type Placed = {
   colour: string;
   spacing: number;
   lineHeight: number;
+  /** Space above it, and whether a fine rule sits in that space (a function's page). */
+  space: number;
+  rule?: boolean;
 };
-
-const INDIC = /^(hi|mr|gu|bn|ta|te|kn|ml|pa)\b/;
 
 function styleOf(
   style: LineStyle,
@@ -250,87 +259,38 @@ function styleOf(
   colours: Palette,
   lang: string,
 ) {
-  const scale = scene.type?.scale ?? 1;
-  const clamp = (min: number, fluid: number, max: number) =>
-    Math.min(max * REM, Math.max(min * REM, fluid * cq)) * scale;
-  const { display, sans, label } = scene.fonts;
-  const names = style === "display" || style === "script" || style === "joiner";
+  // The same lettering as the live pages (lettering.ts): the theme's voice in the line's script
+  const role: TypeRole = name ? "names" : style === "symbol" ? "label" : style;
+  const set = lettering(SUITES[scene.suite].voice ?? "regal", role, lang);
+  const names = ROLES[role].face === "names";
   const type = scene.type;
-  const family = type ? (names ? type.names : type.words) : undefined;
-  const weight = names && type?.bold ? "700 " : "";
+  const own = names ? type?.names : type?.words;
+  const scale = (type?.scale ?? 1) * (own ? set.size / set.faceSize : set.size);
+  const bold = names && type?.bold ? 700 : own ? undefined : set.weight;
   const italic = names && type?.italic ? "italic " : "";
-  const pick = (fallback: string) => family ?? fallback;
-  const nameColour = name && type?.colour ? type.colour : undefined;
-
-  if (name) {
-    return {
-      size: clamp(2.4, 12, 4.6),
-      family: pick(display),
-      colour: nameColour ?? colours.ink,
-      lineHeight: 1.02,
-      spacing: type?.capitals ? 0.04 : 0,
-      upper: Boolean(type?.capitals),
-      prefix: `${italic}${weight}`,
-    };
-  }
-  const base = { prefix: `${italic}${weight}`, upper: false, spacing: 0 };
-  switch (style) {
-    case "label":
-      return {
-        ...base,
-        size: clamp(0.85, 3.6, 1.15),
-        family: pick(label),
-        colour: colours.goldText,
-        lineHeight: 1.4,
-        // Spaced capitals suit Latin letters; Indic letters pull apart
-        spacing: INDIC.test(lang) ? 0.04 : 0.26,
-        upper: !INDIC.test(lang),
-        prefix: "",
-      };
-    case "script":
-      return {
-        ...base,
-        size: clamp(1.35, 6.4, 2.4),
-        family: pick(display),
-        colour: colours.accentText,
-        lineHeight: 1.25,
-      };
-    case "display":
-      return {
-        ...base,
-        size: clamp(1.7, 8.4, 3.2),
-        family: pick(display),
-        colour: colours.ink,
-        lineHeight: 1.08,
-      };
-    case "joiner":
-      return {
-        ...base,
-        size: clamp(1.3, 6.4, 2.4),
-        family: pick(display),
-        colour: colours.accentText,
-        lineHeight: 1,
-      };
-    case "body":
-      return {
-        ...base,
-        size: clamp(1.05, 4.6, 1.45),
-        family: pick(sans),
-        colour: colours.inkMuted,
-        lineHeight: 1.5,
-        prefix: "",
-      };
-    default:
-      return {
-        ...base,
-        size: clamp(1, 4.1, 1.25),
-        family: pick(sans),
-        colour: colours.inkMuted,
-        lineHeight: 1.5,
-        prefix: "",
-      };
-  }
+  const capitals = name && Boolean(type?.capitals);
+  return {
+    size: roleSize(role, cq, REM) * scale,
+    family: own ?? set.family,
+    colour: name && type?.colour ? type.colour : colours[ROLE_INK[role]],
+    lineHeight: set.leading,
+    spacing: capitals ? 0.04 : set.tracking,
+    upper: capitals || set.upper,
+    prefix: `${italic}${bold ? `${bold} ` : ""}`,
+    role,
+  };
 }
+
+const ROLE_INK: Record<TypeRole, keyof Palette> = {
+  names: "ink",
+  display: "ink",
+  date: "ink",
+  script: "accentText",
+  joiner: "accentText",
+  body: "inkMuted",
+  small: "inkMuted",
+  label: "goldText",
+};
 
 function greedy(ctx: CanvasRenderingContext2D, words: readonly string[], width: number): string[] {
   const lines: string[] = [];
@@ -392,7 +352,6 @@ function drawWords(
   let height = 0;
   for (let attempt = 0; attempt < 8; attempt++) {
     placed = [];
-    const gap = 2 * cq * fit;
     if (sacred) {
       const size = Math.min(7.5 * REM, Math.max(4 * REM, 22 * cq)) * fit;
       placed.push({
@@ -404,9 +363,11 @@ function drawWords(
         colour: colours.accentText,
         spacing: 0,
         lineHeight: 1,
+        space: 0,
       });
     }
-    for (const line of beat.lines) {
+    const rule = ruleAt(beat);
+    for (const [index, line] of beat.lines.entries()) {
       const name = beat.scene === "cover" && line.style === "display";
       const lang = line.lang ?? scene.lang;
       const style = styleOf(line.style, name, cq, scene, colours, lang);
@@ -415,7 +376,9 @@ function drawWords(
       ctx.font = font;
       ctx.letterSpacing = `${style.spacing * size}px`;
       const text = style.upper ? line.text.toLocaleUpperCase(lang) : line.text;
-      const lines = wrap(ctx, text, boxW - padX * 2);
+      // Reading lines keep clear of the art's edges, as on the live pages
+      const full = ROLES[style.role].face === "names" && style.role !== "date";
+      const lines = wrap(ctx, text, (boxW - padX * 2) * (full ? 1 : 0.88));
       placed.push({
         kind: "text",
         lines,
@@ -425,22 +388,21 @@ function drawWords(
         colour: style.colour,
         spacing: style.spacing * size,
         lineHeight: style.lineHeight,
+        space: (lineSpace(beat, index, Boolean(sacred)) + (index === rule ? 2.2 : 0)) * cq * fit,
+        rule: index === rule,
       });
     }
-    height =
-      placed.reduce((sum, item) => sum + item.height, 0) +
-      gap * Math.max(0, placed.length - 1) +
-      padY * 2;
+    height = placed.reduce((sum, item) => sum + item.space + item.height, 0) + padY * 2;
     if (height <= areaH || fit <= 0.6) break;
     fit *= 0.92;
   }
 
-  const gap = 2 * cq * fit;
   const x = left + areaW / 2;
   // The host may have lifted the words to the top of the calm area, or set them low
   const room = Math.max(0, areaH - height);
   const place = beat.layout?.place;
-  let y = top + (place === "top" ? 0 : place === "bottom" ? room : room / 2);
+  // Centred words sit a little above the middle, where the eye takes the centre to be
+  let y = top + (place === "top" ? 0 : place === "bottom" ? room : room * 0.4);
   const boxTop = y;
   const intro = lineProgress(entry, 0, seconds);
 
@@ -483,7 +445,9 @@ function drawWords(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   placed.forEach((item, index) => {
+    y += item.space;
     const p = lineProgress(entry, index, seconds);
+    if (p > 0 && item.rule) drawRule(ctx, x, y - item.space / 2, cq * fit, colours, p);
     if (p > 0) {
       const eased = 1 - (1 - p) ** 3;
       ctx.save();
@@ -509,8 +473,39 @@ function drawWords(
       }
       ctx.restore();
     }
-    y += item.height + gap;
+    y += item.height;
   });
+}
+
+/** The fine rule between a function's name and its day: a hairline with a small diamond. */
+function drawRule(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  cq: number,
+  colours: Palette,
+  progress: number,
+) {
+  const half = Math.min(4.5 * REM, Math.max(2.25 * REM, 13 * cq));
+  ctx.save();
+  ctx.globalAlpha *= 1 - (1 - progress) ** 3;
+  const line = ctx.createLinearGradient(x - half, y, x + half, y);
+  line.addColorStop(0, withAlpha(colours.goldText, 0));
+  line.addColorStop(0.3, colours.goldText);
+  line.addColorStop(0.7, colours.goldText);
+  line.addColorStop(1, withAlpha(colours.goldText, 0));
+  ctx.fillStyle = line;
+  ctx.fillRect(x - half, y - 0.75, half * 2, 1.5);
+  ctx.fillStyle = colours.goldText;
+  const d = 0.28 * REM;
+  ctx.beginPath();
+  ctx.moveTo(x, y - d);
+  ctx.lineTo(x + d, y);
+  ctx.lineTo(x, y + d);
+  ctx.lineTo(x - d, y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }
 
 const ROLE_COLOUR: Record<StockRole, keyof Palette> = {
