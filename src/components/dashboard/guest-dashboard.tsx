@@ -10,6 +10,7 @@ import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
 import { Opens } from "./opens";
+import { PhotoWallCard } from "./photo-wall-card";
 import { Reminders } from "./reminders";
 import { ScheduledSends } from "./scheduled-sends";
 import type { DashboardView } from "./types";
@@ -188,6 +189,7 @@ export async function GuestDashboard({
           <Opens view={view} />
           <ScheduledSends view={view} openSend={openSend} />
           <Reminders view={view} />
+          <PhotoWallCard inviteId={view.id} />
           <Cohosts view={view} />
         </div>
       </div>

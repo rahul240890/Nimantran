@@ -99,7 +99,7 @@ const FUNCTION_COLUMNS =
   "id, kind, position, date, start_time, end_time, venue, address, dress_code";
 const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
-/** Visit counts arrive with 20261002160000_guest_opens.sql; until it runs the list reads without them. */
+/** Visit counts arrive with 20261002170000_guest_opens.sql; until it runs the list reads without them. */
 const OPEN_COLUMNS = ", last_opened_at, open_count";
 const SEND_COLUMNS = "id, channel, purpose, function_id, send_at, status";
 const REPLY_COLUMNS =

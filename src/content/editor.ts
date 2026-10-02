@@ -15,6 +15,8 @@ export const editor = {
   progressLabel: "Invite progress",
   progress: (step: number, total: number) => `Step ${step} of ${total}`,
   done: "done",
+  designChosen: "Your design",
+  changeDesign: "Change design",
   back: "Back",
   next: "Continue",
   toPreview: "Preview invitation",
