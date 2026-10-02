@@ -61,10 +61,11 @@ export function clearPhotos() {
 /** Decodes, shrinks and re-encodes a picked file. Throws if the browser can't read it. */
 export async function preparePhoto(
   file: File,
+  maxSide = PHOTO_MAX_SIDE,
 ): Promise<{ blob: Blob; width: number; height: number }> {
   const bitmap = await createImageBitmap(file);
   try {
-    const size = fitWithin(bitmap.width, bitmap.height);
+    const size = fitWithin(bitmap.width, bitmap.height, maxSide);
     const canvas = document.createElement("canvas");
     canvas.width = size.width;
     canvas.height = size.height;
