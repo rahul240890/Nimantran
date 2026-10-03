@@ -17,6 +17,29 @@ export function forgetPhotoUrl(id: string) {
   urls.delete(id);
 }
 
+const REMOTE_TRIES = 3;
+const REMOTE_WAIT_MS = 4_000;
+
+/**
+ * The account's links for an invite's photos. The editor drops ?invite= from the address
+ * right after opening one, and a server action caught in that navigation can go unanswered,
+ * so each try gives up after a few seconds and asks again.
+ */
+async function remotePhotoUrls(inviteId: string): Promise<Record<string, string>> {
+  for (let attempt = 0; attempt < REMOTE_TRIES; attempt++) {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const found = await Promise.race([
+      invitePhotoUrls(inviteId).catch(() => null),
+      new Promise<null>((resolve) => {
+        timer = setTimeout(() => resolve(null), REMOTE_WAIT_MS);
+      }),
+    ]);
+    clearTimeout(timer);
+    if (found) return found;
+  }
+  return {};
+}
+
 /**
  * Maps each photo id to a URL an <img> can show, loading from IndexedDB as needed. Photos
  * this device doesn't have come from the account when the invite is saved there.
@@ -44,7 +67,7 @@ export function usePhotoUrls(
         }),
       );
       if (inviteId && missing.some((id) => !urls.has(id))) {
-        const remote = await invitePhotoUrls(inviteId).catch(() => ({}));
+        const remote = await remotePhotoUrls(inviteId);
         for (const [id, url] of Object.entries(remote)) if (!urls.has(id)) urls.set(id, url);
       }
       if (!cancelled) setVersion((version) => version + 1);

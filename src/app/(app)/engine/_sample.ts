@@ -62,6 +62,10 @@ export function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
       },
       wedding: at("2026-11-20", "18:30", "Umaid Bhawan, Jodhpur", "Circuit House Road"),
     },
+    guide: {
+      sangeet: { pin: "", parking: "Valet at the palace gate" },
+      wedding: { pin: "", parking: "Free parking behind the main lawn" },
+    },
   };
 }
 

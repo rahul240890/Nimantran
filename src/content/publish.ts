@@ -96,6 +96,18 @@ export const guestCopy = {
   where: "Where",
   dressCode: "Dress code",
   directions: "Directions",
+  parking: "Parking",
+  showMap: "Map",
+  hideMap: "Hide map",
+  mapTitle: (place: string) => `Map of ${place}`,
+  /** The event-day banner: what is on now, or later today. */
+  eventDay: {
+    now: "Happening now",
+    later: "Later today",
+    at: (name: string, time: string) => (time ? `${name} at ${time}` : name),
+    details: "Details",
+    dismiss: "Hide this banner",
+  },
   addToCalendar: "Add to calendar",
   googleCalendar: "Google Calendar",
   appleCalendar: "Apple, Outlook and others",

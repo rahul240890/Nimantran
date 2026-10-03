@@ -5,7 +5,7 @@ import { getLocale } from "@/i18n/server";
 import { editorText } from "@/i18n/copy/editor";
 import { includedFunctions, type InviteDraft } from "@/lib/editor/draft";
 import { inviteNames, occasionName } from "@/lib/publish/describe";
-import { mapsUrl } from "@/lib/publish/links";
+import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 import { isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "../_sample";
@@ -20,9 +20,14 @@ export const metadata: Metadata = {
  * A review page for the themed guest page (Step 12q), not a product screen: the guest page
  * for ?suite=<theme> (and ?lang=hi for a Hindi card) with made-up names, dates and pictures, and nothing saved.
  * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
+ * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
-  const { suite: asked, lang, format, photos: count } = await searchParams;
+  const { suite: asked, lang, format, photos: count, now } = await searchParams;
+  const previewNow =
+    typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
+      ? Date.parse(`${now}:00+05:30`)
+      : undefined;
   const suite: SuiteId = isSuiteId(asked) ? asked : "rajwada-bagh";
   const locale = await getLocale();
   const scene = format === "scene";
@@ -31,12 +36,9 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
   const draft: InviteDraft = scene ? sceneDraft(base, sceneCount) : base;
   const { functionCopy } = editorText[locale];
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
-    const fn = draft.functions[told.kind];
     return {
       ...told,
-      address: fn.address,
-      dressCode: fn.dressCode,
-      mapsUrl: mapsUrl(fn.venue, fn.address),
+      ...guestGuide(draft, told.kind),
       googleCalendarUrl: null,
       icsUrl: null,
     };
@@ -59,6 +61,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       allIcsUrl={null}
       rsvpFunctions={rsvpFunctions}
       questions={[]}
+      previewNow={previewNow}
     />
   );
 }

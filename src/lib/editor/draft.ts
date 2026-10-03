@@ -115,6 +115,7 @@ export function newDraft(
     format: "story",
     family: noFamily,
     pages: noPages,
+    guide: {},
   };
 }
 
