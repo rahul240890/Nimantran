@@ -26,5 +26,6 @@ export function fitScale(
     if (fits(mid)) low = mid;
     else high = mid;
   }
-  return { scale: Number(low.toFixed(3)), overflow: false };
+  // Rounded down, never up: a hair larger than the largest size that fits can wrap a line
+  return { scale: Math.floor(low * 1000) / 1000, overflow: false };
 }

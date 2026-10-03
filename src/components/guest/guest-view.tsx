@@ -53,7 +53,7 @@ import type { EventWindow } from "@/lib/publish/event-day";
 import { cn } from "@/lib/cn";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
-import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
@@ -165,6 +165,7 @@ export function GuestView({
             photos.map((photo) => photo.id),
             (id) => photos.find((photo) => photo.id === id)?.url,
             copy,
+            (id) => photoAspect(photos, id),
           ),
           blessing: draftBlessing(draft),
         }),
@@ -194,6 +195,7 @@ export function GuestView({
         photos.map((photo) => photo.id),
         (id) => photos.find((photo) => photo.id === id)?.url,
         copy,
+        (id) => photoAspect(photos, id),
       ),
     [draft.couplePhotos, photos, copy],
   );

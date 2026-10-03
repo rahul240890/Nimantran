@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { StoryPage } from "@/components/invitation/story/story-player";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
@@ -94,7 +94,13 @@ export function PagePreview({
           data-suite={suite}
           data-mood={pageLook(beat.scene).mood}
           className="[container-type:size] absolute inset-0"
-          style={SUITES[suite].art === "card" ? stockStyle(template) : undefined}
+          // A true small copy of the guest's phone: the words keep their share of the page
+          style={
+            {
+              ...(SUITES[suite].art === "card" ? stockStyle(template) : {}),
+              "--type-floor": 0,
+            } as CSSProperties
+          }
         >
           <StoryPage
             key={`${suite}-${beat.id}`}

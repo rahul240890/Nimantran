@@ -115,6 +115,8 @@ export function PreviewStage({
           reply={null}
           type={type}
           framed
+          miniature
+          still={mini}
         />
       </div>
     </div>

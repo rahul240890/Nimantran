@@ -53,7 +53,9 @@ export function sceneSize(role: SceneRole, width: number, rem = 16): number {
 /**
  * The CSS for one line of the scene: the voice's face in the line's script, the host's
  * own lettering over it (Step 12n), and the size, which the scene shrinks with
- * `--scene-fit` when long words would overflow their place on the painting.
+ * `--scene-fit` when long words would overflow their place on the painting. A small
+ * preview of the scene sets `--scene-floor: 0`, so it is a true miniature of the phone's
+ * scene rather than one whose floors make the words too big for the painting.
  */
 export function sceneLine(
   voice: Voice,
@@ -72,7 +74,7 @@ export function sceneLine(
     fontFamily: own ?? set.family,
     fontWeight: names && type?.bold ? 700 : own ? undefined : set.weight,
     fontStyle: names && type?.italic ? "italic" : undefined,
-    fontSize: `calc(clamp(${min}rem, ${fluid}cqw, ${max}rem) * ${size.toFixed(3)} * var(--scene-fit, 1))`,
+    fontSize: `calc(clamp(calc(${min}rem * var(--scene-floor, 1)), ${fluid}cqw, ${max}rem) * ${size.toFixed(3)} * var(--scene-fit, 1))`,
     lineHeight: set.leading,
     letterSpacing:
       couple && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",

@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
-import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
@@ -320,6 +320,7 @@ export function useVideoFilm(
         photos.map((photo) => photo.id),
         (id) => photos.find((photo) => photo.id === id)?.url,
         copy,
+        (id) => photoAspect(photos, id),
       ),
       blessing: draftBlessing(draft),
     });
@@ -342,6 +343,7 @@ export function useVideoFilm(
       photos.map((photo) => photo.id),
       (id) => photos.find((photo) => photo.id === id)?.url,
       copy,
+      (id) => photoAspect(photos, id),
     );
     const page = scenePage(suite, scenePhotos.length);
     if (!page) return null;

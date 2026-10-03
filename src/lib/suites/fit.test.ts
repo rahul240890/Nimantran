@@ -16,4 +16,11 @@ describe("fitting words to a painting", () => {
   it("stops at the smallest readable size and says the page is too full", () => {
     expect(fitScale(() => false)).toEqual({ scale: FIT_MIN, overflow: true });
   });
+
+  it("never hands back a size a hair past the largest that fits", () => {
+    for (const limit of [0.7016, 0.8333, 0.9999]) {
+      const { scale } = fitScale((scale) => scale <= limit, { steps: 12 });
+      expect(scale).toBeLessThanOrEqual(limit);
+    }
+  });
 });

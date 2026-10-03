@@ -84,6 +84,7 @@ export function SceneSample({ suite }: { suite: SuiteId }) {
       photos={SAMPLE_PHOTOS}
       reply={null}
       framed
+      miniature
     />
   );
 }

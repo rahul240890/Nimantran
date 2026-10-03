@@ -24,6 +24,14 @@ export type PhotoPage = {
 /** The paintings' own size, so photos line up with the frames however the page is cropped. */
 export const PAINTING_ASPECT = 768 / 1365;
 
+/** The plain arch frames of themes without framed paintings: width over height. */
+export const ARCH_ASPECT = 3 / 4;
+
+/** A photo's box for a frame: a little past the opening on every side, so no gap shows under its edge. */
+export function photoBox([x, y, width, height]: FrameBox): FrameBox {
+  return [x - 0.8, y - 0.5, width + 1.6, height + 1];
+}
+
 type Entry = {
   one: readonly [FrameBox];
   /** Missing on a theme for one person (a birthday): two photos share the one frame. */

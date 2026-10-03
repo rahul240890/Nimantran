@@ -19,7 +19,8 @@ import {
   type TypeRole,
 } from "@/lib/suites/lettering";
 import { SUITES, pageLook, paintedTone, type Mood, type SuiteId } from "@/lib/suites/catalog";
-import { photoPage } from "@/lib/suites/photo-frames";
+import { photoBox, photoPage } from "@/lib/suites/photo-frames";
+import { photoPlacement, type PhotoFit } from "@/lib/editor/photo-fit";
 import type { CardCopy } from "@/lib/templates/content";
 import type { StockRole } from "@/lib/templates/schema";
 import {
@@ -126,14 +127,15 @@ function drawPage(
     frames?.frames.forEach((box, i) => {
       const photo = beat.photos?.[i] && scene.images.get(beat.photos[i]!.src);
       if (!photo) return;
-      const [x, y, w, h] = box;
-      fillWith(
+      const [x, y, w, h] = photoBox(box);
+      drawFittedPhoto(
         ctx,
         photo,
         (x / 100) * PAGE_W,
         (y / 100) * PAGE_H,
         (w / 100) * PAGE_W,
         (h / 100) * PAGE_H,
+        beat.photos?.[i]?.fit,
       );
     });
     fillWith(ctx, painting, 0, 0, PAGE_W, PAGE_H);
@@ -186,6 +188,43 @@ export function fillWith(
   const sw = w / scale;
   const sh = h / scale;
   ctx.drawImage(image, (width - sw) / 2, (height - sh) * focusY, sw, sh, x, y, w, h);
+}
+
+/**
+ * A host's photo in the box at (x, y), w by h, as they placed it in the editor, clipped to
+ * the box; without a placement it covers the box with the faces kept high.
+ */
+export function drawFittedPhoto(
+  ctx: CanvasRenderingContext2D,
+  image: CanvasImageSource,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  fit: PhotoFit | undefined,
+) {
+  if (!fit) {
+    fillWith(ctx, image, x, y, w, h, 0.3);
+    return;
+  }
+  const place = photoPlacement(fit, w / h);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.clip();
+  // Round the frame's centre, where the host's chosen point of the photo sits
+  ctx.translate(x + w / 2, y + h / 2);
+  ctx.rotate((place.tilt * Math.PI) / 180);
+  const bw = place.width * w;
+  const bh = place.height * h;
+  // The turned photo's box, its chosen point at the origin
+  ctx.translate(-place.x * bw + bw / 2, -place.y * bh + bh / 2);
+  ctx.rotate((place.turn * Math.PI) / 2);
+  const sideways = place.turn % 2 === 1;
+  const iw = sideways ? bh : bw;
+  const ih = sideways ? bw : bh;
+  ctx.drawImage(image, -iw / 2, -ih / 2, iw, ih);
+  ctx.restore();
 }
 
 function sizeOf(image: CanvasImageSource): { width: number; height: number } {

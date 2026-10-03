@@ -235,7 +235,8 @@ export function roleSize(role: TypeRole, cq: number, rem = 16): number {
 /** The same size as CSS, before the page's own scales multiply it. */
 export function roleSizeCss(role: TypeRole): string {
   const { min, fluid, max } = ROLES[role];
-  return `clamp(${min}rem, ${fluid}cqmin, ${max}rem)`;
+  // A small copy of a page (the editor's phone) sets --type-floor: 0, so it shrinks as a whole
+  return `clamp(calc(${min}rem * var(--type-floor, 1)), ${fluid}cqmin, ${max}rem)`;
 }
 
 /** Space above a line, in cqmin: groups breathe, a heading stays close to what it heads. */

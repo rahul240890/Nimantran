@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { StoryPhoto } from "@/lib/engine/story";
 import type { CardCopy } from "@/lib/templates/content";
@@ -29,6 +29,7 @@ export function useCouplePhotos(
         second: copy.second,
         joiner: copy.joiner,
       },
+      (id) => photoAspect(draft.photos, id),
     ),
   );
   return useMemo(() => JSON.parse(key) as StoryPhoto[], [key]);

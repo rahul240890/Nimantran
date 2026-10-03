@@ -1,6 +1,7 @@
 import { INVITE_FORMATS } from "./formats";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
+import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { defaultType, typeSchema } from "./type";
 import { GUIDE_RULES, noFunctionGuide } from "./guide";
@@ -82,9 +83,30 @@ const guideSchema = z.object({
 const photoSchema = z.object({ id: z.string().min(1), width: z.number(), height: z.number() });
 export type PhotoRef = z.infer<typeof photoSchema>;
 
+const cropSchema = z.object({
+  x: z.number().min(0).max(1),
+  y: z.number().min(0).max(1),
+  zoom: z.number().min(MIN_ZOOM).max(MAX_ZOOM),
+  turn: z.number().int().min(0).max(3),
+  tilt: z.number().min(-MAX_TILT).max(MAX_TILT),
+});
+
 const couplePhotosSchema = z.object({
   layout: z.enum(COUPLE_LAYOUTS).catch("none"),
   ids: z.array(z.string()).max(2).catch([]),
+  /** A crop that doesn't read is dropped, so that photo sits by default. */
+  crops: z
+    .record(z.string(), z.unknown())
+    .transform((crops) =>
+      Object.fromEntries(
+        Object.entries(crops).flatMap(([id, crop]) => {
+          const read = cropSchema.safeParse(crop);
+          return read.success ? [[id, read.data]] : [];
+        }),
+      ),
+    )
+    .optional()
+    .catch(undefined),
 });
 
 const traditionSchema = z.object({

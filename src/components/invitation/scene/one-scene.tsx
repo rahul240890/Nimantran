@@ -31,7 +31,9 @@ import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { fitScale } from "@/lib/suites/fit";
 import type { Voice } from "@/lib/suites/lettering";
 import { sceneLine } from "@/lib/suites/scene-type";
-import { PAINTING_ASPECT, type FrameBox } from "@/lib/suites/photo-frames";
+import { PAINTING_ASPECT, photoBox, type FrameBox } from "@/lib/suites/photo-frames";
+import { frameAspectOf } from "@/lib/editor/photo-fit";
+import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import {
   SCENE_HOLD_MS,
   SCENE_SWAP_MS,
@@ -60,58 +62,95 @@ type SceneItem = { kind: "line"; text: string } | { kind: "function"; fn: StoryF
 /** The function in the slot, the side it came from, and which turn brought it. */
 type Shown = { index: number; from: Entrance; turn: number };
 
-const FACES = "50% 30%";
+/** How the words in a box came out: their scale, and whether even the smallest overflowed. */
+type Fitted = { scale: number; overflow: boolean };
 
 /**
  * Shrinks (or grows a little) the words in `box` until `words` fits inside it, by setting
  * `--scene-fit` on `box`. When the words would have to set small, lines marked
- * `data-fit-optional` (a painted card's countdown) step aside first. Words too long to
- * fit even at the smallest size may break.
+ * `data-fit-optional` (a painted card's countdown) step aside first. Words that don't
+ * fit at `min` may go down to `floor` rather than spill out; only past that may they break.
  */
-function fitWords(box: HTMLElement, words: HTMLElement, max: number, min: number) {
+function fitWords(
+  box: HTMLElement,
+  words: HTMLElement,
+  max: number,
+  min: number,
+  floor: number,
+): Fitted {
+  // Computed sizes, to the fraction of a pixel and untouched by a card's flying transform
   const pad = getComputedStyle(box);
   const room =
-    box.clientHeight - parseFloat(pad.paddingTop || "0") - parseFloat(pad.paddingBottom || "0");
+    parseFloat(pad.height) -
+    (pad.boxSizing === "border-box"
+      ? parseFloat(pad.paddingTop || "0") + parseFloat(pad.paddingBottom || "0")
+      : 0);
   const fits = (scale: number) => {
     box.style.setProperty("--scene-fit", String(scale));
-    return words.offsetHeight <= room + 1 && words.scrollWidth <= words.clientWidth + 1;
+    const height = parseFloat(getComputedStyle(words).height) || words.offsetHeight;
+    return height <= room + 0.5 && words.scrollWidth <= words.clientWidth + 1;
   };
   const optional = [...words.querySelectorAll<HTMLElement>("[data-fit-optional]")];
   for (const line of optional) line.hidden = false;
-  let { scale, overflow } = fitScale(fits, { min, max });
-  if (optional.length && scale < 0.9) {
+  let fitted = fitScale(fits, { min, max });
+  if (optional.length && fitted.scale < 0.9) {
     for (const line of optional) line.hidden = true;
-    ({ scale, overflow } = fitScale(fits, { min, max }));
+    fitted = fitScale(fits, { min, max });
   }
-  box.style.setProperty("--scene-fit", String(scale));
-  if (overflow) box.dataset.overflow = "";
+  if (fitted.overflow && floor < min) fitted = fitScale(fits, { min: floor, max: min });
+  box.style.setProperty("--scene-fit", String(fitted.scale));
+  if (fitted.overflow) box.dataset.overflow = "";
   else delete box.dataset.overflow;
+  return fitted;
 }
 
-/** Fits the words now, and again when the painting changes size or the fonts arrive. */
+/**
+ * Fits the words now, and again when the painting changes size or a font arrives (a
+ * script's face loads only once its words are on the page, after the first fit).
+ */
 function useFit(
   outer: RefObject<HTMLElement | null>,
   inner: RefObject<HTMLElement | null>,
   key: string,
-  max = 1.1,
-  min = 0.6,
+  { max = 1.1, min = 0.6, floor = min, onFit }: FitOptions = {},
 ) {
+  const report = useRef(onFit);
+  useLayoutEffect(() => {
+    report.current = onFit;
+  });
   useLayoutEffect(() => {
     const box = outer.current;
     const words = inner.current;
     if (!box || !words) return;
-    const measure = () => fitWords(box, words, max, min);
+    const measure = () => {
+      const fitted = fitWords(box, words, max, min, floor);
+      report.current?.(fitted);
+    };
     measure();
     const resize = new ResizeObserver(measure);
     resize.observe(box);
     let live = true;
     void document.fonts?.ready.then(() => live && measure());
+    document.fonts?.addEventListener("loadingdone", measure);
     return () => {
       live = false;
       resize.disconnect();
+      document.fonts?.removeEventListener("loadingdone", measure);
     };
-  }, [outer, inner, key, max, min]);
+  }, [outer, inner, key, max, min, floor]);
 }
+
+type FitOptions = {
+  max?: number;
+  min?: number;
+  /** The least the words may shrink to before they break, when even `min` overflows. */
+  floor?: number;
+  /** Told how the words came out each time they are fitted. */
+  onFit?: (fitted: Fitted) => void;
+};
+
+/** Below this share of its size, the line under the names opens the slot instead. */
+const LINE_MIN = 0.9;
 
 const box = ([x, y, width, height]: FrameBox): CSSProperties => ({
   left: `${x}%`,
@@ -136,6 +175,17 @@ export type OneSceneProps = {
   detailsHref?: string;
   /** Inside the editor's phone: fills its box instead of the whole screen. */
   framed?: boolean;
+  /**
+   * A small copy of a phone's scene, as the editor and the gallery show it: every line
+   * keeps its share of the painting, without the floors that keep a phone's words
+   * readable (on a small copy they would crowd the painting).
+   */
+  miniature?: boolean;
+  /**
+   * A picture of the scene inside something tapped as a whole (the editor's floating
+   * phone): it plays, but has no buttons of its own.
+   */
+  still?: boolean;
   /** The host's lettering (Step 12n) over the theme's own. */
   type?: PageType;
   className?: string;
@@ -153,6 +203,8 @@ export function OneScene({
   reply,
   detailsHref,
   framed = false,
+  miniature = false,
+  still = false,
   type,
   className,
 }: OneSceneProps) {
@@ -161,8 +213,13 @@ export function OneScene({
   const reduced = useReducedMotion();
 
   // A painting without room for the line opens the slot with it instead
+  const typeKey = JSON.stringify(type ?? null);
+  const lineKey = `${copy.line}${lang}${typeKey}`;
+  // The line under the names that couldn't fit its place on the painting, by its words
+  const [crowded, setCrowded] = useState<string | null>(null);
+  const lineOnPainting = Boolean(page.line) && crowded !== lineKey;
   const items: SceneItem[] = [
-    ...(page.line || !copy.line.trim() ? [] : [{ kind: "line" as const, text: copy.line }]),
+    ...(lineOnPainting || !copy.line.trim() ? [] : [{ kind: "line" as const, text: copy.line }]),
     ...functions.map((fn) => ({ kind: "function" as const, fn })),
   ];
   const count = items.length;
@@ -207,13 +264,20 @@ export function OneScene({
   // In the editor's phone the page already has its own heading
   const Names = framed ? "p" : "h1";
   const voice = SUITES[suite].voice ?? "regal";
+  const namesLine = sceneLine(voice, "names", lang, type);
+  const namesStrut = { fontSize: namesLine.fontSize, lineHeight: namesLine.lineHeight };
   const namesBox = useRef<HTMLHeadingElement>(null);
   const namesWords = useRef<HTMLSpanElement>(null);
   const lineBox = useRef<HTMLParagraphElement>(null);
   const lineWords = useRef<HTMLSpanElement>(null);
-  const typeKey = JSON.stringify(type ?? null);
-  useFit(namesBox, namesWords, `${names.join("|")}${joiner}${lang}${typeKey}`);
-  useFit(lineBox, lineWords, `${copy.line}${lang}${typeKey}`);
+  // Long names shrink further rather than run into the photo or the slot
+  useFit(namesBox, namesWords, `${names.join("|")}${joiner}${lang}${typeKey}`, { floor: 0.42 });
+  // A line that would set too small for its place opens the slot instead, at a size to read
+  useFit(lineBox, lineWords, lineKey, {
+    onFit: ({ scale, overflow }) => {
+      if (overflow || scale < LINE_MIN) setCrowded(lineKey);
+    },
+  });
 
   return (
     <section
@@ -225,6 +289,7 @@ export function OneScene({
         framed ? "h-full" : "h-dvh min-h-[34rem]",
         className,
       )}
+      style={miniature ? ({ "--scene-floor": 0 } as CSSProperties) : undefined}
     >
       {/* The painting again, blurred, fills whatever the painting's own shape leaves */}
       {/* eslint-disable-next-line @next/next/no-img-element -- a blurred fill, not content */}
@@ -251,23 +316,14 @@ export function OneScene({
           {/* The photos lie under the painting and show through its frames */}
           {page.frames.map((frame, i) => {
             const photo = photos[i];
-            const [x, y, width, height] = frame;
-            const style: CSSProperties = {
-              left: `${x - 0.8}%`,
-              top: `${y - 0.5}%`,
-              width: `${width + 1.6}%`,
-              height: `${height + 1}%`,
-            };
+            const style = box(photoBox(frame));
             return photo ? (
-              // eslint-disable-next-line @next/next/no-img-element -- the family's own photo
-              <img
+              <FramedPhoto
                 key={i}
-                src={photo.src}
-                alt={photo.alt}
-                decoding="async"
-                draggable={false}
-                className="absolute bg-card-ivory object-cover select-none"
-                style={{ ...style, objectPosition: FACES }}
+                photo={photo}
+                frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
+                className="absolute bg-card-ivory"
+                style={style}
               />
             ) : (
               <div
@@ -308,8 +364,9 @@ export function OneScene({
             className="story-print scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
-            <span ref={namesWords} className="block max-w-full text-balance">
-              <span style={sceneLine(voice, "names", lang, type)}>{names[0]}</span>
+            {/* Sized as the names, so its own line and the spaces shrink with them */}
+            <span ref={namesWords} className="block max-w-full text-balance" style={namesStrut}>
+              <span style={namesLine}>{names[0]}</span>
               {names[1] && (
                 <>
                   {" "}
@@ -319,12 +376,12 @@ export function OneScene({
                   >
                     {joiner}
                   </span>{" "}
-                  <span style={sceneLine(voice, "names", lang, type)}>{names[1]}</span>
+                  <span style={namesLine}>{names[1]}</span>
                 </>
               )}
             </span>
           </Names>
-          {page.line && copy.line.trim() && (
+          {page.line && lineOnPainting && copy.line.trim() && (
             <p
               ref={lineBox}
               lang={lang}
@@ -365,12 +422,11 @@ export function OneScene({
               />
             )}
             {current && (
-              <button
+              <SlotHolder
                 key={`in-${shown.turn}`}
-                type="button"
+                interactive={!still}
+                label={playing ? words.pause : words.play}
                 onClick={() => setHeld((h) => !h)}
-                aria-label={playing ? words.pause : words.play}
-                className="absolute inset-0 cursor-pointer rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 <SlotCard
                   item={current}
@@ -383,7 +439,7 @@ export function OneScene({
                   side={shown.from}
                   reduced={reduced}
                 />
-              </button>
+              </SlotHolder>
             )}
           </div>
           {/* Screen readers hear the function in the slot when the guest moves it */}
@@ -396,7 +452,7 @@ export function OneScene({
       </div>
 
       <div className="relative z-10 flex shrink-0 flex-col items-center gap-2 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        {(count > 1 || shownFn?.mapsUrl || extra) && (
+        {!still && (count > 1 || shownFn?.mapsUrl || extra) && (
           <div className="flex items-center gap-1 rounded-full bg-card-ivory/85 px-1 text-card-ink shadow-raised backdrop-blur">
             {count > 1 && (
               <>
@@ -463,6 +519,31 @@ export function OneScene({
         </div>
       </div>
     </section>
+  );
+}
+
+/** The slot's card: a button that holds or plays the scene, or a plain box in a picture of it. */
+function SlotHolder({
+  interactive,
+  label,
+  onClick,
+  children,
+}: {
+  interactive: boolean;
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  if (!interactive) return <div className="absolute inset-0">{children}</div>;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      className="absolute inset-0 cursor-pointer rounded-lg focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      {children}
+    </button>
   );
 }
 
@@ -546,13 +627,11 @@ function SlotCard({
       : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
   // A painted card's words fit its writing area; a drawn card's, the card inside its padding
   // A painted card's writing area is fixed by its painting, so its words may set a little smaller
-  useFit(
-    painted ? face : card,
-    words,
-    `${key}${lang}${JSON.stringify(type ?? null)}`,
-    1.15,
-    painted ? 0.5 : 0.6,
-  );
+  useFit(painted ? face : card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, {
+    max: 1.15,
+    min: painted ? 0.5 : 0.6,
+    floor: 0.4,
+  });
   const fn = item.kind === "function" ? item.fn : null;
   const labels = CARD_STORY_WORDS[isCardLanguage(lang) ? lang : "en"];
   const when = Boolean(fn && (fn.date || fn.time));
@@ -585,7 +664,8 @@ function SlotCard({
         )}
         style={painted ? box(painted.text) : undefined}
       >
-        <div ref={words} className="flex w-full flex-col items-center">
+        {/* The card's spacing is set in em of this size, so it shrinks with the words */}
+        <div ref={words} className="scene-card-words flex w-full flex-col items-center">
           {item.kind === "line" ? (
             <p lang={lang} className="text-balance" style={sceneLine(voice, "line", lang, type)}>
               {item.text}
