@@ -410,7 +410,13 @@ function Stage({
       onKeyDown={onKeyDown}
       className="mx-auto flex w-full cursor-grab touch-none justify-center overflow-hidden rounded-lg bg-night select-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring active:cursor-grabbing"
     >
-      <FramePreview spot={spot} src={src} crop={crop} aspect={aspect} maxHeight="50dvh" />
+      <FramePreview
+        spot={spot}
+        src={src}
+        crop={crop}
+        aspect={aspect}
+        maxHeight="min(38dvh, 24rem)"
+      />
     </div>
   );
 }
