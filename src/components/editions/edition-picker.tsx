@@ -203,7 +203,13 @@ export function EditionPicker({
                       : "border-line",
                 )}
               >
-                <div className="flex min-h-7 flex-wrap items-center gap-2">
+                {/* Keeps the cards' names level side by side; a stacked card with no badge skips it */}
+                <div
+                  className={cn(
+                    "min-h-7 flex-wrap items-center gap-2",
+                    isCurrent || highlighted ? "flex" : "hidden sm:flex",
+                  )}
+                >
                   {isCurrent && <Badge tone="gold">{upgradeCopy.currentBadge}</Badge>}
                   {highlighted && (
                     <Badge tone="success" dot>
