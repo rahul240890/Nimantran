@@ -2265,11 +2265,11 @@
  * Still mode's global rule shortens every animation to its end, which leaves a finished
  * picture: petals gone, henna drawn, flowers open.
  */
+/* No letter-spacing here: it would change the lines' width while the page fits its words */
 @keyframes story-line-in {
   from {
     opacity: 0;
     transform: translateY(0.45em);
-    letter-spacing: 0.08em;
     filter: blur(6px);
   }
 }
