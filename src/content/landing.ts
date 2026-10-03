@@ -158,13 +158,14 @@ export const pricing = {
     per: "per event",
     badge: "Best for weddings",
     points: [
-      "Your own music and photos",
-      "Unlimited guests and functions",
-      "Guest list export and reminders",
+      "Up to 3 functions and 20 photos",
+      "Video for WhatsApp Status and Reels",
+      "No watermark on your invite",
     ],
   },
-  note: "Making and sharing your invite is free while we launch. Paid editions come later, with the price shown before you pay.",
+  note: "One payment per invitation, GST included. Never a subscription. Royal and the Wedding bundle cover every function.",
   cta: "Start your invite",
+  compare: "Compare every edition",
 } as const;
 
 export const faq = {

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
+import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import { homePath, languages, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
@@ -61,7 +62,14 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           <ul className="-ms-2 mt-3 flex flex-col">
             {nav.map((item) => (
               <li key={item.id}>
-                <a href={`${home}#${item.id}`} className={linkClass}>
+                <a
+                  href={
+                    item.id === "pricing"
+                      ? pagePath({ kind: "pricing" }, locale)
+                      : `${home}#${item.id}`
+                  }
+                  className={linkClass}
+                >
                   {item.label}
                 </a>
               </li>
@@ -70,6 +78,11 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               <a href={`${home}#waitlist`} className={linkClass}>
                 {shell.joinWaitlist}
               </a>
+            </li>
+            <li>
+              <Link href={pagePath({ kind: "blog" }, locale)} className={linkClass}>
+                {pagesText[locale].blogCopy.crumb}
+              </Link>
             </li>
           </ul>
         </nav>
@@ -120,8 +133,8 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
             © 2026 {locale === "hi" ? site.nameDevanagari : site.name}. {shell.footer.rights}
           </p>
           <div className="flex flex-wrap items-center gap-x-4">
-            <nav aria-label={legalCopy.footer.heading} className="-ms-2 flex">
-              {(["privacy", "terms"] as const).map((kind) => (
+            <nav aria-label={legalCopy.footer.heading} className="-ms-2 flex flex-wrap">
+              {(["privacy", "terms", "refunds", "contact"] as const).map((kind) => (
                 <Link
                   key={kind}
                   href={pagePath({ kind }, locale)}

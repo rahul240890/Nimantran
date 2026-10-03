@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getAdmin } from "@/lib/admin/access";
 import { businessSchema, saveBusiness } from "@/lib/payments/business";
+import { UI_LOCALES } from "@/i18n/locales";
+import { pagePath } from "@/lib/seo/paths";
 import { createCoupon, setCouponActive } from "@/lib/payments/coupons";
 import {
   checkoutProvider,
@@ -131,7 +133,11 @@ export async function saveBusinessDetails(
   const parsed = businessSchema.safeParse(input);
   if (!parsed.success) return "invalid";
   const saved = await saveBusiness(parsed.data, admin.account);
-  if (saved) revalidatePath("/admin/business");
+  if (saved) {
+    revalidatePath("/admin/business");
+    // The contact pages print the business name and address
+    for (const locale of UI_LOCALES) revalidatePath(pagePath({ kind: "contact" }, locale));
+  }
   return saved ? "saved" : "failed";
 }
 

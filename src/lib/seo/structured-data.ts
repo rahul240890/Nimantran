@@ -91,6 +91,29 @@ export function itemList(items: readonly { name: string; path: string }[]): Thin
   };
 }
 
+export function blogPosting(post: {
+  heading: string;
+  description: string;
+  published: string;
+  updated: string;
+  path: string;
+  locale: UiLocale;
+}): Thing {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.heading,
+    description: post.description,
+    datePublished: post.published,
+    dateModified: post.updated,
+    inLanguage: inLanguage(post.locale),
+    mainEntityOfPage: absolute(post.path),
+    url: absolute(post.path),
+    author: { "@type": "Organization", name: site.name, url: absolute("/") },
+    publisher: organization(),
+  };
+}
+
 /** JSON for a script tag: "<" is escaped so no text can close the tag early. */
 export function jsonLdText(data: Thing | Thing[]): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
