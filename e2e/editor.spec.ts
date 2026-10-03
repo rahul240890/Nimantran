@@ -323,7 +323,10 @@ test.describe("invite editor", () => {
       if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
     };
     const hidePhone = async () => {
-      if (!wide) await page.keyboard.press("Escape");
+      if (wide) return;
+      await page.keyboard.press("Escape");
+      // The page behind the sheet takes clicks again once it has closed
+      await expect(page.getByRole("dialog")).toHaveCount(0);
     };
     await page.getByRole("textbox", { name: /First name/ }).fill("રાધા");
     await page.getByRole("textbox", { name: /Second name/ }).fill("અર્જુન");
@@ -354,6 +357,9 @@ test.describe("invite editor", () => {
     await hidePhone();
 
     await next(page);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "When and where is everything?",
+    );
     await page.getByRole("checkbox", { name: /Sangeet/ }).check();
     await page.getByRole("checkbox", { name: /Sangeet/ }).focus();
     await showPhone();
