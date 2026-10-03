@@ -519,6 +519,164 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     text: [9.9, 16.9, 79.3, 73.1],
     dark: true,
   },
+  // A cream card on a banana-leaf platter
+  annaprashan: {
+    frame: [23, 4.1, 54.5, 31.6],
+    names: [18, 42.1, 70, 6.5],
+    line: [20, 48.9, 66, 4.5],
+    card: [11.3, 55.42, 81.94, 24.11],
+    text: [10.6, 16.9, 73.2, 68.4],
+  },
+  // A white card crowned with lilies
+  "christening-lilies": {
+    frame: [21.8, 8.2, 55.3, 31.3],
+    names: [12, 46.1, 76, 6.5],
+    line: null,
+    card: [11.69, 53.83, 76.51, 29.25],
+    text: [9.6, 21.1, 81, 65],
+  },
+  // A clean card on the new home's wall
+  "new-home-modern": {
+    frame: [30.6, 6, 39, 34.7],
+    names: [12, 49.8, 74, 6.5],
+    line: null,
+    card: [13.8, 59.11, 72.5, 23.23],
+    text: [8.6, 12.4, 80, 77.5],
+  },
+  // A temple-gold card between the kalash
+  satyanarayan: {
+    frame: [29.6, 4.8, 40.9, 31.5],
+    names: [10, 46.8, 80, 5.9],
+    line: null,
+    card: [7.78, 53.91, 85.46, 28.96],
+    text: [13.1, 19.3, 72.5, 57],
+  },
+  // A red-and-gold chunri card
+  "mata-ki-chowki": {
+    frame: [23.3, 8.2, 53.4, 30.1],
+    names: [18, 44.7, 64, 6.5],
+    line: null,
+    card: [10.74, 53.59, 78.52, 31.15],
+    text: [9.2, 12.5, 81.5, 75.5],
+    dark: true,
+  },
+  // A stone-carved card with jasmine
+  upanayana: {
+    frame: [24.2, 9.3, 51.2, 27.9],
+    names: [12, 43.5, 76, 6.5],
+    line: null,
+    card: [5.65, 52.92, 88.8, 21.72],
+    text: [9.4, 21.1, 81.1, 55.3],
+  },
+  // A quiet white card edged with tuberoses
+  shraddhanjali: {
+    frame: [29.2, 6.5, 41.6, 31.1],
+    names: [15, 47.1, 70, 6.5],
+    line: null,
+    card: [13.71, 55.38, 72.48, 25.9],
+    text: [8.7, 23.6, 82.8, 63.7],
+  },
+  // A carved wood card in the garden
+  "retirement-garden": {
+    frame: [28.4, 8.1, 44, 31],
+    names: [20, 50.1, 70, 6.5],
+    line: [22, 56.9, 66, 4.5],
+    card: [14.63, 64.9, 71.67, 18.44],
+    text: [8.9, 14.1, 82.3, 73.2],
+  },
+  // A gold card strung with fairy lights
+  "farewell-night": {
+    frame: [19, 8.5, 61.4, 34],
+    names: [10, 45.8, 80, 6.5],
+    line: [12, 52.6, 76, 4.5],
+    card: [4.81, 58.8, 91.85, 24.27],
+    text: [17.6, 17.3, 63.1, 53.6],
+    dark: true,
+  },
+  // A carved board under the ribbon
+  "grand-opening": {
+    frame: [22.7, 9.2, 54.6, 36.7],
+    names: [20, 47.6, 60, 6.4],
+    line: null,
+    card: [13.33, 55.16, 73.43, 20.99],
+    text: [9.1, 34, 81.7, 62.9],
+  },
+  // A gold-lined card on the stage
+  "launch-stage": {
+    frame: [27.5, 5.4, 45, 43.4],
+    names: [15, 50.8, 70, 6.5],
+    line: null,
+    card: [8.98, 58.49, 82.31, 21.25],
+    text: [13.4, 14.2, 72.9, 80],
+    dark: true,
+  },
+  // A gold card under marigold garlands
+  "ganesh-utsav": {
+    frame: [23.8, 8.9, 52.5, 28.9],
+    names: [15, 46.7, 70, 6.5],
+    line: null,
+    card: [10.93, 54.95, 78.06, 26.2],
+    text: [9.7, 15.5, 80.7, 70.6],
+  },
+  // A shola-white card on red silk
+  "durga-pujo": {
+    frame: [23.6, 8.3, 52.3, 28.9],
+    names: [10, 44.6, 80, 6.5],
+    line: null,
+    card: [11.3, 52.4, 77.96, 31.46],
+    text: [9.9, 16.2, 79.5, 66.8],
+    dark: true,
+  },
+  // A peacock-feather card at midnight
+  janmashtami: {
+    frame: [26.9, 12.9, 43.1, 23.5],
+    names: [10, 45.5, 80, 6.5],
+    line: null,
+    card: [10.74, 54.37, 78.24, 30],
+    text: [11.8, 13.7, 78.6, 73.3],
+    dark: true,
+  },
+  // A kasavu-gold card over the pookalam
+  "onam-pookalam": {
+    frame: [25.1, 9.1, 49.4, 27],
+    names: [10, 43.9, 80, 6.5],
+    line: null,
+    card: [10, 52.66, 87.13, 31.41],
+    text: [11.5, 15.4, 71.2, 62.1],
+  },
+  // A cream card above the kolam
+  "pongal-kolam": {
+    frame: [23.9, 4.8, 52.6, 30.3],
+    names: [10, 39.8, 78, 6.5],
+    line: null,
+    card: [10.37, 49.01, 78.89, 27.45],
+    text: [10.9, 14.5, 78.6, 71],
+  },
+  // A kite-shaped card over the rooftops
+  "uttarayan-kites": {
+    frame: [24, 5.2, 52.1, 27.3],
+    names: [20, 37.2, 60, 6.5],
+    line: [22, 44, 56, 4.3],
+    card: [12.78, 49.48, 74.44, 45],
+    text: [19.5, 25, 61, 26.8],
+  },
+  // A phulkari-edged card by the bonfire
+  "lohri-bonfire": {
+    frame: [22.6, 6.7, 54.8, 30.2],
+    names: [10, 41.5, 78, 6.5],
+    line: [12, 48.3, 74, 4.5],
+    card: [8.7, 54.27, 82.59, 26.09],
+    text: [15.5, 18.1, 69.6, 69],
+    dark: true,
+  },
+  // A lantern-lit card under the jali
+  "iftar-dawat": {
+    frame: [25.5, 6, 49, 36.9],
+    names: [12, 46.6, 76, 5.6],
+    line: null,
+    card: [19.23, 53.36, 61.53, 32],
+    text: [9.4, 30.1, 82.1, 57.8],
+  },
 };
 
 export type ScenePage = {

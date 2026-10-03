@@ -845,6 +845,50 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
         </>
       );
       break;
+    // Pujas and festivals of lamps: a row of diyas and petals drifting down
+    case "puja":
+    case "ganesh-chaturthi":
+    case "navratri":
+    case "janmashtami":
+    case "lohri":
+      art = (
+        <>
+          <Diyas />
+          <Falling count={10} seed={26} colours={PETALS} shape="petal" />
+        </>
+      );
+      break;
+    // Home and family rites, and harvest festivals: a garland of flowers over the door
+    case "housewarming":
+    case "thread-ceremony":
+    case "annaprashan":
+    case "christening":
+    case "onam":
+    case "sankranti":
+      art = (
+        <>
+          <Toran />
+          <Falling count={12} seed={28} colours={PETALS} shape="petal" />
+        </>
+      );
+      break;
+    // A remembrance stays quiet: one lamp's row, nothing falling
+    case "prayer-meet":
+      art = <Diyas />;
+      break;
+    // Evenings out: lanterns and confetti
+    case "retirement":
+    case "farewell-party":
+    case "shop-opening":
+    case "launch":
+    case "eid":
+      art = (
+        <>
+          <Lanterns />
+          <Falling count={16} seed={30} colours={CONFETTI} shape="confetti" />
+        </>
+      );
+      break;
     case "reply":
       art = (
         <>

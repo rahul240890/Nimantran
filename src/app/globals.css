@@ -280,9 +280,13 @@
 [data-suite="rajwada-bagh"][data-mood="dawn"],
 [data-suite="glass-house"] [data-mood="dawn"],
 [data-suite="minimal-white"] [data-mood="dawn"],
+[data-suite="new-home-modern"] [data-mood="dawn"],
+[data-suite="shraddhanjali"] [data-mood="dawn"],
 [data-suite="ivory-arch"] [data-mood="dawn"],
 [data-suite="glass-house"][data-mood="dawn"],
 [data-suite="minimal-white"][data-mood="dawn"],
+[data-suite="new-home-modern"][data-mood="dawn"],
+[data-suite="shraddhanjali"][data-mood="dawn"],
 [data-suite="ivory-arch"][data-mood="dawn"],
 [data-suite="love-letter"] [data-mood="dawn"],
 [data-suite="parsi-chalk"] [data-mood="dawn"],
@@ -303,8 +307,10 @@
 [data-suite="cricket-stadium"][data-mood="dawn"],
 [data-suite="jungle-party"][data-mood="dawn"],
 [data-suite="oh-baby"] [data-mood="dawn"],
+[data-suite="annaprashan"] [data-mood="dawn"],
 [data-suite="palna"] [data-mood="dawn"],
 [data-suite="oh-baby"][data-mood="dawn"],
+[data-suite="annaprashan"][data-mood="dawn"],
 [data-suite="palna"][data-mood="dawn"],
 [data-suite="rainbow-unicorn"] [data-mood="dawn"],
 [data-suite="ocean-pearl"] [data-mood="dawn"],
@@ -327,18 +333,24 @@
 [data-suite="amrit-utsav"] [data-mood="dawn"],
 [data-suite="silver-jubilee"] [data-mood="dawn"],
 [data-suite="golden-jubilee"] [data-mood="dawn"],
+[data-suite="retirement-garden"] [data-mood="dawn"],
 [data-suite="saath"] [data-mood="dawn"],
 [data-suite="amrit-utsav"][data-mood="dawn"],
 [data-suite="silver-jubilee"][data-mood="dawn"],
 [data-suite="golden-jubilee"][data-mood="dawn"],
+[data-suite="retirement-garden"][data-mood="dawn"],
 [data-suite="saath"][data-mood="dawn"],
 [data-suite="char-bagh"] [data-mood="dawn"],
+[data-suite="iftar-dawat"] [data-mood="dawn"],
 [data-suite="noor-bagh"] [data-mood="dawn"],
 [data-suite="char-bagh"][data-mood="dawn"],
+[data-suite="iftar-dawat"][data-mood="dawn"],
 [data-suite="noor-bagh"][data-mood="dawn"],
 [data-suite="pune-wada"] [data-mood="dawn"],
+[data-suite="ganesh-utsav"] [data-mood="dawn"],
 [data-suite="peshwai-wada"] [data-mood="dawn"],
 [data-suite="pune-wada"][data-mood="dawn"],
+[data-suite="ganesh-utsav"][data-mood="dawn"],
 [data-suite="peshwai-wada"][data-mood="dawn"] {
   --suite-sky-top: #f3b58f;
   --suite-sky-bottom: #fbe3c4;
@@ -361,9 +373,13 @@
 [data-suite="rajwada-bagh"][data-mood="day"],
 [data-suite="glass-house"] [data-mood="day"],
 [data-suite="minimal-white"] [data-mood="day"],
+[data-suite="new-home-modern"] [data-mood="day"],
+[data-suite="shraddhanjali"] [data-mood="day"],
 [data-suite="ivory-arch"] [data-mood="day"],
 [data-suite="glass-house"][data-mood="day"],
 [data-suite="minimal-white"][data-mood="day"],
+[data-suite="new-home-modern"][data-mood="day"],
+[data-suite="shraddhanjali"][data-mood="day"],
 [data-suite="ivory-arch"][data-mood="day"],
 [data-suite="love-letter"] [data-mood="day"],
 [data-suite="parsi-chalk"] [data-mood="day"],
@@ -384,8 +400,10 @@
 [data-suite="cricket-stadium"][data-mood="day"],
 [data-suite="jungle-party"][data-mood="day"],
 [data-suite="oh-baby"] [data-mood="day"],
+[data-suite="annaprashan"] [data-mood="day"],
 [data-suite="palna"] [data-mood="day"],
 [data-suite="oh-baby"][data-mood="day"],
+[data-suite="annaprashan"][data-mood="day"],
 [data-suite="palna"][data-mood="day"],
 [data-suite="rainbow-unicorn"] [data-mood="day"],
 [data-suite="ocean-pearl"] [data-mood="day"],
@@ -408,18 +426,24 @@
 [data-suite="amrit-utsav"] [data-mood="day"],
 [data-suite="silver-jubilee"] [data-mood="day"],
 [data-suite="golden-jubilee"] [data-mood="day"],
+[data-suite="retirement-garden"] [data-mood="day"],
 [data-suite="saath"] [data-mood="day"],
 [data-suite="amrit-utsav"][data-mood="day"],
 [data-suite="silver-jubilee"][data-mood="day"],
 [data-suite="golden-jubilee"][data-mood="day"],
+[data-suite="retirement-garden"][data-mood="day"],
 [data-suite="saath"][data-mood="day"],
 [data-suite="char-bagh"] [data-mood="day"],
+[data-suite="iftar-dawat"] [data-mood="day"],
 [data-suite="noor-bagh"] [data-mood="day"],
 [data-suite="char-bagh"][data-mood="day"],
+[data-suite="iftar-dawat"][data-mood="day"],
 [data-suite="noor-bagh"][data-mood="day"],
 [data-suite="pune-wada"] [data-mood="day"],
+[data-suite="ganesh-utsav"] [data-mood="day"],
 [data-suite="peshwai-wada"] [data-mood="day"],
 [data-suite="pune-wada"][data-mood="day"],
+[data-suite="ganesh-utsav"][data-mood="day"],
 [data-suite="peshwai-wada"][data-mood="day"] {
   --suite-sky-top: #9fd0dc;
   --suite-sky-bottom: #eef3e2;
@@ -442,9 +466,13 @@
 [data-suite="rajwada-bagh"][data-mood="dusk"],
 [data-suite="glass-house"] [data-mood="dusk"],
 [data-suite="minimal-white"] [data-mood="dusk"],
+[data-suite="new-home-modern"] [data-mood="dusk"],
+[data-suite="shraddhanjali"] [data-mood="dusk"],
 [data-suite="ivory-arch"] [data-mood="dusk"],
 [data-suite="glass-house"][data-mood="dusk"],
 [data-suite="minimal-white"][data-mood="dusk"],
+[data-suite="new-home-modern"][data-mood="dusk"],
+[data-suite="shraddhanjali"][data-mood="dusk"],
 [data-suite="ivory-arch"][data-mood="dusk"],
 [data-suite="love-letter"] [data-mood="dusk"],
 [data-suite="parsi-chalk"] [data-mood="dusk"],
@@ -465,8 +493,10 @@
 [data-suite="cricket-stadium"][data-mood="dusk"],
 [data-suite="jungle-party"][data-mood="dusk"],
 [data-suite="oh-baby"] [data-mood="dusk"],
+[data-suite="annaprashan"] [data-mood="dusk"],
 [data-suite="palna"] [data-mood="dusk"],
 [data-suite="oh-baby"][data-mood="dusk"],
+[data-suite="annaprashan"][data-mood="dusk"],
 [data-suite="palna"][data-mood="dusk"],
 [data-suite="rainbow-unicorn"] [data-mood="dusk"],
 [data-suite="ocean-pearl"] [data-mood="dusk"],
@@ -489,18 +519,24 @@
 [data-suite="amrit-utsav"] [data-mood="dusk"],
 [data-suite="silver-jubilee"] [data-mood="dusk"],
 [data-suite="golden-jubilee"] [data-mood="dusk"],
+[data-suite="retirement-garden"] [data-mood="dusk"],
 [data-suite="saath"] [data-mood="dusk"],
 [data-suite="amrit-utsav"][data-mood="dusk"],
 [data-suite="silver-jubilee"][data-mood="dusk"],
 [data-suite="golden-jubilee"][data-mood="dusk"],
+[data-suite="retirement-garden"][data-mood="dusk"],
 [data-suite="saath"][data-mood="dusk"],
 [data-suite="char-bagh"] [data-mood="dusk"],
+[data-suite="iftar-dawat"] [data-mood="dusk"],
 [data-suite="noor-bagh"] [data-mood="dusk"],
 [data-suite="char-bagh"][data-mood="dusk"],
+[data-suite="iftar-dawat"][data-mood="dusk"],
 [data-suite="noor-bagh"][data-mood="dusk"],
 [data-suite="pune-wada"] [data-mood="dusk"],
+[data-suite="ganesh-utsav"] [data-mood="dusk"],
 [data-suite="peshwai-wada"] [data-mood="dusk"],
 [data-suite="pune-wada"][data-mood="dusk"],
+[data-suite="ganesh-utsav"][data-mood="dusk"],
 [data-suite="peshwai-wada"][data-mood="dusk"] {
   --suite-sky-top: #6f3b6e;
   --suite-sky-bottom: #f3a96b;
@@ -523,9 +559,13 @@
 [data-suite="rajwada-bagh"][data-mood="night"],
 [data-suite="glass-house"] [data-mood="night"],
 [data-suite="minimal-white"] [data-mood="night"],
+[data-suite="new-home-modern"] [data-mood="night"],
+[data-suite="shraddhanjali"] [data-mood="night"],
 [data-suite="ivory-arch"] [data-mood="night"],
 [data-suite="glass-house"][data-mood="night"],
 [data-suite="minimal-white"][data-mood="night"],
+[data-suite="new-home-modern"][data-mood="night"],
+[data-suite="shraddhanjali"][data-mood="night"],
 [data-suite="ivory-arch"][data-mood="night"],
 [data-suite="love-letter"] [data-mood="night"],
 [data-suite="parsi-chalk"] [data-mood="night"],
@@ -546,8 +586,10 @@
 [data-suite="cricket-stadium"][data-mood="night"],
 [data-suite="jungle-party"][data-mood="night"],
 [data-suite="oh-baby"] [data-mood="night"],
+[data-suite="annaprashan"] [data-mood="night"],
 [data-suite="palna"] [data-mood="night"],
 [data-suite="oh-baby"][data-mood="night"],
+[data-suite="annaprashan"][data-mood="night"],
 [data-suite="palna"][data-mood="night"],
 [data-suite="rainbow-unicorn"] [data-mood="night"],
 [data-suite="ocean-pearl"] [data-mood="night"],
@@ -570,18 +612,24 @@
 [data-suite="amrit-utsav"] [data-mood="night"],
 [data-suite="silver-jubilee"] [data-mood="night"],
 [data-suite="golden-jubilee"] [data-mood="night"],
+[data-suite="retirement-garden"] [data-mood="night"],
 [data-suite="saath"] [data-mood="night"],
 [data-suite="amrit-utsav"][data-mood="night"],
 [data-suite="silver-jubilee"][data-mood="night"],
 [data-suite="golden-jubilee"][data-mood="night"],
+[data-suite="retirement-garden"][data-mood="night"],
 [data-suite="saath"][data-mood="night"],
 [data-suite="char-bagh"] [data-mood="night"],
+[data-suite="iftar-dawat"] [data-mood="night"],
 [data-suite="noor-bagh"] [data-mood="night"],
 [data-suite="char-bagh"][data-mood="night"],
+[data-suite="iftar-dawat"][data-mood="night"],
 [data-suite="noor-bagh"][data-mood="night"],
 [data-suite="pune-wada"] [data-mood="night"],
+[data-suite="ganesh-utsav"] [data-mood="night"],
 [data-suite="peshwai-wada"] [data-mood="night"],
 [data-suite="pune-wada"][data-mood="night"],
+[data-suite="ganesh-utsav"][data-mood="night"],
 [data-suite="peshwai-wada"][data-mood="night"] {
   --suite-sky-top: #0d1b2e;
   --suite-sky-bottom: #27405a;
@@ -621,17 +669,21 @@
 [data-suite="white-rann"] [data-mood="dawn"],
 [data-suite="mameru-bandhani"] [data-mood="dawn"],
 [data-suite="sindhi-ajrak"] [data-mood="dawn"],
+[data-suite="uttarayan-kites"] [data-mood="dawn"],
 [data-suite="kutch-toran"] [data-mood="dawn"],
 [data-suite="kutch-bhunga"][data-mood="dawn"],
 [data-suite="white-rann"][data-mood="dawn"],
 [data-suite="mameru-bandhani"][data-mood="dawn"],
 [data-suite="sindhi-ajrak"][data-mood="dawn"],
+[data-suite="uttarayan-kites"][data-mood="dawn"],
 [data-suite="kutch-toran"][data-mood="dawn"],
 [data-suite="punjab-haveli"] [data-mood="dawn"],
 [data-suite="chooda-ceremony"] [data-mood="dawn"],
+[data-suite="lohri-bonfire"] [data-mood="dawn"],
 [data-suite="phulkari-haveli"] [data-mood="dawn"],
 [data-suite="punjab-haveli"][data-mood="dawn"],
 [data-suite="chooda-ceremony"][data-mood="dawn"],
+[data-suite="lohri-bonfire"][data-mood="dawn"],
 [data-suite="phulkari-haveli"][data-mood="dawn"] {
   --suite-sky-top: #f7a58b;
   --suite-sky-bottom: #fde0b8;
@@ -656,17 +708,21 @@
 [data-suite="white-rann"] [data-mood="day"],
 [data-suite="mameru-bandhani"] [data-mood="day"],
 [data-suite="sindhi-ajrak"] [data-mood="day"],
+[data-suite="uttarayan-kites"] [data-mood="day"],
 [data-suite="kutch-toran"] [data-mood="day"],
 [data-suite="kutch-bhunga"][data-mood="day"],
 [data-suite="white-rann"][data-mood="day"],
 [data-suite="mameru-bandhani"][data-mood="day"],
 [data-suite="sindhi-ajrak"][data-mood="day"],
+[data-suite="uttarayan-kites"][data-mood="day"],
 [data-suite="kutch-toran"][data-mood="day"],
 [data-suite="punjab-haveli"] [data-mood="day"],
 [data-suite="chooda-ceremony"] [data-mood="day"],
+[data-suite="lohri-bonfire"] [data-mood="day"],
 [data-suite="phulkari-haveli"] [data-mood="day"],
 [data-suite="punjab-haveli"][data-mood="day"],
 [data-suite="chooda-ceremony"][data-mood="day"],
+[data-suite="lohri-bonfire"][data-mood="day"],
 [data-suite="phulkari-haveli"][data-mood="day"] {
   --suite-sky-top: #7fc4e0;
   --suite-sky-bottom: #fbe7c0;
@@ -691,17 +747,21 @@
 [data-suite="white-rann"] [data-mood="dusk"],
 [data-suite="mameru-bandhani"] [data-mood="dusk"],
 [data-suite="sindhi-ajrak"] [data-mood="dusk"],
+[data-suite="uttarayan-kites"] [data-mood="dusk"],
 [data-suite="kutch-toran"] [data-mood="dusk"],
 [data-suite="kutch-bhunga"][data-mood="dusk"],
 [data-suite="white-rann"][data-mood="dusk"],
 [data-suite="mameru-bandhani"][data-mood="dusk"],
 [data-suite="sindhi-ajrak"][data-mood="dusk"],
+[data-suite="uttarayan-kites"][data-mood="dusk"],
 [data-suite="kutch-toran"][data-mood="dusk"],
 [data-suite="punjab-haveli"] [data-mood="dusk"],
 [data-suite="chooda-ceremony"] [data-mood="dusk"],
+[data-suite="lohri-bonfire"] [data-mood="dusk"],
 [data-suite="phulkari-haveli"] [data-mood="dusk"],
 [data-suite="punjab-haveli"][data-mood="dusk"],
 [data-suite="chooda-ceremony"][data-mood="dusk"],
+[data-suite="lohri-bonfire"][data-mood="dusk"],
 [data-suite="phulkari-haveli"][data-mood="dusk"] {
   --suite-sky-top: #7b2a55;
   --suite-sky-bottom: #f59a4a;
@@ -726,17 +786,21 @@
 [data-suite="white-rann"] [data-mood="night"],
 [data-suite="mameru-bandhani"] [data-mood="night"],
 [data-suite="sindhi-ajrak"] [data-mood="night"],
+[data-suite="uttarayan-kites"] [data-mood="night"],
 [data-suite="kutch-toran"] [data-mood="night"],
 [data-suite="kutch-bhunga"][data-mood="night"],
 [data-suite="white-rann"][data-mood="night"],
 [data-suite="mameru-bandhani"][data-mood="night"],
 [data-suite="sindhi-ajrak"][data-mood="night"],
+[data-suite="uttarayan-kites"][data-mood="night"],
 [data-suite="kutch-toran"][data-mood="night"],
 [data-suite="punjab-haveli"] [data-mood="night"],
 [data-suite="chooda-ceremony"] [data-mood="night"],
+[data-suite="lohri-bonfire"] [data-mood="night"],
 [data-suite="phulkari-haveli"] [data-mood="night"],
 [data-suite="punjab-haveli"][data-mood="night"],
 [data-suite="chooda-ceremony"][data-mood="night"],
+[data-suite="lohri-bonfire"][data-mood="night"],
 [data-suite="phulkari-haveli"][data-mood="night"] {
   --suite-sky-top: #1a1033;
   --suite-sky-bottom: #4a2350;
@@ -748,6 +812,7 @@
   --suite-stars: 1;
 }
 [data-suite="temple-pond"],
+[data-suite="onam-pookalam"],
 [data-suite="kayal"] {
   --suite-plate: #f8f3e3;
   --suite-ink: #13332c;
@@ -761,24 +826,36 @@
   --suite-stone: #e9dcbc;
 }
 [data-suite="temple-pond"] [data-mood="dawn"],
+[data-suite="onam-pookalam"] [data-mood="dawn"],
 [data-suite="kayal"] [data-mood="dawn"],
 [data-suite="temple-pond"][data-mood="dawn"],
+[data-suite="onam-pookalam"][data-mood="dawn"],
 [data-suite="kayal"][data-mood="dawn"],
 [data-suite="jazz-lounge"] [data-mood="dawn"],
+[data-suite="launch-stage"] [data-mood="dawn"],
 [data-suite="deco-noir"] [data-mood="dawn"],
 [data-suite="jazz-lounge"][data-mood="dawn"],
+[data-suite="launch-stage"][data-mood="dawn"],
 [data-suite="deco-noir"][data-mood="dawn"],
 [data-suite="taara"] [data-mood="dawn"],
 [data-suite="taara"][data-mood="dawn"],
+[data-suite="janmashtami"] [data-mood="dawn"],
 [data-suite="pichwai"] [data-mood="dawn"],
+[data-suite="janmashtami"][data-mood="dawn"],
 [data-suite="pichwai"][data-mood="dawn"],
+[data-suite="pongal-kolam"] [data-mood="dawn"],
 [data-suite="tanjore"] [data-mood="dawn"],
+[data-suite="pongal-kolam"][data-mood="dawn"],
 [data-suite="tanjore"][data-mood="dawn"],
 [data-suite="kashi-ghat"] [data-mood="dawn"],
 [data-suite="rishikesh-ganga"] [data-mood="dawn"],
+[data-suite="satyanarayan"] [data-mood="dawn"],
+[data-suite="mata-ki-chowki"] [data-mood="dawn"],
 [data-suite="kashi"] [data-mood="dawn"],
 [data-suite="kashi-ghat"][data-mood="dawn"],
 [data-suite="rishikesh-ganga"][data-mood="dawn"],
+[data-suite="satyanarayan"][data-mood="dawn"],
+[data-suite="mata-ki-chowki"][data-mood="dawn"],
 [data-suite="kashi"][data-mood="dawn"],
 [data-suite="sakura"] [data-mood="dawn"],
 [data-suite="sakura"][data-mood="dawn"],
@@ -792,15 +869,19 @@
 [data-suite="van"][data-mood="dawn"],
 [data-suite="riad"] [data-mood="dawn"],
 [data-suite="riad"][data-mood="dawn"],
+[data-suite="grand-opening"] [data-mood="dawn"],
 [data-suite="deepotsav"] [data-mood="dawn"],
+[data-suite="grand-opening"][data-mood="dawn"],
 [data-suite="deepotsav"][data-mood="dawn"],
 [data-suite="kovil-corridor"] [data-mood="dawn"],
 [data-suite="hampi-ruins"] [data-mood="dawn"],
 [data-suite="coorg-estate"] [data-mood="dawn"],
+[data-suite="upanayana"] [data-mood="dawn"],
 [data-suite="mysuru"] [data-mood="dawn"],
 [data-suite="kovil-corridor"][data-mood="dawn"],
 [data-suite="hampi-ruins"][data-mood="dawn"],
 [data-suite="coorg-estate"][data-mood="dawn"],
+[data-suite="upanayana"][data-mood="dawn"],
 [data-suite="mysuru"][data-mood="dawn"],
 [data-suite="arati-mandap"] [data-mood="dawn"],
 [data-suite="kalamkari"] [data-mood="dawn"],
@@ -816,7 +897,9 @@
 [data-suite="chai-bagan"][data-mood="dawn"],
 [data-suite="sufi-raat"] [data-mood="dawn"],
 [data-suite="sufi-raat"][data-mood="dawn"],
+[data-suite="christening-lilies"] [data-mood="dawn"],
 [data-suite="chapel"] [data-mood="dawn"],
+[data-suite="christening-lilies"][data-mood="dawn"],
 [data-suite="chapel"][data-mood="dawn"],
 [data-suite="bali-garden"] [data-mood="dawn"],
 [data-suite="santorini-white"] [data-mood="dawn"],
@@ -829,16 +912,20 @@
 [data-suite="new-year-eve"] [data-mood="dawn"],
 [data-suite="neon-arcade"] [data-mood="dawn"],
 [data-suite="retro-bollywood"] [data-mood="dawn"],
+[data-suite="farewell-night"] [data-mood="dawn"],
 [data-suite="rooftop"] [data-mood="dawn"],
 [data-suite="space-voyage"][data-mood="dawn"],
 [data-suite="gold-gala"][data-mood="dawn"],
 [data-suite="new-year-eve"][data-mood="dawn"],
 [data-suite="neon-arcade"][data-mood="dawn"],
 [data-suite="retro-bollywood"][data-mood="dawn"],
+[data-suite="farewell-night"][data-mood="dawn"],
 [data-suite="rooftop"][data-mood="dawn"],
 [data-suite="zamindar-bari"] [data-mood="dawn"],
+[data-suite="durga-pujo"] [data-mood="dawn"],
 [data-suite="rajbari"] [data-mood="dawn"],
 [data-suite="zamindar-bari"][data-mood="dawn"],
+[data-suite="durga-pujo"][data-mood="dawn"],
 [data-suite="rajbari"][data-mood="dawn"] {
   --suite-sky-top: #f5b98e;
   --suite-sky-bottom: #fce6c8;
@@ -850,24 +937,36 @@
   --suite-stars: 0;
 }
 [data-suite="temple-pond"] [data-mood="day"],
+[data-suite="onam-pookalam"] [data-mood="day"],
 [data-suite="kayal"] [data-mood="day"],
 [data-suite="temple-pond"][data-mood="day"],
+[data-suite="onam-pookalam"][data-mood="day"],
 [data-suite="kayal"][data-mood="day"],
 [data-suite="jazz-lounge"] [data-mood="day"],
+[data-suite="launch-stage"] [data-mood="day"],
 [data-suite="deco-noir"] [data-mood="day"],
 [data-suite="jazz-lounge"][data-mood="day"],
+[data-suite="launch-stage"][data-mood="day"],
 [data-suite="deco-noir"][data-mood="day"],
 [data-suite="taara"] [data-mood="day"],
 [data-suite="taara"][data-mood="day"],
+[data-suite="janmashtami"] [data-mood="day"],
 [data-suite="pichwai"] [data-mood="day"],
+[data-suite="janmashtami"][data-mood="day"],
 [data-suite="pichwai"][data-mood="day"],
+[data-suite="pongal-kolam"] [data-mood="day"],
 [data-suite="tanjore"] [data-mood="day"],
+[data-suite="pongal-kolam"][data-mood="day"],
 [data-suite="tanjore"][data-mood="day"],
 [data-suite="kashi-ghat"] [data-mood="day"],
 [data-suite="rishikesh-ganga"] [data-mood="day"],
+[data-suite="satyanarayan"] [data-mood="day"],
+[data-suite="mata-ki-chowki"] [data-mood="day"],
 [data-suite="kashi"] [data-mood="day"],
 [data-suite="kashi-ghat"][data-mood="day"],
 [data-suite="rishikesh-ganga"][data-mood="day"],
+[data-suite="satyanarayan"][data-mood="day"],
+[data-suite="mata-ki-chowki"][data-mood="day"],
 [data-suite="kashi"][data-mood="day"],
 [data-suite="sakura"] [data-mood="day"],
 [data-suite="sakura"][data-mood="day"],
@@ -881,15 +980,19 @@
 [data-suite="van"][data-mood="day"],
 [data-suite="riad"] [data-mood="day"],
 [data-suite="riad"][data-mood="day"],
+[data-suite="grand-opening"] [data-mood="day"],
 [data-suite="deepotsav"] [data-mood="day"],
+[data-suite="grand-opening"][data-mood="day"],
 [data-suite="deepotsav"][data-mood="day"],
 [data-suite="kovil-corridor"] [data-mood="day"],
 [data-suite="hampi-ruins"] [data-mood="day"],
 [data-suite="coorg-estate"] [data-mood="day"],
+[data-suite="upanayana"] [data-mood="day"],
 [data-suite="mysuru"] [data-mood="day"],
 [data-suite="kovil-corridor"][data-mood="day"],
 [data-suite="hampi-ruins"][data-mood="day"],
 [data-suite="coorg-estate"][data-mood="day"],
+[data-suite="upanayana"][data-mood="day"],
 [data-suite="mysuru"][data-mood="day"],
 [data-suite="arati-mandap"] [data-mood="day"],
 [data-suite="kalamkari"] [data-mood="day"],
@@ -905,7 +1008,9 @@
 [data-suite="chai-bagan"][data-mood="day"],
 [data-suite="sufi-raat"] [data-mood="day"],
 [data-suite="sufi-raat"][data-mood="day"],
+[data-suite="christening-lilies"] [data-mood="day"],
 [data-suite="chapel"] [data-mood="day"],
+[data-suite="christening-lilies"][data-mood="day"],
 [data-suite="chapel"][data-mood="day"],
 [data-suite="bali-garden"] [data-mood="day"],
 [data-suite="santorini-white"] [data-mood="day"],
@@ -918,16 +1023,20 @@
 [data-suite="new-year-eve"] [data-mood="day"],
 [data-suite="neon-arcade"] [data-mood="day"],
 [data-suite="retro-bollywood"] [data-mood="day"],
+[data-suite="farewell-night"] [data-mood="day"],
 [data-suite="rooftop"] [data-mood="day"],
 [data-suite="space-voyage"][data-mood="day"],
 [data-suite="gold-gala"][data-mood="day"],
 [data-suite="new-year-eve"][data-mood="day"],
 [data-suite="neon-arcade"][data-mood="day"],
 [data-suite="retro-bollywood"][data-mood="day"],
+[data-suite="farewell-night"][data-mood="day"],
 [data-suite="rooftop"][data-mood="day"],
 [data-suite="zamindar-bari"] [data-mood="day"],
+[data-suite="durga-pujo"] [data-mood="day"],
 [data-suite="rajbari"] [data-mood="day"],
 [data-suite="zamindar-bari"][data-mood="day"],
+[data-suite="durga-pujo"][data-mood="day"],
 [data-suite="rajbari"][data-mood="day"] {
   --suite-sky-top: #8cc9d8;
   --suite-sky-bottom: #e8f4ea;
@@ -939,24 +1048,36 @@
   --suite-stars: 0;
 }
 [data-suite="temple-pond"] [data-mood="dusk"],
+[data-suite="onam-pookalam"] [data-mood="dusk"],
 [data-suite="kayal"] [data-mood="dusk"],
 [data-suite="temple-pond"][data-mood="dusk"],
+[data-suite="onam-pookalam"][data-mood="dusk"],
 [data-suite="kayal"][data-mood="dusk"],
 [data-suite="jazz-lounge"] [data-mood="dusk"],
+[data-suite="launch-stage"] [data-mood="dusk"],
 [data-suite="deco-noir"] [data-mood="dusk"],
 [data-suite="jazz-lounge"][data-mood="dusk"],
+[data-suite="launch-stage"][data-mood="dusk"],
 [data-suite="deco-noir"][data-mood="dusk"],
 [data-suite="taara"] [data-mood="dusk"],
 [data-suite="taara"][data-mood="dusk"],
+[data-suite="janmashtami"] [data-mood="dusk"],
 [data-suite="pichwai"] [data-mood="dusk"],
+[data-suite="janmashtami"][data-mood="dusk"],
 [data-suite="pichwai"][data-mood="dusk"],
+[data-suite="pongal-kolam"] [data-mood="dusk"],
 [data-suite="tanjore"] [data-mood="dusk"],
+[data-suite="pongal-kolam"][data-mood="dusk"],
 [data-suite="tanjore"][data-mood="dusk"],
 [data-suite="kashi-ghat"] [data-mood="dusk"],
 [data-suite="rishikesh-ganga"] [data-mood="dusk"],
+[data-suite="satyanarayan"] [data-mood="dusk"],
+[data-suite="mata-ki-chowki"] [data-mood="dusk"],
 [data-suite="kashi"] [data-mood="dusk"],
 [data-suite="kashi-ghat"][data-mood="dusk"],
 [data-suite="rishikesh-ganga"][data-mood="dusk"],
+[data-suite="satyanarayan"][data-mood="dusk"],
+[data-suite="mata-ki-chowki"][data-mood="dusk"],
 [data-suite="kashi"][data-mood="dusk"],
 [data-suite="sakura"] [data-mood="dusk"],
 [data-suite="sakura"][data-mood="dusk"],
@@ -970,15 +1091,19 @@
 [data-suite="van"][data-mood="dusk"],
 [data-suite="riad"] [data-mood="dusk"],
 [data-suite="riad"][data-mood="dusk"],
+[data-suite="grand-opening"] [data-mood="dusk"],
 [data-suite="deepotsav"] [data-mood="dusk"],
+[data-suite="grand-opening"][data-mood="dusk"],
 [data-suite="deepotsav"][data-mood="dusk"],
 [data-suite="kovil-corridor"] [data-mood="dusk"],
 [data-suite="hampi-ruins"] [data-mood="dusk"],
 [data-suite="coorg-estate"] [data-mood="dusk"],
+[data-suite="upanayana"] [data-mood="dusk"],
 [data-suite="mysuru"] [data-mood="dusk"],
 [data-suite="kovil-corridor"][data-mood="dusk"],
 [data-suite="hampi-ruins"][data-mood="dusk"],
 [data-suite="coorg-estate"][data-mood="dusk"],
+[data-suite="upanayana"][data-mood="dusk"],
 [data-suite="mysuru"][data-mood="dusk"],
 [data-suite="arati-mandap"] [data-mood="dusk"],
 [data-suite="kalamkari"] [data-mood="dusk"],
@@ -994,7 +1119,9 @@
 [data-suite="chai-bagan"][data-mood="dusk"],
 [data-suite="sufi-raat"] [data-mood="dusk"],
 [data-suite="sufi-raat"][data-mood="dusk"],
+[data-suite="christening-lilies"] [data-mood="dusk"],
 [data-suite="chapel"] [data-mood="dusk"],
+[data-suite="christening-lilies"][data-mood="dusk"],
 [data-suite="chapel"][data-mood="dusk"],
 [data-suite="bali-garden"] [data-mood="dusk"],
 [data-suite="santorini-white"] [data-mood="dusk"],
@@ -1007,16 +1134,20 @@
 [data-suite="new-year-eve"] [data-mood="dusk"],
 [data-suite="neon-arcade"] [data-mood="dusk"],
 [data-suite="retro-bollywood"] [data-mood="dusk"],
+[data-suite="farewell-night"] [data-mood="dusk"],
 [data-suite="rooftop"] [data-mood="dusk"],
 [data-suite="space-voyage"][data-mood="dusk"],
 [data-suite="gold-gala"][data-mood="dusk"],
 [data-suite="new-year-eve"][data-mood="dusk"],
 [data-suite="neon-arcade"][data-mood="dusk"],
 [data-suite="retro-bollywood"][data-mood="dusk"],
+[data-suite="farewell-night"][data-mood="dusk"],
 [data-suite="rooftop"][data-mood="dusk"],
 [data-suite="zamindar-bari"] [data-mood="dusk"],
+[data-suite="durga-pujo"] [data-mood="dusk"],
 [data-suite="rajbari"] [data-mood="dusk"],
 [data-suite="zamindar-bari"][data-mood="dusk"],
+[data-suite="durga-pujo"][data-mood="dusk"],
 [data-suite="rajbari"][data-mood="dusk"] {
   --suite-sky-top: #5a3a6e;
   --suite-sky-bottom: #f2a064;
@@ -1028,24 +1159,36 @@
   --suite-stars: 0.35;
 }
 [data-suite="temple-pond"] [data-mood="night"],
+[data-suite="onam-pookalam"] [data-mood="night"],
 [data-suite="kayal"] [data-mood="night"],
 [data-suite="temple-pond"][data-mood="night"],
+[data-suite="onam-pookalam"][data-mood="night"],
 [data-suite="kayal"][data-mood="night"],
 [data-suite="jazz-lounge"] [data-mood="night"],
+[data-suite="launch-stage"] [data-mood="night"],
 [data-suite="deco-noir"] [data-mood="night"],
 [data-suite="jazz-lounge"][data-mood="night"],
+[data-suite="launch-stage"][data-mood="night"],
 [data-suite="deco-noir"][data-mood="night"],
 [data-suite="taara"] [data-mood="night"],
 [data-suite="taara"][data-mood="night"],
+[data-suite="janmashtami"] [data-mood="night"],
 [data-suite="pichwai"] [data-mood="night"],
+[data-suite="janmashtami"][data-mood="night"],
 [data-suite="pichwai"][data-mood="night"],
+[data-suite="pongal-kolam"] [data-mood="night"],
 [data-suite="tanjore"] [data-mood="night"],
+[data-suite="pongal-kolam"][data-mood="night"],
 [data-suite="tanjore"][data-mood="night"],
 [data-suite="kashi-ghat"] [data-mood="night"],
 [data-suite="rishikesh-ganga"] [data-mood="night"],
+[data-suite="satyanarayan"] [data-mood="night"],
+[data-suite="mata-ki-chowki"] [data-mood="night"],
 [data-suite="kashi"] [data-mood="night"],
 [data-suite="kashi-ghat"][data-mood="night"],
 [data-suite="rishikesh-ganga"][data-mood="night"],
+[data-suite="satyanarayan"][data-mood="night"],
+[data-suite="mata-ki-chowki"][data-mood="night"],
 [data-suite="kashi"][data-mood="night"],
 [data-suite="sakura"] [data-mood="night"],
 [data-suite="sakura"][data-mood="night"],
@@ -1059,15 +1202,19 @@
 [data-suite="van"][data-mood="night"],
 [data-suite="riad"] [data-mood="night"],
 [data-suite="riad"][data-mood="night"],
+[data-suite="grand-opening"] [data-mood="night"],
 [data-suite="deepotsav"] [data-mood="night"],
+[data-suite="grand-opening"][data-mood="night"],
 [data-suite="deepotsav"][data-mood="night"],
 [data-suite="kovil-corridor"] [data-mood="night"],
 [data-suite="hampi-ruins"] [data-mood="night"],
 [data-suite="coorg-estate"] [data-mood="night"],
+[data-suite="upanayana"] [data-mood="night"],
 [data-suite="mysuru"] [data-mood="night"],
 [data-suite="kovil-corridor"][data-mood="night"],
 [data-suite="hampi-ruins"][data-mood="night"],
 [data-suite="coorg-estate"][data-mood="night"],
+[data-suite="upanayana"][data-mood="night"],
 [data-suite="mysuru"][data-mood="night"],
 [data-suite="arati-mandap"] [data-mood="night"],
 [data-suite="kalamkari"] [data-mood="night"],
@@ -1083,7 +1230,9 @@
 [data-suite="chai-bagan"][data-mood="night"],
 [data-suite="sufi-raat"] [data-mood="night"],
 [data-suite="sufi-raat"][data-mood="night"],
+[data-suite="christening-lilies"] [data-mood="night"],
 [data-suite="chapel"] [data-mood="night"],
+[data-suite="christening-lilies"][data-mood="night"],
 [data-suite="chapel"][data-mood="night"],
 [data-suite="bali-garden"] [data-mood="night"],
 [data-suite="santorini-white"] [data-mood="night"],
@@ -1096,16 +1245,20 @@
 [data-suite="new-year-eve"] [data-mood="night"],
 [data-suite="neon-arcade"] [data-mood="night"],
 [data-suite="retro-bollywood"] [data-mood="night"],
+[data-suite="farewell-night"] [data-mood="night"],
 [data-suite="rooftop"] [data-mood="night"],
 [data-suite="space-voyage"][data-mood="night"],
 [data-suite="gold-gala"][data-mood="night"],
 [data-suite="new-year-eve"][data-mood="night"],
 [data-suite="neon-arcade"][data-mood="night"],
 [data-suite="retro-bollywood"][data-mood="night"],
+[data-suite="farewell-night"][data-mood="night"],
 [data-suite="rooftop"][data-mood="night"],
 [data-suite="zamindar-bari"] [data-mood="night"],
+[data-suite="durga-pujo"] [data-mood="night"],
 [data-suite="rajbari"] [data-mood="night"],
 [data-suite="zamindar-bari"][data-mood="night"],
+[data-suite="durga-pujo"][data-mood="night"],
 [data-suite="rajbari"][data-mood="night"] {
   --suite-sky-top: #081a26;
   --suite-sky-bottom: #173848;
@@ -1118,6 +1271,7 @@
 }
 /* The painted themes (Step 12f) share the light of the landscape they fall back to */
 [data-suite="char-bagh"],
+[data-suite="iftar-dawat"],
 [data-suite="noor-bagh"] {
   --suite-plate: #f7f6ef;
   --suite-ink: #0f3b36;
@@ -1132,6 +1286,7 @@
 }
 [data-suite="punjab-haveli"],
 [data-suite="chooda-ceremony"],
+[data-suite="lohri-bonfire"],
 [data-suite="phulkari-haveli"] {
   --suite-plate: #fff4dc;
   --suite-ink: #3b1a0c;
@@ -1145,6 +1300,7 @@
   --suite-stone: #f2dcb0;
 }
 [data-suite="zamindar-bari"],
+[data-suite="durga-pujo"],
 [data-suite="rajbari"] {
   --suite-plate: #fbf5ea;
   --suite-ink: #3a0f10;
@@ -1158,6 +1314,7 @@
   --suite-stone: #efe2cf;
 }
 [data-suite="pune-wada"],
+[data-suite="ganesh-utsav"],
 [data-suite="peshwai-wada"] {
   --suite-plate: #fbf3e6;
   --suite-ink: #2e1238;
@@ -1174,6 +1331,7 @@
 [data-suite="white-rann"],
 [data-suite="mameru-bandhani"],
 [data-suite="sindhi-ajrak"],
+[data-suite="uttarayan-kites"],
 [data-suite="kutch-toran"] {
   --suite-plate: #fdf6ea;
   --suite-ink: #3a1410;
@@ -1209,6 +1367,7 @@
 [data-suite="amrit-utsav"],
 [data-suite="silver-jubilee"],
 [data-suite="golden-jubilee"],
+[data-suite="retirement-garden"],
 [data-suite="saath"] {
   --suite-plate: #fdf4ee;
   --suite-ink: #3b0f16;
@@ -1226,6 +1385,7 @@
 [data-suite="new-year-eve"],
 [data-suite="neon-arcade"],
 [data-suite="retro-bollywood"],
+[data-suite="farewell-night"],
 [data-suite="rooftop"] {
   --suite-plate: #f8f1ff;
   --suite-ink: #24123d;
@@ -1241,6 +1401,8 @@
 /* The modern and painted themes of Step 12r */
 [data-suite="glass-house"],
 [data-suite="minimal-white"],
+[data-suite="new-home-modern"],
+[data-suite="shraddhanjali"],
 [data-suite="ivory-arch"] {
   --suite-plate: #fbf7ef;
   --suite-ink: #3a2e24;
@@ -1268,6 +1430,7 @@
   --suite-stone: #f7e6e4;
 }
 [data-suite="jazz-lounge"],
+[data-suite="launch-stage"],
 [data-suite="deco-noir"] {
   --suite-plate: #f7f0e0;
   --suite-ink: #14110c;
@@ -1328,6 +1491,7 @@
   --suite-light: #ffe7a8;
   --suite-stone: #e3ebf5;
 }
+[data-suite="janmashtami"],
 [data-suite="pichwai"] {
   --suite-plate: #fbf4e6;
   --suite-ink: #14204a;
@@ -1340,6 +1504,7 @@
   --suite-light: #ffd9a0;
   --suite-stone: #efe2cc;
 }
+[data-suite="pongal-kolam"],
 [data-suite="tanjore"] {
   --suite-plate: #fdf5e6;
   --suite-ink: #3a0a0a;
@@ -1354,6 +1519,8 @@
 }
 [data-suite="kashi-ghat"],
 [data-suite="rishikesh-ganga"],
+[data-suite="satyanarayan"],
+[data-suite="mata-ki-chowki"],
 [data-suite="kashi"] {
   --suite-plate: #fdf6ea;
   --suite-ink: #3a1a0c;
@@ -1369,6 +1536,7 @@
 [data-suite="kovil-corridor"],
 [data-suite="hampi-ruins"],
 [data-suite="coorg-estate"],
+[data-suite="upanayana"],
 [data-suite="mysuru"] {
   --suite-plate: #fdf5e6;
   --suite-ink: #3a0f14;
@@ -1443,6 +1611,7 @@
   --suite-light: #ffe7a8;
   --suite-stone: #ece6d6;
 }
+[data-suite="christening-lilies"],
 [data-suite="chapel"] {
   --suite-plate: #fdfcf7;
   --suite-ink: #1f2a24;
@@ -1517,6 +1686,7 @@
   --suite-stone: #f0e2cf;
 }
 [data-suite="oh-baby"],
+[data-suite="annaprashan"],
 [data-suite="palna"] {
   --suite-plate: #fdf9f6;
   --suite-ink: #3a2a3a;
@@ -1529,6 +1699,7 @@
   --suite-light: #fff4d0;
   --suite-stone: #f3eef3;
 }
+[data-suite="grand-opening"],
 [data-suite="deepotsav"] {
   --suite-plate: #fff8ec;
   --suite-ink: #2a140c;
@@ -2609,6 +2780,7 @@
   --guest-gilt: var(--tpl-emerald-ornament);
 }
 .guest-themed[data-suite="temple-pond"],
+.guest-themed[data-suite="onam-pookalam"],
 .guest-themed[data-suite="kayal"] {
   --guest-deep: var(--tpl-kasavu-back);
   --guest-jewel: var(--tpl-kasavu-kumkum);
@@ -2629,6 +2801,7 @@
 /* Sakura's blossom pink and Palna's baby blue are pale, so their buttons wear the deeper rose */
 .guest-themed[data-suite="sakura"],
 .guest-themed[data-suite="oh-baby"],
+.guest-themed[data-suite="annaprashan"],
 .guest-themed[data-suite="palna"] {
   --guest-jewel: var(--suite-accent-text);
 }
