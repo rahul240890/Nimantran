@@ -58,7 +58,7 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   );
 }
 
-/** A preview only: real plans and checkout arrive with payments. */
+/** Free and Premium side by side; every edition is on the pricing page. */
 export function Pricing({ locale }: { locale: UiLocale }) {
   const { pricing } = landingText[locale];
   return (
@@ -69,9 +69,14 @@ export function Pricing({ locale }: { locale: UiLocale }) {
       </div>
       <div className="mt-10 flex flex-col items-center gap-5 text-center">
         <p className="max-w-md text-ink-muted">{pricing.note}</p>
-        <Button asChild>
-          <Link href={pagePath({ kind: "gallery" }, locale)}>{pricing.cta}</Link>
-        </Button>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button asChild>
+            <Link href={pagePath({ kind: "gallery" }, locale)}>{pricing.cta}</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href={pagePath({ kind: "pricing" }, locale)}>{pricing.compare}</Link>
+          </Button>
+        </div>
       </div>
     </Section>
   );

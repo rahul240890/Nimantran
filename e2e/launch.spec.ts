@@ -89,3 +89,85 @@ test.describe("deleting an account", () => {
     await expect(page).toHaveURL(/\/sign-in/);
   });
 });
+
+test.describe("pages for payments", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("the footer leads to pricing, refunds and contact", async ({ page }) => {
+    await page.goto("/");
+    const legal = page.getByRole("navigation", { name: "Legal" });
+    await legal.getByRole("link", { name: "Refunds" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Refund and cancellation policy",
+    );
+    await expect(page.getByRole("heading", { name: "Full refund within 7 days" })).toBeVisible();
+
+    await page
+      .getByRole("navigation", { name: "Legal" })
+      .getByRole("link", { name: "Contact" })
+      .click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Contact us");
+
+    await page.goto("/pricing");
+    for (const [name, price] of [
+      ["Premium", "₹499"],
+      ["Royal", "₹1,999"],
+      ["Wedding bundle", "₹2,999"],
+    ] as const) {
+      const plan = page.getByRole("article", { name, exact: true });
+      await expect(plan.getByText(price, { exact: true })).toBeVisible();
+    }
+    await page.getByRole("link", { name: "Read the refund policy" }).click();
+    await expect(page).toHaveURL(/\/refunds$/);
+  });
+});
+
+test.describe("blog", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("a reader finds a post, copies a message and goes on to the editor", async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.goto("/blog");
+    await page
+      .getByRole("link", { name: "Wedding invitation wording: 30 messages to copy" })
+      .click();
+    await expect(page).toHaveURL(/\/blog\/wedding-invitation-wording$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Wedding invitation wording: 30 messages to copy",
+    );
+    const types = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).flatMap((text) =>
+      (JSON.parse(text) as Record<string, unknown>[]).map((item) => item["@type"]),
+    );
+    expect(types).toEqual(expect.arrayContaining(["BlogPosting", "FAQPage", "BreadcrumbList"]));
+
+    await page.getByRole("button", { name: "Copy" }).first().click();
+    await expect(page.getByText("Copied").first()).toBeVisible();
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("Ramesh Sharma");
+    expect(await noOverflow(page)).toBe(true);
+
+    await page.getByRole("link", { name: "Create your invitation" }).last().click();
+    await expect(page).toHaveURL(/\/create\?category=wedding/);
+  });
+
+  test("a Hindi post switches to the English blog", async ({ page }) => {
+    await page.goto("/hi/blog/shadi-card-matter-hindi");
+    await expect(page.locator("html")).toHaveAttribute("lang", "hi");
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      /\/hi\/blog\/shadi-card-matter-hindi$/,
+    );
+    await expect(page.locator('link[hreflang="en-IN"]')).toHaveCount(0);
+  });
+
+  test("the sitemap lists every post", async ({ request }) => {
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    expect(sitemap).toContain("/blog/indian-wedding-functions");
+    expect(sitemap).toContain("/hi/blog/shadi-card-matter-hindi");
+    expect(sitemap).toContain("/refunds");
+  });
+});

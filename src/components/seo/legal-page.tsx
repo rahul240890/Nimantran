@@ -23,8 +23,14 @@ function Paragraphs({ blocks }: { blocks: readonly Block[] }) {
   );
 }
 
-/** The privacy policy or the terms: plain reading, a list of sections, and who to write to. */
-export function LegalPage({ locale, kind }: { locale: UiLocale; kind: "privacy" | "terms" }) {
+/** The privacy policy, the terms or the refund policy: plain reading, a list of sections, and who to write to. */
+export function LegalPage({
+  locale,
+  kind,
+}: {
+  locale: UiLocale;
+  kind: "privacy" | "terms" | "refunds";
+}) {
   const { legalCopy, [kind]: doc } = legalText[locale];
   const { seoCopy } = seoText[locale];
   const updated = format(new Date(`${LEGAL_UPDATED}T00:00:00`), "d MMMM yyyy", {
