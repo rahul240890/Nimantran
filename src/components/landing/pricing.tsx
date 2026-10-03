@@ -6,6 +6,8 @@ import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
+import { formatRupees } from "@/lib/plans/catalog";
+import { getPricing } from "@/lib/plans/pricing";
 import { pagePath } from "@/lib/seo/paths";
 import { Section } from "./section";
 
@@ -58,14 +60,20 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   );
 }
 
-/** Free and Premium side by side; every edition is on the pricing page. */
-export function Pricing({ locale }: { locale: UiLocale }) {
+/** Free and Premium side by side, at the admin's price; every edition is on the pricing page. */
+export async function Pricing({ locale }: { locale: UiLocale }) {
   const { pricing } = landingText[locale];
+  const premium = formatRupees((await getPricing()).prices.premium);
   return (
-    <Section id="pricing" eyebrow={pricing.eyebrow} title={pricing.title} intro={pricing.intro}>
+    <Section
+      id="pricing"
+      eyebrow={pricing.eyebrow}
+      title={pricing.title(premium)}
+      intro={pricing.intro}
+    >
       <div className="mx-auto grid max-w-4xl gap-5 md:grid-cols-2 md:gap-6">
         <PlanCard plan={pricing.free} />
-        <PlanCard plan={pricing.premium} featured />
+        <PlanCard plan={{ ...pricing.premium, price: pricing.premium.price(premium) }} featured />
       </div>
       <div className="mt-10 flex flex-col items-center gap-5 text-center">
         <p className="max-w-md text-ink-muted">{pricing.note}</p>

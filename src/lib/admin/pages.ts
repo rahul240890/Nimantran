@@ -4,7 +4,15 @@
  */
 
 export type AdminPageIcon =
-  "overview" | "payments" | "orders" | "coupons" | "invites" | "blog" | "ai" | "business";
+  | "overview"
+  | "payments"
+  | "designs"
+  | "orders"
+  | "coupons"
+  | "invites"
+  | "blog"
+  | "ai"
+  | "business";
 
 export type AdminPage = {
   href: `/admin${string}`;
@@ -26,6 +34,12 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Razorpay",
     description: "Payment keys, webhook and the checkout switch.",
     icon: "payments",
+  },
+  {
+    href: "/admin/designs",
+    label: "Designs and prices",
+    description: "Which designs are Free, Premium or Royal, and what each edition costs.",
+    icon: "designs",
   },
   {
     href: "/admin/orders",

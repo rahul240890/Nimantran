@@ -13,6 +13,7 @@ import {
   type PlanId,
 } from "@/lib/plans/catalog";
 import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
+import { getPricing } from "@/lib/plans/pricing";
 import { supabasePublic } from "@/lib/supabase/public";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
@@ -206,9 +207,10 @@ export async function startCheckout(
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
-  const [current, owner] = await Promise.all([
+  const [current, owner, pricing] = await Promise.all([
     invitePlan(account, eventId),
     ownsInvite(account, eventId),
+    getPricing(),
   ]);
   if (!current || !owner) return { ok: false, reason: "not-found" };
   const price = priceFor(
@@ -217,6 +219,7 @@ export async function startCheckout(
     await checkoutCoupons(),
     code ? cleanCouponCode(code) : null,
     new Date(),
+    pricing.prices,
   );
   if (!price) return { ok: false, reason: "already" };
   const { amountPaise } = price;

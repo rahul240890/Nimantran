@@ -1,4 +1,5 @@
 import type * as en from "../editions";
+import { PLAN_IDS } from "@/lib/plans/catalog";
 import type { Translation } from "@/i18n/text";
 
 /* Hindi copy for editions. */
@@ -112,6 +113,7 @@ export const limitCopy: Translation<typeof en.limitCopy> = {
     languages: (count) => `कार्ड की ${count} भाषाएँ`,
     couplePhotos: (count) => `जोड़े की ${count} फ़ोटो`,
     guests: (count) => `${count} मेहमान`,
+    design: (rank) => `${planCopy[PLAN_IDS[rank] ?? "premium"].name} डिज़ाइन`,
   },
   choose: "संस्करण चुनें",
   edition: (plan) => `संस्करण: ${plan}`,

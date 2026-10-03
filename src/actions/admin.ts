@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { getAdmin } from "@/lib/admin/access";
 import { businessSchema, saveBusiness } from "@/lib/payments/business";
@@ -17,7 +17,10 @@ import {
 } from "@/lib/payments/editions";
 import { checkConnection, type ConnectionCheck } from "@/lib/payments/razorpay";
 import { PAID_PLAN_IDS } from "@/lib/plans/catalog";
+import { allDesignIds, defaultTier } from "@/lib/plans/design-defaults";
+import { pricesInOrder, pricingSchema } from "@/lib/plans/design-tiers";
 import { COUPON_CODE, cleanCouponCode } from "@/lib/plans/offers";
+import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";
 
 /*
@@ -148,4 +151,33 @@ export async function refundPayment(orderId: unknown): Promise<RefundResult | nu
   const result = await refundOrder(parsed.data);
   if (result.ok) revalidatePath("/admin/orders");
   return result;
+}
+
+export type PricingSaveResult = "saved" | "invalid" | "out-of-order" | "failed";
+
+/**
+ * Edition prices and the designs whose tier the admin changed (Admin, Designs), laid over
+ * what is saved, so two admins changing different designs don't undo each other. Only
+ * tiers that differ from the default are kept, so a design added later starts at its
+ * default until changed.
+ */
+export async function saveDesignPricing(input: unknown): Promise<PricingSaveResult | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const parsed = pricingSchema.safeParse(input);
+  if (!parsed.success) return "invalid";
+  if (!pricesInOrder(parsed.data.prices)) return "out-of-order";
+  const known = new Set(allDesignIds());
+  const saved = (await getPricing()).tiers;
+  const tiers = Object.fromEntries(
+    Object.entries({ ...saved, ...parsed.data.tiers }).filter(
+      ([id, tier]) => known.has(id) && tier !== defaultTier(id),
+    ),
+  );
+  if (!(await savePricing({ prices: parsed.data.prices, tiers }, admin.account))) return "failed";
+  // Badges and prices show on nearly every page, and checkout charges by them: every page
+  // that read them carries the tag, so this refreshes them all
+  revalidateTag(PRICING_TAG, { expire: 0 });
+  revalidatePath("/admin/designs");
+  return "saved";
 }

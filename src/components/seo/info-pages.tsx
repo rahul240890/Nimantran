@@ -6,7 +6,8 @@ import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import type { Business } from "@/lib/payments/business-details";
-import { PLANS, PLAN_IDS, formatRupees } from "@/lib/plans/catalog";
+import { PLAN_IDS, editionPrice, formatRupees } from "@/lib/plans/catalog";
+import { getPricing } from "@/lib/plans/pricing";
 import { pagePath } from "@/lib/seo/paths";
 import { faqPage } from "@/lib/seo/structured-data";
 import { site } from "@/lib/site";
@@ -22,8 +23,10 @@ function crumbs(locale: UiLocale, last: Crumb): Crumb[] {
   return [{ name: seoText[locale].seoCopy.home, path: pagePath({ kind: "home" }, locale) }, last];
 }
 
-export function PricingPage({ locale }: { locale: UiLocale }) {
+export async function PricingPage({ locale }: { locale: UiLocale }) {
   const { pricingPageCopy: copy } = pagesText[locale];
+  // The admin's prices (Admin, Designs)
+  const { prices } = await getPricing();
   const { planCopy } = editionsText[locale];
   return (
     <PublicShell
@@ -47,7 +50,7 @@ export function PricingPage({ locale }: { locale: UiLocale }) {
       >
         <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {PLAN_IDS.map((id) => {
-            const plan = PLANS[id];
+            const pricePaise = editionPrice(id, prices);
             const words = planCopy[id];
             const popular = id === "royal";
             return (
@@ -71,10 +74,10 @@ export function PricingPage({ locale }: { locale: UiLocale }) {
                   </div>
                   <p className="flex flex-wrap items-baseline gap-x-2">
                     <span className="font-display text-4xl leading-none">
-                      {plan.pricePaise ? formatRupees(plan.pricePaise) : "₹0"}
+                      {pricePaise ? formatRupees(pricePaise) : "₹0"}
                     </span>
                     <span className="text-sm text-ink-muted">
-                      {plan.pricePaise ? copy.perInvite : copy.free}
+                      {pricePaise ? copy.perInvite : copy.free}
                     </span>
                   </p>
                   <p className="text-sm text-ink-muted">

@@ -12,7 +12,10 @@ import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { checkoutCoupons } from "@/lib/payments/coupons";
 import { formatRupees, isPlanId, planNeeded } from "@/lib/plans/catalog";
+import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { tierPlan } from "@/lib/plans/design-tiers";
 import { pricesFor } from "@/lib/plans/offers";
+import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
 import { editionsText } from "@/i18n/copy/editions";
 import { getLocale, getText } from "@/i18n/server";
@@ -38,13 +41,17 @@ export default async function EditionPage({
     ownsInvite(account, id),
   ]);
   if (!draft || !current) notFound();
-  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons] = await Promise.all([
-    editionsActive(),
-    inviteReceipts(account, id),
-    getLocale(),
-    getText(editionsText),
-    checkoutCoupons().catch(() => []),
-  ]);
+  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons, pricing] = await Promise.all(
+    [
+      editionsActive(),
+      inviteReceipts(account, id),
+      getLocale(),
+      getText(editionsText),
+      checkoutCoupons().catch(() => []),
+      getPricing(),
+    ],
+  );
+  const design = tierPlan(designTier(pricing, draftDesignId(draft)));
 
   return (
     <PageTransition>
@@ -84,12 +91,12 @@ export default async function EditionPage({
           <EditionPicker
             inviteId={id}
             current={current}
-            needed={planNeeded(draft)}
+            needed={planNeeded(draft, design)}
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
             canPay={owner}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
-            prices={pricesFor(current, coupons, null, new Date())}
+            prices={pricesFor(current, coupons, null, new Date(), pricing.prices)}
           />
 
           {receipts.length > 0 && (

@@ -13,9 +13,10 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
+import { usePricing } from "@/components/pricing/pricing-provider";
 import {
-  PLANS,
   PLAN_IDS,
+  editionPrice,
   formatRupees,
   planRank,
   type PaidPlanId,
@@ -90,6 +91,7 @@ export function EditionPicker({
   prices: offerPrices,
 }: EditionPickerProps) {
   const { upgradeCopy, planCopy } = useText(editionsText);
+  const pricing = usePricing();
   const router = useRouter();
   const [coupon, setCoupon] = useState<{
     code: string;
@@ -181,7 +183,6 @@ export function EditionPicker({
       )}
       <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {PLAN_IDS.map((id) => {
-          const plan = PLANS[id];
           const copy = planCopy[id];
           const isCurrent = id === current;
           const below = planRank(id) < planRank(current);
@@ -221,7 +222,9 @@ export function EditionPicker({
                   <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <span className="font-display text-[2.2rem] leading-none tabular-nums">
                       {formatRupees(
-                        offer && price && !isDifference ? price.amountPaise : plan.pricePaise,
+                        offer && price && !isDifference
+                          ? price.amountPaise
+                          : editionPrice(id, pricing.prices),
                       )}
                     </span>
                     {offer && price && !isDifference && (

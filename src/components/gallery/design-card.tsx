@@ -15,6 +15,7 @@ import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
@@ -66,7 +67,7 @@ export function DesignCard({ design, name, description, href, priority, cover }:
         type="button"
         onClick={() => setOpen(true)}
         aria-label={galleryCopy.preview(name)}
-        className="relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night outline-offset-[-3px] focus-visible:outline-2 focus-visible:outline-ring"
+        className="@container/tile relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night outline-offset-[-3px] focus-visible:outline-2 focus-visible:outline-ring"
       >
         {scene ? (
           <>
@@ -125,6 +126,11 @@ export function DesignCard({ design, name, description, href, priority, cover }:
               ? galleryCopy.storyBadge(pages.length)
               : galleryCopy.card}
         </span>
+        {/* Free, or the edition it needs and its price; the eye keeps the other corner */}
+        <TierBadge
+          designId={design.id}
+          className="absolute start-3 bottom-3 max-w-[calc(100%-4.5rem)]"
+        />
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />
         </span>
@@ -266,6 +272,7 @@ function DesignPreview({
           {/* What it is, every page as a thumbnail, and the way into the editor */}
           <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:px-0 lg:py-0">
             <div className="flex flex-col gap-2">
+              <TierBadge designId={design.id} className="self-start" />
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
                 {name}
               </DialogPrimitive.Title>

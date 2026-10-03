@@ -7,6 +7,9 @@ import { draftProblems, parseDraft } from "@/lib/editor/draft-checks";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { planNeeded, planShortfalls, type PlanId, type PlanNeed } from "@/lib/plans/catalog";
+import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { tierPlan } from "@/lib/plans/design-tiers";
+import { getPricing } from "@/lib/plans/pricing";
 import { isSlug, slugAlternatives } from "@/lib/publish/slug";
 
 /*
@@ -99,9 +102,12 @@ export async function publishInvite(inviteId: string, slug: string): Promise<Pub
   if (!draft) return { status: "failed" };
   if (draftProblems(draft).length > 0) return { status: "not-ready" };
   if (await editionsActive()) {
-    const plan = (await invitePlan(account, inviteId)) ?? "free";
-    const shortfalls = planShortfalls(draft, plan);
-    if (shortfalls.length > 0) return { status: "needs-plan", plan: planNeeded(draft), shortfalls };
+    const [plan, pricing] = await Promise.all([invitePlan(account, inviteId), getPricing()]);
+    // The design asks for its own edition, whatever else the invite uses
+    const design = tierPlan(designTier(pricing, draftDesignId(draft)));
+    const shortfalls = planShortfalls(draft, plan ?? "free", design);
+    if (shortfalls.length > 0)
+      return { status: "needs-plan", plan: planNeeded(draft, design), shortfalls };
   }
   const result = await store.publish(account, inviteId, slug);
   if (result.ok) return { status: "published", slug: result.slug };

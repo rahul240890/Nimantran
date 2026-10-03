@@ -8,6 +8,7 @@ import "@fontsource-variable/noto-sans-devanagari";
 import { Providers } from "@/components/providers";
 import { SiteAnalytics } from "@/components/shell/site-analytics";
 import { landingText } from "@/i18n/copy/landing";
+import type { Pricing } from "@/lib/plans/design-tiers";
 import type { UiLocale } from "@/i18n/locales";
 import { site } from "@/lib/site";
 import { themeInitScript } from "@/lib/theme";
@@ -68,7 +69,16 @@ export const rootViewport: Viewport = {
   ],
 };
 
-export function RootHtml({ locale, children }: { locale: UiLocale; children: ReactNode }) {
+export function RootHtml({
+  locale,
+  pricing,
+  children,
+}: {
+  locale: UiLocale;
+  /** The admin's design tiers and prices; the defaults where a layout can't read them. */
+  pricing?: Pricing;
+  children: ReactNode;
+}) {
   return (
     // The theme script sets data-theme on <html> before hydration, so React must not flag it
     <html lang={locale} className="h-full" suppressHydrationWarning>
@@ -78,7 +88,9 @@ export function RootHtml({ locale, children }: { locale: UiLocale; children: Rea
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
       <body className="flex min-h-full flex-col">
-        <Providers locale={locale}>{children}</Providers>
+        <Providers locale={locale} pricing={pricing}>
+          {children}
+        </Providers>
         {/* Counted only on the live site, where Analytics is switched on (docs/LAUNCH.md) */}
         {process.env.VERCEL_ENV === "production" && <SiteAnalytics />}
       </body>
