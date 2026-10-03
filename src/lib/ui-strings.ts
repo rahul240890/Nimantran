@@ -47,5 +47,6 @@ export const uiStrings = {
     title: "This page isn't here",
     body: "The link may be mistyped, or the page has moved.",
     home: "Go to Shubh",
+    designs: "Browse invitation designs",
   },
 } as const;

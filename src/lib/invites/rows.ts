@@ -11,6 +11,7 @@ import {
 } from "@/lib/editor/draft";
 import { parseDraft } from "@/lib/editor/draft-checks";
 import { isTemplateId } from "@/lib/templates/ids";
+import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
 
 /*
  * An invite as the database stores it (supabase/migrations): one events row, one
@@ -186,6 +187,8 @@ export type InviteSummary = {
   /** The main function's date, yyyy-MM-dd, or empty. */
   date: string;
   mainFunction: FunctionId | null;
+  /** The painted theme its pages use, for its picture in My invites. */
+  theme: SuiteId;
   updatedAt: number;
   /** Whether this person made the invite or helps run it (Step 11). */
   role: "owner" | "cohost";
@@ -216,6 +219,12 @@ export function summarize(
     joiner: draft.content.joiner?.trim() || "&",
     date: main ? draft.functions[main].date : "",
     mainFunction: main,
+    theme: suiteFor({
+      suite: draft.suite,
+      tradition: draft.tradition.id,
+      templateId: draft.templateId,
+      category: draft.categoryId,
+    }),
     updatedAt: draft.updatedAt,
     role,
   };

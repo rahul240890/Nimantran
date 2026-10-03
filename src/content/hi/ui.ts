@@ -47,5 +47,6 @@ export const uiStrings: Translation<typeof en> = {
     title: "यह पेज यहाँ नहीं है",
     body: "लिंक शायद ग़लत लिखा है, या पेज कहीं और चला गया है।",
     home: "शुभ इन्विटेशन पर जाएँ",
+    designs: "निमंत्रण डिज़ाइन देखें",
   },
 };

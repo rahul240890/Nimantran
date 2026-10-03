@@ -1,10 +1,10 @@
 import { Check, PenLine } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AccountShell } from "@/components/account/account-shell";
 import { SignInForm } from "@/components/account/sign-in-form";
-import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { PageTransition } from "@/components/motion/page-transition";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,8 @@ import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
-import { getLocale, getText } from "@/i18n/server";
-import type { UiLocale } from "@/i18n/locales";
+import { getText } from "@/i18n/server";
+import { suiteImage } from "@/lib/gallery/catalog";
 import { accountText } from "@/i18n/copy/account";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -25,19 +25,27 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-/** Three designs fanned out like cards in a hand, beside the form on wide screens. */
-function CardFan({ locale }: { locale: UiLocale }) {
+/** Three painted themes fanned out like cards in a hand, beside the form on wide screens. */
+function CardFan() {
   const cards = [
-    { id: "rose", className: "-rotate-12 -translate-x-[58%] translate-y-6" },
-    { id: "emerald", className: "rotate-12 translate-x-[58%] translate-y-6" },
-    { id: "marigold", className: "z-10" },
+    { suite: "kayal", className: "-rotate-12 -translate-x-[58%] translate-y-6" },
+    { suite: "noor-bagh", className: "rotate-12 translate-x-[58%] translate-y-6" },
+    { suite: "rajwada-bagh", className: "z-10" },
   ] as const;
   return (
     <div aria-hidden className="relative mx-auto grid h-80 w-48 place-items-center">
       {cards.map((card) => (
-        <div key={card.id} className={`absolute w-44 ${card.className}`}>
-          <TiltCard maxTilt={6} className="rounded-md shadow-float">
-            <TemplateCover id={card.id} locale={locale} className="rounded-md" />
+        <div key={card.suite} className={`absolute w-40 ${card.className}`}>
+          <TiltCard maxTilt={6} className="rounded-lg shadow-float">
+            <span className="relative block aspect-[9/16] overflow-hidden rounded-lg border-2 border-card-ivory bg-night">
+              <Image
+                src={suiteImage(card.suite)!}
+                alt=""
+                fill
+                sizes="10rem"
+                className="object-cover"
+              />
+            </span>
           </TiltCard>
         </div>
       ))}
@@ -63,7 +71,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
             aria-hidden
             className="relative hidden flex-col items-center gap-10 overflow-hidden rounded-xl border border-line bg-surface-2/60 px-8 py-12 text-center lg:flex"
           >
-            <CardFan locale={await getLocale()} />
+            <CardFan />
             <div className="flex max-w-sm flex-col gap-3">
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {signInCopy.side.eyebrow}
