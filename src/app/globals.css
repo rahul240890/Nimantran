@@ -2265,11 +2265,11 @@
  * Still mode's global rule shortens every animation to its end, which leaves a finished
  * picture: petals gone, henna drawn, flowers open.
  */
+/* No letter-spacing here: it would change the lines' width while the page fits its words */
 @keyframes story-line-in {
   from {
     opacity: 0;
     transform: translateY(0.45em);
-    letter-spacing: 0.08em;
     filter: blur(6px);
   }
 }
@@ -3607,15 +3607,46 @@
 }
 /*
  * Fitting measures sizes straight after setting them. In still mode every property
- * transitions over 0.01ms, which would hand back the old size, so the words never do.
+ * transitions over 0.01ms, which would hand back the old size, so the words on a scene
+ * or a story page never do.
  */
-.scene-words * {
+.scene-words *,
+.story-fit,
+.story-fit > * {
   transition-property: none !important;
 }
+/*
+ * The slot's base size: its gaps, rules and margins are em of it, so when the words shrink
+ * to fit a small card, the space between them shrinks too instead of crowding them out.
+ */
+.scene-card-words {
+  font-size: calc(
+    clamp(calc(0.7rem * var(--scene-floor, 1)), 3.5cqw, 1.1rem) * var(--scene-fit, 1)
+  );
+}
 .scene-rule {
-  width: calc(clamp(2.5rem, 20cqw, 7rem) * var(--scene-fit, 1));
+  width: 5.5em;
+  height: 0.5em;
   margin-block: 0.5em 0.4em;
 }
+.scene-rule::after {
+  width: 0.4em;
+  height: 0.4em;
+}
+/* The photo editor's sliders: a 44px tall hit area round a slim track and a marigold thumb */
+.photo-range {
+  width: 100%;
+  height: 2.75rem;
+  background: transparent;
+  cursor: pointer;
+  accent-color: var(--marigold);
+}
+.photo-range:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+
 /* The gallery's kind-of-invitation filter hides the other kinds (format-filter.tsx) */
 [data-format-filter="scene"] [data-format-item]:not([data-format-item="scene"]),
 [data-format-filter="story"] [data-format-item]:not([data-format-item="story"]),

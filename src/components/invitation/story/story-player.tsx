@@ -607,10 +607,18 @@ export function StoryPage({
       const lines = [...inner.querySelectorAll<HTMLElement>(".story-line")];
       const fits = (scale: number) => {
         inner.style.setProperty("--story-fit", String(scale));
+        // The words' height from their layout, not scrollHeight: lines rising in are still
+        // shifted by their animation, which scrollHeight would count
+        const bottom = Math.max(0, ...lines.map((line) => line.offsetTop + line.offsetHeight));
+        const height = bottom + parseFloat(getComputedStyle(inner).paddingBottom || "0");
         // Each line on its own: the glow behind printed words reaches past the edges on purpose
         return (
-          inner.scrollHeight <= outer.clientHeight + 1 &&
-          lines.every((line) => line.scrollWidth <= line.clientWidth + 1)
+          height <= outer.clientHeight + 1 &&
+          // The sacred symbol is drawn in its own square, so its width never decides the fit
+          lines.every(
+            (line) =>
+              line.classList.contains("story-symbol") || line.scrollWidth <= line.clientWidth + 1,
+          )
         );
       };
       delete inner.dataset.overflow;
@@ -625,8 +633,14 @@ export function StoryPage({
     // Web fonts arrive after the first layout, and Indian scripts' fonts load on demand
     document.fonts?.addEventListener("loadingdone", fit);
     void document.fonts?.ready.then(fit);
+    // Once the page has painted and its lines have risen in, the sizes are settled; in
+    // Still mode a script's face can land between the first fit and the first frame
+    let frame = requestAnimationFrame(() => (frame = requestAnimationFrame(fit)));
+    inner.addEventListener("animationend", fit);
     return () => {
       observer.disconnect();
+      cancelAnimationFrame(frame);
+      inner.removeEventListener("animationend", fit);
       document.fonts?.removeEventListener("loadingdone", fit);
     };
   }, [fitKey]);
@@ -685,7 +699,7 @@ export function StoryPage({
           ref={fitWords}
           data-tone={printed ? paintedTone(look.art, suiteId) : undefined}
           className={cn(
-            "relative flex max-h-full w-[min(100%,36rem)] flex-col [font-variant-numeric:lining-nums]",
+            "story-fit relative flex max-h-full w-[min(100%,36rem)] flex-col [font-variant-numeric:lining-nums]",
             layout?.align === "start" ? "items-start text-start" : "items-center text-center",
             printed
               ? "story-print isolate px-[5cqmin] py-[6cqmin]"
@@ -701,7 +715,7 @@ export function StoryPage({
           )}
           {sacred && (
             <span
-              className="story-line mb-[1cqmin] block size-[calc(clamp(4rem,22cqmin,7.5rem)*var(--story-fit,1))] shrink-0"
+              className="story-line story-symbol mb-[1cqmin] flex size-[calc(clamp(calc(4rem*var(--type-floor,1)),22cqmin,7.5rem)*var(--story-fit,1))] shrink-0 items-center justify-center"
               style={delay(0)}
             >
               {sacred.kind === "art" ? (
@@ -715,7 +729,7 @@ export function StoryPage({
                 <span
                   aria-hidden
                   className={cn(
-                    "block text-center text-[length:calc(clamp(3.4rem,20cqmin,6.5rem)*var(--story-fit,1))] leading-none text-card-accent-text",
+                    "block text-center text-[length:calc(clamp(calc(3.4rem*var(--type-floor,1)),20cqmin,6.5rem)*var(--story-fit,1))] leading-none whitespace-nowrap text-card-accent-text",
                     sacred.font === "display" ? "font-display" : "font-sans",
                   )}
                 >

@@ -8,6 +8,7 @@
 
 import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import type { CardCopy } from "@/lib/templates/content";
+import type { PhotoFit } from "@/lib/editor/photo-fit";
 
 /** The page a beat is, and so the scene painted behind it. Functions each have their own. */
 export const STORY_SCENES = ["blessing", "cover", "family", ...FUNCTION_IDS, "reply"] as const;
@@ -71,7 +72,12 @@ export type BeatLayout = {
 };
 
 /** A photo on the couple's page: where it loads from and what it shows. */
-export type StoryPhoto = { src: string; alt: string };
+export type StoryPhoto = {
+  src: string;
+  alt: string;
+  /** How the host placed the photo in its frame; left out, it sits by default. */
+  fit?: PhotoFit;
+};
 
 export type StoryInput = {
   copy: CardCopy;

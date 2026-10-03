@@ -20,6 +20,7 @@ import {
   SCALE,
   drawEnding,
   drawMotes,
+  drawFittedPhoto,
   fillWith,
   roundRect,
   withAlpha,
@@ -140,8 +141,8 @@ function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Pal
     const src = film.photos[i]?.src;
     const photo = src ? film.images.get(src) : undefined;
     if (photo) {
-      // Faces sit in the upper part of most photos, as object-position 50% 30% keeps them
-      fillWith(ctx, photo, box.x, box.y, box.w, box.h, 0.3);
+      // As the host placed it, or with the faces kept high, as the live scene shows it
+      drawFittedPhoto(ctx, photo, box.x, box.y, box.w, box.h, film.photos[i]?.fit);
       return;
     }
     ctx.fillStyle = colours.paper;

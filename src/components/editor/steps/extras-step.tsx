@@ -14,8 +14,12 @@ import {
   COUPLE_LAYOUTS,
   coupleFrameIds,
   frameCount,
+  photoAspect,
   type CoupleLayout,
 } from "@/lib/editor/couple-photos";
+import type { PhotoCrop } from "@/lib/editor/photo-fit";
+import { draftFrames } from "@/lib/publish/frames";
+import { FramePreview, PhotoAdjust } from "../photo-adjust";
 import { ASKABLE_QUESTIONS, draftPeople, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import type { MusicPlayer } from "@/lib/engine/music-player";
@@ -298,7 +302,67 @@ function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
             </RadioPrimitive.Root>
           </div>
         ))}
+      <FitPhotos draft={draft} update={update} urls={urls} />
     </section>
+  );
+}
+
+/** Each framed photo as guests will see it, with the photo editor to move and zoom it. */
+function FitPhotos({
+  draft,
+  update,
+  urls,
+}: Pick<StepProps, "draft" | "update"> & { urls: Record<string, string | undefined> }) {
+  const { extrasCopy } = useText(editorText);
+  const spots = draftFrames(draft);
+  if (spots.length === 0) return null;
+  const save = (id: string, crop: PhotoCrop | null) =>
+    update((current) => {
+      const crops = { ...current.couplePhotos.crops };
+      if (crop) crops[id] = crop;
+      else delete crops[id];
+      return { ...current, couplePhotos: { ...current.couplePhotos, crops } };
+    });
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-1">
+        <h3 className="text-sm font-semibold text-ink">{extrasCopy.fitHeading}</h3>
+        <p className="text-sm text-ink-muted">{extrasCopy.fitHint}</p>
+      </div>
+      <ul className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
+        {spots.map((spot, i) => {
+          const url = urls[spot.id];
+          const aspect = photoAspect(draft.photos, spot.id);
+          if (!url || !aspect) return null;
+          const crop = draft.couplePhotos.crops?.[spot.id];
+          const frameName = extrasCopy.coupleFrame(i + 1, spots.length);
+          return (
+            <li
+              key={`${spot.id}-${i}`}
+              className="flex items-center gap-3 rounded-lg border border-line bg-surface-2/60 p-2"
+            >
+              <span className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-night">
+                <FramePreview spot={spot} src={url} crop={crop} aspect={aspect} maxHeight="6rem" />
+              </span>
+              <span className="flex min-w-0 flex-col items-start gap-2">
+                <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
+                  {frameName}
+                  {crop && <Badge tone="gold">{extrasCopy.adjusted}</Badge>}
+                </span>
+                <PhotoAdjust
+                  spot={spot}
+                  src={url}
+                  aspect={aspect}
+                  crop={crop}
+                  frameName={frameName}
+                  onSave={(next) => save(spot.id, next)}
+                />
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }
 
