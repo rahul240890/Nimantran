@@ -10,8 +10,10 @@ import {
   muhuratName,
   newDraft,
   withCategory,
+  withGalleryChoice,
   type InviteDraft,
 } from "./draft";
+import { CATEGORIES } from "@/lib/categories/catalog";
 import { draftProblems, parseDraft, stepErrors } from "./draft-checks";
 
 function complete(): InviteDraft {
@@ -376,5 +378,29 @@ describe("muhurat", () => {
       functions: { ...draft.functions, wedding: { ...draft.functions.wedding, endTime: "25:00" } },
     };
     expect(parseDraft(bad)?.functions.wedding.endTime).toBe("");
+  });
+});
+
+describe("designs that suit the occasion", () => {
+  it("drops a wedding theme and card when the occasion becomes a birthday", () => {
+    const wedding = { ...newDraft("paithani"), suite: "peshwai-wada" as const };
+    const birthday = withCategory(wedding, "birthday");
+    expect(birthday.suite).toBeNull();
+    expect(birthday.templateId).toBe(CATEGORIES.birthday.templates[0]);
+    // A choice that suits the new occasion stays
+    const haldi = withCategory({ ...newDraft("marigold"), suite: "kayal" }, "haldi");
+    expect(haldi.suite).toBe("kayal");
+    expect(haldi.templateId).toBe("marigold");
+  });
+
+  it("opens a theme on an occasion it is painted for", () => {
+    const draft = withGalleryChoice(newDraft(), {
+      category: "party",
+      tradition: null,
+      suite: "rajwada-bagh",
+      template: null,
+    });
+    expect(draft.categoryId).toBe("wedding");
+    expect(draft.suite).toBe("rajwada-bagh");
   });
 });

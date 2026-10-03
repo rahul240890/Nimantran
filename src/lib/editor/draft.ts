@@ -16,7 +16,7 @@ import {
   type TemplateId,
 } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
-import type { SuiteId } from "@/lib/suites/catalog";
+import { suiteHome, suiteSuits, type SuiteId } from "@/lib/suites/catalog";
 import type { InviteFormat } from "./formats";
 import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
@@ -131,14 +131,23 @@ export function draftPeople(draft: InviteDraft): People {
 /**
  * Switches the occasion. The functions it plans are ticked and the rest unticked, but
  * every date, venue and word already typed is kept, so switching back loses nothing.
+ * A theme or card painted for another occasion gives way to the new occasion's own.
  */
 export function withCategory(draft: InviteDraft, categoryId: CategoryId): InviteDraft {
   if (draft.categoryId === categoryId) return draft;
-  const planned: readonly FunctionId[] = CATEGORIES[categoryId].functions.planned;
+  const category = CATEGORIES[categoryId];
+  const planned: readonly FunctionId[] = category.functions.planned;
   const functions = Object.fromEntries(
     FUNCTION_IDS.map((id) => [id, { ...draft.functions[id], included: planned.includes(id) }]),
   ) as Record<FunctionId, EventFunction>;
-  return { ...draft, categoryId, functions };
+  const suite = draft.suite && !suiteSuits(draft.suite, categoryId) ? null : draft.suite;
+  const pack =
+    draft.tradition.id && allowsTradition(category) ? TRADITIONS[draft.tradition.id] : null;
+  const cards: readonly TemplateId[] = [...category.templates, ...(pack?.templates ?? [])];
+  const templateId = cards.includes(draft.templateId)
+    ? draft.templateId
+    : (category.templates[0] ?? draft.templateId);
+  return { ...draft, categoryId, functions, suite, templateId };
 }
 
 /**
@@ -157,7 +166,12 @@ export function withGalleryChoice(
     format?: InviteFormat;
   },
 ): InviteDraft {
-  let next = choice.category ? withCategory(draft, choice.category) : draft;
+  // An old or hand-made link can pair a theme with an occasion it isn't painted for
+  const category =
+    choice.category && suiteSuits(choice.suite, choice.category)
+      ? choice.category
+      : choice.category && suiteHome(choice.suite);
+  let next = category ? withCategory(draft, category) : draft;
   if (next.tradition.id !== choice.tradition) {
     next = { ...next, tradition: { ...noTradition, id: choice.tradition } };
   }
