@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useId, useMemo, useState, useTransition, type FormEvent } from "react";
 import { addGuests, updateGuest } from "@/actions/guests";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
@@ -17,7 +16,8 @@ import { normalizePhone } from "@/lib/auth/phone";
 import { GUEST_RULES, parseGuestList, type HostFunction, type HostGuest } from "@/lib/guests/list";
 import { useText } from "@/i18n/client";
 import { dashboardText } from "@/i18n/copy/dashboard";
-import { editorText } from "@/i18n/copy/editor";
+import { FunctionPicker, toStored } from "./guest-fields";
+import { GuestImport } from "./guest-import";
 
 function PartySize({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const copy = useText(dashboardText).dashboardCopy.form;
@@ -54,55 +54,6 @@ function PartySize({ value, onChange }: { value: number; onChange: (value: numbe
     </div>
   );
 }
-
-function FunctionPicker({
-  functions,
-  value,
-  onChange,
-  error,
-}: {
-  functions: HostFunction[];
-  value: string[];
-  onChange: (value: string[]) => void;
-  error: boolean;
-}) {
-  const copy = useText(dashboardText).dashboardCopy.form;
-  const { functionCopy } = useText(editorText);
-  const id = useId();
-  if (functions.length < 2) return null;
-  return (
-    <fieldset aria-describedby={`${id}-hint`} className="flex flex-col gap-2">
-      <legend className="mb-2 font-semibold">{copy.functions}</legend>
-      <div className="grid gap-1 sm:grid-cols-2">
-        {functions.map((fn) => (
-          <Checkbox
-            key={fn.id}
-            label={functionCopy[fn.kind].name}
-            checked={value.includes(fn.id)}
-            invalid={error}
-            onCheckedChange={(checked) =>
-              onChange(
-                checked === true
-                  ? functions.filter((f) => value.includes(f.id) || f.id === fn.id).map((f) => f.id)
-                  : value.filter((item) => item !== fn.id),
-              )
-            }
-          />
-        ))}
-      </div>
-      <p
-        id={`${id}-hint`}
-        className={error ? "text-sm font-medium text-danger" : "text-sm text-ink-muted"}
-      >
-        {error ? copy.functionsRequired : copy.functionsHint}
-      </p>
-    </fieldset>
-  );
-}
-
-/** Everything invited to maps to an empty list, which the database reads as "all". */
-const toStored = (functions: HostFunction[], picked: string[]) =>
-  picked.length === functions.length ? [] : picked;
 
 type SingleProps = {
   inviteId: string;
@@ -318,15 +269,18 @@ function PastedList({ inviteId, functions, onDone }: Omit<SingleProps, "guest">)
   );
 }
 
-/** Adding guests one at a time or as a pasted list, or editing one guest. */
+/** Adding guests one at a time, imported or as a pasted list, or editing one guest. */
 export function GuestFormDialog({
   inviteId,
   functions,
+  guests,
   guest,
   onDone,
 }: {
   inviteId: string;
   functions: HostFunction[];
+  /** Everyone on the list already, so an import can skip them. */
+  guests: HostGuest[];
   guest?: HostGuest;
   onDone: () => void;
 }) {
@@ -339,10 +293,19 @@ export function GuestFormDialog({
         <Tabs defaultValue="one">
           <TabsList>
             <TabsTrigger value="one">{copy.oneTab}</TabsTrigger>
+            <TabsTrigger value="import">{copy.importTab}</TabsTrigger>
             <TabsTrigger value="paste">{copy.pasteTab}</TabsTrigger>
           </TabsList>
           <TabsContent value="one">
             <SingleGuest inviteId={inviteId} functions={functions} onDone={onDone} />
+          </TabsContent>
+          <TabsContent value="import">
+            <GuestImport
+              inviteId={inviteId}
+              functions={functions}
+              guests={guests}
+              onDone={onDone}
+            />
           </TabsContent>
           <TabsContent value="paste">
             <PastedList inviteId={inviteId} functions={functions} onDone={onDone} />

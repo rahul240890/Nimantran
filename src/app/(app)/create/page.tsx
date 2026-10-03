@@ -10,6 +10,7 @@ import { getText } from "@/i18n/server";
 import { isQualityChoice } from "@/content/engine-review";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
+import { hostStore } from "@/lib/invites/hosts";
 import { inviteStore } from "@/lib/invites/store";
 import { isSuiteId } from "@/lib/suites/catalog";
 import { isTemplateId } from "@/lib/templates/ids";
@@ -51,6 +52,11 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     redirect(`/sign-in?next=${encodeURIComponent(`/create?invite=${wanted}`)}`);
   }
   const store = inviteStore();
+  // A co-host who runs only the guests goes to the guest list; the card stays the owner's
+  if (wanted && account && inviteId.safeParse(wanted).success) {
+    const mine = await hostStore()?.myAccess(account, wanted);
+    if (mine?.access === "guests") redirect(`/invites/${wanted}`);
+  }
   const initialInvite =
     wanted && account && store && inviteId.safeParse(wanted).success
       ? await store.get(account, wanted)

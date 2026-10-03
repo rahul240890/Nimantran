@@ -17,7 +17,8 @@ import {
   inviteWhere,
   occasionName,
 } from "@/lib/publish/describe";
-import { inviteUrl, mapsUrl } from "@/lib/publish/links";
+import { guestGuide } from "@/lib/publish/event-day";
+import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 import { storyFunctions } from "@/lib/publish/story";
 
@@ -61,13 +62,10 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
 
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {
     const { kind } = told;
-    const fn = draft.functions[kind];
     const entry = entries.find((item) => item.uid.startsWith(`${invite.id}-${kind}@`));
     return {
       ...told,
-      address: fn.address.trim(),
-      dressCode: fn.dressCode.trim(),
-      mapsUrl: fn.venue.trim() || fn.address.trim() ? mapsUrl(fn.venue, fn.address) : null,
+      ...guestGuide(draft, kind),
       googleCalendarUrl: entry ? googleCalendarUrl(entry) : null,
       icsUrl: entry ? `/i/${invite.slug}/calendar?function=${kind}` : null,
     };

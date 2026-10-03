@@ -113,10 +113,22 @@ test.describe("host dashboard", () => {
     await cohosts.getByRole("button", { name: "Invite a co-host" }).click();
     const inviteDialog = page.getByRole("dialog", { name: "Invite a co-host" });
     await inviteDialog.getByRole("textbox", { name: /Who is it for/ }).fill("Anaya's family");
+    // This one looks after the guests only, and the link goes straight to their WhatsApp
+    await inviteDialog.getByRole("radio", { name: "Guests and replies" }).check();
+    await inviteDialog.getByRole("textbox", { name: /Their WhatsApp number/ }).fill("123");
     await inviteDialog.getByRole("button", { name: "Make link" }).click();
+    await expect(inviteDialog.getByText("That doesn't look like a phone number")).toBeVisible();
+    await inviteDialog.getByRole("textbox", { name: /Their WhatsApp number/ }).fill("98765 43210");
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await inviteDialog.getByRole("button", { name: "Make link" }).click();
+    await expect(inviteDialog.getByRole("link", { name: "Send on WhatsApp" })).toHaveAttribute(
+      "href",
+      /^https:\/\/wa\.me\/919876543210\?text=/,
+    );
     const joinLink = (await inviteDialog.getByTestId("cohost-link").textContent())!.trim();
     await inviteDialog.getByRole("button", { name: "Close" }).click();
     await expect(cohosts.getByText("Link for Anaya's family")).toBeVisible();
+    await expect(cohosts.getByText("Guests and replies · For +919876543210")).toBeVisible();
 
     const cohostContext = await browser.newContext({
       baseURL: info.project.use.baseURL,
@@ -128,6 +140,7 @@ test.describe("host dashboard", () => {
     await expect(
       cohost.getByRole("heading", { name: "Help run Kabir & Anaya's invitation" }),
     ).toBeVisible();
+    await expect(cohost.getByText(/The card stays as they made it/)).toBeVisible();
     expect(await noOverflow(cohost)).toBe(true);
     await cohost.getByRole("link", { name: "Sign in to accept" }).click();
     await signIn(cohost, numberFor(info).replace(/^8/, "7"));
@@ -138,6 +151,12 @@ test.describe("host dashboard", () => {
     await expect(
       cohost.getByText("Only the person who created the invite can add co-hosts."),
     ).toBeVisible();
+    // Guests only: the guest list, but not the card
+    await expect(cohost.getByText("You're looking after the guests")).toBeVisible();
+    await expect(cohost.getByRole("link", { name: "Edit invite" })).toHaveCount(0);
+    const dashboardUrl = cohost.url();
+    await cohost.goto(`/create?invite=${dashboardUrl.split("/").pop()}`);
+    await expect(cohost).toHaveURL(dashboardUrl);
     expect(await noOverflow(cohost)).toBe(true);
     expect((await axe(cohost).analyze()).violations).toEqual([]);
 
@@ -146,11 +165,98 @@ test.describe("host dashboard", () => {
     await expect(cohost.getByText("This link has already been used")).toBeVisible();
     await cohost.goto("/invites");
     await expect(cohost.getByText("Co-host", { exact: true })).toBeVisible();
-    await cohostContext.close();
 
+    // The owner lets them edit the invite too
     await page.reload();
     await expect(cohosts.getByText("Anaya's family")).toBeVisible();
+    const access = cohosts.getByRole("combobox", { name: /can do/ });
+    await expect(access).toHaveText(/Guests and replies/);
+    await access.click();
+    await page.getByRole("option", { name: "Edits the invite" }).click();
+    await expect(page.getByText("Updated", { exact: true })).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
+    await cohost.goto(dashboardUrl);
+    await expect(cohost.getByRole("link", { name: "Edit invite" })).toBeVisible();
+    await expect(cohost.getByText("You're looking after the guests")).toHaveCount(0);
+    await cohostContext.close();
+  });
+
+  test("hosts import guests from a sheet and see who opened their link", async ({
+    page,
+    browser,
+  }, info) => {
+    test.slow();
+    await writeInvite(page, numberFor(info), ["Dev", "Tara"]);
+    await publish(page, "dev-weds-tara");
+    await page.getByRole("link", { name: "Open guest list" }).click();
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    const dialog = page.getByRole("dialog", { name: "Add guests" });
+    await dialog.getByRole("textbox", { name: /^Name/ }).fill("Masi");
+    await dialog.getByRole("textbox", { name: /WhatsApp number/ }).fill("98111 22222");
+    await dialog.getByRole("button", { name: "Add guest" }).click();
+    await expect(page.getByText("Guest added", { exact: true })).toBeVisible();
+
+    // A sheet from Excel or Google Sheets, saved as CSV
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    await dialog.getByRole("tab", { name: "Import" }).click();
+    await expect(dialog.getByRole("button", { name: "Choose a file" })).toBeVisible();
+    await dialog.locator('input[type="file"]').setInputFiles({
+      name: "guests.csv",
+      mimeType: "text/csv",
+      buffer: Buffer.from(
+        "Guest Name,Mobile,Side,People\nSharma uncle,98765 43210,Bride,4\nMasi ji,+91 98111 22222,Bride,2\nDadi,,Groom,1\n",
+      ),
+    });
+    await expect(dialog.getByText("From guests.csv")).toBeVisible();
+    const rows = dialog.getByTestId("import-rows");
+    await expect(rows.getByRole("listitem")).toHaveCount(3);
+    // Masi's number is on the list already, so she starts unticked
+    await expect(rows.getByRole("listitem").filter({ hasText: "Masi ji" })).toContainText(
+      "Already on your list",
+    );
+    await expect(dialog.getByText("2 of 3 selected")).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await dialog.getByRole("button", { name: "Add 2 guests" }).click();
+    await expect(
+      page.getByText("2 guests added, each with a personal link", { exact: true }),
+    ).toBeVisible();
+    const list = page.getByTestId("guest-list");
+    await expect(list.getByRole("listitem").filter({ hasText: /^Sharma uncle/ })).toContainText(
+      "Bride",
+    );
+
+    const opens = page.getByRole("region", { name: "Who's opened it" });
+    await expect(opens).toContainText("Nobody has opened their personal link yet");
+
+    // Sharma uncle opens his personal link
+    await page.getByRole("button", { name: "Actions for Sharma uncle" }).click();
+    const send = page.getByRole("menuitem", { name: "Send invitation" });
+    const wa = new URL((await send.getAttribute("href"))!);
+    const personal = new URL(/https?:\/\/\S+\?g=[0-9a-f]+/.exec(wa.searchParams.get("text")!)![0]);
+    await page.keyboard.press("Escape");
+    const guestContext = await browser.newContext({
+      baseURL: info.project.use.baseURL,
+      viewport: info.project.use.viewport,
+      reducedMotion: "reduce",
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(`${personal.pathname}${personal.search}&quality=2d`);
+    await expect(guest.locator("#main p").filter({ hasText: /^Dear/ }).first()).toContainText(
+      "Sharma uncle",
+    );
+    await guestContext.close();
+
+    await page.reload();
+    await expect(opens.getByTestId("recent-opens")).toContainText("Sharma uncle");
+    await expect(opens).toContainText("No reply yet");
+    await page.getByRole("button", { name: /^Opened, no reply/ }).click();
+    await expect(page.getByText("1 of 3 guests")).toBeVisible();
+    await expect(list.getByRole("listitem").first()).toContainText(/Opened .*ago/);
+    expect(await noOverflow(page)).toBe(true);
+    // Clicking the filter scrolls it to just under the sticky header; check from the top
+    await page.evaluate(() => window.scrollTo(0, 0));
+    expect((await axe(page).analyze()).violations).toEqual([]);
   });
 
   test("hosts schedule a send, their calendar link opens the list, and they mark it sent", async ({
@@ -173,7 +279,7 @@ test.describe("host dashboard", () => {
     await plan.getByRole("radio", { name: /Reminder/ }).check();
     await plan.getByRole("combobox", { name: /^For/ }).click();
     await page.getByRole("option", { name: "Haldi" }).click();
-    // The list fades out before it leaves the page
+    // Let the list finish closing, or axe catches it mid-animation without its label
     await expect(page.getByRole("listbox")).toHaveCount(0);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await plan.getByRole("button", { name: "Schedule", exact: true }).click();

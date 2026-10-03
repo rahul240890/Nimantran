@@ -89,7 +89,9 @@ async function JoinCard({
         <h1 className="font-display text-[2rem] leading-[1.08] break-words sm:text-[2.6rem]">
           {joinCopy.title(names)}
         </h1>
-        <p className="text-ink-muted">{joinCopy.body(preview.invitedBy, occasion)}</p>
+        <p className="text-ink-muted">
+          {joinCopy.body(preview.invitedBy, occasion, preview.access)}
+        </p>
         {preview.label && (
           <p className="text-sm font-semibold">{joinCopy.forLabel(preview.label)}</p>
         )}

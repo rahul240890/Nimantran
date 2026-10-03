@@ -6,6 +6,7 @@ import {
   guestState,
   guestsCsv,
   parseGuestList,
+  recentOpens,
   sortGuests,
   type CsvLabels,
   type HostGuest,
@@ -21,6 +22,8 @@ const guest = (over: Partial<HostGuest> = {}): HostGuest => ({
   functionIds: [],
   selfAdded: false,
   openedAt: null,
+  lastOpenedAt: null,
+  openCount: 0,
   remindedAt: null,
   createdAt: "2026-09-26T00:00:00Z",
   replies: [],
@@ -94,10 +97,24 @@ describe("guest list", () => {
     ) => names(filterGuests(all, { filter, query, functionId: fn }));
     expect(by("waiting")).toEqual(["Kaka", "Didi"]);
     expect(by("not-opened")).toEqual(["Kaka"]);
+    expect(by("seen")).toEqual(["Didi"]);
     expect(by("all", "bride")).toEqual(["Nani"]);
     expect(by("all", "rohan meh")).toEqual(["Rohan Mehta"]);
     expect(by("all", "98123")).toEqual(["Nani"]);
     expect(by("all", "", "h")).toEqual(["Nani", "Rohan Mehta", "Didi"]);
+  });
+
+  it("lists who opened their link most recently", () => {
+    const seen = (name: string, lastOpenedAt: string, over: Partial<HostGuest> = {}) =>
+      guest({ name, openedAt: lastOpenedAt, lastOpenedAt, openCount: 1, ...over });
+    const list = [
+      seen("Early", "2026-09-27T08:00:00Z"),
+      seen("Late", "2026-09-28T08:00:00Z"),
+      seen("Walk-in", "2026-09-29T08:00:00Z", { selfAdded: true }),
+      kaka,
+    ];
+    expect(recentOpens(list).map((item) => item.name)).toEqual(["Late", "Early"]);
+    expect(recentOpens(list, 1).map((item) => item.name)).toEqual(["Late"]);
   });
 
   it("puts the newest replies first, then the rest by name", () => {

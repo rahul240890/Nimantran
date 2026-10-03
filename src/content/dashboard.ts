@@ -15,6 +15,10 @@ export const dashboardCopy = {
   share: "Share",
   edit: "Edit invite",
   open: "Open invitation",
+  guestsOnly: {
+    title: "You're looking after the guests",
+    body: "The family asked you to run the guest list and replies. Only they, or a co-host who edits, can change the card itself.",
+  },
   notLive: {
     title: "This invite isn't live yet",
     body: "You can build your guest list now. Personal links and reminders work once it's published.",
@@ -52,6 +56,7 @@ export const dashboardCopy = {
       maybe: "Maybe",
       declined: "Can't come",
       waiting: "Waiting",
+      seen: "Opened, no reply",
       "not-opened": "Not opened",
     },
     functionLabel: "Celebration",
@@ -76,6 +81,9 @@ export const dashboardCopy = {
     party: (count: number) => plural(count, "person", "people"),
     selfAdded: "Replied from the shared link",
     opened: "Opened",
+    openedWhen: (when: string) => `Opened ${when}`,
+    visits: (count: number) => (count > 1 ? ` · ${count} visits` : ""),
+    firstOpened: (when: string) => `First opened ${when}`,
     notOpened: "Not opened",
     reminded: (when: string) => `Reminded ${when}`,
     notInvited: "Not invited",
@@ -104,6 +112,7 @@ export const dashboardCopy = {
     editTitle: "Edit guest",
     oneTab: "One guest",
     pasteTab: "Paste a list",
+    importTab: "Import",
     name: "Name",
     namePlaceholder: "Sharma uncle, Meera Iyer…",
     nameRequired: "Enter a name",
@@ -142,6 +151,53 @@ export const dashboardCopy = {
     added: (count: number) => (count === 1 ? "Guest added" : `${count} guests added`),
     saved: "Guest saved",
     failed: "Couldn't save. Check your connection and try again.",
+  },
+
+  importer: {
+    intro:
+      "Bring guests in from your phone's contacts, an Excel or CSV sheet, or a contacts file. Each one gets their own personal link.",
+    contacts: "Choose from contacts",
+    contactsHint: "Opens your phone's contacts. Nothing is shared until you add guests.",
+    contactsFailed: "Couldn't open your contacts. Try a file instead.",
+    file: "Choose a file",
+    fileHint: "Excel (.xlsx), CSV or contacts (.vcf), up to 2,000 guests.",
+    noContactsHint:
+      "On an iPhone, open Contacts, select people, tap Share and save the contacts file. Then choose it here.",
+    reading: "Reading your file…",
+    unreadable: "We couldn't read that file. Save it as Excel (.xlsx) or CSV and try again.",
+    oldExcel: "That's an older Excel file. In Excel choose Save As, then Excel Workbook (.xlsx).",
+    empty: "No guests found in that file.",
+    from: (source: string) => `From ${source}`,
+    contactsSource: "your contacts",
+    another: "Choose another",
+    nameColumn: "Name column",
+    phoneColumn: "Number column",
+    noColumn: "None",
+    firstAndLast: (first: string, last: string) => `${first} + ${last}`,
+    column: (label: string) => `Column ${label}`,
+    selectAll: "Select all",
+    summary: (picked: number, total: number) => `${picked} of ${total} selected`,
+    duplicate: "Already on your list",
+    noName: "No name",
+    badPhone: "Number not recognised",
+    noPhone: "No number",
+    party: (count: number) => (count > 1 ? `${count} people` : ""),
+    add: (count: number) => (count ? `Add ${plural(count, "guest", "guests")}` : "Add guests"),
+    adding: (done: number, total: number) => `Adding ${done} of ${total}…`,
+    added: (count: number) =>
+      `${plural(count, "guest", "guests")} added, each with a personal link`,
+    partial: (done: number, total: number) =>
+      `${done} of ${total} guests added. Check your connection and add the rest again.`,
+    nothingPicked: "Tick at least one guest to add",
+  },
+
+  opens: {
+    heading: "Who's opened it",
+    body: "Everyone you send a personal link to shows up here when they open it.",
+    none: "Nobody has opened their personal link yet. Send links from the guest list.",
+    noGuests: "Add guests to send each one a personal link and see when they open it.",
+    replied: "Replied",
+    noReply: "No reply yet",
   },
 
   removeGuest: {
@@ -255,7 +311,7 @@ export const dashboardCopy = {
 
   hosts: {
     heading: "Co-hosts",
-    body: "Both families can run this invite together: edit it, add guests and see every reply.",
+    body: "Family can run this invite with you. Choose what each person can do.",
     you: "You",
     owner: "Created the invite",
     cohost: "Co-host",
@@ -267,12 +323,35 @@ export const dashboardCopy = {
     label: "Who is it for?",
     labelPlaceholder: "Meera's family, Arjun's brother…",
     labelHint: "Shown beside their name.",
+    accessLabel: "What can they do?",
+    access: {
+      edit: {
+        name: "Invite and guests",
+        hint: "Change the card, functions and photos, publish, and run the guest list.",
+        short: "Edits the invite",
+      },
+      guests: {
+        name: "Guests and replies",
+        hint: "Add guests, send reminders and see every reply. The card stays as you made it.",
+        short: "Guests and replies",
+      },
+    },
+    changeAccess: (name: string) => `What ${name} can do`,
+    accessChanged: "Updated",
+    phone: "Their WhatsApp number",
+    phoneHint: "The link opens in a chat with them. Leave it empty to choose the chat yourself.",
+    phoneInvalid: "That doesn't look like a phone number",
+    seats: (used: number, limit: number) => `${used} of ${limit} co-host${limit === 1 ? "" : "s"}`,
+    fullTitle: (limit: number) => `This edition includes ${limit} co-host${limit === 1 ? "" : "s"}`,
+    fullBody: "Upgrade the invite for more, or withdraw a link you no longer need.",
+    upgrade: "See editions",
     create: "Make link",
     creating: "Making link…",
     createFailed: "Couldn't make a link. Try again.",
     pending: "Waiting to join",
     pendingFor: (label: string) => (label ? `Link for ${label}` : "Co-host link"),
     whatsapp: "Send on WhatsApp",
+    sentTo: (phone: string) => `For ${phone}`,
     copy: "Copy link",
     copied: "Link copied",
     withdraw: "Withdraw",
@@ -322,14 +401,19 @@ export const joinCopy = {
   metaTitle: "Join as co-host",
   eyebrow: "Co-host invitation",
   title: (names: string) => `Help run ${names}'s invitation`,
-  body: (who: string, occasion: string) =>
-    `${who || "The family"} asked you to help with the ${occasion.toLowerCase()} invitation. As a co-host you can edit the invite, add guests, send reminders and see every reply.`,
+  body: (who: string, occasion: string, access: "edit" | "guests") =>
+    `${who || "The family"} asked you to help with the ${occasion.toLowerCase()} invitation. ${
+      access === "edit"
+        ? "As a co-host you can edit the invite, add guests, send reminders and see every reply."
+        : "As a co-host you can add guests, send reminders and see every reply. The card stays as they made it."
+    }`,
   forLabel: (label: string) => `Added as: ${label}`,
   accept: "Accept and open guest list",
   signIn: "Sign in to accept",
   signInNote: "Use your mobile number or Google. It takes a moment.",
   accepting: "Joining…",
   failed: "Couldn't accept just now. Try again.",
+  full: "This invite already has all the co-hosts its edition includes. Ask the family to upgrade it or remove someone, then open this link again.",
   usedTitle: "This link has already been used",
   usedBody:
     "Co-host links work once. If you've already joined, the invite is in My invites. Otherwise ask the family for a new link.",

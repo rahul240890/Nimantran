@@ -132,7 +132,11 @@ export function DatePicker({
         </button>
       </PopoverTrigger>
       {/* Seven 44px days need 308px, so on the narrowest phones the calendar runs edge to edge */}
-      <PopoverContent collisionPadding={0} className="max-w-screen p-[5px] min-[360px]:p-2 sm:p-3">
+      <PopoverContent
+        collisionPadding={0}
+        // A short phone may have room for the calendar neither above nor below the field
+        className="max-h-(--radix-popover-content-available-height) max-w-screen overflow-y-auto p-[5px] min-[360px]:p-2 sm:p-3"
+      >
         <Calendar
           autoFocus
           selected={value}

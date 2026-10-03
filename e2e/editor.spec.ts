@@ -245,8 +245,9 @@ test.describe("invite editor", () => {
     // Typing or a click that lands before the editor has hydrated is lost, so try again
     await expect(async () => {
       await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
-      if (!(await arjun.isVisible()))
+      if (!(await arjun.isVisible())) {
         await page.locator("summary", { hasText: "Add family details" }).click();
+      }
       await expect(arjun).toBeVisible({ timeout: 3_000 });
     }).toPass({ timeout: 30_000 });
     await arjun.getByRole("radio", { name: "Son of" }).click();

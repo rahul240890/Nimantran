@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles } from "lucide-react";
+import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
+import { Opens } from "./opens";
+import { PhotoWallCard } from "./photo-wall-card";
 import { Reminders } from "./reminders";
 import { ScheduledSends } from "./scheduled-sends";
 import type { DashboardView } from "./types";
@@ -25,7 +27,7 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
   );
 }
 
-/** The host's home for one invite: counts, the guest list, reminders and co-hosts. */
+/** The host's home for one invite: counts, the guest list, who opened it, reminders and co-hosts. */
 export async function GuestDashboard({
   view,
   openSend,
@@ -82,7 +84,7 @@ export async function GuestDashboard({
                 </Link>
               </Button>
             )}
-            {view.plan && view.plan !== "bundle" && (
+            {view.plan && view.plan !== "bundle" && view.role === "owner" && (
               <Button asChild size="sm" variant="secondary">
                 <Link href={`/invites/${view.id}/edition`}>
                   <Sparkles aria-hidden />
@@ -90,12 +92,14 @@ export async function GuestDashboard({
                 </Link>
               </Button>
             )}
-            <Button asChild size="sm" variant="secondary">
-              <Link href={`/create?invite=${view.id}`}>
-                <Pencil aria-hidden />
-                {copy.edit}
-              </Link>
-            </Button>
+            {view.canEdit && (
+              <Button asChild size="sm" variant="secondary">
+                <Link href={`/create?invite=${view.id}`}>
+                  <Pencil aria-hidden />
+                  {copy.edit}
+                </Link>
+              </Button>
+            )}
             {view.url && (
               <Button asChild size="sm" variant="ghost">
                 <a href={view.url} target="_blank" rel="noopener noreferrer">
@@ -108,7 +112,20 @@ export async function GuestDashboard({
         </div>
       </div>
 
-      {!view.live && (
+      {!view.canEdit && (
+        <div
+          role="note"
+          className="flex items-start gap-3 rounded-lg border border-line bg-surface-2/60 p-5"
+        >
+          <Users aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />
+          <div className="flex flex-col gap-0.5">
+            <p className="font-semibold">{copy.guestsOnly.title}</p>
+            <p className="text-sm text-ink-muted">{copy.guestsOnly.body}</p>
+          </div>
+        </div>
+      )}
+
+      {!view.live && view.canEdit && (
         <div className="flex flex-col gap-3 rounded-lg border border-marigold/45 bg-marigold/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
             <Sparkles aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />
@@ -184,8 +201,10 @@ export async function GuestDashboard({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-start">
         <GuestList view={view} />
         <div className="flex min-w-0 flex-col gap-6">
+          <Opens view={view} />
           <ScheduledSends view={view} openSend={openSend} />
           <Reminders view={view} />
+          <PhotoWallCard inviteId={view.id} />
           <Cohosts view={view} />
         </div>
       </div>
