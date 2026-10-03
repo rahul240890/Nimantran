@@ -1365,11 +1365,85 @@ const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
   emerald: "rajwada-bagh",
 };
 
-/** Whether a theme is painted for an occasion: wedding themes for the wedding journey. */
+/**
+ * The wedding journey: the wedding and its own functions, the categories a wedding theme is
+ * painted for. Every other occasion shows only the themes painted for it.
+ */
+export const WEDDING_JOURNEY = [
+  "wedding",
+  "engagement",
+  "roka",
+  "save-the-date",
+  "haldi",
+  "mehendi",
+  "sangeet",
+  "reception",
+] as const satisfies readonly CategoryId[];
+type JourneyId = (typeof WEDDING_JOURNEY)[number];
+
+export function isWeddingJourney(category: CategoryId): category is JourneyId {
+  return (WEDDING_JOURNEY as readonly CategoryId[]).includes(category);
+}
+
+/** Wedding themes painted for one part of the journey only. */
+const WEDDING_FIT: Partial<Record<SuiteId, readonly JourneyId[]>> = {
+  "love-letter": ["save-the-date"],
+  "roka-shagun": ["roka", "engagement"],
+  "jazz-lounge": ["engagement", "sangeet", "reception"],
+  // A function within the wedding itself
+  "chooda-ceremony": ["wedding"],
+  "mameru-bandhani": ["wedding"],
+  "baraat-band": ["wedding"],
+  // A church wedding has no haldi, mehendi, sangeet or roka
+  chapel: ["wedding", "engagement", "save-the-date", "reception"],
+};
+
+/**
+ * Wedding themes from families that don't hold a roka, a north Indian custom: Muslim,
+ * Christian, Parsi, south Indian and Bengali themes.
+ */
+const NO_ROKA: readonly SuiteId[] = [
+  "noor-bagh",
+  "sufi-raat",
+  "char-bagh",
+  "riad",
+  "parsi-chalk",
+  "kayal",
+  "tanjore",
+  "mysuru",
+  "kalamkari",
+  "temple-pond",
+  "kovil-corridor",
+  "arati-mandap",
+  "hampi-ruins",
+  "coorg-estate",
+  "rajbari",
+  "zamindar-bari",
+  "pattachitra",
+  "chai-bagan",
+];
+
+/** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */
+export function weddingFit(suite: SuiteId): readonly JourneyId[] {
+  if (SUITES[suite].occasions) return [];
+  return (
+    WEDDING_FIT[suite] ??
+    WEDDING_JOURNEY.filter((step) => step !== "roka" || !NO_ROKA.includes(suite))
+  );
+}
+
+/**
+ * Whether a theme is painted for an occasion: wedding themes for the steps of the wedding
+ * journey they suit, every other theme for its own occasions only.
+ */
 export function suiteSuits(suite: SuiteId, category: CategoryId): boolean {
-  const { occasions } = SUITES[suite];
-  if (occasions) return occasions.includes(category);
-  return !OCCASION_SUITES.some((id) => SUITES[id].occasions!.includes(category));
+  if (isWeddingJourney(category)) return weddingFit(suite).includes(category);
+  return Boolean(SUITES[suite].occasions?.includes(category));
+}
+
+/** The occasion a theme opens with: its own, else the first step of the journey it suits. */
+export function suiteHome(suite: SuiteId): CategoryId {
+  return SUITES[suite].occasions?.[0] ?? weddingFit(suite)[0] ?? "wedding";
 }
 
 /** Themes painted for one occasion beyond weddings. */
@@ -1387,15 +1461,18 @@ export function suiteFor(input: {
 }): SuiteId {
   if (input.suite) return input.suite;
   const category = input.category;
-  if (category) {
-    const own = OCCASION_SUITES.find((id) => SUITES[id].occasions!.includes(category));
-    if (own) return own;
+  if (category && !isWeddingJourney(category)) {
+    // An occasion's own theme, else the plain card colours: never a wedding's
+    return OCCASION_SUITES.find((id) => SUITES[id].occasions!.includes(category)) ?? "classic";
   }
+  // On the wedding journey, only a theme painted for this step of it
+  const fits = (id: SuiteId | undefined) => id && (!category || suiteSuits(id, category));
   if (input.tradition) {
     const match = SUITE_IDS.find((id) => SUITES[id].traditions.includes(input.tradition!));
-    if (match) return match;
+    if (fits(match)) return match!;
   }
-  return TEMPLATE_SUITES[input.templateId] ?? "rajwada-bagh";
+  const own = TEMPLATE_SUITES[input.templateId];
+  return fits(own) ? own! : "rajwada-bagh";
 }
 
 type PageKind = "blessing" | "cover" | "family" | "reply" | FunctionId;

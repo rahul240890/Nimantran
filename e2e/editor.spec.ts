@@ -167,10 +167,9 @@ test.describe("invite editor", () => {
       "Pick the card your guests will open",
     );
     const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
-    await expect(designs.first()).toHaveAccessibleName(/Marigold Gate.*Suggested for roka/);
-    await expect(designs.filter({ hasText: "Kerala Kasavu" })).not.toHaveAccessibleName(
-      /Suggested/,
-    );
+    // Only the roka's own designs are offered, not a Kerala wedding card
+    await expect(designs.first()).toHaveAccessibleName(/Marigold Gate/);
+    await expect(designs.filter({ hasText: "Kerala Kasavu" })).toHaveCount(0);
     await next(page);
     await fillCouple(page);
     await next(page);
