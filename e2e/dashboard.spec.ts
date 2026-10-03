@@ -201,6 +201,8 @@ test.describe("host dashboard", () => {
     await plan.getByRole("radio", { name: /Reminder/ }).check();
     await plan.getByRole("combobox", { name: /^For/ }).click();
     await page.getByRole("option", { name: "Haldi" }).click();
+    // Let the list finish closing, or axe catches it half-gone without its label
+    await expect(page.getByRole("listbox")).toHaveCount(0);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await plan.getByRole("button", { name: "Schedule", exact: true }).click();
 
