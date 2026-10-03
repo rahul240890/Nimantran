@@ -9,6 +9,7 @@ import { storyBeats } from "@/lib/engine/story";
 import {
   cardFunctions,
   draftBlessing,
+  draftShowsScene,
   draftSuite,
   storyFamily,
   storyFunctions,
@@ -28,6 +29,8 @@ import { cn } from "@/lib/cn";
 import { applyPages, type DraftPages } from "@/lib/editor/pages";
 import { pageType, type PageType } from "@/lib/editor/type";
 import { Mail, Smartphone } from "lucide-react";
+import { OneScene } from "@/components/invitation/scene/one-scene";
+import { scenePage } from "@/lib/suites/scene";
 import { PagePreview } from "./page-preview";
 import { AiWording } from "./ai-wording";
 import { PageWords } from "./page-words";
@@ -96,6 +99,26 @@ export function PreviewStage({
   const type = useMemo(() => JSON.parse(typeKey) as PageType, [typeKey]);
   const couple = useCouplePhotos(draft, deferredCopy);
   const blessing = draftBlessing(draft);
+  // One Scene (pilot): the whole invitation on one painting instead of the pages
+  const scenePhotos = useCouplePhotos(draft, deferredCopy, true);
+  const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
+  const sceneView = scene && (
+    <div className={cn("flex min-h-0 flex-col items-center", mini ? className : "flex-1")}>
+      <div className="relative isolate aspect-[9/19] h-full max-h-full min-h-0 max-w-full overflow-hidden rounded-[2.2rem] border-[6px] border-night bg-night shadow-overlay">
+        <OneScene
+          suite={suite}
+          page={scene}
+          copy={deferredCopy}
+          lang={language}
+          functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
+          photos={scenePhotos}
+          reply={null}
+          type={type}
+          framed
+        />
+      </div>
+    </div>
+  );
   // The pages as the invite writes them, then with the host's own words and placement
   const written = useMemo(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
@@ -147,6 +170,7 @@ export function PreviewStage({
   const { raga } = draft.music;
   const template = useMemo(() => templateWithRaga(templateId, raga), [templateId, raga]);
 
+  if (mini && sceneView) return sceneView;
   if (mini) {
     return (
       <PagePreview
@@ -220,7 +244,9 @@ export function PreviewStage({
           />
         )}
       </div>
-      {view === "pages" ? (
+      {view === "pages" && sceneView ? (
+        sceneView
+      ) : view === "pages" ? (
         <PagePreview
           beats={listed}
           copy={deferredCopy}

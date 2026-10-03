@@ -10,6 +10,7 @@ import {
   SUITES,
   SUITE_IDS,
   hasGodAtTop,
+  isSceneTheme,
   pageLook,
   suiteFor,
   suitePreview,
@@ -74,7 +75,8 @@ describe("painted backgrounds", () => {
 
 describe("text areas", () => {
   it("give every painting a calm area tall and wide enough for its words", () => {
-    for (const id of SUITE_IDS) {
+    // A Scene theme's cover is its painting with the card, never a page with words
+    for (const id of SUITE_IDS.filter((suite) => !isSceneTheme(suite))) {
       for (const art of Object.keys(SUITES[id].images) as PageArt[]) {
         const area = textArea(id, art);
         expect(area, `${id} ${art}`).not.toBe(DEFAULT_AREA);

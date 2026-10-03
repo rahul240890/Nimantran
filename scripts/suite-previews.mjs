@@ -13,7 +13,9 @@ for (const theme of readdirSync(root)) {
   const cover = join(root, theme, "cover.webp");
   if (!existsSync(cover)) continue;
   const out = join(root, theme, "preview.jpg");
+  // A Scene theme's cover has its photo frame cut out; the preview fills it with ivory
   await sharp(cover)
+    .flatten({ background: "#f6ecd8" })
     .resize({ width: 480, height: 854, fit: "cover" })
     .jpeg({ quality: 78, mozjpeg: true })
     .toFile(out);

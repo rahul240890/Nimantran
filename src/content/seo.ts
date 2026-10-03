@@ -59,12 +59,12 @@ export const seoCopy = {
   footerInvitations: "Invitations",
   footerMore: "Designs and traditions",
   gallery: {
-    title: "3D wedding invitation designs",
+    title: "Invitation designs: Scenes, Stories, 3D cards",
     description:
-      "Twelve 3D invitation designs, from Rajasthani jharokhas to Tamil temple gold, each with its own raga. Share on WhatsApp and collect RSVPs.",
-    heading: "Invitation designs that open like a gate",
+      "Search every design by occasion, wedding tradition and kind: painted Scenes, Stories and 3D cards. Share on WhatsApp and collect RSVPs.",
+    heading: "Find your invitation design",
     intro:
-      "Six classic designs and six from India's regions, each drawn from geometry and set to its own raga. Pick one and make it yours.",
+      "Every design in one place. Search, or narrow by occasion, wedding tradition and kind, then tap Use this design.",
   } satisfies PageWords,
   design: {
     title: (name: string) => `${name} · 3D invitation design`,
@@ -176,6 +176,138 @@ export const seoCopy = {
       heading: "Diwali invitations that glow like a row of diyas",
       intro:
         "Invite family and friends to Lakshmi puja and dinner with one link. Guests see the evening, directions and a reply button.",
+    },
+    housewarming: {
+      title: "Griha pravesh invitation card online",
+      description:
+        "Create a housewarming invitation with painted pages, music and one-tap RSVP. Share it on WhatsApp with directions to the new home.",
+      heading: "Housewarming invitations for a new beginning",
+      intro:
+        "Name the home, add the puja time and the address, and send one link. Guests get directions and reply in a tap.",
+    },
+    puja: {
+      title: "Puja and katha invitation card online",
+      description:
+        "Invite family to a Satyanarayan katha, havan or mata ki chowki with painted pages, bhajans and one-tap RSVP on WhatsApp.",
+      heading: "Puja invitations with the blessings first",
+      intro:
+        "Name the puja, add the time and place, and send one link. Family see the aarti time, directions and a reply button.",
+    },
+    "thread-ceremony": {
+      title: "Thread ceremony invitation card online",
+      description:
+        "Create an upanayan or janeu invitation with painted pages and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Thread ceremony invitations full of blessings",
+      intro:
+        "Write his name, add the muhurat and place, and send one link. Family reply in a tap and get directions.",
+    },
+    annaprashan: {
+      title: "Annaprashan invitation card online",
+      description:
+        "Create an annaprashan or mukhe bhaat invitation with soft painted pages and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Annaprashan invitations for the first rice",
+      intro:
+        "Write the baby's name, add the time and place, and send one link. Family see the baby's photo and reply in a tap.",
+    },
+    christening: {
+      title: "Christening and baptism invitation card online",
+      description:
+        "Create a christening or baptism invitation with soft painted pages of lilies and doves, and one-tap RSVP on WhatsApp.",
+      heading: "Christening invitations as gentle as white lilies",
+      intro:
+        "Write the baby's name, add the church and lunch times, and send one link with directions.",
+    },
+    "prayer-meet": {
+      title: "Prayer meeting and shraddhanjali invitation",
+      description:
+        "Share a prayer meeting or chautha invitation with a calm painted page, the time and place, and directions, in one WhatsApp link.",
+      heading: "Prayer meeting invitations, quiet and simple",
+      intro:
+        "Write their name, add the time and place, and send one link so family and friends can join and find the way.",
+    },
+    retirement: {
+      title: "Retirement party invitation card online",
+      description:
+        "Create a retirement invitation with painted pages, music and one-tap RSVP for family and colleagues. Share it on WhatsApp.",
+      heading: "Retirement invitations for the next chapter",
+      intro:
+        "Write their name, add the time and place, and send one link. Colleagues and family reply in a tap.",
+    },
+    "farewell-party": {
+      title: "Farewell party invitation card online",
+      description:
+        "Create a farewell or graduation party invitation with painted pages, music and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Farewell invitations for one last evening",
+      intro:
+        "Name the batch or the guest of honour, add the time and place, and send one link. Everyone replies in a tap.",
+    },
+    "shop-opening": {
+      title: "Shop opening invitation card online",
+      description:
+        "Create an inauguration invitation for a shop, office or restaurant with painted pages and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Opening invitations for a grand first day",
+      intro: "Name the business, add the puja and opening time, and send one link with directions.",
+    },
+    launch: {
+      title: "Launch event invitation card online",
+      description:
+        "Create a product launch or office event invitation with painted pages and one-tap RSVP. Share it on WhatsApp and count your guests.",
+      heading: "Launch invitations for the big reveal",
+      intro:
+        "Name the event, add the time and venue, and send one link. Guests reply in a tap and get directions.",
+    },
+    "ganesh-chaturthi": {
+      title: "Ganesh Chaturthi invitation card online",
+      description:
+        "Invite family for Ganpati darshan and aarti with painted pages, bhajans and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Ganpati invitations to welcome Bappa home",
+      intro:
+        "Add the darshan days and aarti times, and send one link. Guests get directions and reply in a tap.",
+    },
+    navratri: {
+      title: "Navratri and Durga Puja invitation card",
+      description:
+        "Create a garba night or Durga Puja invitation with painted pages, music and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Navratri invitations for nine bright nights",
+      intro:
+        "Add the nights, the aarti time and the venue, and send one link. Guests reply in a tap.",
+    },
+    janmashtami: {
+      title: "Janmashtami invitation card online",
+      description:
+        "Invite family to Krishna's birthday with painted pages of flutes and peacock feathers, bhajans and one-tap RSVP.",
+      heading: "Janmashtami invitations for Kanha's birthday",
+      intro:
+        "Add the bhajan and aarti time, and send one link. Guests get directions and reply in a tap.",
+    },
+    onam: {
+      title: "Onam invitation card online",
+      description:
+        "Invite friends to an Onam sadhya with painted pages of pookalam and kasavu, music and one-tap RSVP.",
+      heading: "Onam invitations as bright as a pookalam",
+      intro: "Add the sadhya time and place, and send one link. Guests reply in a tap.",
+    },
+    sankranti: {
+      title: "Makar Sankranti and Pongal invitation card",
+      description:
+        "Invite friends to Uttarayan kites or a Pongal lunch with painted pages and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Sankranti invitations for kites and pongal",
+      intro:
+        "Add the time and the terrace or home address, and send one link. Guests reply in a tap.",
+    },
+    lohri: {
+      title: "Lohri invitation card online",
+      description:
+        "Invite family to a Lohri bonfire with painted pages, dhol and one-tap RSVP, for a first Lohri too. Share it on WhatsApp.",
+      heading: "Lohri invitations around the bonfire",
+      intro: "Add the time and place, and send one link. Guests get directions and reply in a tap.",
+    },
+    eid: {
+      title: "Eid and iftar invitation card online",
+      description:
+        "Create an iftar dawat or Eid milan invitation with painted pages of lanterns and crescent moons, and one-tap RSVP on WhatsApp.",
+      heading: "Iftar and Eid invitations under the crescent moon",
+      intro: "Add the iftar time and the address, and send one link. Guests reply in a tap.",
     },
   } satisfies Record<CategoryId, PageWords>,
   traditionPages: {

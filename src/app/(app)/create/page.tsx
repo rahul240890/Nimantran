@@ -1,3 +1,4 @@
+import { isInviteFormat } from "@/lib/editor/formats";
 import type { Metadata } from "next";
 import { isTraditionId } from "@/lib/traditions/catalog";
 import { redirect } from "next/navigation";
@@ -9,6 +10,7 @@ import { getText } from "@/i18n/server";
 import { isQualityChoice } from "@/content/engine-review";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
+import { hostStore } from "@/lib/invites/hosts";
 import { inviteStore } from "@/lib/invites/store";
 import { isSuiteId } from "@/lib/suites/catalog";
 import { isTemplateId } from "@/lib/templates/ids";
@@ -34,13 +36,27 @@ const inviteId = z.uuid();
  * ?quality=high|medium|low|2d forces the preview's level (handy for tests without a GPU).
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const { template, category, tradition, suite, quality, invite, new: fresh } = await searchParams;
+  const {
+    template,
+    category,
+    tradition,
+    suite,
+    format,
+    quality,
+    invite,
+    new: fresh,
+  } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
     redirect(`/sign-in?next=${encodeURIComponent(`/create?invite=${wanted}`)}`);
   }
   const store = inviteStore();
+  // A co-host who runs only the guests goes to the guest list; the card stays the owner's
+  if (wanted && account && inviteId.safeParse(wanted).success) {
+    const mine = await hostStore()?.myAccess(account, wanted);
+    if (mine?.access === "guests") redirect(`/invites/${wanted}`);
+  }
   const initialInvite =
     wanted && account && store && inviteId.safeParse(wanted).success
       ? await store.get(account, wanted)
@@ -51,6 +67,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     initialCategory: isCategoryId(category) ? category : null,
     initialTradition: isTraditionId(tradition) ? tradition : null,
     initialSuite: isSuiteId(suite) ? suite : null,
+    initialFormat: isInviteFormat(format) ? format : null,
     fresh: fresh === "1",
   };
   return (
@@ -64,6 +81,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
           params.initialTemplate,
           params.initialTradition,
           params.initialSuite,
+          params.initialFormat,
         ].join("|")}
         {...params}
         quality={isQualityChoice(quality) ? quality : "auto"}

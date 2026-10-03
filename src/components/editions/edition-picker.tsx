@@ -69,6 +69,8 @@ export type EditionPickerProps = {
   /** A plan to point at, from the publish dialog's link. */
   focus: PlanId | null;
   active: boolean;
+  /** Only the invite's owner pays; co-hosts see the editions and prices. */
+  canPay?: boolean;
   prefill: { name: string; email: string | null; phone: string | null };
   /** Each edition's price now, with any festival offer running. */
   prices: Partial<Record<PaidPlanId, Price>>;
@@ -83,6 +85,7 @@ export function EditionPicker({
   needed,
   focus,
   active,
+  canPay = true,
   prefill,
   prices: offerPrices,
 }: EditionPickerProps) {
@@ -258,7 +261,7 @@ export function EditionPicker({
                   <div className="flex flex-col gap-1.5">
                     <Button
                       variant={highlighted ? "primary" : "secondary"}
-                      disabled={!active || (pending !== null && !busy)}
+                      disabled={!active || !canPay || (pending !== null && !busy)}
                       loading={busy}
                       onClick={() => void buy(id)}
                       leadingIcon={<Sparkles aria-hidden />}
@@ -278,7 +281,7 @@ export function EditionPicker({
           );
         })}
       </ul>
-      {active && current !== "bundle" && (
+      {active && canPay && current !== "bundle" && (
         <CouponForm inviteId={inviteId} applied={coupon?.code ?? null} onApply={setCoupon} />
       )}
       <p role="status" aria-live="polite" className="sr-only">

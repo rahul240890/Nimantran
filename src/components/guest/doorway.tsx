@@ -21,6 +21,7 @@ import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
 import { daysBetween } from "@/lib/publish/countdown";
+import { lettering, type TypeRole } from "@/lib/suites/lettering";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /** How long the doors take to swing open before the pages come in. */
@@ -183,6 +184,16 @@ export function Doorway({
   const theme = SUITES[suite];
   const cover = theme.images.cover!;
   const area = textArea(suite, "cover");
+  // The names in the theme's own lettering, as on the pages inside; the host's face wins
+  const voice = theme.voice ?? "regal";
+  const face = (role: TypeRole, own: string | undefined): CSSProperties => {
+    const set = lettering(voice, role, lang);
+    return {
+      fontFamily: own ?? set.family,
+      ...(own || !set.weight ? {} : { fontWeight: set.weight }),
+      lineHeight: set.leading,
+    };
+  };
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
 
   // The pages follow the doors; in still mode they come at once
@@ -298,18 +309,18 @@ export function Doorway({
               />
               {copy.blessing && (
                 <p
-                  className="font-display text-[clamp(1.1rem,6cqmin,2rem)] leading-tight text-card-accent-text"
-                  style={type.words ? { fontFamily: type.words } : undefined}
+                  className="text-[clamp(1.1rem,6cqmin,2rem)] text-card-accent-text"
+                  style={face("script", type.words)}
                 >
                   {copy.blessing}
                 </p>
               )}
               <h1
                 id="guest-names"
-                className="flex flex-col items-center font-display leading-[1.02] break-words text-card-ink"
+                className="flex flex-col items-center break-words text-card-ink"
                 style={{
-                  fontFamily: type.names,
-                  fontWeight: type.bold ? 700 : undefined,
+                  ...face("names", type.names),
+                  ...(type.bold ? { fontWeight: 700 } : {}),
                   fontStyle: type.italic ? "italic" : undefined,
                   color: type.colour,
                 }}
@@ -330,8 +341,8 @@ export function Doorway({
               </h1>
               {copy.date && (
                 <p
-                  className="text-[clamp(0.95rem,4.4cqmin,1.3rem)] text-card-ink-muted"
-                  style={type.words ? { fontFamily: type.words } : undefined}
+                  className="text-[clamp(0.95rem,4.4cqmin,1.3rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
+                  style={face("body", type.words)}
                 >
                   {copy.date}
                 </p>

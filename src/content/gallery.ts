@@ -12,7 +12,7 @@ export const galleryCopy = {
   eyebrow: "Create an invitation",
   heading: "What are you celebrating?",
   intro:
-    "Pick the occasion, then a design made for it. Every design opens into full-screen painted pages, one for each event, with replies built in.",
+    "Pick the occasion, then a design made for it. A Scene puts everything on one painting, each celebration flying in by turn. A Story gives every celebration its own full-screen painted page. Replies are built into both.",
   searchLabel: "Search occasions and designs",
   searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
   clearSearch: "Clear search",
@@ -20,8 +20,8 @@ export const galleryCopy = {
     count === 0 ? "Nothing matches yet" : count === 1 ? "1 match" : `${count} matches`,
   noResults: "Nothing matches that yet. Try another word, or browse the occasions below.",
   resultKinds: { occasion: "Occasion", kind: "Wedding", design: "Design" },
+  moreCelebrations: "More celebrations",
   soon: "Coming soon",
-  soonNote: "Designs for this occasion are being painted. Weddings are ready today.",
   designsCount: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
   chooseKind: "Choose your wedding",
   chooseKindIntro:
@@ -33,6 +33,34 @@ export const galleryCopy = {
     "Only designs made for this kind of wedding. The card is written in its own language, and you can add English beside it.",
   card: "3D card",
   pagesCount: (count: number) => `${count} pages`,
+  /** The two kinds of painted invitation (src/lib/editor/formats.ts), and the 3D cards. */
+  formats: {
+    label: "Kind of invitation",
+    all: "All",
+    scene: "Scene",
+    story: "Story",
+    card: "3D card",
+  },
+  sceneBadge: "Scene · 1 page",
+  storyBadge: (count: number) => `Story · ${count} pages`,
+  sceneNote:
+    "One painting with your photos and names. Every celebration flies in by turn, and the painting's light follows it from morning to night.",
+  /** Made-up names, words and places the previews show the designs with. */
+  sample: {
+    first: "Arjun",
+    second: "Sia",
+    blessing: "With the blessings of Lord Ganesha",
+    families: "Together with their families",
+    line: "invite you to celebrate their wedding",
+    venues: {
+      haldi: "Family home, Jaipur",
+      mehendi: "The courtyard, Jaipur",
+      sangeet: "Rooftop lawns, Jaipur",
+      baraat: "From the hotel gate",
+      wedding: "Rambagh Palace, Jaipur",
+      reception: "Jai Mahal, Jaipur",
+    },
+  },
   preview: (name: string) => `Preview ${name}`,
   useDesign: "Use this design",
   close: "Close preview",
@@ -95,6 +123,13 @@ export const occasionTaglines: Record<string, string> = {
   retirement: "A career celebrated",
   party: "Rooftops, music and friends",
   diwali: "Diyas and dinner",
+  lohri: "Bonfire and bhangra",
+  sankranti: "Kites and pongal",
+  onam: "Pookalam and sadhya",
+  janmashtami: "Kanha's birthday",
+  "prayer-meet": "In loving memory",
+  christening: "Baptism and lunch",
+  annaprashan: "The first rice",
   holi: "Colours and gujiya",
   navratri: "Nine nights of garba",
   "ganesh-chaturthi": "Bappa comes home",
@@ -142,4 +177,17 @@ export const weddingKindCopy: Record<WeddingKind, { name: string; description: s
     name: "Modern",
     description: "Clean cards for any family, in English or Hindi.",
   },
+};
+
+/** The Designs page: every design, with search and filters (src/lib/gallery/filters.ts). */
+export const catalogCopy = {
+  searchLabel: "Search designs",
+  searchPlaceholder: "Search by name, place or tradition…",
+  occasionLabel: "Occasion",
+  allOccasions: "All occasions",
+  traditionLabel: "Wedding tradition",
+  allTraditions: "All traditions",
+  count: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
+  clear: "Clear filters",
+  empty: "No design matches all of these yet. Try fewer filters.",
 };

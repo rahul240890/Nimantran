@@ -1,5 +1,6 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { SUITES, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import { SUITES, isSceneTheme, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
@@ -113,41 +114,68 @@ export const OCCASIONS: readonly Occasion[] = [
     ["godh bharai", "seemantham", "valaikappu", "shrimant", "dohale jevan", "baby"],
     "family",
   ),
+  live(
+    "annaprashan",
+    { suite: "annaprashan", page: "cover" },
+    ["mukhe bhaat", "choroonu", "first rice", "rice ceremony", "annaprasana"],
+    "family",
+  ),
+  live(
+    "christening",
+    { suite: "christening-lilies", page: "cover" },
+    ["baptism", "holy communion", "church"],
+    "family",
+  ),
   soon("naming-ceremony", "family", { en: "Naming ceremony", hi: "नामकरण" }, [
     "naamkaran",
     "barsa",
     "cradle ceremony",
   ]),
   soon("mundan", "family", { en: "Mundan", hi: "मुंडन" }, ["chudakarana", "first haircut"]),
-  soon("housewarming", "family", { en: "Housewarming", hi: "गृह प्रवेश" }, [
-    "griha pravesh",
-    "vastu",
-    "new home",
-  ]),
-  soon("puja", "family", { en: "Puja and katha", hi: "पूजा और कथा" }, [
-    "satyanarayan",
-    "katha",
-    "havan",
-    "jagran",
-  ]),
-  soon("thread-ceremony", "family", { en: "Thread ceremony", hi: "जनेऊ संस्कार" }, [
-    "janeu",
-    "upanayan",
-    "munj",
-  ]),
+  live(
+    "housewarming",
+    { suite: "new-home-modern", page: "cover" },
+    ["griha pravesh", "vastu", "new home"],
+    "family",
+  ),
+  live(
+    "puja",
+    { suite: "satyanarayan", page: "cover" },
+    ["satyanarayan", "katha", "havan", "jagran", "mata ki chowki", "pooja"],
+    "family",
+  ),
+  live(
+    "thread-ceremony",
+    { suite: "upanayana", page: "cover" },
+    ["janeu", "upanayan", "munj"],
+    "family",
+  ),
+  live(
+    "prayer-meet",
+    { suite: "shraddhanjali", page: "cover" },
+    ["shraddhanjali", "chautha", "uthamna", "besna", "memorial", "condolence", "remembrance"],
+    "family",
+  ),
 
   soon("fresher-party", "parties", { en: "Fresher party", hi: "फ्रेशर पार्टी" }, [
     "college",
     "freshers",
   ]),
   soon("welcome-party", "parties", { en: "Welcome party", hi: "वेलकम पार्टी" }, ["welcome"]),
-  soon("farewell-party", "parties", { en: "Farewell party", hi: "फेयरवेल पार्टी" }, [
-    "farewell",
-    "send off",
-  ]),
+  live(
+    "farewell-party",
+    { suite: "farewell-night", page: "cover" },
+    ["farewell", "send off", "graduation", "convocation"],
+    "parties",
+  ),
   soon("kitty-party", "parties", { en: "Kitty party", hi: "किटी पार्टी" }, ["kitty", "ladies"]),
   soon("reunion", "parties", { en: "Reunion", hi: "रीयूनियन" }, ["alumni", "get together"]),
-  soon("retirement", "parties", { en: "Retirement", hi: "सेवानिवृत्ति" }, ["retirement party"]),
+  live(
+    "retirement",
+    { suite: "retirement-garden", page: "cover" },
+    ["retirement party"],
+    "parties",
+  ),
   live(
     "party",
     { suite: "rooftop", page: "cover" },
@@ -161,24 +189,63 @@ export const OCCASIONS: readonly Occasion[] = [
     ["deepavali", "lakshmi puja", "diwali party", "diwali milan", "deepawali"],
     "festivals",
   ),
+  live(
+    "janmashtami",
+    { suite: "janmashtami", page: "cover" },
+    ["gokulashtami", "krishna janmashtami", "dahi handi", "kanha"],
+    "festivals",
+  ),
+  live(
+    "onam",
+    { suite: "onam-pookalam", page: "cover" },
+    ["sadhya", "pookalam", "thiruvonam"],
+    "festivals",
+  ),
+  live(
+    "sankranti",
+    { suite: "uttarayan-kites", page: "cover" },
+    ["uttarayan", "makar sankranti", "pongal", "kite festival", "bhogi", "khichdi"],
+    "festivals",
+  ),
+  live(
+    "lohri",
+    { suite: "lohri-bonfire", page: "cover" },
+    ["first lohri", "bonfire", "maghi"],
+    "festivals",
+  ),
   soon("holi", "festivals", { en: "Holi", hi: "होली" }, ["rang", "colours"]),
-  soon("navratri", "festivals", { en: "Navratri and garba", hi: "नवरात्रि और गरबा" }, [
-    "garba",
-    "dandiya",
-    "durga puja",
-  ]),
-  soon("ganesh-chaturthi", "festivals", { en: "Ganesh Chaturthi", hi: "गणेश चतुर्थी" }, [
-    "ganpati",
-  ]),
-  soon("eid", "festivals", { en: "Eid", hi: "ईद" }, ["iftar", "eid milan"]),
+  live(
+    "navratri",
+    { suite: "durga-pujo", page: "cover" },
+    ["garba", "dandiya", "durga puja", "pujo", "dussehra"],
+    "festivals",
+  ),
+  live(
+    "ganesh-chaturthi",
+    { suite: "ganesh-utsav", page: "cover" },
+    ["ganpati", "ganeshotsav", "vinayaka chaturthi", "bappa"],
+    "festivals",
+  ),
+  live(
+    "eid",
+    { suite: "iftar-dawat", page: "cover" },
+    ["iftar", "eid milan", "ramadan", "ramzan", "iftar party", "dawat"],
+    "festivals",
+  ),
   soon("christmas", "festivals", { en: "Christmas", hi: "क्रिसमस" }, ["xmas", "new year"]),
 
-  soon("shop-opening", "business", { en: "Shop opening", hi: "दुकान का उद्घाटन" }, [
-    "inauguration",
-    "opening",
-    "udghatan",
-  ]),
-  soon("launch", "business", { en: "Launch event", hi: "लॉन्च इवेंट" }, ["product launch"]),
+  live(
+    "shop-opening",
+    { suite: "grand-opening", page: "cover" },
+    ["inauguration", "opening", "udghatan", "office opening", "restaurant opening"],
+    "business",
+  ),
+  live(
+    "launch",
+    { suite: "launch-stage", page: "cover" },
+    ["product launch", "book launch", "office event", "conference"],
+    "business",
+  ),
   soon("office-party", "business", { en: "Office party", hi: "ऑफ़िस पार्टी" }, [
     "corporate",
     "team",
@@ -193,10 +260,32 @@ export function occasionById(id: string): Occasion | undefined {
  * A design in the gallery: a theme for the event pages with its matching card, or, for the
  * card-colour theme, one of the 3D card designs on its own.
  */
-export type GalleryDesign = { id: string; suite: SuiteId; template: TemplateId };
+export type GalleryDesign = {
+  id: string;
+  suite: SuiteId;
+  template: TemplateId;
+  /** "scene": the theme as one painting (scene.ts); missing, its story of pages. */
+  format?: "scene";
+};
 
 export function paintedDesign(suite: SuiteId): GalleryDesign {
   return { id: suite, suite, template: SUITES[suite].template ?? "marigold" };
+}
+
+/** A theme as a Scene: its photos, names and every celebration on one painting. */
+export function sceneDesign(suite: SuiteId): GalleryDesign {
+  return { ...paintedDesign(suite), id: `${suite}-scene`, format: "scene" };
+}
+
+/**
+ * Each painted design, with its Scene first where the theme has one. A Scene theme has
+ * no pages of its own, so it is listed as its Scene alone.
+ */
+function withScenes(designs: GalleryDesign[]): GalleryDesign[] {
+  const scenes = designs
+    .filter((design) => design.suite !== "classic" && hasScene(design.suite))
+    .map((design) => ({ ...design, id: `${design.suite}-scene`, format: "scene" as const }));
+  return [...scenes, ...designs.filter((design) => !isSceneTheme(design.suite))];
 }
 
 export function cardDesign(template: TemplateId): GalleryDesign {
@@ -226,7 +315,20 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "north-indian",
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
-    suites: ["rajwada-bagh", "kashi", "chinar", "gulaab", "ivory-arch"],
+    suites: [
+      "kashi-ghat",
+      "rishikesh-ganga",
+      "baraat-band",
+      "roka-shagun",
+      "chooda-ceremony",
+      "chinar-dal",
+      "char-bagh",
+      "rajwada-bagh",
+      "kashi",
+      "chinar",
+      "gulaab",
+      "ivory-arch",
+    ],
     cards: ["marigold", "scroll"],
     keywords: ["hindi", "up", "delhi", "bihar", "punjabi hindu", "kashmiri", "kashmir"],
   },
@@ -234,7 +336,15 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "gujarati",
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
-    suites: ["kutch-toran", "shahi-savari", "pichwai"],
+    suites: [
+      "kutch-bhunga",
+      "white-rann",
+      "mameru-bandhani",
+      "sindhi-ajrak",
+      "kutch-toran",
+      "shahi-savari",
+      "pichwai",
+    ],
     cards: ["bandhani"],
     keywords: ["gujrati", "kutch", "kathiawadi", "patel", "kankotri", "hast melap"],
   },
@@ -242,7 +352,17 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "rajasthani",
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
-    suites: ["shahi-savari", "pichwai", "neel", "mitti"],
+    suites: [
+      "udaipur-lake",
+      "pink-haveli",
+      "jaisalmer-dunes",
+      "fort-night",
+      "sheesh-mahal",
+      "shahi-savari",
+      "pichwai",
+      "neel",
+      "mitti",
+    ],
     cards: ["rangmahal", "scroll"],
     keywords: ["marwari", "rajput", "jaipur", "udaipur"],
   },
@@ -250,7 +370,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "marathi",
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
-    suites: ["peshwai-wada"],
+    suites: ["pune-wada", "peshwai-wada"],
     cards: ["paithani"],
     keywords: ["maharashtrian", "lagna", "mumbai", "pune"],
   },
@@ -258,7 +378,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "bengali",
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
-    suites: ["rajbari", "pattachitra", "chai-bagan"],
+    suites: ["zamindar-bari", "rajbari", "pattachitra", "chai-bagan"],
     cards: ["alpona"],
     keywords: [
       "bangali",
@@ -276,7 +396,17 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "tamil",
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
-    suites: ["kayal", "tanjore", "mysuru", "kalamkari"],
+    suites: [
+      "temple-pond",
+      "kovil-corridor",
+      "arati-mandap",
+      "hampi-ruins",
+      "coorg-estate",
+      "kayal",
+      "tanjore",
+      "mysuru",
+      "kalamkari",
+    ],
     cards: ["gopuram", "kasavu"],
     keywords: [
       "south indian",
@@ -296,7 +426,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     tradition: null,
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
-    suites: ["phulkari-haveli"],
+    suites: ["punjab-haveli", "phulkari-haveli"],
     cards: ["phulkari"],
     keywords: ["sikh", "anand karaj", "punjab", "sardar"],
   },
@@ -305,7 +435,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     tradition: null,
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
-    suites: ["noor-bagh", "sufi-raat", "riad"],
+    suites: ["char-bagh", "noor-bagh", "sufi-raat", "riad"],
     cards: ["emerald"],
     keywords: ["nikah", "walima", "shaadi", "islamic", "moroccan"],
   },
@@ -351,7 +481,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
 /** The designs a wedding kind offers: its painted themes, then its 3D cards. */
 export function kindDesigns(kind: WeddingKind): GalleryDesign[] {
   const entry = WEDDING_KIND_ENTRIES[kind];
-  return [
+  return withScenes([
     // A kind's painted theme pairs with the kind's own card (Shahi Savari with Bandhani)
     ...entry.suites
       .filter((suite) => suite !== "classic")
@@ -360,7 +490,7 @@ export function kindDesigns(kind: WeddingKind): GalleryDesign[] {
         template: entry.cards[0] ?? paintedDesign(suite).template,
       })),
     ...entry.cards.map(cardDesign),
-  ];
+  ]);
 }
 
 /** Painted themes with pictures, in the order the gallery shows them. */
@@ -370,10 +500,10 @@ export const PAINTED_SUITES: readonly SuiteId[] = (Object.keys(SUITES) as SuiteI
 
 /** Every design for an occasion: the painted themes made for it, then the cards that suit it. */
 export function occasionDesigns(category: CategoryId): GalleryDesign[] {
-  return [
+  return withScenes([
     ...PAINTED_SUITES.filter((suite) => suiteSuits(suite, category)).map(paintedDesign),
     ...CATEGORIES[category].templates.map(cardDesign),
-  ];
+  ]);
 }
 
 /** The occasion a theme opens in the editor: its own, else a wedding. */
@@ -383,7 +513,7 @@ export function suiteOccasion(suite: SuiteId): CategoryId {
 
 /** Every design in the gallery, painted first. */
 export function allDesigns(): GalleryDesign[] {
-  return [...PAINTED_SUITES.map(paintedDesign), ...TEMPLATE_IDS.map(cardDesign)];
+  return withScenes([...PAINTED_SUITES.map(paintedDesign), ...TEMPLATE_IDS.map(cardDesign)]);
 }
 
 /** Where "Use this design" takes the host: the editor, set up for this choice. */
@@ -396,6 +526,7 @@ export function designHref(
   if (tradition) params.set("tradition", tradition);
   params.set("suite", design.suite);
   params.set("template", design.template);
+  if (design.format) params.set("format", design.format);
   return `/create?${params.toString()}`;
 }
 

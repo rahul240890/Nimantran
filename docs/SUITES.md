@@ -26,7 +26,7 @@ Seven painted themes: Rajwada Bagh, Shahi Savari and Kayal, then Noor Bagh (Musl
 2. Check the image tool's terms allow commercial use.
 3. Crop to 9:16 and convert to WebP at quality about 80, aiming for 100 to 270 KB each. Match each image to its page by what it shows, not by file order.
 4. Save as `public/suites/<theme>/<page>.webp`, where page is one of `cover`, `family`, `haldi`, `mehendi`, `sangeet`, `baraat`, `wedding`, `reception`, `reply`.
-5. Mark where its words go in `src/lib/suites/areas.ts`: the calm part of the painting as `[top, bottom, left, right]` percentages (a wall, the sky, still water, the inside of an arch). Check it on a phone screenshot; the words must not cover the art.
+5. Mark where its words go in `src/lib/suites/areas.ts`: the calm part of the painting as `[top, bottom, left, right]` percentages (a wall, the sky, still water, the inside of an arch). Check it on a phone screenshot; the words must not cover the art. `/engine/pages?suite=<theme>&lang=gu` shows all of a theme's pages at phone size in any card language. A theme's lettering is its `voice` (regal unless set; `src/lib/suites/lettering.ts`).
 6. List it in that theme's `images` in `src/lib/suites/catalog.ts`, for example `images: { cover: "/suites/kayal/cover.webp" }`.
 
 Painted pages also get a light CSS animation by kind of page (`src/components/invitation/story/page-effects.tsx`, `fx-*` classes in `globals.css`): petals on cover, haldi, mehendi and wedding, dust on family, twinkling lights on sangeet and reception, fireworks on baraat, bobbing lamps on reply. It uses the theme's `--suite-light` and `--suite-accent` colours, ignores taps, and is not drawn in still mode. A new theme gets it with no code change.

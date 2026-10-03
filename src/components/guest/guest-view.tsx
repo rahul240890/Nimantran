@@ -1,18 +1,21 @@
 "use client";
 
-import { CalendarPlus, MailCheck } from "lucide-react";
+import { CalendarPlus, MailCheck, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
 import { DiyaCountdown } from "@/components/guest/diya-countdown";
+import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { Doorway } from "@/components/guest/doorway";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
+import { PhotoWall } from "@/components/guest/photo-wall";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
+import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import type { QualityChoice } from "@/content/engine-review";
@@ -32,7 +35,13 @@ import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
 import "@/components/invitation/type/fonts.css";
 import { applyPages } from "@/lib/editor/pages";
-import { cardFunctions, draftBlessing, draftSuite, storyFamily } from "@/lib/publish/story";
+import {
+  cardFunctions,
+  draftBlessing,
+  draftShowsScene,
+  draftSuite,
+  storyFamily,
+} from "@/lib/publish/story";
 import {
   CARD_COUNTDOWN_WORDS,
   CARD_GREETING_WORDS,
@@ -40,10 +49,12 @@ import {
   daysAway,
 } from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
+import type { EventWindow } from "@/lib/publish/event-day";
 import { cn } from "@/lib/cn";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
-import { couplePagePhotos } from "@/lib/editor/couple-photos";
+import { couplePagePhotos, sceneCouple } from "@/lib/editor/couple-photos";
+import { scenePage } from "@/lib/suites/scene";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -64,7 +75,14 @@ export type GuestFunction = {
   venue: string;
   address: string;
   dressCode: string;
+  /** Where to park, from the host (the event-day guide). */
+  parking: string;
+  /** One tap to directions, to the host's pin when there is one. */
   mapsUrl: string | null;
+  /** A small map of the venue, loaded only when the guest asks for it. */
+  mapEmbedUrl: string | null;
+  /** When it is on, in India time, for the "happening now" banner. */
+  window: EventWindow | null;
   googleCalendarUrl: string | null;
   icsUrl: string | null;
 };
@@ -82,6 +100,8 @@ type GuestViewProps = {
   questions: RsvpQuestionId[];
   /** A Free invite once payments are on: "Made with Shubh" across the pages (Step 17). */
   watermark?: boolean;
+  /** A fixed moment for the event-day banner, on review pages. */
+  previewNow?: number;
 };
 
 export function GuestView({
@@ -96,6 +116,7 @@ export function GuestView({
   rsvpFunctions,
   questions,
   watermark = false,
+  previewNow,
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
@@ -116,21 +137,26 @@ export function GuestView({
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
   const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  // The pages speak the card's language, not the site's
+  const told = useMemo(
+    () =>
+      cardFunctions(functions, draft, language).map((fn) => ({
+        ...fn,
+        countdown: today
+          ? daysAway(
+              daysBetween(today, draft.functions[fn.kind].date),
+              CARD_COUNTDOWN_WORDS[language],
+            )
+          : undefined,
+      })),
+    [functions, draft, language, today],
+  );
   const story = useMemo<InvitationStory>(
     () => ({
       beats: applyPages(
         storyBeats({
           copy,
-          // The pages speak the card's language, not the site's
-          functions: cardFunctions(functions, draft, language).map((fn) => ({
-            ...fn,
-            countdown: today
-              ? daysAway(
-                  daysBetween(today, draft.functions[fn.kind].date),
-                  CARD_COUNTDOWN_WORDS[language],
-                )
-              : undefined,
-          })),
+          functions: told,
           replies,
           words: CARD_STORY_WORDS[language],
           family: storyFamily(draft, language),
@@ -150,7 +176,7 @@ export function GuestView({
       type: pageType(draft.type, [language]),
       reply: replies ? { href: "#rsvp", label: guestCopy.reply } : null,
     }),
-    [copy, functions, replies, language, guestCopy.reply, draft, today, photos],
+    [copy, told, replies, language, guestCopy.reply, draft, photos],
   );
   // A painted theme opens as a doorway with a countdown; the card colours keep the 3D card
   const suite = draftSuite(draft);
@@ -160,6 +186,18 @@ export function GuestView({
   const mainAt = mainKind ? startsAt(mainDate, draft.functions[mainKind].time) : null;
   const main = mainAt === null ? null : { date: mainDate, at: mainAt };
   const music = useRagaMusic(template);
+  // One Scene (pilot): the whole invitation on one painting, in place of the doorway and pages
+  const scenePhotos = useMemo(
+    () =>
+      couplePagePhotos(
+        sceneCouple(draft.couplePhotos),
+        photos.map((photo) => photo.id),
+        (id) => photos.find((photo) => photo.id === id)?.url,
+        copy,
+      ),
+    [draft.couplePhotos, photos, copy],
+  );
+  const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
   // The family's blocks in the language the guest is reading
@@ -178,230 +216,280 @@ export function GuestView({
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <div className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30">
-        <ThemeMenu labels={uiStrings.theme} />
-      </div>
+      <EventDayBanner functions={functions} previewNow={previewNow} />
+      <div className="relative flex flex-1 flex-col">
+        <div className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30">
+          <ThemeMenu labels={uiStrings.theme} />
+        </div>
 
-      {watermark && <WatermarkLayer />}
-      <main id="main" className="flex flex-1 flex-col">
-        {doorway ? (
-          <Doorway
-            suite={suite}
-            template={template}
-            copy={copy}
-            lang={language}
-            languages={languages}
-            onLanguage={setLanguage}
-            beats={story.beats}
-            textBox={draft.textBox}
-            type={story.type!}
-            main={main}
-            reply={story.reply ?? null}
-            music={music}
-            musicOnOpen={draft.music.playOnOpen}
-            guest={guestName}
-          />
-        ) : (
-          <>
-            {/* The card, first and large, in a warm pool of light */}
-            <section
-              aria-labelledby="guest-names"
-              className="relative isolate flex flex-col items-center gap-4 overflow-hidden px-4 pt-[max(3.5rem,calc(env(safe-area-inset-top)+3rem))] pb-10 sm:px-6"
-            >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute top-[45%] left-1/2 -z-10 aspect-square w-[min(140%,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-                style={{
-                  background:
-                    "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
-                }}
-              />
-              {guestName ? (
-                <p lang={language} className="flex flex-col items-center gap-1 text-center">
-                  <span
-                    className={cn(
-                      "text-sm text-accent-text",
-                      language === "en" && "font-label tracking-[0.32em] uppercase",
+        {watermark && <WatermarkLayer />}
+        <main id="main" className="flex flex-1 flex-col">
+          {scene ? (
+            <OneScene
+              suite={suite}
+              page={scene}
+              copy={copy}
+              lang={language}
+              functions={told}
+              photos={scenePhotos}
+              reply={story.reply ?? null}
+              type={story.type}
+              detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
+              header={
+                (guestName || languages.length > 1) && (
+                  <>
+                    {guestName && (
+                      <p
+                        lang={language}
+                        className="rounded-full bg-card-ivory/85 px-4 py-1 text-center text-sm text-card-ink shadow-raised backdrop-blur"
+                      >
+                        {CARD_GREETING_WORDS[language].dear}{" "}
+                        <span className="font-semibold">{guestName}</span>
+                      </p>
                     )}
-                  >
-                    {CARD_GREETING_WORDS[language].dear}
-                  </span>
-                  <span className="max-w-[22ch] font-display text-2xl leading-tight break-words text-ink">
-                    {guestName}
-                  </span>
-                  <span className="text-sm text-ink-muted">
-                    {CARD_GREETING_WORDS[language].invited}
-                  </span>
-                </p>
-              ) : (
-                <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
-                  {guestCopy.invited}
-                </p>
-              )}
-              <h1
-                id="guest-names"
-                className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
+                    {languages.length > 1 && (
+                      <CardLanguageToggle
+                        label={guestCopy.cardLanguage}
+                        languages={languages}
+                        value={language}
+                        onValueChange={setLanguage}
+                      />
+                    )}
+                  </>
+                )
+              }
+              extra={
+                <SceneButton
+                  label={
+                    music.playing ? uiStrings.invitation.pauseMusic : uiStrings.invitation.playMusic
+                  }
+                  pressed={music.playing}
+                  onClick={music.toggle}
+                >
+                  {music.playing ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+                </SceneButton>
+              }
+            />
+          ) : doorway ? (
+            <Doorway
+              suite={suite}
+              template={template}
+              copy={copy}
+              lang={language}
+              languages={languages}
+              onLanguage={setLanguage}
+              beats={story.beats}
+              textBox={draft.textBox}
+              type={story.type!}
+              main={main}
+              reply={story.reply ?? null}
+              music={music}
+              musicOnOpen={draft.music.playOnOpen}
+              guest={guestName}
+            />
+          ) : (
+            <>
+              {/* The card, first and large, in a warm pool of light */}
+              <section
+                aria-labelledby="guest-names"
+                className="relative isolate flex flex-col items-center gap-4 overflow-hidden px-4 pt-[max(3.5rem,calc(env(safe-area-inset-top)+3rem))] pb-10 sm:px-6"
               >
-                {names}
-              </h1>
-              <p className="text-ink-muted">{occasion}</p>
-              <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
-              {languages.length > 1 && (
-                <CardLanguageToggle
-                  label={guestCopy.cardLanguage}
-                  languages={languages}
-                  value={language}
-                  onValueChange={setLanguage}
+                <div
+                  aria-hidden
+                  className="pointer-events-none absolute top-[45%] left-1/2 -z-10 aspect-square w-[min(140%,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+                  style={{
+                    background:
+                      "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
+                  }}
                 />
-              )}
-              <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
-                <Invitation
-                  copy={copy}
-                  lang={language}
-                  template={template}
-                  quality={quality}
-                  open={open}
-                  onOpenChange={setOpen}
-                  musicOnOpen={draft.music.playOnOpen}
-                  tradition={draftTradition(draft)?.id ?? null}
-                  story={story}
-                />
-              </div>
-              <div className="flex flex-col items-center gap-3">
-                {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
-                {rsvpFunctions.length > 0 && (
-                  <Button asChild size="lg">
-                    <a href="#rsvp">
-                      <MailCheck aria-hidden />
-                      {guestCopy.reply}
-                    </a>
-                  </Button>
+                {guestName ? (
+                  <p lang={language} className="flex flex-col items-center gap-1 text-center">
+                    <span
+                      className={cn(
+                        "text-sm text-accent-text",
+                        language === "en" && "font-label tracking-[0.32em] uppercase",
+                      )}
+                    >
+                      {CARD_GREETING_WORDS[language].dear}
+                    </span>
+                    <span className="max-w-[22ch] font-display text-2xl leading-tight break-words text-ink">
+                      {guestName}
+                    </span>
+                    <span className="text-sm text-ink-muted">
+                      {CARD_GREETING_WORDS[language].invited}
+                    </span>
+                  </p>
+                ) : (
+                  <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
+                    {guestCopy.invited}
+                  </p>
                 )}
-              </div>
-            </section>
-          </>
-        )}
-
-        {look ? (
-          <ThemedDetails
-            suite={suite}
-            look={look}
-            copy={copy}
-            lang={language}
-            functions={cardFunctions(functions, draft, language)}
-            main={
-              mainKind && mainDate
-                ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
-                : null
-            }
-            photos={photos}
-            family={family}
-            familyLang={language}
-            allIcsUrl={allIcsUrl}
-            music={music}
-            reply={rsvp}
-          />
-        ) : (
-          <>
-            <FamilyWording family={family} lang={language} />
-
-            <section
-              aria-labelledby="guest-functions"
-              className="border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
-            >
-              <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                <div className="flex flex-wrap items-end justify-between gap-4">
-                  <h2
-                    id="guest-functions"
-                    className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                  >
-                    {guestCopy.functions}
-                  </h2>
-                  {allIcsUrl && (
-                    <Button asChild variant="secondary">
-                      <a href={allIcsUrl} download>
-                        <CalendarPlus aria-hidden />
-                        {guestCopy.addAll}
+                <h1
+                  id="guest-names"
+                  className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
+                >
+                  {names}
+                </h1>
+                <p className="text-ink-muted">{occasion}</p>
+                <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
+                {languages.length > 1 && (
+                  <CardLanguageToggle
+                    label={guestCopy.cardLanguage}
+                    languages={languages}
+                    value={language}
+                    onValueChange={setLanguage}
+                  />
+                )}
+                <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
+                  <Invitation
+                    copy={copy}
+                    lang={language}
+                    template={template}
+                    quality={quality}
+                    open={open}
+                    onOpenChange={setOpen}
+                    musicOnOpen={draft.music.playOnOpen}
+                    tradition={draftTradition(draft)?.id ?? null}
+                    story={story}
+                  />
+                </div>
+                <div className="flex flex-col items-center gap-3">
+                  {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
+                  {rsvpFunctions.length > 0 && (
+                    <Button asChild size="lg">
+                      <a href="#rsvp">
+                        <MailCheck aria-hidden />
+                        {guestCopy.reply}
                       </a>
                     </Button>
                   )}
                 </div>
-                <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-                  {functions.map((fn) => (
-                    <li key={fn.kind}>
-                      <FunctionCard fn={fn} />
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </section>
-
-            {photos.length > 0 && (
-              <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
-                <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                  <h2
-                    id="guest-photos"
-                    className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                  >
-                    {guestCopy.photos}
-                  </h2>
-                  <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                    {photos.map((photo, index) => (
-                      <li
-                        key={photo.id}
-                        className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
-                        <img
-                          src={photo.url}
-                          alt={guestCopy.photoAlt(index + 1)}
-                          width={photo.width}
-                          height={photo.height}
-                          loading="lazy"
-                          decoding="async"
-                          className="aspect-[4/5] h-full w-full object-cover"
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
               </section>
-            )}
-            {rsvpFunctions.length > 0 && (
+            </>
+          )}
+
+          {look ? (
+            <ThemedDetails
+              suite={suite}
+              look={look}
+              copy={copy}
+              lang={language}
+              functions={cardFunctions(functions, draft, language)}
+              main={
+                mainKind && mainDate
+                  ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
+                  : null
+              }
+              photos={photos}
+              family={family}
+              familyLang={language}
+              allIcsUrl={allIcsUrl}
+              music={music}
+              reply={rsvp}
+            />
+          ) : (
+            <>
+              <FamilyWording family={family} lang={language} />
+
               <section
-                id="rsvp"
-                aria-labelledby="guest-rsvp"
-                className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                aria-labelledby="guest-functions"
+                className="border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
               >
-                <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-                  <div className="flex flex-col gap-2">
+                <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                  <div className="flex flex-wrap items-end justify-between gap-4">
                     <h2
-                      id="guest-rsvp"
+                      id="guest-functions"
                       className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
                     >
-                      {rsvpCopy.heading}
+                      {guestCopy.functions}
                     </h2>
-                    <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                    {allIcsUrl && (
+                      <Button asChild variant="secondary">
+                        <a href={allIcsUrl} download>
+                          <CalendarPlus aria-hidden />
+                          {guestCopy.addAll}
+                        </a>
+                      </Button>
+                    )}
                   </div>
-                  {rsvp}
+                  <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
+                    {functions.map((fn) => (
+                      <li key={fn.kind}>
+                        <FunctionCard fn={fn} />
+                      </li>
+                    ))}
+                  </ol>
                 </div>
               </section>
-            )}
-          </>
-        )}
-      </main>
 
-      <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
-          <p className="flex items-center gap-2 text-sm text-ink-muted">
-            <BrandMark className="size-6 text-accent-text" />
-            {guestCopy.madeWith}
-          </p>
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/">{guestCopy.createYours}</Link>
-          </Button>
-        </div>
-      </footer>
+              {photos.length > 0 && (
+                <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
+                  <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                    <h2
+                      id="guest-photos"
+                      className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                    >
+                      {guestCopy.photos}
+                    </h2>
+                    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                      {photos.map((photo, index) => (
+                        <li
+                          key={photo.id}
+                          className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
+                          <img
+                            src={photo.url}
+                            alt={guestCopy.photoAlt(index + 1)}
+                            width={photo.width}
+                            height={photo.height}
+                            loading="lazy"
+                            decoding="async"
+                            className="aspect-[4/5] h-full w-full object-cover"
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </section>
+              )}
+              {rsvpFunctions.length > 0 && (
+                <section
+                  id="rsvp"
+                  aria-labelledby="guest-rsvp"
+                  className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                >
+                  <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+                    <div className="flex flex-col gap-2">
+                      <h2
+                        id="guest-rsvp"
+                        className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                      >
+                        {rsvpCopy.heading}
+                      </h2>
+                      <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                    </div>
+                    {rsvp}
+                  </div>
+                </section>
+              )}
+            </>
+          )}
+          <PhotoWall slug={slug} />
+        </main>
+
+        <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
+            <p className="flex items-center gap-2 text-sm text-ink-muted">
+              <BrandMark className="size-6 text-accent-text" />
+              {guestCopy.madeWith}
+            </p>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/">{guestCopy.createYours}</Link>
+            </Button>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

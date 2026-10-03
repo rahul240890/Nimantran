@@ -9,10 +9,91 @@
  */
 
 import type { CategoryId } from "@/lib/categories/catalog";
+import type { Voice } from "./lettering";
 import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { GuestLookChoice } from "./guest-look";
+
+/**
+ * Scene themes: one painting each, with a painted card that flies in with each celebration
+ * (scene.ts). They have no pages of their own, so they only show as a Scene, and take the
+ * rest of their look (colours, lettering, guest page) from the painted theme they're kin to.
+ */
+export const SCENE_THEME_IDS = [
+  "udaipur-lake",
+  "pink-haveli",
+  "char-bagh",
+  "kashi-ghat",
+  "temple-pond",
+  "kovil-corridor",
+  "arati-mandap",
+  "zamindar-bari",
+  "kutch-bhunga",
+  "punjab-haveli",
+  "pune-wada",
+  "chinar-dal",
+  "space-voyage",
+  "rainbow-unicorn",
+  "dino-jungle",
+  "ocean-pearl",
+  "boho-onederland",
+  "fairytale-castle",
+  "little-racer",
+  "gold-gala",
+  "amrit-utsav",
+  "silver-jubilee",
+  "golden-jubilee",
+  "oh-baby",
+  "new-year-eve",
+  "kitty-tea",
+  "pool-party",
+  "baraat-band",
+  "roka-shagun",
+  "chooda-ceremony",
+  "rishikesh-ganga",
+  "jaisalmer-dunes",
+  "fort-night",
+  "sheesh-mahal",
+  "white-rann",
+  "mameru-bandhani",
+  "sindhi-ajrak",
+  "hampi-ruins",
+  "coorg-estate",
+  "bali-garden",
+  "santorini-white",
+  "glass-house",
+  "minimal-white",
+  "fairy-forest",
+  "love-letter",
+  "parsi-chalk",
+  "jazz-lounge",
+  "bride-squad",
+  "teej-jhoola",
+  "cricket-stadium",
+  "neon-arcade",
+  "retro-bollywood",
+  "annaprashan",
+  "christening-lilies",
+  "new-home-modern",
+  "satyanarayan",
+  "mata-ki-chowki",
+  "upanayana",
+  "shraddhanjali",
+  "retirement-garden",
+  "farewell-night",
+  "grand-opening",
+  "launch-stage",
+  "ganesh-utsav",
+  "durga-pujo",
+  "janmashtami",
+  "onam-pookalam",
+  "pongal-kolam",
+  "uttarayan-kites",
+  "lohri-bonfire",
+  "iftar-dawat",
+] as const;
+export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
 export const SUITE_IDS = [
   "rajwada-bagh",
@@ -52,6 +133,7 @@ export const SUITE_IDS = [
   "palna",
   "deepotsav",
   "jungle-party",
+  ...SCENE_THEME_IDS,
   "classic",
 ] as const;
 export type SuiteId = (typeof SUITE_IDS)[number];
@@ -131,9 +213,11 @@ export type Suite = {
    * differently from it. Missing keeps the plain details page.
    */
   guest?: GuestLookChoice;
+  /** How its words are lettered (lettering.ts); missing is regal, the palaces' serif. */
+  voice?: Voice;
 };
 
-export const SUITES: Record<SuiteId, Suite> = {
+const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "rajwada-bagh": {
     id: "rajwada-bagh",
     art: "bagh",
@@ -318,6 +402,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A pastel garden arch of balloons and bunting, the cake table under it
   gubbara: {
+    voice: "playful",
     id: "gubbara",
     art: "bagh",
     turn: "fade",
@@ -359,6 +444,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A city rooftop at night: fairy lights, floor cushions, a DJ and fireworks
   rooftop: {
+    voice: "modern",
     id: "rooftop",
     art: "kayal",
     turn: "sweep",
@@ -377,6 +463,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Modern and minimal: ivory plaster arches, pampas grass and soft sunlight
   "ivory-arch": {
+    voice: "romantic",
     id: "ivory-arch",
     art: "bagh",
     turn: "arch",
@@ -405,6 +492,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Loose watercolour roses and peonies on white paper
   gulaab: {
+    voice: "romantic",
     id: "gulaab",
     art: "bagh",
     turn: "fade",
@@ -433,6 +521,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Black lacquer and gold art deco, like a grand 1920s hotel
   "deco-noir": {
+    voice: "modern",
     id: "deco-noir",
     art: "kayal",
     turn: "sweep",
@@ -468,6 +557,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A midnight sky of gold moons, stars and soft clouds
   taara: {
+    voice: "modern",
     id: "taara",
     art: "kayal",
     turn: "fade",
@@ -496,6 +586,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Layers of cut paper in pastel shades, with real depth
   kaagaz: {
+    voice: "modern",
     id: "kaagaz",
     art: "bagh",
     turn: "arch",
@@ -523,6 +614,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Boho desert: terracotta arches, pampas grass and the dunes at sunset
   mitti: {
+    voice: "romantic",
     id: "mitti",
     art: "savari",
     turn: "sweep",
@@ -669,6 +761,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A beach wedding: white drapes, palms and a pastel sunset over the sea
   sagar: {
+    voice: "romantic",
     id: "sagar",
     art: "kayal",
     turn: "ripple",
@@ -868,6 +961,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A white garden chapel with stained glass and lilies, opening with the window's blessing
   chapel: {
+    voice: "romantic",
     id: "chapel",
     art: "kayal",
     turn: "fade",
@@ -897,6 +991,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Soft cherry blossoms over a wooden bridge, a still pond and paper lanterns
   sakura: {
+    voice: "romantic",
     id: "sakura",
     art: "kayal",
     turn: "fade",
@@ -924,6 +1019,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A Tuscan vineyard at golden hour, with olive trees and a rustic stone villa
   vigna: {
+    voice: "romantic",
     id: "vigna",
     art: "kayal",
     turn: "fade",
@@ -952,6 +1048,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // Snowy mountains, a pine forest and warm winter lights
   himani: {
+    voice: "romantic",
     id: "himani",
     art: "kayal",
     turn: "fade",
@@ -980,6 +1077,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // An enchanted forest of moss, ferns, fairy lights and fireflies
   van: {
+    voice: "romantic",
     id: "van",
     art: "kayal",
     turn: "fade",
@@ -1036,6 +1134,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A flower swing cradle among soft pastel clouds, for a baby shower
   palna: {
+    voice: "playful",
     id: "palna",
     art: "bagh",
     turn: "fade",
@@ -1079,6 +1178,7 @@ export const SUITES: Record<SuiteId, Suite> = {
   },
   // A storybook jungle of friendly animals, balloons and big leaves
   "jungle-party": {
+    voice: "playful",
     id: "jungle-party",
     art: "bagh",
     turn: "fade",
@@ -1104,6 +1204,154 @@ export const SUITES: Record<SuiteId, Suite> = {
     images: {},
   },
 };
+
+/** The painted theme each Scene theme takes its colours, lettering and guest page from. */
+const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
+  "udaipur-lake": "rajwada-bagh",
+  "pink-haveli": "shahi-savari",
+  "char-bagh": "noor-bagh",
+  "kashi-ghat": "kashi",
+  "temple-pond": "kayal",
+  "kovil-corridor": "mysuru",
+  "arati-mandap": "kalamkari",
+  "zamindar-bari": "rajbari",
+  "kutch-bhunga": "kutch-toran",
+  "punjab-haveli": "phulkari-haveli",
+  "pune-wada": "peshwai-wada",
+  "chinar-dal": "chinar",
+  "space-voyage": "rooftop",
+  "rainbow-unicorn": "gubbara",
+  "dino-jungle": "jungle-party",
+  "ocean-pearl": "gubbara",
+  "boho-onederland": "gubbara",
+  "fairytale-castle": "gubbara",
+  "little-racer": "jungle-party",
+  "gold-gala": "rooftop",
+  "amrit-utsav": "saath",
+  "silver-jubilee": "saath",
+  "golden-jubilee": "saath",
+  "oh-baby": "palna",
+  "new-year-eve": "rooftop",
+  "kitty-tea": "gubbara",
+  "pool-party": "gubbara",
+  "baraat-band": "rajwada-bagh",
+  "roka-shagun": "rajwada-bagh",
+  "chooda-ceremony": "phulkari-haveli",
+  "rishikesh-ganga": "kashi",
+  "jaisalmer-dunes": "shahi-savari",
+  "fort-night": "rajwada-bagh",
+  "sheesh-mahal": "shahi-savari",
+  "white-rann": "kutch-toran",
+  "mameru-bandhani": "kutch-toran",
+  "sindhi-ajrak": "kutch-toran",
+  "hampi-ruins": "mysuru",
+  "coorg-estate": "mysuru",
+  "bali-garden": "sagar",
+  "santorini-white": "sagar",
+  "glass-house": "ivory-arch",
+  "minimal-white": "ivory-arch",
+  "fairy-forest": "van",
+  "love-letter": "gulaab",
+  "parsi-chalk": "gulaab",
+  "jazz-lounge": "deco-noir",
+  "bride-squad": "gubbara",
+  "teej-jhoola": "gubbara",
+  "cricket-stadium": "jungle-party",
+  "neon-arcade": "rooftop",
+  "retro-bollywood": "rooftop",
+  annaprashan: "palna",
+  "christening-lilies": "chapel",
+  "new-home-modern": "ivory-arch",
+  satyanarayan: "kashi",
+  "mata-ki-chowki": "kashi",
+  upanayana: "mysuru",
+  shraddhanjali: "ivory-arch",
+  "retirement-garden": "saath",
+  "farewell-night": "rooftop",
+  "grand-opening": "deepotsav",
+  "launch-stage": "deco-noir",
+  "ganesh-utsav": "peshwai-wada",
+  "durga-pujo": "rajbari",
+  janmashtami: "pichwai",
+  "onam-pookalam": "kayal",
+  "pongal-kolam": "tanjore",
+  "uttarayan-kites": "kutch-toran",
+  "lohri-bonfire": "phulkari-haveli",
+  "iftar-dawat": "noor-bagh",
+};
+
+/** The occasions a Scene theme is painted for beyond weddings. */
+const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
+  "space-voyage": ["birthday"],
+  "rainbow-unicorn": ["birthday"],
+  "dino-jungle": ["birthday"],
+  "ocean-pearl": ["birthday"],
+  "boho-onederland": ["birthday"],
+  "fairytale-castle": ["birthday"],
+  "little-racer": ["birthday"],
+  "gold-gala": ["birthday", "party"],
+  "amrit-utsav": ["birthday"],
+  "silver-jubilee": ["anniversary"],
+  "golden-jubilee": ["anniversary"],
+  "oh-baby": ["baby-shower"],
+  "new-year-eve": ["party"],
+  "kitty-tea": ["party"],
+  "pool-party": ["party", "birthday"],
+  "bride-squad": ["party"],
+  "teej-jhoola": ["party"],
+  "cricket-stadium": ["birthday"],
+  "neon-arcade": ["birthday", "party"],
+  "retro-bollywood": ["party", "birthday"],
+  annaprashan: ["annaprashan"],
+  "christening-lilies": ["christening"],
+  "new-home-modern": ["housewarming"],
+  satyanarayan: ["puja"],
+  "mata-ki-chowki": ["puja"],
+  upanayana: ["thread-ceremony"],
+  shraddhanjali: ["prayer-meet"],
+  "retirement-garden": ["retirement"],
+  "farewell-night": ["farewell-party"],
+  "grand-opening": ["shop-opening"],
+  "launch-stage": ["launch"],
+  "ganesh-utsav": ["ganesh-chaturthi"],
+  "durga-pujo": ["navratri"],
+  janmashtami: ["janmashtami"],
+  "onam-pookalam": ["onam"],
+  "pongal-kolam": ["sankranti"],
+  "uttarayan-kites": ["sankranti"],
+  "lohri-bonfire": ["lohri"],
+  "iftar-dawat": ["eid"],
+};
+
+/** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
+function sceneTheme(id: SceneThemeId): Suite {
+  const { art, turn, faiths, template, guest, voice } = PAINTED[SCENE_KIN[id]];
+  return {
+    id,
+    art,
+    turn,
+    faiths,
+    template,
+    traditions: [],
+    guest,
+    voice,
+    images: { cover: `/suites/${id}/cover.webp` },
+    ...(SCENE_OCCASIONS[id] && { occasions: SCENE_OCCASIONS[id] }),
+  };
+}
+
+export const SUITES: Record<SuiteId, Suite> = {
+  ...PAINTED,
+  ...(Object.fromEntries(SCENE_THEME_IDS.map((id) => [id, sceneTheme(id)])) as Record<
+    SceneThemeId,
+    Suite
+  >),
+};
+
+/** Whether a theme is one of the Scene themes, which only show as a Scene. */
+export function isSceneTheme(suite: SuiteId): suite is SceneThemeId {
+  return (SCENE_THEME_IDS as readonly SuiteId[]).includes(suite);
+}
 
 /** Designs whose own look already says where they are from. */
 const TEMPLATE_SUITES: Partial<Record<TemplateId, SuiteId>> = {
@@ -1178,6 +1426,23 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   party: { art: "reception", mood: "night" },
   "baby-shower": { art: "reception", mood: "day" },
   diwali: { art: "reception", mood: "night" },
+  housewarming: { art: "reception", mood: "day" },
+  puja: { art: "reception", mood: "dusk" },
+  "thread-ceremony": { art: "reception", mood: "dawn" },
+  annaprashan: { art: "reception", mood: "day" },
+  christening: { art: "reception", mood: "day" },
+  "prayer-meet": { art: "reception", mood: "dawn" },
+  retirement: { art: "reception", mood: "dusk" },
+  "farewell-party": { art: "reception", mood: "night" },
+  "shop-opening": { art: "reception", mood: "day" },
+  launch: { art: "reception", mood: "night" },
+  "ganesh-chaturthi": { art: "reception", mood: "day" },
+  navratri: { art: "reception", mood: "night" },
+  janmashtami: { art: "reception", mood: "night" },
+  onam: { art: "reception", mood: "day" },
+  sankranti: { art: "reception", mood: "day" },
+  lohri: { art: "reception", mood: "night" },
+  eid: { art: "reception", mood: "dusk" },
 };
 
 /**

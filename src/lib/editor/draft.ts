@@ -17,6 +17,7 @@ import {
 } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
 import type { SuiteId } from "@/lib/suites/catalog";
+import type { InviteFormat } from "./formats";
 import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
 import { noPages } from "./pages";
@@ -111,8 +112,10 @@ export function newDraft(
     type: defaultType,
     couplePhotos: noCouplePhotos,
     blessingPage: true,
+    format: "story",
     family: noFamily,
     pages: noPages,
+    guide: {},
   };
 }
 
@@ -150,6 +153,8 @@ export function withGalleryChoice(
     tradition: TraditionPack["id"] | null;
     suite: SuiteId;
     template: TemplateId | null;
+    /** A Scene design opens as one painting; any other design as its story of pages. */
+    format?: InviteFormat;
   },
 ): InviteDraft {
   let next = choice.category ? withCategory(draft, choice.category) : draft;
@@ -163,6 +168,7 @@ export function withGalleryChoice(
   return {
     ...next,
     suite: choice.suite,
+    format: choice.format ?? "story",
     templateId: choice.template ?? next.templateId,
     languages: [main],
     step: "couple",

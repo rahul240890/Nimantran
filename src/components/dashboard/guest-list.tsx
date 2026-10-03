@@ -1,6 +1,6 @@
 "use client";
 
-import { formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import {
   BellRing,
   CircleCheck,
@@ -54,7 +54,7 @@ import { personalUrl, whatsappToUrl } from "@/lib/publish/links";
 import { GuestFormDialog } from "./guest-form";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
-import { dateLocale } from "@/i18n/dates";
+import { dateLocale, timeAgo } from "@/i18n/dates";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -109,6 +109,7 @@ function GuestRow({
   const waiting = guest.replies.length === 0;
   const opened = Boolean(guest.openedAt) || !waiting;
   const kind = waiting && (guest.openedAt || guest.remindedAt) ? "reminder" : "invite";
+  const ago = (when: string) => timeAgo(when, locale);
 
   const send = () => {
     if (kind === "reminder") {
@@ -148,24 +149,32 @@ function GuestRow({
           })}
         </ul>
         <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
-          <span className="inline-flex items-center gap-1.5">
+          <span
+            className={cn("inline-flex items-center gap-1.5", opened && "text-ink")}
+            title={
+              guest.openedAt
+                ? copy.guest.firstOpened(
+                    format(guest.openedAt, "PPp", { locale: dateLocale[locale] }),
+                  )
+                : undefined
+            }
+          >
             {opened ? (
               <Eye aria-hidden className="size-4" />
             ) : (
               <EyeOff aria-hidden className="size-4" />
             )}
-            {opened ? copy.guest.opened : copy.guest.notOpened}
+            {guest.lastOpenedAt
+              ? copy.guest.openedWhen(ago(guest.lastOpenedAt)) + copy.guest.visits(guest.openCount)
+              : opened
+                ? copy.guest.opened
+                : copy.guest.notOpened}
           </span>
           {guest.phone && <span className="tabular-nums">{formatPhone(guest.phone)}</span>}
           {guest.remindedAt && waiting && (
             <span className="inline-flex items-center gap-1.5">
               <BellRing aria-hidden className="size-4" />
-              {copy.guest.reminded(
-                formatDistanceToNow(guest.remindedAt, {
-                  addSuffix: true,
-                  locale: dateLocale[locale],
-                }),
-              )}
+              {copy.guest.reminded(ago(guest.remindedAt))}
             </span>
           )}
           {guest.selfAdded && <span>{copy.guest.selfAdded}</span>}
@@ -494,6 +503,7 @@ export function GuestList({ view }: { view: DashboardView }) {
           <GuestFormDialog
             inviteId={view.id}
             functions={view.functions}
+            guests={view.guests}
             onDone={() => setAdding(false)}
           />
         )}
@@ -504,6 +514,7 @@ export function GuestList({ view }: { view: DashboardView }) {
             key={editing.id}
             inviteId={view.id}
             functions={view.functions}
+            guests={view.guests}
             guest={editing}
             onDone={() => setEditing(null)}
           />

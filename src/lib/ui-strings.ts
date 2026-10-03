@@ -31,6 +31,8 @@ export const uiStrings = {
   /** Words the story adds between the host's own (Step 12d). */
   storyWords: {
     saveTheDate: "Save the date",
+    when: "Date & time",
+    where: "Venue",
     joinUs: "Will you join us?",
     withLove: "With love, we await you",
     and: "and",

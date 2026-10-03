@@ -15,7 +15,8 @@ import {
   type InviteDraft,
 } from "@/lib/editor/draft";
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
-import { hasBlessingPage, suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { hasBlessingPage, isSceneTheme, suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { formatCardDate, formatCardTime, type CardLanguage } from "@/lib/templates/card-languages";
 import { formatTime } from "@/lib/time";
 
@@ -111,6 +112,15 @@ export function draftSuite(draft: InviteDraft): SuiteId {
     templateId: draft.templateId,
     category: draft.categoryId,
   });
+}
+
+/**
+ * Whether the invite shows as One Scene: the host picked it and its theme has a scene, or
+ * its theme is a Scene theme, which has no pages of its own.
+ */
+export function draftShowsScene(draft: InviteDraft): boolean {
+  const suite = draftSuite(draft);
+  return (draft.format === "scene" || isSceneTheme(suite)) && hasScene(suite);
 }
 
 /** Whether the pages open with the theme's painted god: when it has one and the host keeps it. */

@@ -34,6 +34,8 @@ export type Plan = {
   watermark: boolean;
   /** The story as an MP4 for WhatsApp Status and Reels (Step 17c). */
   video: boolean;
+  /** Days the guest photo wall stays open after the last function (Step 24); 0 for none. */
+  albumDays: number;
   limits: PlanLimits;
 };
 
@@ -42,6 +44,7 @@ const UNLIMITED = Number.POSITIVE_INFINITY;
 export const PLANS: Record<PlanId, Plan> = {
   free: {
     id: "free",
+    albumDays: 0,
     pricePaise: 0,
     watermark: true,
     video: false,
@@ -49,6 +52,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   premium: {
     id: "premium",
+    albumDays: 30,
     pricePaise: 49_900,
     watermark: false,
     video: true,
@@ -56,6 +60,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   royal: {
     id: "royal",
+    albumDays: 365,
     pricePaise: 1_99_900,
     watermark: false,
     video: true,
@@ -69,6 +74,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   bundle: {
     id: "bundle",
+    albumDays: UNLIMITED,
     pricePaise: 2_99_900,
     watermark: false,
     video: true,
@@ -81,6 +87,14 @@ export const PLANS: Record<PlanId, Plan> = {
     },
   },
 };
+
+/**
+ * Co-hosts each edition includes (docs/PRICING.md); null for no limit. Kept apart from
+ * PlanLimits because the database counts them (cohost_limit()), not the invite's draft.
+ */
+const COHOSTS: Record<PlanId, number | null> = { free: 1, premium: 3, royal: null, bundle: null };
+
+export const cohostLimit = (plan: PlanId): number | null => COHOSTS[plan];
 
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === "string" && (PLAN_IDS as readonly string[]).includes(value);

@@ -15,7 +15,7 @@ describe("public pages", () => {
 
   it("cover every occasion, tradition and design", () => {
     const pages = publicPages();
-    expect(pages.filter((page) => page.kind === "occasion")).toHaveLength(13);
+    expect(pages.filter((page) => page.kind === "occasion")).toHaveLength(30);
     expect(pages.filter((page) => page.kind === "tradition")).toHaveLength(7);
     expect(pages.filter((page) => page.kind === "design")).toHaveLength(12);
     const paths = pages.flatMap((page) => UI_LOCALES.map((locale) => pagePath(page, locale)));

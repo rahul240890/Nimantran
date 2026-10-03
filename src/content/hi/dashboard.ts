@@ -15,6 +15,10 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
   share: "भेजें",
   edit: "निमंत्रण बदलें",
   open: "निमंत्रण खोलें",
+  guestsOnly: {
+    title: "आप मेहमानों की देखभाल कर रहे हैं",
+    body: "परिवार ने आपसे मेहमान सूची और जवाब सँभालने को कहा है। कार्ड को सिर्फ़ वे, या बदलाव कर सकने वाले सह-मेज़बान, बदल सकते हैं।",
+  },
   notLive: {
     title: "यह निमंत्रण अभी लाइव नहीं है",
     body: "मेहमान सूची आप अभी बना सकते हैं। निजी लिंक और याद-दिहानी प्रकाशित करने के बाद चलेंगी।",
@@ -53,6 +57,7 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       maybe: "शायद",
       declined: "नहीं आ पाएँगे",
       waiting: "इंतज़ार",
+      seen: "खोला, जवाब नहीं",
       "not-opened": "नहीं खोला",
     },
     functionLabel: "उत्सव",
@@ -77,6 +82,9 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     party: (count) => (count === 1 ? "1 व्यक्ति" : `${n(count)} लोग`),
     selfAdded: "साझा लिंक से जवाब दिया",
     opened: "खोला",
+    openedWhen: (when) => `${when} खोला`,
+    visits: (count) => (count > 1 ? ` · ${n(count)} बार` : ""),
+    firstOpened: (when) => `पहली बार ${when} खोला`,
     notOpened: "नहीं खोला",
     reminded: (when) => `${when} याद दिलाया`,
     notInvited: "आमंत्रित नहीं",
@@ -105,6 +113,7 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     editTitle: "मेहमान बदलें",
     oneTab: "एक मेहमान",
     pasteTab: "सूची चिपकाएँ",
+    importTab: "आयात करें",
     name: "नाम",
     namePlaceholder: "शर्मा अंकल, मीरा अय्यर…",
     nameRequired: "नाम लिखें",
@@ -143,6 +152,52 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     added: (count) => (count === 1 ? "मेहमान जुड़ गया" : `${count} मेहमान जुड़ गए`),
     saved: "मेहमान सहेजा गया",
     failed: "सहेज नहीं पाए। इंटरनेट जाँचें और फिर कोशिश करें।",
+  },
+
+  importer: {
+    intro:
+      "फ़ोन के कॉन्टैक्ट, Excel या CSV शीट, या कॉन्टैक्ट फ़ाइल से मेहमान लाइए। हर एक को उसका अपना निजी लिंक मिलता है।",
+    contacts: "कॉन्टैक्ट से चुनें",
+    contactsHint: "आपके फ़ोन के कॉन्टैक्ट खुलते हैं। मेहमान जोड़ने तक कुछ साझा नहीं होता।",
+    contactsFailed: "कॉन्टैक्ट नहीं खुले। फ़ाइल से आज़माएँ।",
+    file: "फ़ाइल चुनें",
+    fileHint: "Excel (.xlsx), CSV या कॉन्टैक्ट (.vcf), 2,000 मेहमानों तक।",
+    noContactsHint:
+      "iPhone पर Contacts खोलें, लोग चुनें, Share दबाएँ और कॉन्टैक्ट फ़ाइल सहेजें। फिर उसे यहाँ चुनें।",
+    reading: "आपकी फ़ाइल पढ़ रहे हैं…",
+    unreadable: "यह फ़ाइल पढ़ी नहीं जा सकी। इसे Excel (.xlsx) या CSV में सहेजकर फिर कोशिश करें।",
+    oldExcel: "यह पुरानी Excel फ़ाइल है। Excel में Save As चुनें, फिर Excel Workbook (.xlsx)।",
+    empty: "इस फ़ाइल में कोई मेहमान नहीं मिला।",
+    from: (source) => `${source} से`,
+    contactsSource: "आपके कॉन्टैक्ट",
+    another: "दूसरी चुनें",
+    nameColumn: "नाम वाला कॉलम",
+    phoneColumn: "नंबर वाला कॉलम",
+    noColumn: "कोई नहीं",
+    firstAndLast: (first, last) => `${first} + ${last}`,
+    column: (label) => `कॉलम ${label}`,
+    selectAll: "सभी चुनें",
+    summary: (picked, total) => `${n(total)} में से ${n(picked)} चुने`,
+    duplicate: "सूची में पहले से",
+    noName: "नाम नहीं",
+    badPhone: "नंबर समझ नहीं आया",
+    noPhone: "नंबर नहीं",
+    party: (count) => (count > 1 ? `${n(count)} लोग` : ""),
+    add: (count) => (count ? `${n(count)} मेहमान जोड़ें` : "मेहमान जोड़ें"),
+    adding: (done, total) => `${n(total)} में से ${n(done)} जोड़ रहे हैं…`,
+    added: (count) => `${n(count)} मेहमान जुड़े, हर एक का निजी लिंक तैयार`,
+    partial: (done, total) =>
+      `${n(total)} में से ${n(done)} मेहमान जुड़े। कनेक्शन देखकर बाक़ी फिर जोड़ें।`,
+    nothingPicked: "जोड़ने के लिए कम से कम एक मेहमान चुनें",
+  },
+
+  opens: {
+    heading: "किसने खोला",
+    body: "जिसे भी आप निजी लिंक भेजते हैं, वह खोलते ही यहाँ दिखता है।",
+    none: "अभी किसी ने अपना निजी लिंक नहीं खोला। मेहमान सूची से लिंक भेजें।",
+    noGuests: "मेहमान जोड़िए, हर एक को निजी लिंक भेजिए और देखिए कब खोला।",
+    replied: "जवाब दिया",
+    noReply: "अभी जवाब नहीं",
   },
 
   removeGuest: {
@@ -198,9 +253,67 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       "SMS और ईमेल से अपने-आप याद-दिहानी, भारत में टेक्स्ट मैसेज की व्यवस्था होने पर आएगी।",
   },
 
+  schedule: {
+    heading: "तय समय पर भेजें",
+    body: (count) =>
+      count
+        ? `${n(count)} भेजना तय है। समय आने पर आपका कैलेंडर याद दिलाएगा, और हर संदेश यहाँ तैयार मिलेगा।`
+        : "निमंत्रण या याद-दिहानी भेजने का दिन और समय चुनिए। आपका कैलेंडर याद दिलाएगा, और हर संदेश यहाँ तैयार मिलेगा।",
+    notLive: "कब भेजना है, यह तय करने के लिए पहले निमंत्रण प्रकाशित करें।",
+    add: "समय तय करें",
+    limit: "एक साथ इतने ही रुक सकते हैं। पहले कोई एक भेजें या रद्द करें।",
+    planTitle: "भेजने का समय तय करें",
+    planDescription:
+      "इस समय आपका फ़ोन याद दिलाएगा, और हर मेहमान का निजी लिंक वाला WhatsApp संदेश आपके नंबर से भेजने के लिए तैयार होगा।",
+    what: "क्या भेजना है",
+    purposes: {
+      invite: "निमंत्रण",
+      reminder: "याद-दिहानी",
+    },
+    purposeHints: {
+      invite: "आपकी सूची के सभी मेहमान",
+      reminder: "सिर्फ़ वे मेहमान जिन्होंने अभी जवाब नहीं दिया",
+    },
+    forLabel: "किसके लिए",
+    everything: "सभी समारोह",
+    date: "तारीख़",
+    datePlaceholder: "दिन चुनें",
+    time: "समय",
+    timeHint: "भारतीय समय",
+    save: "तय करें",
+    cancel: "रद्द करें",
+    past: "यह समय निकल चुका है। बाद का समय चुनें।",
+    missing: "दिन और समय चुनें।",
+    failed: "समय तय नहीं हो सका। फिर से कोशिश करें।",
+    savedTitle: "समय तय हो गया",
+    savedBody: (when) =>
+      `${when} के लिए तय। इसे अपने कैलेंडर में जोड़ें, ताकि समय आने पर फ़ोन याद दिलाए।`,
+    google: "Google कैलेंडर में जोड़ें",
+    apple: "Apple या Outlook कैलेंडर",
+    done: "हो गया",
+    label: (purpose, fn) =>
+      `${purpose === "invite" ? "निमंत्रण" : "याद-दिहानी"}${fn ? ` · ${fn}` : ""}`,
+    audience: (count) => `${n(count)} मेहमान`,
+    due: "भेजने का समय",
+    sendNow: "अभी भेजें",
+    actions: (label) => `${label} के और विकल्प`,
+    cancelSend: "यह भेजना रद्द करें",
+    cancelled: "भेजना रद्द हुआ",
+    sendTitle: (label) => `भेजें: ${label}`,
+    sendDescription:
+      "हर बटन उसी मेहमान के लिए संदेश तैयार करके WhatsApp खोलता है। पूरी सूची भेज दें, तो इसे भेजा हुआ मार्क करें।",
+    nobody: "अभी किसी को भेजने की ज़रूरत नहीं।",
+    markSent: "भेजा हुआ मार्क करें",
+    notYet: "अभी नहीं",
+    marked: "भेजा हुआ मार्क हुआ",
+    calendarTitle: (purpose, names) =>
+      purpose === "invite" ? `${names} के निमंत्रण भेजें` : `मेहमानों को याद दिलाएँ: ${names}`,
+    calendarBody: "अपनी मेहमान सूची खोलें। हर WhatsApp संदेश भेजने के लिए तैयार है:",
+  },
+
   hosts: {
     heading: "सह-मेज़बान",
-    body: "दोनों परिवार मिलकर यह निमंत्रण सँभाल सकते हैं: बदलना, मेहमान जोड़ना और हर जवाब देखना।",
+    body: "परिवार के लोग आपके साथ यह निमंत्रण सँभाल सकते हैं। चुनें कि हर व्यक्ति क्या कर सकता है।",
     you: "आप",
     owner: "निमंत्रण बनाया",
     cohost: "सह-मेज़बान",
@@ -212,12 +325,35 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     label: "यह किसके लिए है?",
     labelPlaceholder: "मीरा का परिवार, अर्जुन के भाई…",
     labelHint: "उनके नाम के साथ दिखेगा।",
+    accessLabel: "वे क्या कर सकेंगे?",
+    access: {
+      edit: {
+        name: "निमंत्रण और मेहमान",
+        hint: "कार्ड, कार्यक्रम और फ़ोटो बदलना, प्रकाशित करना, और मेहमान सूची सँभालना।",
+        short: "निमंत्रण बदल सकते हैं",
+      },
+      guests: {
+        name: "मेहमान और जवाब",
+        hint: "मेहमान जोड़ना, याद दिलाना और हर जवाब देखना। कार्ड वैसा ही रहेगा जैसा आपने बनाया।",
+        short: "मेहमान और जवाब",
+      },
+    },
+    changeAccess: (name) => `${name} क्या कर सकते हैं`,
+    accessChanged: "बदल दिया",
+    phone: "उनका WhatsApp नंबर",
+    phoneHint: "लिंक उनकी चैट में खुलेगा। ख़ाली छोड़ें तो चैट आप खुद चुनें।",
+    phoneInvalid: "यह फ़ोन नंबर नहीं लगता",
+    seats: (used, limit) => `${limit} में से ${used} सह-मेज़बान`,
+    fullTitle: (limit) => `इस संस्करण में ${limit} सह-मेज़बान शामिल हैं`,
+    fullBody: "और जोड़ने के लिए निमंत्रण अपग्रेड करें, या जो लिंक अब नहीं चाहिए उसे वापस लें।",
+    upgrade: "संस्करण देखें",
     create: "लिंक बनाएँ",
     creating: "लिंक बन रहा है…",
     createFailed: "लिंक नहीं बना। फिर कोशिश करें।",
     pending: "जुड़ने का इंतज़ार",
     pendingFor: (label) => (label ? `${label} के लिए लिंक` : "सह-मेज़बान का लिंक"),
     whatsapp: "WhatsApp पर भेजें",
+    sentTo: (phone) => `${phone} के लिए`,
     copy: "लिंक कॉपी करें",
     copied: "लिंक कॉपी हो गया",
     withdraw: "वापस लें",
@@ -267,14 +403,19 @@ export const joinCopy: Translation<typeof en.joinCopy> = {
   metaTitle: "सह-मेज़बान बनें",
   eyebrow: "सह-मेज़बान का न्योता",
   title: (names) => `${names} का निमंत्रण सँभालने में मदद करें`,
-  body: (who, occasion) =>
-    `${who || "परिवार"} ने आपसे ${occasion} के निमंत्रण में मदद माँगी है। सह-मेज़बान के रूप में आप निमंत्रण बदल सकते हैं, मेहमान जोड़ सकते हैं, याद दिला सकते हैं और हर जवाब देख सकते हैं।`,
+  body: (who, occasion, access) =>
+    `${who || "परिवार"} ने आपसे ${occasion} के निमंत्रण में मदद माँगी है। ${
+      access === "edit"
+        ? "सह-मेज़बान के रूप में आप निमंत्रण बदल सकते हैं, मेहमान जोड़ सकते हैं, याद दिला सकते हैं और हर जवाब देख सकते हैं।"
+        : "सह-मेज़बान के रूप में आप मेहमान जोड़ सकते हैं, याद दिला सकते हैं और हर जवाब देख सकते हैं। कार्ड वैसा ही रहेगा जैसा उन्होंने बनाया।"
+    }`,
   forLabel: (label) => `इस रूप में जुड़ेंगे: ${label}`,
   accept: "स्वीकार करें और मेहमान सूची खोलें",
   signIn: "स्वीकार करने के लिए साइन इन करें",
   signInNote: "अपने मोबाइल नंबर या Google से। बस एक पल लगेगा।",
   accepting: "जुड़ रहे हैं…",
   failed: "अभी स्वीकार नहीं हो पाया। फिर कोशिश करें।",
+  full: "इस निमंत्रण में उसके संस्करण के सभी सह-मेज़बान जुड़ चुके हैं। परिवार से अपग्रेड करने या किसी को हटाने को कहें, फिर यह लिंक दोबारा खोलें।",
   usedTitle: "यह लिंक पहले ही इस्तेमाल हो चुका है",
   usedBody:
     "सह-मेज़बान के लिंक एक बार चलते हैं। अगर आप जुड़ चुके हैं, तो निमंत्रण मेरे निमंत्रण में है। नहीं तो परिवार से नया लिंक माँगें।",

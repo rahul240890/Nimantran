@@ -7,30 +7,62 @@ import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/ids";
 import { isFunctionId } from "@/lib/events/functions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { GuestReplyRow, HostFunction, HostGuest, ReplyStatus } from "@/lib/guests/list";
+import {
+  SCHEDULE_LIMIT,
+  type ScheduledSend,
+  type SendPurpose,
+  type SendStatus,
+} from "@/lib/guests/schedule";
 import { supabaseServer } from "@/lib/supabase/server";
+import { editionsActive, publishedPlan } from "@/lib/payments/editions";
+import { cohostLimit } from "@/lib/plans/catalog";
 import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import { previewDb, previewHosts, type PreviewGuest, type PreviewInvite } from "./preview-db";
 import { rowsToDraft, type EventRow, type FunctionRow } from "./rows";
 
 /*
  * The host dashboard (Step 11): the guest list with everyone's replies, and the people who
- * run the invite. Supabase checks every read and write with row level security, so a
- * co-host reaches exactly what the owner does except adding or removing hosts.
+ * run the invite. Supabase checks every read and write with row level security. A co-host
+ * with edit access reaches what the owner does except deleting the invite, paying, and
+ * adding or removing hosts; one with guests access runs only the guest list and replies.
  */
+
+/** What a co-host may do: edit the invite and its guests, or the guests and replies only. */
+export type HostAccess = "edit" | "guests";
+export const HOST_ACCESS = ["edit", "guests"] as const satisfies HostAccess[];
+
+/** Rows written before co-host access existed (or before its migration ran) can edit. */
+const accessOf = (value: unknown): HostAccess => (value === "guests" ? "guests" : "edit");
 
 export type Host = {
   userId: string;
   name: string;
   role: "owner" | "cohost";
   side: string;
+  access: HostAccess;
   you: boolean;
 };
 
-export type HostInvite = { id: string; label: string; token: string; createdAt: string };
+export type HostInvite = {
+  id: string;
+  label: string;
+  token: string;
+  access: HostAccess;
+  /** The WhatsApp number the owner sends the link to, when they gave one. */
+  phone: string | null;
+  createdAt: string;
+};
+
+/** The signed-in person's place on an invite. */
+export type MyAccess = { role: "owner" | "cohost"; access: HostAccess };
+
+export type NewHostInvite = { label: string; access: HostAccess; phone: string | null };
 
 export type Dashboard = {
   id: string;
   role: "owner" | "cohost";
+  /** Whether the signed-in person can edit the invite itself (owners always can). */
+  canEdit: boolean;
   status: EventRow["status"];
   slug: string | null;
   draft: InviteDraft;
@@ -40,7 +72,11 @@ export type Dashboard = {
   hosts: Host[];
   /** Co-host links not used yet; only the owner sees them. */
   hostInvites: HostInvite[];
+  /** Invitations and reminders planned for later, sent from the host's WhatsApp. */
+  schedules: ScheduledSend[];
 };
+
+export type NewSend = { purpose: SendPurpose; functionId: string | null; sendAt: string };
 
 export type NewGuest = {
   name: string;
@@ -58,10 +94,14 @@ export type JoinPreview = {
   templateId: TemplateId;
   content: Record<string, string>;
   label: string;
+  access: HostAccess;
   invitedBy: string;
 };
 
-export type AcceptResult = { ok: true; id: string } | { ok: false; reason: "used" | "failed" };
+export type AcceptResult =
+  | { ok: true; id: string }
+  /** full: the invite has all the co-hosts its edition includes; the link still works later. */
+  | { ok: false; reason: "used" | "full" | "failed" };
 
 type HostStore = {
   dashboard(account: Account, id: string): Promise<Dashboard | null>;
@@ -69,9 +109,18 @@ type HostStore = {
   updateGuest(account: Account, id: string, guestId: string, patch: GuestPatch): Promise<boolean>;
   removeGuests(account: Account, id: string, guestIds: string[]): Promise<boolean>;
   markReminded(account: Account, id: string, guestIds: string[]): Promise<boolean>;
-  createHostInvite(account: Account, id: string, label: string): Promise<string | null>;
+  scheduleSend(account: Account, id: string, send: NewSend): Promise<string | null>;
+  closeSend(
+    account: Account,
+    id: string,
+    sendId: string,
+    status: Exclude<SendStatus, "scheduled">,
+  ): Promise<boolean>;
+  createHostInvite(account: Account, id: string, invite: NewHostInvite): Promise<string | null>;
   withdrawHostInvite(account: Account, id: string, inviteId: string): Promise<boolean>;
   removeHost(account: Account, id: string, userId: string): Promise<boolean>;
+  setHostAccess(account: Account, id: string, userId: string, access: HostAccess): Promise<boolean>;
+  myAccess(account: Account, id: string): Promise<MyAccess | null>;
   joinPreview(token: string): Promise<JoinPreview | null>;
   acceptHostInvite(account: Account, token: string): Promise<AcceptResult>;
 };
@@ -82,8 +131,20 @@ const FUNCTION_COLUMNS =
   "id, kind, position, date, start_time, end_time, venue, address, dress_code";
 const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
+/** Visit counts arrive with 20261002170000_guest_opens.sql; until it runs the list reads without them. */
+const OPEN_COLUMNS = ", last_opened_at, open_count";
+const SEND_COLUMNS = "id, channel, purpose, function_id, send_at, status";
 const REPLY_COLUMNS =
   "guest_id, function_id, status, adults, children, message, answers, responded_at";
+
+type InviteRow = {
+  id: string;
+  label: string;
+  token: string;
+  access?: string;
+  phone?: string | null;
+  created_at: string;
+};
 
 type ReplyRow = {
   guest_id: string | null;
@@ -96,6 +157,34 @@ type ReplyRow = {
   responded_at: string;
 };
 
+type SendRow = {
+  id: string;
+  channel: string;
+  purpose: string;
+  function_id: string | null;
+  send_at: string;
+  status: string;
+};
+
+/** WhatsApp sends the dashboard can show; email and SMS rows wait for their providers. */
+function toSends(rows: SendRow[]): ScheduledSend[] {
+  return rows.flatMap((row): ScheduledSend[] =>
+    row.channel === "whatsapp" &&
+    (row.purpose === "invite" || row.purpose === "reminder") &&
+    (row.status === "scheduled" || row.status === "sent" || row.status === "cancelled")
+      ? [
+          {
+            id: row.id,
+            purpose: row.purpose,
+            functionId: row.function_id,
+            sendAt: new Date(row.send_at).toISOString(),
+            status: row.status,
+          },
+        ]
+      : [],
+  );
+}
+
 type GuestRow = {
   id: string;
   name: string;
@@ -106,6 +195,8 @@ type GuestRow = {
   function_ids: string[];
   self_added: boolean;
   opened_at: string | null;
+  last_opened_at?: string | null;
+  open_count?: number;
   reminded_at: string | null;
   created_at: string;
 };
@@ -140,13 +231,16 @@ const supabaseStore: HostStore = {
   async dashboard(account, id) {
     const supabase = await supabaseServer();
     if (!supabase) return null;
-    const { data, error } = await supabase
-      .from("events")
-      .select(
-        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${GUEST_COLUMNS}), rsvps(${REPLY_COLUMNS})`,
-      )
-      .eq("id", id)
-      .maybeSingle();
+    const read = (guestColumns: string) =>
+      supabase
+        .from("events")
+        .select(
+          `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), rsvp_questions(preset), guests(${guestColumns}), rsvps(${REPLY_COLUMNS}), scheduled_sends(${SEND_COLUMNS})`,
+        )
+        .eq("id", id)
+        .maybeSingle();
+    let { data, error } = await read(GUEST_COLUMNS + OPEN_COLUMNS);
+    if (error) ({ data, error } = await read(GUEST_COLUMNS));
     if (error || !data) return null;
     const row = data as unknown as EventRow & {
       owner_id: string;
@@ -154,21 +248,38 @@ const supabaseStore: HostStore = {
       rsvp_questions: { preset: string | null }[];
       guests: GuestRow[];
       rsvps: ReplyRow[];
+      scheduled_sends: SendRow[] | null;
     };
     const role = row.owner_id === account.id ? "owner" : "cohost";
+    // "*" keeps working on a database that hasn't had the co-host access migration yet
     const [{ data: hostRows }, { data: inviteRows }] = await Promise.all([
       supabase.rpc("event_host_list", { p_event: id }),
       role === "owner"
         ? supabase
             .from("event_host_invites")
-            .select("id, label, token, created_at")
+            .select("*")
             .eq("event_id", id)
             .is("accepted_at", null)
             .order("created_at")
-        : Promise.resolve({
-            data: [] as { id: string; label: string; token: string; created_at: string }[],
-          }),
+        : Promise.resolve({ data: [] as InviteRow[] }),
     ]);
+    const hosts = (
+      (hostRows ?? []) as {
+        user_id: string;
+        name: string;
+        role: Host["role"];
+        side: string;
+        access?: string;
+      }[]
+    ).map((host): Host => ({
+      userId: host.user_id,
+      name: host.name,
+      role: host.role,
+      side: host.side,
+      access: accessOf(host.access),
+      you: host.user_id === account.id,
+    }));
+    const me = hosts.find((host) => host.you);
     const presets = row.rsvp_questions.flatMap((q) => (q.preset ? [q.preset] : []));
     const byGuest = new Map<string, ReplyRow[]>();
     for (const reply of row.rsvps) {
@@ -178,6 +289,7 @@ const supabaseStore: HostStore = {
     return {
       id,
       role,
+      canEdit: role === "owner" || me?.access !== "guests",
       status: row.status,
       slug: row.status === "published" ? row.slug : null,
       draft: rowsToDraft(row, row.functions, [], presets),
@@ -195,27 +307,24 @@ const supabaseStore: HostStore = {
             functionIds: guest.function_ids ?? [],
             selfAdded: guest.self_added,
             openedAt: guest.opened_at,
+            lastOpenedAt: guest.last_opened_at ?? guest.opened_at,
+            openCount: guest.open_count ?? (guest.opened_at ? 1 : 0),
             remindedAt: guest.reminded_at,
             createdAt: guest.created_at,
           },
           byGuest.get(guest.id) ?? [],
         ),
       ),
-      hosts: (
-        (hostRows ?? []) as { user_id: string; name: string; role: Host["role"]; side: string }[]
-      ).map((host) => ({
-        userId: host.user_id,
-        name: host.name,
-        role: host.role,
-        side: host.side,
-        you: host.user_id === account.id,
-      })),
-      hostInvites: (inviteRows ?? []).map((invite) => ({
+      hosts,
+      hostInvites: ((inviteRows ?? []) as InviteRow[]).map((invite) => ({
         id: invite.id,
         label: invite.label,
         token: invite.token,
+        access: accessOf(invite.access),
+        phone: invite.phone ?? null,
         createdAt: invite.created_at,
       })),
+      schedules: toSends(row.scheduled_sends ?? []),
     };
   },
 
@@ -273,12 +382,57 @@ const supabaseStore: HostStore = {
     return !error;
   },
 
-  async createHostInvite(_account, id, label) {
+  async scheduleSend(_account, id, send) {
+    const supabase = await supabaseServer();
+    if (!supabase) return null;
+    const { count } = await supabase
+      .from("scheduled_sends")
+      .select("id", { count: "exact", head: true })
+      .eq("event_id", id)
+      .eq("status", "scheduled");
+    if ((count ?? 0) >= SCHEDULE_LIMIT) return null;
+    const { data, error } = await supabase
+      .from("scheduled_sends")
+      .insert({
+        event_id: id,
+        function_id: send.functionId,
+        channel: "whatsapp",
+        purpose: send.purpose,
+        audience: send.purpose === "reminder" ? "pending" : "all",
+        send_at: send.sendAt,
+      })
+      .select("id")
+      .single();
+    return error || !data ? null : (data.id as string);
+  },
+
+  async closeSend(_account, id, sendId, status) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { error, count } = await supabase
+      .from("scheduled_sends")
+      .update(
+        { status, sent_at: status === "sent" ? new Date().toISOString() : null },
+        { count: "exact" },
+      )
+      .eq("event_id", id)
+      .eq("id", sendId)
+      .eq("status", "scheduled");
+    return !error && (count ?? 0) > 0;
+  },
+
+  async createHostInvite(_account, id, { label, access, phone }) {
     const supabase = await supabaseServer();
     if (!supabase) return null;
     const { data, error } = await supabase
       .from("event_host_invites")
-      .insert({ event_id: id, label })
+      // Plain links stay as they were, so they work before the access migration runs
+      .insert({
+        event_id: id,
+        label,
+        ...(access === "guests" ? { access } : {}),
+        ...(phone ? { phone } : {}),
+      })
       .select("token")
       .single();
     return error || !data ? null : (data.token as string);
@@ -307,6 +461,32 @@ const supabaseStore: HostStore = {
     return !error && (count ?? 0) > 0;
   },
 
+  async setHostAccess(_account, id, userId, access) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { error, count } = await supabase
+      .from("event_hosts")
+      .update({ access }, { count: "exact" })
+      .eq("event_id", id)
+      .eq("user_id", userId)
+      .eq("role", "cohost");
+    return !error && (count ?? 0) > 0;
+  },
+
+  async myAccess(account, id) {
+    const supabase = await supabaseServer();
+    if (!supabase) return null;
+    const { data, error } = await supabase
+      .from("event_hosts")
+      .select("*")
+      .eq("event_id", id)
+      .eq("user_id", account.id)
+      .maybeSingle();
+    if (error || !data) return null;
+    const row = data as { role: MyAccess["role"]; access?: string };
+    return { role: row.role, access: row.role === "owner" ? "edit" : accessOf(row.access) };
+  },
+
   async joinPreview(token) {
     const supabase = await supabaseServer();
     if (!supabase) return null;
@@ -318,6 +498,7 @@ const supabaseStore: HostStore = {
       template_id: string;
       content: Record<string, string>;
       label: string;
+      access?: string;
       invited_by: string;
     };
     return {
@@ -326,6 +507,7 @@ const supabaseStore: HostStore = {
       templateId: isTemplateId(row.template_id) ? row.template_id : "marigold",
       content: row.content ?? {},
       label: row.label,
+      access: accessOf(row.access),
       invitedBy: row.invited_by,
     };
   },
@@ -335,12 +517,20 @@ const supabaseStore: HostStore = {
     if (!supabase) return { ok: false, reason: "failed" };
     const { data, error } = await supabase.rpc("accept_host_invite", { p_token: token });
     if (error?.code === "P0002") return { ok: false, reason: "used" };
+    if (error?.code === "53400") return { ok: false, reason: "full" };
     if (error || typeof data !== "string") return { ok: false, reason: "failed" };
     return { ok: true, id: data };
   },
 };
 
 /* ---------- Preview mode ---------- */
+
+/** How many co-hosts a preview invite's edition includes; null for no limit. */
+async function previewCohostRoom(stored: PreviewInvite): Promise<number | null> {
+  if (!(await editionsActive())) return null;
+  // In preview mode the edition is looked up by the invite's id alone
+  return cohostLimit(await publishedPlan(stored.event.slug ?? "", stored.event.id));
+}
 
 function hosted(account: Account, id: string): PreviewInvite | null {
   const stored = previewDb.invites.get(id);
@@ -359,6 +549,8 @@ function previewGuestView(guest: PreviewGuest): HostGuest {
       functionIds: guest.functionIds,
       selfAdded: guest.selfAdded,
       openedAt: guest.openedAt ?? null,
+      lastOpenedAt: guest.lastOpenedAt ?? guest.openedAt ?? null,
+      openCount: guest.openCount ?? (guest.openedAt ? 1 : 0),
       remindedAt: guest.remindedAt ?? null,
       createdAt: guest.createdAt ?? new Date(0).toISOString(),
     },
@@ -387,9 +579,11 @@ const previewStore: HostStore = {
     const stored = hosted(account, id);
     if (!stored) return null;
     const role = stored.owner === account.id ? "owner" : "cohost";
+    const mine = (stored.hosts ?? []).find((host) => host.userId === account.id);
     return {
       id,
       role,
+      canEdit: role === "owner" || accessOf(mine?.access) === "edit",
       status: stored.event.status,
       slug: stored.event.status === "published" ? stored.event.slug : null,
       draft: rowsToDraft(stored.event, stored.functions, [], stored.questions),
@@ -401,17 +595,21 @@ const previewStore: HostStore = {
         name: host.name,
         role: host.role,
         side: host.side,
+        access: accessOf(host.access),
         you: host.userId === account.id,
       })),
       hostInvites:
         role === "owner"
-          ? (stored.hostInvites ?? []).map(({ id: inviteId, label, token, createdAt }) => ({
-              id: inviteId,
-              label,
-              token,
-              createdAt,
+          ? (stored.hostInvites ?? []).map((invite) => ({
+              id: invite.id,
+              label: invite.label,
+              token: invite.token,
+              access: accessOf(invite.access),
+              phone: invite.phone ?? null,
+              createdAt: invite.createdAt,
             }))
           : [],
+      schedules: (stored.schedules ?? []).map((send) => ({ ...send })),
     };
   },
   async addGuests(account, id, guests) {
@@ -464,7 +662,25 @@ const previewStore: HostStore = {
     }
     return true;
   },
-  async createHostInvite(account, id, label) {
+  async scheduleSend(account, id, send) {
+    const stored = hosted(account, id);
+    if (!stored) return null;
+    const waiting = (stored.schedules ?? []).filter((item) => item.status === "scheduled");
+    if (waiting.length >= SCHEDULE_LIMIT) return null;
+    if (send.functionId && !stored.functions.some((fn) => `${id}:${fn.kind}` === send.functionId)) {
+      return null;
+    }
+    const sendId = randomUUID();
+    stored.schedules = [...(stored.schedules ?? []), { id: sendId, ...send, status: "scheduled" }];
+    return sendId;
+  },
+  async closeSend(account, id, sendId, status) {
+    const send = hosted(account, id)?.schedules?.find((item) => item.id === sendId);
+    if (!send || send.status !== "scheduled") return false;
+    send.status = status;
+    return true;
+  },
+  async createHostInvite(account, id, { label, access, phone }) {
     const stored = hosted(account, id);
     if (!stored || stored.owner !== account.id) return null;
     const token = randomBytes(18).toString("hex");
@@ -474,6 +690,8 @@ const previewStore: HostStore = {
         id: randomUUID(),
         label,
         token,
+        access,
+        phone,
         invitedBy: account.id,
         invitedByName: account.name,
         createdAt: new Date().toISOString(),
@@ -499,6 +717,20 @@ const previewStore: HostStore = {
     );
     return stored.hosts.length < before;
   },
+  async setHostAccess(account, id, userId, access) {
+    const stored = hosted(account, id);
+    const host = stored?.hosts?.find((item) => item.userId === userId && item.role === "cohost");
+    if (!stored || stored.owner !== account.id || !host) return false;
+    host.access = access;
+    return true;
+  },
+  async myAccess(account, id) {
+    const stored = hosted(account, id);
+    if (!stored) return null;
+    if (stored.owner === account.id) return { role: "owner", access: "edit" };
+    const host = stored.hosts?.find((item) => item.userId === account.id);
+    return { role: "cohost", access: accessOf(host?.access) };
+  },
   async joinPreview(token) {
     for (const stored of previewDb.invites.values()) {
       const invite = stored.hostInvites?.find((item) => item.token === token);
@@ -509,6 +741,7 @@ const previewStore: HostStore = {
         templateId: isTemplateId(stored.event.template_id) ? stored.event.template_id : "marigold",
         content: stored.event.content,
         label: invite.label,
+        access: accessOf(invite.access),
         invitedBy: invite.invitedByName,
       };
     }
@@ -518,6 +751,11 @@ const previewStore: HostStore = {
     for (const stored of previewDb.invites.values()) {
       const invite = stored.hostInvites?.find((item) => item.token === token);
       if (!invite) continue;
+      if (!previewHosts(stored, account.id)) {
+        const room = await previewCohostRoom(stored);
+        const cohosts = (stored.hosts ?? []).filter((host) => host.role === "cohost").length;
+        if (room !== null && cohosts >= room) return { ok: false, reason: "full" };
+      }
       stored.hostInvites = stored.hostInvites!.filter((item) => item !== invite);
       if (!previewHosts(stored, account.id)) {
         stored.hosts = [
@@ -527,6 +765,7 @@ const previewStore: HostStore = {
             name: account.name,
             role: "cohost",
             side: invite.label,
+            access: accessOf(invite.access),
             createdAt: new Date().toISOString(),
           },
         ];

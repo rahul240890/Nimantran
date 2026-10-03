@@ -1,5 +1,6 @@
 "use client";
 
+import type { InviteFormat } from "@/lib/editor/formats";
 import {
   ArrowLeft,
   ArrowRight,
@@ -63,6 +64,14 @@ const WIDE = "(min-width: 64rem)";
 
 /** The steps where words are typed, which get the floating live preview on phones. */
 const MINI_STEPS = new Set<EditorStep>(["couple", "functions", "extras"]);
+
+/*
+ * The progress shows five stages, not seven steps: choosing the occasion, tradition and
+ * design is one stage, Design, which a host arriving from the gallery has already done.
+ */
+const STAGES = ["design", "couple", "functions", "extras", "preview"] as const;
+const SETUP = new Set<EditorStep>(["occasion", "tradition", "design"]);
+const stageOf = (step: EditorStep) => (SETUP.has(step) ? 0 : STAGES.indexOf(step as never));
 const MINI_HIDDEN_KEY = "shubhdwar-editor-mini-hidden";
 
 /** Whether the floating preview is hidden, remembered on this device. */
@@ -176,6 +185,7 @@ export function Editor({
   initialCategory,
   initialTradition = null,
   initialSuite = null,
+  initialFormat = null,
   signedIn = false,
   initialInvite = null,
   fresh = false,
@@ -188,6 +198,8 @@ export function Editor({
   initialTradition?: TraditionId | null;
   /** A design chosen in the gallery (?suite=<id>, with its card, occasion and tradition). */
   initialSuite?: SuiteId | null;
+  /** The gallery's Scene or Story version of that design (?format=scene). */
+  initialFormat?: InviteFormat | null;
   /** Drafts save to the account as well as the device. */
   signedIn?: boolean;
   /** An invite opened from My invites (?invite=<id>). */
@@ -197,7 +209,15 @@ export function Editor({
   /** ?invite= named an invite this person can't open. */
   missing?: boolean;
 }) {
-  const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
+  const {
+    editor,
+    previewCopy,
+    stepCopy: baseSteps,
+    namesCopy,
+    syncCopy,
+    suiteCopy,
+    designCopy,
+  } = useText(editorText);
   const { publishCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
   const { draft, save } = useSyncExternalStore(
@@ -253,6 +273,7 @@ export function Editor({
           tradition: initialTradition,
           suite: initialSuite,
           template: initialTemplate,
+          format: initialFormat ?? undefined,
         };
         const current = inviteDraft.get().draft;
         const switched =
@@ -287,6 +308,7 @@ export function Editor({
     initialCategory,
     initialTradition,
     initialSuite,
+    initialFormat,
     update,
     router,
     syncCopy,
@@ -430,10 +452,10 @@ export function Editor({
         {/* On phones the floating preview sits beside the progress and the step's title */}
         <div className={cn(miniShown && "max-lg:pe-[6.5rem]")}>
           <Stepper
-            steps={EDITOR_STEPS.map((id) => ({ id, label: stepCopy[id].label }))}
-            current={index}
+            steps={STAGES.map((id) => ({ id, label: stepCopy[id].label }))}
+            current={stageOf(step)}
             label={editor.progressLabel}
-            progressText={editor.progress(index + 1, EDITOR_STEPS.length)}
+            progressText={editor.progress(stageOf(step) + 1, STAGES.length)}
             doneLabel={editor.done}
           />
         </div>
@@ -447,6 +469,27 @@ export function Editor({
                 miniShown && "max-lg:pe-[6.5rem]",
               )}
             >
+              {/* Past the design: what was chosen, with the way back to change it */}
+              {!SETUP.has(step) && (
+                <div className="-mt-2 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                  <span className="text-ink-muted">
+                    {editor.designChosen}:{" "}
+                    <span className="font-semibold text-ink">
+                      {draft.suite && draft.suite !== "classic"
+                        ? suiteCopy.names[draft.suite]
+                        : designCopy[draft.templateId].name}
+                    </span>
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => goTo("design")}
+                    className="-ms-2 text-accent-text"
+                  >
+                    {editor.changeDesign}
+                  </Button>
+                </div>
+              )}
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {copy.eyebrow}
               </p>

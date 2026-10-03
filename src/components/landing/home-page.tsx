@@ -22,8 +22,8 @@ export function HomePage({ locale }: { locale: UiLocale }) {
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale} />
           <HomeOccasions locale={locale} />
-          <HowItWorks locale={locale} />
           <HomeThemes locale={locale} />
+          <HowItWorks locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />
           <Waitlist />

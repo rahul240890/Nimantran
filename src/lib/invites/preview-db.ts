@@ -1,5 +1,6 @@
 import "server-only";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
+import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { EventRow, FunctionRow, PhotoRow } from "./rows";
 
 /*
@@ -20,6 +21,8 @@ export type PreviewInvite = {
   hosts?: PreviewHost[];
   /** Co-host links not yet used. */
   hostInvites?: PreviewHostInvite[];
+  /** Invitations and reminders planned for later (scheduled sending). */
+  schedules?: ScheduledSend[];
 };
 
 export type PreviewHost = {
@@ -27,6 +30,8 @@ export type PreviewHost = {
   name: string;
   role: "owner" | "cohost";
   side: string;
+  /** What a co-host may do (co-hosts, part 2); missing means edit. */
+  access?: "edit" | "guests";
   createdAt: string;
 };
 
@@ -34,6 +39,8 @@ export type PreviewHostInvite = {
   id: string;
   label: string;
   token: string;
+  access?: "edit" | "guests";
+  phone?: string | null;
   invitedBy: string;
   invitedByName: string;
   createdAt: string;
@@ -65,8 +72,24 @@ export type PreviewGuest = {
   group?: string;
   partySize?: number;
   openedAt?: string | null;
+  lastOpenedAt?: string | null;
+  openCount?: number;
   remindedAt?: string | null;
   createdAt?: string;
+};
+
+/** A guest's photo on the shared wall (Step 24); its file is in `files` under `path`. */
+export type PreviewWallPhoto = {
+  id: string;
+  eventId: string;
+  guestToken: string | null;
+  name: string;
+  device: string;
+  path: string;
+  width: number;
+  height: number;
+  hidden: boolean;
+  createdAt: string;
 };
 
 type PreviewDb = {
@@ -75,6 +98,8 @@ type PreviewDb = {
   files: Map<string, PreviewFile>;
   /** Guests by token. */
   guests: Map<string, PreviewGuest>;
+  /** Photo wall photos by id. */
+  wall: Map<string, PreviewWallPhoto>;
 };
 
 const holder = globalThis as unknown as { __shubhdwarPreviewDb?: PreviewDb };
@@ -83,8 +108,10 @@ export const previewDb: PreviewDb = (holder.__shubhdwarPreviewDb ??= {
   invites: new Map(),
   files: new Map(),
   guests: new Map(),
+  wall: new Map(),
 });
 previewDb.guests ??= new Map();
+previewDb.wall ??= new Map();
 
 /** A photo as a data URL: preview mode has no file storage to link to. */
 export function previewPhotoUrl(eventId: string, photoId: string): string | null {
@@ -97,4 +124,11 @@ export function previewHosts(stored: PreviewInvite, accountId: string): boolean 
   return (
     stored.owner === accountId || (stored.hosts ?? []).some((host) => host.userId === accountId)
   );
+}
+
+/** Whether this person may change a preview invite itself: not a guests-only co-host. */
+export function previewEdits(stored: PreviewInvite, accountId: string): boolean {
+  if (stored.owner === accountId) return true;
+  const host = (stored.hosts ?? []).find((item) => item.userId === accountId);
+  return Boolean(host) && host!.access !== "guests";
 }

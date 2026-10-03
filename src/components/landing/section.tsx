@@ -32,7 +32,7 @@ export function Section({
       aria-labelledby={`${id}-title`}
       className={cn("scroll-mt-16 outline-none", className)}
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24 lg:px-8 lg:py-28">
+      <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div
           className={cn(
             "flex reveal-on-scroll flex-col gap-4",
@@ -55,7 +55,7 @@ export function Section({
           </h2>
           {intro ? <p className="max-w-xl text-lg text-ink-muted">{intro}</p> : null}
         </div>
-        <div className="mt-12 sm:mt-14">{children}</div>
+        <div className="mt-10 sm:mt-12">{children}</div>
       </div>
     </section>
   );

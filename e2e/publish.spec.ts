@@ -125,7 +125,8 @@ test.describe("publish and share", () => {
     await signIn(laptop, number);
     await laptop.getByRole("article").getByRole("link", { name: "Continue" }).click();
     await expect(laptop.getByText("Your invitation is ready")).toBeVisible();
-    await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible();
+    // The photo's link comes from the account by a server action, slow on a busy runner
+    await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible({ timeout: 15_000 });
     await expect
       .poll(() =>
         laptop

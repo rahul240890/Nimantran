@@ -143,3 +143,125 @@ describe("co-host links", () => {
     expect(await t.as(arjun, () => q("select id from events"))).toEqual([]);
   });
 });
+
+/* Co-hosts, part 2: what each co-host may do, and how many each edition includes. */
+describe("co-host access", () => {
+  let helper: string;
+  let cousin: string;
+
+  const inviteWith = (access: "edit" | "guests", phone: string | null = null) =>
+    t
+      .as(priya, () =>
+        q<{ token: string }>(
+          "insert into event_host_invites (event_id, label, access, phone) values ($1, 'Mama ji', $2, $3) returning token",
+          [event, access, phone],
+        ),
+      )
+      .then((rows) => rows[0]!.token);
+
+  beforeAll(async () => {
+    helper = await t.createUser({ name: "Mama ji" });
+    cousin = await t.createUser({ name: "Cousin" });
+  });
+
+  it("carry the access the owner chose, and the number the link went to", async () => {
+    const token = await inviteWith("guests", "+919812345670");
+    const [row] = await t.as(null, () =>
+      q<{ preview: { access: string } }>("select public.host_invite_preview($1) as preview", [
+        token,
+      ]),
+    );
+    expect(row!.preview.access).toBe("guests");
+    expect(await accept(helper, token)).toBe(event);
+    const hosts = await t.as(helper, () =>
+      q<{ name: string; access: string }>(
+        "select name, access from public.event_host_list($1) where role = 'cohost'",
+        [event],
+      ),
+    );
+    expect(hosts).toEqual([{ name: "Mama ji", access: "guests" }]);
+  });
+
+  it("let a guests-only co-host run the guest list but not change the card", async () => {
+    await t.as(helper, () =>
+      q("insert into guests (event_id, name) values ($1, 'Bua ji')", [event]),
+    );
+    expect(await t.as(priya, () => q("select id from guests where name = 'Bua ji'"))).toHaveLength(
+      1,
+    );
+    await t.as(helper, () =>
+      q(`update events set content = '{"first": "Changed"}' where id = $1`, [event]),
+    );
+    const [card] = await t.as(priya, () =>
+      q<{ content: { first: string } }>("select content from events where id = $1", [event]),
+    );
+    expect(card!.content.first).toBe("Priya");
+    await expect(
+      t.as(helper, () =>
+        q("insert into functions (event_id, kind, position) values ($1, 'haldi', 0)", [event]),
+      ),
+    ).rejects.toThrow(/row-level security/);
+    // Still reads the card and its functions, to show them on the dashboard
+    expect(await t.as(helper, () => q("select id from events"))).toHaveLength(1);
+  });
+
+  it("let the owner change what a co-host can do, and nobody else", async () => {
+    await t.as(helper, () =>
+      q("update event_hosts set access = 'edit' where event_id = $1 and user_id = $2", [
+        event,
+        helper,
+      ]),
+    );
+    const before = await t.as(priya, () =>
+      q<{ access: string }>("select access from event_hosts where user_id = $1", [helper]),
+    );
+    expect(before).toEqual([{ access: "guests" }]);
+    await t.as(priya, () =>
+      q("update event_hosts set access = 'edit' where event_id = $1 and user_id = $2", [
+        event,
+        helper,
+      ]),
+    );
+    await t.as(helper, () =>
+      q(`update events set content = content || '{"line": "With love"}' where id = $1`, [event]),
+    );
+    const [card] = await t.as(priya, () =>
+      q<{ content: { line: string } }>("select content from events where id = $1", [event]),
+    );
+    expect(card!.content.line).toBe("With love");
+    await expect(
+      t.as(priya, () =>
+        q("update event_hosts set role = 'owner' where event_id = $1 and user_id = $2", [
+          event,
+          helper,
+        ]),
+      ),
+    ).rejects.toThrow();
+  });
+
+  it("never let a co-host delete the invite or remove the owner", async () => {
+    await t.as(helper, () => q("delete from events where id = $1", [event]));
+    await t.as(helper, () =>
+      q("delete from event_hosts where event_id = $1 and user_id = $2", [event, priya]),
+    );
+    expect(await t.as(priya, () => q("select id from events"))).toHaveLength(1);
+    expect(
+      await t.as(priya, () => q("select user_id from event_hosts where role = 'owner'")),
+    ).toHaveLength(1);
+  });
+
+  it("stop at the edition's co-hosts once payments are on, and keep the link", async () => {
+    await q(
+      `insert into app_settings (key, value) values ('payments', '{"checkoutEnabled": true}')
+       on conflict (key) do update set value = excluded.value`,
+    );
+    // Free includes one co-host, and Mama ji is already one
+    const token = await inviteWith("edit");
+    await expect(accept(cousin, token)).rejects.toThrow(/all the co-hosts/);
+    await q("insert into event_plans (event_id, plan_id, source) values ($1, 'premium', 'admin')", [
+      event,
+    ]);
+    expect(await accept(cousin, token)).toBe(event);
+    await q("delete from app_settings where key = 'payments'");
+  });
+});

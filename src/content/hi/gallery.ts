@@ -10,7 +10,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   eyebrow: "निमंत्रण बनाएँ",
   heading: "आप क्या मना रहे हैं?",
   intro:
-    "अवसर चुनिए, फिर उसी के लिए बना डिज़ाइन। हर डिज़ाइन पूरी स्क्रीन के चित्रित पन्नों में खुलता है, हर रस्म का अपना पन्ना, और जवाब देने की सुविधा साथ में।",
+    "अवसर चुनिए, फिर उसी के लिए बना डिज़ाइन। दृश्य में सब कुछ एक ही चित्र पर होता है, हर रस्म बारी-बारी से उड़कर आती है। कहानी में हर रस्म का अपना पूरी स्क्रीन का चित्रित पन्ना होता है। दोनों में जवाब देने की सुविधा साथ है।",
   searchLabel: "अवसर और डिज़ाइन खोजें",
   searchPlaceholder: "जैसे गुजराती शादी, हल्दी, जन्मदिन…",
   clearSearch: "खोज साफ़ करें",
@@ -18,8 +18,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     count === 0 ? "अभी कुछ नहीं मिला" : count === 1 ? "1 नतीजा" : `${count} नतीजे`,
   noResults: "इससे अभी कुछ नहीं मिला। कोई और शब्द आज़माइए, या नीचे अवसर देखिए।",
   resultKinds: { occasion: "अवसर", kind: "शादी", design: "डिज़ाइन" },
+  moreCelebrations: "और उत्सव",
   soon: "जल्द आ रहा है",
-  soonNote: "इस अवसर के डिज़ाइन बन रहे हैं। शादी के डिज़ाइन आज ही तैयार हैं।",
   designsCount: (count: number) => (count === 1 ? "1 डिज़ाइन" : `${count} डिज़ाइन`),
   chooseKind: "अपनी शादी चुनिए",
   chooseKindIntro:
@@ -30,6 +30,32 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   kindIntro:
     "सिर्फ़ इसी तरह की शादी के लिए बने डिज़ाइन। कार्ड अपनी भाषा में लिखा जाता है, और साथ में अंग्रेज़ी भी जोड़ सकते हैं।",
   card: "3D कार्ड",
+  formats: {
+    label: "निमंत्रण का प्रकार",
+    all: "सभी",
+    scene: "दृश्य",
+    story: "कहानी",
+    card: "3D कार्ड",
+  },
+  sceneBadge: "दृश्य · 1 पन्ना",
+  storyBadge: (count) => `कहानी · ${count} पन्ने`,
+  sceneNote:
+    "आपकी फ़ोटो और नामों वाला एक चित्र। हर रस्म बारी-बारी से उड़कर आती है, और चित्र की रोशनी सुबह से रात तक उसके साथ बदलती है।",
+  sample: {
+    first: "अर्जुन",
+    second: "सिया",
+    blessing: "श्री गणेश जी के आशीर्वाद से",
+    families: "अपने परिवारों के साथ",
+    line: "आपको सपरिवार सादर आमंत्रित करते हैं",
+    venues: {
+      haldi: "घर का आँगन, जयपुर",
+      mehendi: "हवेली का चौक, जयपुर",
+      sangeet: "छत का लॉन, जयपुर",
+      baraat: "होटल के द्वार से",
+      wedding: "रामबाग पैलेस, जयपुर",
+      reception: "जय महल, जयपुर",
+    },
+  },
   pagesCount: (count: number) => `${count} पन्ने`,
   preview: (name: string) => `${name} की झलक देखें`,
   useDesign: "यह डिज़ाइन चुनें",
@@ -92,6 +118,13 @@ export const occasionTaglines: Translation<typeof en.occasionTaglines> = {
   retirement: "एक लंबे सफ़र का जश्न",
   party: "छत, संगीत और दोस्त",
   diwali: "दीये और दावत",
+  lohri: "अलाव और भांगड़ा",
+  sankranti: "पतंग और पोंगल",
+  onam: "पूक्कलम और सद्या",
+  janmashtami: "कान्हा का जन्मदिन",
+  "prayer-meet": "प्रेमपूर्ण स्मृति में",
+  christening: "बपतिस्मा और भोजन",
+  annaprashan: "पहला अन्न",
   holi: "रंग और गुझिया",
   navratri: "नौ रातें, गरबा",
   "ganesh-chaturthi": "बप्पा घर आए",
@@ -139,4 +172,16 @@ export const weddingKindCopy: Translation<typeof en.weddingKindCopy> = {
     name: "आधुनिक",
     description: "हर परिवार के लिए सादे कार्ड, अंग्रेज़ी या हिन्दी में।",
   },
+};
+
+export const catalogCopy: Translation<typeof en.catalogCopy> = {
+  searchLabel: "डिज़ाइन खोजें",
+  searchPlaceholder: "नाम, जगह या परंपरा से खोजें…",
+  occasionLabel: "अवसर",
+  allOccasions: "सभी अवसर",
+  traditionLabel: "शादी की परंपरा",
+  allTraditions: "सभी परंपराएँ",
+  count: (count: number) => `${count} डिज़ाइन`,
+  clear: "फ़िल्टर हटाएँ",
+  empty: "इन सब से मेल खाता कोई डिज़ाइन अभी नहीं है। कम फ़िल्टर आज़माइए।",
 };

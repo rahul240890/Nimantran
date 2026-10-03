@@ -1,7 +1,9 @@
+import { INVITE_FORMATS } from "./formats";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { defaultType, typeSchema } from "./type";
+import { GUIDE_RULES, noFunctionGuide } from "./guide";
 import {
   CONTACT_NAME_MAX,
   FAMILY_MAX,
@@ -71,6 +73,11 @@ const functionSchema = z.object({
   dressCode: z.string().max(FUNCTION_RULES.dressCode).catch(""),
 });
 export type EventFunction = z.infer<typeof functionSchema>;
+
+const guideSchema = z.object({
+  pin: z.string().max(GUIDE_RULES.pin).catch(""),
+  parking: z.string().max(GUIDE_RULES.parking).catch(""),
+});
 
 const photoSchema = z.object({ id: z.string().min(1), width: z.number(), height: z.number() });
 export type PhotoRef = z.infer<typeof photoSchema>;
@@ -180,12 +187,16 @@ export const draftSchema = z.object({
   type: typeSchema.catch(defaultType),
   /** The couple's photo page (Step 12l): which of the invite's photos fill its frames. */
   couplePhotos: couplePhotosSchema.catch(noCouplePhotos),
+  /** Pages one after another, or the whole invitation on one painting (One Scene pilot). */
+  format: z.enum(INVITE_FORMATS).catch("story"),
   /** Open with the theme's painted god, where it has one (Step 12r). */
   blessingPage: z.boolean().catch(true),
   /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
   family: familySchema.catch(noFamily),
   /** The host's own words and placement on each page (Step 12s); see ./pages.ts. */
   pages: pagesSchema.catch(noPages),
+  /** Each function's map pin and parking for the event-day guide; see ./guide.ts. */
+  guide: z.partialRecord(z.enum(FUNCTION_IDS), guideSchema.catch(noFunctionGuide)).catch({}),
 });
 export type InviteDraft = z.infer<typeof draftSchema>;
 

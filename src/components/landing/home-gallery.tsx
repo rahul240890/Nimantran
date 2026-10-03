@@ -1,45 +1,59 @@
-import { ArrowRight, Search } from "lucide-react";
+import { ArrowRight, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import { DesignCard } from "@/components/gallery/design-card";
 import { designWords } from "@/components/gallery/design-words";
+import { FormatFilter } from "@/components/gallery/format-filter";
 import { OccasionTile } from "@/components/gallery/occasion-tile";
 import { Button } from "@/components/ui/button";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
-import { cn } from "@/lib/cn";
 import {
   OCCASIONS,
-  PAINTED_SUITES,
   designHref,
   paintedDesign,
+  sceneDesign,
   suiteOccasion,
+  type GalleryDesign,
+  type Occasion,
 } from "@/lib/gallery/catalog";
+import type { SuiteId } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { pagePath } from "@/lib/seo/paths";
 import { Section } from "./section";
 
+function SubHeading({ children }: { children: string }) {
+  return (
+    <h3 className="mb-4 font-label text-xs tracking-[0.22em] text-ink-muted uppercase">
+      {children}
+    </h3>
+  );
+}
+
 /**
- * The home page's way in (Step 12g): a search that opens the gallery, the wedding journey's
- * occasions as paintings, and the occasions coming next.
+ * The home page's occasions: the wedding's functions, then every other occasion that is ready,
+ * each a painting with its name on a plain strip beneath it, and one quiet line for those
+ * still being painted.
  */
 export function HomeOccasions({ locale }: { locale: UiLocale }) {
   const { homeGallery } = landingText[locale];
   const { galleryCopy, occasionTaglines } = galleryText[locale];
   const gallery = pagePath({ kind: "gallery" }, locale);
   const wedding = OCCASIONS.filter((occasion) => occasion.section === "wedding");
-  const beyond = OCCASIONS.filter((occasion) => occasion.section !== "wedding");
-  // Each painting once: occasions sharing one (a baby shower and a naming ceremony) show the
-  // first. Live occasions lead, then the paintings of those still to come.
-  const painted = beyond
-    .filter(
-      (occasion, index) =>
-        occasion.tile && beyond.findIndex((other) => other.tile === occasion.tile) === index,
-    )
-    .sort((a, b) => Number(Boolean(b.category)) - Number(Boolean(a.category)));
-  const soon = beyond
-    .filter((occasion) => !occasion.category && !painted.includes(occasion))
-    .slice(0, 10);
+  const more = OCCASIONS.filter((occasion) => occasion.section !== "wedding" && occasion.category);
+  const soon = OCCASIONS.filter((occasion) => !occasion.category);
   const other = locale === "en" ? "hi" : "en";
+  const tile = (occasion: Occasion, compact = false) => (
+    <OccasionTile
+      occasion={occasion}
+      name={occasion.names[locale]}
+      otherName={compact ? null : { text: occasion.names[other], lang: other }}
+      tagline={compact ? "" : (occasionTaglines[occasion.id] ?? "")}
+      href={pagePath({ kind: "occasion", id: occasion.category! }, locale)}
+      soonLabel={galleryCopy.soon}
+      compact={compact}
+    />
+  );
 
   return (
     <Section
@@ -48,116 +62,81 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
       title={homeGallery.occasionsTitle}
       intro={homeGallery.occasionsIntro}
     >
-      <div className="flex flex-col gap-10">
-        {/* A plain form, so searching works before the page's scripts have loaded */}
-        <form
-          role="search"
-          action={gallery}
-          method="get"
-          className="mx-auto flex w-full max-w-2xl items-center gap-2 rounded-full border border-line-control bg-surface p-1.5 ps-5 shadow-raised focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/35"
-        >
-          <Search aria-hidden className="size-5 shrink-0 text-ink-muted" />
-          <label htmlFor="home-search" className="sr-only">
-            {homeGallery.searchLabel}
-          </label>
-          <input
-            id="home-search"
-            name="q"
-            type="search"
-            placeholder={homeGallery.searchPlaceholder}
-            autoComplete="off"
-            enterKeyHint="search"
-            className="h-11 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint [&::-webkit-search-cancel-button]:hidden"
-          />
-          <Button type="submit" size="sm" className="rounded-full max-[359px]:px-3">
-            {homeGallery.search}
-          </Button>
-        </form>
-
-        <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-          {wedding.map((occasion, index) => {
-            // The big first tile takes four cells, so with a multiple of four the last row
-            // would end one short in both the phone's two columns and the desktop's four
-            const fillsLastRow = index === wedding.length - 1 && wedding.length % 4 === 0;
-            return (
-              <li
-                key={occasion.id}
-                className={cn(
-                  "reveal-on-scroll",
-                  index === 0 && "col-span-2 row-span-2",
-                  fillsLastRow && "col-span-2",
-                )}
-              >
-                <OccasionTile
-                  occasion={occasion}
-                  name={occasion.names[locale]}
-                  otherName={{ text: occasion.names[other], lang: other }}
-                  tagline={occasionTaglines[occasion.id] ?? ""}
-                  href={pagePath({ kind: "occasion", id: occasion.category! }, locale)}
-                  soonLabel={galleryCopy.soon}
-                  feature={index === 0}
-                  className={cn(fillsLastRow && "aspect-[8/5] lg:aspect-auto lg:h-full")}
-                />
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="flex flex-col items-center gap-5 text-center">
-          <h3 className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
-            {homeGallery.moreHeading}
-          </h3>
-          <ul className="grid w-full grid-cols-2 gap-3 text-start sm:grid-cols-3 sm:gap-4 lg:grid-cols-7">
-            {painted.slice(0, 7).map((occasion, index) => (
-              // Six fill two or three even rows on smaller screens; the seventh joins at full width
-              <li
-                key={occasion.id}
-                className={cn("reveal-on-scroll", index === 6 && "hidden lg:block")}
-              >
-                <OccasionTile
-                  occasion={occasion}
-                  name={occasion.names[locale]}
-                  otherName={null}
-                  tagline=""
-                  href={
-                    occasion.category
-                      ? pagePath({ kind: "occasion", id: occasion.category }, locale)
-                      : null
-                  }
-                  soonLabel={galleryCopy.soon}
-                  compact
-                />
+      <div className="flex flex-col gap-12">
+        <div>
+          <SubHeading>{homeGallery.weddingHeading}</SubHeading>
+          <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {wedding.map((occasion) => (
+              <li key={occasion.id} className="reveal-on-scroll">
+                {tile(occasion)}
               </li>
             ))}
           </ul>
-          <p className="pt-2 font-label text-xs tracking-[0.24em] text-ink-muted uppercase">
-            {homeGallery.soonHeading}
-          </p>
-          <ul className="flex flex-wrap justify-center gap-2">
-            {soon.map((occasion) => (
-              <li
-                key={occasion.id}
-                className="inline-flex min-h-11 items-center rounded-full border border-line bg-surface px-4 text-sm text-ink-muted"
-              >
-                {occasion.names[locale]}
+        </div>
+
+        <div>
+          <SubHeading>{homeGallery.moreHeading}</SubHeading>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-6">
+            {more.map((occasion) => (
+              <li key={occasion.id} className="reveal-on-scroll">
+                {tile(occasion, true)}
               </li>
             ))}
+            <li className="reveal-on-scroll">
+              <Link
+                href={gallery}
+                className="group flex h-full min-h-40 flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-line-strong bg-surface-2 p-4 text-center outline-offset-3 transition-colors hover:bg-surface focus-visible:outline-2 focus-visible:outline-ring"
+              >
+                <span className="grid size-12 place-items-center rounded-full bg-surface text-accent-text shadow-raised">
+                  <LayoutGrid aria-hidden className="size-5" />
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-display text-lg leading-tight text-ink">
+                  {homeGallery.allOccasions}
+                  <ArrowRight
+                    aria-hidden
+                    className="size-4 text-accent-text transition-transform group-hover:translate-x-0.5 rtl:rotate-180 motion-still:transition-none"
+                  />
+                </span>
+              </Link>
+            </li>
           </ul>
-          <Button asChild variant="secondary">
-            <Link href={gallery}>
-              {homeGallery.allOccasions}
-              <ArrowRight aria-hidden className="rtl:rotate-180" />
-            </Link>
-          </Button>
+          {soon.length > 0 && (
+            <p className="mt-5 text-sm leading-relaxed text-ink-muted">
+              <span className="font-label text-xs tracking-[0.18em] text-ink uppercase">
+                {homeGallery.soonHeading}:
+              </span>{" "}
+              {soon.map((occasion) => occasion.names[locale]).join(" · ")}
+            </p>
+          )}
         </div>
       </div>
     </Section>
   );
 }
 
-/** Every painted theme, each opening into all its pages. */
+/** Themes the home page shows first: well-loved paintings across traditions and occasions. */
+const POPULAR: readonly SuiteId[] = [
+  "rajwada-bagh",
+  "kayal",
+  "noor-bagh",
+  "shahi-savari",
+  "rajbari",
+  "ivory-arch",
+  "peshwai-wada",
+  "gubbara",
+];
+
+/** Eight designs: every Scene among the popular themes (up to four), each beside a Story. */
+function popularDesigns(): GalleryDesign[] {
+  const scenes = POPULAR.filter(hasScene).slice(0, 4).map(sceneDesign);
+  const stories = POPULAR.slice(0, 8 - scenes.length).map(paintedDesign);
+  return stories.flatMap((story, index) => (scenes[index] ? [scenes[index], story] : [story]));
+}
+
+/** A short pick of designs, with the Scene and Story switch, leading to all of them. */
 export function HomeThemes({ locale }: { locale: UiLocale }) {
   const { homeGallery } = landingText[locale];
+  const designs = popularDesigns();
   return (
     <Section
       id="templates"
@@ -166,25 +145,30 @@ export function HomeThemes({ locale }: { locale: UiLocale }) {
       intro={homeGallery.themesIntro}
     >
       <div className="flex flex-col items-center gap-8">
-        {/* A row that scrolls sideways, so seven themes never leave a gap in a grid */}
-        <ul className="-mx-4 flex w-[calc(100%+2rem)] snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:w-full lg:scroll-px-0 lg:px-0">
-          {PAINTED_SUITES.map((suite) => {
-            const design = paintedDesign(suite);
-            const { name, description } = designWords(design, locale);
-            return (
-              <li key={suite} className="w-[68%] shrink-0 snap-start sm:w-[38%] lg:w-[23.5%]">
-                <DesignCard
-                  design={design}
-                  name={name}
-                  description={description}
-                  href={designHref(design, { category: suiteOccasion(suite) })}
-                />
-              </li>
-            );
-          })}
-        </ul>
-        <Button asChild variant="secondary">
-          <Link href={`${pagePath({ kind: "occasion", id: "wedding" }, locale)}#designs`}>
+        <div className="w-full">
+          <FormatFilter formats={["scene", "story"]}>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+              {designs.map((design) => {
+                const { name, description } = designWords(design, locale);
+                return (
+                  <li
+                    key={design.id}
+                    data-format-item={design.format === "scene" ? "scene" : "story"}
+                  >
+                    <DesignCard
+                      design={design}
+                      name={name}
+                      description={description}
+                      href={designHref(design, { category: suiteOccasion(design.suite) })}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+          </FormatFilter>
+        </div>
+        <Button asChild>
+          <Link href={pagePath({ kind: "designs" }, locale)}>
             {homeGallery.allDesigns}
             <ArrowRight aria-hidden className="rtl:rotate-180" />
           </Link>

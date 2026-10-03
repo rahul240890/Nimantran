@@ -32,8 +32,12 @@ export type StoryFunction = {
   googleCalendarUrl?: string | null;
 };
 
-/** How a line is set: which font and how large, from the story's own small type scale. */
-export type LineStyle = "symbol" | "label" | "script" | "display" | "joiner" | "body" | "small";
+/**
+ * How a line is set: which font and how large, from the story's own small type scale
+ * (src/lib/suites/lettering.ts). "date" is a function's day, set below its name.
+ */
+export type LineStyle =
+  "symbol" | "label" | "script" | "display" | "date" | "joiner" | "body" | "small";
 
 export type StoryLine = {
   text: string;
@@ -92,6 +96,10 @@ export type FamilyLine = { title: string; text: string; lang?: string };
 /** The few words the story adds of its own, in the page's language. */
 export type StoryWords = {
   saveTheDate: string;
+  /** The small label over a function's day and time ("Date & time", "शुभ तिथि"). */
+  when: string;
+  /** The small label over its place ("Venue", "शुभ स्थान"). */
+  where: string;
   joinUs: string;
   withLove: string;
   and: string;
@@ -200,10 +208,8 @@ export function storyBeats({
   const more = lines(family.slice(half));
   const invite = [
     ...line(copy.line, "body"),
-    ...(single || !copy.date
-      ? []
-      : [...line(w.saveTheDate, "label"), ...line(copy.date, "display")]),
-    ...(functions.length === 0 ? line(copy.date, "display") : []),
+    ...(single || !copy.date ? [] : [...line(w.saveTheDate, "label"), ...line(copy.date, "date")]),
+    ...(functions.length === 0 ? line(copy.date, "date") : []),
   ];
   // A family's own blessings fill a page, so the invitation and the day turn to the next
   if (family.length > 0 && invite.length > 0) {
@@ -220,13 +226,17 @@ export function storyBeats({
   for (const fn of functions) {
     beats.push(
       beat(`fn-${fn.kind}`, fn.kind, [
-        ...line(fn.countdown ?? "", "small"),
-        ...line(fn.name, "label"),
+        // The function's name leads, as on a printed card; the day sits below it
+        ...line(fn.countdown ?? "", "label"),
+        ...line(fn.name, "display"),
         ...(fn.localName ? line(fn.localName.text, "script", fn.localName.lang) : []),
-        ...line(fn.date, "display"),
+        // Then the day and the place, each under its own small label with room between,
+        // as a studio sets a printed card
+        ...(fn.date || fn.time ? line(w.when, "label") : []),
+        ...line(fn.date, "date"),
         ...(fn.muhurat && fn.time ? line(fn.muhurat.text, "small", fn.muhurat.lang) : []),
         ...line(fn.time, "body"),
-        ...line(fn.venue, "small"),
+        ...(fn.venue ? [...line(w.where, "label"), ...line(fn.venue, "body")] : []),
       ]),
     );
     const maps = fn.mapsUrl ?? null;

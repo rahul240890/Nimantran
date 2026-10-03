@@ -1,5 +1,7 @@
 "use client";
 
+import { Image as ImageIcon, Layers } from "lucide-react";
+import { isInviteFormat } from "@/lib/editor/formats";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
@@ -12,10 +14,12 @@ import {
   SUITES,
   SUITE_IDS,
   hasBlessingPage,
+  isSceneTheme,
   isSuiteId,
   suiteFor,
   suiteSuits,
 } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -40,6 +44,9 @@ export function DesignStep({ draft, update }: StepProps) {
     category: draft.categoryId,
   });
   const suite = draft.suite ?? suggestedSuite;
+  // A Scene theme only shows as a Scene, so there is no choice of kind to make
+  const sceneOnly = isSceneTheme(suite);
+  const offersFormats = hasScene(suite) && !sceneOnly;
 
   return (
     <div className="flex flex-col gap-10">
@@ -151,7 +158,37 @@ export function DesignStep({ draft, update }: StepProps) {
             );
           })}
         </RadioGroup>
-        {SUITES[suite].art !== "card" && (
+        {offersFormats && (
+          <h4 className="font-display text-xl leading-tight">{suiteCopy.formatHeading}</h4>
+        )}
+        {offersFormats && (
+          <RadioGroup
+            label={suiteCopy.formatHeading}
+            variant="card"
+            value={draft.format}
+            onValueChange={(value) => {
+              if (isInviteFormat(value)) update((current) => ({ ...current, format: value }));
+            }}
+            className="grid-cols-1 min-[400px]:grid-cols-2"
+          >
+            {(["scene", "story"] as const).map((format) => (
+              <RadioItem
+                key={format}
+                value={format}
+                label={suiteCopy.formats[format].name}
+                description={suiteCopy.formats[format].description}
+                icon={
+                  format === "scene" ? (
+                    <ImageIcon aria-hidden className="size-6 text-accent-text" />
+                  ) : (
+                    <Layers aria-hidden className="size-6 text-accent-text" />
+                  )
+                }
+              />
+            ))}
+          </RadioGroup>
+        )}
+        {SUITES[suite].art !== "card" && draft.format !== "scene" && !sceneOnly && (
           <Switch
             label={suiteCopy.textBox}
             description={suiteCopy.textBoxHint}
