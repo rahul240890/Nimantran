@@ -2,7 +2,14 @@ import { describe, expect, it } from "vitest";
 import { POSTS } from "@/content/blog";
 import { UI_LOCALES } from "@/i18n/locales";
 import { pagePath, publicPages, switchLocalePath } from "@/lib/seo/paths";
-import { blogPostPath, postLinks, postsIn, readingMinutes, translatedPost } from "./posts";
+import {
+  blogPostPath,
+  postLinks,
+  postsIn,
+  readingMinutes,
+  relatedPosts,
+  translatedPost,
+} from "./posts";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -60,5 +67,17 @@ describe("blog posts", () => {
     expect(switchLocalePath("/blog", "hi")).toBe("/hi/blog");
     expect(switchLocalePath("/pricing", "hi")).toBe("/hi/pricing");
     expect(switchLocalePath("/hi/refunds", "en")).toBe("/refunds");
+  });
+
+  it("suggest linked posts first, never the post itself", () => {
+    const posts = postsIn("en");
+    for (const post of posts) {
+      const related = relatedPosts(post, posts);
+      expect(related.length).toBe(Math.min(4, posts.length - 1));
+      expect(related).not.toContain(post);
+    }
+    const wording = posts.find((post) => post.slug === "wedding-invitation-wording")!;
+    const linked = postLinks(wording);
+    expect(linked).toContain(blogPostPath(relatedPosts(wording, posts)[0]!.slug, "en"));
   });
 });

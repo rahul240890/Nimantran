@@ -38,4 +38,6 @@ export type BlogPost = {
   keywords: readonly string[];
   body: readonly PostBlock[];
   faq?: readonly { q: string; a: string }[];
+  /** A picture for the post's card and header; posts without one use their occasion's. */
+  cover?: { src: string; alt: string };
 };

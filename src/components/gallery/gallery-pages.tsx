@@ -21,6 +21,7 @@ import {
   type Occasion,
   type WeddingKind,
 } from "@/lib/gallery/catalog";
+import { blogPostPath, postsIn } from "@/lib/blog/posts";
 import { pagePath } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
@@ -328,6 +329,7 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
   const name = category.names[locale];
   const designs = occasionDesigns(id);
   const functions = category.functions.suggested;
+  const posts = postsIn(locale).filter((post) => post.occasion === id);
   return (
     <PublicShell
       locale={locale}
@@ -370,6 +372,26 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
               >
                 <h3 className="font-display text-xl">{functionCopy[fn].name}</h3>
                 <p className="text-sm text-ink-muted">{functionCopy[fn].description}</p>
+              </li>
+            ))}
+          </ul>
+        </Shelf>
+      )}
+      {posts.length > 0 && (
+        <Shelf id="wording" heading={galleryCopy.wordingHeading} intro={galleryCopy.wordingIntro}>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <li key={post.slug}>
+                <Link
+                  href={blogPostPath(post.slug, post.locale)}
+                  className="group flex min-h-11 items-center justify-between gap-3 rounded-lg border border-line bg-surface px-4 py-3 font-semibold text-ink shadow-raised transition-colors duration-150 hover:border-marigold hover:text-accent-text"
+                >
+                  {post.title}
+                  <ArrowRight
+                    aria-hidden
+                    className="size-4 shrink-0 transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none rtl:rotate-180"
+                  />
+                </Link>
               </li>
             ))}
           </ul>

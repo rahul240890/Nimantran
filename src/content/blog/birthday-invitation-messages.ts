@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const birthdayInvitationMessages: BlogPost = {
   slug: "birthday-invitation-messages",
   locale: "en",
+  pair: "birthday",
   title: "Birthday invitation messages for WhatsApp",
   description:
     "Birthday invitation messages to copy: first birthday, kids' parties, milestone birthdays, surprise parties and short WhatsApp texts.",

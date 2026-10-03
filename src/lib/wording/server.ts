@@ -1,6 +1,5 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
-import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
+import { askJson } from "@/lib/ai/ask";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import type { PageLine } from "@/lib/editor/pages";
@@ -14,10 +13,9 @@ import {
   type WordingRequest,
 } from "./prompt";
 import {
+  WORDING_SHAPE,
   aiConfig,
   answerSchema,
-  chatAnswer,
-  chatRequest,
   type AiConfig,
   type WordingAnswer,
 } from "./providers";
@@ -73,28 +71,5 @@ export async function writeWording(
   return { ok: true, pages, left: free === null ? null : Math.max(0, free - used) };
 }
 
-async function ask(config: AiConfig, prompt: string): Promise<WordingAnswer | null> {
-  if (config.provider === "anthropic") {
-    const client = new Anthropic({ apiKey: config.apiKey });
-    const response = await client.beta.messages.parse({
-      model: config.model,
-      max_tokens: 16000,
-      // A decline in one safety category is retried on the model best suited to it
-      betas: ["server-side-fallback-2026-07-01"],
-      fallbacks: "default",
-      // Short wording from facts already written: low effort writes it well and quickly
-      output_config: { effort: "low", format: betaZodOutputFormat(answerSchema) },
-      system: WORDING_SYSTEM,
-      messages: [{ role: "user", content: prompt }],
-    });
-    if (response.stop_reason === "refusal") return null;
-    return response.parsed_output ?? null;
-  }
-  const { url, init } = chatRequest(config, WORDING_SYSTEM, prompt);
-  const response = await fetch(url, { ...init, signal: AbortSignal.timeout(60_000) });
-  if (!response.ok) {
-    console.error(`[server-error] AI wording: ${config.provider} answered ${response.status}`);
-    return null;
-  }
-  return chatAnswer(await response.json());
-}
+const ask = (config: AiConfig, prompt: string): Promise<WordingAnswer | null> =>
+  askJson(config, { system: WORDING_SYSTEM, prompt, schema: answerSchema, shape: WORDING_SHAPE });
