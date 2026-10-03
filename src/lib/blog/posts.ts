@@ -1,6 +1,7 @@
 import { POSTS } from "@/content/blog";
 import type { BlogPost } from "@/content/blog/types";
 import { homePath, type UiLocale } from "@/i18n/locales";
+import { CATEGORIES } from "@/lib/categories/catalog";
 
 /* The blog's posts, newest first, and their addresses. */
 
@@ -67,4 +68,26 @@ export function postLinks(post: BlogPost): string[] {
   return texts.flatMap((text) =>
     [...text.matchAll(INLINE_TOKEN)].flatMap((match) => (match[2] ? [match[2]] : [])),
   );
+}
+
+/**
+ * The posts to suggest under a post: the ones it links to or that link to it first, then
+ * the same occasion, then the same kind of occasion, then the newest. Readers who came
+ * from search find their next answer, and search engines see the posts on a topic linked.
+ */
+export function relatedPosts(post: BlogPost, posts: readonly BlogPost[], count = 4): BlogPost[] {
+  const path = blogPostPath(post.slug, post.locale);
+  const linksOut = new Set(postLinks(post));
+  const group = (item: BlogPost) => CATEGORIES[item.occasion]?.group;
+  const score = (item: BlogPost) =>
+    (linksOut.has(blogPostPath(item.slug, item.locale)) ? 3 : 0) +
+    (postLinks(item).includes(path) ? 2 : 0) +
+    (item.occasion === post.occasion ? 2 : 0) +
+    (group(item) === group(post) ? 1 : 0);
+  return posts
+    .filter((item) => item.slug !== post.slug || item.locale !== post.locale)
+    .map((item) => ({ item, score: score(item) }))
+    .sort((a, b) => b.score - a.score || b.item.published.localeCompare(a.item.published))
+    .slice(0, count)
+    .map(({ item }) => item);
 }

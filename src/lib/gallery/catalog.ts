@@ -75,6 +75,10 @@ const TILES: Record<string, string> = {
   "shop-opening": "business",
 };
 
+/** The occasion's painted tile, when it has one. */
+export const occasionTile = (id: string): string | null =>
+  TILES[id] ? `/occasions/${TILES[id]}.webp` : null;
+
 const withTile = (occasion: Occasion): Occasion =>
   TILES[occasion.id] ? { ...occasion, tile: `/occasions/${TILES[occasion.id]}.webp` } : occasion;
 

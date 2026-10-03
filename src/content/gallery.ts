@@ -88,6 +88,8 @@ export const galleryCopy = {
     description: `Wedding invitations made for ${name} families: painted pages for every function, each ceremony by its own name, and RSVP on WhatsApp.`,
   }),
   moreOccasions: "More occasions",
+  wordingHeading: "Wording ideas",
+  wordingIntro: "Messages to copy for your card and WhatsApp, from our blog.",
 };
 
 export const sectionNames: Record<OccasionSection, string> = {

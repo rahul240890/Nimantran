@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { UI_LOCALES } from "@/i18n/locales";
-import { POSTS } from "@/content/blog";
 import { blogPostPath, translatedPost } from "@/lib/blog/posts";
+import { allPostsIn } from "@/lib/blog/store";
 import { pagePath, publicPages } from "@/lib/seo/paths";
 import { absolute } from "@/lib/seo/structured-data";
 
@@ -10,7 +10,10 @@ import { absolute } from "@/lib/seo/structured-data";
  * every blog post in the language it was written in.
  */
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/* Refreshed every hour, so posts published from Admin, Blog are listed. */
+export const revalidate = 3600;
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = publicPages().flatMap((page) => {
     const legal = page.kind === "privacy" || page.kind === "terms" || page.kind === "refunds";
     const languages = {
@@ -26,7 +29,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: { languages },
     }));
   });
-  const posts = POSTS.map((post) => {
+  const all = (await Promise.all(UI_LOCALES.map(allPostsIn))).flat();
+  const posts = all.map((post) => {
     const languages = Object.fromEntries(
       UI_LOCALES.flatMap((locale) => {
         const slug = translatedPost(post.slug, locale);

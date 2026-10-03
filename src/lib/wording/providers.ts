@@ -52,11 +52,17 @@ export const answerSchema = z.object({
 });
 export type WordingAnswer = z.infer<typeof answerSchema>;
 
-const JSON_RULE =
-  'Answer with only a JSON object, no other text, in this shape: {"pages":[{"id":"<page id>","lines":[{"style":"<line kind>","text":"<words>"}]}]}';
+/** The wording answer's shape, spelled out for models without structured output. */
+export const WORDING_SHAPE =
+  '{"pages":[{"id":"<page id>","lines":[{"style":"<line kind>","text":"<words>"}]}]}';
 
 /** The request to an OpenAI-style chat API, asking for a JSON answer. */
-export function chatRequest(config: AiConfig, system: string, prompt: string) {
+export function chatRequest(
+  config: AiConfig,
+  system: string,
+  prompt: string,
+  shape: string = WORDING_SHAPE,
+) {
   if (config.provider === "anthropic") throw new Error("Anthropic uses its own SDK");
   return {
     url: `${BASE_URLS[config.provider]}/chat/completions`,
@@ -69,7 +75,10 @@ export function chatRequest(config: AiConfig, system: string, prompt: string) {
       body: JSON.stringify({
         model: config.model,
         messages: [
-          { role: "system", content: `${system}\n\n${JSON_RULE}` },
+          {
+            role: "system",
+            content: `${system}\n\nAnswer with only a JSON object, no other text, in this shape: ${shape}`,
+          },
           { role: "user", content: prompt },
         ],
         response_format: { type: "json_object" },
@@ -79,8 +88,8 @@ export function chatRequest(config: AiConfig, system: string, prompt: string) {
   };
 }
 
-/** The wording out of a chat API's reply; null when it isn't the JSON asked for. */
-export function chatAnswer(reply: unknown): WordingAnswer | null {
+/** The JSON out of a chat API's reply, in the expected shape; null otherwise. */
+export function chatAnswerJson<T>(reply: unknown, schema: z.ZodType<T>): T | null {
   const content = z
     .object({ choices: z.array(z.object({ message: z.object({ content: z.string() }) })).min(1) })
     .safeParse(reply);
@@ -89,9 +98,13 @@ export function chatAnswer(reply: unknown): WordingAnswer | null {
   // Some models wrap JSON in a code fence even when asked not to
   const json = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
   try {
-    const parsed = answerSchema.safeParse(JSON.parse(json));
+    const parsed = schema.safeParse(JSON.parse(json));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
   }
 }
+
+/** The wording out of a chat API's reply; null when it isn't the JSON asked for. */
+export const chatAnswer = (reply: unknown): WordingAnswer | null =>
+  chatAnswerJson(reply, answerSchema);

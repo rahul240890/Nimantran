@@ -98,6 +98,7 @@ export function blogPosting(post: {
   updated: string;
   path: string;
   locale: UiLocale;
+  image?: string;
 }): Thing {
   return {
     "@context": "https://schema.org",
@@ -109,6 +110,7 @@ export function blogPosting(post: {
     inLanguage: inLanguage(post.locale),
     mainEntityOfPage: absolute(post.path),
     url: absolute(post.path),
+    ...(post.image ? { image: absolute(post.image) } : {}),
     author: { "@type": "Organization", name: site.name, url: absolute("/") },
     publisher: organization(),
   };

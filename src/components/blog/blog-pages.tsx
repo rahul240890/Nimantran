@@ -8,7 +8,8 @@ import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import { dateLocale } from "@/i18n/dates";
 import type { UiLocale } from "@/i18n/locales";
-import { blogPostPath, postsIn, readingMinutes } from "@/lib/blog/posts";
+import { blogPostPath, readingMinutes } from "@/lib/blog/posts";
+import { occasionTile } from "@/lib/gallery/catalog";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
 import { blogPosting, faqPage, itemList } from "@/lib/seo/structured-data";
@@ -17,8 +18,8 @@ import { CopyButton } from "./copy-button";
 import { Inline } from "./inline";
 
 /*
- * The blog (docs/BLOG.md): its front page in each language, and each post. Static, so
- * every word is in the HTML; posts are data in src/content/blog.
+ * The blog (docs/BLOG.md): its front page in each language, and each post. Every word is
+ * in the HTML; posts come from src/content/blog and from Admin, Blog.
  */
 
 function blogCrumbs(locale: UiLocale): Crumb[] {
@@ -41,13 +42,32 @@ function PostMeta({ post }: { post: BlogPost }) {
   );
 }
 
+/** The post's own cover, or its occasion's painted tile. */
+function coverOf(post: BlogPost): { src: string; alt: string } | null {
+  if (post.cover) return post.cover;
+  const tile = occasionTile(post.occasion);
+  return tile ? { src: tile, alt: "" } : null;
+}
+
 function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "h2" | "h3" }) {
   const Heading = headingLevel;
   return (
     <ul className="grid gap-5 sm:grid-cols-2">
       {posts.map((post) => (
         <li key={post.slug} className="flex">
-          <article className="relative flex w-full flex-col gap-3 rounded-lg border border-line bg-surface p-5 shadow-raised transition-[border-color,transform] duration-150 focus-within:border-marigold hover:-translate-y-0.5 hover:border-marigold motion-reduce:hover:translate-y-0 sm:p-6">
+          <article className="relative flex w-full flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-5 shadow-raised transition-[border-color,transform] duration-150 focus-within:border-marigold hover:-translate-y-0.5 hover:border-marigold motion-reduce:hover:translate-y-0 sm:p-6">
+            {coverOf(post) && (
+              // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
+              <img
+                src={coverOf(post)!.src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width={640}
+                height={360}
+                className="-mx-5 -mt-5 mb-1 aspect-[16/9] w-[calc(100%+2.5rem)] max-w-none object-cover sm:-mx-6 sm:-mt-6 sm:w-[calc(100%+3rem)]"
+              />
+            )}
             <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
               {CATEGORIES[post.occasion].names[post.locale]}
             </p>
@@ -70,9 +90,17 @@ function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "
   );
 }
 
-export function BlogIndexPage({ locale }: { locale: UiLocale }) {
+export function BlogIndexPage({
+  locale,
+  posts,
+  otherHasPosts,
+}: {
+  locale: UiLocale;
+  posts: BlogPost[];
+  /** Whether the blog in the other site language has posts to link to. */
+  otherHasPosts: boolean;
+}) {
   const { blogCopy } = pagesText[locale];
-  const posts = postsIn(locale);
   const other = locale === "en" ? "hi" : "en";
   return (
     <PublicShell
@@ -99,7 +127,7 @@ export function BlogIndexPage({ locale }: { locale: UiLocale }) {
           {blogCopy.heading}
         </h1>
         <p className="max-w-2xl text-lg text-ink-muted">{blogCopy.intro}</p>
-        {postsIn(other).length > 0 && (
+        {otherHasPosts && (
           <p>
             <Link
               href={blogPostPath(null, other)}
@@ -189,7 +217,7 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
   );
 }
 
-export function BlogPostPage({ post }: { post: BlogPost }) {
+export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] }) {
   const { locale } = post;
   const { blogCopy } = pagesText[locale];
   const path = blogPostPath(post.slug, locale);
@@ -197,15 +225,13 @@ export function BlogPostPage({ post }: { post: BlogPost }) {
   const contents = post.body.flatMap((block) =>
     typeof block !== "string" && "h2" in block ? [block] : [],
   );
-  const more = postsIn(locale)
-    .filter((item) => item.slug !== post.slug)
-    .slice(0, 4);
+  const cover = coverOf(post);
   return (
     <PublicShell
       locale={locale}
       crumbs={[...blogCrumbs(locale), { name: post.heading, path }]}
       jsonLd={[
-        blogPosting({ ...post, path }),
+        blogPosting({ ...post, path, image: cover?.src }),
         ...(post.faq?.length ? [faqPage(post.faq, locale)] : []),
       ]}
     >
@@ -225,6 +251,17 @@ export function BlogPostPage({ post }: { post: BlogPost }) {
           </h1>
           <PostMeta post={post} />
           <p className="text-lg text-ink-muted">{post.intro}</p>
+          {cover && (
+            // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
+            <img
+              src={cover.src}
+              alt={cover.alt}
+              width={1200}
+              height={675}
+              fetchPriority="high"
+              className="mt-2 aspect-[16/9] w-full rounded-lg border border-line object-cover shadow-raised"
+            />
+          )}
         </header>
 
         {contents.length > 2 && (

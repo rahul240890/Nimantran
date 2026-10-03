@@ -4,7 +4,9 @@ import {
   Building2,
   LayoutDashboard,
   Mails,
+  Newspaper,
   ReceiptText,
+  Sparkles,
   TicketPercent,
   WalletCards,
   type LucideIcon,
@@ -20,6 +22,8 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   orders: ReceiptText,
   coupons: TicketPercent,
   invites: Mails,
+  blog: Newspaper,
+  ai: Sparkles,
   business: Building2,
 };
 

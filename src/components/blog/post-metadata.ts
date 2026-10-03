@@ -26,6 +26,7 @@ export function postMetadata(post: BlogPost): Metadata {
       locale: post.locale === "hi" ? "hi_IN" : "en_IN",
       publishedTime: post.published,
       modifiedTime: post.updated,
+      ...(post.cover ? { images: [{ url: post.cover.src, alt: post.cover.alt }] } : {}),
     },
     twitter: { card: "summary_large_image", title: post.title, description: post.description },
   };
