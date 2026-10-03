@@ -1,5 +1,12 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
-import { SUITES, isSceneTheme, suiteSuits, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import {
+  SUITES,
+  isSceneTheme,
+  suiteHome,
+  suiteSuits,
+  type PageArt,
+  type SuiteId,
+} from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
@@ -323,7 +330,6 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
       "kashi-ghat",
       "rishikesh-ganga",
       "baraat-band",
-      "roka-shagun",
       "chooda-ceremony",
       "chinar-dal",
       "char-bagh",
@@ -488,7 +494,7 @@ export function kindDesigns(kind: WeddingKind): GalleryDesign[] {
   return withScenes([
     // A kind's painted theme pairs with the kind's own card (Shahi Savari with Bandhani)
     ...entry.suites
-      .filter((suite) => suite !== "classic")
+      .filter((suite) => suite !== "classic" && suiteSuits(suite, "wedding"))
       .map((suite) => ({
         ...paintedDesign(suite),
         template: entry.cards[0] ?? paintedDesign(suite).template,
@@ -510,9 +516,9 @@ export function occasionDesigns(category: CategoryId): GalleryDesign[] {
   ]);
 }
 
-/** The occasion a theme opens in the editor: its own, else a wedding. */
+/** The occasion a theme opens in the editor: its own, else the wedding step it suits. */
 export function suiteOccasion(suite: SuiteId): CategoryId {
-  return SUITES[suite].occasions?.[0] ?? "wedding";
+  return suiteHome(suite);
 }
 
 /** Every design in the gallery, painted first. */

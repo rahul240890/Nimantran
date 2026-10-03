@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { draftCategory, draftTradition } from "@/lib/editor/draft";
-import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
+import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import type { StepProps } from "./types";
 import { SuiteThumb } from "@/components/invitation/story/suite-thumb";
 import {
@@ -32,8 +32,8 @@ export function DesignStep({ draft, update }: StepProps) {
   const suggested: readonly TemplateId[] = [
     ...new Set([...(tradition?.templates ?? []), ...category.templates]),
   ];
-  // The occasion's designs first, best first; every design stays available
-  const order = [...suggested, ...TEMPLATE_IDS.filter((id) => !suggested.includes(id))];
+  // Only the designs made for this occasion and tradition, best first, and the one chosen
+  const order = suggested.includes(draft.templateId) ? suggested : [...suggested, draft.templateId];
   const allSuggested = order.length === suggested.length;
 
   // The event pages' theme: the host's choice, else the one their tradition suggests

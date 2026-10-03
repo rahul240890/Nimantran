@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { FUNCTION_IDS } from "@/lib/events/functions";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
@@ -9,11 +10,13 @@ import {
   PAGE_ARTS,
   SUITES,
   SUITE_IDS,
+  WEDDING_JOURNEY,
   hasGodAtTop,
   isSceneTheme,
   pageLook,
   suiteFor,
   suitePreview,
+  suiteSuits,
   type PageArt,
 } from "./catalog";
 import { DEFAULT_AREA, textArea } from "./areas";
@@ -42,6 +45,25 @@ describe("event suites", () => {
     );
     expect(suiteFor({ suite: null, tradition: null, templateId: "kasavu" })).toBe("kayal");
     expect(suiteFor({ suite: null, tradition: null, templateId: "marigold" })).toBe("rajwada-bagh");
+  });
+
+  it("knows the wedding journey's categories", () => {
+    expect([...WEDDING_JOURNEY].sort()).toEqual(
+      CATEGORY_IDS.filter((id) => CATEGORIES[id].group === "wedding-journey").sort(),
+    );
+  });
+
+  it("suggests only a theme painted for the occasion", () => {
+    for (const category of CATEGORY_IDS) {
+      for (const templateId of TEMPLATE_IDS) {
+        const suite = suiteFor({ suite: null, tradition: null, templateId, category });
+        expect(suiteSuits(suite, category), `${suite} for ${category}`).toBe(true);
+      }
+    }
+    // A Tamil family's roka gets a north Indian theme, not Kayal
+    expect(
+      suiteFor({ suite: null, tradition: "tamil", templateId: "marigold", category: "roka" }),
+    ).toBe("rajwada-bagh");
   });
 
   it("gives every tradition a theme and every page a painting and a light", () => {

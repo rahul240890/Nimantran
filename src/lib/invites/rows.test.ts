@@ -8,6 +8,7 @@ function sample(): InviteDraft {
   const draft = withCategory(newDraft("kasavu"), "engagement");
   return {
     ...draft,
+    templateId: "kasavu",
     step: "functions",
     content: { first: "Aditya", second: "Priya", joiner: "weds" },
     functions: {

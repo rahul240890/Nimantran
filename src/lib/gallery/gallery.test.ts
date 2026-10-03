@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { searchWords } from "@/components/gallery/design-words";
-import { CATEGORY_IDS } from "@/lib/categories/catalog";
+import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { newDraft, withGalleryChoice } from "@/lib/editor/draft";
-import { SUITES, suiteFor } from "@/lib/suites/catalog";
+import { SUITES, suiteFor, suiteSuits, weddingFit } from "@/lib/suites/catalog";
 import {
   OCCASIONS,
   WEDDING_KINDS,
@@ -45,6 +45,43 @@ describe("gallery catalog", () => {
     const ids = occasionDesigns("haldi").map((design) => design.id);
     expect(ids).toContain("kayal");
     expect(ids).toContain("card-marigold");
+  });
+
+  it("shows each occasion only the designs made for it", () => {
+    for (const category of CATEGORY_IDS) {
+      const wedding = CATEGORIES[category].group === "wedding-journey";
+      for (const design of occasionDesigns(category)) {
+        if (design.suite === "classic") {
+          expect(CATEGORIES[category].templates).toContain(design.template);
+          continue;
+        }
+        expect(suiteSuits(design.suite, category), `${design.id} for ${category}`).toBe(true);
+        // A wedding's theme never shows for a party, a puja or a festival
+        if (!wedding) expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
+      }
+      // Every occasion has at least one painted design of its own
+      expect(occasionDesigns(category).some((design) => design.suite !== "classic")).toBe(true);
+    }
+    for (const kind of WEDDING_KINDS) {
+      for (const design of kindDesigns(kind)) {
+        if (design.suite !== "classic") expect(suiteSuits(design.suite, "wedding")).toBe(true);
+      }
+    }
+  });
+
+  it("keeps function themes to their own step of the wedding journey", () => {
+    const ids = (category: Parameters<typeof occasionDesigns>[0]) =>
+      occasionDesigns(category).map((design) => design.id);
+    expect(ids("save-the-date")).toContain("love-letter-scene");
+    expect(ids("wedding")).not.toContain("love-letter-scene");
+    expect(ids("roka")).toContain("roka-shagun-scene");
+    expect(ids("haldi")).not.toContain("roka-shagun-scene");
+    expect(ids("haldi")).not.toContain("baraat-band-scene");
+    expect(ids("haldi")).not.toContain("chapel");
+    expect(ids("reception")).toContain("chapel");
+    expect(ids("roka")).not.toContain("noor-bagh");
+    expect(ids("mehendi")).toContain("noor-bagh");
+    expect(suiteOccasion("love-letter")).toBe("save-the-date");
   });
 
   it("sends Use this design to the editor with everything chosen", () => {
