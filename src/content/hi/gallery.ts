@@ -83,6 +83,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     description: `${name} परिवारों के लिए शादी के निमंत्रण: हर रस्म का चित्रित पन्ना, रस्मों के अपने नाम, और WhatsApp पर जवाब।`,
   }),
   moreOccasions: "और अवसर",
+  wordingHeading: "निमंत्रण के शब्द",
+  wordingIntro: "कार्ड और WhatsApp के लिए कॉपी करने लायक़ संदेश, हमारे ब्लॉग से।",
 };
 
 export const sectionNames: Translation<typeof en.sectionNames> = {

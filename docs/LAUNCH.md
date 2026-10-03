@@ -5,6 +5,8 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 ## What the code already does
 
 - **Delete account** on the profile page lets hosts erase their own data, as the DPDP Act expects.
+- **Pages a payment provider checks**: pricing (`/pricing`, prices read from `src/lib/plans/catalog.ts`), refund and cancellation (`/refunds`, words in `src/content/legal.ts`), and contact (`/contact`, which prints the email from step 3 and the business name, address, phone and GSTIN saved in **Admin → Business details**). All have Hindi versions under `/hi/…` and are linked from every footer.
+- **Blog** at `/blog` and `/hi/blog` for search traffic. How to add a post: [BLOG.md](BLOG.md).
 - **Privacy policy and terms** are at `/privacy` and `/terms`, with Hindi versions at `/hi/privacy` and `/hi/terms`. The footer on every page links to them, and so does the sign-in page. Both are written for India's Digital Personal Data Protection Act, 2023. The wording lives in `src/content/legal.ts` and `src/content/hi/legal.ts`. Change `LEGAL_UPDATED` in `src/lib/legal.ts` whenever the wording changes.
 - **Visitor analytics** use Vercel Web Analytics. It sets no cookies and counts only on the live site. Invitation links, guest codes and anything after `?` are removed before a visit is counted (`src/lib/analytics.ts`), so the numbers never show whose invitation was opened.
 - **Error reports**: errors in visitors' browsers and on the server are written to the Vercel logs, one line each:
@@ -68,9 +70,13 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
    - Free projects pause after a week with no visits, which would break every invitation link.
    - Pro also keeps daily backups.
    - Where: Supabase, then **Organization**, then **Billing**.
-2. **Run the pending SQL files**, if you haven't already. They are in the project files:
-   - `step12a-card-languages.sql`
-   - `step12a-new-designs-seed.sql`
+2. **Run the pending SQL files**, if you haven't already, in this order. They are in the project files under `shubhdwar/`. Running one twice does no harm.
+   - `step9-publish.sql`, `step10-rsvp.sql`, `step11-host-dashboard.sql`
+   - `step12a-card-languages.sql`, `step12a-new-designs-seed.sql`, `step12a-tradition-packs.sql`
+   - `step12p-occasions.sql`, `step12s-ai-wording.sql`, `step12u-occasions.sql`
+   - `step15-admin-and-editions.sql`, `step17-coupons-invoices.sql`
+   - `step24-photo-wall.sql`, `step-cohosts-part2.sql`, `guest-opens.sql`, `step-occasions-2.sql`
+   - `blog-posts.sql` (Admin, Blog)
 
    To run each one: Supabase, then **SQL Editor**, then **New query**, paste the file, then **Run**.
 
@@ -83,6 +89,20 @@ Phone sign-in now uses a test number. Real SMS in India needs DLT registration:
 1. Register the business and a sign-in message template on a DLT portal (Jio, Airtel or Vodafone Idea). The SMS provider can help with this.
 2. Choose a provider that Supabase supports, such as Twilio, MessageBird or Vonage. For Indian providers such as MSG91, use Supabase's **Send SMS hook**. Ask Claude to set this up.
 3. In Supabase, go to **Authentication**, then **Sign In / Providers**, then **Phone**. Enter the provider's details and remove the test numbers.
+
+### 8a. Payments (Razorpay)
+
+Click-by-click steps are in the project files, `shubhdwar/launch-setup-steps.md`. In short:
+
+1. Finish Razorpay's activation (KYC) with the live domain. Razorpay checks `/terms`, `/privacy`, `/refunds`, `/contact` and `/pricing`; fill in **Admin → Business details** first so the contact page shows the address.
+2. In Test Mode, generate API keys and put them in Vercel as `RAZORPAY_KEY_ID` and `RAZORPAY_KEY_SECRET`.
+3. Add a webhook to `https://your-domain/api/razorpay/webhook` with the events `payment.captured`, `order.paid` and `payment.failed`, and put its secret in Vercel as `RAZORPAY_WEBHOOK_SECRET`.
+4. Turn checkout on in **Admin → Razorpay** and make a test payment with the UPI ID `success@razorpay`.
+5. Once KYC is approved, swap in the live keys and the live webhook's secret.
+
+### 8b. AI wording
+
+"Write with AI" works with Gemini, ChatGPT, DeepSeek or Claude (`src/lib/wording/providers.ts`). In Vercel set `AI_PROVIDER` (`gemini`, `openai`, `deepseek` or `anthropic`), `AI_API_KEY`, and optionally `AI_MODEL`. An `ANTHROPIC_API_KEY` alone still means Claude.
 
 ### 9. Waitlist sign-ups
 

@@ -7,6 +7,7 @@ import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
+import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
@@ -56,8 +57,15 @@ function wordsFor(page: PublicPage, locale: UiLocale): Words {
     }
     case "tradition":
       return seoCopy.traditionPages[page.id];
+    case "pricing":
+      return pagesText[locale].pricingPageCopy;
+    case "contact":
+      return pagesText[locale].contactPageCopy;
+    case "blog":
+      return pagesText[locale].blogCopy;
     case "privacy":
-    case "terms": {
+    case "terms":
+    case "refunds": {
       const { title, description } = legalText[locale][page.kind];
       return { title, description };
     }

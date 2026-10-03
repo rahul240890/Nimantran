@@ -3,7 +3,8 @@
  * under src/app/(app)/admin; the menu, the overview and the tests pick it up.
  */
 
-export type AdminPageIcon = "overview" | "payments" | "orders" | "coupons" | "invites" | "business";
+export type AdminPageIcon =
+  "overview" | "payments" | "orders" | "coupons" | "invites" | "blog" | "ai" | "business";
 
 export type AdminPage = {
   href: `/admin${string}`;
@@ -43,6 +44,18 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Invites",
     description: "Every invite and its edition, newest first.",
     icon: "invites",
+  },
+  {
+    href: "/admin/blog",
+    label: "Blog",
+    description: "Write, schedule and publish blog posts.",
+    icon: "blog",
+  },
+  {
+    href: "/admin/ai",
+    label: "AI",
+    description: "Which AI writes wording and blog drafts, and whether its key works.",
+    icon: "ai",
   },
   {
     href: "/admin/business",

@@ -3,6 +3,8 @@ import { expect, test, type Page } from "@playwright/test";
 import { noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
 import { UI_LOCALES } from "../src/i18n/locales";
 import { pagePath, publicPages } from "../src/lib/seo/paths";
+import { POSTS } from "../src/content/blog";
+import { blogPostPath } from "../src/lib/blog/posts";
 
 /*
  * Step 13's quality pass: every page a visitor can reach passes a stricter accessibility
@@ -20,9 +22,10 @@ const strictAxe = (page: Page) =>
     "best-practice",
   ]);
 
-const everyPublicPage = UI_LOCALES.flatMap((locale) =>
-  publicPages().map((page) => pagePath(page, locale)),
-);
+const everyPublicPage = [
+  ...UI_LOCALES.flatMap((locale) => publicPages().map((page) => pagePath(page, locale))),
+  ...POSTS.map((post) => blogPostPath(post.slug, post.locale)),
+];
 const appPages = ["/sign-in", "/create?quality=2d", "/no-such-page"];
 
 test.describe("accessibility sweep", () => {

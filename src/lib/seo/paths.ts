@@ -4,6 +4,7 @@ import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { UI_LOCALES, homePath, type UiLocale } from "@/i18n/locales";
 import { WEDDING_KINDS, type WeddingKind } from "@/lib/gallery/ids";
+import { blogPostPath, translatedPost } from "@/lib/blog/posts";
 
 /*
  * The public, indexable pages (docs/BRAND_SEO.md, section 6), generated from data: one
@@ -19,6 +20,10 @@ export type PublicPage =
   | { kind: "occasion"; id: CategoryId }
   | { kind: "wedding-kind"; id: WeddingKind }
   | { kind: "tradition"; id: TraditionId }
+  | { kind: "pricing" }
+  | { kind: "blog" }
+  | { kind: "contact" }
+  | { kind: "refunds" }
   | { kind: "privacy" }
   | { kind: "terms" };
 
@@ -39,6 +44,14 @@ function basePath(page: PublicPage): string {
       return `/invitations/wedding/${page.id}`;
     case "tradition":
       return `/traditions/${page.id}`;
+    case "pricing":
+      return "/pricing";
+    case "blog":
+      return "/blog";
+    case "contact":
+      return "/contact";
+    case "refunds":
+      return "/refunds";
     case "privacy":
       return "/privacy";
     case "terms":
@@ -63,6 +76,10 @@ export function publicPages(): PublicPage[] {
     ...CATEGORY_IDS.map((id) => ({ kind: "occasion" as const, id })),
     ...WEDDING_KINDS.map((id) => ({ kind: "wedding-kind" as const, id })),
     ...TRADITION_IDS.map((id) => ({ kind: "tradition" as const, id })),
+    { kind: "pricing" },
+    { kind: "blog" },
+    { kind: "contact" },
+    { kind: "refunds" },
     { kind: "privacy" },
     { kind: "terms" },
   ];
@@ -79,7 +96,8 @@ export function pageAlternates(page: PublicPage, locale: UiLocale): Metadata["al
   };
 }
 
-const LOCALIZED = /^\/(designs|invitations|traditions|privacy|terms)(\/|$)/;
+const LOCALIZED =
+  /^\/(designs|invitations|traditions|pricing|blog|contact|refunds|privacy|terms)(\/|$)/;
 
 /**
  * The same page in another language, for the language menu: public pages carry their
@@ -92,5 +110,8 @@ export function switchLocalePath(pathname: string, locale: UiLocale): string | n
   const rest = prefix ? pathname.slice(prefix.length) || "/" : pathname;
   if (rest !== "/" && !LOCALIZED.test(rest)) return null;
   if (rest === "/") return homePath(locale);
+  // A post is written in one language: the other language goes to its own blog
+  const post = /^\/blog\/(.+)$/.exec(rest)?.[1];
+  if (post) return blogPostPath(translatedPost(post, locale) ?? null, locale);
   return locale === "en" ? rest : `${homePath(locale)}${rest}`;
 }
