@@ -9,6 +9,7 @@ import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
 import { GuestList } from "./guest-list";
+import { Opens } from "./opens";
 import { PhotoWallCard } from "./photo-wall-card";
 import { Reminders } from "./reminders";
 import { ScheduledSends } from "./scheduled-sends";
@@ -26,7 +27,7 @@ function Stat({ label, value, note }: { label: string; value: string; note: stri
   );
 }
 
-/** The host's home for one invite: counts, the guest list, reminders and co-hosts. */
+/** The host's home for one invite: counts, the guest list, who opened it, reminders and co-hosts. */
 export async function GuestDashboard({
   view,
   openSend,
@@ -200,6 +201,7 @@ export async function GuestDashboard({
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)] lg:items-start">
         <GuestList view={view} />
         <div className="flex min-w-0 flex-col gap-6">
+          <Opens view={view} />
           <ScheduledSends view={view} openSend={openSend} />
           <Reminders view={view} />
           <PhotoWallCard inviteId={view.id} />

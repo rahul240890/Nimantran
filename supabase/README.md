@@ -43,6 +43,9 @@ database keeps every invite. Applied so far after the first setup:
   `wall_photos_for()` for guests, and `add_wall_photo()` and `remove_wall_photo()`, which only
   the server's service role can call. Guests' uploads need `SUPABASE_SERVICE_ROLE_KEY` in
   Vercel.
+- `20261002170000_guest_opens.sql` — guest list import and opens: `guests.last_opened_at`
+  and `guests.open_count`, and `guest_reply()` counting each visit to a personal link once
+  per half hour. The guest list still loads before it runs, without visit times.
 
 - `20261002160000_cohost_access.sql` — co-hosts, part 2: what each co-host can do (`access`
   on `event_hosts` and `event_host_invites`, `can_edit_event()`), the co-hosts each edition

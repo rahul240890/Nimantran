@@ -168,6 +168,8 @@ test.describe("coupons, invoices and refunds", () => {
     await expect(admin.getByText(`${code} is ready`).first()).toBeVisible();
     await expect(admin.getByText(code, { exact: true })).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
+    // After a client navigation the <title> streams in late
+    await expect(admin).toHaveTitle(/\S/);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
     // The host, with checkout on

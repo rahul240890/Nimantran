@@ -72,6 +72,8 @@ export type PreviewGuest = {
   group?: string;
   partySize?: number;
   openedAt?: string | null;
+  lastOpenedAt?: string | null;
+  openCount?: number;
   remindedAt?: string | null;
   createdAt?: string;
 };
