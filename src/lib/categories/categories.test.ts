@@ -29,7 +29,7 @@ const durgaPuja = festival("durga-puja", [9, 10], ["WB"]);
 const withFestivals = [...all, onam, durgaPuja];
 
 describe("category catalogue", () => {
-  it("launches with the wedding journey, then birthdays, anniversaries, parties, baby showers and Diwali", () => {
+  it("launches with the wedding journey, then family, festival, party and business occasions", () => {
     expect(CATEGORY_IDS).toEqual([
       "wedding",
       "engagement",
@@ -44,6 +44,23 @@ describe("category catalogue", () => {
       "party",
       "baby-shower",
       "diwali",
+      "housewarming",
+      "puja",
+      "thread-ceremony",
+      "ganesh-chaturthi",
+      "navratri",
+      "annaprashan",
+      "eid",
+      "retirement",
+      "janmashtami",
+      "sankranti",
+      "farewell-party",
+      "shop-opening",
+      "onam",
+      "lohri",
+      "launch",
+      "christening",
+      "prayer-meet",
     ]);
   });
 
@@ -95,7 +112,8 @@ describe("seasonal and regional ordering", () => {
   });
 
   it("puts Durga Puja first in Bengal in October", () => {
-    expect(order({ month: 10, region: "WB" })[0]).toBe("durga-puja");
+    // Navratri is Durga Puja in Bengal, so the real occasion leads ahead of the sample one
+    expect(order({ month: 10, region: "WB" }).slice(0, 2)).toEqual(["navratri", "durga-puja"]);
   });
 
   it("keeps regional festivals out of the lead elsewhere or out of season", () => {

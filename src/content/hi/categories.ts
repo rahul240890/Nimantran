@@ -29,6 +29,23 @@ export const categoryTaglines: Translation<typeof en.categoryTaglines> = {
   party: "तारों भरी रात में संगीत, खाना और दोस्त",
   "baby-shower": "होने वाली माँ के लिए आशीर्वाद, गीत और मिठाई",
   diwali: "दीये, मिठाई और सबके साथ लक्ष्मी पूजा",
+  housewarming: "नए घर में पूजा और पहला भोजन",
+  puja: "कथा, हवन या जागरण, आरती और प्रसाद के साथ",
+  "thread-ceremony": "परिवार के आशीर्वाद के साथ जनेऊ और उपनयन",
+  annaprashan: "बच्चे का पहला अन्न, आशीर्वाद के साथ",
+  christening: "नन्हे के लिए आशीर्वाद और भोजन",
+  "prayer-meet": "प्रार्थना के साथ एक जीवन का स्मरण",
+  retirement: "एक लंबे करियर के नाम शुभकामनाएँ",
+  "farewell-party": "साथ की एक आख़िरी शाम",
+  "shop-opening": "फ़ीता, पूजा और पहला स्वागत",
+  launch: "कोई उत्पाद, किताब या दफ़्तर",
+  "ganesh-chaturthi": "बप्पा के दर्शन, आरती और मोदक",
+  navratri: "गरबा की रातें और दुर्गा पूजा",
+  janmashtami: "कान्हा के लिए भजन और आधी रात की आरती",
+  onam: "पूक्कलम और केले के पत्ते पर सद्या",
+  sankranti: "पतंग, तिल और पोंगल",
+  lohri: "अलाव, रेवड़ी और भांगड़ा",
+  eid: "इफ़्तार दावत और ईद मिलन",
 };
 
 export const questionLabels: Translation<typeof en.questionLabels> = {

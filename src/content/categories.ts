@@ -33,6 +33,23 @@ export const categoryTaglines: Record<CategoryId, string> = {
   party: "Music, food and friends on a starry night",
   "baby-shower": "Blessings, songs and sweets for the mother-to-be",
   diwali: "Diyas, sweets and Lakshmi puja with everyone",
+  housewarming: "Puja and a first meal in the new home",
+  puja: "Katha, havan or jagran, with aarti and prasad",
+  "thread-ceremony": "Janeu and upanayan with family blessings",
+  annaprashan: "The baby's first rice, with blessings",
+  christening: "A blessing and lunch for the little one",
+  "prayer-meet": "Remembering a life with prayers",
+  retirement: "Toasts to a career well lived",
+  "farewell-party": "One last evening together",
+  "shop-opening": "Ribbon, puja and a first welcome",
+  launch: "A product, a book or an office",
+  "ganesh-chaturthi": "Bappa's darshan, aarti and modak",
+  navratri: "Garba nights and Durga Puja",
+  janmashtami: "Bhajans and midnight aarti for Kanha",
+  onam: "Pookalam and a sadhya on a banana leaf",
+  sankranti: "Kites, til and pongal",
+  lohri: "Bonfire, rewari and bhangra",
+  eid: "Iftar dawat and Eid milan",
 };
 
 export const questionLabels: Record<RsvpQuestionId, string> = {
