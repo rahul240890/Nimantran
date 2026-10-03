@@ -28,7 +28,11 @@ export type HostGuest = {
   functionIds: string[];
   /** Added by replying from the open link rather than by the hosts. */
   selfAdded: boolean;
+  /** First time they opened their personal link. */
   openedAt: string | null;
+  /** Latest visit, and how many visits (each counted once per half hour). */
+  lastOpenedAt: string | null;
+  openCount: number;
   remindedAt: string | null;
   createdAt: string;
   replies: GuestReplyRow[];
@@ -63,14 +67,30 @@ export const GUEST_FILTERS = [
   "maybe",
   "declined",
   "waiting",
+  "seen",
   "not-opened",
 ] as const;
 export type GuestFilter = (typeof GUEST_FILTERS)[number];
 
+/** Whether the guest has seen the invitation: opened their link, or replied from any link. */
+export function hasOpened(guest: Pick<HostGuest, "openedAt" | "replies">): boolean {
+  return Boolean(guest.openedAt) || guest.replies.length > 0;
+}
+
 export function matchesFilter(guest: HostGuest, filter: GuestFilter): boolean {
   if (filter === "all") return true;
-  if (filter === "not-opened") return !guest.openedAt && guest.replies.length === 0;
+  if (filter === "not-opened") return !hasOpened(guest);
+  // Opened their personal link but not replied: the people a nudge helps most
+  if (filter === "seen") return Boolean(guest.openedAt) && guest.replies.length === 0;
   return guestState(guest) === filter;
+}
+
+/** Who opened their personal link most recently, newest first. */
+export function recentOpens(guests: HostGuest[], limit = 6): HostGuest[] {
+  return guests
+    .filter((guest) => guest.lastOpenedAt && !guest.selfAdded)
+    .sort((a, b) => b.lastOpenedAt!.localeCompare(a.lastOpenedAt!))
+    .slice(0, limit);
 }
 
 /** Search by name, group or phone digits, ignoring case, accents and spacing. */
@@ -148,7 +168,7 @@ export function dashboardCounts(guests: HostGuest[], functions: HostFunction[]):
   let invitedPeople = 0;
   for (const guest of guests) {
     byState[guestState(guest)] += 1;
-    if (guest.openedAt || guest.replies.length) opened += 1;
+    if (hasOpened(guest)) opened += 1;
     invitedPeople += guest.partySize;
   }
   return {
@@ -231,7 +251,7 @@ export function guestsCsv(
     }),
     ...labels.answers.map((answer) => guest.answers[answer.id] ?? ""),
     guest.message,
-    guest.openedAt || guest.replies.length ? labels.yes : labels.no,
+    hasOpened(guest) ? labels.yes : labels.no,
     linkFor(guest),
   ]);
   // A byte order mark so Excel opens Hindi and other scripts correctly
@@ -241,6 +261,9 @@ export function guestsCsv(
 /* ---------- Pasting a list ---------- */
 
 export const GUEST_RULES = { name: 80, group: 40, partySize: 20, paste: 300 } as const;
+
+/** Most guests one save sends; bigger imports go in batches of this size. */
+export const GUEST_BATCH = GUEST_RULES.paste;
 
 export type PastedGuest = {
   line: number;

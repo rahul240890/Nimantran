@@ -83,7 +83,12 @@ export async function findReply(slug: string, token: string): Promise<GuestReply
     const invite = await findPublishedInvite(slug);
     const guest = previewDb.guests.get(token);
     if (!invite || !guest || guest.eventId !== invite.id) return null;
-    guest.openedAt ??= new Date().toISOString();
+    const now = new Date();
+    guest.openedAt ??= now.toISOString();
+    // One visit per half hour, as guest_reply() counts them
+    const last = guest.lastOpenedAt ? Date.parse(guest.lastOpenedAt) : 0;
+    if (now.getTime() - last > 30 * 60 * 1000) guest.openCount = (guest.openCount ?? 0) + 1;
+    guest.lastOpenedAt = now.toISOString();
     return fromRows(
       guest.name,
       guest.functionIds,
