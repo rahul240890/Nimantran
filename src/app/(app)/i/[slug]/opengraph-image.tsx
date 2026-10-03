@@ -5,6 +5,7 @@ import { draftCopy, draftTemplate } from "@/lib/editor/draft";
 import { initialOf } from "@/lib/templates/content";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
+import { firstReadable, readableOn } from "@/lib/og/contrast";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { draftSuite } from "@/lib/publish/story";
 import { suitePreview } from "@/lib/suites/catalog";
@@ -54,6 +55,10 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const gold = colour(c.gold, "#b8862f");
   const ink = colour(c.ink, "#2a1a24");
   const accentText = colour(c.accentText, "#9a4c08");
+  // Most cards are light paper on a dark back; a dark-paper card (Emerald Palace) has light ink
+  const text = readableOn(back, paper, ink);
+  // Gold details on the back, unless the card's gold is too close to it to read
+  const detail = firstReadable(back, 3, gold, accentText, text);
   const when = inviteWhen(draft);
   const where = inviteWhere(draft);
   const monogram = [copy.first, copy.second].filter(Boolean).map(initialOf).join(" · ");
@@ -70,11 +75,11 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         gap: 56,
         padding: "0 72px",
         background: back,
-        color: paper,
+        color: text,
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 18 }}>
-        <div style={{ fontFamily: "Tenor Sans", fontSize: 26, letterSpacing: 8, color: gold }}>
+        <div style={{ fontFamily: "Tenor Sans", fontSize: 26, letterSpacing: 8, color: detail }}>
           {`YOU'RE INVITED · ${occasionName(draft).toUpperCase()}`}
         </div>
         <div
@@ -88,7 +93,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
         </div>
         {when && <div style={{ fontFamily: "Tenor Sans", fontSize: 30, marginTop: 8 }}>{when}</div>}
         {where && (
-          <div style={{ fontFamily: "Tenor Sans", fontSize: 26, color: gold }}>{where}</div>
+          <div style={{ fontFamily: "Tenor Sans", fontSize: 26, color: detail }}>{where}</div>
         )}
       </div>
 

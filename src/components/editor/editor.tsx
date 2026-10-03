@@ -500,7 +500,10 @@ export function Editor({
               >
                 {copy.title}
               </h1>
-              <p className="max-w-xl text-ink-muted">{copy.intro}</p>
+              {/* The intro starts below the floating preview, so it takes the full width back */}
+              <p className={cn("max-w-xl text-ink-muted", miniShown && "max-lg:-me-[6.5rem]")}>
+                {copy.intro}
+              </p>
             </div>
 
             {/* Phones and tablets see the card inline on the last step */}

@@ -63,7 +63,7 @@ describe("a card's sample wording", () => {
     const copy = draftCopy(gujarati);
     expect(copy.first).toBe("રાધા");
     expect(copy.second).toBe("અર્જુન");
-    expect(copy.families).toBe("પટેલ પરિવાર અને શાહ પરિવાર");
+    expect(copy.families).toBe("બંને પરિવાર તરફથી");
     expect(copy.line).not.toMatch(/[a-z]/i);
     expect(copy.date).not.toMatch(/[a-z]/i);
   });

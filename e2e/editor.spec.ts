@@ -330,9 +330,7 @@ test.describe("invite editor", () => {
     await page.getByRole("textbox", { name: /First name/ }).fill("રાધા");
     await page.getByRole("textbox", { name: /Second name/ }).fill("અર્જુન");
     // Untyped lines preview in the card's language, never the design's English samples
-    await expect(page.getByRole("textbox", { name: /Families/ })).toHaveValue(
-      "પટેલ પરિવાર અને શાહ પરિવાર",
-    );
+    await expect(page.getByRole("textbox", { name: /Families/ })).toHaveValue("બંને પરિવાર તરફથી");
 
     // Lettering: a Gujarati card offers only fonts that write Gujarati
     const names = page.getByRole("radiogroup", { name: "Names", exact: true });
