@@ -25,13 +25,14 @@ function writeMuted(muted: boolean) {
 }
 
 /**
- * The card's raga, composed live so it costs no data and loaded only when first played.
+ * The card's raga, composed live so it costs no data and loaded only when first played
+ * (or the host's own clip, streamed).
  * Quiet in a background tab, carrying on when the guest comes back; a guest who turns it
  * off keeps it off for the rest of the visit.
  */
 export function useRagaMusic(template: Template) {
-  const { raga, tempo } = template.music;
-  const music = useMemo(() => ({ raga, tempo }), [raga, tempo]);
+  const { raga, tempo, clip } = template.music;
+  const music = useMemo(() => ({ raga, tempo, clip }), [raga, tempo, clip]);
   const player = useRef<MusicPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
 

@@ -5,6 +5,7 @@ import { questionLabels } from "@/content/categories";
 import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
 import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
+import { clipPath, type MusicClip } from "@/lib/editor/music-clip";
 import { supabaseServer } from "@/lib/supabase/server";
 import { wallFilePaths } from "./photo-wall";
 import { previewDb, previewEdits, previewHosts, previewPhotoUrl } from "./preview-db";
@@ -26,7 +27,15 @@ import {
  */
 
 export type SaveResult =
-  { ok: true; id: string; updatedAt: number; missingPhotos: string[] } | { ok: false };
+  | {
+      ok: true;
+      id: string;
+      updatedAt: number;
+      missingPhotos: string[];
+      /** The host's music clip isn't in the account yet. */
+      missingClip: boolean;
+    }
+  | { ok: false };
 
 export type PublishResult =
   { ok: true; slug: string } | { ok: false; reason: "taken" | "missing" | "failed" };
@@ -40,7 +49,14 @@ type InviteStore = {
   save(account: Account, draft: InviteDraft): Promise<SaveResult>;
   remove(account: Account, id: string): Promise<boolean>;
   addPhoto(account: Account, id: string, photo: NewPhoto, file: Blob): Promise<boolean>;
-  /** Short-lived links to an invite's photos, by photo id. */
+  /** Stores the host's music clip; the draft names it on its next save. */
+  addClip(
+    account: Account,
+    id: string,
+    clip: Pick<MusicClip, "id" | "type">,
+    file: Blob,
+  ): Promise<boolean>;
+  /** Short-lived links to an invite's photos and music clip, by id. */
   photoUrls(account: Account, id: string): Promise<Record<string, string>>;
   slugAvailable(slug: string): Promise<boolean>;
   publish(account: Account, id: string, slug: string): Promise<PublishResult>;
@@ -206,11 +222,32 @@ const supabaseStore: InviteStore = {
       }
     }
     const stored = new Set(media.map((row) => row.id as string));
+
+    // The music clip: drop any the host replaced or took out, and say if this one is missing
+    const { data: clips, error: clipsError } = await supabase
+      .from("media")
+      .select("id, storage_path")
+      .eq("event_id", id)
+      .eq("kind", "audio");
+    if (clipsError || !clips) return { ok: false };
+    const clipId = draft.music.clip?.id ?? null;
+    const oldClips = clips.filter((row) => row.id !== clipId);
+    if (oldClips.length) {
+      await supabase.storage.from(BUCKET).remove(oldClips.map((row) => row.storage_path as string));
+      await supabase
+        .from("media")
+        .delete()
+        .in(
+          "id",
+          oldClips.map((row) => row.id as string),
+        );
+    }
     return {
       ok: true,
       id,
       updatedAt: Date.parse(saved.data.updated_at as string) || Date.now(),
       missingPhotos: wanted.filter((photoId) => !stored.has(photoId)),
+      missingClip: clipId !== null && !clips.some((row) => row.id === clipId),
     };
   },
 
@@ -251,6 +288,24 @@ const supabaseStore: InviteStore = {
     return !error;
   },
 
+  async addClip(_account, id, clip, file) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const path = clipPath(id, clip);
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(path, file, { contentType: file.type, upsert: true });
+    if (uploadError) return false;
+    const { error } = await supabase.from("media").upsert({
+      id: clip.id,
+      event_id: id,
+      kind: "audio",
+      storage_path: path,
+      position: 0,
+    });
+    return !error;
+  },
+
   async photoUrls(_account, id) {
     const supabase = await supabaseServer();
     if (!supabase) return {};
@@ -258,7 +313,7 @@ const supabaseStore: InviteStore = {
       .from("media")
       .select("id, storage_path")
       .eq("event_id", id)
-      .eq("kind", "photo");
+      .in("kind", ["photo", "audio"]);
     if (!media?.length) return {};
     const { data } = await supabase.storage.from(BUCKET).createSignedUrls(
       media.map((row) => row.storage_path as string),
@@ -346,6 +401,9 @@ const previewStore: InviteStore = {
     for (const photo of mine?.photos ?? []) {
       if (!wanted.includes(photo.id)) previewDb.files.delete(`${id}/${photo.id}`);
     }
+    const clipId = draft.music.clip?.id ?? null;
+    const oldClip = mine?.clip ?? null;
+    if (oldClip && oldClip !== clipId) previewDb.files.delete(`${id}/${oldClip}`);
     previewDb.invites.set(id, {
       owner: mine?.owner ?? account.id,
       hosts: mine?.hosts ?? [
@@ -367,6 +425,7 @@ const previewStore: InviteStore = {
       },
       functions,
       photos,
+      clip: clipId,
       questions: draftQuestions(draft),
       publishedAt: mine?.publishedAt ?? null,
     });
@@ -376,6 +435,7 @@ const previewStore: InviteStore = {
       id,
       updatedAt: updated.getTime(),
       missingPhotos: wanted.filter((photoId) => !stored.has(photoId)),
+      missingClip: clipId !== null && !previewDb.files.has(`${id}/${clipId}`),
     };
   },
   async remove(account, id) {
@@ -387,6 +447,7 @@ const previewStore: InviteStore = {
       previewDb.files.delete(row.path);
       previewDb.wall.delete(row.id);
     }
+    if (stored.clip) previewDb.files.delete(`${id}/${stored.clip}`);
     return previewDb.invites.delete(id);
   },
   async addPhoto(account, id, photo, file) {
@@ -402,13 +463,23 @@ const previewStore: InviteStore = {
     ];
     return true;
   },
+  async addClip(account, id, clip, file) {
+    const stored = previewDb.invites.get(id);
+    if (!stored || !previewHosts(stored, account.id)) return false;
+    previewDb.files.set(`${id}/${clip.id}`, {
+      type: file.type,
+      data: new Uint8Array(await file.arrayBuffer()),
+    });
+    return true;
+  },
   async photoUrls(account, id) {
     const stored = previewDb.invites.get(id);
     if (!stored || !previewHosts(stored, account.id)) return {};
+    const ids = [...stored.photos.map((photo) => photo.id), ...(stored.clip ? [stored.clip] : [])];
     return Object.fromEntries(
-      stored.photos.flatMap((photo) => {
-        const url = previewPhotoUrl(id, photo.id);
-        return url ? [[photo.id, url]] : [];
+      ids.flatMap((fileId) => {
+        const url = previewPhotoUrl(id, fileId);
+        return url ? [[fileId, url]] : [];
       }),
     );
   },

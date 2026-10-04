@@ -37,6 +37,8 @@ import { PageWords } from "./page-words";
 import type { FunctionId } from "@/lib/events/functions";
 import type { StepProps } from "./steps/types";
 import { useCouplePhotos } from "./use-couple-photos";
+import { useClipUrl } from "./use-photo-urls";
+import { withClip } from "@/lib/editor/music-clip";
 
 type PreviewStageProps = {
   draft: InviteDraft;
@@ -170,7 +172,11 @@ export function PreviewStage({
 
   const { templateId } = draft;
   const { raga } = draft.music;
-  const template = useMemo(() => templateWithRaga(templateId, raga), [templateId, raga]);
+  const clipUrl = useClipUrl(draft);
+  const template = useMemo(
+    () => withClip(templateWithRaga(templateId, raga), clipUrl),
+    [templateId, raga, clipUrl],
+  );
 
   if (mini && sceneView) return sceneView;
   if (mini) {

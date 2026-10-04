@@ -2,6 +2,7 @@ import "server-only";
 import { cache } from "react";
 import { authMode } from "@/lib/auth/mode";
 import type { InviteDraft } from "@/lib/editor/draft";
+import { clipPath } from "@/lib/editor/music-clip";
 import type { FunctionId } from "@/lib/events/functions";
 import { isSlug } from "@/lib/publish/slug";
 import { supabasePublic } from "@/lib/supabase/public";
@@ -24,6 +25,8 @@ export type PublicInvite = {
   /** Each function's id in the database, for replies. */
   functionIds: Partial<Record<FunctionId, string>>;
   photos: PublicPhoto[];
+  /** A link to the host's own music clip, when they chose one and it has uploaded. */
+  clipUrl: string | null;
   updatedAt: string;
 };
 
@@ -61,12 +64,20 @@ async function fromSupabase(slug: string): Promise<PublicInvite | null> {
       return url ? [{ id: photo.id, url, width: photo.width ?? 1, height: photo.height ?? 1 }] : [];
     });
   }
+  // The clip sits beside the photos, so the same policy lets guests read it
+  const clip = draft.music.clip;
+  const clipLink = clip
+    ? await supabase.storage
+        .from("event-media")
+        .createSignedUrl(clipPath(row.id, clip), PHOTO_LINK_SECONDS)
+    : null;
   return {
     id: row.id,
     slug: row.slug ?? slug,
     draft,
     functionIds: Object.fromEntries(row.functions.map((fn) => [fn.kind, fn.id])),
     photos,
+    clipUrl: clipLink?.data?.signedUrl ?? null,
     updatedAt: row.updated_at,
   };
 }
@@ -77,10 +88,12 @@ function fromPreview(slug: string): PublicInvite | null {
   );
   if (!stored) return null;
   const id = stored.event.id;
+  const draft = rowsToDraft(stored.event, stored.functions, [], stored.questions);
   return {
     id,
     slug,
-    draft: rowsToDraft(stored.event, stored.functions, [], stored.questions),
+    draft,
+    clipUrl: draft.music.clip ? previewPhotoUrl(id, draft.music.clip.id) : null,
     functionIds: Object.fromEntries(stored.functions.map((fn) => [fn.kind, `${id}:${fn.kind}`])),
     photos: [...stored.photos]
       .sort((a, b) => a.position - b.position)

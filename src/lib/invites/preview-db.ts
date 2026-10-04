@@ -14,6 +14,8 @@ export type PreviewInvite = {
   event: EventRow;
   functions: FunctionRow[];
   photos: PhotoRow[];
+  /** The host's music clip's id, once named by a save; its file sits beside the photos. */
+  clip?: string | null;
   /** The RSVP's library questions, in order. */
   questions: RsvpQuestionId[];
   publishedAt: string | null;
@@ -94,7 +96,7 @@ export type PreviewWallPhoto = {
 
 type PreviewDb = {
   invites: Map<string, PreviewInvite>;
-  /** Photo files by "<event id>/<photo id>". */
+  /** Photo and music clip files by "<event id>/<file id>". */
   files: Map<string, PreviewFile>;
   /** Guests by token. */
   guests: Map<string, PreviewGuest>;

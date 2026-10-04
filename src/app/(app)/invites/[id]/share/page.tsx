@@ -82,6 +82,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
               draft={published?.draft ?? draft}
               functions={storyFunctions(published?.draft ?? draft, locale)}
               photos={published?.photos ?? []}
+              clipUrl={published?.clipUrl ?? null}
               url={url}
               slug={draft.slug}
               names={names}

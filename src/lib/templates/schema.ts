@@ -65,6 +65,11 @@ export const templateSchema = z.object({
     raga: z.enum(RAGA_IDS),
     /** Beats per minute; the raga's own tempo when left out. */
     tempo: z.number().int().min(48).max(100).optional(),
+    /**
+     * A link to the host's own music clip, played instead of the raga. Never set in the
+     * catalogue: the editor and the guest page add it to the invite's design (music-clip.ts).
+     */
+    clip: z.string().optional(),
   }),
   /** The slots this design shows, each with its sample wording (English). */
   slots: z

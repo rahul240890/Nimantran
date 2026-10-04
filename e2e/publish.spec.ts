@@ -1,6 +1,33 @@
 import { expect, test } from "@playwright/test";
 import { axe, next, noOverflow, numberFor, publish, signIn, writeInvite } from "./invite-helpers";
 
+/** A mono WAV of a soft tone, `seconds` long, for the music clip tests. */
+function toneWav(seconds: number): Buffer {
+  const rate = 8_000;
+  const samples = rate * seconds;
+  const wav = Buffer.alloc(44 + samples * 2);
+  wav.write("RIFF", 0);
+  wav.writeUInt32LE(36 + samples * 2, 4);
+  wav.write("WAVEfmt ", 8);
+  wav.writeUInt32LE(16, 16);
+  wav.writeUInt16LE(1, 20);
+  wav.writeUInt16LE(1, 22);
+  wav.writeUInt32LE(rate, 24);
+  wav.writeUInt32LE(rate * 2, 28);
+  wav.writeUInt16LE(2, 32);
+  wav.writeUInt16LE(16, 34);
+  wav.write("data", 36);
+  wav.writeUInt32LE(samples * 2, 40);
+  for (let i = 0; i < samples; i++) {
+    const swell = Math.sin((Math.PI * i) / samples);
+    wav.writeInt16LE(
+      Math.round(Math.sin((2 * Math.PI * 440 * i) / rate) * 8000 * swell),
+      44 + i * 2,
+    );
+  }
+  return wav;
+}
+
 test.describe("publish and share", () => {
   test.use({ reducedMotion: "reduce" });
 
@@ -134,6 +161,56 @@ test.describe("publish and share", () => {
           .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
       )
       .toBe(true);
+  });
+
+  test("a host's own music is trimmed, kept and follows the invite to another device", async ({
+    page,
+    browser,
+  }, info) => {
+    const number = numberFor(info);
+    await writeInvite(page, number, ["Ishaan", "Tara"]);
+    await page.getByRole("button", { name: "Edit music" }).click();
+    await page.getByRole("radio", { name: "Your own music" }).click();
+    await page.locator('input[accept^="audio"]').setInputFiles({
+      name: "Shehnai at dawn.wav",
+      mimeType: "audio/wav",
+      buffer: toneWav(6),
+    });
+    await expect(page.getByText("Keep the part you love")).toBeVisible();
+    await expect(page.getByRole("img", { name: /The shape of Shehnai at dawn/ })).toBeVisible();
+    const use = page.getByRole("button", { name: "Use this music" });
+    await expect(use).toBeDisabled();
+    await page.getByRole("checkbox", { name: "I have the right to use this music" }).click();
+    await use.click();
+    await expect(page.getByText("Your music · 6 seconds")).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await next(page);
+    await expect(page.getByText(/Shehnai at dawn/)).toBeVisible();
+
+    await page.clock.runFor(2_000);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const draft = JSON.parse(localStorage.getItem("nimantran-invite-draft") ?? "null");
+          const saved = localStorage.getItem("nimantran-invite-synced");
+          return Boolean(draft?.remoteId) && saved === `${draft.remoteId}:${draft.updatedAt}`;
+        }),
+      )
+      .toBe(true);
+
+    // On another device the clip comes from the account, ready to play
+    const laptop = await browser.newPage({
+      baseURL: info.project.use.baseURL,
+      reducedMotion: "reduce",
+    });
+    await laptop.goto("/sign-in?next=/invites");
+    await signIn(laptop, number);
+    await laptop.getByRole("article").getByRole("link", { name: "Continue" }).click();
+    await laptop.getByRole("button", { name: "Edit music" }).click();
+    await expect(laptop.getByRole("radio", { name: "Your own music" })).toBeChecked();
+    await expect(laptop.getByText("Shehnai at dawn")).toBeVisible();
+    await expect(laptop.getByRole("button", { name: "Listen" })).toBeEnabled({ timeout: 15_000 });
   });
 
   test("a two-language card with a muhurat opens in the guest's language", async ({

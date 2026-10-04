@@ -1,6 +1,7 @@
 "use client";
 
 import type { PhotoRef } from "@/lib/editor/draft";
+import type { MusicClip } from "@/lib/editor/music-clip";
 import { loadPhoto } from "@/lib/editor/photos";
 
 /*
@@ -31,4 +32,16 @@ export async function uploadPhotos(
     if (!response?.ok) ok = false;
   }
   return ok;
+}
+
+/** Sends the host's music clip, when this device has it. */
+export async function uploadClip(inviteId: string, clip: MusicClip): Promise<boolean> {
+  const blob = await loadPhoto(clip.id).catch(() => null);
+  if (!blob) return false;
+  const response = await fetch(`/api/invites/${inviteId}/music/${clip.id}`, {
+    method: "POST",
+    headers: { "content-type": clip.type },
+    body: blob,
+  }).catch(() => null);
+  return Boolean(response?.ok);
 }

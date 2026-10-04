@@ -87,6 +87,7 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
       occasion={occasionName(draft, locale)}
       functions={functions}
       photos={invite.photos}
+      clipUrl={invite.clipUrl}
       allIcsUrl={entries.length > 1 ? `/i/${invite.slug}/calendar` : null}
       rsvpFunctions={rsvpFunctions}
       questions={draftQuestions(draft)}

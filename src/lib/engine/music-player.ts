@@ -1,7 +1,8 @@
 /*
  * Plays the invitation's music with the Web Audio API. Strings are plucked with the
  * Karplus-Strong method (a burst of noise fed back through a short delay), so a whole
- * santoor and tanpura fit in a few kilobytes of code. Browser only.
+ * santoor and tanpura fit in a few kilobytes of code. A host's own clip plays through an
+ * audio element instead, looping. Browser only.
  */
 
 import { composePhrase, frequency, PHRASE_BEATS, RAGAS, TANPURA, type Note } from "./music";
@@ -91,6 +92,8 @@ export class MusicPlayer {
   private random = seededRandom(3);
   private playing = false;
   private music: MusicChoice;
+  /** The host's own clip, while one is the track. */
+  private clip: HTMLAudioElement | null = null;
 
   constructor(music: MusicChoice) {
     this.music = music;
@@ -101,13 +104,31 @@ export class MusicPlayer {
   }
 
   setTrack(music: MusicChoice) {
+    const switching = (music.clip ?? null) !== (this.music.clip ?? null);
+    const resume = switching && this.playing;
+    if (resume) this.pause();
+    if (switching) this.dropClip();
     this.music = music;
     this.pitch = 0;
+    // Swapping between the raga and a clip carries on playing the new one
+    if (resume) void this.play().catch(() => undefined);
   }
 
   /** Starts or resumes the music. Must be called from a tap or key press. */
   async play() {
     if (this.playing) return;
+    if (this.music.clip) {
+      if (!this.clip) {
+        const clip = new Audio();
+        clip.loop = true;
+        clip.preload = "auto";
+        clip.src = this.music.clip;
+        this.clip = clip;
+      }
+      await this.clip.play();
+      this.playing = true;
+      return;
+    }
     const AudioContextClass =
       window.AudioContext ??
       (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -154,7 +175,13 @@ export class MusicPlayer {
 
   /** Fades out and goes quiet. */
   pause() {
-    if (!this.playing || !this.ctx || !this.master) return;
+    if (!this.playing) return;
+    if (this.clip) {
+      this.playing = false;
+      this.clip.pause();
+      return;
+    }
+    if (!this.ctx || !this.master) return;
     this.playing = false;
     window.clearInterval(this.timer);
     const now = this.ctx.currentTime;
@@ -173,9 +200,18 @@ export class MusicPlayer {
   dispose() {
     window.clearInterval(this.timer);
     this.playing = false;
+    this.dropClip();
     void this.ctx?.close();
     this.ctx = null;
     this.buffers.clear();
+  }
+
+  private dropClip() {
+    if (!this.clip) return;
+    this.clip.pause();
+    this.clip.removeAttribute("src");
+    this.clip.load();
+    this.clip = null;
   }
 
   private buffer(pitch: number, voice: Voice): AudioBuffer {

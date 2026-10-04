@@ -1,6 +1,16 @@
 "use client";
 
-import { ImageIcon, ImageOff, ImagePlus, Images, Pause, Play, X } from "lucide-react";
+import {
+  ImageIcon,
+  ImageOff,
+  ImagePlus,
+  Images,
+  Music2,
+  Pause,
+  Play,
+  Upload,
+  X,
+} from "lucide-react";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, type DragEvent } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +36,9 @@ import type { MusicPlayer } from "@/lib/engine/music-player";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
-import { forgetPhotoUrl, rememberPhotoUrl, usePhotoUrls } from "../use-photo-urls";
+import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
+import { OwnMusic } from "../own-music";
+import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
 import { categoriesText } from "@/i18n/copy/categories";
@@ -368,6 +380,15 @@ function FitPhotos({
 
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
+  const clip = draft.music.clip;
+  const clipUrl = useClipUrl(draft);
+  // "Your own music" stays chosen while the host picks a song, before any clip exists
+  const [ownChosen, setOwnChosen] = useState(clip !== null);
+  const source = clip || ownChosen ? "own" : "raga";
+  // Going back to a raga keeps the clip on this device, so switching again brings it back
+  const setAside = useRef<MusicClip | null>(null);
+  const setClip = (next: MusicClip | null) =>
+    update((current) => ({ ...current, music: { ...current.music, clip: next } }));
   const own = TEMPLATES[draft.templateId].music.raga;
   const value = draft.music.raga ?? own;
   const tempo = TEMPLATES[draft.templateId].music.tempo;
@@ -403,51 +424,89 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
       aria-labelledby="music-heading"
       className="flex flex-col gap-4 border-t border-line pt-6"
     >
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex min-w-0 flex-1 basis-60 flex-col gap-1">
-          <h2 id="music-heading" className="font-display text-xl">
-            {extrasCopy.musicHeading}
-          </h2>
-          <p className="text-sm text-ink-muted">{extrasCopy.musicHint}</p>
-        </div>
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          aria-pressed={listening}
-          leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
-          onClick={() => void listen()}
-        >
-          {listening ? extrasCopy.stopListening : extrasCopy.listen(extrasCopy.ragaNames[value])}
-        </Button>
+      <div className="flex flex-col gap-1">
+        <h2 id="music-heading" className="font-display text-xl">
+          {extrasCopy.musicHeading}
+        </h2>
+        <p className="text-sm text-ink-muted">{extrasCopy.musicHint}</p>
       </div>
       <RadioGroup
         label={extrasCopy.musicHeading}
-        variant="card"
-        value={value}
-        onValueChange={(next) =>
-          update((current) => ({
-            ...current,
-            // Choosing the design's own raga follows the design if it changes later
-            music: { ...current.music, raga: next === own ? null : (next as RagaId) },
-          }))
-        }
-        className="grid-cols-1 min-[400px]:grid-cols-2"
-      >
-        {RAGA_IDS.map((raga) => (
-          <RadioItem
-            key={raga}
-            value={raga}
-            label={
-              <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                {extrasCopy.ragaNames[raga]}
-                {raga === own && <Badge tone="gold">{extrasCopy.designsOwn}</Badge>}
-              </span>
+        variant="segment"
+        value={source}
+        onValueChange={(next) => {
+          if (next === "own") {
+            player.current?.pause();
+            setListening(false);
+            setOwnChosen(true);
+            if (!clip && setAside.current) setClip(setAside.current);
+          } else {
+            setOwnChosen(false);
+            if (clip) {
+              setAside.current = clip;
+              setClip(null);
             }
-            description={extrasCopy.ragaMoods[raga]}
-          />
-        ))}
+          }
+        }}
+      >
+        <RadioItem value="raga" label={extrasCopy.musicSource.raga} icon={<Music2 aria-hidden />} />
+        <RadioItem value="own" label={extrasCopy.musicSource.own} icon={<Upload aria-hidden />} />
       </RadioGroup>
+      {source === "own" ? (
+        <OwnMusic
+          clip={clip}
+          url={clipUrl}
+          onClip={(next) => {
+            setAside.current = null;
+            setClip(next);
+          }}
+        />
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p className="min-w-0 flex-1 basis-48 text-sm text-ink-muted">{extrasCopy.ragaHint}</p>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              aria-pressed={listening}
+              leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
+              onClick={() => void listen()}
+            >
+              {listening
+                ? extrasCopy.stopListening
+                : extrasCopy.listen(extrasCopy.ragaNames[value])}
+            </Button>
+          </div>
+          <RadioGroup
+            label={extrasCopy.musicHeading}
+            variant="card"
+            value={value}
+            onValueChange={(next) =>
+              update((current) => ({
+                ...current,
+                // Choosing the design's own raga follows the design if it changes later
+                music: { ...current.music, raga: next === own ? null : (next as RagaId) },
+              }))
+            }
+            className="grid-cols-1 min-[400px]:grid-cols-2"
+          >
+            {RAGA_IDS.map((raga) => (
+              <RadioItem
+                key={raga}
+                value={raga}
+                label={
+                  <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    {extrasCopy.ragaNames[raga]}
+                    {raga === own && <Badge tone="gold">{extrasCopy.designsOwn}</Badge>}
+                  </span>
+                }
+                description={extrasCopy.ragaMoods[raga]}
+              />
+            ))}
+          </RadioGroup>
+        </>
+      )}
       <Switch
         label={extrasCopy.playOnOpen}
         description={extrasCopy.playOnOpenHint}

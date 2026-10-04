@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { invitePhotoUrls } from "@/actions/invites";
+import type { InviteDraft } from "@/lib/editor/draft";
 import { loadPhoto } from "@/lib/editor/photos";
 
-/* Object URLs for stored photos, shared by every view and kept for the visit */
+/* Object URLs for stored photos and music clips, shared by every view and kept for the visit */
 const urls = new Map<string, string>();
 
 export function rememberPhotoUrl(id: string, blob: Blob) {
@@ -78,4 +79,14 @@ export function usePhotoUrls(
   }, [key, inviteId]);
 
   return Object.fromEntries(ids.map((id) => [id, urls.get(id)]));
+}
+
+const noIds: readonly string[] = [];
+
+/** A URL for the host's music clip, from this device or the account; null without one. */
+export function useClipUrl(draft: InviteDraft): string | null {
+  const id = draft.music.clip?.id ?? null;
+  const ids = useMemo(() => (id ? [id] : noIds), [id]);
+  const urls = usePhotoUrls(ids, draft.remoteId);
+  return (id && urls[id]) || null;
 }

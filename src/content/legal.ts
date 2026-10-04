@@ -272,6 +272,7 @@ export const terms: LegalDoc = {
             "Post anything unlawful, hateful, obscene, or that disrespects any faith or community.",
           ],
         },
+        "Music you upload must be your own recording, licensed to you, or free to use. If a music owner tells us a clip uses their work without permission, we remove it from the invitation and the invitation plays one of our ragas instead.",
         "We may remove an invitation or close an account that breaks these rules, and will tell the host why unless the law stops us.",
       ],
     },
