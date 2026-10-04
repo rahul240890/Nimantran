@@ -64,7 +64,9 @@ test.describe("designs and prices", () => {
     await page.goto(`/designs?q=${word}`);
     const tile = page.locator(`[data-design="${id}"]`);
     await expect(tile.locator("[data-tier]")).toHaveAttribute("data-tier", "premium");
-    await expect(tile.getByText("Premium · ₹499")).toBeVisible();
+    // A phone's narrow tile shows the price alone
+    const phone = info.project.name.startsWith("phone");
+    await expect(tile.getByText(phone ? "₹499" : "Premium · ₹499", { exact: true })).toBeVisible();
 
     await page.goto("/sign-in?next=%2Fadmin%2Fdesigns");
     await signIn(page, ADMIN);
@@ -73,7 +75,7 @@ test.describe("designs and prices", () => {
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     // Both screen sizes run at once on one server; one of them changes the setting
-    if (info.project.name.startsWith("phone")) return;
+    if (phone) return;
 
     const search = page.getByRole("searchbox", { name: "Search designs" });
     const tiers = page.getByRole("radiogroup", { name: `${name} (Scene) tier` });
