@@ -38,7 +38,7 @@ export type StoryFunction = {
  * (src/lib/suites/lettering.ts). "date" is a function's day, set below its name.
  */
 export type LineStyle =
-  "symbol" | "label" | "script" | "display" | "date" | "joiner" | "body" | "small";
+  "symbol" | "label" | "script" | "display" | "date" | "joiner" | "body" | "small" | "venue";
 
 export type StoryLine = {
   text: string;
@@ -102,10 +102,6 @@ export type FamilyLine = { title: string; text: string; lang?: string };
 /** The few words the story adds of its own, in the page's language. */
 export type StoryWords = {
   saveTheDate: string;
-  /** The small label over a function's day and time ("Date & time", "शुभ तिथि"). */
-  when: string;
-  /** The small label over its place ("Venue", "शुभ स्थान"). */
-  where: string;
   joinUs: string;
   withLove: string;
   and: string;
@@ -232,17 +228,15 @@ export function storyBeats({
   for (const fn of functions) {
     beats.push(
       beat(`fn-${fn.kind}`, fn.kind, [
-        // The function's name leads, as on a printed card; the day sits below it
+        // The function's name leads, large, as on a printed card; then its day with the
+        // weekday and the hour, then the place, with no small headings over them
         ...line(fn.countdown ?? "", "label"),
         ...line(fn.name, "display"),
         ...(fn.localName ? line(fn.localName.text, "script", fn.localName.lang) : []),
-        // Then the day and the place, each under its own small label with room between,
-        // as a studio sets a printed card
-        ...(fn.date || fn.time ? line(w.when, "label") : []),
         ...line(fn.date, "date"),
         ...(fn.muhurat && fn.time ? line(fn.muhurat.text, "small", fn.muhurat.lang) : []),
         ...line(fn.time, "body"),
-        ...(fn.venue ? [...line(w.where, "label"), ...line(fn.venue, "body")] : []),
+        ...line(fn.venue, "venue"),
       ]),
     );
     const maps = fn.mapsUrl ?? null;
@@ -252,7 +246,7 @@ export function storyBeats({
 
   // One function's venue is on its own page; a single card venue closes the story instead
   const closing = [...line(replies ? w.joinUs : w.withLove, "display")];
-  if (functions.length === 0) closing.push(...line(copy.venue, "body"));
+  if (functions.length === 0) closing.push(...line(copy.venue, "venue"));
   beats.push(beat("reply", "reply", closing));
 
   return fitStory(beats);

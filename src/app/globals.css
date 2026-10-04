@@ -3624,6 +3624,15 @@
     clamp(calc(0.7rem * var(--scene-floor, 1)), 3.5cqw, 1.1rem) * var(--scene-fit, 1)
   );
 }
+/* A plain sheet laid over a painted card whose middle is busy (the love letter's wax seal) */
+.scene-plate {
+  border-radius: 0.35rem;
+  background: color-mix(in oklab, var(--card-ivory) 96%, transparent);
+  box-shadow:
+    0 0.15rem 0.6rem rgb(0 0 0 / 0.22),
+    inset 0 0 0 0.25rem color-mix(in oklab, var(--card-ivory) 96%, transparent),
+    inset 0 0 0 0.32rem color-mix(in oklab, var(--card-gold) 60%, transparent);
+}
 .scene-rule {
   width: 5.5em;
   height: 0.5em;

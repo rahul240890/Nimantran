@@ -29,7 +29,12 @@ import { photoPage, type FrameBox } from "./photo-frames";
 export type SlotStyle = "jharokha" | "kasavu" | "painted";
 
 /** A Scene theme's painted card: its picture, and where on it the words go (percent of the card). */
-export type PaintedCard = { image: string; text: FrameBox };
+export type PaintedCard = {
+  image: string;
+  text: FrameBox;
+  /** The writing area has art in it (a wax seal), so the words sit on a sheet laid over it. */
+  plate: boolean;
+};
 
 type SceneLayout = {
   /** The names, printed on the painting. */
@@ -90,6 +95,8 @@ type PaintedEntry = {
   text: FrameBox;
   /** The painting is dark behind the names, so they print light at every hour. */
   dark?: true;
+  /** The card's middle is busy (a wax seal), so its words sit on a plain sheet over it. */
+  plate?: true;
 };
 
 const PAINTED: Record<SceneThemeId, PaintedEntry> = {
@@ -452,13 +459,14 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     card: [10.73, 55.26, 78.96, 28.83],
     text: [9.2, 13, 81.1, 72.8],
   },
-  // An envelope closed with a wax seal
+  // An envelope closed with a wax seal; the letter is laid over the seal, so the words read
   "love-letter": {
     frame: [27.7, 8.9, 45.1, 34.3],
     names: [20, 47.3, 60, 6.5],
     line: null,
     card: [14.24, 55.98, 72.37, 23.62],
-    text: [5.2, 4.3, 88.4, 91],
+    text: [7, 8, 86, 84],
+    plate: true,
   },
   // A lace-edged card with rose sprigs
   "parsi-chalk": {
@@ -566,7 +574,7 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     names: [12, 43.5, 76, 6.5],
     line: null,
     card: [5.65, 52.92, 88.8, 21.72],
-    text: [9.4, 21.1, 81.1, 55.3],
+    text: [8.5, 18.5, 83, 62],
   },
   // A quiet white card edged with tuberoses
   shraddhanjali: {
@@ -658,7 +666,7 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     names: [20, 37.2, 60, 6.5],
     line: [22, 44, 56, 4.3],
     card: [12.78, 49.48, 74.44, 45],
-    text: [19.5, 25, 61, 26.8],
+    text: [23.5, 21.5, 53, 34],
   },
   // A phulkari-edged card by the bonfire
   "lohri-bonfire": {
@@ -694,12 +702,12 @@ export type ScenePage = {
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
   if (isSceneTheme(suite)) {
     // One frame: with two photos, the first (the couple, or the bride) shows
-    const { frame, names, line, card, text, dark } = PAINTED[suite];
+    const { frame, names, line, card, text, dark, plate } = PAINTED[suite];
     return {
       image: `/suites/${suite}/scene.webp`,
       style: "painted",
       dark: Boolean(dark),
-      card: { image: `/suites/${suite}/card.webp`, text },
+      card: { image: `/suites/${suite}/card.webp`, text, plate: Boolean(plate) },
       frames: [frame],
       names,
       line,

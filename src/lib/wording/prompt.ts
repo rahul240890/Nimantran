@@ -61,9 +61,10 @@ Line kinds (the "style" of each line):
 - label: a small heading in capitals, a few words
 - script: a blessing, an invocation or a short accent line
 - display: large text; on the cover, each name is its own display line; a function's page leads with its name
-- date: a date, set below a function's name or under "save the date"
-- body: an ordinary sentence
-- small: a small note, like a venue or a countdown
+- date: a date with its weekday, set below a function's name or under "save the date"
+- venue: a function's place, set below its date and time
+- body: an ordinary sentence, or a function's time
+- small: a small note, like a countdown
 
 Rules:
 - Write only in the language you are told, in its own script. Never mix in English words on a card in another language unless the host typed them.

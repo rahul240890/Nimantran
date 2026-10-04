@@ -1039,6 +1039,7 @@ export const pageWordsCopy: Translation<typeof en.pageWordsCopy> = {
     script: "आशीर्वचन",
     display: "बड़ा",
     date: "तारीख़",
+    venue: "स्थान",
     body: "सामान्य",
     small: "छोटे अक्षर",
   },

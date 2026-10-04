@@ -12,6 +12,7 @@ import { seededRandom } from "@/lib/engine/particles";
 import { DEFAULT_AREA, textArea, type TextArea } from "@/lib/suites/areas";
 import {
   ROLES,
+  keepDate,
   lettering,
   lineSpace,
   roleSize,
@@ -338,6 +339,7 @@ const ROLE_INK: Record<TypeRole, keyof Palette> = {
   joiner: "accentText",
   body: "inkMuted",
   small: "inkMuted",
+  venue: "ink",
   label: "goldText",
 };
 
@@ -359,7 +361,8 @@ function greedy(ctx: CanvasRenderingContext2D, words: readonly string[], width: 
 
 /** Wraps to the width, then evens the lines out, as text-wrap: balance does on the pages. */
 export function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): string[] {
-  const words = text.split(/\s+/).filter(Boolean);
+  // A no-break space holds words together, as it does on the pages
+  const words = text.split(/[^\S\u00a0]+/).filter(Boolean);
   const lines = greedy(ctx, words, width);
   if (lines.length < 2) return lines;
   let low = width / lines.length;
@@ -424,7 +427,8 @@ function drawWords(
       const font = `${style.prefix}${size}px ${style.family}`;
       ctx.font = font;
       ctx.letterSpacing = `${style.spacing * size}px`;
-      const text = style.upper ? line.text.toLocaleUpperCase(lang) : line.text;
+      const said = style.role === "date" ? keepDate(line.text) : line.text;
+      const text = style.upper ? said.toLocaleUpperCase(lang) : said;
       // Reading lines keep clear of the art's edges, as on the live pages
       const full = ROLES[style.role].face === "names" && style.role !== "date";
       const lines = wrap(ctx, text, (boxW - padX * 2) * (full ? 1 : 0.88));

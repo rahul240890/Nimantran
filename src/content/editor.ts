@@ -1033,6 +1033,7 @@ export const pageWordsCopy = {
     script: "Blessing",
     display: "Large",
     date: "Date",
+    venue: "Venue",
     body: "Text",
     small: "Small text",
   },

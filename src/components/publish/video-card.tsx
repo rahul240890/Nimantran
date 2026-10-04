@@ -360,7 +360,6 @@ export function useVideoFilm(
         fn: { ...fn, countdown: undefined },
       })),
     ];
-    const words = CARD_STORY_WORDS[language];
     return {
       copy,
       suite,
@@ -368,7 +367,6 @@ export function useVideoFilm(
       items,
       photos: scenePhotos,
       timeline: sceneTimeline(items.length),
-      labels: { when: words.when, where: words.where },
       type: pageType(draft.type, [language]),
     };
   }, [draft, functions, photos, language]);

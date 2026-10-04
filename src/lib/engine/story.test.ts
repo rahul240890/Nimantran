@@ -120,15 +120,18 @@ describe("event pages", () => {
     expect(texts.indexOf("Aanya")).toBeLessThan(texts.indexOf("Vihaan"));
   });
 
-  it("sets a function's day and place under their own small labels", () => {
-    const beats = storyBeats({ copy, functions: [fn("sangeet")], replies: false, words });
+  it("leads a function's page with its name, then the day, the hour and the place, unlabelled", () => {
+    const sangeet = fn("sangeet");
+    const beats = storyBeats({ copy, functions: [sangeet], replies: false, words });
     const lines = beats.find((b) => b.scene === "sangeet")!.lines;
-    const at = (text: string) => lines.findIndex((l) => l.text === text);
-    expect(lines[at(words.when)]!.style).toBe("label");
-    expect(lines[at(words.where)]!.style).toBe("label");
-    expect(at(words.when)).toBeLessThan(at(words.where));
-    // The venue follows its label, the last line of the page
-    expect(lines.at(-2)!.text).toBe(words.where);
+    expect(lines.map((l) => l.style)).toEqual(["display", "date", "body", "venue"]);
+    expect(lines.map((l) => l.text)).toEqual([
+      sangeet.name,
+      sangeet.date,
+      sangeet.time,
+      sangeet.venue,
+    ]);
+    expect(lines.some((l) => l.style === "label")).toBe(false);
   });
 
   it("leaves out empty lines and a blessing nobody wrote", () => {
@@ -143,11 +146,7 @@ describe("event pages", () => {
     expect(beats[0]!.symbol).toBe(false);
     for (const beat of beats) for (const line of beat.lines) expect(line.text).not.toBe("");
     const mehendi = beats.find((b) => b.scene === "mehendi")!;
-    expect(mehendi.lines.map((l) => l.text)).toEqual([
-      "Mehendi",
-      words.when,
-      "Friday, 12 February 2027",
-    ]);
+    expect(mehendi.lines.map((l) => l.text)).toEqual(["Mehendi", "Friday, 12 February 2027"]);
     expect(beats.at(-1)!.lines[0]!.text).toBe(words.withLove);
   });
 
