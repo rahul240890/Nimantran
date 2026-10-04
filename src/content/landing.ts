@@ -142,21 +142,22 @@ export const templates = {
 
 export const pricing = {
   eyebrow: "Pricing",
-  title: "Free to start, premium from ₹499",
+  /** Premium's price as Admin, Designs sets it. */
+  title: (price: string) => `Free to start, premium from ${price}`,
   intro: "Make your invite and share it for free. Upgrade one event when you want more.",
   free: {
     name: "Free",
     price: "₹0",
     per: "to start",
     points: [
-      "Every design, opened in 3D",
+      "Free designs, and try every other one",
       "Share on WhatsApp with one link",
       "One-tap RSVP for your guests",
     ],
   },
   premium: {
     name: "Premium",
-    price: "from ₹499",
+    price: (price: string) => `from ${price}`,
     per: "per event",
     badge: "Best for weddings",
     points: [

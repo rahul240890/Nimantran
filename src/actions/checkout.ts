@@ -12,6 +12,7 @@ import {
   type StartedCheckout,
 } from "@/lib/payments/editions";
 import { PAID_PLAN_IDS, type PaidPlanId, type PlanId } from "@/lib/plans/catalog";
+import { getPricing } from "@/lib/plans/pricing";
 import {
   cleanCouponCode,
   codeProblem,
@@ -75,7 +76,8 @@ export async function tryCoupon(input: unknown): Promise<CouponCheck> {
   const now = new Date();
   const problem = codeProblem(current, coupons, typed, now);
   if (problem) return { ok: false, reason: problem };
-  return { ok: true, code: typed, prices: pricesFor(current, coupons, typed, now) };
+  const { prices } = await getPricing();
+  return { ok: true, code: typed, prices: pricesFor(current, coupons, typed, now, prices) };
 }
 
 export type InviteEdition = { plan: PlanId; prices: Partial<Record<PaidPlanId, Price>> } | null;
@@ -87,5 +89,6 @@ export async function inviteEdition(inviteId: unknown): Promise<InviteEdition> {
   if (!id.success || !account || !(await editionsActive())) return null;
   const plan = await invitePlan(account, id.data);
   if (!plan) return null;
-  return { plan, prices: pricesFor(plan, await checkoutCoupons(), null, new Date()) };
+  const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
+  return { plan, prices: pricesFor(plan, coupons, null, new Date(), pricing.prices) };
 }

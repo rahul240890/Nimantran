@@ -3,6 +3,7 @@
 import { Image as ImageIcon, Layers } from "lucide-react";
 import { isInviteFormat } from "@/lib/editor/formats";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { TierBadge } from "@/components/pricing/tier-badge";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
@@ -18,6 +19,7 @@ import {
   isSuiteId,
   suiteFor,
   suiteSuits,
+  type SuiteId,
 } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
 import { useLocale, useText } from "@/i18n/client";
@@ -47,6 +49,13 @@ export function DesignStep({ draft, update }: StepProps) {
   // A Scene theme only shows as a Scene, so there is no choice of kind to make
   const sceneOnly = isSceneTheme(suite);
   const offersFormats = hasScene(suite) && !sceneOnly;
+  // The gallery design each choice makes, for its Free or Premium badge (Admin, Designs)
+  const themeDesign = (id: SuiteId, format = draft.format) =>
+    id === "classic"
+      ? `card-${draft.templateId}`
+      : (format === "scene" || isSceneTheme(id)) && hasScene(id)
+        ? `${id}-scene`
+        : id;
 
   return (
     <div className="flex flex-col gap-10">
@@ -75,7 +84,19 @@ export function DesignStep({ draft, update }: StepProps) {
                   )}
                 </>
               }
-              description={designCopy[id].description}
+              description={
+                <>
+                  {/* A card's own price counts only when the card is the whole design */}
+                  {suite === "classic" && (
+                    <TierBadge
+                      designId={`card-${id}`}
+                      variant="plain"
+                      className="mb-1.5 flex w-fit"
+                    />
+                  )}
+                  {designCopy[id].description}
+                </>
+              }
               badge={
                 isSuggested ? (
                   <Badge aria-hidden tone="gold" className="h-6 px-2 text-xs">
@@ -138,6 +159,11 @@ export function DesignStep({ draft, update }: StepProps) {
                 }
                 description={
                   <>
+                    <TierBadge
+                      designId={themeDesign(id)}
+                      variant="plain"
+                      className="mb-1.5 flex w-fit"
+                    />
                     {suiteCopy.descriptions[id]}
                     {pair && pair !== draft.templateId && (
                       <span className="mt-1 block text-sm">
@@ -176,7 +202,16 @@ export function DesignStep({ draft, update }: StepProps) {
                 key={format}
                 value={format}
                 label={suiteCopy.formats[format].name}
-                description={suiteCopy.formats[format].description}
+                description={
+                  <>
+                    <TierBadge
+                      designId={themeDesign(suite, format)}
+                      variant="plain"
+                      className="mb-1.5 flex w-fit"
+                    />
+                    {suiteCopy.formats[format].description}
+                  </>
+                }
                 icon={
                   format === "scene" ? (
                     <ImageIcon aria-hidden className="size-6 text-accent-text" />

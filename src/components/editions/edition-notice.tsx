@@ -4,12 +4,15 @@ import { Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { inviteEdition, type InviteEdition } from "@/actions/checkout";
+import { useDesignTier } from "@/components/pricing/pricing-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import { PLAN_IDS, formatRupees, planShortfalls, type PaidPlanId } from "@/lib/plans/catalog";
+import { draftDesignId } from "@/lib/plans/design-defaults";
+import { tierPlan } from "@/lib/plans/design-tiers";
 
 /**
  * In the editor's last step: what this invite uses beyond its edition, while payments are
@@ -18,6 +21,8 @@ import { PLAN_IDS, formatRupees, planShortfalls, type PaidPlanId } from "@/lib/p
 export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteId: string }) {
   const { limitCopy, planCopy } = useText(editionsText);
   const [edition, setEdition] = useState<InviteEdition>(null);
+  // The design asks for its own edition (Admin, Designs)
+  const design = tierPlan(useDesignTier(draftDesignId(draft)).tier);
 
   useEffect(() => {
     let live = true;
@@ -30,10 +35,10 @@ export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteI
   }, [inviteId]);
 
   if (!edition) return null;
-  const shortfalls = planShortfalls(draft, edition.plan);
+  const shortfalls = planShortfalls(draft, edition.plan, design);
   if (shortfalls.length === 0) return null;
   const needed = PLAN_IDS.slice(PLAN_IDS.indexOf(edition.plan)).find(
-    (id): id is PaidPlanId => id !== "free" && planShortfalls(draft, id).length === 0,
+    (id): id is PaidPlanId => id !== "free" && planShortfalls(draft, id, design).length === 0,
   );
   const price = needed ? edition.prices[needed] : undefined;
 

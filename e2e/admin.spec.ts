@@ -55,6 +55,49 @@ test.describe("master admin", () => {
   });
 });
 
+test.describe("designs and prices", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("an admin makes a design free and its tile says so", async ({ page }, info) => {
+    test.setTimeout(90_000);
+    const [id, word, name] = ["kayal-scene", "kayal", "Kayal"];
+    await page.goto(`/designs?q=${word}`);
+    const tile = page.locator(`[data-design="${id}"]`);
+    await expect(tile.locator("[data-tier]")).toHaveAttribute("data-tier", "premium");
+    // A phone's narrow tile shows the price alone
+    const phone = info.project.name.startsWith("phone");
+    await expect(tile.getByText(phone ? "₹499" : "Premium · ₹499", { exact: true })).toBeVisible();
+
+    await page.goto("/sign-in?next=%2Fadmin%2Fdesigns");
+    await signIn(page, ADMIN);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Designs and prices");
+    await expect(page).toHaveTitle(/Designs and prices/);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    // Both screen sizes run at once on one server; one of them changes the setting
+    if (phone) return;
+
+    const search = page.getByRole("searchbox", { name: "Search designs" });
+    const tiers = page.getByRole("radiogroup", { name: `${name} (Scene) tier` });
+    await search.fill(word);
+    await tiers.getByRole("radio", { name: "Free" }).click();
+    await expect(page.getByText("1 change not saved yet.")).toBeVisible();
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText("Designs and prices saved").first()).toBeVisible();
+
+    await page.goto(`/designs?q=${word}`);
+    await expect(tile.locator("[data-tier]")).toHaveAttribute("data-tier", "free");
+    await expect(tile.getByText("Free", { exact: true })).toBeVisible();
+
+    // Back as it was, for every other test
+    await page.goto("/admin/designs");
+    await search.fill(word);
+    await tiers.getByRole("radio", { name: "Premium" }).click();
+    await page.getByRole("button", { name: "Save" }).click();
+    await expect(page.getByText("Designs and prices saved").first()).toBeVisible();
+  });
+});
+
 test.describe("editions", () => {
   test.use({ reducedMotion: "reduce" });
 

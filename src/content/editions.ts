@@ -1,4 +1,4 @@
-import type { PlanId, PlanLimits } from "@/lib/plans/catalog";
+import { PLAN_IDS, type PlanId, type PlanLimits } from "@/lib/plans/catalog";
 
 /*
  * English copy for editions: the plan cards, buying one for an invite, and the watermark
@@ -115,7 +115,9 @@ export const limitCopy = {
     languages: (count: number) => `${count} card languages`,
     couplePhotos: (count: number) => `${count} couple photos`,
     guests: (count: number) => `${count} guests`,
-  } satisfies Record<keyof PlanLimits, (count: number) => string>,
+    /** The design's own edition, by its place in the list (1 Premium, 2 Royal). */
+    design: (rank: number) => `A ${planCopy[PLAN_IDS[rank] ?? "premium"].name} design`,
+  } satisfies Record<keyof PlanLimits | "design", (count: number) => string>,
   choose: "Choose edition",
   edition: (plan: string) => `Edition: ${plan}`,
   unlockBody: (plan: string, price: string) =>

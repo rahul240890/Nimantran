@@ -41,6 +41,11 @@ export const galleryCopy = {
     story: "Story",
     card: "3D card",
   },
+  /** Each design's tier (Admin, Designs) and what it costs, on its tile. */
+  tiers: { free: "Free", premium: "Premium", royal: "Royal" },
+  tierPrice: (tier: string, price: string) => `${tier} · ${price}`,
+  tierLabel: (tier: string, price: string | null) =>
+    price ? `${tier} design, publish from ${price}` : "Free design",
   sceneBadge: "Scene · 1 page",
   storyBadge: (count: number) => `Story · ${count} pages`,
   sceneNote:

@@ -106,10 +106,27 @@ export function isPaidPlanId(value: unknown): value is PaidPlanId {
 
 export const planRank = (id: PlanId) => PLAN_IDS.indexOf(id);
 
+/** Each paid edition's price in paise; the admin can change them (Admin, Designs). */
+export type EditionPrices = Record<PaidPlanId, number>;
+
+const LIST_PRICES: EditionPrices = {
+  premium: PLANS.premium.pricePaise,
+  royal: PLANS.royal.pricePaise,
+  bundle: PLANS.bundle.pricePaise,
+};
+
+/** An edition's price today: nothing for Free, else the admin's price or the list price. */
+export const editionPrice = (id: PlanId, prices: EditionPrices = LIST_PRICES): number =>
+  id === "free" ? 0 : prices[id];
+
 /** What moving from one edition to a higher one costs: the difference, never less than ₹1. */
-export function upgradePricePaise(from: PlanId, to: PaidPlanId): number | null {
+export function upgradePricePaise(
+  from: PlanId,
+  to: PaidPlanId,
+  prices: EditionPrices = LIST_PRICES,
+): number | null {
   if (planRank(to) <= planRank(from)) return null;
-  return Math.max(100, PLANS[to].pricePaise - PLANS[from].pricePaise);
+  return Math.max(100, editionPrice(to, prices) - editionPrice(from, prices));
 }
 
 /** "₹499", "₹1,999": whole rupees in Indian grouping, paise only when there are any. */
@@ -121,23 +138,39 @@ export function formatRupees(paise: number): string {
   })}`;
 }
 
-export type PlanNeed = { limit: keyof PlanLimits; used: number };
+/**
+ * Something an invite uses beyond its edition: a limit and how much of it is used, or its
+ * design, which asks for an edition of its own (`used` is then that edition's rank).
+ */
+export type PlanNeed = { limit: keyof PlanLimits | "design"; used: number };
 
-/** What an invite uses that the edition doesn't cover; empty when it fits. */
-export function planShortfalls(draft: InviteDraft, plan: PlanId): PlanNeed[] {
+/**
+ * What an invite uses that the edition doesn't cover; empty when it fits. `design` is the
+ * edition the invite's design asks for (src/lib/plans/design-tiers.ts).
+ */
+export function planShortfalls(
+  draft: InviteDraft,
+  plan: PlanId,
+  design: PlanId = "free",
+): PlanNeed[] {
   const limits = PLANS[plan].limits;
+  const needsDesign: PlanNeed[] =
+    planRank(plan) < planRank(design) ? [{ limit: "design", used: planRank(design) }] : [];
   const used: Pick<PlanLimits, "functions" | "photos" | "languages" | "couplePhotos"> = {
     functions: includedFunctions(draft).length,
     photos: draft.photos.length,
     languages: cardLanguages(draft).length,
     couplePhotos: draft.photos.length ? frameCount(draft.couplePhotos.layout) : 0,
   };
-  return (Object.keys(used) as (keyof typeof used)[]).flatMap((limit) =>
-    used[limit] > limits[limit] ? [{ limit, used: used[limit] }] : [],
-  );
+  return [
+    ...needsDesign,
+    ...(Object.keys(used) as (keyof typeof used)[]).flatMap((limit) =>
+      used[limit] > limits[limit] ? [{ limit, used: used[limit] }] : [],
+    ),
+  ];
 }
 
-/** The lowest edition an invite fits in, as the host has made it. */
-export function planNeeded(draft: InviteDraft): PlanId {
-  return PLAN_IDS.find((id) => planShortfalls(draft, id).length === 0) ?? "royal";
+/** The lowest edition an invite fits in, as the host has made it, with its design's edition. */
+export function planNeeded(draft: InviteDraft, design: PlanId = "free"): PlanId {
+  return PLAN_IDS.find((id) => planShortfalls(draft, id, design).length === 0) ?? "royal";
 }

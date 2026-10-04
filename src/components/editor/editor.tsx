@@ -1,5 +1,7 @@
 "use client";
 
+import { TierBadge } from "@/components/pricing/tier-badge";
+import { draftDesignId } from "@/lib/plans/design-defaults";
 import type { InviteFormat } from "@/lib/editor/formats";
 import {
   ArrowLeft,
@@ -480,6 +482,7 @@ export function Editor({
                         : designCopy[draft.templateId].name}
                     </span>
                   </span>
+                  <TierBadge designId={draftDesignId(draft)} variant="plain" />
                   <Button
                     variant="ghost"
                     size="sm"

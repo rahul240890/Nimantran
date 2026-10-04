@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { RootHtml, rootMetadata, rootViewport } from "@/components/root-html";
+import { BUILT_PRICING } from "@/lib/plans/design-defaults";
 import { getLocale } from "@/i18n/server";
 
 /* The app's pages: the editor, accounts, guest lists and invitations. Language from the visitor. */
@@ -12,5 +13,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport = rootViewport;
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  return <RootHtml locale={await getLocale()}>{children}</RootHtml>;
+  return (
+    <RootHtml locale={await getLocale()} pricing={BUILT_PRICING}>
+      {children}
+    </RootHtml>
+  );
 }

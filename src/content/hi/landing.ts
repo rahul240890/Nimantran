@@ -146,21 +146,21 @@ export const templates: Translation<typeof en.templates> = {
 
 export const pricing: Translation<typeof en.pricing> = {
   eyebrow: "क़ीमत",
-  title: "शुरुआत मुफ़्त, प्रीमियम ₹499 से",
+  title: (price) => `शुरुआत मुफ़्त, प्रीमियम ${price} से`,
   intro: "निमंत्रण बनाइए और मुफ़्त भेजिए। जब ज़्यादा चाहिए, तब एक उत्सव अपग्रेड कीजिए।",
   free: {
     name: "मुफ़्त",
     price: "₹0",
     per: "शुरुआत के लिए",
     points: [
-      "हर डिज़ाइन, 3D में",
+      "फ़्री डिज़ाइन, और बाकी सब आज़माकर देखें",
       "WhatsApp पर एक लिंक से भेजें",
       "मेहमानों के लिए एक टैप में जवाब",
     ],
   },
   premium: {
     name: "प्रीमियम",
-    price: "₹499 से",
+    price: (price) => `${price} से`,
     per: "प्रति उत्सव",
     badge: "शादियों के लिए सबसे अच्छा",
     points: [

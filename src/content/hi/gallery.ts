@@ -37,6 +37,10 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     story: "कहानी",
     card: "3D कार्ड",
   },
+  tiers: { free: "फ़्री", premium: "प्रीमियम", royal: "रॉयल" },
+  tierPrice: (tier, price) => `${tier} · ${price}`,
+  tierLabel: (tier, price) =>
+    price ? `${tier} डिज़ाइन, ${price} से प्रकाशित करें` : "फ़्री डिज़ाइन",
   sceneBadge: "दृश्य · 1 पन्ना",
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:

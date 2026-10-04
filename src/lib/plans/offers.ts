@@ -1,4 +1,10 @@
-import { PLAN_IDS, upgradePricePaise, type PaidPlanId, type PlanId } from "./catalog";
+import {
+  PLAN_IDS,
+  upgradePricePaise,
+  type EditionPrices,
+  type PaidPlanId,
+  type PlanId,
+} from "./catalog";
 
 /*
  * Coupons and festival offers (Step 17). A coupon takes a percentage or a fixed amount off
@@ -68,8 +74,9 @@ export function priceFor(
   coupons: readonly Coupon[],
   code: string | null,
   now: Date,
+  prices?: EditionPrices,
 ): Price | null {
-  const listPaise = upgradePricePaise(from, to);
+  const listPaise = upgradePricePaise(from, to, prices);
   if (listPaise === null) return null;
   const usable = coupons.filter((coupon) => couponProblem(coupon, to, now) === null);
   const typed = code ? usable.find((coupon) => coupon.code === code) : undefined;
@@ -96,11 +103,12 @@ export function pricesFor(
   coupons: readonly Coupon[],
   code: string | null,
   now: Date,
+  editionPrices?: EditionPrices,
 ): Partial<Record<PaidPlanId, Price>> {
   const prices: Partial<Record<PaidPlanId, Price>> = {};
   for (const id of PLAN_IDS) {
     if (id === "free") continue;
-    const price = priceFor(from, id, coupons, code, now);
+    const price = priceFor(from, id, coupons, code, now, editionPrices);
     if (price) prices[id] = price;
   }
   return prices;

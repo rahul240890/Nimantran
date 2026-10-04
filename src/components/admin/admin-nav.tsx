@@ -5,6 +5,7 @@ import {
   LayoutDashboard,
   Mails,
   Newspaper,
+  Palette,
   ReceiptText,
   Sparkles,
   TicketPercent,
@@ -19,6 +20,7 @@ import { cn } from "@/lib/cn";
 const ICONS: Record<AdminPageIcon, LucideIcon> = {
   overview: LayoutDashboard,
   payments: WalletCards,
+  designs: Palette,
   orders: ReceiptText,
   coupons: TicketPercent,
   invites: Mails,
