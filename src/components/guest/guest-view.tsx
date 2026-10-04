@@ -55,6 +55,7 @@ import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
+import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
@@ -95,6 +96,8 @@ type GuestViewProps = {
   occasion: string;
   functions: GuestFunction[];
   photos: PublicPhoto[];
+  /** The host's own music clip, played instead of the raga. */
+  clipUrl?: string | null;
   allIcsUrl: string | null;
   rsvpFunctions: RsvpFunction[];
   questions: RsvpQuestionId[];
@@ -112,6 +115,7 @@ export function GuestView({
   occasion,
   functions,
   photos,
+  clipUrl = null,
   allIcsUrl,
   rsvpFunctions,
   questions,
@@ -128,8 +132,8 @@ export function GuestView({
   );
   const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
   const template = useMemo(
-    () => templateWithRaga(draft.templateId, draft.music.raga),
-    [draft.templateId, draft.music.raga],
+    () => withClip(templateWithRaga(draft.templateId, draft.music.raga), clipUrl),
+    [draft.templateId, draft.music.raga, clipUrl],
   );
   const [open, setOpen] = useState(false);
   // A guest who came by their own link is greeted by name before the invitation opens

@@ -110,3 +110,37 @@ export async function renderRaga(
   }
   return ctx.startRendering();
 }
+
+/** The host's own clip, looped to fill `seconds` and faded like the raga. */
+async function renderClip(url: string, seconds: number, sampleRate: number): Promise<AudioBuffer> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error("Clip unavailable");
+  const data = await response.arrayBuffer();
+  const ctx = new OfflineAudioContext(2, Math.ceil(seconds * sampleRate), sampleRate);
+  const clip = await ctx.decodeAudioData(data);
+  const master = ctx.createGain();
+  master.gain.setValueAtTime(1, 0);
+  master.gain.setValueAtTime(1, Math.max(0, seconds - FADE_OUT));
+  master.gain.linearRampToValueAtTime(0, seconds);
+  master.connect(ctx.destination);
+  const source = ctx.createBufferSource();
+  source.buffer = clip;
+  source.loop = true;
+  source.connect(master);
+  source.start(0);
+  return ctx.startRendering();
+}
+
+/** The invite's music as a recording: the host's clip when they chose one, else the raga. */
+export async function renderMusic(
+  music: MusicChoice,
+  seconds: number,
+  sampleRate = 48_000,
+): Promise<AudioBuffer> {
+  if (music.clip) {
+    // A clip that won't load still leaves the video with music
+    const clip = await renderClip(music.clip, seconds, sampleRate).catch(() => null);
+    if (clip) return clip;
+  }
+  return renderRaga(music, seconds, sampleRate);
+}

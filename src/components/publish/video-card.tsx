@@ -11,6 +11,7 @@ import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { withClip } from "@/lib/editor/music-clip";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -39,6 +40,8 @@ type VideoCardProps = {
   draft: InviteDraft;
   functions: StoryFunction[];
   photos: PublicPhoto[];
+  /** The host's own music clip, which the video plays instead of the raga. */
+  clipUrl?: string | null;
   url: string;
   slug: string;
   names: string;
@@ -69,6 +72,7 @@ const TEST_CODECS = { video: "vp9", audio: "opus" } as const;
 export function VideoCard(props: VideoCardProps) {
   const { videoCopy } = useText(publishText);
   const { draft, functions, photos, url, slug, names, allowed, upgradeHref, testCodecs } = props;
+  const clipUrl = props.clipUrl ?? null;
   const codecs = testCodecs ? TEST_CODECS : undefined;
   const [music, setMusic] = useState(true);
   const [state, setState] = useState<State>({ step: "idle" });
@@ -125,7 +129,7 @@ export function VideoCard(props: VideoCardProps) {
       const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
       const blob = await makeVideo(
         ready.film,
-        music && !silent ? template.music : null,
+        music && !silent ? withClip(template, clipUrl).music : null,
         (done) => setState({ step: "making", done }),
         controller.signal,
         codecs,

@@ -4,7 +4,7 @@ import { saveInvite } from "@/actions/invites";
 import { MAX_PHOTOS, newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { shelvePhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { inviteDraft } from "@/lib/editor/store";
-import { uploadPhotos } from "./photo-upload";
+import { uploadClip, uploadPhotos } from "./photo-upload";
 
 /*
  * Keeps the draft open in the editor saved to the signed-in person's account, photos
@@ -70,6 +70,8 @@ async function push(): Promise<SyncState> {
     const uploaded = result.missingPhotos.length
       ? await uploadPhotos(result.id, draft.photos, result.missingPhotos)
       : true;
+    // The music clip follows; until it's there guests hear the raga, so it never holds up a save
+    if (result.missingClip && draft.music.clip) await uploadClip(result.id, draft.music.clip);
     if (uploaded) {
       markSynced({ ...draft, remoteId: result.id });
       set("synced");

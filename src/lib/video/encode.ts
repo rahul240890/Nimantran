@@ -1,8 +1,8 @@
 /*
  * Makes the MP4 in the host's own browser (Step 17c): each frame drawn on a canvas and
- * encoded with the browser's H.264 encoder, the raga rendered offline and encoded as
- * AAC, both written into one file WhatsApp and Instagram accept. Nothing is uploaded and
- * no server does any work. Browser only.
+ * encoded with the browser's H.264 encoder, the music (the raga, or the host's own clip)
+ * rendered offline and encoded as AAC, both written into one file WhatsApp and Instagram
+ * accept. Nothing is uploaded and no server does any work. Browser only.
  */
 
 import {
@@ -15,7 +15,7 @@ import {
   canEncodeAudio,
   canEncodeVideo,
 } from "mediabunny";
-import { renderRaga } from "@/lib/engine/music-render";
+import { renderMusic } from "@/lib/engine/music-render";
 import type { MusicChoice } from "@/lib/engine/music-player";
 import { FRAME_RATE, VIDEO_HEIGHT, VIDEO_WIDTH } from "./timeline";
 
@@ -90,7 +90,7 @@ export async function makeVideo(
   try {
     if (audio && music) {
       onProgress(0.01);
-      await audio.add(await renderRaga(music, total));
+      await audio.add(await renderMusic(music, total));
     }
     const frames = Math.ceil(total * FRAME_RATE);
     for (let frame = 0; frame < frames; frame++) {

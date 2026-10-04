@@ -191,7 +191,7 @@ export function PreviewStep({
 
       <Section title={previewCopy.musicHeading} step="extras" goTo={goTo}>
         <p className="text-sm">
-          {extrasCopy.ragaNames[raga]}
+          {draft.music.clip ? draft.music.clip.name : extrasCopy.ragaNames[raga]}
           {draft.music.playOnOpen ? ` · ${previewCopy.playsOnOpen}` : ""}
         </p>
       </Section>

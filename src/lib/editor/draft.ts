@@ -99,7 +99,7 @@ export function newDraft(
     content: {},
     functions: defaultFunctions(categoryId),
     photos: [],
-    music: { raga: null, playOnOpen: true },
+    music: { raga: null, playOnOpen: true, clip: null },
     updatedAt: 0,
     remoteId: null,
     slug: null,

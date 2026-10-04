@@ -18,7 +18,7 @@ import { isSlug, slugAlternatives } from "@/lib/publish/slug";
  */
 
 export type SyncResult =
-  | { status: "saved"; id: string; savedAt: number; missingPhotos: string[] }
+  | { status: "saved"; id: string; savedAt: number; missingPhotos: string[]; missingClip: boolean }
   | { status: "signed-out" }
   | { status: "failed" };
 
@@ -35,6 +35,7 @@ export async function saveInvite(input: unknown): Promise<SyncResult> {
         id: result.id,
         savedAt: result.updatedAt,
         missingPhotos: result.missingPhotos,
+        missingClip: result.missingClip,
       }
     : { status: "failed" };
 }

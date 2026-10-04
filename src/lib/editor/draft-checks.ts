@@ -3,6 +3,7 @@ import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
 import { SUITE_IDS } from "@/lib/suites/catalog";
+import { clipSchema } from "./music-clip";
 import { defaultType, typeSchema } from "./type";
 import { GUIDE_RULES, noFunctionGuide } from "./guide";
 import {
@@ -181,8 +182,10 @@ export const draftSchema = z.object({
       /** null plays the design's own raga. */
       raga: z.enum(RAGA_IDS).nullable().catch(null),
       playOnOpen: z.boolean().catch(true),
+      /** The host's own short music clip, played instead of the raga. */
+      clip: clipSchema.nullable().catch(null),
     })
-    .catch({ raga: null, playOnOpen: true }),
+    .catch({ raga: null, playOnOpen: true, clip: null }),
   updatedAt: z.number().catch(0),
   /** The event this draft is saved as in the signed-in person's account (Step 8). */
   remoteId: z.uuid().nullable().catch(null),

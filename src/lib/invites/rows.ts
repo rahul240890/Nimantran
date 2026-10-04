@@ -26,7 +26,8 @@ export type EventRow = {
   status: "draft" | "published" | "archived";
   slug: string | null;
   content: Record<string, string>;
-  music: { raga: string | null; playOnOpen: boolean };
+  /** The raga, and the host's own clip when they chose one (read leniently). */
+  music: { raga: string | null; playOnOpen: boolean; clip?: unknown };
   editor_step: string;
   updated_at: string;
   /** The tradition pack and the family's religious elements (Step 12a). */
