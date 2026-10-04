@@ -666,7 +666,7 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     names: [20, 37.2, 60, 6.5],
     line: [22, 44, 56, 4.3],
     card: [12.78, 49.48, 74.44, 45],
-    text: [23.5, 21.5, 53, 34],
+    text: [19.5, 23.5, 61, 29.5],
   },
   // A phulkari-edged card by the bonfire
   "lohri-bonfire": {
