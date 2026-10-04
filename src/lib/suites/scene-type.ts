@@ -19,10 +19,12 @@ export type SceneRole =
   | "line"
   /** The function's name in the slot. */
   | "function"
-  /** Its day. */
+  /** Its day, with the weekday. */
   | "date"
-  /** Its time and venue. */
+  /** Its time. */
   | "detail"
+  /** Its place, below the day. */
+  | "venue"
   /** "In 5 days". */
   | "countdown";
 
@@ -38,11 +40,20 @@ export const SCENE_SIZES: Record<SceneRole, SceneSize> = {
   names: { role: "names", min: 1.25, fluid: 9.6, max: 3.4 },
   joiner: { role: "joiner", min: 0.8, fluid: 5.6, max: 2 },
   line: { role: "body", min: 0.72, fluid: 3.9, max: 1.3 },
-  function: { role: "display", min: 1.05, fluid: 7, max: 2.4 },
-  date: { role: "date", min: 0.78, fluid: 4.1, max: 1.35 },
+  function: { role: "display", min: 1.25, fluid: 9.2, max: 3.1 },
+  date: { role: "date", min: 0.8, fluid: 4.3, max: 1.4 },
   detail: { role: "small", min: 0.7, fluid: 3.5, max: 1.1 },
+  venue: { role: "venue", min: 0.8, fluid: 4.2, max: 1.35 },
   countdown: { role: "label", min: 0.6, fluid: 2.6, max: 0.85 },
 };
+
+/**
+ * How much the function's name shrinks when the slot's words must: faster than the lines
+ * under it, so on a small card the heading gives up room before the day and the place do.
+ */
+export function headingFit(fit: number): number {
+  return Math.max(0.35, fit * 1.5 - 0.5);
+}
 
 /** A scene line's designed size in px on a painting `width` px wide. */
 export function sceneSize(role: SceneRole, width: number, rem = 16): number {
@@ -70,11 +81,14 @@ export function sceneLine(
   const couple = role === "names";
   // A face the host picked has its own proportions, so only the script's size applies
   const size = (own ? set.size / set.faceSize : set.size) * (type?.scale ?? 1);
+  // The same curve as headingFit, for the live scene
+  const fit =
+    role === "function" ? "max(0.35, var(--scene-fit, 1) * 1.5 - 0.5)" : "var(--scene-fit, 1)";
   return {
     fontFamily: own ?? set.family,
     fontWeight: names && type?.bold ? 700 : own ? undefined : set.weight,
     fontStyle: names && type?.italic ? "italic" : undefined,
-    fontSize: `calc(clamp(calc(${min}rem * var(--scene-floor, 1)), ${fluid}cqw, ${max}rem) * ${size.toFixed(3)} * var(--scene-fit, 1))`,
+    fontSize: `calc(clamp(calc(${min}rem * var(--scene-floor, 1)), ${fluid}cqw, ${max}rem) * ${size.toFixed(3)} * ${fit})`,
     lineHeight: set.leading,
     letterSpacing:
       couple && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",

@@ -10,9 +10,9 @@
 import type { PageType } from "@/lib/editor/type";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
 import { SUITES, type Mood } from "@/lib/suites/catalog";
-import type { Voice } from "@/lib/suites/lettering";
+import { keepDate, type Voice } from "@/lib/suites/lettering";
 import { sceneLight, type Entrance, type ScenePage } from "@/lib/suites/scene";
-import { sceneFont, type SceneFont, type SceneRole } from "@/lib/suites/scene-type";
+import { headingFit, sceneFont, type SceneFont, type SceneRole } from "@/lib/suites/scene-type";
 import type { FrameBox } from "@/lib/suites/photo-frames";
 import {
   PAGE_H,
@@ -40,8 +40,6 @@ export type SceneFilm = EndingScene & {
   items: readonly SceneItem[];
   photos: readonly StoryPhoto[];
   timeline: SceneTimeline;
-  /** The small labels over a celebration's day and place, in the card's language. */
-  labels: { when: string; where: string };
   lang: string;
   type?: PageType;
 };
@@ -213,16 +211,7 @@ type Row = {
   glow?: string;
 };
 type RuleRow = { kind: "rule"; width: number; gap: number; colour: string };
-type ColumnsRow = {
-  kind: "columns";
-  columns: Row[][];
-  /** Each column's width, and the room between two. */
-  width: number;
-  between: number;
-  gap: number;
-  divider: string;
-};
-type Block = Row | RuleRow | ColumnsRow;
+type Block = Row | RuleRow;
 
 function textRow(
   ctx: CanvasRenderingContext2D,
@@ -253,21 +242,12 @@ function textRow(
 
 function heightOf(block: Block): number {
   if (block.kind === "rule") return block.gap;
-  if (block.kind === "columns") {
-    return (
-      block.gap +
-      Math.max(...block.columns.map((rows) => rows.reduce((h, r) => h + heightOf(r), 0)))
-    );
-  }
   return block.gap + block.lines.length * block.size * block.leading;
 }
 
 /** Whether every line fits the width it was wrapped to (a single long word may not). */
 function fitsWidth(ctx: CanvasRenderingContext2D, block: Block, width: number): boolean {
   if (block.kind === "rule") return true;
-  if (block.kind === "columns") {
-    return block.columns.every((rows) => rows.every((row) => fitsWidth(ctx, row, block.width)));
-  }
   ctx.font = block.font;
   ctx.letterSpacing = `${block.spacing}px`;
   return block.lines.every((line) => ctx.measureText(line).width <= width + 0.5);
@@ -287,28 +267,6 @@ function drawBlocks(
     if (block.kind === "rule") {
       drawRule(ctx, cx, y + block.gap / 2, block.width, block.colour, alpha);
       y += block.gap;
-      continue;
-    }
-    if (block.kind === "columns") {
-      y += block.gap;
-      const count = block.columns.length;
-      const total = block.width * count + block.between * (count - 1);
-      const tallest = Math.max(
-        ...block.columns.map((rows) => rows.reduce((h, r) => h + heightOf(r), 0)),
-      );
-      block.columns.forEach((rows, i) => {
-        const x = cx - total / 2 + block.width / 2 + i * (block.width + block.between);
-        drawBlocks(ctx, rows, x, y, alpha);
-      });
-      if (count > 1) {
-        // A fine gold line between the day and the place
-        ctx.save();
-        ctx.globalAlpha *= alpha;
-        ctx.fillStyle = block.divider;
-        ctx.fillRect(cx - 0.4, y, 0.8, tallest);
-        ctx.restore();
-      }
-      y += tallest;
       continue;
     }
     y += block.gap;
@@ -556,8 +514,23 @@ function drawCardFace(
     const ty = top + (card.text[1] / 100) * h;
     const tw = (card.text[2] / 100) * w;
     const th = (card.text[3] / 100) * h;
+    if (card.plate) {
+      // A plain sheet over the art in the writing area, as the live scene lays it
+      ctx.save();
+      ctx.shadowColor = "rgb(0 0 0 / 0.22)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetY = 2;
+      ctx.fillStyle = withAlpha(colours.paper, 0.96);
+      roundRect(ctx, tx, ty, tw, th, 0.8 * CQW);
+      ctx.fill();
+      ctx.restore();
+      ctx.strokeStyle = withAlpha(colours.gold, 0.6);
+      ctx.lineWidth = 0.3 * CQW;
+      roundRect(ctx, tx + 0.8 * CQW, ty + 0.8 * CQW, tw - 1.6 * CQW, th - 1.6 * CQW, 0.5 * CQW);
+      ctx.stroke();
+    }
     // A margin inside the painted border, so the words never touch it
-    const pad = 0.025 * tw;
+    const pad = (card.plate ? 0.045 : 0.025) * tw;
     return { x: tx + pad, y: ty + pad, w: tw - pad * 2, h: th - pad * 2, painted: true };
   }
   ctx.fillStyle = colours.paper;
@@ -618,7 +591,7 @@ function drawCardFace(
   };
 }
 
-/** A celebration's name, a rule, then its day and its place side by side under labels. */
+/** A celebration's name, large, a rule, then its day with the weekday, its hour and its place. */
 function drawCardWords(
   ctx: CanvasRenderingContext2D,
   film: SceneFilm,
@@ -627,14 +600,14 @@ function drawCardWords(
   box: { x: number; y: number; w: number; h: number; painted: boolean },
   colours: Palette,
 ) {
-  const { lang, type, labels } = film;
+  const { lang, type } = film;
   const font = (role: SceneRole, script = lang) => sceneFont(voice, role, script, PAGE_W, type);
   const build = (fit: number): Block[] => {
     if (item.kind === "line")
       return [textRow(ctx, item.text, font("line"), fit, box.w, colours.ink, lang)];
     const fn = item.fn;
     const blocks: Block[] = [
-      textRow(ctx, fn.name, font("function"), fit, box.w, colours.ink, lang),
+      textRow(ctx, fn.name, font("function"), headingFit(fit), box.w, colours.ink, lang),
     ];
     if (fn.localName) {
       blocks.push(
@@ -658,49 +631,39 @@ function drawCardWords(
       gap: nameSize * 0.9,
       colour: colours.goldText,
     });
-    const both = when && Boolean(fn.venue);
-    const width = both ? (box.w * 0.88) / 2 : box.w;
-    const label = (text: string) =>
-      textRow(ctx, text, font("countdown"), fit, width, colours.goldText, lang);
-    const columns: Row[][] = [];
-    if (when) {
-      const rows: Row[] = [label(labels.when)];
-      if (fn.date)
-        rows.push(
-          textRow(ctx, fn.date, font("date"), fit, width, colours.ink, lang, rows[0]!.size * 0.35),
-        );
-      if (fn.time) {
-        const time = fn.muhurat ? `${fn.muhurat.text} · ${fn.time}` : fn.time;
-        rows.push(
-          textRow(
-            ctx,
-            time,
-            font("detail"),
-            fit,
-            width,
-            colours.inkMuted,
-            lang,
-            rows[0]!.size * 0.2,
-          ),
-        );
-      }
-      columns.push(rows);
+    if (fn.date)
+      blocks.push(
+        textRow(
+          ctx,
+          keepDate(fn.date),
+          font("date"),
+          fit,
+          box.w,
+          colours.ink,
+          lang,
+          nameSize * 0.4,
+        ),
+      );
+    if (fn.time) {
+      const time = fn.muhurat ? `${fn.muhurat.text} · ${fn.time}` : fn.time;
+      blocks.push(
+        textRow(ctx, time, font("detail"), fit, box.w, colours.inkMuted, lang, nameSize * 0.12),
+      );
     }
     if (fn.venue) {
-      const first = label(labels.where);
-      columns.push([
-        first,
-        textRow(ctx, fn.venue, font("date"), fit, width, colours.ink, lang, first.size * 0.35),
-      ]);
+      blocks.push(
+        textRow(
+          ctx,
+          fn.venue,
+          font("venue"),
+          fit,
+          box.w,
+          colours.ink,
+          lang,
+          when ? nameSize * 0.42 : nameSize * 0.4,
+        ),
+      );
     }
-    blocks.push({
-      kind: "columns",
-      columns,
-      width,
-      between: box.w * 0.12,
-      gap: 0,
-      divider: withAlpha(colours.gold, 0.45),
-    });
     return blocks;
   };
   const { blocks, height } = fitBlocks(ctx, build, box.w, box.h, {

@@ -77,7 +77,7 @@ test.describe("deleting an account", () => {
     await confirm.click();
 
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByText("Your account has been deleted")).toBeVisible();
+    await expect(page.getByText("Your account has been deleted", { exact: true })).toBeVisible();
     expect(await page.evaluate(() => localStorage.getItem("nimantran-invite-draft"))).toBeNull();
 
     // The guest link is closed, and the account pages ask to sign in again

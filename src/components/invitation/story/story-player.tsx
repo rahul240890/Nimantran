@@ -34,6 +34,7 @@ import { textArea, type TextArea } from "@/lib/suites/areas";
 import { fitScale } from "@/lib/suites/fit";
 import {
   ROLES,
+  keepDate,
   lettering,
   lineSpace,
   roleOf,
@@ -101,6 +102,7 @@ const LINE_COLOUR: Record<TypeRole, string> = {
   joiner: "text-card-accent-text",
   body: "text-card-ink-muted",
   small: "text-card-ink-muted",
+  venue: "text-card-ink",
   label: "text-card-gold-text",
 };
 
@@ -771,7 +773,7 @@ export function StoryPage({
                     ),
                   }}
                 >
-                  {line.text}
+                  {role === "date" ? keepDate(line.text) : line.text}
                 </p>
               </Fragment>
             );

@@ -141,6 +141,17 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
   },
 };
 
+/**
+ * A function's day as it should break: after the weekday, never inside "18 November 2026",
+ * so a narrow card reads "Sunday, / 18 November 2026". A long day keeps its plain spaces.
+ */
+export function keepDate(date: string): string {
+  const comma = date.indexOf(", ");
+  if (comma < 0) return date;
+  const rest = date.slice(comma + 2);
+  return rest.length > 18 ? date : `${date.slice(0, comma + 2)}${rest.replace(/ /g, "\u00a0")}`;
+}
+
 /** The script a language is written in; anything unknown is set as Latin. */
 export function scriptOfLang(lang: string | undefined): FontScript {
   const code = (lang ?? "en").toLowerCase().split("-")[0];
@@ -153,7 +164,8 @@ export function scriptOfLang(lang: string | undefined): FontScript {
 
 /**
  * A kind of line on the page. The couple's names on the cover are their own kind, the
- * largest on any page; "date" is a function's day, set below its name.
+ * largest on any page; "date" is a function's day, set below its name, and "venue" its
+ * place, below the day.
  */
 export type TypeRole = Exclude<LineStyle, "symbol"> | "names";
 
@@ -169,11 +181,12 @@ type RoleSpec = {
 
 export const ROLES: Record<TypeRole, RoleSpec> = {
   names: { face: "names", min: 2.3, fluid: 11.5, max: 4.4, leading: [1.04, 1.28] },
-  display: { face: "names", min: 1.55, fluid: 7.6, max: 2.9, leading: [1.1, 1.32] },
+  display: { face: "names", min: 1.8, fluid: 9.8, max: 3.7, leading: [1.1, 1.32] },
   date: { face: "names", min: 1.2, fluid: 5.4, max: 2, leading: [1.18, 1.4] },
   script: { face: "names", min: 1.2, fluid: 5.6, max: 2.1, leading: [1.2, 1.42] },
   joiner: { face: "names", min: 1.15, fluid: 5.6, max: 2.1, leading: [1, 1.2] },
   body: { face: "words", min: 1, fluid: 4.4, max: 1.38, leading: [1.42, 1.62] },
+  venue: { face: "words", min: 1.06, fluid: 4.8, max: 1.5, leading: [1.32, 1.52] },
   small: { face: "words", min: 0.92, fluid: 3.8, max: 1.18, leading: [1.42, 1.6] },
   label: { face: "label", min: 0.78, fluid: 3.2, max: 1.04, leading: [1.3, 1.5] },
 };
@@ -212,7 +225,10 @@ export type Lettering = {
 export function lettering(voice: Voice, role: TypeRole, lang: string | undefined): Lettering {
   const script = scriptOfLang(lang);
   const spec = ROLES[role];
-  const choice = VOICES[voice][spec.face][script];
+  const named = VOICES[voice][spec.face][script];
+  // A day in a flowing hand is hard to read at a glance, so it takes the reading face instead
+  const choice =
+    role === "date" && named.fallback === "cursive" ? VOICES[voice].words[script] : named;
   const indic = script !== "latin";
   const label = role === "label";
   return {
@@ -243,6 +259,8 @@ export function roleSizeCss(role: TypeRole): string {
 export function spaceBefore(role: TypeRole, previous: TypeRole | null): number {
   if (previous === null) return 0;
   if (role === "label") return 4.4;
+  // The place is its own group below the day and time
+  if (role === "venue") return 3;
   if (previous === "label") return 0.8;
   if (role === "joiner" || previous === "joiner") return 0.4;
   if (previous === "display" || previous === "names" || role === "display") return 2.2;

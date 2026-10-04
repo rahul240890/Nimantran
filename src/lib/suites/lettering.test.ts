@@ -5,6 +5,7 @@ import type { StoryBeat } from "@/lib/engine/story";
 import { SUITE_IDS, SUITES } from "./catalog";
 import {
   VOICES,
+  keepDate,
   lettering,
   lineSpace,
   roleOf,
@@ -103,5 +104,47 @@ describe("lettering on the event pages", () => {
     const cover = page("cover", [{ text: "Arjun", style: "display" }]);
     expect(roleOf(cover, "display")).toBe("names");
     expect(roleOf(page("reply", []), "display")).toBe("display");
+  });
+});
+
+describe("a function's day and place", () => {
+  it("breaks a day after its weekday, never inside the date", () => {
+    expect(keepDate("Sunday, 22 November 2026")).toBe("Sunday, 22\u00a0November\u00a02026");
+    expect(keepDate("22 November 2026")).toBe("22 November 2026");
+    // A long day keeps its plain spaces, so it can still wrap on a narrow card
+    expect(keepDate("ஞாயிற்றுக்கிழமை, 22 நவம்பர் 2026 காலை")).toBe(
+      "ஞாயிற்றுக்கிழமை, 22 நவம்பர் 2026 காலை",
+    );
+  });
+
+  it("sets the day in a reading face where the names are in a flowing hand", () => {
+    expect(lettering("romantic", "date", "en").family).toContain("Cormorant Garamond");
+    expect(lettering("regal", "date", "en").family).toContain("Playfair Display");
+  });
+
+  it("sets the place in the reading face, larger than plain text", () => {
+    const venue = lettering("romantic", "venue", "en");
+    expect(venue.family).toContain("Cormorant Garamond");
+    expect(
+      lineSpace(
+        page("haldi", [
+          { text: "Haldi", style: "display" },
+          { text: "Sunday, 22 November 2026", style: "date" },
+          { text: "Sharma Niwas", style: "venue" },
+        ]),
+        2,
+        false,
+      ),
+    ).toBeGreaterThan(
+      lineSpace(
+        page("haldi", [
+          { text: "Haldi", style: "display" },
+          { text: "Sunday, 22 November 2026", style: "date" },
+          { text: "10:00 AM", style: "body" },
+        ]),
+        2,
+        false,
+      ),
+    );
   });
 });
