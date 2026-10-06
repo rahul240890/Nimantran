@@ -3662,3 +3662,612 @@
 [data-format-filter="card"] [data-format-item]:not([data-format-item="card"]) {
   display: none;
 }
+
+/*
+ * Openings (Step 12x): the guest's first screen, drawn from the theme's own colours.
+ * Like the card-* tokens these are art, the same in light and dark. The colour card
+ * ("classic") has no suite colours, so each falls back to the card's.
+ */
+[data-opening] {
+  --open-jewel: var(--suite-accent, var(--card-back));
+  --open-gilt: var(--suite-gold, var(--card-gold));
+  --open-light: var(--suite-light, var(--gold-glint));
+  --open-plate: var(--suite-plate, var(--card-ivory));
+  --open-leaf: var(--suite-leaf, color-mix(in oklab, var(--success) 85%, var(--card-gold)));
+  --open-deep: color-mix(in oklab, var(--suite-near, var(--night)) 72%, black);
+  --open-wood: color-mix(in oklab, var(--open-jewel) 58%, black);
+  --open-wood-dark: color-mix(in oklab, var(--open-jewel) 32%, black);
+  --open-leaf-deep: color-mix(in oklab, var(--open-leaf) 70%, black);
+  --open-gilt-bright: color-mix(in oklab, var(--open-gilt) 62%, white);
+  --open-gilt-dark: color-mix(in oklab, var(--open-gilt) 58%, black);
+  --open-petal: color-mix(in oklab, var(--open-plate) 82%, var(--open-jewel));
+  --open-petal-fall: color-mix(in oklab, var(--rose) 70%, var(--open-plate));
+  --open-shadow: color-mix(in oklab, black 45%, transparent);
+  --open-seal-ink: color-mix(in oklab, var(--open-jewel) 30%, black);
+  --open-seal-ring: color-mix(in oklab, var(--open-jewel) 45%, black);
+  --open-medallion-ink: var(--card-gold-text);
+}
+.opening-page {
+  background: var(--open-deep);
+}
+.opening-surround {
+  background:
+    radial-gradient(
+      closest-side,
+      color-mix(in oklab, var(--open-jewel) 40%, transparent),
+      transparent
+    ),
+    color-mix(in oklab, var(--open-deep) 60%, transparent);
+}
+.opening-stage {
+  background: var(--open-deep);
+}
+
+/* Words: a cream cartouche with a gilt double rule, so names read on any art */
+.opening-plate {
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      color-mix(in oklab, var(--open-light) 35%, transparent),
+      transparent 70%
+    ),
+    var(--open-plate);
+  border-radius: 50% 50% 1rem 1rem / 2.6rem 2.6rem 1rem 1rem;
+  box-shadow:
+    0 0 0 0.3rem var(--open-plate),
+    0 0 0 0.45rem var(--open-gilt),
+    0 1.2rem 2.4rem var(--open-shadow);
+  outline: 1px solid color-mix(in oklab, var(--open-gilt) 70%, transparent);
+  outline-offset: -0.7rem;
+}
+.opening-fade {
+  transition: opacity 500ms ease;
+}
+.opening-stage[data-open="true"] .opening-fade,
+.opening-stage[data-open="true"] .opening-crest {
+  opacity: 0;
+  pointer-events: none;
+}
+.opening-stage[data-open="true"] .opening-crest {
+  transition: opacity 700ms ease 500ms;
+}
+
+/* The light beyond: a warm pool, slow rays, lanterns rising once open */
+.opening-beyond {
+  background: radial-gradient(
+    closest-side at 50% 45%,
+    var(--open-light),
+    color-mix(in oklab, var(--marigold) 75%, var(--open-jewel)) 55%,
+    var(--open-wood-dark)
+  );
+}
+.opening-rays {
+  translate: -50% -50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in oklab, var(--open-light) 38%, transparent) 0deg 6deg,
+    transparent 6deg 18deg
+  );
+  mask-image: radial-gradient(closest-side, black, transparent);
+  animation: opening-spin 40s linear infinite;
+}
+.opening-lantern {
+  bottom: -8%;
+  width: 3.4cqw;
+  height: 4.6cqw;
+  border-radius: 40% 40% 30% 30%;
+  background: radial-gradient(circle at 50% 60%, var(--open-light), var(--marigold) 70%);
+  box-shadow: 0 0 3cqw var(--marigold);
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .opening-lantern {
+  animation: opening-rise 2.4s ease-out calc(var(--i) * 120ms) both;
+}
+
+/* Palace gates */
+.opening-jaali {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      color-mix(in oklab, var(--open-gilt) 22%, transparent) 0 0.35cqw,
+      transparent 0.35cqw 6cqw
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      color-mix(in oklab, var(--open-gilt) 22%, transparent) 0 0.35cqw,
+      transparent 0.35cqw 6cqw
+    ),
+    linear-gradient(180deg, var(--open-wood-dark), var(--open-deep) 70%);
+}
+.opening-arch,
+.opening-arch-trim {
+  border-radius: 50% 50% 0 0 / 30% 30% 0 0;
+}
+.opening-arch-trim {
+  background: linear-gradient(
+    90deg,
+    var(--open-gilt-dark),
+    var(--open-gilt-bright) 20%,
+    var(--open-gilt) 50%,
+    var(--open-gilt-bright) 80%,
+    var(--open-gilt-dark)
+  );
+  box-shadow:
+    inset 0 0 0 1cqw color-mix(in oklab, var(--open-gilt-dark) 60%, transparent),
+    0 0 6cqw color-mix(in oklab, var(--open-light) 30%, transparent);
+}
+.opening-door {
+  backface-visibility: hidden;
+  transition: transform 1400ms cubic-bezier(0.65, 0, 0.25, 1);
+  box-shadow: inset 0 0 3cqw var(--open-shadow);
+}
+.opening-door-left {
+  transform-origin: left center;
+}
+.opening-door-right {
+  transform-origin: right center;
+}
+.opening-stage[data-open="true"] .opening-door-left {
+  transform: rotateY(82deg);
+}
+.opening-stage[data-open="true"] .opening-door-right {
+  transform: rotateY(-82deg);
+}
+/* The cover's own doors swing out toward the guest, as before */
+.opening-door-out-left {
+  transform-origin: left center;
+  box-shadow: none;
+}
+.opening-door-out-right {
+  transform-origin: right center;
+  box-shadow: none;
+}
+.opening-stage[data-open="true"] .opening-door-out-left {
+  transform: rotateY(-104deg);
+}
+.opening-stage[data-open="true"] .opening-door-out-right {
+  transform: rotateY(104deg);
+}
+.opening-door-wood {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 1.6cqw,
+      color-mix(in oklab, black 10%, transparent) 1.6cqw 1.8cqw
+    ),
+    radial-gradient(circle, var(--open-gilt) 0 0.45cqw, transparent 0.55cqw) 0 0 / 5cqw 5cqw,
+    linear-gradient(90deg, var(--open-wood-dark), var(--open-wood) 45%, var(--open-wood-dark));
+}
+.opening-door-right.opening-door-wood {
+  background-position:
+    0 0,
+    2.5cqw 0,
+    0 0;
+}
+.opening-panel {
+  display: block;
+  position: relative;
+  border: 0.6cqw solid var(--open-gilt);
+  border-radius: 1cqw;
+  background: color-mix(in oklab, var(--open-wood-dark) 70%, transparent);
+  box-shadow:
+    inset 0 0 0 0.8cqw color-mix(in oklab, var(--open-wood) 80%, transparent),
+    inset 0 0 0 1.1cqw color-mix(in oklab, var(--open-gilt) 50%, transparent),
+    0 0.5cqw 1cqw var(--open-shadow);
+}
+.opening-ladi {
+  background:
+    radial-gradient(circle, var(--marigold) 0 38%, var(--marigold-strong) 39% 55%, transparent 57%)
+      0 0 / 100% 3.4cqw repeat-y,
+    linear-gradient(var(--open-gilt), var(--open-gilt)) 50% 0 / 0.3cqw 100% no-repeat;
+  transform-origin: top center;
+  animation: opening-sway 5s ease-in-out infinite alternate;
+}
+.opening-toran-drop {
+  animation: opening-sway 4s ease-in-out calc(var(--i) * -370ms) infinite alternate;
+}
+.opening-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: flicker 1.3s ease-in-out infinite alternate;
+}
+
+/* Temple doors */
+.opening-stone {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 9cqw,
+      color-mix(in oklab, var(--open-gilt-dark) 30%, transparent) 9cqw 9.5cqw
+    ),
+    radial-gradient(
+      ellipse at 50% 20%,
+      color-mix(in oklab, var(--open-light) 25%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(180deg, var(--open-wood), var(--open-wood-dark) 55%, var(--open-deep));
+}
+.opening-tier {
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 3cqw,
+      color-mix(in oklab, var(--open-wood-dark) 45%, transparent) 3cqw 5.5cqw,
+      transparent 5.5cqw 7cqw
+    ),
+    linear-gradient(180deg, var(--open-gilt-bright), var(--open-gilt) 50%, var(--open-gilt-dark));
+}
+.opening-pillar {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 12cqw,
+      var(--open-gilt) 12cqw 13.4cqw,
+      transparent 13.4cqw 14cqw
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--open-plate) 40%, var(--open-gilt-dark)),
+      color-mix(in oklab, var(--open-plate) 80%, var(--open-gilt)) 50%,
+      color-mix(in oklab, var(--open-plate) 40%, var(--open-gilt-dark))
+    );
+  box-shadow: 0 0 2cqw var(--open-shadow);
+}
+.opening-lintel {
+  background: linear-gradient(180deg, var(--open-gilt-bright), var(--open-gilt-dark));
+  border-radius: 0.6cqw;
+  box-shadow: 0 1cqw 2cqw var(--open-shadow);
+}
+.opening-doorframe {
+  box-shadow: 0 0 0 1.4cqw var(--open-gilt-dark);
+}
+.opening-door-brass {
+  background:
+    radial-gradient(
+        circle,
+        var(--open-gilt-bright) 0 0.5cqw,
+        var(--open-gilt-dark) 0.6cqw 0.9cqw,
+        transparent 1cqw
+      )
+      0 0 / 100% 5.5cqw repeat-y,
+    linear-gradient(
+      90deg,
+      var(--open-gilt-dark),
+      var(--open-gilt) 30%,
+      var(--open-gilt-bright) 55%,
+      var(--open-gilt) 80%,
+      var(--open-gilt-dark)
+    );
+  background-size:
+    1.8cqw 5.5cqw,
+    100% 100%;
+  background-position:
+    0.4cqw 0,
+    0 0;
+}
+.opening-brass-panel {
+  display: grid;
+  border-radius: 0.8cqw;
+  background: linear-gradient(160deg, var(--open-gilt), var(--open-gilt-dark));
+  box-shadow:
+    inset 0 0 0 0.6cqw var(--open-gilt-bright),
+    inset 0 0 0 1.1cqw var(--open-gilt-dark),
+    inset 0 0 2cqw var(--open-shadow);
+}
+.opening-bell {
+  animation: opening-ring 2.6s ease-in-out calc(var(--i) * -300ms) infinite alternate;
+}
+.opening-stage[data-open="true"] .opening-bell {
+  animation-duration: 0.35s;
+}
+
+/* Silk curtains */
+.opening-curtain {
+  background:
+    linear-gradient(180deg, transparent 94%, var(--open-gilt) 94% 95.2%, transparent 95.2%),
+    repeating-linear-gradient(180deg, transparent 0 96.5%, var(--open-gilt) 96.5% 100%) 0 0 / 2.4cqw
+      100%,
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 13cqw,
+      color-mix(in oklab, black 22%, transparent) 15cqw,
+      transparent 18cqw
+    ),
+    repeating-linear-gradient(
+      90deg,
+      var(--open-wood-dark) 0,
+      var(--open-wood) 2.6cqw,
+      color-mix(in oklab, var(--open-jewel) 72%, var(--open-wood)) 4.4cqw,
+      color-mix(in oklab, var(--open-jewel) 85%, var(--open-light)) 5.2cqw,
+      var(--open-wood) 7cqw,
+      var(--open-wood-dark) 9.5cqw
+    );
+  box-shadow: inset 0 3cqw 4cqw var(--open-shadow);
+  transition: transform 1500ms cubic-bezier(0.6, 0, 0.2, 1);
+  animation: opening-billow 6s ease-in-out infinite alternate;
+}
+.opening-curtain-left {
+  transform-origin: left top;
+}
+.opening-curtain-right {
+  transform-origin: right top;
+  animation-delay: -3s;
+}
+.opening-stage[data-open="true"] .opening-curtain {
+  animation: none;
+  transform: scaleX(0.2) skewY(0deg);
+}
+.opening-pelmet {
+  background:
+    linear-gradient(180deg, transparent 88%, var(--open-gilt) 88%),
+    repeating-linear-gradient(
+      90deg,
+      var(--open-wood-dark) 0,
+      var(--open-wood) 4cqw,
+      var(--open-wood-dark) 8cqw
+    );
+  box-shadow: 0 1cqw 2cqw var(--open-shadow);
+}
+.opening-bulb {
+  background: var(--open-light);
+  box-shadow: 0 0 2cqw var(--marigold);
+  animation: opening-twinkle 1.8s ease-in-out calc(var(--i) * -230ms) infinite alternate;
+}
+.opening-tassel {
+  border-radius: 40% 40% 20% 20%;
+  background:
+    repeating-linear-gradient(90deg, var(--open-gilt) 0 0.5cqw, var(--open-gilt-dark) 0.5cqw 0.9cqw)
+      0 40% / 100% 60% no-repeat,
+    radial-gradient(
+      circle at 50% 22%,
+      var(--open-gilt-bright) 0 25%,
+      var(--open-gilt) 26% 34%,
+      transparent 35%
+    );
+  transition: opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .opening-tassel {
+  opacity: 0;
+}
+
+/* Royal envelope */
+.opening-envelope-back {
+  background: linear-gradient(180deg, var(--open-wood-dark), var(--open-wood));
+}
+.opening-envelope-card {
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in oklab, var(--open-light) 40%, transparent),
+      transparent 60%
+    ),
+    var(--open-plate);
+  box-shadow:
+    inset 0 0 0 1.4cqw var(--open-plate),
+    inset 0 0 0 1.8cqw var(--open-gilt);
+  transform: translateY(102%);
+  transition: transform 1000ms cubic-bezier(0.3, 0, 0.2, 1) 650ms;
+}
+.opening-stage[data-open="true"] .opening-envelope-card {
+  transform: translateY(0);
+}
+.opening-fold-side {
+  background:
+    radial-gradient(circle at 0 50%, color-mix(in oklab, white 10%, transparent), transparent 60%),
+    color-mix(in oklab, var(--open-jewel) 78%, black);
+}
+.opening-fold-bottom {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, black 18%, transparent), transparent 30%),
+    color-mix(in oklab, var(--open-jewel) 86%, black);
+}
+.opening-flap {
+  transition:
+    transform 1100ms cubic-bezier(0.6, 0, 0.3, 1) 250ms,
+    z-index 0s 800ms;
+  filter: drop-shadow(0 1.4cqw 1.4cqw var(--open-shadow));
+}
+.opening-stage[data-open="true"] .opening-flap {
+  transform: rotateX(178deg);
+  z-index: 2;
+}
+.opening-flap-edge {
+  background: linear-gradient(180deg, var(--open-gilt-dark), var(--open-gilt-bright));
+}
+.opening-flap-front {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 4cqw,
+      color-mix(in oklab, var(--open-gilt) 14%, transparent) 4cqw 4.3cqw
+    ),
+    linear-gradient(180deg, var(--open-jewel), color-mix(in oklab, var(--open-jewel) 70%, black));
+}
+.opening-flap-lining {
+  background: repeating-linear-gradient(
+    90deg,
+    var(--open-plate) 0 3cqw,
+    color-mix(in oklab, var(--open-plate) 80%, var(--open-gilt)) 3cqw 6cqw
+  );
+}
+.opening-seal {
+  background:
+    radial-gradient(
+      circle at 35% 30%,
+      color-mix(in oklab, white 30%, transparent),
+      transparent 40%
+    ),
+    radial-gradient(
+      circle,
+      color-mix(in oklab, var(--open-jewel) 70%, var(--rose)) 0 62%,
+      color-mix(in oklab, var(--open-jewel) 50%, black) 72%
+    );
+  box-shadow: 0 0.8cqw 1.4cqw var(--open-shadow);
+  border-radius: 48% 52% 50% 46% / 50% 46% 54% 50%;
+  transition:
+    transform 900ms cubic-bezier(0.5, 0, 0.7, 0.4),
+    opacity 900ms ease;
+}
+.opening-stage[data-open="true"] .opening-seal-left {
+  transform: translate(-40%, 90%) rotate(-50deg);
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .opening-seal-right {
+  transform: translate(40%, 90%) rotate(50deg);
+  opacity: 0;
+}
+
+/* Lotus bloom */
+.opening-rangoli {
+  background:
+    repeating-radial-gradient(
+      circle at 50% 52%,
+      transparent 0 5cqw,
+      color-mix(in oklab, var(--open-gilt) 20%, transparent) 5cqw 5.3cqw
+    ),
+    radial-gradient(
+      circle at 50% 52%,
+      color-mix(in oklab, var(--open-jewel) 50%, var(--open-deep)),
+      var(--open-deep) 70%
+    );
+}
+.opening-petal {
+  transform: rotate(var(--a));
+  transition:
+    transform 1300ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 1300ms ease;
+}
+.opening-stage[data-open="true"] .opening-petal {
+  transform: rotate(calc(var(--a) + 25deg)) translateY(-70px) scale(1.5);
+  opacity: 0;
+}
+.opening-lotus {
+  animation: opening-breathe 6s ease-in-out infinite alternate;
+}
+.opening-turn {
+  transform-origin: 0 0;
+  animation: opening-spin 60s linear infinite;
+}
+
+/* The god's niche and the symbol's medallion */
+.opening-niche {
+  overflow: hidden;
+  border-radius: 50% 50% 0.6rem 0.6rem / 32% 32% 0.6rem 0.6rem;
+  box-shadow:
+    0 0 0 0.25rem var(--open-gilt),
+    0 0 0 0.45rem var(--open-wood-dark),
+    0 0 0 0.6rem var(--open-gilt-dark),
+    0 1rem 2rem var(--open-shadow);
+}
+.opening-medallion {
+  background: radial-gradient(
+    circle,
+    var(--open-plate) 0 60%,
+    color-mix(in oklab, var(--open-plate) 70%, var(--open-gilt))
+  );
+  box-shadow:
+    0 0 0 0.25rem var(--open-gilt),
+    0 0 0 0.45rem var(--open-wood-dark),
+    0 0.8rem 1.6rem var(--open-shadow);
+}
+.opening-halo {
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--open-light) 70%, transparent),
+    transparent
+  );
+  animation: opening-breathe 4s ease-in-out infinite alternate;
+}
+
+/* Petals once it opens */
+.opening-falling {
+  animation: opening-fall 2.6s linear calc(var(--i) * 90ms) both;
+}
+.opening-falling > span {
+  animation: petal-sway 0.9s ease-in-out infinite alternate;
+  --sway: inherit;
+}
+
+@keyframes opening-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes opening-rise {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.7);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-70cqh) scale(1);
+  }
+}
+@keyframes opening-sway {
+  from {
+    rotate: -2.5deg;
+  }
+  to {
+    rotate: 2.5deg;
+  }
+}
+@keyframes opening-ring {
+  from {
+    rotate: -9deg;
+  }
+  to {
+    rotate: 9deg;
+  }
+}
+@keyframes opening-billow {
+  from {
+    transform: scaleX(1) skewY(0deg);
+  }
+  to {
+    transform: scaleX(0.985) skewY(0.4deg);
+  }
+}
+@keyframes opening-twinkle {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes opening-breathe {
+  from {
+    opacity: 0.75;
+    scale: 0.97;
+  }
+  to {
+    opacity: 1;
+    scale: 1.02;
+  }
+}
+@keyframes opening-fall {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 110cqh, 0);
+  }
+}
+
+/* Still mode: no drifting or swaying, and each move lands at once */
+@media (prefers-reduced-motion: reduce) {
+  .opening-stage *,
+  .opening-stage *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+:where([data-motion="reduce"]) .opening-stage *,
+:where([data-motion="reduce"]) .opening-stage *::before {
+  animation: none !important;
+  transition: none !important;
+}

@@ -22,6 +22,7 @@ import {
   type SuiteId,
 } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
+import { OpeningPicker } from "@/components/editor/opening-picker";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -240,6 +241,13 @@ export function DesignStep({ draft, update }: StepProps) {
           />
         )}
       </section>
+
+      <OpeningPicker
+        draft={draft}
+        suite={suite}
+        scene={(draft.format === "scene" || sceneOnly) && hasScene(suite)}
+        update={update}
+      />
     </div>
   );
 }
