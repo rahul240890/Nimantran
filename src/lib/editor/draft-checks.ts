@@ -1,3 +1,4 @@
+import { draftFrameSlots } from "@/lib/publish/frames";
 import { INVITE_FORMATS } from "./formats";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
@@ -95,6 +96,7 @@ const cropSchema = z.object({
 const couplePhotosSchema = z.object({
   layout: z.enum(COUPLE_LAYOUTS).catch("none"),
   ids: z.array(z.string()).max(2).catch([]),
+  strict: z.boolean().optional().catch(undefined),
   /** A crop that doesn't read is dropped, so that photo sits by default. */
   crops: z
     .record(z.string(), z.unknown())
@@ -230,7 +232,7 @@ export function parseDraft(value: unknown): InviteDraft | null {
   return result.success ? result.data : null;
 }
 
-export type StepErrors = Record<string, "required" | "too-long" | "no-functions">;
+export type StepErrors = Record<string, "required" | "too-long" | "no-functions" | "photo-needed">;
 
 /** What stops the host moving past a step. Keys are field ids (slot ids or "haldi.date"). */
 export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
@@ -257,6 +259,12 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
         errors[key] = issue.message === "too-long" ? "too-long" : "required";
       }
     }
+  }
+  if (step === "extras") {
+    // A design that shows photos in its frames needs each one
+    draftFrameSlots(draft).forEach((id, frame) => {
+      if (!id) errors[`frame-${frame}`] = "photo-needed";
+    });
   }
   if (step === "functions") {
     const ids = includedFunctions(draft);

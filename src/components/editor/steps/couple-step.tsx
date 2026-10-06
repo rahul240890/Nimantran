@@ -5,8 +5,8 @@ import { languageName } from "@/components/invitation/card-language-toggle";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
+import { Languages } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { slotLabels } from "@/content/templates-review";
 import {
@@ -15,18 +15,25 @@ import {
   draftPeople,
   coupleValue,
   draftCopy,
-  languageOptions,
   type CardLanguage,
 } from "@/lib/editor/draft";
+import {
+  cardSuggestions,
+  SUGGESTED_SLOTS,
+  type SuggestedSlot,
+} from "@/lib/templates/card-suggestions";
 import type { CardCopy } from "@/lib/templates/content";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { CARD_SAMPLES } from "@/lib/templates/story-words";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
+import { defaultType } from "@/lib/editor/type";
 import { isLatinName, type ScriptLanguage } from "@/lib/names/transliterate";
 import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
 import { FamilySection } from "./family-section";
+import { Fold } from "./fold";
+import { Ideas } from "./ideas";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
@@ -173,43 +180,8 @@ function SlotField({
   );
 }
 
-function LanguageChoice({ draft, update }: Pick<StepProps, "draft" | "update">) {
-  const { coupleCopy } = useText(editorText);
-  const [own, other] = languageOptions(draft);
-  const choices: CardLanguage[][] = [[own], [other], [own, other]];
-  const label = (choice: CardLanguage[]) =>
-    choice.length === 2
-      ? coupleCopy.bothLanguages(languageName(choice[0]!), languageName(choice[1]!))
-      : languageName(choice[0]!);
-  return (
-    <section aria-labelledby="languages-heading" className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h2 id="languages-heading" className="font-display text-xl">
-          {coupleCopy.languagesHeading}
-        </h2>
-        <p className="text-sm text-ink-muted">{coupleCopy.languagesHint}</p>
-      </div>
-      <RadioGroup
-        label={coupleCopy.languagesHeading}
-        orientation="horizontal"
-        value={cardLanguages(draft).join("+")}
-        onValueChange={(value) =>
-          update((current) => ({
-            ...current,
-            languages: choices.find((choice) => choice.join("+") === value) ?? ["en"],
-          }))
-        }
-      >
-        {choices.map((choice) => (
-          <RadioItem key={choice.join("+")} value={choice.join("+")} label={label(choice)} />
-        ))}
-      </RadioGroup>
-    </section>
-  );
-}
-
-export function CoupleStep({ draft, update, errors }: StepProps) {
-  const { coupleCopy, namesCopy } = useText(editorText);
+export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
+  const { coupleCopy, namesCopy, studioCopy } = useText(editorText);
   const template = TEMPLATES[draft.templateId];
   const used = new Set(slotsOf(template));
   // A birthday or a party is led by one name: no second name and nothing to join them
@@ -218,7 +190,14 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       ? (namesCopy.one[draft.categoryId as keyof typeof namesCopy.one] ?? null)
       : null;
   const names = (one ? ["first" as const] : NAME_SLOTS).filter((id) => used.has(id));
+  // The lines most cards change stay in view; the rest fold under "More card words"
   const wording = COUPLE_SLOTS.filter((id) => used.has(id) && !NAME_SLOTS.includes(id));
+  const shown: SlotId[] = wording.filter((id) => id === "blessing" || id === "line");
+  const folded: SlotId[] = [
+    ...(!one && used.has("joiner") ? (["joiner"] as const) : []),
+    ...wording.filter((id) => !shown.includes(id)),
+  ];
+  const mainNames = names.filter((id) => id !== "joiner");
 
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
@@ -242,6 +221,24 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       : undefined;
   };
 
+  const ideasFor = (
+    id: SlotId,
+    language: CardLanguage,
+    value: string,
+    pick: (v: string) => void,
+  ) =>
+    (SUGGESTED_SLOTS as readonly string[]).includes(id) ? (
+      <Ideas
+        field={slotLabels[id]}
+        ideas={cardSuggestions(draft.categoryId, language, id as SuggestedSlot).filter(
+          (idea) => idea.length <= SLOT_RULES[id].maxLength,
+        )}
+        value={value}
+        language={language}
+        onPick={pick}
+      />
+    ) : null;
+
   const field = (id: SlotId) => {
     const slot = (
       <SlotField
@@ -258,7 +255,18 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
         {...(scriptNote(id) ? { hint: scriptNote(id) } : {})}
       />
     );
-    if (main === "en" || id === "joiner" || !NAME_SLOTS.includes(id)) return slot;
+    if (!NAME_SLOTS.includes(id) || id === "joiner") {
+      const ideas = ideasFor(id, main, coupleValue(draft, template, id), (value) => set(id, value));
+      return ideas ? (
+        <div key={id} className="flex flex-col gap-2.5">
+          {slot}
+          {ideas}
+        </div>
+      ) : (
+        slot
+      );
+    }
+    if (main === "en") return slot;
     return (
       <div key={id} className="flex flex-col gap-2">
         {slot}
@@ -271,8 +279,9 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
     );
   };
 
-  const translatedField = (id: SlotId) =>
-    second && secondCopy ? (
+  const translatedField = (id: SlotId) => {
+    if (!second || !secondCopy) return null;
+    const slot = (
       <SlotField
         key={id}
         id={id}
@@ -282,14 +291,26 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
         translation={{ language: second, placeholder: shownOn(secondCopy, id) }}
         label={id === "first" && one ? one.label : undefined}
       />
-    ) : null;
+    );
+    const ideas = NAME_SLOTS.includes(id)
+      ? null
+      : ideasFor(id, second, draft.translation[id] ?? "", (value) => setTranslation(id, value));
+    return ideas ? (
+      <div key={id} className="flex flex-col gap-2.5">
+        {slot}
+        {ideas}
+      </div>
+    ) : (
+      slot
+    );
+  };
 
-  const wordingGrid = (render: (id: SlotId) => ReactNode) => (
+  const wordingGrid = (render: (id: SlotId) => ReactNode, ids: readonly SlotId[] = wording) => (
     <div className="grid gap-5 sm:grid-cols-2">
-      {wording.map((id) => (
+      {ids.map((id) => (
         <div
           key={id}
-          data-page-target={id === "blessing" ? "cover" : "family"}
+          data-page-target={id === "line" || id === "families" ? "family" : "cover"}
           className={id === "doorLeft" || id === "doorRight" ? undefined : "sm:col-span-2"}
         >
           {render(id)}
@@ -298,13 +319,39 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
     </div>
   );
 
+  const languages = cardLanguages(draft);
+  const foldedFilled = folded.some((id) => draft.content[id] !== undefined);
+  const typeChanged = JSON.stringify(draft.type) !== JSON.stringify(defaultType);
+
   return (
     <div className="flex flex-col gap-8">
-      <LanguageChoice draft={draft} update={update} />
+      {/* The language was chosen a step back; it shows here with the way back to it */}
+      <p className="-mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
+        <Languages aria-hidden className="size-4 text-accent-text" />
+        <span>
+          {coupleCopy.cardIn}{" "}
+          <span className="font-semibold text-ink">
+            {languages.map((language, i) => (
+              <span key={language} lang={language}>
+                {i > 0 && " + "}
+                {languageName(language)}
+              </span>
+            ))}
+          </span>
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => goTo("language")}
+          className="-ms-2 text-accent-text"
+        >
+          {coupleCopy.changeLanguage}
+        </Button>
+      </p>
       <section
         aria-labelledby="names-heading"
         data-page-target="cover"
-        className="flex flex-col gap-5 border-t border-line pt-6"
+        className="flex flex-col gap-5"
       >
         <div className="flex flex-col gap-1">
           <h2 id="names-heading" className="font-display text-xl">
@@ -312,9 +359,9 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           </h2>
           <p className="text-sm text-ink-muted">{coupleCopy.anyScript}</p>
         </div>
-        <div className="flex flex-col gap-5">{names.map(field)}</div>
+        <div className="flex flex-col gap-5">{mainNames.map(field)}</div>
       </section>
-      {wording.length > 0 && (
+      {shown.length > 0 && (
         <section
           aria-labelledby="wording-heading"
           className="flex flex-col gap-5 border-t border-line pt-6"
@@ -322,8 +369,18 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           <h2 id="wording-heading" className="font-display text-xl">
             {coupleCopy.wordingHeading}
           </h2>
-          {wordingGrid(field)}
+          {wordingGrid(field, shown)}
         </section>
+      )}
+      {folded.length > 0 && (
+        <Fold
+          title={coupleCopy.moreWording}
+          intro={coupleCopy.moreWordingHint}
+          filled={foldedFilled}
+          pageTarget="cover"
+        >
+          {wordingGrid(field, folded)}
+        </Fold>
       )}
       {second && (
         <section
@@ -341,7 +398,14 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
         </section>
       )}
       <FamilySection draft={draft} update={update} />
-      <Lettering draft={draft} update={update} />
+      <Fold
+        title={studioCopy.lettering}
+        intro={studioCopy.letteringIntro}
+        filled={typeChanged}
+        pageTarget="cover"
+      >
+        <Lettering draft={draft} update={update} headless />
+      </Fold>
     </div>
   );
 }

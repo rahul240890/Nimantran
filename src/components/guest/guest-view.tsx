@@ -48,6 +48,7 @@ import {
   CARD_STORY_WORDS,
   daysAway,
 } from "@/lib/templates/story-words";
+import { draftCouple } from "@/lib/publish/frames";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import type { EventWindow } from "@/lib/publish/event-day";
 import { cn } from "@/lib/cn";
@@ -165,7 +166,7 @@ export function GuestView({
           words: CARD_STORY_WORDS[language],
           family: storyFamily(draft, language),
           couple: couplePagePhotos(
-            draft.couplePhotos,
+            draftCouple(draft),
             photos.map((photo) => photo.id),
             (id) => photos.find((photo) => photo.id === id)?.url,
             copy,
@@ -195,13 +196,13 @@ export function GuestView({
   const scenePhotos = useMemo(
     () =>
       couplePagePhotos(
-        sceneCouple(draft.couplePhotos),
+        sceneCouple(draftCouple(draft)),
         photos.map((photo) => photo.id),
         (id) => photos.find((photo) => photo.id === id)?.url,
         copy,
         (id) => photoAspect(photos, id),
       ),
-    [draft.couplePhotos, photos, copy],
+    [draft, photos, copy],
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
   // A theme with a guest look carries on below the pages; others keep the plain details

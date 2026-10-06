@@ -1,17 +1,18 @@
 "use client";
 
 import {
+  Check,
   ImageIcon,
   ImageOff,
   ImagePlus,
   Images,
+  LoaderCircle,
   Music2,
   Pause,
   Play,
   Upload,
   X,
 } from "lucide-react";
-import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, type DragEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,15 +21,15 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  COUPLE_LAYOUTS,
-  coupleFrameIds,
-  frameCount,
-  photoAspect,
-  type CoupleLayout,
-} from "@/lib/editor/couple-photos";
+import { photoAspect, type CoupleLayout } from "@/lib/editor/couple-photos";
 import type { PhotoCrop } from "@/lib/editor/photo-fit";
-import { draftFrames } from "@/lib/publish/frames";
+import {
+  coupleLayouts,
+  draftCouple,
+  draftFrames,
+  draftFrameSlots,
+  framedDesign,
+} from "@/lib/publish/frames";
 import { FramePreview, PhotoAdjust } from "../photo-adjust";
 import { ASKABLE_QUESTIONS, draftPeople, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
@@ -50,28 +51,29 @@ function newId(): string {
     : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 }
 
-function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
+/** Reads, shrinks and saves photos on this device; each one saved is handed to `onAdded`. */
+function usePhotoUpload(draft: StepProps["draft"]) {
   const { extrasCopy } = useText(editorText);
-  const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
-  const [dragging, setDragging] = useState(false);
-  const urls = usePhotoUrls(
-    draft.photos.map((photo) => photo.id),
-    draft.remoteId,
-  );
   const room = MAX_PHOTOS - draft.photos.length;
 
-  const add = async (files: File[]) => {
+  const add = async (
+    files: File[],
+    onAdded: (photo: { id: string; width: number; height: number }) => void,
+    { limit = room, replacing = false }: { limit?: number; replacing?: boolean } = {},
+  ) => {
     const images = files.filter((file) => file.type.startsWith("image/"));
     if (images.length === 0) return;
-    if (room <= 0) {
+    // Replacing a frame's photo frees its place first
+    const space = replacing ? room + 1 : room;
+    if (space <= 0) {
       toast({ title: extrasCopy.full(MAX_PHOTOS), tone: "info" });
       return;
     }
     setBusy(true);
     let unreadable = false;
     let unsaved = false;
-    for (const file of images.slice(0, room)) {
+    for (const file of images.slice(0, Math.min(limit, space))) {
       let prepared;
       try {
         prepared = await preparePhoto(file);
@@ -87,44 +89,310 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
         break;
       }
       rememberPhotoUrl(id, prepared.blob);
-      update((current) => ({
-        ...current,
-        photos: [...current.photos, { id, width: prepared.width, height: prepared.height }].slice(
-          0,
-          MAX_PHOTOS,
-        ),
-      }));
+      onAdded({ id, width: prepared.width, height: prepared.height });
     }
     setBusy(false);
     if (unsaved) toast({ title: extrasCopy.storageFailed, tone: "error" });
     else if (unreadable) toast({ title: extrasCopy.photoFailed, tone: "error" });
-    if (images.length > room) toast({ title: extrasCopy.full(MAX_PHOTOS), tone: "info" });
+    if (images.length > Math.min(limit, space) && limit > 1) {
+      toast({ title: extrasCopy.full(MAX_PHOTOS), tone: "info" });
+    }
   };
+  return { add, busy, room };
+}
+
+function forgetPhoto(id: string) {
+  forgetPhotoUrl(id);
+  void deletePhoto(id).catch(() => {
+    // Left behind in storage; harmless, and cleared with the next new invite
+  });
+}
+
+const LAYOUT_ICONS: Record<CoupleLayout, typeof ImageIcon> = {
+  none: ImageOff,
+  one: ImageIcon,
+  two: Images,
+};
+
+/**
+ * The photos the design itself shows, each in its own upload field (Step 12l's photo page,
+ * or a Scene's frame). A design with painted frames always asks for them: one, or one each
+ * where it has a two-frame painting. Only a design without painted frames can do without.
+ */
+function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
+  const { extrasCopy, editor } = useText(editorText);
+  const ids = draft.photos.map((photo) => photo.id);
+  const urls = usePhotoUrls(ids, draft.remoteId);
+  const one = draftPeople(draft) === "one";
+  const layouts = coupleLayouts(draft);
+  const couple = draftCouple(draft);
+  const slots = draftFrameSlots(draft);
+  const spots = draftFrames(draft);
+  const framed = framedDesign(draft);
+  const { add, busy } = usePhotoUpload(draft);
+  const [adding, setAdding] = useState<number | null>(null);
+  const inputs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Each frame named for whose photo goes in it, by the names typed on the card
+  const first = draft.content.first?.trim();
+  const second = draft.content.second?.trim();
+  const frameName = (frame: number) =>
+    slots.length === 1
+      ? one
+        ? extrasCopy.framePhotos.one
+        : extrasCopy.framePhotos.together
+      : frame === 0
+        ? first
+          ? extrasCopy.framePhotos.of(first)
+          : extrasCopy.framePhotos.first
+        : second
+          ? extrasCopy.framePhotos.of(second)
+          : extrasCopy.framePhotos.second;
+
+  const setLayout = (layout: CoupleLayout) =>
+    update((current) => ({
+      ...current,
+      couplePhotos: { ...draftCouple(current), layout },
+    }));
+
+  const fill = (frame: number, files: File[]) => {
+    setAdding(frame);
+    const old = slots[frame];
+    void add(
+      files,
+      (photo) => {
+        update((current) => {
+          const now = draftFrameSlots(current);
+          now[frame] = photo.id;
+          // The photo it replaces leaves the invite, unless another frame still shows it
+          const gone = old && !now.includes(old) ? old : null;
+          return {
+            ...current,
+            photos: [...current.photos.filter((p) => p.id !== gone), photo].slice(0, MAX_PHOTOS),
+            couplePhotos: {
+              ...draftCouple(current),
+              ids: now.map((id) => id ?? ""),
+              strict: true,
+            },
+          };
+        });
+        if (old && !slots.some((id, i) => i !== frame && id === old)) forgetPhoto(old);
+      },
+      { limit: 1, replacing: Boolean(old) },
+    ).finally(() => setAdding(null));
+  };
+
+  const saveCrop = (id: string, crop: PhotoCrop | null) =>
+    update((current) => {
+      const crops = { ...current.couplePhotos.crops };
+      if (crop) crops[id] = crop;
+      else delete crops[id];
+      return { ...current, couplePhotos: { ...current.couplePhotos, crops } };
+    });
+
+  return (
+    <section
+      aria-labelledby="design-photos-heading"
+      data-page-target="couple"
+      className="flex flex-col gap-4"
+    >
+      <div className="flex flex-col gap-1">
+        <h2 id="design-photos-heading" className="font-display text-xl">
+          {framed ? extrasCopy.designPhotosHeading : extrasCopy.coupleHeading}
+        </h2>
+        <p className="text-sm text-ink-muted">
+          {framed
+            ? extrasCopy.designPhotosHint(slots.length)
+            : one
+              ? extrasCopy.photoHintOne
+              : extrasCopy.coupleHint}
+        </p>
+      </div>
+      {layouts.length > 1 && (
+        <RadioGroup
+          label={framed ? extrasCopy.designPhotosHeading : extrasCopy.coupleHeading}
+          variant="segment"
+          value={couple.layout}
+          onValueChange={(next) => setLayout(next as CoupleLayout)}
+        >
+          {layouts.map((id) => {
+            const Icon = LAYOUT_ICONS[id];
+            const label =
+              one && id !== "two" ? extrasCopy.photoLayoutsOne[id] : extrasCopy.coupleLayouts[id];
+            return <RadioItem key={id} value={id} icon={<Icon aria-hidden />} label={label} />;
+          })}
+        </RadioGroup>
+      )}
+      {slots.length > 0 && (
+        <ul className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
+          {slots.map((id, frame) => {
+            const name = frameName(frame);
+            const url = id ? urls[id] : undefined;
+            const spot = id ? spots.find((s) => s.id === id) : undefined;
+            const aspect = id ? photoAspect(draft.photos, id) : undefined;
+            const crop = id ? draft.couplePhotos.crops?.[id] : undefined;
+            const error = errors[`frame-${frame}`];
+            const errorId = `frame-${frame}-error`;
+            return (
+              <li
+                key={frame}
+                className={cn(
+                  "flex flex-col gap-3 rounded-lg border-2 bg-surface p-3 shadow-raised transition-colors duration-200",
+                  id ? "border-line" : "border-dashed border-line-strong",
+                  error && "border-danger",
+                )}
+              >
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-sm font-semibold text-ink">{name}</span>
+                  {id ? (
+                    <Badge tone="gold">
+                      <Check aria-hidden className="size-3" strokeWidth={3} />
+                      {extrasCopy.framePhotoAdded}
+                    </Badge>
+                  ) : (
+                    <span className="text-xs font-semibold text-accent-text">
+                      {extrasCopy.framePhotoNeeded}
+                    </span>
+                  )}
+                </span>
+                <button
+                  type="button"
+                  aria-label={
+                    id ? extrasCopy.changeFramePhoto(name) : extrasCopy.addFramePhoto(name)
+                  }
+                  aria-describedby={error ? errorId : undefined}
+                  data-invalid={error ? true : undefined}
+                  disabled={busy}
+                  onClick={() => inputs.current[frame]?.click()}
+                  className="group/frame relative grid min-h-40 cursor-pointer place-items-center overflow-hidden rounded-md bg-surface-2 transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-wait motion-safe:active:scale-[0.98]"
+                >
+                  {id && url && spot && aspect ? (
+                    <FramePreview
+                      spot={spot}
+                      src={url}
+                      crop={crop}
+                      aspect={aspect}
+                      maxHeight="11rem"
+                    />
+                  ) : id && url ? (
+                    // Local object URLs: next/image can't optimise these
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={url} alt="" className="h-44 w-full object-cover" />
+                  ) : (
+                    <span className="flex flex-col items-center gap-2 px-4 py-6 text-center text-ink-muted">
+                      {adding === frame ? (
+                        <LoaderCircle
+                          aria-hidden
+                          className="size-7 animate-spin motion-reduce:animate-none"
+                        />
+                      ) : (
+                        <ImagePlus aria-hidden className="size-7 text-accent-text" />
+                      )}
+                      <span className="text-sm font-semibold text-ink">
+                        {extrasCopy.addFramePhoto(name)}
+                      </span>
+                    </span>
+                  )}
+                </button>
+                {id && (
+                  <span className="flex flex-wrap gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      leadingIcon={<ImagePlus aria-hidden />}
+                      loading={adding === frame}
+                      onClick={() => inputs.current[frame]?.click()}
+                    >
+                      {extrasCopy.changePhoto}
+                    </Button>
+                    {url && spot && aspect && (
+                      <PhotoAdjust
+                        spot={spot}
+                        src={url}
+                        aspect={aspect}
+                        crop={crop}
+                        frameName={name}
+                        onSave={(next) => saveCrop(id, next)}
+                      />
+                    )}
+                  </span>
+                )}
+                {error && (
+                  <p id={errorId} role="alert" className="text-sm font-medium text-danger">
+                    {editor.errors[error as keyof typeof editor.errors]}
+                  </p>
+                )}
+                <input
+                  ref={(node) => {
+                    inputs.current[frame] = node;
+                  }}
+                  type="file"
+                  accept={PHOTO_ACCEPT}
+                  tabIndex={-1}
+                  aria-hidden
+                  className="sr-only"
+                  onChange={(event) => {
+                    const files = [...(event.target.files ?? [])];
+                    event.target.value = "";
+                    fill(frame, files);
+                  }}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/** Any other photos, for guests to scroll through: optional, and apart from the frames. */
+function MorePhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { extrasCopy } = useText(editorText);
+  const input = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const framed = new Set(draftFrameSlots(draft).filter((id): id is string => id !== null));
+  const photos = draft.photos.filter((photo) => !framed.has(photo.id));
+  const urls = usePhotoUrls(
+    photos.map((photo) => photo.id),
+    draft.remoteId,
+  );
+  const { add, busy, room } = usePhotoUpload(draft);
+
+  const addMore = (files: File[]) =>
+    void add(files, (photo) =>
+      update((current) => ({
+        ...current,
+        photos: [...current.photos, photo].slice(0, MAX_PHOTOS),
+        // The frames keep their own photos: these never stand in for them
+        couplePhotos: { ...draftCouple(current), ids: frameIds(current), strict: true },
+      })),
+    );
 
   const remove = (id: string) => {
     update((current) => ({
       ...current,
       photos: current.photos.filter((photo) => photo.id !== id),
     }));
-    forgetPhotoUrl(id);
-    void deletePhoto(id).catch(() => {
-      // Left behind in storage; harmless, and cleared with the next new invite
-    });
+    forgetPhoto(id);
   };
 
   const onDrop = (event: DragEvent) => {
     event.preventDefault();
     setDragging(false);
-    void add([...event.dataTransfer.files]);
+    addMore([...event.dataTransfer.files]);
   };
 
   return (
-    <section aria-labelledby="photos-heading" className="flex flex-col gap-4">
+    <section
+      aria-labelledby="photos-heading"
+      className="flex flex-col gap-4 border-t border-line pt-6"
+    >
       <div className="flex flex-col gap-1">
         <h2 id="photos-heading" className="font-display text-xl">
-          {extrasCopy.photosHeading}
+          {extrasCopy.galleryHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.photosHint(MAX_PHOTOS)}</p>
+        <p className="text-sm text-ink-muted">{extrasCopy.galleryHint(MAX_PHOTOS)}</p>
       </div>
 
       <div
@@ -169,14 +437,14 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
           onChange={(event) => {
             const files = [...(event.target.files ?? [])];
             event.target.value = "";
-            void add(files);
+            addMore(files);
           }}
         />
       </div>
 
-      {draft.photos.length > 0 && (
+      {photos.length > 0 && (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {draft.photos.map((photo, index) => {
+          {photos.map((photo, index) => {
             const url = urls[photo.id];
             return (
               <li
@@ -215,167 +483,9 @@ function Photos({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
-const LAYOUT_ICONS: Record<CoupleLayout, typeof ImageIcon> = {
-  none: ImageOff,
-  one: ImageIcon,
-  two: Images,
-};
-
-/** The couple's photo page (Step 12l): none, one photo, or two, and which photo fills each frame. */
-function CouplePage({ draft, update }: Pick<StepProps, "draft" | "update">) {
-  const { extrasCopy } = useText(editorText);
-  const ids = draft.photos.map((photo) => photo.id);
-  const urls = usePhotoUrls(ids, draft.remoteId);
-  // A birthday or party has one guest of honour, so one photo at most
-  const one = draftPeople(draft) === "one";
-  const layout = one && draft.couplePhotos.layout === "two" ? "one" : draft.couplePhotos.layout;
-  const layouts = one ? (["none", "one"] as const) : COUPLE_LAYOUTS;
-  const frames = frameCount(layout);
-  const filled = coupleFrameIds(draft.couplePhotos, ids);
-
-  const choose = (frame: number, id: string) =>
-    update((current) => {
-      const next = coupleFrameIds(current.couplePhotos, ids);
-      // The photo leaves any other frame it was in, which then takes the next free one
-      const picked = next.map((other, i) => (i === frame ? id : other === id ? "" : other));
-      picked[frame] = id;
-      return { ...current, couplePhotos: { ...current.couplePhotos, ids: picked } };
-    });
-
-  return (
-    <section
-      aria-labelledby="couple-heading"
-      data-page-target="couple"
-      className="flex flex-col gap-4 border-t border-line pt-6"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 id="couple-heading" className="font-display text-xl">
-          {extrasCopy.coupleHeading}
-        </h2>
-        <p className="text-sm text-ink-muted">
-          {one ? extrasCopy.photoHintOne : extrasCopy.coupleHint}
-        </p>
-      </div>
-      <RadioGroup
-        label={extrasCopy.coupleHeading}
-        variant="card"
-        value={layout}
-        onValueChange={(next) =>
-          update((current) => ({
-            ...current,
-            couplePhotos: { ...current.couplePhotos, layout: next as CoupleLayout },
-          }))
-        }
-        className="grid-cols-1"
-      >
-        {layouts.map((id) => {
-          const Icon = LAYOUT_ICONS[id];
-          const label =
-            one && id !== "two" ? extrasCopy.photoLayoutsOne[id] : extrasCopy.coupleLayouts[id];
-          return <RadioItem key={id} value={id} icon={<Icon />} label={label} />;
-        })}
-      </RadioGroup>
-      {frames > 0 && ids.length === 0 && (
-        <p className="text-sm text-ink-muted">{extrasCopy.coupleAddFirst}</p>
-      )}
-      {frames > 0 &&
-        ids.length > 1 &&
-        Array.from({ length: frames }, (_, frame) => (
-          <div key={frame} className="flex flex-col gap-2">
-            <p id={`couple-frame-${frame}`} className="text-sm font-semibold text-ink">
-              {extrasCopy.coupleFrame(frame + 1, frames)}
-            </p>
-            <RadioPrimitive.Root
-              aria-labelledby={`couple-frame-${frame}`}
-              orientation="horizontal"
-              value={filled[frame] ?? ""}
-              onValueChange={(id) => choose(frame, id)}
-              className="flex flex-wrap gap-2"
-            >
-              {draft.photos.map((photo, index) => {
-                const url = urls[photo.id];
-                return (
-                  <RadioPrimitive.Item
-                    key={photo.id}
-                    value={photo.id}
-                    aria-label={extrasCopy.useThisPhoto(index + 1)}
-                    className="size-14 cursor-pointer overflow-hidden rounded-md border-2 border-line bg-surface-2 transition-[border-color,box-shadow] duration-200 hover:border-line-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-[state=checked]:border-marigold data-[state=checked]:shadow-[0_0_0_2px_var(--marigold)]"
-                  >
-                    {url ? (
-                      // Local object URLs: next/image can't optimise these
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={url} alt="" className="size-full object-cover" />
-                    ) : (
-                      <ImageIcon aria-hidden className="m-auto size-5 text-ink-faint" />
-                    )}
-                  </RadioPrimitive.Item>
-                );
-              })}
-            </RadioPrimitive.Root>
-          </div>
-        ))}
-      <FitPhotos draft={draft} update={update} urls={urls} />
-    </section>
-  );
-}
-
-/** Each framed photo as guests will see it, with the photo editor to move and zoom it. */
-function FitPhotos({
-  draft,
-  update,
-  urls,
-}: Pick<StepProps, "draft" | "update"> & { urls: Record<string, string | undefined> }) {
-  const { extrasCopy } = useText(editorText);
-  const spots = draftFrames(draft);
-  if (spots.length === 0) return null;
-  const save = (id: string, crop: PhotoCrop | null) =>
-    update((current) => {
-      const crops = { ...current.couplePhotos.crops };
-      if (crop) crops[id] = crop;
-      else delete crops[id];
-      return { ...current, couplePhotos: { ...current.couplePhotos, crops } };
-    });
-  return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-col gap-1">
-        <h3 className="text-sm font-semibold text-ink">{extrasCopy.fitHeading}</h3>
-        <p className="text-sm text-ink-muted">{extrasCopy.fitHint}</p>
-      </div>
-      <ul className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
-        {spots.map((spot, i) => {
-          const url = urls[spot.id];
-          const aspect = photoAspect(draft.photos, spot.id);
-          if (!url || !aspect) return null;
-          const crop = draft.couplePhotos.crops?.[spot.id];
-          const frameName = extrasCopy.coupleFrame(i + 1, spots.length);
-          return (
-            <li
-              key={`${spot.id}-${i}`}
-              className="flex items-center gap-3 rounded-lg border border-line bg-surface-2/60 p-2"
-            >
-              <span className="flex h-24 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-night">
-                <FramePreview spot={spot} src={url} crop={crop} aspect={aspect} maxHeight="6rem" />
-              </span>
-              <span className="flex min-w-0 flex-col items-start gap-2">
-                <span className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
-                  {frameName}
-                  {crop && <Badge tone="gold">{extrasCopy.adjusted}</Badge>}
-                </span>
-                <PhotoAdjust
-                  spot={spot}
-                  src={url}
-                  aspect={aspect}
-                  crop={crop}
-                  frameName={frameName}
-                  onSave={(next) => save(spot.id, next)}
-                />
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
-  );
+/** The frames' photo ids as stored, holding each frame's place. */
+function frameIds(draft: StepProps["draft"]): string[] {
+  return draftFrameSlots(draft).map((id) => id ?? "");
 }
 
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
@@ -559,11 +669,11 @@ function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
-export function ExtrasStep({ draft, update }: StepProps) {
+export function ExtrasStep({ draft, update, errors }: StepProps) {
   return (
     <div className="flex flex-col gap-8">
-      <Photos draft={draft} update={update} />
-      <CouplePage draft={draft} update={update} />
+      <DesignPhotos draft={draft} update={update} errors={errors} />
+      <MorePhotos draft={draft} update={update} />
       <Music draft={draft} update={update} />
       <Questions draft={draft} update={update} />
     </div>

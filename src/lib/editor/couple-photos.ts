@@ -16,6 +16,11 @@ export type CouplePhotos = {
   ids: string[];
   /** How the host placed each photo in its frame, by photo id; a missing one sits by default. */
   crops?: Record<string, PhotoCrop>;
+  /**
+   * Set once the host fills the frames from their own upload fields: each frame then shows
+   * only the photo chosen for it, never one of the invite's other photos.
+   */
+  strict?: boolean;
 };
 
 export const noCouplePhotos: CouplePhotos = { layout: "none", ids: [] };
@@ -30,6 +35,11 @@ export const frameCount = (layout: CoupleLayout) =>
  * frames shows as many as there are; none means no photo page.
  */
 export function coupleFrameIds(couple: CouplePhotos, photoIds: readonly string[]): string[] {
+  if (couple.strict) {
+    return frameSlots(couple, photoIds, frameCount(couple.layout)).filter(
+      (id): id is string => id !== null,
+    );
+  }
   const chosen: string[] = [];
   for (let i = 0; i < frameCount(couple.layout); i++) {
     const pick = couple.ids[i];
@@ -41,6 +51,29 @@ export function coupleFrameIds(couple: CouplePhotos, photoIds: readonly string[]
     if (id) chosen.push(id);
   }
   return chosen;
+}
+
+/**
+ * Each frame's own photo, by frame, or null where the host hasn't added one yet: what the
+ * editor's upload fields show. Older invites, which filled frames from the invite's photos
+ * in order, show those photos in their frames.
+ */
+export function frameSlots(
+  couple: CouplePhotos,
+  photoIds: readonly string[],
+  count: number,
+): (string | null)[] {
+  if (!couple.strict) {
+    const filled = coupleFrameIds({ ...couple, layout: count >= 2 ? "two" : "one" }, photoIds);
+    return Array.from({ length: count }, (_, i) => filled[i] ?? null);
+  }
+  const seen = new Set<string>();
+  return Array.from({ length: count }, (_, i) => {
+    const id = couple.ids[i];
+    if (!id || !photoIds.includes(id) || seen.has(id)) return null;
+    seen.add(id);
+    return id;
+  });
 }
 
 /** A scene always shows photos: one of the couple if the host picked one, else one each. */

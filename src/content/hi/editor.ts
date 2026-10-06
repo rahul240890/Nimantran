@@ -29,6 +29,7 @@ export const editor: Translation<typeof en.editor> = {
     required: "कृपया इसे भरें",
     "too-long": "यह कार्ड के लिए बहुत लंबा है",
     "no-functions": "कम से कम एक रस्म चुनें",
+    "photo-needed": "यह तस्वीर जोड़ें। आपका डिज़ाइन इसे अपने फ़्रेम में दिखाता है।",
   },
   save: {
     idle: "ड्राफ़्ट इसी डिवाइस पर सहेजे जाते हैं",
@@ -69,6 +70,13 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     intro:
       "हर डिज़ाइन 3D में खुलता है, अपने बेल-बूटों, पंखुड़ियों और राग के साथ। कभी भी बदलें, आपके शब्द नहीं खोएँगे।",
   },
+  language: {
+    label: "भाषा",
+    eyebrow: "कार्ड की भाषा",
+    title: "आपका कार्ड किस भाषा में हो?",
+    intro:
+      "कार्ड पर सब कुछ इसी भाषा में आएगा: नाम, शब्द, रस्मों के नाम और तारीख़ें। हर पंक्ति के लिए दिए गए सुझाव भी इसी भाषा में होंगे।",
+  },
   couple: {
     label: "जोड़ा",
     eyebrow: "जोड़ा",
@@ -88,7 +96,7 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     eyebrow: "तस्वीरें और संगीत",
     title: "इसे अपना बनाइए",
     intro:
-      "मेहमानों के लिए कुछ तस्वीरें जोड़ें, कार्ड खुलते समय बजने वाला राग चुनें, और तय करें कि जवाब में क्या पूछना है।",
+      "आपका डिज़ाइन जो तस्वीरें दिखाता है वे जोड़ें, कार्ड खुलते समय बजने वाला राग चुनें, और तय करें कि जवाब में क्या पूछना है।",
   },
   preview: {
     label: "झलक",
@@ -325,6 +333,8 @@ export const functionFields: Translation<typeof en.functionFields> = {
   endTime: "ख़त्म होने का समय",
   endHint: "देर तक चलना हो तो ख़ाली छोड़ दें।",
   muhuratHint: "शुरू और ख़त्म होने का सही समय, मिनट तक, चुनें। मेहमानों को ठीक वैसा ही दिखेगा।",
+  moreDetails: "और जानकारी",
+  moreDetailsHint: "ख़त्म होने का समय, पता, नक़्शे की पिन, पार्किंग और ड्रेस कोड",
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
@@ -343,6 +353,24 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   bothLanguages: (main, second) => `${main} और ${second}`,
   secondHeading: (language) => `${language} में कार्ड`,
   secondHint: (main) => `कोई पंक्ति ख़ाली छोड़ें तो ${main} कार्ड वाले शब्द ही आएँगे।`,
+  ideas: "सुझाव",
+  ideasLabel: (field) => `${field} के सुझाव`,
+  useIdea: (text) => `“${text}” लिखें`,
+  moreWording: "कार्ड के और शब्द",
+  moreWordingHint:
+    "द्वार के शब्द, परिवार की पंक्ति और नामों के बीच का शब्द। हर एक आपके अवसर के शब्दों से शुरू होता है।",
+  cardIn: "कार्ड की भाषा:",
+  changeLanguage: "भाषा बदलें",
+};
+
+export const languageCopy: Translation<typeof en.languageCopy> = {
+  mainHeading: "कार्ड की भाषा",
+  traditionMatch: "आपकी परंपरा की",
+  secondHeading: "दूसरी भाषा भी जोड़ें?",
+  secondHint:
+    "मेहमान निमंत्रण पर दोनों भाषाओं के बीच बदल सकेंगे। दूसरी भाषा प्रीमियम और रॉयल संस्करण में मिलती है।",
+  secondNone: "सिर्फ़ एक भाषा",
+  secondLabel: "दूसरी भाषा",
 };
 
 export const namesCopy: Translation<typeof en.namesCopy> = {
@@ -450,6 +478,25 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
     one: "एक तस्वीर",
   },
   coupleAddFirst: "ऊपर तस्वीर जोड़ें, वह फ़्रेम में लग जाएगी।",
+  designPhotosHeading: "आपके डिज़ाइन की तस्वीरें",
+  designPhotosHint: (frames) =>
+    frames === 1
+      ? "आपके डिज़ाइन में एक फ़्रेम है। उसमें लगने वाली तस्वीर जोड़ें।"
+      : "आपके डिज़ाइन में दो फ़्रेम हैं। दोनों के लिए एक-एक तस्वीर जोड़ें।",
+  framePhotos: {
+    together: "आप दोनों की तस्वीर",
+    one: "आपकी तस्वीर",
+    of: (name) => `${name} की तस्वीर`,
+    first: "पहली तस्वीर",
+    second: "दूसरी तस्वीर",
+  },
+  addFramePhoto: (frame) => `जोड़ें: ${frame}`,
+  changeFramePhoto: (frame) => `बदलें: ${frame}`,
+  framePhotoAdded: "जुड़ गई",
+  framePhotoNeeded: "ज़रूरी",
+  changePhoto: "तस्वीर बदलें",
+  galleryHeading: "और तस्वीरें",
+  galleryHint: (max) => `वैकल्पिक। मेहमान इन्हें निमंत्रण पर देख सकेंगे। कुल ${max} तस्वीरें तक।`,
   coupleFrame: (index, frames) =>
     frames === 1 ? "फ़्रेम की तस्वीर" : index === 1 ? "पहला फ़्रेम" : "दूसरा फ़्रेम",
   useThisPhoto: (index) => `तस्वीर ${index}`,

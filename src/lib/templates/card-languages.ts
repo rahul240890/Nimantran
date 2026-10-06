@@ -13,6 +13,14 @@ export function isCardLanguage(value: unknown): value is CardLanguage {
   return typeof value === "string" && (CARD_LANGUAGES as readonly string[]).includes(value);
 }
 
+/** Hindi and Marathi share Devanagari, so a Hindi family's invocation suits a Marathi card. */
+const SCRIPT_OF: Record<string, string> = { hi: "deva", mr: "deva" };
+
+/** Whether two languages are written in the same script. */
+export function sameScript(a: string, b: string): boolean {
+  return a === b || (SCRIPT_OF[a] !== undefined && SCRIPT_OF[a] === SCRIPT_OF[b]);
+}
+
 const DATE_LOCALES: Partial<Record<CardLanguage, DateLocale>> = { hi, gu, bn, ta };
 
 // date-fns has no Marathi, so its day and month names are kept here
