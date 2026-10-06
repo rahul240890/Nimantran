@@ -12,6 +12,7 @@ import {
   draftSymbol,
   draftTradition,
   includedFunctions,
+  withTradition,
 } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
@@ -200,15 +201,8 @@ export function TraditionStep(props: StepProps) {
         variant="card"
         value={draft.tradition.id ?? NONE}
         onValueChange={(value) =>
-          update((current) => ({
-            ...current,
-            // A new tradition starts from its own symbol; the family's wording is kept
-            tradition: {
-              ...current.tradition,
-              id: isTraditionId(value) ? value : null,
-              symbol: null,
-            },
-          }))
+          // A new tradition starts from its own symbol and suggests its own card language
+          update((current) => withTradition(current, isTraditionId(value) ? value : null))
         }
         className="grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-3"
       >

@@ -35,6 +35,7 @@ export const editor = {
     required: "Please fill this in",
     "too-long": "This is too long for the card",
     "no-functions": "Choose at least one function",
+    "photo-needed": "Add this photo. Your design shows it in its frame.",
   },
   save: {
     idle: "Drafts save on this device",
@@ -79,6 +80,13 @@ export const stepCopy: Record<
     intro:
       "Every design opens in 3D with its own ornaments, petals and raga. You can switch at any time without losing your words.",
   },
+  language: {
+    label: "Language",
+    eyebrow: "Card language",
+    title: "Which language is your card in?",
+    intro:
+      "Everything on the card follows it: the names, the wording, the function names and the dates. The ideas we offer for each line come in this language too.",
+  },
   couple: {
     label: "Couple",
     eyebrow: "The couple",
@@ -98,7 +106,7 @@ export const stepCopy: Record<
     eyebrow: "Photos and music",
     title: "Make it yours",
     intro:
-      "Add a few photos for your guests, choose the raga that plays as the card opens, and pick what the RSVP asks.",
+      "Add the photos your design shows, choose the raga that plays as the card opens, and pick what the RSVP asks.",
   },
   preview: {
     label: "Preview",
@@ -340,6 +348,8 @@ export const functionFields = {
   endHint: "Leave it empty if the evening runs open.",
   muhuratHint:
     "choose the exact start and end, to the minute. Guests see them just as you set them.",
+  moreDetails: "More details",
+  moreDetailsHint: "End time, address, map pin, parking and dress code",
 } as const;
 
 export const coupleCopy = {
@@ -358,6 +368,25 @@ export const coupleCopy = {
   bothLanguages: (main: string, second: string) => `${main} and ${second}`,
   secondHeading: (language: string) => `The card in ${language}`,
   secondHint: (main: string) => `Leave a line empty to repeat the ${main} card's words.`,
+  ideas: "Ideas",
+  ideasLabel: (field: string) => `Ideas for ${field}`,
+  useIdea: (text: string) => `Use “${text}”`,
+  moreWording: "More card words",
+  moreWordingHint:
+    "Gate words, the family line and the word between the names. Each starts with wording for your occasion.",
+  cardIn: "Card language:",
+  changeLanguage: "Change language",
+} as const;
+
+/** The language step: the card's language, asked before anything is written. */
+export const languageCopy = {
+  mainHeading: "Card language",
+  traditionMatch: "Your tradition's",
+  secondHeading: "Add a second language?",
+  secondHint:
+    "Guests switch between the two on the invitation. A second language comes with the Premium and Royal editions.",
+  secondNone: "Only one language",
+  secondLabel: "Second language",
 } as const;
 
 /**
@@ -481,6 +510,26 @@ export const extrasCopy = {
     one: "One photo",
   },
   coupleAddFirst: "Add a photo above and it fills the frame.",
+  designPhotosHeading: "Photos for your design",
+  designPhotosHint: (frames: number) =>
+    frames === 1
+      ? "Your design has a photo frame. Add the photo that goes in it."
+      : "Your design has two photo frames. Add a photo for each.",
+  framePhotos: {
+    together: "Photo of you both",
+    one: "Your photo",
+    of: (name: string) => `${name}'s photo`,
+    first: "First photo",
+    second: "Second photo",
+  },
+  addFramePhoto: (frame: string) => `Add: ${frame}`,
+  changeFramePhoto: (frame: string) => `Change: ${frame}`,
+  framePhotoAdded: "Added",
+  framePhotoNeeded: "Needed",
+  changePhoto: "Change photo",
+  galleryHeading: "More photos",
+  galleryHint: (max: number) =>
+    `Optional. Guests can scroll through these on the invitation. Up to ${max} photos in all.`,
   coupleFrame: (index: number, frames: number) =>
     frames === 1 ? "Photo in the frame" : index === 1 ? "First frame" : "Second frame",
   useThisPhoto: (index: number) => `Photo ${index}`,

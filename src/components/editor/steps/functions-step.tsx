@@ -2,7 +2,7 @@
 
 import { format, parseISO } from "date-fns";
 import { Car, ChevronDown, CircleAlert, MapPin, MapPinned, Shirt } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -61,6 +61,27 @@ function FunctionFields({
     return { today: now, end: new Date(now.getFullYear() + 2, 11, 31) };
   }, []);
 
+  // The rarer details fold away until asked for, or once one of them is filled in
+  const filled = Boolean(
+    fn.endTime || fn.address || fn.dressCode || guide.pin.trim() || guide.parking.trim(),
+  );
+  const [open, setOpen] = useState(filled);
+  const moreId = useId();
+  const endTime = (
+    <Field
+      label={functionFields.endTime}
+      optionalLabel={editor.optional}
+      hint={muhurat ? undefined : functionFields.endHint}
+    >
+      <TimePicker
+        value={fn.endTime || undefined}
+        onValueChange={(endTime) => set({ endTime })}
+        placeholder={functionFields.timePlaceholder}
+        step={muhurat ? 1 : 15}
+      />
+    </Field>
+  );
+
   return (
     <div className="grid gap-5 border-t border-line px-4 pt-5 pb-5 sm:grid-cols-2 sm:px-5">
       <Field
@@ -89,20 +110,7 @@ function FunctionFields({
           />
         </Field>
       )}
-      {withTime && (
-        <Field
-          label={functionFields.endTime}
-          optionalLabel={editor.optional}
-          hint={muhurat ? undefined : functionFields.endHint}
-        >
-          <TimePicker
-            value={fn.endTime || undefined}
-            onValueChange={(endTime) => set({ endTime })}
-            placeholder={functionFields.timePlaceholder}
-            step={muhurat ? 1 : 15}
-          />
-        </Field>
-      )}
+      {withTime && muhurat && endTime}
       {withTime && muhurat && (
         <p className="-mt-2 text-sm text-ink-muted sm:col-span-2">
           <span lang={muhurat.lang} className="font-semibold text-accent-text">
@@ -129,93 +137,125 @@ function FunctionFields({
         />
       </Field>
       {withTime && (
-        <Field
-          label={functionFields.address}
-          optionalLabel={editor.optional}
-          hint={functionFields.addressHint}
-          className="sm:col-span-2"
-        >
-          <Input
-            value={fn.address}
-            maxLength={FUNCTION_RULES.address}
-            autoComplete="street-address"
-            onChange={(event) => set({ address: event.target.value })}
-          />
-        </Field>
+        <div className="sm:col-span-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            aria-expanded={open}
+            aria-controls={moreId}
+            trailingIcon={
+              <ChevronDown
+                aria-hidden
+                className={cn(
+                  "transition-transform motion-reduce:transition-none",
+                  open && "rotate-180",
+                )}
+              />
+            }
+            onClick={() => setOpen(!open)}
+            className="-ms-2 text-accent-text"
+          >
+            {functionFields.moreDetails}
+          </Button>
+          {!open && <p className="text-sm text-ink-muted">{functionFields.moreDetailsHint}</p>}
+        </div>
       )}
-      {withTime && (
-        <Field
-          label={functionFields.pin}
-          optionalLabel={editor.optional}
-          hint={functionFields.pinHint}
-          error={guide.pin.trim() && !mapsPin(guide.pin) ? functionFields.pinInvalid : undefined}
-          className="sm:col-span-2"
-        >
-          <Input
-            type="url"
-            inputMode="url"
-            value={guide.pin}
-            maxLength={GUIDE_RULES.pin}
-            placeholder="https://maps.app.goo.gl/…"
-            autoComplete="off"
-            spellCheck={false}
-            leading={<MapPinned />}
-            onChange={(event) => setGuide({ pin: event.target.value })}
-          />
-        </Field>
-      )}
-      {withTime && (
-        <Field
-          label={functionFields.parking}
-          optionalLabel={editor.optional}
-          className="sm:col-span-2"
-        >
-          <Input
-            value={guide.parking}
-            maxLength={GUIDE_RULES.parking}
-            placeholder={functionFields.parkingPlaceholder}
-            autoComplete="off"
-            leading={<Car />}
-            onChange={(event) => setGuide({ parking: event.target.value })}
-          />
-        </Field>
-      )}
-      {withTime && (
-        <div className="flex flex-col gap-3 sm:col-span-2">
-          <Field label={functionFields.dressCode} optionalLabel={editor.optional}>
-            <Input
-              value={fn.dressCode}
-              maxLength={FUNCTION_RULES.dressCode}
-              autoComplete="off"
-              leading={<Shirt />}
-              onChange={(event) => set({ dressCode: event.target.value })}
-            />
-          </Field>
-          <div role="group" aria-label={functionFields.dressIdeas}>
-            <ul className="flex flex-wrap gap-2">
-              {copy.dressIdeas.map((idea) => {
-                const chosen = fn.dressCode === idea;
-                return (
-                  <li key={idea}>
-                    <button
-                      type="button"
-                      aria-pressed={chosen}
-                      onClick={() => set({ dressCode: chosen ? "" : idea })}
-                      className={cn(
-                        "min-h-11 cursor-pointer rounded-full border px-4 text-sm transition-[background-color,border-color,color,transform] duration-150 active:scale-95",
-                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                        chosen
-                          ? "border-marigold bg-marigold/15 font-semibold text-accent-text"
-                          : "border-line-strong bg-surface text-ink-muted hover:border-line-control hover:text-ink",
-                      )}
-                    >
-                      {idea}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+      {withTime && open && (
+        <div id={moreId} className="grid gap-5 sm:col-span-2 sm:grid-cols-2">
+          {!muhurat && endTime}
+          {
+            <Field
+              label={functionFields.address}
+              optionalLabel={editor.optional}
+              hint={functionFields.addressHint}
+              className="sm:col-span-2"
+            >
+              <Input
+                value={fn.address}
+                maxLength={FUNCTION_RULES.address}
+                autoComplete="street-address"
+                onChange={(event) => set({ address: event.target.value })}
+              />
+            </Field>
+          }
+          {
+            <Field
+              label={functionFields.pin}
+              optionalLabel={editor.optional}
+              hint={functionFields.pinHint}
+              error={
+                guide.pin.trim() && !mapsPin(guide.pin) ? functionFields.pinInvalid : undefined
+              }
+              className="sm:col-span-2"
+            >
+              <Input
+                type="url"
+                inputMode="url"
+                value={guide.pin}
+                maxLength={GUIDE_RULES.pin}
+                placeholder="https://maps.app.goo.gl/…"
+                autoComplete="off"
+                spellCheck={false}
+                leading={<MapPinned />}
+                onChange={(event) => setGuide({ pin: event.target.value })}
+              />
+            </Field>
+          }
+          {
+            <Field
+              label={functionFields.parking}
+              optionalLabel={editor.optional}
+              className="sm:col-span-2"
+            >
+              <Input
+                value={guide.parking}
+                maxLength={GUIDE_RULES.parking}
+                placeholder={functionFields.parkingPlaceholder}
+                autoComplete="off"
+                leading={<Car />}
+                onChange={(event) => setGuide({ parking: event.target.value })}
+              />
+            </Field>
+          }
+          {
+            <div className="flex flex-col gap-3 sm:col-span-2">
+              <Field label={functionFields.dressCode} optionalLabel={editor.optional}>
+                <Input
+                  value={fn.dressCode}
+                  maxLength={FUNCTION_RULES.dressCode}
+                  autoComplete="off"
+                  leading={<Shirt />}
+                  onChange={(event) => set({ dressCode: event.target.value })}
+                />
+              </Field>
+              <div role="group" aria-label={functionFields.dressIdeas}>
+                <ul className="flex flex-wrap gap-2">
+                  {copy.dressIdeas.map((idea) => {
+                    const chosen = fn.dressCode === idea;
+                    return (
+                      <li key={idea}>
+                        <button
+                          type="button"
+                          aria-pressed={chosen}
+                          onClick={() => set({ dressCode: chosen ? "" : idea })}
+                          className={cn(
+                            "min-h-11 cursor-pointer rounded-full border px-4 text-sm transition-[background-color,border-color,color,transform] duration-150 active:scale-95",
+                            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                            chosen
+                              ? "border-marigold bg-marigold/15 font-semibold text-accent-text"
+                              : "border-line-strong bg-surface text-ink-muted hover:border-line-control hover:text-ink",
+                          )}
+                        >
+                          {idea}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          }
         </div>
       )}
     </div>

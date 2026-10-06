@@ -30,6 +30,18 @@ export async function signIn(page: Page, number: string) {
   await page.getByRole("button", { name: "Skip for now" }).click();
 }
 
+/** Fills each of the design's photo frames through its own upload field. */
+export async function addDesignPhotos(page: Page) {
+  const add = page.getByRole("button", { name: /^Add: / });
+  const count = await add.count();
+  for (let i = count; i > 0; i--) {
+    const chooser = page.waitForEvent("filechooser");
+    await add.first().click();
+    await (await chooser).setFiles({ name: "us.png", mimeType: "image/png", buffer: PNG });
+    await expect(add).toHaveCount(i - 1);
+  }
+}
+
 /** Signs in and writes a complete wedding invite with one photo, ending on the preview step. */
 export async function writeInvite(page: Page, number: string, names: [string, string]) {
   // A known "today" for the calendar; time still moves, so every edit saves
@@ -40,6 +52,7 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await next(page);
   await next(page);
   await next(page);
+  await next(page); // language
   await page.getByRole("textbox", { name: /First name/ }).fill(names[0]);
   await page.getByRole("textbox", { name: /Second name/ }).fill(names[1]);
   await next(page);
@@ -55,6 +68,7 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await wedding.getByRole("combobox", { name: /Starts at/ }).click();
   await page.getByRole("option", { name: "6:30 pm" }).click();
   await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Taj Falaknuma, Hyderabad");
+  await wedding.getByRole("button", { name: "More details" }).click();
   await wedding.getByRole("button", { name: "Traditional Indian" }).click();
   const haldi = item("Haldi");
   await haldi.getByRole("button", { name: /^Date/ }).click();
@@ -64,12 +78,7 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await page.getByRole("option", { name: "10:00 am" }).click();
   await haldi.getByRole("textbox", { name: /^Venue/ }).fill("Family home, Banjara Hills");
   await next(page);
-  await page.locator('input[type="file"]').setInputFiles({
-    name: "us.png",
-    mimeType: "image/png",
-    buffer: PNG,
-  });
-  await expect(page.getByRole("img", { name: "Photo 1" })).toBeVisible();
+  await addDesignPhotos(page);
   await next(page);
   await expect(page.getByText("Your invitation is ready")).toBeVisible();
 }

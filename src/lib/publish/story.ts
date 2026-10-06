@@ -10,6 +10,7 @@ import {
   draftCopy,
   draftTradition,
   includedFunctions,
+  languagePack,
   muhuratName,
   needsTime,
   type InviteDraft,
@@ -17,6 +18,7 @@ import {
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
 import { hasBlessingPage, isSceneTheme, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
+import { CARD_FUNCTION_NAMES, CARD_MUHURAT_WORDS } from "@/lib/templates/card-function-names";
 import { formatCardDate, formatCardTime, type CardLanguage } from "@/lib/templates/card-languages";
 import { formatTime } from "@/lib/time";
 
@@ -65,11 +67,18 @@ export function cardFunctions<T extends StoryFunction>(
     const own = pack !== null && pack.language === language;
     const english = language === "en";
     const siteNames = editorText[language === "hi" ? "hi" : "en"].functionCopy;
+    // A card in another language than its tradition's names each function as that
+    // language's own cards do: its tradition's word where it has one, else the plain name
+    const plain =
+      language === "en" || language === "hi"
+        ? siteNames[fn.kind].name
+        : (languagePack(language)?.ceremonies[fn.kind]?.native ??
+          CARD_FUNCTION_NAMES[language][fn.kind]);
     const name = own
       ? (local?.native ?? siteNames[fn.kind].name)
       : english
         ? (local?.latin ?? siteNames[fn.kind].name)
-        : siteNames[fn.kind].name;
+        : plain;
     const { date, time, endTime } = draft.functions[fn.kind];
     return {
       ...fn,
@@ -80,7 +89,14 @@ export function cardFunctions<T extends StoryFunction>(
       time: fn.time && time ? formatCardTime(time, endTime || null, language) : fn.time,
       muhurat:
         fn.muhurat && muhurat
-          ? { text: own ? muhurat.native : muhurat.latin, lang: language }
+          ? {
+              text: own
+                ? muhurat.native
+                : english
+                  ? muhurat.latin
+                  : (languagePack(language)?.muhurat?.native ?? CARD_MUHURAT_WORDS[language]),
+              lang: language,
+            }
           : fn.muhurat,
     };
   });

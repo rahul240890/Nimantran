@@ -160,14 +160,39 @@ describe("a design chosen in the gallery", () => {
       suite: "shahi-savari",
       template: "bandhani",
     });
+    // The card's language is asked next, set to the tradition's own
     expect(next).toMatchObject({
-      step: "couple",
+      step: "language",
       suite: "shahi-savari",
       templateId: "bandhani",
       languages: ["gu"],
       content: { first: "Aarav" },
     });
     expect(next.tradition.id).toBe("gujarati");
+  });
+
+  it("keeps the chosen languages for another design of the same tradition", () => {
+    const first = withGalleryChoice(newDraft(), {
+      category: "wedding",
+      tradition: "gujarati",
+      suite: "shahi-savari",
+      template: "bandhani",
+    });
+    const chosen = { ...first, languages: ["hi" as const, "gu" as const], updatedAt: 1 };
+    const next = withGalleryChoice(chosen, {
+      category: "wedding",
+      tradition: "gujarati",
+      suite: "kutch-toran",
+      template: "bandhani",
+    });
+    expect(next.languages).toEqual(["hi", "gu"]);
+    const other = withGalleryChoice(chosen, {
+      category: "wedding",
+      tradition: "bengali",
+      suite: "rajbari",
+      template: null,
+    });
+    expect(other.languages).toEqual(["bn"]);
   });
 
   it("clears the tradition for a kind without a pack", () => {

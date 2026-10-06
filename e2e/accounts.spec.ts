@@ -158,6 +158,7 @@ test.describe("accounts", () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto("/create?quality=2d&category=engagement");
     await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue" }).click(); // language
     await page.getByRole("textbox", { name: /First name/ }).fill("Aditya");
     await page.getByRole("textbox", { name: /Second name/ }).fill("Priya");
     await page.getByRole("button", { name: "Continue" }).click();
@@ -192,9 +193,7 @@ test.describe("accounts", () => {
     await signInWithPhone(phone, number);
     await expect(phone).toHaveURL(/\/create/);
     await phone.getByRole("radio", { name: /Roka/ }).click();
-    await phone.getByRole("button", { name: "Continue" }).click();
-    await phone.getByRole("button", { name: "Continue" }).click();
-    await phone.getByRole("button", { name: "Continue" }).click();
+    for (let i = 0; i < 4; i++) await phone.getByRole("button", { name: "Continue" }).click();
     await phone.getByRole("textbox", { name: /First name/ }).fill("Kabir");
     await phone.getByRole("textbox", { name: /Second name/ }).fill("Ananya");
     await expect(phone.getByText("Saved to your account")).toHaveCount(1);

@@ -1,5 +1,6 @@
 import { frameCount } from "@/lib/editor/couple-photos";
 import { cardLanguages, includedFunctions, type InviteDraft } from "@/lib/editor/draft";
+import { draftCouple } from "@/lib/publish/frames";
 
 /*
  * The editions a host can buy for one invite (docs/PRICING.md, section 2). Prices are in
@@ -160,7 +161,7 @@ export function planShortfalls(
     functions: includedFunctions(draft).length,
     photos: draft.photos.length,
     languages: cardLanguages(draft).length,
-    couplePhotos: draft.photos.length ? frameCount(draft.couplePhotos.layout) : 0,
+    couplePhotos: draft.photos.length ? frameCount(draftCouple(draft).layout) : 0,
   };
   return [
     ...needsDesign,

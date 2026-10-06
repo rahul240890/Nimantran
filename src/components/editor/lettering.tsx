@@ -94,9 +94,12 @@ function FontTile({
 export function Lettering({
   draft,
   update,
+  headless = false,
 }: {
   draft: InviteDraft;
   update: (change: (draft: InviteDraft) => InviteDraft) => void;
+  /** Inside a fold that already carries the heading and intro. */
+  headless?: boolean;
 }) {
   const { studioCopy } = useText(editorText);
   const languages = cardLanguages(draft);
@@ -136,16 +139,19 @@ export function Lettering({
 
   return (
     <section
-      aria-labelledby="lettering-heading"
+      aria-labelledby={headless ? undefined : "lettering-heading"}
+      aria-label={headless ? studioCopy.lettering : undefined}
       data-page-target="cover"
-      className="flex flex-col gap-6 border-t border-line pt-6"
+      className={cn("flex flex-col gap-6", !headless && "border-t border-line pt-6")}
     >
-      <div className="flex flex-col gap-1">
-        <h2 id="lettering-heading" className="font-display text-xl">
-          {studioCopy.lettering}
-        </h2>
-        <p className="text-sm text-ink-muted">{studioCopy.letteringIntro}</p>
-      </div>
+      {!headless && (
+        <div className="flex flex-col gap-1">
+          <h2 id="lettering-heading" className="font-display text-xl">
+            {studioCopy.lettering}
+          </h2>
+          <p className="text-sm text-ink-muted">{studioCopy.letteringIntro}</p>
+        </div>
+      )}
 
       <div className="flex flex-col gap-2.5">
         <h3 id="names-font" className="font-semibold text-ink">

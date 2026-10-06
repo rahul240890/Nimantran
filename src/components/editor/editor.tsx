@@ -33,6 +33,7 @@ import {
   withCategory,
   functionOrder,
   withGalleryChoice,
+  withTradition,
   type EditorStep,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -52,6 +53,7 @@ import "@/components/invitation/type/fonts.css";
 import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
 import { ExtrasStep } from "./steps/extras-step";
+import { LanguageStep } from "./steps/language-step";
 import { FunctionsStep } from "./steps/functions-step";
 import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
@@ -65,14 +67,17 @@ import { uiText } from "@/i18n/copy/ui";
 const WIDE = "(min-width: 64rem)";
 
 /** The steps where words are typed, which get the floating live preview on phones. */
-const MINI_STEPS = new Set<EditorStep>(["couple", "functions", "extras"]);
+const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions", "extras"]);
 
 /*
- * The progress shows five stages, not seven steps: choosing the occasion, tradition and
- * design is one stage, Design, which a host arriving from the gallery has already done.
+ * The progress shows five stages, not eight steps: choosing the occasion, tradition, design
+ * and the card's language is one stage, Design. A host arriving from the gallery starts on
+ * its last step, the language, with the design already chosen.
  */
 const STAGES = ["design", "couple", "functions", "extras", "preview"] as const;
-const SETUP = new Set<EditorStep>(["occasion", "tradition", "design"]);
+const SETUP = new Set<EditorStep>(["occasion", "tradition", "design", "language"]);
+/** The steps where the design is still being picked; past them, it shows with a way back. */
+const PICKING = new Set<EditorStep>(["occasion", "tradition", "design"]);
 const stageOf = (step: EditorStep) => (SETUP.has(step) ? 0 : STAGES.indexOf(step as never));
 const MINI_HIDDEN_KEY = "shubhdwar-editor-mini-hidden";
 
@@ -113,6 +118,7 @@ const opensOn: Record<EditorStep, boolean> = {
   occasion: false,
   tradition: true,
   design: false,
+  language: true,
   couple: true,
   functions: true,
   extras: false,
@@ -295,9 +301,7 @@ export function Editor({
         let next = initialCategory ? withCategory(draft, initialCategory) : draft;
         if (draft.step === "occasion") next = { ...next, step: "design" };
         if (initialTemplate) next = { ...next, templateId: initialTemplate };
-        if (initialTradition) {
-          next = { ...next, tradition: { ...next.tradition, id: initialTradition, symbol: null } };
-        }
+        if (initialTradition) next = withTradition(next, initialTradition);
         return next;
       });
     })();
@@ -472,7 +476,7 @@ export function Editor({
               )}
             >
               {/* Past the design: what was chosen, with the way back to change it */}
-              {!SETUP.has(step) && (
+              {!PICKING.has(step) && (
                 <div className="-mt-2 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                   <span className="text-ink-muted">
                     {editor.designChosen}:{" "}
@@ -536,6 +540,7 @@ export function Editor({
                 {step === "occasion" && <OccasionStep {...props} />}
                 {step === "tradition" && <TraditionStep {...props} />}
                 {step === "design" && <DesignStep {...props} />}
+                {step === "language" && <LanguageStep {...props} />}
                 {step === "couple" && <CoupleStep {...props} />}
                 {step === "functions" && <FunctionsStep {...props} />}
                 {step === "extras" && <ExtrasStep {...props} />}

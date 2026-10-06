@@ -2,7 +2,13 @@ import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS, type People, type RsvpQuestionId } from "@/lib/categories/ids";
 import type { Category } from "@/lib/categories/schema";
 import { FUNCTION_IDS, OCCASION_FUNCTIONS, type FunctionId } from "@/lib/events/functions";
-import { CARD_LANGUAGES, formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
+import {
+  CARD_LANGUAGES,
+  formatCardDate,
+  isCardLanguage,
+  sameScript,
+  type CardLanguage,
+} from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy, type CardCopy } from "@/lib/templates/content";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
@@ -47,6 +53,7 @@ export const EDITOR_STEPS = [
   "occasion",
   "tradition",
   "design",
+  "language",
   "couple",
   "functions",
   "extras",
@@ -174,20 +181,41 @@ export function withGalleryChoice(
       ? choice.category
       : choice.category && suiteHome(choice.suite);
   let next = category ? withCategory(draft, category) : draft;
+  // The language step comes next, set to the tradition's own language; another design of
+  // the same tradition keeps the languages the host already chose
+  const languages =
+    next.tradition.id === choice.tradition && draft.updatedAt !== 0
+      ? next.languages
+      : [traditionLanguage(choice.tradition)];
   if (next.tradition.id !== choice.tradition) {
     next = { ...next, tradition: { ...noTradition, id: choice.tradition } };
   }
-  const language = choice.tradition ? TRADITIONS[choice.tradition].language : "en";
-  const main = (CARD_LANGUAGES as readonly string[]).includes(language)
-    ? (language as CardLanguage)
-    : "en";
   return {
     ...next,
     suite: choice.suite,
     format: choice.format ?? "story",
     templateId: choice.template ?? next.templateId,
-    languages: [main],
-    step: "couple",
+    languages,
+    step: "language",
+  };
+}
+
+/** The card language a tradition is usually written in; English for none. */
+export function traditionLanguage(id: TraditionPack["id"] | null): CardLanguage {
+  const language = id ? TRADITIONS[id].language : "en";
+  return isCardLanguage(language) ? language : "en";
+}
+
+/**
+ * Follows another tradition, starting from its own symbol and suggesting its own language
+ * for the card; the family's wording is kept.
+ */
+export function withTradition(draft: InviteDraft, id: TraditionPack["id"] | null): InviteDraft {
+  if (draft.tradition.id === id) return draft;
+  return {
+    ...draft,
+    tradition: { ...draft.tradition, id, symbol: null },
+    languages: [traditionLanguage(id)],
   };
 }
 
@@ -282,10 +310,18 @@ export function traditionWording(
       : language === "en"
         ? "latin"
         : "script";
-  wording.blessing = pack.invocation && mode !== "off" ? pack.invocation[mode] : "";
+  // A card in another script than the tradition's (a Gujarati family's Tamil card) writes
+  // the invocation and gate words the way that language's own cards do
+  const own = language === "en" || sameScript(pack.language, language);
+  const local = own ? pack : languagePack(language);
+  const invocation = mode === "script" ? local?.invocation : pack.invocation;
+  wording.blessing = invocation && mode !== "off" ? invocation[mode] : "";
   if (pack.doors && draft.categoryId === "wedding") {
     // A Hindi card's gates say शुभ विवाह; only its English side says Shubh Vivah
-    const doors = language === "en" ? pack.doors.latin : pack.doors.native;
+    const doors =
+      language === "en"
+        ? pack.doors.latin
+        : (local?.doors?.native ?? cardSamplesDoors(language) ?? pack.doors.native);
     wording.doorLeft = doors[0];
     wording.doorRight = doors[1];
   }
@@ -300,21 +336,28 @@ export function muhuratName(
   return id === "wedding" ? (draftTradition(draft)?.muhurat ?? null) : null;
 }
 
-/**
- * The languages a card can be written in: the tradition's own and English, or English
- * and Hindi when there is none.
- */
-export function languageOptions(draft: InviteDraft): [CardLanguage, CardLanguage] {
-  const language = draftTradition(draft)?.language;
-  const own = language && language !== "en" ? (language as CardLanguage) : null;
-  return own && (CARD_LANGUAGES as readonly string[]).includes(own) ? [own, "en"] : ["en", "hi"];
+/** The pack whose own language this is, for the words that language's cards carry. */
+export function languagePack(language: CardLanguage): TraditionPack | null {
+  if (language === "en") return null;
+  return Object.values(TRADITIONS).find((pack) => pack.language === language) ?? null;
 }
 
-/** The card's languages, main first. A language the tradition no longer offers falls away. */
+function cardSamplesDoors(language: CardLanguage): readonly [string, string] | null {
+  if (language === "en") return null;
+  const { doorLeft, doorRight } = CARD_SAMPLES[language];
+  return doorLeft && doorRight ? [doorLeft, doorRight] : null;
+}
+
+/**
+ * The card's languages, main first: any of the card languages, whatever the tradition, as
+ * the host chose them on the language step.
+ */
 export function cardLanguages(draft: InviteDraft): [CardLanguage, ...CardLanguage[]] {
-  const options: readonly CardLanguage[] = languageOptions(draft);
-  const [first, ...rest] = draft.languages.filter((language) => options.includes(language));
-  return first ? [first, ...rest] : ["en"];
+  const [first, ...rest] = draft.languages.filter(
+    (language, i, all) =>
+      (CARD_LANGUAGES as readonly string[]).includes(language) && all.indexOf(language) === i,
+  );
+  return first ? [first, ...rest.slice(0, 1)] : ["en"];
 }
 
 function isSecondLanguage(draft: InviteDraft, language: CardLanguage): boolean {

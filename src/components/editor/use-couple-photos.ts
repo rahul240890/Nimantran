@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
+import { draftCouple } from "@/lib/publish/frames";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { StoryPhoto } from "@/lib/engine/story";
 import type { CardCopy } from "@/lib/templates/content";
@@ -21,7 +22,7 @@ export function useCouplePhotos(
   // A stable value while nothing it shows changes, so the pages don't restart
   const key = JSON.stringify(
     couplePagePhotos(
-      scene ? sceneCouple(draft.couplePhotos) : draft.couplePhotos,
+      scene ? sceneCouple(draftCouple(draft)) : draftCouple(draft),
       ids,
       (id) => urls[id],
       {

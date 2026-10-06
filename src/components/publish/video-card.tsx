@@ -23,6 +23,7 @@ import {
   draftSuite,
   storyFamily,
 } from "@/lib/publish/story";
+import { draftCouple } from "@/lib/publish/frames";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { drawFrame, videoImages } from "@/lib/video/draw";
 import type { VideoFilm } from "@/lib/video/encode";
@@ -320,7 +321,7 @@ export function useVideoFilm(
       words: CARD_STORY_WORDS[language],
       family: storyFamily(draft, language),
       couple: couplePagePhotos(
-        draft.couplePhotos,
+        draftCouple(draft),
         photos.map((photo) => photo.id),
         (id) => photos.find((photo) => photo.id === id)?.url,
         copy,
@@ -343,7 +344,7 @@ export function useVideoFilm(
     const copy = draftCopy(draft, language);
     const suite = draftSuite(draft);
     const scenePhotos = couplePagePhotos(
-      sceneCouple(draft.couplePhotos),
+      sceneCouple(draftCouple(draft)),
       photos.map((photo) => photo.id),
       (id) => photos.find((photo) => photo.id === id)?.url,
       copy,

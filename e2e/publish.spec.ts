@@ -1,5 +1,14 @@
 import { expect, test } from "@playwright/test";
-import { axe, next, noOverflow, numberFor, publish, signIn, writeInvite } from "./invite-helpers";
+import {
+  addDesignPhotos,
+  axe,
+  next,
+  noOverflow,
+  numberFor,
+  publish,
+  signIn,
+  writeInvite,
+} from "./invite-helpers";
 
 /** A mono WAV of a soft tone, `seconds` long, for the music clip tests. */
 function toneWav(seconds: number): Buffer {
@@ -226,7 +235,13 @@ test.describe("publish and share", () => {
     await next(page);
     await next(page);
 
-    await page.getByRole("radio", { name: "ગુજરાતી and English" }).click();
+    // The language step: Gujarati, with English beside it for guests to switch to
+    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked();
+    await page
+      .getByRole("radiogroup", { name: "Add a second language?" })
+      .getByRole("radio", { name: "English" })
+      .click();
+    await next(page);
     await page.locator('[data-slot="first"]').fill("આરવ");
     await page.locator('[data-slot="second"]').fill("મીરા");
     const english = page.getByRole("region", { name: "The card in English" });
@@ -250,6 +265,7 @@ test.describe("publish and share", () => {
     await page.getByRole("option", { name: "10:31 am" }).click();
     await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Hotel Grand Bhagwati, Surat");
     await next(page);
+    await addDesignPhotos(page);
     await next(page);
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
     const path = await publish(page, "aarav-meera-gu");

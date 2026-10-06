@@ -82,11 +82,19 @@ describe("invite draft", () => {
   });
 
   it("lists the steps still to finish", () => {
+    // The wedding's own theme paints a photo frame, so it asks for its photo too
     expect(draftProblems(newDraft()).map((problem) => problem.step)).toEqual([
       "couple",
       "functions",
+      "extras",
     ]);
-    expect(draftProblems(complete())).toEqual([]);
+    expect(draftProblems(complete()).map((problem) => problem.step)).toEqual(["extras"]);
+    const photo = { id: "p1", width: 800, height: 1000 };
+    expect(draftProblems({ ...complete(), photos: [photo] })).toEqual([]);
+    // Once the frames have their own fields, another photo never stands in for one
+    const strict = { ...complete(), photos: [photo] };
+    strict.couplePhotos = { layout: "one", ids: [""], strict: true };
+    expect(draftProblems(strict).map((problem) => problem.step)).toEqual(["extras"]);
   });
 
   it("plays the chosen raga at its own tempo", () => {
@@ -304,13 +312,23 @@ describe("two-language cards", () => {
     };
   };
 
-  it("offer the tradition's language and English, or English and Hindi", () => {
+  it("can be any card language, whatever the tradition", () => {
     expect(cardLanguages(tamil(["ta", "en"]))).toEqual(["ta", "en"]);
     expect(cardLanguages(complete())).toEqual(["en"]);
     expect(cardLanguages({ ...complete(), languages: ["hi", "en"] })).toEqual(["hi", "en"]);
-    // A language the tradition doesn't offer falls away
-    expect(cardLanguages({ ...tamil(["mr", "en"]) })).toEqual(["en"]);
-    expect(cardLanguages({ ...tamil(["mr"]) })).toEqual(["en"]);
+    // A Tamil family can write their card in Marathi, with Gujarati beside it
+    expect(cardLanguages({ ...tamil(["mr", "gu"]) })).toEqual(["mr", "gu"]);
+    expect(cardLanguages({ ...tamil(["mr", "mr"]) })).toEqual(["mr"]);
+  });
+
+  it("write a card in another script than the tradition's in that language's own words", () => {
+    const draft = tamil(["gu"]);
+    const copy = draftCopy({ ...draft, content: {} });
+    // The Gujarati pack's invocation, not the Tamil one in Tamil letters
+    expect(copy.blessing).toBe("॥ શ્રી ગણેશાય નમઃ ॥");
+    // A Marathi card keeps a Hindi family's Devanagari invocation
+    const hindi = { ...draft, tradition: { ...draft.tradition, id: "north-hindu" as const } };
+    expect(draftCopy({ ...hindi, languages: ["mr"] }).blessing).toBe("॥ श्री गणेशाय नमः ॥");
   });
 
   it("draw each language's own words, repeating the main card's where left empty", () => {
