@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SCENE_THEME_IDS, isSceneTheme } from "./catalog";
-import { ENTRANCES, SCENE_SUITES, entranceFor, hasScene, scenePage } from "./scene";
+import { ENTRANCES, SCENE_SUITES, entranceFor, hasScene, sceneFrames, scenePage } from "./scene";
 
 const bottom = ([, y, , height]: readonly number[]) => y! + height!;
 
@@ -12,8 +12,10 @@ describe("One Scene", () => {
     for (const suite of SCENE_SUITES) {
       for (const photos of [0, 1, 2]) {
         const page = scenePage(suite, photos)!;
-        // A Scene theme is painted with one frame
-        expect(page.frames.length).toBe(photos === 2 && !isSceneTheme(suite) ? 2 : 1);
+        // A Scene theme is painted with one frame, or one each for the bride and the groom
+        expect(page.frames.length).toBe(
+          isSceneTheme(suite) ? sceneFrames(suite) : photos === 2 ? 2 : 1,
+        );
         const framesEnd = Math.max(...page.frames.map((frame) => bottom(frame)));
         const boxes = [page.names, page.line, page.slot].filter((box) => box !== null);
         for (const [x, y, width, height] of boxes) {
@@ -45,6 +47,19 @@ describe("One Scene", () => {
       expect((width * page.slot[2]) / 100, suite).toBeGreaterThanOrEqual(45);
       expect((height * page.slot[3]) / 100, suite).toBeGreaterThanOrEqual(12);
     }
+  });
+
+  it("puts the bride's frame on the left and the groom's on the right, apart", () => {
+    const pairs = SCENE_THEME_IDS.filter((suite) => sceneFrames(suite) === 2);
+    expect(pairs).toEqual(
+      expect.arrayContaining(["kadamb-krishna", "gulmohar", "wisteria-tunnel"]),
+    );
+    for (const suite of pairs) {
+      const [bride, groom] = scenePage(suite, 1)!.frames;
+      expect(bride![0] + bride![2], suite).toBeLessThan(groom![0]);
+    }
+    expect(sceneFrames("udaipur-lake")).toBe(1);
+    expect(sceneFrames("kayal")).toBe(1);
   });
 
   it("is only offered on themes that have it", () => {

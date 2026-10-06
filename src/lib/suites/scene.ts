@@ -83,12 +83,14 @@ const SCENES: Partial<Record<Exclude<SuiteId, SceneThemeId>, SceneEntry>> = {
 };
 
 /**
- * A Scene theme's painting: its one frame, the names and line between the frame and the
- * card, and the card (its box on the painting, and the writing area on its face). With
- * no room for the line, the line opens the slot instead.
+ * A Scene theme's painting: its frame, or its two frames (the bride's on the left, the
+ * groom's on the right), the names and line between the frames and the card, and the card
+ * (its box on the painting, and the writing area on its face). With no room for the line,
+ * the line opens the slot instead.
  */
-type PaintedEntry = {
-  frame: FrameBox;
+type PaintedEntry = (
+  { frame: FrameBox; pair?: never } | { pair: readonly [FrameBox, FrameBox]; frame?: never }
+) & {
   names: FrameBox;
   line: FrameBox | null;
   card: FrameBox;
@@ -685,6 +687,283 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
     card: [19.23, 53.36, 61.53, 32],
     text: [9.4, 30.1, 82.1, 57.8],
   },
+  // Radha Krishna above two kadamba frames by the Yamuna
+  "kadamb-krishna": {
+    pair: [
+      [13.3, 19.6, 26.2, 22.7],
+      [60.4, 19.6, 26.2, 22.7],
+    ],
+    names: [10, 46.6, 80, 6.2],
+    line: null,
+    card: [4.14, 54.01, 91.82, 34.03],
+    text: [7.6, 10.7, 84.8, 76.6],
+  },
+  // Ganesha above two marigold arches
+  "ganesh-genda": {
+    pair: [
+      [15.2, 18, 28.6, 25.8],
+      [55.8, 18, 28.7, 25.7],
+    ],
+    names: [10, 45.1, 80, 4.5],
+    line: null,
+    card: [5.31, 50.36, 89.37, 34.45],
+    text: [7.1, 9.6, 85.8, 79.1],
+  },
+  // Sita and Ram above two jaimala frames
+  "siya-ram-mala": {
+    pair: [
+      [14.9, 16.3, 26.8, 23.4],
+      [58.6, 16.3, 26.9, 23.4],
+    ],
+    names: [6, 44.3, 88, 3.3],
+    line: null,
+    card: [4.78, 48.09, 90.65, 38.94],
+    text: [6.8, 8.1, 86.5, 82],
+  },
+  // Shiva and Parvati above two Brahma Kamal frames
+  "kailash-kamal": {
+    pair: [
+      [13.9, 16.8, 27.9, 23.2],
+      [58.1, 16.9, 27.8, 23.1],
+    ],
+    names: [10, 44.3, 80, 5.6],
+    line: null,
+    card: [5.42, 51.08, 89.27, 36.42],
+    text: [8, 10.4, 83.9, 77.5],
+  },
+  // Two lotus frames over the pond
+  "kamal-sarovar": {
+    pair: [
+      [11.6, 9.3, 30.8, 25.8],
+      [57.6, 9.3, 30.8, 25.8],
+    ],
+    names: [10, 39.4, 80, 6.1],
+    line: null,
+    card: [4.57, 46.71, 90.86, 39.71],
+    text: [6.6, 7.9, 86.8, 82.6],
+  },
+  // Two gulmohar frames under the blue sky
+  gulmohar: {
+    pair: [
+      [11.5, 10.4, 31.5, 26.4],
+      [57.2, 10.4, 31.3, 26.3],
+    ],
+    names: [10, 41.3, 80, 6.5],
+    line: null,
+    card: [5.42, 49.28, 89.05, 36.9],
+    text: [5.9, 7.3, 88.2, 83.6],
+  },
+  // Two banyan-root frames hung from the branches
+  "vat-vriksha": {
+    pair: [
+      [12.6, 11.8, 28.2, 23.6],
+      [59.3, 11.8, 28.1, 23.6],
+    ],
+    names: [10, 40.2, 80, 6.5],
+    line: [12, 47, 76, 4.5],
+    card: [5.1, 53.23, 89.8, 35.89],
+    text: [6, 7.7, 88, 82.8],
+  },
+  // Two jasmine frames in the moonlight
+  "mogra-raat": {
+    pair: [
+      [14.5, 10.2, 26.9, 25.5],
+      [58.9, 10.2, 26.8, 25.5],
+    ],
+    names: [10, 41.6, 80, 6.5],
+    line: null,
+    card: [9.03, 50.9, 82.04, 38.58],
+    text: [7.6, 8.4, 84.8, 81.5],
+    dark: true,
+  },
+  // Two tulip frames below the snow peaks
+  "tulip-kashmir": {
+    pair: [
+      [11.3, 9.6, 28.4, 26],
+      [60.4, 9.6, 28.3, 26],
+    ],
+    names: [10, 40.1, 80, 6.5],
+    line: null,
+    card: [6.38, 47.97, 87.25, 39.65],
+    text: [7.4, 8.4, 85.2, 81.4],
+  },
+  // Two wisteria arches in the tunnel
+  "wisteria-tunnel": {
+    pair: [
+      [13.8, 10.1, 27.5, 27.3],
+      [58.7, 10.1, 27.5, 27.3],
+    ],
+    names: [10, 42.8, 80, 6.5],
+    line: null,
+    card: [7.23, 51.56, 85.97, 37.2],
+    text: [6, 7.1, 88, 84.1],
+  },
+  // Two blossom frames hung from the tree of love
+  "prem-vriksh": {
+    pair: [
+      [14, 16, 29.8, 24.9],
+      [56.5, 16, 29.8, 24.8],
+    ],
+    names: [10, 45.4, 80, 6.5],
+    line: null,
+    card: [5.1, 53.23, 89.69, 33.13],
+    text: [6.8, 9.6, 86.5, 78.8],
+  },
+  // Two amaltas arches, one higher than the other
+  amaltas: {
+    pair: [
+      [19.6, 18.9, 23.6, 23.3],
+      [58.1, 10, 23.4, 23.3],
+    ],
+    names: [10, 46.6, 80, 6.5],
+    line: null,
+    card: [5.84, 54.43, 88.84, 31.94],
+    text: [6.3, 9, 87.4, 79.9],
+  },
+  // Two palash frames in the forest
+  "palash-van": {
+    pair: [
+      [11.4, 8.3, 29.9, 27.5],
+      [57.6, 8.3, 30, 27.5],
+    ],
+    names: [10, 40.4, 80, 6.5],
+    line: [12, 47.2, 76, 4.5],
+    card: [5.43, 53.11, 89.26, 32.78],
+    text: [7.4, 10.6, 85.1, 76.8],
+  },
+  // Two parijat frames, one higher than the other
+  "parijat-angan": {
+    pair: [
+      [18.4, 9.6, 25.6, 21.5],
+      [56.7, 18.6, 24.5, 20.9],
+    ],
+    names: [10, 43.8, 80, 5.3],
+    line: null,
+    card: [6.8, 49.88, 86.08, 37.38],
+    text: [6.9, 8.2, 86.4, 81.9],
+  },
+  // Two mango-leaf frames in the orchard
+  "aam-bagiya": {
+    pair: [
+      [13, 14.2, 27.7, 25],
+      [58.8, 9.3, 27.1, 25.2],
+    ],
+    names: [10, 45.1, 80, 6.5],
+    line: null,
+    card: [6.48, 54.43, 87.04, 31.94],
+    text: [6.2, 8.6, 87.7, 80.7],
+  },
+  // Two banana-leaf arches strung with jasmine
+  "vazhai-mandap": {
+    pair: [
+      [14.1, 11.1, 26.6, 25.7],
+      [57.5, 17.3, 27.8, 24.8],
+    ],
+    names: [10, 45.7, 80, 3.4],
+    line: null,
+    card: [5.74, 49.94, 88.42, 36.24],
+    text: [6.2, 7.8, 87.7, 82.6],
+  },
+  // Two peacock-feather frames, one higher than the other
+  "mor-bagh": {
+    pair: [
+      [14.6, 8.6, 28.9, 23.4],
+      [57.8, 14.9, 28.8, 23.1],
+    ],
+    names: [10, 42.3, 80, 6.3],
+    line: null,
+    card: [10.31, 49.76, 79.28, 34.87],
+    text: [8.4, 10, 83.2, 78.2],
+  },
+  // Two orchid frames by the waterfall
+  "orchid-meghalaya": {
+    pair: [
+      [14.9, 9.9, 24.8, 20.5],
+      [60.8, 17.1, 25.6, 20.5],
+    ],
+    names: [10, 43.2, 80, 6.5],
+    line: null,
+    card: [5.21, 52.15, 89.48, 32.12],
+    text: [6.2, 9, 87.5, 80],
+  },
+  // Two rhododendron frames, one higher than the other
+  "rhododendron-himalaya": {
+    pair: [
+      [17.5, 17.3, 25.1, 21.8],
+      [59.3, 9, 25.7, 21.8],
+    ],
+    names: [10, 43.4, 80, 6.2],
+    line: null,
+    card: [7.44, 50.78, 84.91, 36.42],
+    text: [7.4, 9, 85.2, 80.3],
+  },
+  // Two sunflower frames over the field
+  "sunflower-haldi": {
+    pair: [
+      [13.1, 14.2, 27.2, 22.6],
+      [60.7, 8, 26.9, 23],
+    ],
+    names: [10, 41.9, 80, 6.5],
+    line: null,
+    card: [7.01, 50.48, 85.97, 35.47],
+    text: [6.7, 8.4, 86.5, 81.3],
+  },
+  // Two lavender frames tied with a ribbon
+  "lavender-field": {
+    pair: [
+      [13.1, 11.8, 30.4, 25.3],
+      [59.4, 16, 29.6, 24.6],
+    ],
+    names: [10, 44.9, 80, 5.1],
+    line: null,
+    card: [4.78, 51.2, 90.44, 33.01],
+    text: [6.9, 9.8, 86.2, 78.4],
+  },
+  // Two hydrangea frames by the lake
+  "hydrangea-blue": {
+    pair: [
+      [15.4, 16.6, 27.3, 23.7],
+      [58.4, 8, 27.2, 24.3],
+    ],
+    names: [10, 44.9, 80, 4.8],
+    line: null,
+    card: [7.86, 50.54, 85.44, 36.24],
+    text: [6, 7.8, 86.7, 82.6],
+  },
+  // Two peony frames in the garden
+  "peony-blush": {
+    pair: [
+      [14.9, 13.2, 27.5, 21.2],
+      [58.6, 16.2, 28.4, 21.1],
+    ],
+    names: [10, 41.6, 80, 5.9],
+    line: null,
+    card: [8.93, 48.74, 82.15, 38.04],
+    text: [5.1, 5.5, 89.8, 87.4],
+  },
+  // Two magnolia frames under the moon
+  "magnolia-moon": {
+    pair: [
+      [13.3, 9.8, 29.8, 24],
+      [57.3, 17.9, 28.9, 23.2],
+    ],
+    names: [10, 46.3, 80, 4.9],
+    line: null,
+    card: [8.71, 52.03, 82.89, 38.46],
+    text: [7.1, 8, 85.8, 82.4],
+    dark: true,
+  },
+  // Two orchid frames under the floral chandelier
+  "phool-chandelier": {
+    pair: [
+      [14.3, 18.7, 24.9, 21.2],
+      [61.8, 11, 25.6, 22.1],
+    ],
+    names: [10, 44.8, 80, 6.5],
+    line: null,
+    card: [12.01, 53.05, 75.56, 34.63],
+    text: [7.1, 8, 86.5, 82.2],
+  },
 };
 
 export type ScenePage = {
@@ -702,13 +981,13 @@ export type ScenePage = {
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
   if (isSceneTheme(suite)) {
     // One frame: with two photos, the first (the couple, or the bride) shows
-    const { frame, names, line, card, text, dark, plate } = PAINTED[suite];
+    const { frame, pair, names, line, card, text, dark, plate } = PAINTED[suite];
     return {
       image: `/suites/${suite}/scene.webp`,
       style: "painted",
       dark: Boolean(dark),
       card: { image: `/suites/${suite}/card.webp`, text, plate: Boolean(plate) },
-      frames: [frame],
+      frames: pair ?? [frame],
       names,
       line,
       slot: card,
@@ -727,6 +1006,11 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
     dark: false,
     ...layout,
   };
+}
+
+/** How many photos a Scene theme's painting has frames for: one, or the bride's and the groom's. */
+export function sceneFrames(suite: SuiteId): 1 | 2 {
+  return isSceneTheme(suite) && PAINTED[suite].pair ? 2 : 1;
 }
 
 /** Whether a theme can be shown as one scene. */
