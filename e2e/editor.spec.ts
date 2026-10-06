@@ -182,6 +182,30 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
   });
 
+  test("the details are one page whose parts fold to what's in them", async ({ page }) => {
+    await page.goto("/create?quality=2d");
+    for (let i = 0; i < 4; i++) await next(page);
+    const parts = page.getByRole("group", { name: "Your details, in three parts" });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await expect(parts.getByRole("button", { name: /^Photos & music: / })).toBeVisible();
+
+    await fillCouple(page);
+    await next(page);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "When and where is everything?",
+    );
+    const couple = parts.getByRole("button", { name: "Couple: Aditya & Priya, done. Open" });
+    await expect(couple).toBeVisible();
+    await expect(parts.getByRole("button", { name: /^Functions: / })).toHaveCount(0);
+
+    // Any part opens with one tap, without walking through the others
+    await parts.getByRole("button", { name: /^Photos & music: / }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Make it yours");
+    await expect(parts.getByRole("button", { name: /^Functions: .*needs a look/ })).toBeVisible();
+    await parts.getByRole("button", { name: /^Couple: / }).click();
+    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
+  });
+
   test("a design chosen on the landing page starts the invite", async ({ page }) => {
     await page.goto("/create?quality=2d&template=kasavu");
     await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).toBeChecked();

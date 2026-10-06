@@ -1,7 +1,5 @@
 "use client";
 
-import { TierBadge } from "@/components/pricing/tier-badge";
-import { draftDesignId } from "@/lib/plans/design-defaults";
 import type { InviteFormat } from "@/lib/editor/formats";
 import {
   ArrowLeft,
@@ -49,6 +47,8 @@ import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PublishButton } from "@/components/publish/publish-button";
 import { PreviewStage } from "./preview-stage";
+import { DesignBar } from "./design-bar";
+import { DETAIL_STEPS, SectionMark, SectionRow, isDetailStep } from "./detail-sections";
 import "@/components/invitation/type/fonts.css";
 import { CoupleStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
@@ -70,15 +70,16 @@ const WIDE = "(min-width: 64rem)";
 const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions", "extras"]);
 
 /*
- * The progress shows five stages, not eight steps: choosing the occasion, tradition, design
- * and the card's language is one stage, Design. A host arriving from the gallery starts on
- * its last step, the language, with the design already chosen.
+ * The progress shows three stages, not eight steps: pick a design (occasion, tradition,
+ * design and the card's language), add your details (names, functions, photos and music,
+ * as three parts of one page), then preview and share. A host arriving from the gallery
+ * starts on the design stage's last step, the language, with the design already chosen.
  */
-const STAGES = ["design", "couple", "functions", "extras", "preview"] as const;
+const STAGES = ["design", "details", "preview"] as const;
 const SETUP = new Set<EditorStep>(["occasion", "tradition", "design", "language"]);
 /** The steps where the design is still being picked; past them, it shows with a way back. */
 const PICKING = new Set<EditorStep>(["occasion", "tradition", "design"]);
-const stageOf = (step: EditorStep) => (SETUP.has(step) ? 0 : STAGES.indexOf(step as never));
+const stageOf = (step: EditorStep) => (SETUP.has(step) ? 0 : isDetailStep(step) ? 1 : 2);
 const MINI_HIDDEN_KEY = "shubhdwar-editor-mini-hidden";
 
 /** Whether the floating preview is hidden, remembered on this device. */
@@ -217,15 +218,7 @@ export function Editor({
   /** ?invite= named an invite this person can't open. */
   missing?: boolean;
 }) {
-  const {
-    editor,
-    previewCopy,
-    stepCopy: baseSteps,
-    namesCopy,
-    syncCopy,
-    suiteCopy,
-    designCopy,
-  } = useText(editorText);
+  const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
   const { publishCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
   const { draft, save } = useSyncExternalStore(
@@ -430,6 +423,51 @@ export function Editor({
     />
   );
 
+  // The step's title: numbered within the details, under a small label elsewhere
+  const intro = (number: number | null) => (
+    <div key={`${step}-title`} className="flex animate-rise flex-col gap-2 pb-6">
+      <div className={cn("flex flex-col gap-2", miniShown && "max-lg:pe-[6.5rem]")}>
+        {number === null ? (
+          <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
+            {copy.eyebrow}
+          </p>
+        ) : (
+          <p className="flex items-center gap-2.5 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
+            <SectionMark number={number} active />
+            {copy.eyebrow}
+          </p>
+        )}
+        <h1
+          ref={heading}
+          tabIndex={-1}
+          className="font-display text-[2rem] leading-[1.08] outline-none sm:text-[2.6rem]"
+        >
+          {copy.title}
+        </h1>
+      </div>
+      <p className="max-w-xl text-ink-muted">{copy.intro}</p>
+    </div>
+  );
+  const content = (
+    <div key={step} className="flex-1 animate-rise pb-8">
+      {step === "occasion" && <OccasionStep {...props} />}
+      {step === "tradition" && <TraditionStep {...props} />}
+      {step === "design" && <DesignStep {...props} />}
+      {step === "language" && <LanguageStep {...props} />}
+      {step === "couple" && <CoupleStep {...props} />}
+      {step === "functions" && <FunctionsStep {...props} />}
+      {step === "extras" && <ExtrasStep {...props} />}
+      {step === "preview" && (
+        <PreviewStep
+          {...props}
+          onReset={() => void reset()}
+          signedIn={signedIn}
+          keepsInvite={keepsInvite}
+        />
+      )}
+    </div>
+  );
+
   return (
     // Clipped sideways as a safety net: nothing here may widen the page on a phone
     <div className="flex min-h-dvh flex-col overflow-x-clip">
@@ -455,10 +493,10 @@ export function Editor({
       </header>
 
       <main className="mx-auto flex w-full max-w-[90rem] flex-1 flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        {/* On phones the floating preview sits beside the progress and the step's title */}
+        {/* On phones the floating preview sits beside the progress and the chosen design */}
         <div className={cn(miniShown && "max-lg:pe-[6.5rem]")}>
           <Stepper
-            steps={STAGES.map((id) => ({ id, label: stepCopy[id].label }))}
+            steps={STAGES.map((id) => ({ id, label: editor.stages[id] }))}
             current={stageOf(step)}
             label={editor.progressLabel}
             progressText={editor.progress(stageOf(step) + 1, STAGES.length)}
@@ -468,58 +506,14 @@ export function Editor({
 
         <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
           <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
-            <div
-              key={step}
-              className={cn(
-                "flex animate-rise flex-col gap-2 pb-6",
-                miniShown && "max-lg:pe-[6.5rem]",
-              )}
-            >
-              {/* Past the design: what was chosen, with the way back to change it */}
-              {!PICKING.has(step) && (
-                <div className="-mt-2 mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-                  <span className="text-ink-muted">
-                    {editor.designChosen}:{" "}
-                    <span className="font-semibold text-ink">
-                      {draft.suite && draft.suite !== "classic"
-                        ? suiteCopy.names[draft.suite]
-                        : designCopy[draft.templateId].name}
-                    </span>
-                  </span>
-                  <TierBadge designId={draftDesignId(draft)} variant="plain" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => goTo("design")}
-                    className="-ms-2 text-accent-text"
-                  >
-                    {editor.changeDesign}
-                  </Button>
-                </div>
-              )}
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                {copy.eyebrow}
-              </p>
-              <h1
-                ref={heading}
-                tabIndex={-1}
-                className="font-display text-[2rem] leading-[1.08] outline-none sm:text-[2.6rem]"
-              >
-                {copy.title}
-              </h1>
-              {/* The intro starts below the floating preview, so it takes the full width back */}
-              <p className={cn("max-w-xl text-ink-muted", miniShown && "max-lg:-me-[6.5rem]")}>
-                {copy.intro}
-              </p>
-            </div>
-
-            {/* Phones and tablets see the card inline on the last step */}
-            {!wide && last && (
-              <section aria-label={editor.preview} className="mb-8">
-                {preview("h-[min(78svh,40rem)] min-h-[28rem]")}
-              </section>
+            {/* Past the design: what was chosen, with the way back to change it */}
+            {!PICKING.has(step) && (
+              <DesignBar
+                draft={draft}
+                onChange={() => goTo("design")}
+                className={cn("mb-5", miniShown && "max-lg:pe-[6.5rem]")}
+              />
             )}
-
             <form
               ref={form}
               noValidate
@@ -536,23 +530,49 @@ export function Editor({
               }}
               className="flex flex-1 flex-col"
             >
-              <div key={step} className="flex-1 animate-rise pb-8">
-                {step === "occasion" && <OccasionStep {...props} />}
-                {step === "tradition" && <TraditionStep {...props} />}
-                {step === "design" && <DesignStep {...props} />}
-                {step === "language" && <LanguageStep {...props} />}
-                {step === "couple" && <CoupleStep {...props} />}
-                {step === "functions" && <FunctionsStep {...props} />}
-                {step === "extras" && <ExtrasStep {...props} />}
-                {step === "preview" && (
-                  <PreviewStep
-                    {...props}
-                    onReset={() => void reset()}
-                    signedIn={signedIn}
-                    keepsInvite={keepsInvite}
-                  />
-                )}
-              </div>
+              {isDetailStep(step) ? (
+                // The details: three parts of one page, the open one in full, the others
+                // folded to a line that says what's in them
+                <div
+                  role="group"
+                  aria-label={editor.sections.label}
+                  className="flex flex-1 flex-col gap-3 pb-8"
+                >
+                  {DETAIL_STEPS.map((part, at) =>
+                    part === step ? (
+                      <div
+                        key={part}
+                        aria-current="step"
+                        className="flex flex-col border-y border-line bg-surface/70 px-4 pt-5 max-sm:-mx-4 sm:rounded-xl sm:border sm:p-6 sm:shadow-raised lg:p-8"
+                      >
+                        {intro(at + 1)}
+                        {content}
+                      </div>
+                    ) : (
+                      <div key={part}>
+                        <SectionRow
+                          draft={draft}
+                          part={part}
+                          current={step}
+                          label={stepCopy[part].label}
+                          onOpen={() => goTo(part)}
+                        />
+                      </div>
+                    ),
+                  )}
+                </div>
+              ) : (
+                <>
+                  {intro(null)}
+                  {/* Phones and tablets see the card inline on the last step */}
+                  {!wide && last && (
+                    <section aria-label={editor.preview} className="mb-8">
+                      {preview("h-[min(78svh,40rem)] min-h-[28rem]")}
+                    </section>
+                  )}
+                  {content}
+                </>
+              )}
 
               {errorCount > 0 && (
                 <p
