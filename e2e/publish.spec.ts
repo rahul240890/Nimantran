@@ -306,9 +306,6 @@ test.describe("publish and share", () => {
     await expect(story.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
     await expect(story.getByText("આરવ")).toBeVisible();
     await guest.keyboard.press("ArrowRight");
-    // The design's own photo frame comes after the cover
-    await expect(story).toHaveAttribute("data-story-beat", "couple");
-    await guest.keyboard.press("ArrowRight");
     await expect(story).toHaveAttribute("data-story-beat", "family");
     await guest.keyboard.press("ArrowRight");
     await expect(story).toHaveAttribute("data-story-beat", "fn-wedding");
