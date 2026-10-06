@@ -13,19 +13,19 @@ import { uiText } from "@/i18n/copy/ui";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
-import { remaining, todayInIndia } from "@/lib/publish/countdown";
-import { textArea } from "@/lib/suites/areas";
-import { SUITES, paintedTone, type SuiteId } from "@/lib/suites/catalog";
+import type { OpeningGod, OpeningStyle } from "@/lib/opening/catalog";
+import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
+import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import { lettering, type TypeRole } from "@/lib/suites/lettering";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
-import { daysBetween } from "@/lib/publish/countdown";
-import { lettering, type TypeRole } from "@/lib/suites/lettering";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 
-/** How long the doors take to swing open before the pages come in. */
-const OPEN_MS = 1100;
+/** How long the opening takes to open before the pages come in. */
+export const OPEN_MS = 1500;
 
 const noSubscribe = () => () => {};
 
@@ -86,22 +86,22 @@ function Countdown({
       role="timer"
       aria-label={`${label}: ${summary}`}
       data-testid="door-countdown"
-      className="flex animate-fade-in items-stretch gap-2 motion-still:animate-none"
+      className="flex animate-fade-in items-stretch gap-[min(0.5rem,1.8cqw)] motion-still:animate-none"
     >
       {cells.map(([value, unit]) => (
         <span
           key={unit}
           aria-hidden
-          className="flex min-w-[4.25rem] flex-col items-center rounded-xl border border-card-ivory/30 bg-night/35 px-2.5 pt-2 pb-1.5 backdrop-blur-sm"
+          className="flex min-w-[min(4.1rem,19cqw)] flex-col items-center rounded-xl border border-card-ivory/30 bg-night/40 px-[min(0.625rem,1.6cqw)] pt-2 pb-1.5 backdrop-blur-sm [@media(max-height:640px)]:pt-1.5 [@media(max-height:640px)]:pb-1"
         >
-          <span className="font-display text-[1.9rem] leading-none text-card-ivory tabular-nums">
+          <span className="font-display text-[1.8rem] leading-none text-card-ivory tabular-nums [@media(max-height:640px)]:text-[1.45rem]">
             {String(value).padStart(2, "0")}
           </span>
           <span
             lang={lang}
             className={cn(
-              "mt-1 text-[0.7rem] text-card-ivory/85",
-              lang === "en" && "font-label tracking-[0.18em] uppercase",
+              "mt-1 text-[min(0.7rem,3.2cqw)] text-card-ivory/85",
+              lang === "en" && "font-label tracking-[0.14em] uppercase",
             )}
           >
             {unit}
@@ -118,7 +118,7 @@ function GuestGreeting({ name, lang }: { name: string; lang: CardLanguage }) {
   return (
     <p
       lang={lang}
-      className="flex max-w-full animate-[pop-in_900ms_ease-out_both] flex-col items-center gap-1 text-center text-card-ivory motion-still:animate-none"
+      className="flex max-w-full animate-[pop-in_900ms_ease-out_both] flex-col items-center gap-0.5 text-center text-card-ivory motion-still:animate-none"
     >
       <span
         className={cn(
@@ -128,7 +128,7 @@ function GuestGreeting({ name, lang }: { name: string; lang: CardLanguage }) {
       >
         {words.dear}
       </span>
-      <span className="max-w-[20ch] font-display text-[clamp(1.6rem,8vw,2.4rem)] leading-tight break-words">
+      <span className="max-w-[20ch] font-display text-[clamp(1.4rem,7vw,2.1rem)] leading-tight break-words">
         {name}
       </span>
       <span className="text-sm text-card-ivory/85">{words.invited}</span>
@@ -136,36 +136,21 @@ function GuestGreeting({ name, lang }: { name: string; lang: CardLanguage }) {
   );
 }
 
-/**
- * The guest's first screen for a painted theme (Step 12o): the theme's cover painting as a
- * doorway, the couple's names printed on it in the card's language, and a countdown to the
- * main event. Opening it swings the two halves of the painting apart and the event pages
- * come in; closing the pages shuts the doors again.
- */
-export function Doorway({
-  suite,
-  template,
-  copy,
-  lang,
-  languages,
-  onLanguage,
-  beats,
-  textBox,
-  type,
-  main,
-  reply,
-  music,
-  musicOnOpen,
-  guest,
-}: {
+/** The first letters of the names, for the envelope's wax seal. */
+function initials(copy: CardCopy): string {
+  const first = Array.from(copy.first.trim())[0] ?? "";
+  const second = Array.from(copy.second.trim())[0] ?? "";
+  return second ? `${first}${second}` : first;
+}
+
+export type OpeningProps = {
   suite: SuiteId;
-  template: Template;
+  style: OpeningStyle;
+  god: OpeningGod | null;
   copy: CardCopy;
   lang: CardLanguage;
   languages: readonly CardLanguage[];
   onLanguage: (language: CardLanguage) => void;
-  beats: readonly StoryBeat[];
-  textBox: boolean;
   type: PageType;
   /** The main event's date and start, for the countdown; null without a date. */
   main: { date: string; at: number } | null;
@@ -173,17 +158,45 @@ export function Doorway({
   /** The page's music, shared with the player further down. */
   music: RagaMusic;
   musicOnOpen: boolean;
-  /** The guest's name when they came by their own link: the doorway greets them first. */
+  /** The guest's name when they came by their own link: the opening greets them first. */
   guest: string | null;
-}) {
+  /** What comes once it opens: the event pages, or (for One Scene) the page behind it. */
+  after:
+    | { kind: "pages"; template: Template; beats: readonly StoryBeat[]; textBox: boolean }
+    | { kind: "enter"; onEnter: () => void };
+};
+
+/**
+ * The guest's first screen (Step 12x): a full-height opening in the style the host chose,
+ * with the god or symbol they chose top-centre, the names, and a countdown to the main
+ * event. Opening it plays the style's move (doors swing, curtains gather, the flap lifts,
+ * the lotus blooms), petals fall, and the invitation comes in.
+ */
+export function Opening({
+  suite,
+  style,
+  god,
+  copy,
+  lang,
+  languages,
+  onLanguage,
+  type,
+  main,
+  reply,
+  music,
+  musicOnOpen,
+  guest,
+  after,
+}: OpeningProps) {
   const { guestCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
   const still = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [pages, setPages] = useState(false);
   const theme = SUITES[suite];
-  const cover = theme.images.cover!;
-  const area = textArea(suite, "cover");
+  const cover = theme.images.cover;
+  const painted = style === "doors" && Boolean(cover);
+  const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
   const face = (role: TypeRole, own: string | undefined): CSSProperties => {
@@ -196,10 +209,21 @@ export function Doorway({
   };
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
 
-  // The pages follow the doors; in still mode they come at once
+  // The invitation follows the opening; in still mode it comes at once
+  const latest = useRef(after);
+  useEffect(() => {
+    latest.current = after;
+  });
   useEffect(() => {
     if (!open || pages) return;
-    const timer = window.setTimeout(() => setPages(true), still ? 0 : OPEN_MS);
+    const timer = window.setTimeout(
+      () => {
+        const next = latest.current;
+        if (next.kind === "enter") next.onEnter();
+        else setPages(true);
+      },
+      still ? 0 : OPEN_MS,
+    );
     return () => window.clearTimeout(timer);
   }, [open, pages, still]);
 
@@ -222,94 +246,88 @@ export function Doorway({
     setOpen(false);
   };
 
-  const door = (side: "left" | "right") => (
-    <div
-      aria-hidden
-      className={cn(
-        "absolute inset-y-0 w-1/2 overflow-hidden [backface-visibility:hidden]",
-        "transition-transform duration-[1100ms] ease-[cubic-bezier(0.7,0,0.25,1)] motion-still:transition-none",
-        side === "left" ? "left-0 origin-left" : "right-0 origin-right",
-      )}
-      style={{
-        transform: open ? `rotateY(${side === "left" ? -104 : 104}deg)` : undefined,
-      }}
-    >
-      <div className={cn("absolute inset-y-0 w-[200%]", side === "left" ? "left-0" : "right-0")}>
-        <Image
-          src={cover}
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 40rem) 32rem, 100vw"
-          className="object-cover"
-        />
-      </div>
-      {/* The seam where the two halves meet */}
-      <span
-        className={cn(
-          "absolute inset-y-0 w-px bg-card-gold/50",
-          side === "left" ? "right-0" : "left-0",
-        )}
-      />
-    </div>
-  );
-
   return (
     <section
       aria-labelledby="guest-names"
       data-suite={suite}
       data-mood="dusk"
       data-doorway={open ? "open" : "closed"}
+      data-opening={style}
       style={{ "--story-scale": type.scale } as CSSProperties}
-      className="relative isolate flex min-h-svh items-center justify-center overflow-hidden bg-suite-near sm:py-6"
+      className="opening-page relative isolate flex min-h-svh items-center justify-center overflow-hidden sm:py-6"
     >
-      {/* The painting again, softly, filling a wide screen around the doorway */}
+      {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        <Image src={cover} alt="" fill sizes="100vw" className="scale-110 object-cover blur-2xl" />
-        <div className="absolute inset-0 bg-night/45" />
+        {cover ? (
+          <Image
+            src={cover}
+            alt=""
+            fill
+            sizes="100vw"
+            className="scale-110 object-cover blur-2xl"
+          />
+        ) : null}
+        <div className="opening-surround absolute inset-0" />
       </div>
 
-      <div className="relative h-svh w-full overflow-hidden [perspective:1600px] sm:aspect-[9/16] sm:h-[min(calc(100svh-3rem),58rem)] sm:w-auto sm:rounded-[1.75rem] sm:border sm:border-card-ivory/40 sm:shadow-overlay">
-        {/* The light beyond the doors */}
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 70%, var(--suite-plate)), var(--suite-near))",
-          }}
-        />
-        {door("left")}
-        {door("right")}
+      <div
+        data-open={open}
+        className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:h-[min(calc(100svh-3rem),58rem)] sm:w-auto sm:rounded-[1.75rem] sm:border sm:border-card-ivory/40 sm:shadow-overlay"
+      >
+        <OpeningArt style={style} cover={cover} seal={initials(copy)} />
+        {open && !still && <OpeningPetals />}
 
-        <div
-          className={cn(
-            "absolute inset-0 transition-opacity duration-500 motion-still:transition-none",
-            open && "pointer-events-none opacity-0",
+        <div className="absolute inset-0 z-30 flex flex-col">
+          {languages.length > 1 && (
+            <div className="opening-fade absolute inset-x-0 top-0 z-10 flex justify-center pt-[max(0.75rem,env(safe-area-inset-top))]">
+              <CardLanguageToggle
+                label={guestCopy.cardLanguage}
+                languages={languages}
+                value={lang}
+                onValueChange={onLanguage}
+              />
+            </div>
           )}
-        >
-          {/* The names, printed on the painting's calm space like the pages inside */}
+
+          {/* The god or symbol, top-centre, never under the words */}
           <div
-            className="[container-type:size] absolute flex items-center justify-center"
+            className={cn(
+              "opening-crest flex flex-none items-end justify-center px-[10cqw] pb-[1.5cqh]",
+              languages.length > 1 ? "pt-[max(3.75rem,8cqh)]" : "pt-[max(1.5rem,5cqh)]",
+            )}
             style={{
-              top: `${area.top}%`,
-              bottom: `${area.bottom}%`,
-              left: `${area.left}%`,
-              right: `${area.right}%`,
+              height:
+                god || style === "envelope"
+                  ? `${layout.crest + (languages.length > 1 ? 4 : 0)}%`
+                  : undefined,
             }}
           >
+            {god && <GodCrest god={god} />}
+          </div>
+          <div aria-hidden className="flex-none" style={{ height: `${layout.gap}%` }} />
+
+          {/* The names, on a plate (drawn styles) or printed on the painting (its own doors) */}
+          <div className="relative flex min-h-0 flex-1 items-center justify-center px-[7cqw]">
+            {style === "lotus" && <LotusBloom />}
             <div
               lang={lang}
-              data-tone={paintedTone("cover", suite)}
-              className="story-print isolate flex max-h-full w-full flex-col items-center gap-[2cqmin] px-[4cqmin] text-center text-card-ink"
+              data-tone={painted ? "light" : undefined}
+              className={cn(
+                "opening-fade relative isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
+                painted
+                  ? "story-print w-full px-[3cqw]"
+                  : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
+              )}
             >
-              <span
-                aria-hidden
-                className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
-              />
+              {painted && (
+                <span
+                  aria-hidden
+                  className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
+                />
+              )}
               {copy.blessing && (
                 <p
-                  className="text-[clamp(1.1rem,6cqmin,2rem)] text-card-accent-text"
+                  className="text-[clamp(0.85rem,4.2cqw,1.5rem)] text-card-accent-text"
                   style={face("script", type.words)}
                 >
                   {copy.blessing}
@@ -325,15 +343,15 @@ export function Doorway({
                   color: type.colour,
                 }}
               >
-                <span className="text-[length:calc(clamp(2.3rem,13cqmin,4.4rem)*var(--story-scale,1))]">
+                <span className="text-[length:calc(clamp(1.7rem,min(10cqw,6cqh),3.6rem)*var(--story-scale,1))]">
                   {copy.first}
                 </span>{" "}
                 {joiner && (
                   <>
-                    <span className="text-[length:calc(clamp(1.3rem,7cqmin,2.4rem)*var(--story-scale,1))] text-card-accent-text">
+                    <span className="text-[length:calc(clamp(1.1rem,min(6cqw,4cqh),2.2rem)*var(--story-scale,1))] text-card-accent-text">
                       {joiner}
                     </span>{" "}
-                    <span className="text-[length:calc(clamp(2.3rem,13cqmin,4.4rem)*var(--story-scale,1))]">
+                    <span className="text-[length:calc(clamp(1.7rem,min(10cqw,6cqh),3.6rem)*var(--story-scale,1))]">
                       {copy.second}
                     </span>
                   </>
@@ -341,7 +359,7 @@ export function Doorway({
               </h1>
               {copy.date && (
                 <p
-                  className="text-[clamp(0.95rem,4.4cqmin,1.3rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
+                  className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
                   style={face("body", type.words)}
                 >
                   {copy.date}
@@ -350,19 +368,8 @@ export function Doorway({
             </div>
           </div>
 
-          {languages.length > 1 && (
-            <div className="absolute inset-x-0 top-0 flex justify-center pt-[max(0.75rem,env(safe-area-inset-top))]">
-              <CardLanguageToggle
-                label={guestCopy.cardLanguage}
-                languages={languages}
-                value={lang}
-                onValueChange={onLanguage}
-              />
-            </div>
-          )}
-
-          {/* The countdown and the way in, over the painting's ground */}
-          <div className="absolute inset-x-0 bottom-0 flex flex-col items-center gap-4 bg-linear-to-t from-night/90 via-night/60 to-transparent px-4 pt-20 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+          {/* The countdown and the way in, over the ground */}
+          <div className="opening-fade flex flex-none flex-col items-center gap-3 bg-linear-to-t from-night/90 via-night/65 to-transparent px-4 pt-10 pb-[max(1rem,env(safe-area-inset-bottom))] [@media(min-height:700px)]:gap-4">
             {guest && <GuestGreeting name={guest} lang={lang} />}
             {main && (
               <Countdown
@@ -379,6 +386,7 @@ export function Doorway({
                 leadingIcon={<DoorOpen aria-hidden />}
                 onClick={enter}
                 aria-expanded={open}
+                disabled={open}
               >
                 {guestCopy.doorway.open}
               </Button>
@@ -402,13 +410,13 @@ export function Doorway({
         </div>
       </div>
 
-      {pages && (
+      {pages && after.kind === "pages" && (
         <StoryPlayer
-          beats={beats}
+          beats={after.beats}
           copy={copy}
-          template={template}
+          template={after.template}
           suite={suite}
-          textBox={textBox}
+          textBox={after.textBox}
           type={type}
           still={still}
           labels={uiStrings.invitation.story}
@@ -424,5 +432,47 @@ export function Doorway({
         />
       )}
     </section>
+  );
+}
+
+/**
+ * The opening on its own, small and without words, for the host's choice in the editor:
+ * it plays its opening move while chosen (and stays still in still mode).
+ */
+export function OpeningSample({
+  suite,
+  style,
+  god,
+  open,
+  seal,
+}: {
+  suite: SuiteId;
+  style: OpeningStyle;
+  god: OpeningGod | null;
+  open: boolean;
+  seal: string;
+}) {
+  const layout = OPENING_LAYOUT[style];
+  return (
+    <div
+      data-suite={suite}
+      data-opening={style}
+      className="opening-page relative aspect-[9/16] w-full overflow-hidden rounded-lg"
+    >
+      <div data-open={open} className="opening-stage [container-type:size] absolute inset-0">
+        <OpeningArt style={style} cover={SUITES[suite].images.cover} seal={seal} />
+        <div className="absolute inset-0 z-30 flex flex-col">
+          <div
+            className="opening-crest flex flex-none items-end justify-center px-[10cqw] pt-[5cqh] pb-[1.5cqh]"
+            style={{ height: god || style === "envelope" ? `${layout.crest}%` : undefined }}
+          >
+            {god && <GodCrest god={god} />}
+          </div>
+          <div className="relative flex min-h-0 flex-1 items-center justify-center">
+            {style === "lotus" && <LotusBloom />}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

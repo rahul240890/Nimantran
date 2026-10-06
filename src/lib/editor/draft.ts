@@ -28,6 +28,7 @@ import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
 import { noPages } from "./pages";
 import { defaultType } from "./type";
+import { noOpening } from "@/lib/opening/catalog";
 import type {
   DraftTradition,
   EventFunction,
@@ -119,6 +120,7 @@ export function newDraft(
     type: defaultType,
     couplePhotos: noCouplePhotos,
     blessingPage: true,
+    opening: noOpening,
     format: "story",
     family: noFamily,
     pages: noPages,

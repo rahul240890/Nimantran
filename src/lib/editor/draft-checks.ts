@@ -1,5 +1,6 @@
 import { draftFrameSlots } from "@/lib/publish/frames";
 import { INVITE_FORMATS } from "./formats";
+import { OPENING_GODS, OPENING_STYLES, noOpening } from "@/lib/opening/catalog";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
@@ -218,6 +219,13 @@ export const draftSchema = z.object({
   format: z.enum(INVITE_FORMATS).catch("story"),
   /** Open with the theme's painted god, where it has one (Step 12r). */
   blessingPage: z.boolean().catch(true),
+  /** The guest's first screen and the god above it (Step 12x); see lib/opening. */
+  opening: z
+    .object({
+      style: z.enum(OPENING_STYLES).nullable().catch(null),
+      god: z.enum(OPENING_GODS).nullable().catch(null),
+    })
+    .catch(noOpening),
   /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
   family: familySchema.catch(noFamily),
   /** The host's own words and placement on each page (Step 12s); see ./pages.ts. */

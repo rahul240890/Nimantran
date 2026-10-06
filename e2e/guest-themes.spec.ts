@@ -106,6 +106,9 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
     test(`${suite} as One Scene, ${colorScheme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
       await page.goto(`/engine/guest?suite=${suite}&format=scene&photos=2`);
+      // A Scene opens behind palace gates too, unless the host chose to go straight in
+      await expect(page.locator("[data-opening]")).toHaveAttribute("data-opening", "palace");
+      await page.getByRole("button", { name: "Open the invitation" }).click();
       const scene = page.locator("section[data-scene-mood]");
       await expect(page.getByRole("heading", { level: 1, name: /Arjun/ })).toBeVisible();
       // Still with reduced motion: the arrows step through the celebrations
@@ -124,6 +127,33 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
       expect(moods.size).toBeGreaterThan(1);
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
+    });
+  }
+}
+
+// Every opening style (Step 12w), with and without a god, in both colour themes
+for (const [style, god] of [
+  ["palace", "ganesha"],
+  ["temple", "om"],
+  ["curtain", null],
+  ["envelope", "lakshmi-ganesha"],
+  ["lotus", "kalash"],
+  ["doors", "jagannath"],
+] as const) {
+  for (const colorScheme of ["light", "dark"] as const) {
+    test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+      await page.goto(
+        `/engine/guest?suite=rajwada-bagh&opening=${style}${god ? `&god=${god}` : ""}`,
+      );
+      const opening = page.locator(`[data-opening="${style}"]`);
+      await expect(opening).toHaveAttribute("data-doorway", "closed");
+      await expect(opening.getByRole("heading", { level: 1 })).toContainText("Arjun");
+      expect(await noOverflow(page)).toBe(true);
+      expect((await axe(page).analyze()).violations).toEqual([]);
+      // Opening it brings the pages (at once in still mode)
+      await page.getByRole("button", { name: "Open the invitation" }).click();
+      await expect(page.locator("[data-story-beat]").first()).toBeVisible();
     });
   }
 }

@@ -736,7 +736,7 @@ export const previewCopy = {
 export const suiteCopy = {
   heading: "Event pages",
   intro:
-    "After the doors open, each function gets its own full-screen page in this theme. Your tradition's ceremony names, blessing and symbol stay the same in every theme.",
+    "After the invitation opens, each function gets its own full-screen page in this theme. Your tradition's ceremony names, blessing and symbol stay the same in every theme.",
   suggested: "Suits your tradition",
   pairs: (design: string) => `Also switches the card to ${design}`,
   preview: "Play the pages",
@@ -1134,5 +1134,57 @@ export const aiCopy = {
     "used-up":
       "This invite has used its 3 free drafts. Premium, Royal and the Wedding bundle can write as often as you like.",
     failed: "The words couldn't be written just now. Try again.",
+  },
+} as const;
+
+/** The guest's first screen (Step 12x): how the invitation opens, and the god above it. */
+export const openingCopy = {
+  heading: "How it opens",
+  intro:
+    "The first thing guests see, full screen, with your names and a countdown. Tap a style to watch it open.",
+  styles: {
+    doors: {
+      name: "Theme doors",
+      description: "Your theme's own painting parts down the middle like two doors.",
+    },
+    palace: {
+      name: "Palace gates",
+      description: "Carved doors under a garlanded arch swing open into warm light.",
+    },
+    temple: {
+      name: "Temple doors",
+      description: "Brass doors with ringing bells and lamps, under a golden gopuram.",
+    },
+    curtain: {
+      name: "Silk curtains",
+      description: "Velvet curtains with fairy lights gather aside like a stage.",
+    },
+    envelope: {
+      name: "Royal envelope",
+      description: "A wax seal with your initials breaks and the card rises out.",
+    },
+    lotus: {
+      name: "Lotus bloom",
+      description: "A great lotus around your names opens petal by petal.",
+    },
+    none: {
+      name: "Straight in",
+      description: "No opening: guests land on the Scene itself.",
+    },
+  },
+  godHeading: "God or symbol above",
+  godIntro:
+    "Shown whole at the top centre, never under any words. Leave it off for an opening without a god.",
+  noGod: "None",
+  gods: {
+    ganesha: "Ganesha",
+    "ganesha-gold": "Ganesha in gold",
+    "lakshmi-ganesha": "Lakshmi and Ganesha",
+    shrinathji: "Shrinathji",
+    venkateswara: "Venkateswara",
+    jagannath: "Jagannath",
+    om: "Om",
+    swastik: "Swastik",
+    kalash: "Mangal kalash",
   },
 } as const;
