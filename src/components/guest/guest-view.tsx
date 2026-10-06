@@ -1,13 +1,12 @@
 "use client";
 
-import { CalendarPlus, MailCheck, Volume2, VolumeX } from "lucide-react";
+import { CalendarPlus, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
-import { DiyaCountdown } from "@/components/guest/diya-countdown";
+import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
-import { Doorway } from "@/components/guest/doorway";
+import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
@@ -18,12 +17,10 @@ import { useRagaMusic } from "@/components/invitation/use-raga-music";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
-import type { QualityChoice } from "@/content/engine-review";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import {
   cardLanguages,
   draftCopy,
-  draftTradition,
   mainFunction,
   templateWithRaga,
   type CardLanguage,
@@ -50,11 +47,11 @@ import {
 } from "@/lib/templates/story-words";
 import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import type { EventWindow } from "@/lib/publish/event-day";
-import { cn } from "@/lib/cn";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
+import { openingGod, openingStyle } from "@/lib/opening/catalog";
 import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale, useText } from "@/i18n/client";
@@ -91,9 +88,6 @@ export type GuestFunction = {
 type GuestViewProps = {
   slug: string;
   draft: InviteDraft;
-  quality: QualityChoice;
-  names: string;
-  occasion: string;
   functions: GuestFunction[];
   photos: PublicPhoto[];
   /** The host's own music clip, played instead of the raga. */
@@ -110,9 +104,6 @@ type GuestViewProps = {
 export function GuestView({
   slug,
   draft,
-  quality,
-  names,
-  occasion,
   functions,
   photos,
   clipUrl = null,
@@ -135,7 +126,6 @@ export function GuestView({
     () => withClip(templateWithRaga(draft.templateId, draft.music.raga), clipUrl),
     [draft.templateId, draft.music.raga, clipUrl],
   );
-  const [open, setOpen] = useState(false);
   // A guest who came by their own link is greeted by name before the invitation opens
   const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;
@@ -183,7 +173,7 @@ export function GuestView({
     }),
     [copy, told, replies, language, guestCopy.reply, draft, photos],
   );
-  // A painted theme opens as a doorway with a countdown; the card colours keep the 3D card
+  // A painted theme (not the colour card) carries on in its own look below the opening
   const suite = draftSuite(draft);
   const doorway = SUITES[suite].art !== "card" && Boolean(SUITES[suite].images.cover);
   const mainKind = mainFunction(draft);
@@ -204,6 +194,11 @@ export function GuestView({
     [draft.couplePhotos, photos, copy],
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
+  // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
+  const opening = openingStyle(draft.opening, suite, Boolean(scene));
+  const god = openingGod(draft.opening, draft.categoryId);
+  const [entered, setEntered] = useState(false);
+  const showOpening = !entered && opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
   // The family's blocks in the language the guest is reading
@@ -212,13 +207,6 @@ export function GuestView({
     rsvpFunctions.length > 0 ? (
       <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} />
     ) : null;
-  const dates = useMemo(
-    () =>
-      Object.values(draft.functions)
-        .filter((f) => f.included)
-        .map((f) => f.date),
-    [draft.functions],
-  );
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -230,7 +218,7 @@ export function GuestView({
 
         {watermark && <WatermarkLayer />}
         <main id="main" className="flex flex-1 flex-col">
-          {scene ? (
+          {scene && !showOpening ? (
             <OneScene
               suite={suite}
               page={scene}
@@ -276,102 +264,27 @@ export function GuestView({
                 </SceneButton>
               }
             />
-          ) : doorway ? (
-            <Doorway
+          ) : (
+            <Opening
               suite={suite}
-              template={template}
+              style={opening}
+              god={god}
               copy={copy}
               lang={language}
               languages={languages}
               onLanguage={setLanguage}
-              beats={story.beats}
-              textBox={draft.textBox}
               type={story.type!}
               main={main}
               reply={story.reply ?? null}
               music={music}
               musicOnOpen={draft.music.playOnOpen}
               guest={guestName}
+              after={
+                scene
+                  ? { kind: "enter", onEnter: () => setEntered(true) }
+                  : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
+              }
             />
-          ) : (
-            <>
-              {/* The card, first and large, in a warm pool of light */}
-              <section
-                aria-labelledby="guest-names"
-                className="relative isolate flex flex-col items-center gap-4 overflow-hidden px-4 pt-[max(3.5rem,calc(env(safe-area-inset-top)+3rem))] pb-10 sm:px-6"
-              >
-                <div
-                  aria-hidden
-                  className="pointer-events-none absolute top-[45%] left-1/2 -z-10 aspect-square w-[min(140%,64rem)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
-                  style={{
-                    background:
-                      "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 26%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
-                  }}
-                />
-                {guestName ? (
-                  <p lang={language} className="flex flex-col items-center gap-1 text-center">
-                    <span
-                      className={cn(
-                        "text-sm text-accent-text",
-                        language === "en" && "font-label tracking-[0.32em] uppercase",
-                      )}
-                    >
-                      {CARD_GREETING_WORDS[language].dear}
-                    </span>
-                    <span className="max-w-[22ch] font-display text-2xl leading-tight break-words text-ink">
-                      {guestName}
-                    </span>
-                    <span className="text-sm text-ink-muted">
-                      {CARD_GREETING_WORDS[language].invited}
-                    </span>
-                  </p>
-                ) : (
-                  <p className="font-label text-xs tracking-[0.32em] text-accent-text uppercase">
-                    {guestCopy.invited}
-                  </p>
-                )}
-                <h1
-                  id="guest-names"
-                  className="max-w-3xl text-center font-display text-[2.1rem] leading-[1.08] break-words sm:text-[3rem]"
-                >
-                  {names}
-                </h1>
-                <p className="text-ink-muted">{occasion}</p>
-                <DiyaCountdown dates={dates} labels={guestCopy.countdown} />
-                {languages.length > 1 && (
-                  <CardLanguageToggle
-                    label={guestCopy.cardLanguage}
-                    languages={languages}
-                    value={language}
-                    onValueChange={setLanguage}
-                  />
-                )}
-                <div className="flex h-[min(72svh,44rem)] min-h-[26rem] w-full max-w-4xl flex-col">
-                  <Invitation
-                    copy={copy}
-                    lang={language}
-                    template={template}
-                    quality={quality}
-                    open={open}
-                    onOpenChange={setOpen}
-                    musicOnOpen={draft.music.playOnOpen}
-                    tradition={draftTradition(draft)?.id ?? null}
-                    story={story}
-                  />
-                </div>
-                <div className="flex flex-col items-center gap-3">
-                  {!open && <p className="text-sm text-ink-muted">{guestCopy.openHint}</p>}
-                  {rsvpFunctions.length > 0 && (
-                    <Button asChild size="lg">
-                      <a href="#rsvp">
-                        <MailCheck aria-hidden />
-                        {guestCopy.reply}
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </section>
-            </>
           )}
 
           {look ? (

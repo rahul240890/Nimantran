@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
-import { isQualityChoice } from "@/content/engine-review";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
@@ -47,10 +46,8 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
   };
 }
 
-/** ?quality=2d (or a level) forces the card's drawing, for tests without a GPU. */
-export default async function InvitePage({ params, searchParams }: PageProps<"/i/[slug]">) {
+export default async function InvitePage({ params }: PageProps<"/i/[slug]">) {
   const { slug } = await params;
-  const { quality } = await searchParams;
   const invite = await findPublishedInvite(slug);
   if (!invite) notFound();
   const { draft } = invite;
@@ -82,9 +79,6 @@ export default async function InvitePage({ params, searchParams }: PageProps<"/i
     <GuestView
       slug={invite.slug}
       draft={draft}
-      quality={isQualityChoice(quality) ? quality : "auto"}
-      names={inviteNames(draft)}
-      occasion={occasionName(draft, locale)}
       functions={functions}
       photos={invite.photos}
       clipUrl={invite.clipUrl}
