@@ -12,6 +12,24 @@ export const editor: Translation<typeof en.editor> = {
   done: "पूरा",
   designChosen: "आपका डिज़ाइन",
   changeDesign: "डिज़ाइन बदलें",
+  stages: { design: "डिज़ाइन", details: "आपकी जानकारी", preview: "झलक और भेजें" },
+  sections: {
+    label: "आपकी जानकारी, तीन हिस्सों में",
+    open: (part, summary, state) =>
+      `${part}: ${summary}${state === "done" ? ", पूरा" : state === "check" ? ", एक बार देखें" : ""}। खोलें`,
+    done: "पूरा",
+    check: "एक बार देखें",
+    edit: "बदलें",
+    names: (names) => (names.length ? names.join(" और ") : "नाम जोड़ें"),
+    functions: (names) =>
+      names.length === 0
+        ? "अपनी रस्में चुनें"
+        : names.length <= 3
+          ? names.join(", ")
+          : `${names.slice(0, 2).join(", ")} और ${names.length - 2} और`,
+    extras: (photos, music) =>
+      `${photos === 0 ? "अभी कोई तस्वीर नहीं" : `${photos} तस्वीर${photos === 1 ? "" : "ें"}`} · ${music ? "संगीत चालू" : "संगीत बंद"}`,
+  },
   back: "पीछे",
   next: "आगे बढ़ें",
   toPreview: "निमंत्रण देखें",

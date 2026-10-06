@@ -17,6 +17,26 @@ export const editor = {
   done: "done",
   designChosen: "Your design",
   changeDesign: "Change design",
+  /** The three stages the progress shows: pick, fill in, see it. */
+  stages: { design: "Design", details: "Your details", preview: "Preview & share" },
+  /** The details page: its sections, each folded to one line with what's filled in. */
+  sections: {
+    label: "Your details, in three parts",
+    open: (part: string, summary: string, state: "done" | "todo" | "check") =>
+      `${part}: ${summary}${state === "done" ? ", done" : state === "check" ? ", needs a look" : ""}. Open`,
+    done: "Done",
+    check: "Needs a look",
+    edit: "Edit",
+    names: (names: string[]) => (names.length ? names.join(" & ") : "Add the names"),
+    functions: (names: string[]) =>
+      names.length === 0
+        ? "Choose your functions"
+        : names.length <= 3
+          ? names.join(", ")
+          : `${names.slice(0, 2).join(", ")} and ${names.length - 2} more`,
+    extras: (photos: number, music: boolean) =>
+      `${photos === 0 ? "No photos yet" : photos === 1 ? "1 photo" : `${photos} photos`} · ${music ? "music on" : "no music"}`,
+  },
   back: "Back",
   next: "Continue",
   toPreview: "Preview invitation",
