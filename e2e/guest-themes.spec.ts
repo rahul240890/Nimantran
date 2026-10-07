@@ -157,3 +157,51 @@ for (const [style, god] of [
     });
   }
 }
+
+// The thirteen openings added in Step 12y, each in one of the colour themes
+for (const [i, [style, god]] of (
+  [
+    ["mandap", "ganesha-gold"],
+    ["jharokha", null],
+    ["phool", "swastik"],
+    ["scroll", null],
+    ["diyas", "om"],
+    ["rangoli", null],
+    ["peacock", "shrinathji"],
+    ["storybook", null],
+    ["lanterns", null],
+    ["moonlit", null],
+    ["fireworks", null],
+    ["balloons", null],
+    ["gift", "kalash"],
+  ] as const
+).entries()) {
+  const colorScheme = i % 2 === 0 ? "light" : "dark";
+  const suite = ["rajwada-bagh", "kayal", "noor-bagh", "gubbara"][i % 4];
+  test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    await page.goto(`/engine/guest?suite=${suite}&opening=${style}${god ? `&god=${god}` : ""}`);
+    const opening = page.locator(`[data-opening="${style}"]`);
+    await expect(opening).toHaveAttribute("data-doorway", "closed");
+    await expect(opening.getByRole("heading", { level: 1 })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await page.getByRole("button", { name: "Open the invitation" }).click();
+    await expect(page.locator("[data-story-beat]").first()).toBeVisible();
+  });
+}
+
+// With motion on, a welcome with the names comes between the opening and the pages
+test("the welcome before the pages", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
+  await page.getByRole("button", { name: "Open the invitation" }).click();
+  const welcome = page.getByTestId("opening-welcome");
+  await expect(welcome).toBeVisible();
+  await expect(welcome).toContainText("Arjun");
+  await expect(page.getByRole("button", { name: "Continue" })).toBeFocused();
+  expect((await axe(page).analyze()).violations).toEqual([]);
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(welcome).toHaveCount(0);
+  await expect(page.locator("[data-story-beat]").first()).toBeVisible();
+});

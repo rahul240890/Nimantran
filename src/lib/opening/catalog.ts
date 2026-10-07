@@ -15,8 +15,50 @@ export const OPENING_STYLES = [
   "curtain",
   "envelope",
   "lotus",
+  "mandap",
+  "jharokha",
+  "phool",
+  "scroll",
+  "diyas",
+  "rangoli",
+  "peacock",
+  "storybook",
+  "lanterns",
+  "moonlit",
+  "fireworks",
+  "balloons",
+  "gift",
   "none",
 ] as const;
+
+/** How the editor groups the styles, so twenty choices stay easy to scan. */
+export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
+  { id: "doors", styles: ["doors", "palace", "temple", "jharokha", "mandap", "storybook"] },
+  { id: "reveals", styles: ["curtain", "phool", "envelope", "scroll", "gift"] },
+  { id: "light", styles: ["lotus", "diyas", "rangoli", "peacock", "lanterns", "moonlit"] },
+  { id: "party", styles: ["fireworks", "balloons", "none"] },
+];
+
+/** Each occasion's own opening, when the host hasn't picked one and there is no cover. */
+const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
+  birthday: "balloons",
+  party: "fireworks",
+  "farewell-party": "fireworks",
+  launch: "fireworks",
+  "shop-opening": "gift",
+  "baby-shower": "gift",
+  diwali: "diyas",
+  eid: "moonlit",
+  janmashtami: "peacock",
+  onam: "rangoli",
+  sankranti: "rangoli",
+  lohri: "lanterns",
+  navratri: "lanterns",
+  engagement: "mandap",
+  "save-the-date": "envelope",
+  anniversary: "storybook",
+  housewarming: "jharokha",
+};
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 
 /**
@@ -82,10 +124,16 @@ export function openingStyles(suite: SuiteId, scene: boolean): readonly OpeningS
 }
 
 /** The style the guest sees: the host's pick when it fits, else the design's own. */
-export function openingStyle(choice: OpeningChoice, suite: SuiteId, scene: boolean): OpeningStyle {
+export function openingStyle(
+  choice: OpeningChoice,
+  suite: SuiteId,
+  scene: boolean,
+  category?: CategoryId,
+): OpeningStyle {
   const offered = openingStyles(suite, scene);
   if (choice.style && offered.includes(choice.style)) return choice.style;
-  return hasCoverDoors(suite) && !scene ? "doors" : "palace";
+  if (hasCoverDoors(suite) && !scene) return "doors";
+  return (category && OCCASION_OPENING[category]) ?? "palace";
 }
 
 /** The god the guest sees, dropped where the occasion doesn't offer one. */

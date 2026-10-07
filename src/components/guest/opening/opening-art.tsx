@@ -3,6 +3,21 @@ import type { CSSProperties, ReactNode } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { SYMBOLS } from "@/components/invitation/art/symbols";
 import { cn } from "@/lib/cn";
+import {
+  Balloons,
+  Diyas,
+  Fireworks,
+  FlowerCurtain,
+  GiftBox,
+  Jharokha,
+  Mandap,
+  Moonlit,
+  Peacock,
+  Rangoli,
+  Scroll,
+  SkyLanterns,
+  Storybook,
+} from "./opening-art-more";
 import { GOD_PAINTINGS, type OpeningGod, type OpeningStyle } from "@/lib/opening/catalog";
 
 /*
@@ -20,6 +35,19 @@ export const OPENING_LAYOUT: Record<OpeningStyle, { crest: number; gap: number }
   curtain: { crest: 22, gap: 2 },
   envelope: { crest: 27, gap: 11 },
   lotus: { crest: 21, gap: 0 },
+  mandap: { crest: 24, gap: 2 },
+  jharokha: { crest: 24, gap: 4 },
+  phool: { crest: 22, gap: 0 },
+  scroll: { crest: 22, gap: 0 },
+  diyas: { crest: 22, gap: 0 },
+  rangoli: { crest: 21, gap: 0 },
+  peacock: { crest: 21, gap: 0 },
+  storybook: { crest: 22, gap: 0 },
+  lanterns: { crest: 22, gap: 0 },
+  moonlit: { crest: 24, gap: 0 },
+  fireworks: { crest: 22, gap: 0 },
+  balloons: { crest: 22, gap: 0 },
+  gift: { crest: 22, gap: 4 },
   none: { crest: 22, gap: 0 },
 };
 
@@ -499,6 +527,32 @@ export function OpeningArt({
           <Beyond className="inset-0 opacity-60" />
         </>
       );
+    case "mandap":
+      return <Mandap />;
+    case "jharokha":
+      return <Jharokha />;
+    case "phool":
+      return <FlowerCurtain />;
+    case "scroll":
+      return <Scroll />;
+    case "diyas":
+      return <Diyas />;
+    case "rangoli":
+      return <Rangoli />;
+    case "peacock":
+      return <Peacock />;
+    case "storybook":
+      return <Storybook />;
+    case "lanterns":
+      return <SkyLanterns />;
+    case "moonlit":
+      return <Moonlit />;
+    case "fireworks":
+      return <Fireworks />;
+    case "balloons":
+      return <Balloons />;
+    case "gift":
+      return <GiftBox />;
     case "none":
       return <div className="opening-rangoli absolute inset-0" />;
   }

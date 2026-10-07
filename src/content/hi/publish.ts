@@ -83,6 +83,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     again: "फिर से खोलें",
     counting: "उत्सव की उलटी गिनती",
     details: "पूरा ब्योरा देखें",
+    skip: "आगे बढ़ें",
   },
   countdown: {
     days: (n) => `${n} दिन बाकी`,

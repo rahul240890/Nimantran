@@ -9,6 +9,8 @@ import { LINE_IN, LINE_STAGGER, type StoryBeat } from "@/lib/engine/story";
 /** WhatsApp Status takes up to about a minute per update; Reels feel right under 45 seconds. */
 export const VIDEO_MIN_SECONDS = 30;
 export const VIDEO_MAX_SECONDS = 45;
+/** With the host's fixed time on each page, the video runs as long as that, up to a minute. */
+export const VIDEO_FIXED_MAX_SECONDS = 60;
 /** The closing card with the link. */
 export const END_SECONDS = 4;
 /** No page flashes by faster than this, however many functions there are. */
@@ -41,9 +43,16 @@ export type VideoTimeline = {
   total: number;
 };
 
-/** Times each page so the whole video, closing card included, is 30 to 45 seconds. */
-export function videoTimeline(story: readonly StoryBeat[]): VideoTimeline {
-  const room = VIDEO_MAX_SECONDS - END_SECONDS;
+/**
+ * Times each page so the whole video, closing card included, is 30 to 45 seconds. With
+ * `fixed` (the host set a time for every page) each page keeps it, so the video and its
+ * music run exactly as long as the pages need, squeezed only past a minute.
+ */
+export function videoTimeline(
+  story: readonly StoryBeat[],
+  { fixed = false }: { fixed?: boolean } = {},
+): VideoTimeline {
+  const room = (fixed ? VIDEO_FIXED_MAX_SECONDS : VIDEO_MAX_SECONDS) - END_SECONDS;
   const floor = Math.min(VIDEO_BEAT_MIN, room / Math.max(story.length, 1));
   const natural = story.reduce((sum, beat) => sum + beat.seconds, 0);
   let lengths = story.map((beat) => beat.seconds);
@@ -52,7 +61,7 @@ export function videoTimeline(story: readonly StoryBeat[]): VideoTimeline {
     const spare = natural - story.length * floor;
     const scale = Math.max(0, (room - story.length * floor) / Math.max(spare, 0.001));
     lengths = story.map((beat) => floor + Math.max(0, beat.seconds - floor) * scale);
-  } else if (natural + END_SECONDS < VIDEO_MIN_SECONDS && natural > 0) {
+  } else if (!fixed && natural + END_SECONDS < VIDEO_MIN_SECONDS && natural > 0) {
     // A short story lingers a little on each page instead of ending early
     const scale = (VIDEO_MIN_SECONDS - END_SECONDS) / natural;
     lengths = story.map((beat) => beat.seconds * scale);

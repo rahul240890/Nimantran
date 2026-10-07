@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { beatSeconds, type StoryBeat, type StoryLine } from "@/lib/engine/story";
+import { beatSeconds, paceStory, type StoryBeat, type StoryLine } from "@/lib/engine/story";
 import {
   CROSSFADE,
   END_SECONDS,
   lineProgress,
   pagesAt,
   VIDEO_BEAT_MIN,
+  VIDEO_FIXED_MAX_SECONDS,
   VIDEO_MAX_SECONDS,
   VIDEO_MIN_SECONDS,
   videoTimeline,
@@ -75,5 +76,37 @@ describe("video timeline", () => {
     });
     expect(pagesAt(timeline, timeline.end + 0.1)).toMatchObject({ current: "end", previous: 1 });
     expect(pagesAt(timeline, 0)).toMatchObject({ current: 0, previous: null, fade: 1 });
+  });
+});
+
+describe("a fixed time on every page (Step 12y)", () => {
+  const story = (functions: number) => [
+    beat("cover"),
+    beat("family"),
+    ...Array.from({ length: functions }, (_, i) => beat(`fn-${i}`)),
+    beat("reply", 1),
+  ];
+
+  it("holds every page for the host's time, so the music runs exactly as long", () => {
+    const timeline = videoTimeline(paceStory(story(3), 5), { fixed: true });
+    expect(timeline.beats.map((b) => b.seconds)).toEqual([5, 5, 5, 5, 5, 5]);
+    expect(timeline.total).toBe(6 * 5 + END_SECONDS);
+  });
+
+  it("grows with the number of functions instead of stretching to 30 seconds", () => {
+    const two = videoTimeline(paceStory(story(1), 4), { fixed: true }).total;
+    const five = videoTimeline(paceStory(story(4), 4), { fixed: true }).total;
+    expect(two).toBe(4 * 4 + END_SECONDS);
+    expect(five - two).toBe(3 * 4);
+  });
+
+  it("still squeezes a very long story into a minute", () => {
+    const timeline = videoTimeline(paceStory(story(12), 10), { fixed: true });
+    expect(timeline.total).toBeLessThanOrEqual(VIDEO_FIXED_MAX_SECONDS + 0.01);
+  });
+
+  it("leaves the story's own timing when the host chose Auto", () => {
+    const beats = story(2);
+    expect(paceStory(beats, null)).toBe(beats);
   });
 });

@@ -604,6 +604,14 @@ export const extrasCopy = {
   designsOwn: "Design's own",
   playOnOpen: "Play music when guests open the card",
   playOnOpenHint: "Guests can pause it at any time.",
+  pacing: {
+    heading: "Time on each page",
+    hint: "The music and the reel run as long as your pages. Auto gives each page the time its words need.",
+    auto: "Auto",
+    seconds: (n: number) => `${n}s`,
+    summary: (pages: number, live: number, reel: number) =>
+      `${pages} pages: about ${live} seconds of music on the invitation, and a ${reel} second reel.`,
+  },
   questionsHeading: "Questions for guests",
   questionsHint:
     "Every reply says who's coming to each function and can include a note. Tick anything else you'd like to know.",
@@ -1301,10 +1309,68 @@ export const openingCopy = {
       name: "Lotus bloom",
       description: "A great lotus around your names opens petal by petal.",
     },
+    mandap: {
+      name: "Wedding mandap",
+      description: "Sheer drapes rise between banana-leaf pillars and jasmine strings.",
+    },
+    jharokha: {
+      name: "Jharokha window",
+      description: "Four carved jaali shutters of a sandstone window fold back.",
+    },
+    phool: {
+      name: "Flower curtain",
+      description: "Strings of marigold, rose and jasmine part from the middle.",
+    },
+    scroll: {
+      name: "Royal scroll",
+      description: "The ribbon slips and a farmaan scroll rolls itself up.",
+    },
+    diyas: {
+      name: "Rows of diyas",
+      description: "Lamps light one by one, then flare into warm light.",
+    },
+    rangoli: {
+      name: "Rangoli",
+      description: "A rangoli draws itself in colour, then spins out into light.",
+    },
+    peacock: {
+      name: "Peacock fan",
+      description: "A peacock's feathers fan out behind your names, then fold away.",
+    },
+    storybook: {
+      name: "Storybook",
+      description: "A gilt clothbound cover swings open to the first page.",
+    },
+    lanterns: {
+      name: "Sky lanterns",
+      description: "Glowing paper lanterns drift in the night, then rise away.",
+    },
+    moonlit: {
+      name: "Moonlit night",
+      description: "A crescent moon, stars and swaying lanterns over the arches.",
+    },
+    fireworks: {
+      name: "Fireworks",
+      description: "Fireworks burst over a skyline of domes.",
+    },
+    balloons: {
+      name: "Balloons",
+      description: "A sky full of balloons floats up and away.",
+    },
+    gift: {
+      name: "Gift box",
+      description: "The bow unties and the lid lifts off.",
+    },
     none: {
       name: "Straight in",
       description: "No opening: guests land on the Scene itself.",
     },
+  },
+  groups: {
+    doors: "Doors and gates",
+    reveals: "Curtains and reveals",
+    light: "Light and blossom",
+    party: "Party",
   },
   godHeading: "God or symbol above",
   godIntro:

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
  * A review page for the themed guest page (Step 12q), not a product screen: the guest page
  * for ?suite=<theme> (and ?lang=hi for a Hindi card) with made-up names, dates and pictures, and nothing saved.
  * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
- * ?opening=palace (or doors, temple, curtain, envelope, lotus, none) and ?god=ganesha choose the
+ * ?opening=palace (or any style in lib/opening/catalog.ts) and ?god=ganesha choose the
  * first screen (Step 12x).
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  */

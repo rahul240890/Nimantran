@@ -81,6 +81,7 @@ export const guestCopy = {
     again: "Open it again",
     counting: "Counting down to the celebration",
     details: "See the details",
+    skip: "Continue",
   },
   countdown: {
     days: (n: number) => `${n} days to go`,

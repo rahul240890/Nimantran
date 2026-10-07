@@ -4193,6 +4193,11 @@
   --open-seal-ink: color-mix(in oklab, var(--open-jewel) 30%, black);
   --open-seal-ring: color-mix(in oklab, var(--open-jewel) 45%, black);
   --open-medallion-ink: var(--card-gold-text);
+  --open-stone-light: color-mix(in oklab, var(--open-plate) 75%, var(--open-gilt));
+  --open-feather: color-mix(in oklab, var(--open-leaf) 70%, var(--open-deep));
+  --open-feather-eye: color-mix(in oklab, var(--open-jewel) 35%, var(--night));
+  --open-ribbon: color-mix(in oklab, var(--open-jewel) 82%, var(--rose));
+  --open-ribbon-dark: color-mix(in oklab, var(--open-ribbon) 60%, black);
 }
 .opening-page {
   background: var(--open-deep);
@@ -4763,6 +4768,690 @@
   to {
     transform: translate3d(0, 110cqh, 0);
   }
+}
+
+/* Step 12y: thirteen more openings */
+.opening-night {
+  background:
+    radial-gradient(
+      ellipse at 50% 110%,
+      color-mix(in oklab, var(--open-jewel) 45%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--night) 80%, var(--open-deep)),
+      var(--open-deep)
+    );
+}
+.opening-star {
+  aspect-ratio: 1;
+  background: var(--open-light);
+  box-shadow: 0 0 1cqw var(--open-light);
+  animation: opening-twinkle 2.4s ease-in-out calc(var(--i) * -170ms) infinite alternate;
+}
+/* Light that blooms in only once it opens (diyas, scroll, lanterns, party) */
+.opening-glow-in {
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 1200ms ease,
+    transform 1400ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+.opening-stage[data-open="true"] .opening-glow-in {
+  opacity: 1;
+  transform: scale(1.4);
+}
+
+/* Mandap */
+.opening-jasmine {
+  background: radial-gradient(circle, var(--open-plate) 0 40%, transparent 46%) 0 0 / 100% 2.2cqw
+    repeat-y;
+  transform-origin: top center;
+  animation: opening-sway 4.5s ease-in-out calc(var(--i) * -400ms) infinite alternate;
+  transition:
+    transform 1200ms ease,
+    opacity 1000ms ease;
+}
+.opening-stage[data-open="true"] .opening-jasmine {
+  animation: none;
+  transform: translateY(-70%);
+  opacity: 0;
+}
+.opening-drape {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--open-plate) 55%, transparent) 0 2cqw,
+      color-mix(in oklab, var(--open-petal) 30%, transparent) 2cqw 5cqw,
+      color-mix(in oklab, var(--open-plate) 70%, transparent) 5cqw 6cqw
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--open-jewel) 30%, transparent),
+      transparent 70%
+    );
+  backdrop-filter: blur(1.5px);
+  transform-origin: top center;
+  transition:
+    transform 1400ms cubic-bezier(0.6, 0, 0.2, 1),
+    opacity 1200ms ease 200ms;
+}
+.opening-drape-left {
+  clip-path: polygon(0 0, 100% 0, 30% 100%, 0 100%);
+}
+.opening-drape-right {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 70% 100%);
+}
+.opening-stage[data-open="true"] .opening-drape {
+  transform: scaleY(0.08);
+  opacity: 0;
+}
+.opening-banana {
+  border-radius: 1cqw;
+  background: repeating-linear-gradient(
+    160deg,
+    var(--open-leaf) 0 3cqw,
+    var(--open-leaf-deep) 3cqw 4cqw,
+    color-mix(in oklab, var(--open-leaf) 70%, var(--open-light)) 4cqw 5.5cqw
+  );
+  box-shadow: 0 0 2cqw var(--open-shadow);
+}
+.opening-pot {
+  background: radial-gradient(
+    circle at 35% 30%,
+    var(--open-gilt-bright),
+    var(--open-gilt) 45%,
+    var(--open-gilt-dark)
+  );
+  box-shadow: 0 0.4cqw 0.8cqw var(--open-shadow);
+}
+
+/* Jharokha */
+.opening-sandstone {
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 7cqw,
+      color-mix(in oklab, var(--open-gilt-dark) 25%, transparent) 7cqw 7.4cqw
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--open-plate) 45%, var(--open-gilt-dark)),
+      color-mix(in oklab, var(--open-plate) 25%, var(--open-wood-dark))
+    );
+}
+.opening-jharokha-frame,
+.opening-jharokha-hole {
+  border-radius: 50% 50% 0.6cqw 0.6cqw / 22% 22% 0.6cqw 0.6cqw;
+}
+.opening-jharokha-frame {
+  background: linear-gradient(
+    180deg,
+    var(--open-stone-light),
+    color-mix(in oklab, var(--open-stone-light) 70%, var(--open-gilt-dark))
+  );
+  box-shadow:
+    inset 0 0 0 1cqw color-mix(in oklab, var(--open-gilt-dark) 40%, transparent),
+    0 2cqw 4cqw var(--open-shadow);
+}
+.opening-shutter {
+  backface-visibility: hidden;
+  border: 0.5cqw solid var(--open-gilt-dark);
+  background:
+    radial-gradient(circle, transparent 0 0.9cqw, var(--open-stone-light) 1cqw) 0 0 / 4cqw 4cqw,
+    var(--open-wood-dark);
+  box-shadow: inset 0 0 2cqw var(--open-shadow);
+  transition: transform 1300ms cubic-bezier(0.6, 0, 0.25, 1) calc(var(--i) * 180ms);
+}
+.opening-shutter-left {
+  transform-origin: left center;
+}
+.opening-shutter-right {
+  transform-origin: right center;
+}
+.opening-stage[data-open="true"] .opening-shutter-left {
+  transform: rotateY(88deg);
+}
+.opening-stage[data-open="true"] .opening-shutter-right {
+  transform: rotateY(-88deg);
+}
+
+/* Flower curtain */
+.opening-string {
+  transform-origin: top center;
+  animation: opening-sway 4s ease-in-out calc(var(--i) * -310ms) infinite alternate;
+  transition: translate 1400ms cubic-bezier(0.55, 0, 0.2, 1) calc(var(--i) * 40ms);
+}
+.opening-string-marigold {
+  background:
+    radial-gradient(circle, var(--marigold) 0 36%, var(--marigold-strong) 37% 50%, transparent 52%)
+      0 0 / 100% 5cqw repeat-y,
+    linear-gradient(var(--open-leaf), var(--open-leaf)) 50% 0 / 0.3cqw 100% no-repeat;
+}
+.opening-string-rose {
+  background:
+    radial-gradient(
+        circle,
+        var(--open-petal-fall) 0 32%,
+        var(--open-ribbon) 33% 48%,
+        transparent 50%
+      )
+      0 1.6cqw / 100% 5cqw repeat-y,
+    linear-gradient(var(--open-leaf), var(--open-leaf)) 50% 0 / 0.3cqw 100% no-repeat;
+}
+.opening-string-jasmine {
+  background:
+    radial-gradient(circle, var(--open-plate) 0 28%, transparent 32%) 0 0.8cqw / 100% 3cqw repeat-y,
+    linear-gradient(var(--open-leaf), var(--open-leaf)) 50% 0 / 0.3cqw 100% no-repeat;
+}
+.opening-stage[data-open="true"] .opening-string {
+  animation: none;
+  translate: var(--push) 0;
+}
+
+/* Royal scroll */
+.opening-velvet {
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    var(--open-wood),
+    var(--open-wood-dark) 70%,
+    var(--open-deep)
+  );
+}
+.opening-scroll-paper {
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--open-gilt-dark) 30%, transparent),
+      transparent 8%,
+      transparent 92%,
+      color-mix(in oklab, var(--open-gilt-dark) 30%, transparent)
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 6cqw,
+      color-mix(in oklab, var(--open-gilt) 10%, transparent) 6cqw 6.2cqw
+    ),
+    var(--open-plate);
+  box-shadow:
+    inset 0 0 0 2cqw var(--open-plate),
+    inset 0 0 0 2.4cqw var(--open-gilt),
+    0 2cqw 4cqw var(--open-shadow);
+  transform-origin: top center;
+  transition: transform 1100ms cubic-bezier(0.6, 0, 0.3, 1) 250ms;
+}
+.opening-stage[data-open="true"] .opening-scroll-paper {
+  transform: scaleY(0);
+}
+.opening-scroll-rod {
+  border-radius: 2cqw;
+  background: linear-gradient(
+    180deg,
+    var(--open-gilt-bright),
+    var(--open-gilt) 50%,
+    var(--open-gilt-dark)
+  );
+  box-shadow: 0 0.8cqw 1.2cqw var(--open-shadow);
+  transition:
+    transform 1100ms cubic-bezier(0.6, 0, 0.3, 1) 250ms,
+    opacity 500ms ease 1100ms;
+}
+.opening-stage[data-open="true"] .opening-scroll-bottom {
+  transform: translateY(-86cqh);
+}
+.opening-stage[data-open="true"] .opening-scroll-rod {
+  opacity: 0;
+}
+.opening-ribbon {
+  background: linear-gradient(
+    90deg,
+    var(--open-ribbon-dark),
+    var(--open-ribbon),
+    var(--open-ribbon-dark)
+  );
+  transition:
+    transform 500ms ease,
+    opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .opening-ribbon {
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+/* Diyas */
+.opening-lamp .opening-lamp-glow {
+  opacity: 0.35;
+  animation: opening-twinkle 1.6s ease-in-out calc(var(--i) * -140ms) infinite alternate;
+}
+.opening-lamp .opening-flame {
+  animation:
+    opening-light 600ms ease-out calc(var(--i) * 120ms) both,
+    flicker 1.3s ease-in-out calc(var(--i) * 120ms + 600ms) infinite alternate;
+}
+.opening-stage[data-open="true"] .opening-lamp .opening-lamp-glow {
+  animation: none;
+  opacity: 1;
+  transform: scale(2.2);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 900ms ease,
+    opacity 600ms ease;
+}
+.opening-turn-slow {
+  animation: opening-spin 90s linear infinite;
+}
+
+/* Rangoli */
+.opening-draw {
+  stroke-dasharray: 1;
+  animation: opening-draw 1.4s ease-out calc(var(--i) * 90ms) both;
+}
+.opening-rangoli-art {
+  transition:
+    transform 1400ms cubic-bezier(0.5, 0, 0.2, 1),
+    opacity 1100ms ease 300ms;
+}
+.opening-stage[data-open="true"] .opening-rangoli-art {
+  transform: rotate(140deg) scale(2.4);
+  opacity: 0;
+}
+
+/* Peacock */
+.opening-peacock-ground {
+  background:
+    radial-gradient(
+      ellipse at 50% 92%,
+      color-mix(in oklab, var(--open-leaf) 45%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--open-leaf) 25%, var(--open-deep)),
+      var(--open-deep)
+    );
+}
+.opening-feather {
+  transform-origin: 50% 100%;
+  rotate: var(--a);
+  animation: opening-fan 3.5s ease-in-out calc(var(--i) * -200ms) infinite alternate;
+  transition:
+    rotate 1300ms cubic-bezier(0.6, 0, 0.3, 1) calc(var(--i) * 30ms),
+    opacity 900ms ease 400ms;
+}
+.opening-stage[data-open="true"] .opening-feather {
+  animation: none;
+  rotate: calc(var(--a) * 2.2);
+  opacity: 0;
+}
+
+/* Storybook */
+.opening-book-page {
+  background:
+    radial-gradient(
+      ellipse at 50% 40%,
+      color-mix(in oklab, var(--open-light) 40%, transparent),
+      transparent 70%
+    ),
+    var(--open-plate);
+  box-shadow:
+    inset 2cqw 0 3cqw color-mix(in oklab, var(--open-gilt-dark) 30%, transparent),
+    0 1cqw 3cqw var(--open-shadow);
+}
+.opening-book-cover {
+  transition: transform 1500ms cubic-bezier(0.6, 0, 0.25, 1);
+}
+.opening-stage[data-open="true"] .opening-book-cover {
+  transform: rotateY(-165deg);
+}
+.opening-book-front {
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 1cqw,
+      color-mix(in oklab, black 6%, transparent) 1cqw 1.2cqw
+    ),
+    linear-gradient(135deg, var(--open-jewel), var(--open-wood) 60%, var(--open-wood-dark));
+  box-shadow:
+    inset 0 0 3cqw var(--open-shadow),
+    0 1cqw 3cqw var(--open-shadow);
+}
+.opening-book-spine {
+  border-radius: 2cqw 0 0 2cqw;
+  background: linear-gradient(
+    90deg,
+    var(--open-wood-dark),
+    var(--open-wood) 60%,
+    var(--open-wood-dark)
+  );
+  box-shadow: inset -0.4cqw 0 0 var(--open-gilt-dark);
+}
+.opening-book-border {
+  border: 0.6cqw double var(--open-gilt);
+}
+.opening-book-inside {
+  background: linear-gradient(
+    90deg,
+    var(--open-plate),
+    color-mix(in oklab, var(--open-plate) 85%, var(--open-gilt))
+  );
+}
+
+/* Sky lanterns */
+.opening-sky-lantern {
+  aspect-ratio: 3 / 4;
+  border-radius: 30% 30% 18% 18% / 34% 34% 14% 14%;
+  background: radial-gradient(
+    ellipse at 50% 80%,
+    var(--open-light),
+    var(--marigold) 55%,
+    color-mix(in oklab, var(--marigold-strong) 70%, var(--open-jewel))
+  );
+  box-shadow: 0 0 4cqw color-mix(in oklab, var(--marigold) 80%, transparent);
+  animation: opening-bob 4s ease-in-out calc(var(--i) * -300ms) infinite alternate;
+  transition:
+    translate 1800ms cubic-bezier(0.4, 0, 0.6, 1) calc(var(--i) * 50ms),
+    opacity 1200ms ease 600ms;
+}
+.opening-stage[data-open="true"] .opening-sky-lantern {
+  translate: 0 -110cqh;
+  opacity: 0;
+}
+
+/* Fireworks */
+.opening-burst {
+  opacity: 0;
+  animation: opening-burst 3.2s ease-out calc(var(--i) * 640ms) infinite;
+}
+.opening-stage[data-open="true"] .opening-burst {
+  animation: opening-burst 1.2s ease-out calc(var(--i) * 90ms) 1 both;
+}
+.opening-window {
+  animation: opening-twinkle 2s ease-in-out calc(var(--i) * -300ms) infinite alternate;
+}
+
+/* Balloons */
+.opening-party-sky {
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      color-mix(in oklab, var(--open-light) 25%, transparent),
+      transparent 40%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--open-jewel) 45%, var(--open-deep)),
+      var(--open-deep)
+    );
+}
+.opening-balloon {
+  animation: opening-bob 3.6s ease-in-out calc(var(--i) * -260ms) infinite alternate;
+  transition: translate 1700ms cubic-bezier(0.5, 0, 0.7, 0.4) calc(var(--i) * 25ms);
+}
+.opening-stage[data-open="true"] .opening-balloon {
+  translate: 0 calc(var(--rise) * -1);
+}
+
+/* Gift box */
+.opening-gift-box,
+.opening-gift-lid {
+  border-radius: 1.6cqw;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 4cqw,
+      color-mix(in oklab, var(--open-plate) 16%, transparent) 4cqw 6cqw
+    ),
+    linear-gradient(180deg, var(--open-jewel), var(--open-wood));
+  box-shadow:
+    inset 0 0 3cqw var(--open-shadow),
+    0 1.4cqw 3cqw var(--open-shadow);
+}
+.opening-gift-lid {
+  z-index: 1;
+  transition:
+    transform 1100ms cubic-bezier(0.5, 0, 0.3, 1) 350ms,
+    opacity 600ms ease 1000ms;
+}
+.opening-gift-box {
+  transition:
+    transform 900ms ease 700ms,
+    opacity 700ms ease 900ms;
+}
+.opening-gift-band {
+  background: linear-gradient(
+    90deg,
+    var(--open-gilt-dark),
+    var(--open-gilt-bright) 50%,
+    var(--open-gilt-dark)
+  );
+}
+.opening-gift-box .opening-gift-band:last-child {
+  background: linear-gradient(
+    180deg,
+    var(--open-gilt-dark),
+    var(--open-gilt-bright) 50%,
+    var(--open-gilt-dark)
+  );
+}
+.opening-bow {
+  transform-origin: 50% 80%;
+  transition:
+    transform 450ms ease,
+    opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .opening-bow {
+  transform: scale(0.2);
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .opening-gift-lid {
+  transform: translateY(-40cqh) rotate(-14deg);
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .opening-gift-box {
+  transform: translateY(14cqh) scale(0.96);
+  opacity: 0;
+}
+
+/* Moonlit night */
+.opening-moon {
+  background: radial-gradient(circle at 70% 40%, transparent 0 46%, var(--open-light) 47%);
+  box-shadow: none;
+  filter: drop-shadow(0 0 3cqw color-mix(in oklab, var(--open-light) 70%, transparent));
+  transition: transform 1500ms ease;
+}
+.opening-stage[data-open="true"] .opening-moon {
+  transform: translateY(-12cqh) scale(1.2);
+}
+.opening-fanoos {
+  transform-origin: top center;
+  animation: opening-sway 3.4s ease-in-out calc(var(--i) * -700ms) infinite alternate;
+}
+.opening-fanoos .opening-lamp-glow {
+  animation: opening-twinkle 1.8s ease-in-out calc(var(--i) * -300ms) infinite alternate;
+}
+.opening-stage[data-open="true"] .opening-fanoos {
+  animation-duration: 0.6s;
+}
+
+@keyframes opening-light {
+  from {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes opening-draw {
+  from {
+    stroke-dashoffset: 1;
+    fill-opacity: 0;
+  }
+  70% {
+    fill-opacity: 0;
+  }
+  to {
+    stroke-dashoffset: 0;
+    fill-opacity: 1;
+  }
+}
+@keyframes opening-fan {
+  from {
+    rotate: calc(var(--a) * 0.96);
+  }
+  to {
+    rotate: calc(var(--a) * 1.03);
+  }
+}
+@keyframes opening-bob {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-2.5cqh);
+  }
+}
+@keyframes opening-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.1);
+  }
+  12% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6%) scale(1.08);
+  }
+}
+
+/* Step 12y: the welcome between the opening and the invitation */
+.opening-welcome {
+  cursor: pointer;
+  background: radial-gradient(
+    circle at 50% 42%,
+    color-mix(in oklab, var(--open-light) 70%, var(--open-plate)),
+    var(--open-plate) 46%,
+    color-mix(in oklab, var(--open-plate) 78%, var(--open-gilt)) 100%
+  );
+  animation: opening-welcome-in 700ms ease both;
+}
+.opening-welcome-ring circle {
+  fill: none;
+  stroke: var(--open-gilt);
+  stroke-width: 1.6;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  animation: opening-draw-ring 1400ms cubic-bezier(0.6, 0, 0.2, 1) 150ms forwards;
+}
+.opening-welcome-ring circle + circle {
+  stroke-width: 0.8;
+  stroke-dasharray: 0.02 0.02;
+  animation-delay: 450ms;
+}
+.opening-welcome-ring text {
+  fill: var(--card-gold-text);
+  font-size: 2.6rem;
+  opacity: 0;
+  animation: opening-welcome-fade 900ms ease 700ms forwards;
+}
+.opening-welcome-rise {
+  opacity: 0;
+  translate: 0 1.4rem;
+  animation: opening-welcome-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) forwards;
+}
+.opening-welcome-names {
+  line-height: 1.05;
+  text-shadow: 0 0.06em 0.3em color-mix(in oklab, var(--open-gilt) 45%, transparent);
+}
+.opening-welcome-rule {
+  width: min(42cqw, 12rem);
+  height: 0.75rem;
+  background:
+    radial-gradient(circle, var(--open-gilt) 0 0.22rem, transparent 0.24rem) center / 0.75rem
+      0.75rem no-repeat,
+    linear-gradient(
+        90deg,
+        transparent,
+        var(--open-gilt) 30%,
+        transparent 46%,
+        transparent 54%,
+        var(--open-gilt) 70%,
+        transparent
+      )
+      center / 100% 1px no-repeat;
+}
+.opening-welcome-spark {
+  width: 0.5rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--open-gilt-bright), transparent 70%);
+  opacity: 0;
+  animation: opening-welcome-spark 2.2s ease-in-out calc(var(--i) * 140ms) infinite;
+}
+@keyframes opening-welcome-in {
+  from {
+    opacity: 0;
+    scale: 1.06;
+  }
+}
+@keyframes opening-draw-ring {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes opening-welcome-fade {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes opening-welcome-rise {
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes opening-welcome-spark {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+    scale: 1.3;
+  }
+}
+/* The names on the opening itself: a soft gilt glow so they read from across a room */
+.opening-names {
+  text-shadow:
+    0 0.04em 0 color-mix(in oklab, var(--open-gilt) 55%, transparent),
+    0 0.08em 0.35em color-mix(in oklab, var(--open-gilt) 30%, transparent);
+}
+.opening-rule {
+  width: min(36cqw, 10rem);
+  height: 0.6rem;
+  background:
+    radial-gradient(circle, var(--open-gilt) 0 0.18rem, transparent 0.2rem) center / 0.6rem 0.6rem
+      no-repeat,
+    linear-gradient(
+        90deg,
+        transparent,
+        var(--open-gilt) 30%,
+        transparent 44%,
+        transparent 56%,
+        var(--open-gilt) 70%,
+        transparent
+      )
+      center / 100% 1px no-repeat;
 }
 
 /* Still mode: no drifting or swaying, and each move lands at once */
