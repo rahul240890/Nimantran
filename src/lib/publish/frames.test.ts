@@ -14,4 +14,11 @@ describe("design photo frames", () => {
     const draft = { ...newDraft(), suite: "udaipur-lake" as const, format: "scene" as const };
     expect(coupleLayouts(draft)).toEqual(["one"]);
   });
+
+  it("asks an illustrated card for no photos, its couple being painted", () => {
+    const draft = { ...newDraft(), suite: "mor-kamal" as const, format: "scene" as const };
+    expect(coupleLayouts(draft)).toEqual(["none"]);
+    expect(draftCouple({ ...draft, couplePhotos: { layout: "two", ids: [] } }).layout).toBe("none");
+    expect(draftFrameSlots(draft)).toEqual([]);
+  });
 });

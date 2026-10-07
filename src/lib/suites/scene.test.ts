@@ -1,8 +1,17 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { SCENE_THEME_IDS, isSceneTheme } from "./catalog";
-import { ENTRANCES, SCENE_SUITES, entranceFor, hasScene, sceneFrames, scenePage } from "./scene";
+import { ILLUSTRATED_IDS, SCENE_THEME_IDS, isSceneTheme } from "./catalog";
+import type { FrameBox } from "./photo-frames";
+import {
+  ENTRANCES,
+  SCENE_SUITES,
+  entranceFor,
+  hasScene,
+  isIllustrated,
+  sceneFrames,
+  scenePage,
+} from "./scene";
 
 const bottom = ([, y, , height]: readonly number[]) => y! + height!;
 
@@ -32,7 +41,7 @@ describe("One Scene", () => {
 
   it("gives every Scene theme its painting, its card and words that sit on the card", () => {
     expect(SCENE_SUITES).toEqual(expect.arrayContaining([...SCENE_THEME_IDS]));
-    for (const suite of SCENE_THEME_IDS) {
+    for (const suite of SCENE_THEME_IDS.filter((id) => !isIllustrated(id))) {
       const page = scenePage(suite, 2)!;
       expect(page.style).toBe("painted");
       for (const src of [page.image, page.card!.image]) {
@@ -46,6 +55,35 @@ describe("One Scene", () => {
       // Room enough on the card for a celebration's name, day and place
       expect((width * page.slot[2]) / 100, suite).toBeGreaterThanOrEqual(45);
       expect((height * page.slot[3]) / 100, suite).toBeGreaterThanOrEqual(12);
+    }
+  });
+
+  it("prints an illustrated card's words in its empty space, with no photos", () => {
+    expect(ILLUSTRATED_IDS.length).toBe(23);
+    for (const suite of ILLUSTRATED_IDS) {
+      const page = scenePage(suite, 2)!;
+      expect(page.style).toBe("bare");
+      expect(page.card).toBeNull();
+      expect(page.frames).toEqual([]);
+      expect(sceneFrames(suite)).toBe(0);
+      expect(existsSync(join(process.cwd(), "public", page.image)), suite).toBe(true);
+      // The names, the line and the slot stay on the painting, one under the other
+      for (const [x, y, width, height] of [page.names, page.line, page.slot].filter(
+        (box): box is FrameBox => box !== null,
+      )) {
+        expect(x).toBeGreaterThanOrEqual(0);
+        expect(y).toBeGreaterThanOrEqual(0);
+        expect(x + width, suite).toBeLessThanOrEqual(100);
+        expect(y + height, suite).toBeLessThanOrEqual(100);
+      }
+      expect(page.slot[1]).toBeGreaterThanOrEqual(bottom(page.line ?? page.names) - 0.01);
+      // Room enough for a celebration's name, day and place
+      expect(page.slot[2], suite).toBeGreaterThanOrEqual(45);
+      expect(page.slot[3], suite).toBeGreaterThanOrEqual(10);
+      // Its parts cover the whole painting between them, without overlapping
+      const area = page.pieces.reduce((sum, { box: [, , w, h] }) => sum + w * h, 0);
+      expect(area, suite).toBeCloseTo(100 * 100, 3);
+      expect(new Set(page.pieces.map((piece) => piece.from)).size, suite).toBeGreaterThan(2);
     }
   });
 

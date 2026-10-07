@@ -13,8 +13,10 @@
 
 import type { FunctionId } from "@/lib/events/functions";
 import {
+  ILLUSTRATED_IDS,
   isSceneTheme,
   pageLook,
+  type IllustratedId,
   type Mood,
   type PageArt,
   type SceneThemeId,
@@ -24,9 +26,10 @@ import { photoPage, type FrameBox } from "./photo-frames";
 
 /**
  * The slot's card: drawn in the theme's colours (a palace window, a kasavu-bordered
- * panel), or the theme's own painted card.
+ * panel), the theme's own painted card, or no card at all: an illustrated card's words
+ * print straight onto its painting's empty space.
  */
-export type SlotStyle = "jharokha" | "kasavu" | "painted";
+export type SlotStyle = "jharokha" | "kasavu" | "painted" | "bare";
 
 /** A Scene theme's painted card: its picture, and where on it the words go (percent of the card). */
 export type PaintedCard = {
@@ -45,7 +48,7 @@ type SceneLayout = {
 };
 
 type SceneEntry = {
-  style: Exclude<SlotStyle, "painted">;
+  style: Exclude<SlotStyle, "painted" | "bare">;
   one: SceneLayout;
   two: SceneLayout;
 };
@@ -101,7 +104,7 @@ type PaintedEntry = (
   plate?: true;
 };
 
-const PAINTED: Record<SceneThemeId, PaintedEntry> = {
+const PAINTED: Record<Exclude<SceneThemeId, IllustratedId>, PaintedEntry> = {
   // A white marble jharokha panel on Lake Pichola at dusk
   "udaipur-lake": {
     frame: [31.6, 11.4, 36.9, 28.2],
@@ -966,6 +969,105 @@ const PAINTED: Record<SceneThemeId, PaintedEntry> = {
   },
 };
 
+/**
+ * An illustrated card's painting: the empty space its words go in (the names at its top,
+ * the line under them and each celebration below), and whether that space is dark.
+ */
+type IllustratedEntry = {
+  open: FrameBox;
+  /** Where the names go when the painting sets them apart (between two symbols). */
+  names?: FrameBox;
+  dark?: true;
+};
+
+const ILLUSTRATED: Record<IllustratedId, IllustratedEntry> = {
+  // Blush watercolour above the couple, the peacock and the lotus
+  "mor-kamal": { open: [8, 13, 84, 38] },
+  // Cream paper under the toran, above the elephants
+  "rajwada-haathi": { open: [10, 15, 78, 39] },
+  // Handmade paper between the bamboo, under the sun
+  "madhubani-machhli": { open: [26, 19, 48, 50] },
+  // Indigo night under the kadamba branch and the moon
+  "pichwai-gaay": { open: [22, 10, 62, 27], dark: true },
+  // Plaster under the bells, above the elephant and the lamp
+  "kerala-mural": { open: [14, 14, 80, 38] },
+  // The wall inside the temple arch, between the banana plants
+  "kalyana-vazhai": { open: [26, 17, 48, 38] },
+  // Ivory under the mango leaves, above the shola crowns
+  "alpana-topor": { open: [8, 10, 84, 34] },
+  // The mirror-work panel below the dancers
+  "kutch-rang": { open: [7, 51, 86, 35] },
+  // The night sky between the cypresses, under the lanterns
+  "mughal-bagh": { open: [15, 16, 70, 34], dark: true },
+  // Cream between the phulkari strips
+  "phulkari-lavan": { open: [12, 10, 76, 37] },
+  // Ivory between the roses and the doves
+  "safed-gulaab": { open: [18, 24, 64, 30] },
+  // Cream above the gold line drawing
+  "line-art-gold": { open: [10, 18, 80, 33] },
+  // The sunset sky between the palms
+  "samudra-sanjh": { open: [16, 7, 68, 37] },
+  // The paper night sky above the moon
+  "kaagaz-chaand": { open: [10, 6, 80, 35], dark: true },
+  // Beige sky above the village and the doli
+  "doli-vidaai": { open: [16, 8, 76, 37] },
+  // Cream under the marigold strings
+  "haldi-genda": { open: [8, 21, 84, 22] },
+  // Mint under the mango branch, above the swing
+  "mehendi-jhoola": { open: [8, 20, 84, 24] },
+  // Plum night under the lights
+  "sangeet-dhol": { open: [8, 15, 84, 30], dark: true },
+  // Pale sky between the balloons
+  "pehla-janamdin": { open: [17, 15, 65, 38] },
+  // Cream under the garland, above the cradle and the swans
+  "godh-bharai": { open: [10, 15, 80, 31] },
+  // The wall under the toran, above the doorway
+  "griha-kalash": { open: [8, 16, 84, 26] },
+  // The evening sky beside the neem tree
+  "sona-saath": { open: [6, 6, 54, 44] },
+  // Cream under the lamps, the names between the two swastiks
+  "bagh-reception": { open: [14, 15, 72, 35], names: [14, 19, 72, 7.5] },
+};
+
+export function isIllustrated(suite: SuiteId): suite is IllustratedId {
+  return (ILLUSTRATED_IDS as readonly SuiteId[]).includes(suite);
+}
+
+/**
+ * The names at the top of the empty space, the line under them where it is tall enough,
+ * and each celebration in the rest.
+ */
+function openLayout({ open, names: placed }: IllustratedEntry): SceneLayout {
+  const [x, y, w, h] = open;
+  const names: FrameBox = placed ?? [x, y, w, Math.min(8.5, Math.max(6, h * 0.22))];
+  const top = names[1] + names[3];
+  const end = y + h;
+  const line: FrameBox | null = end - top >= 22 ? [x + 3, top, w - 6, 4.5] : null;
+  const from = line ? top + line[3] + 1 : top + 0.5;
+  return { names, line, slot: [x, from, w, end - from] };
+}
+
+/**
+ * How an illustrated card opens: its empty space first, then the art above it drops in,
+ * the art at its sides slides in and the art below it rises, so the painting comes
+ * together from every side. The pieces cover the whole painting between them.
+ */
+function openPieces([x, y, w, h]: FrameBox): Piece[] {
+  const right = x + w;
+  const bottom = y + h;
+  const pieces: Piece[] = [
+    { box: [x, y, w, h], from: "fade", order: 0 },
+    { box: [0, 0, 100, y], from: "top", order: 1 },
+    { box: [0, y, x, h], from: "left", order: 2 },
+    { box: [right, y, 100 - right, h], from: "right", order: 2 },
+    { box: [0, bottom, 100, 100 - bottom], from: "bottom", order: 3 },
+  ];
+  return pieces.filter(({ box }) => box[2] > 0.5 && box[3] > 0.5);
+}
+
+/** A part of an illustrated card's painting and the side it comes in from as the card opens. */
+export type Piece = { box: FrameBox; from: Entrance | "fade"; order: number };
+
 export type ScenePage = {
   image: string;
   style: SlotStyle;
@@ -975,10 +1077,24 @@ export type ScenePage = {
   frames: readonly FrameBox[];
   /** The names and line print light whatever the hour, on a dark painting. */
   dark: boolean;
+  /** An illustrated card's painting in parts, as it comes together; empty for every other. */
+  pieces: readonly Piece[];
 } & SceneLayout;
 
 /** The painting and places for a theme's scene with this many photos, if it has one. */
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
+  if (isIllustrated(suite)) {
+    const entry = ILLUSTRATED[suite];
+    return {
+      image: `/suites/${suite}/scene.webp`,
+      style: "bare",
+      dark: Boolean(entry.dark),
+      card: null,
+      frames: [],
+      pieces: openPieces(entry.open),
+      ...openLayout(entry),
+    };
+  }
   if (isSceneTheme(suite)) {
     // One frame: with two photos, the first (the couple, or the bride) shows
     const { frame, pair, names, line, card, text, dark, plate } = PAINTED[suite];
@@ -988,6 +1104,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       dark: Boolean(dark),
       card: { image: `/suites/${suite}/card.webp`, text, plate: Boolean(plate) },
       frames: pair ?? [frame],
+      pieces: [],
       names,
       line,
       slot: card,
@@ -1004,12 +1121,17 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
     card: null,
     frames: page.frames,
     dark: false,
+    pieces: [],
     ...layout,
   };
 }
 
-/** How many photos a Scene theme's painting has frames for: one, or the bride's and the groom's. */
-export function sceneFrames(suite: SuiteId): 1 | 2 {
+/**
+ * How many photos a Scene theme's painting has frames for: one, the bride's and the
+ * groom's, or none on an illustrated card.
+ */
+export function sceneFrames(suite: SuiteId): 0 | 1 | 2 {
+  if (isIllustrated(suite)) return 0;
   return isSceneTheme(suite) && PAINTED[suite].pair ? 2 : 1;
 }
 
@@ -1018,7 +1140,11 @@ export function hasScene(suite: SuiteId): boolean {
   return isSceneTheme(suite) || Boolean(SCENES[suite as keyof typeof SCENES]);
 }
 
-export const SCENE_SUITES = [...Object.keys(SCENES), ...Object.keys(PAINTED)] as SuiteId[];
+export const SCENE_SUITES = [
+  ...Object.keys(SCENES),
+  ...Object.keys(PAINTED),
+  ...ILLUSTRATED_IDS,
+] as SuiteId[];
 
 /** The sides a function can come in from; each one leaves the way the next comes in. */
 export const ENTRANCES = ["right", "left", "bottom", "top"] as const;
