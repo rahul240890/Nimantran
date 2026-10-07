@@ -39,6 +39,8 @@ import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
+import { PagePacing } from "../page-pacing";
+import { draftShowsScene } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
@@ -625,6 +627,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
           update((current) => ({ ...current, music: { ...current.music, playOnOpen } }))
         }
       />
+      {!draftShowsScene(draft) && <PagePacing draft={draft} update={update} />}
     </section>
   );
 }

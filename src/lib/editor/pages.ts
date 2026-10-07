@@ -1,4 +1,10 @@
-import { beatSeconds, fitStory, type BeatLayout, type StoryBeat } from "@/lib/engine/story";
+import {
+  beatSeconds,
+  fitStory,
+  paceStory,
+  type BeatLayout,
+  type StoryBeat,
+} from "@/lib/engine/story";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 
 /*
@@ -69,12 +75,14 @@ export function hasOwnWords(pages: DraftPages, language: CardLanguage, pageId: s
 
 /**
  * The invite's pages with the host's changes: their own lines where they wrote them, their
- * placement, and the pages they left out gone. Timings follow the new words.
+ * placement, and the pages they left out gone. Timings follow the new words, or the
+ * time the host fixed for every page.
  */
 export function applyPages(
   beats: readonly StoryBeat[],
   pages: DraftPages,
   language: CardLanguage,
+  pace: number | null = null,
 ): StoryBeat[] {
   const own = pages.words[language] ?? {};
   const changed = beats
@@ -97,7 +105,7 @@ export function applyPages(
       if (layout) next = { ...next, layout: beatLayout(layout) };
       return next;
     });
-  return fitStory(changed);
+  return pace ? paceStory(changed, pace) : fitStory(changed);
 }
 
 function beatLayout(layout: PageLayout): BeatLayout {

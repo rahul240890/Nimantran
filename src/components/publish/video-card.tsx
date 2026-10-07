@@ -329,11 +329,11 @@ export function useVideoFilm(
       ),
       blessing: draftBlessing(draft),
     });
-    const beats = applyPages(written, draft.pages, language);
+    const beats = applyPages(written, draft.pages, language, draft.pageSeconds);
     return {
       copy,
       suite,
-      timeline: videoTimeline(beats),
+      timeline: videoTimeline(beats, { fixed: draft.pageSeconds !== null }),
       type: pageType(draft.type, [language]),
     };
   }, [draft, functions, photos, language]);

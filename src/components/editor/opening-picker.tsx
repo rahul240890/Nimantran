@@ -12,6 +12,7 @@ import { draftCopy, type InviteDraft } from "@/lib/editor/draft";
 import {
   GOD_PAINTINGS,
   OPENING_GODS,
+  OPENING_GROUPS,
   offersGods,
   openingGod,
   openingStyle,
@@ -56,11 +57,12 @@ export function OpeningPicker({
 }) {
   const { openingCopy } = useText(editorText);
   const still = useReducedMotion();
-  const style = openingStyle(draft.opening, suite, scene);
+  const style = openingStyle(draft.opening, suite, scene, draft.categoryId);
   const god = openingGod(draft.opening, draft.categoryId);
   const beat = useBeat(!still);
   const copy = draftCopy(draft, draft.languages[0]);
   const seal = `${Array.from(copy.first.trim())[0] ?? ""}${Array.from(copy.second.trim())[0] ?? ""}`;
+  const offered = openingStyles(suite, scene);
   const setOpening = (change: Partial<InviteDraft["opening"]>) =>
     update((current) => ({ ...current, opening: { ...current.opening, ...change } }));
 
@@ -76,53 +78,69 @@ export function OpeningPicker({
         aria-labelledby="opening-heading"
         value={style}
         onValueChange={(value) => setOpening({ style: value as OpeningStyle })}
-        className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4"
+        className="flex flex-col gap-5"
       >
-        {openingStyles(suite, scene).map((id) => {
-          const words = openingCopy.styles[id];
+        {OPENING_GROUPS.map((group) => {
+          const styles = group.styles.filter((id) => offered.includes(id));
+          if (styles.length === 0) return null;
           return (
-            <RadioPrimitive.Item
-              key={id}
-              value={id}
-              aria-describedby={`opening-${id}-d`}
-              className={cn(
-                "group/opening flex cursor-pointer flex-col gap-2 rounded-lg border border-line-strong bg-surface p-2 text-start shadow-raised",
-                "transition-[transform,box-shadow,border-color] duration-200 ease-out-expo hover:-translate-y-0.5 hover:shadow-float motion-still:hover:translate-y-0",
-                "data-[state=checked]:border-marigold data-[state=checked]:shadow-[0_0_0_1px_var(--marigold),var(--elev-float)]",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-              )}
-            >
-              {id === "none" ? (
-                <span
-                  aria-hidden
-                  className="grid aspect-[9/16] w-full place-items-center rounded-lg border border-dashed border-line-strong bg-surface-2 font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-                >
-                  {words.name}
-                </span>
-              ) : (
-                <OpeningSample
-                  suite={suite}
-                  style={id}
-                  god={god}
-                  open={id === style && beat}
-                  seal={seal}
-                />
-              )}
-              <span className="flex flex-col gap-0.5 px-1 pb-1">
-                <span className="flex items-center justify-between gap-2 font-semibold text-ink">
-                  {words.name}
-                  <span
-                    aria-hidden
-                    className="grid size-[18px] shrink-0 place-items-center rounded-full border-2 border-line-control group-data-[state=checked]/opening:border-marigold"
-                  >
-                    <span className="size-2 scale-0 rounded-full bg-marigold transition-transform group-data-[state=checked]/opening:scale-100" />
-                  </span>
-                </span>
-                <span id={`opening-${id}-d`} className="text-sm text-ink-muted">
-                  {words.description}
-                </span>
-              </span>
-            </RadioPrimitive.Item>
+            <div key={group.id} role="presentation" className="flex flex-col gap-2.5">
+              <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
+                {openingCopy.groups[group.id as keyof typeof openingCopy.groups]}
+              </p>
+              <div
+                role="presentation"
+                className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4"
+              >
+                {styles.map((id) => {
+                  const words = openingCopy.styles[id];
+                  return (
+                    <RadioPrimitive.Item
+                      key={id}
+                      value={id}
+                      aria-describedby={`opening-${id}-d`}
+                      className={cn(
+                        "group/opening flex cursor-pointer flex-col gap-2 rounded-lg border border-line-strong bg-surface p-2 text-start shadow-raised",
+                        "transition-[transform,box-shadow,border-color] duration-200 ease-out-expo hover:-translate-y-0.5 hover:shadow-float motion-still:hover:translate-y-0",
+                        "data-[state=checked]:border-marigold data-[state=checked]:shadow-[0_0_0_1px_var(--marigold),var(--elev-float)]",
+                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                      )}
+                    >
+                      {id === "none" ? (
+                        <span
+                          aria-hidden
+                          className="grid aspect-[9/16] w-full place-items-center rounded-lg border border-dashed border-line-strong bg-surface-2 font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+                        >
+                          {words.name}
+                        </span>
+                      ) : (
+                        <OpeningSample
+                          suite={suite}
+                          style={id}
+                          god={god}
+                          open={id === style && beat}
+                          seal={seal}
+                        />
+                      )}
+                      <span className="flex flex-col gap-0.5 px-1 pb-1">
+                        <span className="flex items-center justify-between gap-2 font-semibold text-ink">
+                          {words.name}
+                          <span
+                            aria-hidden
+                            className="grid size-[18px] shrink-0 place-items-center rounded-full border-2 border-line-control group-data-[state=checked]/opening:border-marigold"
+                          >
+                            <span className="size-2 scale-0 rounded-full bg-marigold transition-transform group-data-[state=checked]/opening:scale-100" />
+                          </span>
+                        </span>
+                        <span id={`opening-${id}-d`} className="text-sm text-ink-muted">
+                          {words.description}
+                        </span>
+                      </span>
+                    </RadioPrimitive.Item>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </RadioPrimitive.Root>

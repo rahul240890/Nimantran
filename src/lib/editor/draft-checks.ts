@@ -226,6 +226,8 @@ export const draftSchema = z.object({
       god: z.enum(OPENING_GODS).nullable().catch(null),
     })
     .catch(noOpening),
+  /** Seconds on every page, which sets the music's length (Step 12y); null times each page. */
+  pageSeconds: z.number().int().min(3).max(15).nullable().catch(null),
   /** Parents, a line in memory, and whom to call (Step 12s); see ./family.ts. */
   family: familySchema.catch(noFamily),
   /** The host's own words and placement on each page (Step 12s); see ./pages.ts. */

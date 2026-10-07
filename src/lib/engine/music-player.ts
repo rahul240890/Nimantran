@@ -173,8 +173,8 @@ export class MusicPlayer {
     this.timer = window.setInterval(() => this.schedule(), TICK_MS);
   }
 
-  /** Fades out and goes quiet. */
-  pause() {
+  /** Fades out over `fade` seconds and goes quiet. */
+  pause(fade = 0.6) {
     if (!this.playing) return;
     if (this.clip) {
       this.playing = false;
@@ -187,11 +187,14 @@ export class MusicPlayer {
     const now = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(now);
     this.master.gain.setValueAtTime(this.master.gain.value, now);
-    this.master.gain.linearRampToValueAtTime(0, now + 0.6);
+    this.master.gain.linearRampToValueAtTime(0, now + fade);
     const ctx = this.ctx;
-    window.setTimeout(() => {
-      if (!this.playing) void ctx.suspend();
-    }, 700);
+    window.setTimeout(
+      () => {
+        if (!this.playing) void ctx.suspend();
+      },
+      fade * 1000 + 100,
+    );
     // Pick up with a fresh phrase next time rather than notes queued long ago
     this.nextPhrase = 0;
     this.nextDrone = 0;

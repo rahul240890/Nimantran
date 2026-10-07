@@ -91,6 +91,8 @@ type StoryPlayerProps = {
   music?: { playing: boolean; toggle: () => void; play: string; pause: string } | null;
   /** `hadFocus` says whether keyboard focus was inside the pages as they closed. */
   onDone: (hadFocus: boolean) => void;
+  /** The last page's time is up (the guest has seen every page at its pace). */
+  onFinished?: () => void;
 };
 
 /* Each kind of line's ink; sizes, faces and spacing come from the lettering spec */
@@ -137,6 +139,7 @@ export function StoryPlayer({
   reply,
   music,
   onDone: onDoneProp,
+  onFinished,
 }: StoryPlayerProps) {
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
@@ -191,13 +194,19 @@ export function StoryPlayer({
     if (!running) return;
     const already = spent.current.index === index ? spent.current.ms : 0;
     const start = performance.now();
-    // The last page stays until the guest acts, so the reply button can be pressed
-    const timer = last ? null : window.setTimeout(next, Math.max(0, seconds * 1000 - already));
+    // The last page stays until the guest acts, so the reply button can be pressed; once
+    // its time is up the music, timed to the pages, comes to rest
+    const left = Math.max(0, seconds * 1000 - already);
+    const timer = !last
+      ? window.setTimeout(next, left)
+      : onFinished
+        ? window.setTimeout(onFinished, left)
+        : null;
     return () => {
       if (timer !== null) window.clearTimeout(timer);
       spent.current = { index, ms: already + performance.now() - start };
     };
-  }, [running, index, seconds, last, next]);
+  }, [running, index, seconds, last, next, onFinished]);
 
   // Fetch the next page's painting ahead, so it is ready when the page turns
   const upcoming = beats[index + 1];

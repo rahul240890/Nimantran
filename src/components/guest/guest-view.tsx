@@ -166,6 +166,7 @@ export function GuestView({
         }),
         draft.pages,
         language,
+        draft.pageSeconds,
       ),
       suite: draftSuite(draft),
       textBox: draft.textBox,
@@ -196,7 +197,7 @@ export function GuestView({
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
   // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
-  const opening = openingStyle(draft.opening, suite, Boolean(scene));
+  const opening = openingStyle(draft.opening, suite, Boolean(scene), draft.categoryId);
   const god = openingGod(draft.opening, draft.categoryId);
   const [entered, setEntered] = useState(false);
   const showOpening = !entered && opening !== "none";

@@ -26,6 +26,8 @@ import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from 
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
+/** How long the welcome stays between the opening and the invitation, unless tapped. */
+export const WELCOME_MS = 3200;
 
 const noSubscribe = () => () => {};
 
@@ -143,6 +145,125 @@ function initials(copy: CardCopy): string {
   return second ? `${first}${second}` : first;
 }
 
+const SPARKS = Array.from({ length: 18 }, (_, i) => i);
+
+/**
+ * The moment between the opening and the invitation (Step 12y): the theme's light fills
+ * the frame, a ring draws itself round the initials, and the names rise large with the
+ * guest's welcome and the date. It moves on by itself; a tap moves on sooner.
+ */
+function OpeningWelcome({
+  copy,
+  lang,
+  guest,
+  names,
+  script,
+  skip,
+  onSkip,
+}: {
+  copy: CardCopy;
+  lang: CardLanguage;
+  guest: string | null;
+  names: CSSProperties;
+  script: CSSProperties;
+  skip: string;
+  onSkip: () => void;
+}) {
+  const words = CARD_GREETING_WORDS[lang];
+  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
+  const button = useRef<HTMLButtonElement>(null);
+  useEffect(() => button.current?.focus({ preventScroll: true }), []);
+  return (
+    <div
+      lang={lang}
+      data-testid="opening-welcome"
+      onClick={onSkip}
+      className="opening-welcome absolute inset-0 z-40 flex flex-col items-center justify-center gap-[2.4cqh] px-[8cqw] text-center"
+    >
+      <div aria-hidden className="absolute inset-0 overflow-hidden">
+        {SPARKS.map((i) => (
+          <span
+            key={i}
+            className="opening-welcome-spark absolute rounded-full"
+            style={
+              {
+                left: `${((i * 37 + 11) % 92) + 4}%`,
+                top: `${((i * 53 + 7) % 86) + 6}%`,
+                "--i": i,
+              } as CSSProperties
+            }
+          />
+        ))}
+      </div>
+      <svg
+        aria-hidden
+        viewBox="0 0 120 120"
+        className="opening-welcome-ring relative w-[30cqw] max-w-[9rem]"
+      >
+        <circle cx="60" cy="60" r="54" pathLength={1} />
+        <circle cx="60" cy="60" r="46" pathLength={1} />
+        <text x="60" y="60" dominantBaseline="central" textAnchor="middle" style={names}>
+          {initials(copy)}
+        </text>
+      </svg>
+      {(guest || copy.blessing) && (
+        <p
+          className="opening-welcome-rise relative text-[clamp(0.95rem,4.6cqw,1.5rem)] text-card-accent-text"
+          style={{ ...script, "--d": "500ms" } as CSSProperties}
+        >
+          {guest ? `${words.dear} ${guest}` : copy.blessing}
+        </p>
+      )}
+      <p
+        className="opening-welcome-rise opening-welcome-names relative flex flex-col items-center break-words text-card-ink"
+        style={{ ...names, "--d": "750ms" } as CSSProperties}
+      >
+        <span className="text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]">{copy.first}</span>
+        {joiner && (
+          <>
+            <span className="text-[clamp(1.2rem,min(7cqw,4.5cqh),2.4rem)] text-card-accent-text">
+              {joiner}
+            </span>
+            <span className="text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]">{copy.second}</span>
+          </>
+        )}
+      </p>
+      <span
+        aria-hidden
+        className="opening-welcome-rule opening-welcome-rise relative"
+        style={{ "--d": "1000ms" } as CSSProperties}
+      />
+      {(guest ? words.invited : copy.line) && (
+        <p
+          className="opening-welcome-rise relative max-w-[30ch] text-[clamp(0.85rem,3.8cqw,1.15rem)] text-card-ink-muted"
+          style={{ "--d": "1150ms" } as CSSProperties}
+        >
+          {guest ? words.invited : copy.line}
+        </p>
+      )}
+      {copy.date && (
+        <p
+          className="opening-welcome-rise relative font-label text-[clamp(0.75rem,3.2cqw,1rem)] tracking-[0.2em] text-card-ink uppercase [font-variant-numeric:lining-nums]"
+          style={{ "--d": "1300ms" } as CSSProperties}
+        >
+          {copy.date}
+        </p>
+      )}
+      <button
+        ref={button}
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          onSkip();
+        }}
+        className="absolute end-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] inline-flex min-h-11 items-center rounded-full px-4 font-label text-xs tracking-[0.2em] text-card-ink-muted uppercase focus-visible:outline-2 focus-visible:outline-ring"
+      >
+        {skip}
+      </button>
+    </div>
+  );
+}
+
 export type OpeningProps = {
   suite: SuiteId;
   style: OpeningStyle;
@@ -214,18 +335,31 @@ export function Opening({
   useEffect(() => {
     latest.current = after;
   });
+  const [welcome, setWelcome] = useState(false);
+  const goIn = () => {
+    setWelcome(false);
+    const next = latest.current;
+    if (next.kind === "enter") next.onEnter();
+    else setPages(true);
+  };
+  const goInLatest = useRef(goIn);
   useEffect(() => {
-    if (!open || pages) return;
+    goInLatest.current = goIn;
+  });
+  // Once open, a moment of welcome with the names (Step 12y); still mode goes straight in
+  useEffect(() => {
+    if (!open || pages || welcome) return;
     const timer = window.setTimeout(
-      () => {
-        const next = latest.current;
-        if (next.kind === "enter") next.onEnter();
-        else setPages(true);
-      },
+      () => (still ? goInLatest.current() : setWelcome(true)),
       still ? 0 : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, still]);
+  }, [open, pages, welcome, still]);
+  useEffect(() => {
+    if (!welcome) return;
+    const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
+    return () => window.clearTimeout(timer);
+  }, [welcome]);
 
   const button = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
@@ -242,6 +376,7 @@ export function Opening({
   };
   const leave = (hadFocus: boolean) => {
     returnFocus.current = hadFocus;
+    setWelcome(false);
     setPages(false);
     setOpen(false);
   };
@@ -335,7 +470,10 @@ export function Opening({
               )}
               <h1
                 id="guest-names"
-                className="flex flex-col items-center break-words text-card-ink"
+                className={cn(
+                  "flex flex-col items-center break-words text-card-ink",
+                  !painted && "opening-names",
+                )}
                 style={{
                   ...face("names", type.names),
                   ...(type.bold ? { fontWeight: 700 } : {}),
@@ -343,20 +481,21 @@ export function Opening({
                   color: type.colour,
                 }}
               >
-                <span className="text-[length:calc(clamp(1.7rem,min(10cqw,6cqh),3.6rem)*var(--story-scale,1))]">
+                <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
                   {copy.first}
                 </span>{" "}
                 {joiner && (
                   <>
-                    <span className="text-[length:calc(clamp(1.1rem,min(6cqw,4cqh),2.2rem)*var(--story-scale,1))] text-card-accent-text">
+                    <span className="text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))] text-card-accent-text">
                       {joiner}
                     </span>{" "}
-                    <span className="text-[length:calc(clamp(1.7rem,min(10cqw,6cqh),3.6rem)*var(--story-scale,1))]">
+                    <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
                       {copy.second}
                     </span>
                   </>
                 )}
               </h1>
+              {!painted && copy.date && <span aria-hidden className="opening-rule" />}
               {copy.date && (
                 <p
                   className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
@@ -408,6 +547,17 @@ export function Opening({
             </a>
           </div>
         </div>
+        {welcome && (
+          <OpeningWelcome
+            copy={copy}
+            lang={lang}
+            guest={guest}
+            names={face("names", type.names)}
+            script={face("script", type.words)}
+            skip={guestCopy.doorway.skip}
+            onSkip={goIn}
+          />
+        )}
       </div>
 
       {pages && after.kind === "pages" && (
@@ -429,6 +579,7 @@ export function Opening({
             pause: uiStrings.invitation.pauseMusic,
           }}
           onDone={leave}
+          onFinished={music.rest}
         />
       )}
     </section>

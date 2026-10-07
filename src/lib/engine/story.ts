@@ -269,6 +269,14 @@ export function fitStory(beats: StoryBeat[]): StoryBeat[] {
   }));
 }
 
+/** The times a host can fix for every page (Step 12y); null lets each page take its own. */
+export const PAGE_SECONDS = [4, 5, 6, 8, 10] as const;
+
+/** Every page held for the host's fixed time, or the story as timed when they left it. */
+export function paceStory(beats: StoryBeat[], pace: number | null): StoryBeat[] {
+  return pace ? beats.map((b) => ({ ...b, seconds: pace })) : beats;
+}
+
 export function storyLength(beats: readonly StoryBeat[]): number {
   return Number(beats.reduce((sum, b) => sum + b.seconds, 0).toFixed(2));
 }

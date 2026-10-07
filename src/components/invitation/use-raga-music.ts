@@ -81,7 +81,13 @@ export function useRagaMusic(template: Template) {
     }
   }, [playing, play]);
 
-  return { playing, play, toggle };
+  // The story has run its time: the music fades away, still on for the next play
+  const rest = useCallback(() => {
+    player.current?.pause(2.5);
+    setPlaying(false);
+  }, []);
+
+  return { playing, play, toggle, rest };
 }
 
 /** The music controls a page shares between its parts (the doorway and the details below). */

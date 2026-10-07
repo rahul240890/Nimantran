@@ -124,14 +124,15 @@ export function PreviewStage({
     });
   }, [functionsKey, familyKey, deferredCopy, language, couple, blessing]);
   const pagesKey = JSON.stringify(draft.pages);
+  const { pageSeconds } = draft;
   // The editor lists every page, the ones left out too, so they can be brought back
   const listed = useMemo(() => {
     const pages = JSON.parse(pagesKey) as DraftPages;
     const layout = Object.fromEntries(
       Object.entries(pages.layout).map(([id, page]) => [id, { ...page, hidden: false }]),
     );
-    return applyPages(written, { ...pages, layout }, language);
-  }, [written, pagesKey, language]);
+    return applyPages(written, { ...pages, layout }, language, pageSeconds);
+  }, [written, pagesKey, language, pageSeconds]);
   const hidden = useMemo(
     () =>
       new Set(
@@ -147,8 +148,8 @@ export function PreviewStage({
   );
   // The pages guests will see, with the ones left out taken away
   const beats = useMemo(
-    () => applyPages(written, JSON.parse(pagesKey) as DraftPages, language),
-    [written, pagesKey, language],
+    () => applyPages(written, JSON.parse(pagesKey) as DraftPages, language, pageSeconds),
+    [written, pagesKey, language, pageSeconds],
   );
 
   const { templateId } = draft;

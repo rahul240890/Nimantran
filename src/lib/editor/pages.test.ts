@@ -25,6 +25,12 @@ describe("the host's own pages", () => {
     expect(applyPages(beats, noPages, "en")).toEqual(beats);
   });
 
+  it("holds every page for the time the host fixed (Step 12y)", () => {
+    const paced = applyPages(beats, noPages, "en", 6);
+    expect(paced.map((b) => b.id)).toEqual(beats.map((b) => b.id));
+    expect(paced.every((b) => b.seconds === 6)).toBe(true);
+  });
+
   it("uses the host's lines, placement and box, in the language they were written for", () => {
     const pages: DraftPages = {
       layout: { cover: { hidden: false, place: "top", align: "start", box: "on" } },

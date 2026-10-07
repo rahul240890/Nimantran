@@ -121,6 +121,7 @@ export function newDraft(
     couplePhotos: noCouplePhotos,
     blessingPage: true,
     opening: noOpening,
+    pageSeconds: null,
     format: "story",
     family: noFamily,
     pages: noPages,
