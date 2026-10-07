@@ -672,7 +672,10 @@ function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
 export function ExtrasStep({ draft, update, errors }: StepProps) {
   return (
     <div className="flex flex-col gap-8">
-      <DesignPhotos draft={draft} update={update} errors={errors} />
+      {/* An illustrated card paints its couple, so it has no photos to ask for */}
+      {coupleLayouts(draft).some((layout) => layout !== "none") && (
+        <DesignPhotos draft={draft} update={update} errors={errors} />
+      )}
       <MorePhotos draft={draft} update={update} />
       <Music draft={draft} update={update} />
       <Questions draft={draft} update={update} />

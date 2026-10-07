@@ -884,6 +884,29 @@ export const suiteCopy = {
     "peony-blush": "Peony Blush",
     "magnolia-moon": "Magnolia Moon",
     "phool-chandelier": "Phool Chandelier",
+    "mor-kamal": "Mor Kamal",
+    "rajwada-haathi": "Rajwada Haathi",
+    "madhubani-machhli": "Madhubani Machhli",
+    "pichwai-gaay": "Pichwai Gaay",
+    "kerala-mural": "Kerala Mural",
+    "kalyana-vazhai": "Kalyana Vazhai",
+    "alpana-topor": "Alpana Topor",
+    "kutch-rang": "Kutch Rang",
+    "mughal-bagh": "Mughal Bagh",
+    "phulkari-lavan": "Phulkari Lavan",
+    "safed-gulaab": "Safed Gulaab",
+    "line-art-gold": "Gold Line",
+    "samudra-sanjh": "Samudra Sanjh",
+    "kaagaz-chaand": "Kaagaz Chaand",
+    "doli-vidaai": "Doli Vidaai",
+    "haldi-genda": "Haldi Genda",
+    "mehendi-jhoola": "Mehendi Jhoola",
+    "sangeet-dhol": "Sangeet Dhol",
+    "pehla-janamdin": "Pehla Janamdin",
+    "godh-bharai": "Godh Bharai",
+    "griha-kalash": "Griha Kalash",
+    "sona-saath": "Sona Saath",
+    "bagh-reception": "Bagh Reception",
     "mameru-bandhani": "Mameru Bandhani",
     "sindhi-ajrak": "Sindhi Ajrak",
     "hampi-ruins": "Hampi Ruins",
@@ -1025,6 +1048,47 @@ export const suiteCopy = {
     "peony-blush": "A dreamy garden of blush peonies and garden roses in pastel light.",
     "magnolia-moon": "White magnolia glowing under a full moon by a quiet lake.",
     "phool-chandelier": "A candlelit hall under cascading orchids, roses and crystal strands.",
+    "mor-kamal":
+      "A painted couple with a peacock and lotus in soft blush watercolour. No photos needed.",
+    "rajwada-haathi":
+      "A Rajasthani miniature: the couple under a gold umbrella between two elephants. No photos needed.",
+    "madhubani-machhli":
+      "Madhubani art from Mithila: the sun, bamboo, fish and the couple with a garland. No photos needed.",
+    "pichwai-gaay":
+      "A Pichwai night: the couple with white cows by a lotus pond under the moon. No photos needed.",
+    "kerala-mural":
+      "A Kerala mural: the thali, a decorated elephant and a brass lamp. No photos needed.",
+    "kalyana-vazhai":
+      "A South Indian temple wedding by the sacred fire, between banana plants. No photos needed.",
+    "alpana-topor":
+      "A Bengali wedding with shola crowns, paan leaves and a white alpana. No photos needed.",
+    "kutch-rang":
+      "A Gujarati couple dancing with dandiya, mirror work, a dhol and a camel. No photos needed.",
+    "mughal-bagh":
+      "A nikah in a Mughal garden at night, with lanterns, cypresses and a fountain. No photos needed.",
+    "phulkari-lavan": "An Anand Karaj between phulkari borders, with marigolds. No photos needed.",
+    "safed-gulaab": "A garden wedding with white roses, doves and a flower arch. No photos needed.",
+    "line-art-gold":
+      "A modern couple drawn in one gold line, with eucalyptus leaves. No photos needed.",
+    "samudra-sanjh": "A beach wedding at sunset between the palms. No photos needed.",
+    "kaagaz-chaand":
+      "Layered paper art: the couple on the hills under a gold moon. No photos needed.",
+    "doli-vidaai":
+      "A folk-art doli procession through the village, with the groom on a white horse. No photos needed.",
+    "haldi-genda": "A sunny haldi with marigold strings and a bowl of turmeric. No photos needed.",
+    "mehendi-jhoola": "The bride on a flower swing with henna hands and parrots. No photos needed.",
+    "sangeet-dhol":
+      "A sangeet night with fairy lights, a dhol and the couple dancing. No photos needed.",
+    "pehla-janamdin":
+      "A first birthday in the clouds with balloons, a cake and animal friends. No photos needed.",
+    "godh-bharai":
+      "A gentle baby shower with a cradle, swans and a garland of roses. No photos needed.",
+    "griha-kalash":
+      "A griha pravesh: the couple at the new door with a kalash, toran and rangoli. No photos needed.",
+    "sona-saath":
+      "An anniversary couple on a swing under the neem tree at sunset. No photos needed.",
+    "bagh-reception":
+      "A garden reception with gazebos, swans, hanging flowers and lamps. No photos needed.",
     "mameru-bandhani": "Bandhani silks, brass and gifts for the mameru.",
     "sindhi-ajrak": "Indigo and madder ajrak, roses and tassels for a Sindhi wedding.",
     "hampi-ruins": "Stone steps, brass lamps and jasmine among the old temples.",

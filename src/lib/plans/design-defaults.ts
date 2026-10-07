@@ -8,13 +8,14 @@ import {
   suiteFor,
   type SuiteId,
 } from "@/lib/suites/catalog";
-import { hasScene } from "@/lib/suites/scene";
+import { hasScene, isIllustrated } from "@/lib/suites/scene";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
 
 /*
- * Free by default: every 3D card, plus a few Scenes so each kind of celebration has a
- * painted design at no cost. A prayer meet's Scene is always free to start with.
+ * Free by default: every 3D card, every illustrated card (no photos needed), plus a few
+ * Scenes so each kind of celebration has a painted design at no cost. A prayer meet's
+ * Scene is always free to start with.
  */
 const FREE_SCENES: ReadonlySet<string> = new Set([
   "minimal-white",
@@ -32,13 +33,14 @@ const FREE_SCENES: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * A design's tier before the admin changes it: 3D cards are free, the grandest wedding
+ * A design's tier before the admin changes it: 3D cards and illustrated cards are free, the grandest wedding
  * Stories (the ones that open with a painted god) are Royal, and the rest are Premium.
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
   if (designId.endsWith("-scene")) {
-    return FREE_SCENES.has(designId.slice(0, -"-scene".length)) ? "free" : "premium";
+    const suite = designId.slice(0, -"-scene".length);
+    return FREE_SCENES.has(suite) || isIllustrated(suite as SuiteId) ? "free" : "premium";
   }
   const suite = designId as SuiteId;
   const wedding = suite in SUITES && !SUITES[suite].occasions?.length;

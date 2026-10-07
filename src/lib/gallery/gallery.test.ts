@@ -27,6 +27,8 @@ describe("gallery catalog", () => {
 
   it("gives each wedding kind only its own designs", () => {
     expect(kindDesigns("gujarati").map((design) => design.id)).toEqual([
+      "kutch-rang-scene",
+      "pichwai-gaay-scene",
       "kutch-bhunga-scene",
       "white-rann-scene",
       "mameru-bandhani-scene",

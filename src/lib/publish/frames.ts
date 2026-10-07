@@ -42,13 +42,17 @@ export type FrameSpot = {
  * (every Scene, and the Story themes with photo pages) always shows them, so it asks for its
  * photos: one, or one each where it has a two-frame painting. A Scene theme painted with the
  * bride's and the groom's frames always asks for both. Only a design without painted frames
- * can leave the photo page out.
+ * can leave the photo page out, and an illustrated card, with its couple painted, has none.
  */
 export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
   const one = draftPeople(draft) === "one";
   const suite = draftSuite(draft);
   if (draftShowsScene(draft)) {
-    if (isSceneTheme(suite)) return [!one && sceneFrames(suite) === 2 ? "two" : "one"];
+    if (isSceneTheme(suite)) {
+      const frames = sceneFrames(suite);
+      if (frames === 0) return ["none"];
+      return [!one && frames === 2 ? "two" : "one"];
+    }
     return one ? ["one"] : ["one", "two"];
   }
   if (PHOTO_PAGE_SUITES.includes(suite)) {
@@ -71,8 +75,8 @@ export function framedDesign(draft: InviteDraft): boolean {
 export function draftCouple(draft: InviteDraft): CouplePhotos {
   const layouts = coupleLayouts(draft);
   const own = draft.couplePhotos.layout;
-  // A painting with the bride's and the groom's frames offers only "two"
-  const layout = layouts.includes(own) ? own : layouts.includes("one") ? "one" : "two";
+  // A painting with the bride's and the groom's frames offers only "two"; one with none, "none"
+  const layout = layouts.includes(own) ? own : layouts.includes("one") ? "one" : layouts[0]!;
   return layout === own ? draft.couplePhotos : { ...draft.couplePhotos, layout };
 }
 

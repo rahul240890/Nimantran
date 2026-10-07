@@ -41,6 +41,7 @@ import {
   sceneLight,
   type Entrance,
   type PaintedCard,
+  type Piece,
   type ScenePage,
 } from "@/lib/suites/scene";
 import type { CardCopy } from "@/lib/templates/content";
@@ -147,6 +148,9 @@ type FitOptions = {
   onFit?: (fitted: Fitted) => void;
 };
 
+/** How long an illustrated card takes to come together, its words appearing at the end. */
+const OPEN_MS = 1500;
+
 /** Below this share of its size, the line under the names opens the slot instead. */
 const LINE_MIN = 0.9;
 
@@ -215,6 +219,16 @@ export function OneScene({
   const { guestCopy } = useText(publishText);
   const words = guestCopy.scene;
   const reduced = useReducedMotion();
+
+  // An illustrated card comes together from its sides once, then shows as one painting
+  const pieces = page.pieces.length > 0 && !reduced;
+  const [assembled, setAssembled] = useState(false);
+  useEffect(() => {
+    if (!pieces) return;
+    const timer = window.setTimeout(() => setAssembled(true), OPEN_MS);
+    return () => window.clearTimeout(timer);
+  }, [pieces]);
+  const opening = pieces && !assembled;
 
   // A painting without room for the line opens the slot with it instead
   const typeKey = JSON.stringify(type ?? null);
@@ -362,14 +376,18 @@ export function OneScene({
               </div>
             );
           })}
-          {/* eslint-disable-next-line @next/next/no-img-element -- the painting with its frames cut out */}
-          <img
-            src={page.image}
-            alt=""
-            aria-hidden
-            draggable={false}
-            className="absolute inset-0 size-full select-none"
-          />
+          {opening ? (
+            <PaintingPieces image={page.image} pieces={page.pieces} />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- the painting with its frames cut out
+            <img
+              src={page.image}
+              alt=""
+              aria-hidden
+              draggable={false}
+              className="absolute inset-0 size-full select-none"
+            />
+          )}
 
           {/* The light of the hour, over the whole painting */}
           <div aria-hidden className="scene-wash" data-mood="dawn" />
@@ -386,6 +404,7 @@ export function OneScene({
             id="scene-names"
             lang={lang}
             data-tone={tone}
+            data-after={pieces || undefined}
             className="story-print story-print-haze scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
@@ -411,6 +430,7 @@ export function OneScene({
               ref={lineBox}
               lang={lang}
               data-tone={tone}
+              data-after={pieces || undefined}
               className="story-print story-print-haze scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
@@ -429,6 +449,7 @@ export function OneScene({
             role="group"
             aria-roledescription="carousel"
             aria-label={words.label}
+            data-after={pieces || undefined}
             className="absolute [perspective:60rem]"
             style={box(page.slot)}
           >
@@ -440,6 +461,7 @@ export function OneScene({
                 type={type}
                 style={page.style}
                 card={page.card}
+                tone={tone}
                 lang={lang}
                 motion="out"
                 side={shown.from}
@@ -459,6 +481,7 @@ export function OneScene({
                   type={type}
                   style={page.style}
                   card={page.card}
+                  tone={tone}
                   lang={lang}
                   motion="in"
                   side={shown.from}
@@ -547,6 +570,34 @@ export function OneScene({
   );
 }
 
+/**
+ * An illustrated card's painting in parts: its empty space appears, then the art around
+ * it comes in from the side it sits on. Each part is the whole painting clipped to its box.
+ */
+function PaintingPieces({ image, pieces }: { image: string; pieces: readonly Piece[] }) {
+  return (
+    <div aria-hidden className="absolute inset-0 overflow-hidden">
+      {pieces.map(({ box: [x, y, width, height], from, order }) => (
+        // eslint-disable-next-line @next/next/no-img-element -- a part of the painting, flying in
+        <img
+          key={`${from}-${x}-${y}`}
+          src={image}
+          alt=""
+          draggable={false}
+          data-from={from}
+          className="scene-piece absolute inset-0 size-full select-none"
+          style={
+            {
+              clipPath: `inset(${y}% ${100 - x - width}% ${100 - y - height}% ${x}%)`,
+              "--order": order,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </div>
+  );
+}
+
 /** The slot's card: a button that holds or plays the scene, or a plain box in a picture of it. */
 function SlotHolder({
   interactive,
@@ -604,6 +655,7 @@ function SlotCard({
   type,
   style,
   card: painted,
+  tone,
   lang,
   motion,
   side,
@@ -615,6 +667,8 @@ function SlotCard({
   style: ScenePage["style"];
   /** The theme's own painted card, whose writing area holds the words. */
   card: PaintedCard | null;
+  /** Whether words printed straight on the painting (no card) set light or dark. */
+  tone: "light" | "dark";
   lang: string;
   motion: "in" | "out";
   side: Entrance;
@@ -643,7 +697,12 @@ function SlotCard({
       data-slot={style}
       data-motion={reduced ? `${motion}-still` : motion}
       data-side={side}
-      className="scene-slot scene-words absolute inset-0 flex flex-col items-center justify-center text-center text-card-ink [font-variant-numeric:lining-nums]"
+      data-tone={style === "bare" ? tone : undefined}
+      className={cn(
+        "scene-slot scene-words absolute inset-0 flex flex-col items-center justify-center text-center text-card-ink [font-variant-numeric:lining-nums]",
+        // With no card, the words print on the painting with its soft glow behind them
+        style === "bare" && "story-print scene-print",
+      )}
       style={{ "--swap": `${SCENE_SWAP_MS}ms` } as CSSProperties}
     >
       {painted && (

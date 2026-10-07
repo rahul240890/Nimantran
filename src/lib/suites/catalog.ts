@@ -16,6 +16,38 @@ import type { TraditionId } from "@/lib/traditions/schema";
 import type { GuestLookChoice } from "./guest-look";
 
 /**
+ * Illustrated cards: a painted couple (or family) instead of photos, the words in the
+ * painting's own empty space, and the art flying in from its sides when the card opens.
+ * They are Scene themes with no photo frame (scene.ts ILLUSTRATED), so they need no photos.
+ */
+export const ILLUSTRATED_IDS = [
+  "mor-kamal",
+  "rajwada-haathi",
+  "madhubani-machhli",
+  "pichwai-gaay",
+  "kerala-mural",
+  "kalyana-vazhai",
+  "alpana-topor",
+  "kutch-rang",
+  "mughal-bagh",
+  "phulkari-lavan",
+  "safed-gulaab",
+  "line-art-gold",
+  "samudra-sanjh",
+  "kaagaz-chaand",
+  "doli-vidaai",
+  "haldi-genda",
+  "mehendi-jhoola",
+  "sangeet-dhol",
+  "pehla-janamdin",
+  "godh-bharai",
+  "griha-kalash",
+  "sona-saath",
+  "bagh-reception",
+] as const;
+export type IllustratedId = (typeof ILLUSTRATED_IDS)[number];
+
+/**
  * Scene themes: one painting each, with a painted card that flies in with each celebration
  * (scene.ts). They have no pages of their own, so they only show as a Scene, and take the
  * rest of their look (colours, lettering, guest page) from the painted theme they're kin to.
@@ -117,6 +149,7 @@ export const SCENE_THEME_IDS = [
   "peony-blush",
   "magnolia-moon",
   "phool-chandelier",
+  ...ILLUSTRATED_IDS,
 ] as const;
 export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
@@ -1328,6 +1361,29 @@ const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "peony-blush": "gulaab",
   "magnolia-moon": "taara",
   "phool-chandelier": "ivory-arch",
+  "mor-kamal": "gulaab",
+  "rajwada-haathi": "shahi-savari",
+  "madhubani-machhli": "mitti",
+  "pichwai-gaay": "pichwai",
+  "kerala-mural": "kayal",
+  "kalyana-vazhai": "tanjore",
+  "alpana-topor": "rajbari",
+  "kutch-rang": "kutch-toran",
+  "mughal-bagh": "noor-bagh",
+  "phulkari-lavan": "phulkari-haveli",
+  "safed-gulaab": "ivory-arch",
+  "line-art-gold": "ivory-arch",
+  "samudra-sanjh": "sagar",
+  "kaagaz-chaand": "taara",
+  "doli-vidaai": "mitti",
+  "haldi-genda": "shahi-savari",
+  "mehendi-jhoola": "van",
+  "sangeet-dhol": "rooftop",
+  "pehla-janamdin": "gubbara",
+  "godh-bharai": "palna",
+  "griha-kalash": "peshwai-wada",
+  "sona-saath": "saath",
+  "bagh-reception": "ivory-arch",
 };
 
 /** The occasions a Scene theme is painted for beyond weddings. */
@@ -1371,6 +1427,10 @@ const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
   "uttarayan-kites": ["sankranti"],
   "lohri-bonfire": ["lohri"],
   "iftar-dawat": ["eid"],
+  "pehla-janamdin": ["birthday"],
+  "godh-bharai": ["baby-shower"],
+  "griha-kalash": ["housewarming"],
+  "sona-saath": ["anniversary", "retirement"],
 };
 
 /** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
@@ -1446,6 +1506,13 @@ const WEDDING_FIT: Partial<Record<SuiteId, readonly JourneyId[]>> = {
   "baraat-band": ["wedding"],
   // A church wedding has no haldi, mehendi, sangeet or roka
   chapel: ["wedding", "engagement", "save-the-date", "reception"],
+  "safed-gulaab": ["wedding", "engagement", "save-the-date", "reception"],
+  // Illustrated cards painted for one function, or for the wedding day itself
+  "doli-vidaai": ["wedding"],
+  "haldi-genda": ["haldi"],
+  "mehendi-jhoola": ["mehendi"],
+  "sangeet-dhol": ["sangeet", "reception"],
+  "bagh-reception": ["reception", "engagement"],
 };
 
 /**
@@ -1472,6 +1539,10 @@ const NO_ROKA: readonly SuiteId[] = [
   "pattachitra",
   "chai-bagan",
   "vazhai-mandap",
+  "mughal-bagh",
+  "kerala-mural",
+  "kalyana-vazhai",
+  "alpana-topor",
 ];
 
 /** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */

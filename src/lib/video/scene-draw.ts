@@ -484,8 +484,13 @@ function drawCard(
   ctx.rotate(((rot * away) / 180) * Math.PI);
   ctx.scale(scale, scale);
   const mood = sceneLight(item.kind === "function" ? item.fn.kind : "line").mood;
-  const colours = film.palette(mood, null);
-  const inner = drawCardFace(ctx, film, slot.w, slot.h, colours);
+  // With no card (an illustrated card), the words print on the painting in its own tone
+  const bare = film.page.style === "bare";
+  const tone = film.page.dark || mood === "night" ? "dark" : "light";
+  const colours = film.palette(mood, bare ? tone : null);
+  const inner = bare
+    ? { x: -slot.w / 2, y: -slot.h / 2, w: slot.w, h: slot.h, painted: true }
+    : drawCardFace(ctx, film, slot.w, slot.h, colours);
   drawCardWords(ctx, film, voice, item, inner, colours);
   ctx.restore();
 }

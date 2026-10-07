@@ -55,6 +55,8 @@ test.describe("blog manager", () => {
     await page.getByRole("button", { name: "Save" }).click();
     await expect(page.getByText("Published").first()).toBeVisible();
     await expect(page).toHaveURL(/\/admin\/blog\/[0-9a-f-]{36}$/);
+    // The new address comes before its title on a client-side move; check the finished page
+    await expect(page).toHaveTitle(/Edit post/);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 

@@ -6,7 +6,8 @@ import { cn } from "@/lib/cn";
 import type { StoryPhoto } from "@/lib/engine/story";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { PAINTING_ASPECT } from "@/lib/suites/photo-frames";
-import { scenePage } from "@/lib/suites/scene";
+import { sceneLine } from "@/lib/suites/scene-type";
+import { scenePage, type ScenePage } from "@/lib/suites/scene";
 import { useSampleInvite } from "./sample";
 
 /*
@@ -63,6 +64,42 @@ export function ScenePoster({
         sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
         className="object-cover"
       />
+      {/* An illustrated card's empty space carries sample names, so it reads as a card */}
+      {page.style === "bare" && !SUITES[suite].occasions && (
+        <PosterNames suite={suite} page={page} />
+      )}
+    </span>
+  );
+}
+
+/** The sample couple's names where an illustrated wedding card prints them. */
+function PosterNames({ suite, page }: { suite: SuiteId; page: ScenePage }) {
+  const { copy, lang } = useSampleInvite([]);
+  const voice = SUITES[suite].voice ?? "regal";
+  const [x, y, width, height] = page.names;
+  return (
+    <span
+      aria-hidden
+      data-suite={suite}
+      data-tone={page.dark ? "dark" : "light"}
+      lang={lang}
+      className="story-print [container-type:size] absolute inset-0 block"
+    >
+      <span
+        className="absolute flex items-center justify-center text-center text-card-ink"
+        style={{ left: `${x}%`, top: `${y}%`, width: `${width}%`, height: `${height}%` }}
+      >
+        <span
+          className="text-balance"
+          style={{ ...sceneLine(voice, "names", lang), fontSize: "8.5cqw" }}
+        >
+          {copy.first}{" "}
+          <span className="text-card-accent-text" style={{ fontSize: "0.6em" }}>
+            {copy.joiner}
+          </span>{" "}
+          {copy.second}
+        </span>
+      </span>
     </span>
   );
 }
