@@ -7,7 +7,6 @@ import { Editor } from "@/components/editor/editor";
 import { PageTransition } from "@/components/motion/page-transition";
 import { editorText } from "@/i18n/copy/editor";
 import { getText } from "@/i18n/server";
-import { isQualityChoice } from "@/content/engine-review";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
 import { hostStore } from "@/lib/invites/hosts";
@@ -33,19 +32,9 @@ const inviteId = z.uuid();
  * engagement, save-the-date…); ?template=<id> starts one with that design, and
  * ?tradition=<id> with that tradition, ?suite=<id> with that page theme (the gallery's
  * Use this design sends all four);
- * ?quality=high|medium|low|2d forces the preview's level (handy for tests without a GPU).
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const {
-    template,
-    category,
-    tradition,
-    suite,
-    format,
-    quality,
-    invite,
-    new: fresh,
-  } = await searchParams;
+  const { template, category, tradition, suite, format, invite, new: fresh } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -84,7 +73,6 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
           params.initialFormat,
         ].join("|")}
         {...params}
-        quality={isQualityChoice(quality) ? quality : "auto"}
         signedIn={Boolean(account)}
         initialInvite={initialInvite}
         missing={Boolean(wanted && !initialInvite)}
