@@ -65,8 +65,12 @@ import { uiText } from "@/i18n/copy/ui";
 
 const WIDE = "(min-width: 64rem)";
 
-/** The steps where words are typed, which get the floating live preview on phones. */
-const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions", "extras"]);
+/**
+ * The steps where words are typed, which get the floating live preview on phones. The
+ * photos part shows each photo in its own frame already, and a floating phone there would
+ * sit over the photo buttons.
+ */
+const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions"]);
 
 /*
  * The progress shows three stages, not eight steps: pick a design (occasion, tradition,

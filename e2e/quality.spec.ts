@@ -33,7 +33,9 @@ test.describe("accessibility sweep", () => {
 
   for (const path of [...everyPublicPage, ...appPages]) {
     test(`${path} passes a strict accessibility check`, async ({ page }) => {
-      await page.goto(path);
+      // The check reads the page, not its pictures: a design shelf asks the image
+      // optimiser for a dozen covers at once, which can outlast the timeout on a busy runner
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await strictAxe(page).analyze()).violations).toEqual([]);

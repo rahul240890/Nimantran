@@ -386,7 +386,7 @@ export function OneScene({
             id="scene-names"
             lang={lang}
             data-tone={tone}
-            className="story-print scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
+            className="story-print story-print-haze scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
             {/* Sized as the names, so its own line and the spaces shrink with them */}
@@ -411,7 +411,7 @@ export function OneScene({
               ref={lineBox}
               lang={lang}
               data-tone={tone}
-              className="story-print scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
+              className="story-print story-print-haze scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
               <span
