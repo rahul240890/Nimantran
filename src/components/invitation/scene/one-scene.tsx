@@ -190,6 +190,11 @@ export type OneSceneProps = {
   still?: boolean;
   /** The host's lettering (Step 12n) over the theme's own. */
   type?: PageType;
+  /**
+   * The function the host is filling in, in the editor: it comes into the slot and stays
+   * there, so the painting holds still and only its details change as they are typed.
+   */
+  focus?: string | null;
   className?: string;
 };
 
@@ -208,6 +213,7 @@ export function OneScene({
   miniature = false,
   still = false,
   type,
+  focus = null,
   className,
 }: OneSceneProps) {
   const { guestCopy } = useText(publishText);
@@ -236,10 +242,31 @@ export function OneScene({
   ];
   const count = items.length;
 
-  const [shown, setShown] = useState<Shown>({ index: 0, from: "right", turn: 0 });
+  // The function being filled in, if it is on the card
+  const focused = focus
+    ? items.findIndex((item) => item.kind === "function" && item.fn.kind === focus)
+    : -1;
+  const [shown, setShown] = useState<Shown>({
+    index: Math.max(0, focused),
+    from: "right",
+    turn: 0,
+  });
   const [leaving, setLeaving] = useState<Shown | null>(null);
-  const [held, setHeld] = useState(false);
+  const [held, setHeld] = useState(focused >= 0);
   const index = count > 0 ? shown.index % count : 0;
+  // When the host moves to another function, it flies into the slot and stays; leaving the
+  // functions lets the slot play through them all again
+  const focusKey = `${focus}:${focused}`;
+  const [seenFocus, setSeenFocus] = useState(focusKey);
+  if (seenFocus !== focusKey) {
+    setSeenFocus(focusKey);
+    setHeld(focused >= 0);
+    if (focused >= 0 && focused !== index) {
+      const turn = shown.turn + 1;
+      setLeaving(shown);
+      setShown({ index: focused, from: entranceFor(turn), turn });
+    }
+  }
   const playing = !held && !reduced && count > 1;
 
   const go = useCallback(
@@ -378,7 +405,7 @@ export function OneScene({
             lang={lang}
             data-tone={tone}
             data-after={pieces || undefined}
-            className="story-print scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
+            className="story-print story-print-haze scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
             {/* Sized as the names, so its own line and the spaces shrink with them */}
@@ -404,7 +431,7 @@ export function OneScene({
               lang={lang}
               data-tone={tone}
               data-after={pieces || undefined}
-              className="story-print scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
+              className="story-print story-print-haze scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
               <span

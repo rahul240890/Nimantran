@@ -1125,9 +1125,6 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
 };
 
 export const studioCopy: Translation<typeof en.studioCopy> = {
-  views: "दिखाएँ",
-  pages: "पन्ने",
-  card: "कार्ड",
   pagesHint: "आप जो पन्ना भर रहे हैं, वह लिखते-लिखते यहाँ दिखता है।",
   pageNames: {
     blessing: "आशीर्वाद",

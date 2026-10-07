@@ -165,12 +165,14 @@ test.describe("invite editor", () => {
     await expect(summary.getByText("Thu, 15 Oct 2026 · 6:30 pm")).toBeVisible();
     await expect(summary.getByText("Taj Falaknuma, Hyderabad")).toBeVisible();
     await expect(page.getByText(/Raag Bhupali/)).toBeVisible();
-    // The live card carries the couple's names and the wedding's venue
-    await page.getByRole("button", { name: "Card", exact: true }).click();
-    const card = page.locator("[data-engine-state]");
-    await expect(card.locator(".sr-only").getByText("Aditya and Priya")).toBeAttached();
-    await expect(card.locator(".sr-only").getByText("Taj Falaknuma, Hyderabad")).toBeAttached();
-    await expect(card.locator(".sr-only").getByText("Thursday, 15 October 2026")).toBeAttached();
+    // The design itself carries the couple's names and the wedding's date and venue
+    const phone = page.getByRole("img", { name: /, as guests see it$/ });
+    await expect(phone).toContainText("Aditya");
+    await page.getByRole("button", { name: "Show the Wedding page" }).click();
+    await expect(phone).toContainText("Taj Falaknuma, Hyderabad");
+    await expect(phone).toContainText("15 October 2026");
+    // The editor shows only the design, never a stand-in card
+    await expect(page.getByRole("button", { name: "Card", exact: true })).toHaveCount(0);
 
     await page.reload();
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
@@ -233,15 +235,14 @@ test.describe("invite editor", () => {
     // The wedding is one of the roka's rarer functions, folded until asked for
     await page.getByRole("button", { name: /^Show \d+ more functions$/ }).click();
     await expect(page.getByRole("checkbox", { name: /Wedding/ })).not.toBeChecked();
-    // The card announces the roka in the occasion's own words (in a sheet on phones)
+    // The design announces the roka in the occasion's own words (in a sheet on phones)
     if (page.viewportSize()!.width < 1024) {
       await page.getByRole("button", { name: "Preview", exact: true }).click();
     }
-    await page.getByRole("button", { name: "Card", exact: true }).click();
-    const card = page.locator("[data-engine-state]");
-    await expect(
-      card.locator(".sr-only").getByText("seek your blessings at their roka ceremony"),
-    ).toBeAttached();
+    await page.getByRole("button", { name: "Show the Family page" }).last().click();
+    await expect(page.getByRole("img", { name: /, as guests see it$/ }).last()).toContainText(
+      "seek your blessings at their roka ceremony",
+    );
     if (page.viewportSize()!.width < 1024) await page.keyboard.press("Escape");
 
     // Switching the occasion keeps what was typed
@@ -268,13 +269,12 @@ test.describe("invite editor", () => {
     await expect(page.getByText("திருமணம்")).toBeVisible();
 
     const wide = page.viewportSize()!.width >= 1024;
-    const card = page.locator("[data-engine-state] .sr-only");
-    if (wide) await page.getByRole("button", { name: "Card", exact: true }).click();
-    if (wide) await expect(card.getByText("ஸ்ரீ விநாயகர் துணை")).toBeAttached();
+    const card = page.getByRole("img", { name: /, as guests see it$/ });
+    if (wide) await expect(card).toContainText("ஸ்ரீ விநாயகர் துணை");
     await page.getByRole("radio", { name: /In English letters/ }).click();
-    if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toBeAttached();
+    if (wide) await expect(card).toContainText("Sri Vinayagar Thunai");
     await page.getByRole("radio", { name: /Leave it off/ }).click();
-    if (wide) await expect(card.getByText("Sri Vinayagar Thunai")).toHaveCount(0);
+    if (wide) await expect(card).not.toContainText("Sri Vinayagar Thunai");
 
     await page.reload();
     await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
@@ -456,6 +456,27 @@ test.describe("invite editor", () => {
     await next(page);
     await expect(page.getByRole("heading", { name: "Make it yours" })).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
+  });
+
+  test("a Scene keeps its painting and holds the function being filled in", async ({ page }) => {
+    test.skip(page.viewportSize()!.width < 1024, "the phone beside the form");
+    await page.goto("/create?suite=udaipur-lake&format=scene");
+    await next(page); // language
+    await fillCouple(page);
+    await next(page);
+    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
+    await page
+      .getByRole("textbox", { name: /^Venue/ })
+      .first()
+      .fill("Lake Palace lawns");
+    // The design itself, with only its event box changing: no stand-in card to switch to
+    await expect(page.getByRole("button", { name: "Card", exact: true })).toHaveCount(0);
+    const slot = page.getByRole("group", { name: "The celebrations, one by one" });
+    await expect(slot).toContainText("Sangeet");
+    await expect(slot).toContainText("Lake Palace lawns");
+    // It stays while the host types, past the time a function would play for
+    await page.waitForTimeout(5000);
+    await expect(slot).toContainText("Sangeet");
   });
 
   test("the button bar fits common phone widths on every step", async ({ browser }, info) => {
