@@ -17,7 +17,7 @@ import {
   type FrameBox,
 } from "@/lib/suites/photo-frames";
 import { isSceneTheme } from "@/lib/suites/catalog";
-import { scenePage } from "@/lib/suites/scene";
+import { sceneFrames, scenePage } from "@/lib/suites/scene";
 import { draftShowsScene, draftSuite } from "./story";
 
 /*
@@ -40,13 +40,17 @@ export type FrameSpot = {
 /**
  * The photo layouts this invite's design offers. A design that paints its own photo frames
  * (every Scene, and the Story themes with photo pages) always shows them, so it asks for its
- * photos: one, or one each where it has a two-frame painting. Only a design without painted
- * frames can leave the photo page out.
+ * photos: one, or one each where it has a two-frame painting. A Scene theme painted with the
+ * bride's and the groom's frames always asks for both. Only a design without painted frames
+ * can leave the photo page out.
  */
 export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
   const one = draftPeople(draft) === "one";
   const suite = draftSuite(draft);
-  if (draftShowsScene(draft)) return isSceneTheme(suite) || one ? ["one"] : ["one", "two"];
+  if (draftShowsScene(draft)) {
+    if (isSceneTheme(suite)) return [!one && sceneFrames(suite) === 2 ? "two" : "one"];
+    return one ? ["one"] : ["one", "two"];
+  }
   if (PHOTO_PAGE_SUITES.includes(suite)) {
     const two = photoPage(suite, 2)?.frames.length === 2;
     return one || !two ? ["one"] : ["one", "two"];
@@ -67,7 +71,8 @@ export function framedDesign(draft: InviteDraft): boolean {
 export function draftCouple(draft: InviteDraft): CouplePhotos {
   const layouts = coupleLayouts(draft);
   const own = draft.couplePhotos.layout;
-  const layout = layouts.includes(own) ? own : "one";
+  // A painting with the bride's and the groom's frames offers only "two"
+  const layout = layouts.includes(own) ? own : layouts.includes("one") ? "one" : "two";
   return layout === own ? draft.couplePhotos : { ...draft.couplePhotos, layout };
 }
 
