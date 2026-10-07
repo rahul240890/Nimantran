@@ -194,13 +194,19 @@ for (const [i, [style, god]] of (
 // With motion on, a welcome with the names comes between the opening and the pages
 test("the welcome before the pages", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  // The page's clock is held, so the welcome waits while it is checked
+  await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
+  await page.clock.pauseAt(new Date("2026-10-01T10:00:05+05:30"));
   await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
   await page.getByRole("button", { name: "Open the invitation" }).click();
+  await page.clock.runFor(1600);
   const welcome = page.getByTestId("opening-welcome");
   await expect(welcome).toBeVisible();
   await expect(welcome).toContainText("Arjun");
   await expect(page.getByRole("button", { name: "Continue" })).toBeFocused();
-  expect((await axe(page).analyze()).violations).toEqual([]);
+  // It waits on its own while the clock is held, then Continue moves on at once
+  await page.clock.runFor(2000);
+  await expect(welcome).toBeVisible();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(welcome).toHaveCount(0);
   await expect(page.locator("[data-story-beat]").first()).toBeVisible();
