@@ -2,8 +2,6 @@
 
 import { useDeferredValue, useMemo, useState } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
-import { Invitation, type InvitationStory } from "@/components/invitation/invitation";
-import type { QualityChoice } from "@/content/engine-review";
 import { useLocale, useText } from "@/i18n/client";
 import { storyBeats } from "@/lib/engine/story";
 import {
@@ -19,7 +17,6 @@ import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
   draftCopy,
-  draftTradition,
   templateWithRaga,
   type CardLanguage,
   type InviteDraft,
@@ -28,7 +25,6 @@ import type { CardCopy } from "@/lib/templates/content";
 import { cn } from "@/lib/cn";
 import { applyPages, type DraftPages } from "@/lib/editor/pages";
 import { pageType, type PageType } from "@/lib/editor/type";
-import { Mail, Smartphone } from "lucide-react";
 import { OneScene } from "@/components/invitation/scene/one-scene";
 import { scenePage } from "@/lib/suites/scene";
 import { PagePreview } from "./page-preview";
@@ -42,11 +38,6 @@ import { withClip } from "@/lib/editor/music-clip";
 
 type PreviewStageProps = {
   draft: InviteDraft;
-  quality: QualityChoice;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  /** Switches the box behind the words from the pages, so the host can compare live. */
-  onTextBox?: (on: boolean) => void;
   /** The page being edited, shown in the phone ("cover", "fn-sangeet"). */
   page: string;
   onPage: (page: string) => void;
@@ -57,18 +48,13 @@ type PreviewStageProps = {
   className?: string;
 };
 
-type View = "pages" | "card";
-
 /**
- * The live invitation beside the form. Typing is never held up by the card: the words
- * reach it as a deferred value, and it only repaints when they actually change.
+ * The live invitation beside the form, as the design itself: the Scene's one painting or
+ * the Story's pages, never a stand-in card. Typing is never held up by it: the words reach
+ * it as a deferred value, and it only repaints when they actually change.
  */
 export function PreviewStage({
   draft,
-  quality,
-  open,
-  onOpenChange,
-  onTextBox,
   page,
   onPage,
   update,
@@ -80,7 +66,6 @@ export function PreviewStage({
     id.startsWith("fn-")
       ? functionCopy[id.slice(3) as FunctionId].name
       : (studioCopy.pageNames[id as keyof typeof studioCopy.pageNames] ?? id);
-  const [view, setView] = useState<View>("pages");
   const languages = cardLanguages(draft);
   const [chosen, setChosen] = useState<CardLanguage | null>(null);
   const language = chosen && languages.includes(chosen) ? chosen : languages[0];
@@ -119,6 +104,7 @@ export function PreviewStage({
           framed
           miniature
           still={mini}
+          focus={page.startsWith("fn-") ? page.slice(3) : null}
         />
       </div>
     </div>
@@ -159,16 +145,11 @@ export function PreviewStage({
     0,
     listed.findIndex((b) => b.id === page),
   );
-  const story = useMemo<InvitationStory>(() => {
-    const pages = JSON.parse(pagesKey) as DraftPages;
-    return {
-      beats: applyPages(written, pages, language),
-      suite,
-      textBox,
-      type,
-      onTextBox,
-    };
-  }, [written, pagesKey, language, suite, textBox, type, onTextBox]);
+  // The pages guests will see, with the ones left out taken away
+  const beats = useMemo(
+    () => applyPages(written, JSON.parse(pagesKey) as DraftPages, language),
+    [written, pagesKey, language],
+  );
 
   const { templateId } = draft;
   const { raga } = draft.music;
@@ -213,48 +194,17 @@ export function PreviewStage({
             "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 30%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
         }}
       />
-      <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 pb-3">
-        <div
-          role="group"
-          aria-label={studioCopy.views}
-          className="inline-flex items-center gap-1 rounded-full border border-line bg-surface-2 p-1"
-        >
-          {(
-            [
-              ["pages", Smartphone, studioCopy.pages],
-              ["card", Mail, studioCopy.card],
-            ] as const
-          ).map(([id, Icon, label]) => (
-            <button
-              key={id}
-              type="button"
-              aria-pressed={view === id}
-              onClick={() => setView(id)}
-              className={cn(
-                "inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full px-4 font-semibold whitespace-nowrap transition-colors duration-200 [&_svg]:size-4.5",
-                "focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring",
-                view === id
-                  ? "bg-surface text-ink shadow-raised ring-1 ring-line"
-                  : "text-ink-muted hover:text-ink",
-              )}
-            >
-              <Icon aria-hidden />
-              {label}
-            </button>
-          ))}
-        </div>
-        {languages.length > 1 && (
+      {languages.length > 1 && (
+        <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 pb-3">
           <CardLanguageToggle
             label={coupleCopy.languagesHeading}
             languages={languages}
             value={language}
             onValueChange={setChosen}
           />
-        )}
-      </div>
-      {view === "pages" && sceneView ? (
-        sceneView
-      ) : view === "pages" ? (
+        </div>
+      )}
+      {sceneView ?? (
         <PagePreview
           beats={listed}
           copy={deferredCopy}
@@ -287,7 +237,7 @@ export function PreviewStage({
               <AiWording
                 draft={draft}
                 update={update}
-                beats={story.beats}
+                beats={beats}
                 page={listed[shownIndex]!}
                 pageName={pageName(listed[shownIndex]!.id)}
                 language={language}
@@ -295,19 +245,6 @@ export function PreviewStage({
             </div>
           )}
         </PagePreview>
-      ) : (
-        <Invitation
-          copy={deferredCopy}
-          lang={language}
-          template={template}
-          quality={quality}
-          open={open}
-          onOpenChange={onOpenChange}
-          musicOnOpen={draft.music.playOnOpen}
-          tradition={draftTradition(draft)?.id ?? null}
-          story={story}
-          autoStory={false}
-        />
       )}
     </div>
   );

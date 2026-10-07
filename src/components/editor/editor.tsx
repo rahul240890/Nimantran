@@ -23,7 +23,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { Stepper } from "@/components/ui/stepper";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { toast } from "@/components/ui/toast";
-import type { QualityChoice } from "@/content/engine-review";
 import type { CategoryId } from "@/lib/categories/catalog";
 import {
   EDITOR_STEPS,
@@ -114,18 +113,6 @@ const miniStore = (() => {
   };
 })();
 
-/** The card opens on the steps where the host is writing what's inside it. */
-const opensOn: Record<EditorStep, boolean> = {
-  occasion: false,
-  tradition: true,
-  design: false,
-  language: true,
-  couple: true,
-  functions: true,
-  extras: false,
-  preview: false,
-};
-
 const SYNC_DELAY = 1200;
 
 /** The page the phone shows as each step opens: the one that step fills in. */
@@ -189,7 +176,6 @@ function SaveStatus({
 }
 
 export function Editor({
-  quality,
   initialTemplate,
   initialCategory,
   initialTradition = null,
@@ -200,7 +186,6 @@ export function Editor({
   fresh = false,
   missing = false,
 }: {
-  quality: QualityChoice;
   initialTemplate: TemplateId | null;
   initialCategory: CategoryId | null;
   /** A tradition picked on its page (?tradition=<id>). */
@@ -241,7 +226,6 @@ export function Editor({
   const index = EDITOR_STEPS.indexOf(step);
   const last = index === EDITOR_STEPS.length - 1;
 
-  const [cardOpen, setCardOpen] = useState(opensOn[step]);
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
   const [sheet, setSheet] = useState(false);
@@ -357,7 +341,6 @@ export function Editor({
     (next: EditorStep) => {
       moved.current = true;
       setChecking(null);
-      setCardOpen(opensOn[next]);
       setPage(stepPage(inviteDraft.get().draft, next));
       update((current) => ({ ...current, step: next }));
     },
@@ -402,7 +385,6 @@ export function Editor({
       inviteDraft.reset(fresh());
     }
     moved.current = true;
-    setCardOpen(false);
     toast({ title: previewCopy.cleared, tone: "success" });
   };
 
@@ -412,10 +394,6 @@ export function Editor({
     <PreviewStage
       mini={mini}
       draft={draft}
-      quality={quality}
-      open={cardOpen}
-      onOpenChange={setCardOpen}
-      onTextBox={(textBox) => update((current) => ({ ...current, textBox }))}
       page={page}
       onPage={setPage}
       update={update}

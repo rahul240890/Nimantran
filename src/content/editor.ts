@@ -1061,9 +1061,6 @@ export const suiteCopy = {
 
 /** The editor's live page and lettering (Step 12n). */
 export const studioCopy = {
-  views: "Show",
-  pages: "Pages",
-  card: "Card",
   pagesHint: "The page you're editing comes up here as you type.",
   pageNames: {
     blessing: "Blessing",
