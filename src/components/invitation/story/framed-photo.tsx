@@ -71,7 +71,7 @@ export function FramedPhoto({
       role={alt ? "img" : undefined}
       aria-label={alt || undefined}
       aria-hidden={alt ? undefined : true}
-      className={cn("block overflow-hidden", className)}
+      className={cn("relative block overflow-hidden", className)}
       style={style}
     >
       <span className="block" style={box}>
