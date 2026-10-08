@@ -1027,6 +1027,88 @@ const ILLUSTRATED: Record<IllustratedId, IllustratedEntry> = {
   "sona-saath": { open: [6, 6, 54, 44] },
   // Cream under the lamps, the names between the two swastiks
   "bagh-reception": { open: [14, 15, 72, 35], names: [14, 19, 72, 7.5] },
+  // Ivory paper under the tree's crown, beside the trunk
+  "gond-vriksh": { open: [30, 29, 64, 17] },
+  // Terracotta between the two Warli trees, under the sun and moon
+  "warli-vivah": { open: [25, 10, 51, 46], dark: true },
+  // Cream between the two fish, under the shola fans
+  "kalighat-pat": { open: [18, 13, 64, 31] },
+  // The cream panel under the mandapam canopy
+  "cheriyal-talambralu": { open: [14, 15, 72, 33] },
+  // Soft gold between the betel-nut trees, under the gamosa
+  "axomiya-biya": { open: [11, 15, 78, 28] },
+  // Cream between the samai lamps, under the Paithani border
+  "antarpat-mangal": { open: [12, 10, 76, 34] },
+  // Pale sky under the monsoon clouds, between the tree and the cypress
+  "kangra-megh": { open: [21, 12, 60, 35] },
+  // Ivory under the jasmine arch, between the lanterns
+  "hyderabadi-nikah": { open: [13, 18, 74, 31] },
+  // White tile between the palm and the balcony
+  "goa-azulejo": { open: [30, 12, 49, 42] },
+  // Cotton paper inside the pressed flowers
+  "pressed-phool": { open: [22, 17, 56, 49] },
+  // Golden sky between the cypresses, under the grapevine
+  "tuscan-vineyard": { open: [11, 13, 78, 32] },
+  // Sand between the pampas and the palm leaves, under the macramé
+  "boho-pampas": { open: [25, 15, 51, 40] },
+  // Winter sky between the snowy pines
+  "winter-pine": { open: [13, 13, 74, 32] },
+  // Plain cotton between the stitched tree and the elephant
+  "kantha-silai": { open: [22, 11, 53, 41] },
+  // The glowing screen between the puppet tree and the elephant
+  "tholu-bommalata": { open: [29, 14, 47, 30] },
+  // Plain muslin between the embroidered cypresses
+  "chikankari-awadh": { open: [21, 13, 58, 41] },
+  // The black panel inside the silver frame
+  "bidri-raat": { open: [21, 12, 58, 36], dark: true },
+  // The frosted pane in the middle of the window
+  "stained-glass": { open: [27, 28, 46, 31] },
+  // Celadon between the tree and the bamboo
+  "chinoiserie-bagh": { open: [24, 14, 54, 40] },
+  // Cream inside the iris arch
+  "nouveau-arch": { open: [18, 15, 64, 32] },
+  // The taped paper between the stamps and the compass
+  "safar-shaadi": { open: [22, 13, 57, 36] },
+  // Peach between the baby elephant and the horse
+  "chibi-jodi": { open: [28, 11, 51, 32] },
+  // Night sky between the house and the lantern tree
+  "jaago-gagar": { open: [12, 12, 72, 28], dark: true },
+  // Cream between the lamp stands, under the toran and Ganesha
+  "tilak-thaal": { open: [12, 13, 76, 29] },
+  // Cream under the jasmine, beside the banana plants
+  "nalangu-vilayattu": { open: [13, 9, 61, 35] },
+  // Blush between the rose trellises
+  "sagai-anguthi": { open: [13, 12, 74, 38] },
+  // Midnight blue under the fairy lights
+  "chandni-cocktail": { open: [15, 13, 65, 33], dark: true },
+  // Cream between the two puppets
+  "kathputli-sangeet": { open: [31, 13, 48, 42] },
+  // Cream between the mare and the shehnai
+  sehrabandi: { open: [16, 12, 62, 30] },
+  // The wall between the carved door frames
+  "laxmi-aagman": { open: [12, 11, 76, 27] },
+  // Cream between the lamps, under the jasmine
+  shashtipurti: { open: [13, 12, 74, 28] },
+  // Cream under the tent, between the poles
+  "circus-tent": { open: [20, 19, 63, 26] },
+  // Sky between the blocks and the signal
+  "toy-train": { open: [20, 14, 58, 40] },
+  // Butter yellow under the bunting, between the gift and the balloons
+  "pet-party": { open: [20, 11, 59, 32] },
+  // Lilac between the cassettes and the boombox
+  "mixtape-party": { open: [19, 14, 61, 38] },
+  // Night sky between the palms
+  "pehli-salgirah": { open: [12, 14, 76, 32], dark: true },
+  // Ivory under the arch, between the lanterns
+  "eid-milan": { open: [12, 14, 76, 30] },
+  // Indigo between the garbo lamps
+  "garba-raas": { open: [20, 13, 60, 34], dark: true },
+  // Cream between the lamp and the banana plant
+  valaikappu: { open: [11, 11, 64, 33] },
+  // Cream between the pillars, under the toran and Ganesha
+  "shubh-labh": { open: [18, 12, 63, 33] },
+  // Sunrise sky beside the riverside tree
+  "retirement-naav": { open: [22, 11, 72, 36] },
 };
 
 export function isIllustrated(suite: SuiteId): suite is IllustratedId {

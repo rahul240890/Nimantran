@@ -915,6 +915,47 @@ export const suiteCopy = {
     "griha-kalash": "Griha Kalash",
     "sona-saath": "Sona Saath",
     "bagh-reception": "Bagh Reception",
+    "gond-vriksh": "Gond Vriksh",
+    "warli-vivah": "Warli Vivah",
+    "kalighat-pat": "Kalighat Pat",
+    "cheriyal-talambralu": "Cheriyal Talambralu",
+    "axomiya-biya": "Axomiya Biya",
+    "antarpat-mangal": "Antarpat Mangal",
+    "kangra-megh": "Kangra Megh",
+    "hyderabadi-nikah": "Hyderabadi Nikah",
+    "goa-azulejo": "Goa Azulejo",
+    "pressed-phool": "Pressed Phool",
+    "tuscan-vineyard": "Tuscan Vineyard",
+    "boho-pampas": "Boho Pampas",
+    "winter-pine": "Winter Pine",
+    "kantha-silai": "Kantha Silai",
+    "tholu-bommalata": "Tholu Bommalata",
+    "chikankari-awadh": "Chikankari Awadh",
+    "bidri-raat": "Bidri Raat",
+    "stained-glass": "Stained Glass",
+    "chinoiserie-bagh": "Chinoiserie Bagh",
+    "nouveau-arch": "Nouveau Arch",
+    "safar-shaadi": "Safar Shaadi",
+    "chibi-jodi": "Chibi Jodi",
+    "jaago-gagar": "Jaago Gagar",
+    "tilak-thaal": "Tilak Thaal",
+    "nalangu-vilayattu": "Nalangu",
+    "sagai-anguthi": "Gulaab Anguthi",
+    "chandni-cocktail": "Chandni Cocktail",
+    "kathputli-sangeet": "Kathputli Sangeet",
+    sehrabandi: "Sehrabandi",
+    "laxmi-aagman": "Laxmi Aagman",
+    shashtipurti: "Shashtipurti",
+    "circus-tent": "Circus Tent",
+    "toy-train": "Toy Train",
+    "pet-party": "Pet Party",
+    "mixtape-party": "Mixtape Party",
+    "pehli-salgirah": "Pehli Salgirah",
+    "eid-milan": "Eid Milan",
+    "garba-raas": "Garba Raas",
+    valaikappu: "Valaikappu",
+    "shubh-labh": "Shubh Labh",
+    "retirement-naav": "Retirement Naav",
     "mameru-bandhani": "Mameru Bandhani",
     "sindhi-ajrak": "Sindhi Ajrak",
     "hampi-ruins": "Hampi Ruins",
@@ -1097,6 +1138,76 @@ export const suiteCopy = {
       "An anniversary couple on a swing under the neem tree at sunset. No photos needed.",
     "bagh-reception":
       "A garden reception with gazebos, swans, hanging flowers and lamps. No photos needed.",
+    "gond-vriksh":
+      "A Gond tree of life full of birds, with the couple and a deer and peacock beneath it. No photos needed.",
+    "warli-vivah":
+      "White Warli figures dance round the couple's cart on red earth. No photos needed.",
+    "kalighat-pat":
+      "A Bengali bride and groom in bold Kalighat brushwork, between two rui fish. No photos needed.",
+    "cheriyal-talambralu":
+      "A Telugu couple showering each other with rice, painted as a Cheriyal scroll. No photos needed.",
+    "axomiya-biya":
+      "An Assamese couple in muga silk under a gamosa border, with a xorai and tea hills. No photos needed.",
+    "antarpat-mangal":
+      "A Marathi wedding at the antarpat, between two brass samai lamps. No photos needed.",
+    "kangra-megh":
+      "A Pahari miniature: the couple under one umbrella in the first monsoon rain. No photos needed.",
+    "hyderabadi-nikah":
+      "A Deccan nikah under jasmine strings and brass lanterns. No photos needed.",
+    "goa-azulejo": "A seaside wedding painted on blue-and-white Goan tiles. No photos needed.",
+    "pressed-phool":
+      "Pressed wildflowers and ferns on handmade cotton paper, simple and modern. No photos needed.",
+    "tuscan-vineyard":
+      "The couple walking between vineyards at golden hour, under hanging grapes. No photos needed.",
+    "boho-pampas":
+      "A relaxed boho couple among pampas grass, macramé and candles. No photos needed.",
+    "winter-pine": "A winter wedding among snowy pines and warm lanterns. No photos needed.",
+    "kantha-silai":
+      "A wedding told in Kantha running stitches on soft white cotton. No photos needed.",
+    "tholu-bommalata":
+      "An Andhra shadow-puppet wedding glowing on a lamp-lit screen. No photos needed.",
+    "chikankari-awadh":
+      "Lucknow chikankari, white on white, with the couple between embroidered cypresses. No photos needed.",
+    "bidri-raat":
+      "Bidri silver inlay on black: the couple under a silver canopy. No photos needed.",
+    "stained-glass": "A sunlit stained glass window of roses, lilies and doves. No photos needed.",
+    "chinoiserie-bagh":
+      "Hand-painted chinoiserie: peonies, birds and the couple on a garden bridge. No photos needed.",
+    "nouveau-arch": "An art nouveau arch of lilies and irises around the couple. No photos needed.",
+    "safar-shaadi":
+      "A travel scrapbook for a destination wedding: stamps, a compass and suitcases. No photos needed.",
+    "chibi-jodi":
+      "A cute cartoon bride and groom with a baby elephant and a little horse. No photos needed.",
+    "jaago-gagar":
+      "A Punjabi jaago night: a brass gagar of lamps, phulkari and a dhol. No photos needed.",
+    "tilak-thaal": "The tilak ceremony: the bride's family welcome the groom. No photos needed.",
+    "nalangu-vilayattu":
+      "Tamil nalangu games: the couple rolling a coconut as the family cheer. No photos needed.",
+    "sagai-anguthi":
+      "A ring ceremony in a rose garden, in soft blush watercolour. No photos needed.",
+    "chandni-cocktail": "A pre-wedding party on a terrace under fairy lights. No photos needed.",
+    "kathputli-sangeet": "A Rajasthani sangeet with dancing kathputli puppets. No photos needed.",
+    sehrabandi: "The family tie the groom's sehra before the baraat. No photos needed.",
+    "laxmi-aagman": "The bride's welcome home as she tips the kalash of rice. No photos needed.",
+    shashtipurti: "A 60th birthday blessing, the family showering petals. No photos needed.",
+    "circus-tent":
+      "A circus birthday with a little ringmaster, an elephant and a seal. No photos needed.",
+    "toy-train":
+      "A wooden toy train carrying balloons, cake and gifts over green hills. No photos needed.",
+    "pet-party":
+      "A birthday party for a dog, with friends, a cake and paw-print balloons. No photos needed.",
+    "mixtape-party":
+      "A retro cassette party with polaroids, a boombox and roller skates. No photos needed.",
+    "pehli-salgirah":
+      "A first anniversary on a lantern-lit houseboat under the moon. No photos needed.",
+    "eid-milan": "A family Eid get-together under lanterns and a crescent moon. No photos needed.",
+    "garba-raas":
+      "A Navratri garba night with dandiya, mirror work and garbo lamps. No photos needed.",
+    valaikappu: "A Tamil bangle ceremony for the mother-to-be. No photos needed.",
+    "shubh-labh":
+      "A shop opening: cutting the ribbon at a door hung with marigolds. No photos needed.",
+    "retirement-naav":
+      "A retirement as a new journey: setting off by boat at sunrise. No photos needed.",
     "mameru-bandhani": "Bandhani silks, brass and gifts for the mameru.",
     "sindhi-ajrak": "Indigo and madder ajrak, roses and tassels for a Sindhi wedding.",
     "hampi-ruins": "Stone steps, brass lamps and jasmine among the old temples.",
