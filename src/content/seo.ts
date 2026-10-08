@@ -309,6 +309,62 @@ export const seoCopy = {
       heading: "Iftar and Eid invitations under the crescent moon",
       intro: "Add the iftar time and the address, and send one link. Guests reply in a tap.",
     },
+    "naming-ceremony": {
+      title: "Naming ceremony invitation card online",
+      description:
+        "Invite family to a naming ceremony or barsa with painted pages, the baby's name and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Naming ceremony invitations for the little one",
+      intro: "Add the time and the address, and send one link. Guests reply in a tap.",
+    },
+    holi: {
+      title: "Holi party invitation card online",
+      description:
+        "Invite friends to play Holi with painted pages full of colour and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Holi invitations full of colour",
+      intro: "Add the time and the place, and send one link. Guests reply in a tap.",
+    },
+    christmas: {
+      title: "Christmas party invitation card online",
+      description:
+        "Invite family and friends to a Christmas party with painted pages, carols and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Christmas invitations with carols and cake",
+      intro: "Add the time and the address, and send one link. Guests reply in a tap.",
+    },
+    reunion: {
+      title: "School and college reunion invitation online",
+      description:
+        "Bring the old batch together with a painted invitation, one link and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Reunion invitations for the old gang",
+      intro: "Add the time and the place, and send one link. Friends reply in a tap.",
+    },
+    graduation: {
+      title: "Graduation party invitation card online",
+      description:
+        "Celebrate a graduate with a painted invitation, one link and one-tap RSVP. Share it on WhatsApp.",
+      heading: "Graduation invitations for a proud day",
+      intro: "Add the time and the place, and send one link. Guests reply in a tap.",
+    },
+    "gudi-padwa": {
+      title: "Gudi Padwa and Ugadi invitation card online",
+      description:
+        "Invite family for Gudi Padwa or Ugadi with painted pages of the gudi, neem and rangoli, and one-tap RSVP on WhatsApp.",
+      heading: "Gudi Padwa and Ugadi invitations for the new year",
+      intro: "Add the time and the address, and send one link. Guests reply in a tap.",
+    },
+    baisakhi: {
+      title: "Baisakhi invitation card online",
+      description:
+        "Invite family to a Baisakhi celebration with painted pages of the harvest and bhangra, and one-tap RSVP on WhatsApp.",
+      heading: "Baisakhi invitations for the harvest",
+      intro: "Add the time and the place, and send one link. Guests reply in a tap.",
+    },
+    bihu: {
+      title: "Bihu invitation card online",
+      description:
+        "Invite family to Rongali Bihu with painted pages of gamosa, dhol and kopou flowers, and one-tap RSVP on WhatsApp.",
+      heading: "Bihu invitations for the Assamese new year",
+      intro: "Add the time and the place, and send one link. Guests reply in a tap.",
+    },
   } satisfies Record<CategoryId, PageWords>,
   traditionPages: {
     "north-hindu": {

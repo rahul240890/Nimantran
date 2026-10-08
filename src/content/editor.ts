@@ -335,6 +335,46 @@ export const functionCopy: Record<
     description: "Breaking the fast, dinner and Eid wishes",
     dressIdeas: ["Festive ethnic", "Whites and greens", "Something elegant"],
   },
+  "naming-ceremony": {
+    name: "Naming ceremony",
+    description: "Naming, blessings and lunch",
+    dressIdeas: ["Pastels", "Festive ethnic", "Something comfortable"],
+  },
+  holi: {
+    name: "Holi",
+    description: "Colours, music, thandai and lunch",
+    dressIdeas: ["Whites", "Old clothes you can colour", "Comfortable shoes"],
+  },
+  christmas: {
+    name: "Christmas party",
+    description: "Carols, plum cake and dinner",
+    dressIdeas: ["Reds and greens", "Something festive", "Something warm"],
+  },
+  reunion: {
+    name: "Reunion",
+    description: "Old friends, stories and dinner",
+    dressIdeas: ["Smart casual", "Your old school colours", "Something comfortable"],
+  },
+  graduation: {
+    name: "Graduation party",
+    description: "Cake, family and a proud toast",
+    dressIdeas: ["Smart casual", "Something festive", "Your college colours"],
+  },
+  "gudi-padwa": {
+    name: "Gudi Padwa",
+    description: "The gudi, prayers and a festive lunch",
+    dressIdeas: ["Nauvari and kurtas", "Festive ethnic", "Saffron and green"],
+  },
+  baisakhi: {
+    name: "Baisakhi",
+    description: "The harvest, bhangra, giddha and dinner",
+    dressIdeas: ["Phulkari", "Bright turbans and duppattas", "Festive ethnic"],
+  },
+  bihu: {
+    name: "Bihu",
+    description: "Bihu songs, dance and pitha",
+    dressIdeas: ["Mekhela chador", "Gamosa", "Festive ethnic"],
+  },
 };
 
 export const functionFields = {
@@ -473,6 +513,34 @@ export const namesCopy = {
     },
     lohri: { label: "Celebration", eyebrow: "Lohri", title: "What's your Lohri night called?" },
     eid: { label: "Dawat", eyebrow: "Eid and iftar", title: "What's your dawat called?" },
+    "naming-ceremony": {
+      label: "Baby",
+      eyebrow: "The naming ceremony",
+      title: "What's the baby's name?",
+    },
+    holi: { label: "Celebration", eyebrow: "Holi", title: "What's your Holi party called?" },
+    christmas: {
+      label: "Party",
+      eyebrow: "Christmas",
+      title: "What's your Christmas party called?",
+    },
+    reunion: {
+      label: "Reunion",
+      eyebrow: "The reunion",
+      title: "Which batch or group is meeting?",
+    },
+    graduation: { label: "Graduate", eyebrow: "The graduation", title: "Who is graduating?" },
+    "gudi-padwa": {
+      label: "Celebration",
+      eyebrow: "Gudi Padwa and Ugadi",
+      title: "What's your new year gathering called?",
+    },
+    baisakhi: {
+      label: "Celebration",
+      eyebrow: "Baisakhi",
+      title: "What's your Baisakhi celebration called?",
+    },
+    bihu: { label: "Celebration", eyebrow: "Bihu", title: "What's your Bihu celebration called?" },
   },
   one: {
     birthday: { label: "Birthday name", example: "Aarav" },
@@ -496,6 +564,14 @@ export const namesCopy = {
     sankranti: { label: "Celebration name", example: "Kite Day" },
     lohri: { label: "Celebration name", example: "Lohri Night" },
     eid: { label: "Dawat name", example: "Iftar Dawat" },
+    "naming-ceremony": { label: "Baby's name", example: "Anaya" },
+    holi: { label: "Celebration name", example: "Holi Milan" },
+    christmas: { label: "Party name", example: "Christmas Party" },
+    reunion: { label: "Batch or group", example: "Batch of 2006" },
+    graduation: { label: "Graduate's name", example: "Riya" },
+    "gudi-padwa": { label: "Celebration name", example: "Gudi Padwa Lunch" },
+    baisakhi: { label: "Celebration name", example: "Baisakhi Mela" },
+    bihu: { label: "Celebration name", example: "Rongali Bihu" },
   },
   oneHint: "It's printed large on the cover. Say who invites and why in the wording below.",
 } as const;
@@ -915,6 +991,15 @@ export const suiteCopy = {
     "griha-kalash": "Griha Kalash",
     "sona-saath": "Sona Saath",
     "bagh-reception": "Bagh Reception",
+    "naamkaran-chanda": "Naamkaran Chanda",
+    "swagat-laxmi": "Swagat Laxmi",
+    "holi-rang": "Holi Rang",
+    "christmas-tara": "Christmas Tara",
+    "reunion-yaarana": "Reunion Yaarana",
+    "graduation-topi": "Graduation Topi",
+    "gudi-padwa": "Gudi Padwa",
+    "baisakhi-mela": "Baisakhi Mela",
+    "bihu-utsav": "Bihu Utsav",
     "gond-vriksh": "Gond Vriksh",
     "warli-vivah": "Warli Vivah",
     "kalighat-pat": "Kalighat Pat",
@@ -1138,6 +1223,24 @@ export const suiteCopy = {
       "An anniversary couple on a swing under the neem tree at sunset. No photos needed.",
     "bagh-reception":
       "A garden reception with gazebos, swans, hanging flowers and lamps. No photos needed.",
+    "naamkaran-chanda":
+      "Parents bend over a marigold cradle under a crescent moon and paper cranes. No photos needed.",
+    "swagat-laxmi":
+      "Grandparents shower petals as the new baby comes home, under bells and roses. No photos needed.",
+    "holi-rang":
+      "Friends throw gulal to a dhol beat beside a flame tree, with gujiya and bowls of colour. No photos needed.",
+    "christmas-tara":
+      "A family sings carols by the tree, with plum cake, gifts and paper stars. No photos needed.",
+    "reunion-yaarana":
+      "Old classmates crowd the school steps with a photo, a cricket bat and tiffin boxes. No photos needed.",
+    "graduation-topi":
+      "Proud parents hug the graduate under flying caps, balloons and sunflowers. No photos needed.",
+    "gudi-padwa":
+      "A Marathi family by the raised gudi, with puran poli and a flower rangoli. No photos needed.",
+    "baisakhi-mela":
+      "Bhangra and giddha in golden wheat, with kites, a dhol and a village fair. No photos needed.",
+    "bihu-utsav":
+      "Bihu dancers in mekhela chador with dhol and pepa, kopou flowers and pitha. No photos needed.",
     "gond-vriksh":
       "A Gond tree of life full of birds, with the couple and a deer and peacock beneath it. No photos needed.",
     "warli-vivah":

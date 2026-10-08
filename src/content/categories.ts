@@ -50,6 +50,14 @@ export const categoryTaglines: Record<CategoryId, string> = {
   sankranti: "Kites, til and pongal",
   lohri: "Bonfire, rewari and bhangra",
   eid: "Iftar dawat and Eid milan",
+  "naming-ceremony": "Name the baby, bless the family",
+  holi: "Colours, music and gujiya",
+  christmas: "Carols, cake and the tree",
+  reunion: "Old friends, one evening",
+  graduation: "Caps off to the graduate",
+  "gudi-padwa": "The gudi, neem and puran poli",
+  baisakhi: "Harvest, bhangra and giddha",
+  bihu: "Bihu songs, dance and pitha",
 };
 
 export const questionLabels: Record<RsvpQuestionId, string> = {

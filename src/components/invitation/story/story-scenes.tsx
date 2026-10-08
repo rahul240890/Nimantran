@@ -825,8 +825,9 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
         </>
       );
       break;
-    // A baby shower: a garland of flowers and petals drifting down
+    // A baby shower or a naming: a garland of flowers and petals drifting down
     case "baby-shower":
+    case "naming-ceremony":
       art = (
         <>
           <Toran />
@@ -858,13 +859,16 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
         </>
       );
       break;
-    // Home and family rites, and harvest festivals: a garland of flowers over the door
+    // Home and family rites, and harvest and new year festivals: a garland of flowers over the door
     case "housewarming":
     case "thread-ceremony":
     case "annaprashan":
     case "christening":
     case "onam":
     case "sankranti":
+    case "gudi-padwa":
+    case "baisakhi":
+    case "bihu":
       art = (
         <>
           <Toran />
@@ -882,6 +886,10 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
     case "shop-opening":
     case "launch":
     case "eid":
+    case "holi":
+    case "christmas":
+    case "reunion":
+    case "graduation":
       art = (
         <>
           <Lanterns />

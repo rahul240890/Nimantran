@@ -1027,6 +1027,24 @@ const ILLUSTRATED: Record<IllustratedId, IllustratedEntry> = {
   "sona-saath": { open: [6, 6, 54, 44] },
   // Cream under the lamps, the names between the two swastiks
   "bagh-reception": { open: [14, 15, 72, 35], names: [14, 19, 72, 7.5] },
+  // Pale sky between the hanging cranes, under the moon
+  "naamkaran-chanda": { open: [14, 16, 72, 35] },
+  // Cream under the rose garland and bells
+  "swagat-laxmi": { open: [14, 12, 64, 32] },
+  // White between the colour clouds, above the dancers
+  "holi-rang": { open: [22, 19, 58, 29] },
+  // The cream wall under the garland, beside the tree
+  "christmas-tara": { open: [26, 13, 56, 37] },
+  // The green chalkboard above the friends
+  "reunion-yaarana": { open: [22, 18, 57, 25], dark: true },
+  // The white board under the flying caps
+  "graduation-topi": { open: [20, 18, 60, 33] },
+  // Cream under the marigold toran, beside the gudi
+  "gudi-padwa": { open: [23, 11, 54, 36] },
+  // Sky between the wheat stalks, under the bunting
+  "baisakhi-mela": { open: [13, 16, 74, 33] },
+  // Cream under the gamosa, between the bamboo and orchids
+  "bihu-utsav": { open: [21, 14, 63, 40] },
   // Ivory paper under the tree's crown, beside the trunk
   "gond-vriksh": { open: [30, 29, 64, 17] },
   // Terracotta between the two Warli trees, under the sun and moon

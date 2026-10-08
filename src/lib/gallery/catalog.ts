@@ -137,11 +137,12 @@ export const OCCASIONS: readonly Occasion[] = [
     ["baptism", "holy communion", "church"],
     "family",
   ),
-  soon("naming-ceremony", "family", { en: "Naming ceremony", hi: "नामकरण" }, [
-    "naamkaran",
-    "barsa",
-    "cradle ceremony",
-  ]),
+  live(
+    "naming-ceremony",
+    { suite: "naamkaran-chanda", page: "cover" },
+    ["barsa", "namkaran", "cradle ceremony", "naamkaran"],
+    "family",
+  ),
   soon("mundan", "family", { en: "Mundan", hi: "मुंडन" }, ["chudakarana", "first haircut"]),
   live(
     "housewarming",
@@ -176,11 +177,22 @@ export const OCCASIONS: readonly Occasion[] = [
   live(
     "farewell-party",
     { suite: "farewell-night", page: "cover" },
-    ["farewell", "send off", "graduation", "convocation"],
+    ["farewell", "send off"],
+    "parties",
+  ),
+  live(
+    "graduation",
+    { suite: "graduation-topi", page: "cover" },
+    ["convocation", "graduation party", "degree", "passing out"],
     "parties",
   ),
   soon("kitty-party", "parties", { en: "Kitty party", hi: "किटी पार्टी" }, ["kitty", "ladies"]),
-  soon("reunion", "parties", { en: "Reunion", hi: "रीयूनियन" }, ["alumni", "get together"]),
+  live(
+    "reunion",
+    { suite: "reunion-yaarana", page: "cover" },
+    ["alumni", "get together", "batch", "school friends", "college friends"],
+    "parties",
+  ),
   live(
     "retirement",
     { suite: "retirement-garden", page: "cover" },
@@ -224,7 +236,38 @@ export const OCCASIONS: readonly Occasion[] = [
     ["first lohri", "bonfire", "maghi"],
     "festivals",
   ),
-  soon("holi", "festivals", { en: "Holi", hi: "होली" }, ["rang", "colours"]),
+  live(
+    "gudi-padwa",
+    { suite: "gudi-padwa", page: "cover" },
+    [
+      "ugadi",
+      "yugadi",
+      "padwa",
+      "marathi new year",
+      "telugu new year",
+      "kannada new year",
+      "cheti chand",
+    ],
+    "festivals",
+  ),
+  live(
+    "baisakhi",
+    { suite: "baisakhi-mela", page: "cover" },
+    ["vaisakhi", "harvest", "bhangra", "khalsa"],
+    "festivals",
+  ),
+  live(
+    "bihu",
+    { suite: "bihu-utsav", page: "cover" },
+    ["rongali bihu", "bohag bihu", "assamese new year", "magh bihu"],
+    "festivals",
+  ),
+  live(
+    "holi",
+    { suite: "holi-rang", page: "cover" },
+    ["rang", "colours", "holi milan", "dhulandi", "rangwali"],
+    "festivals",
+  ),
   live(
     "navratri",
     { suite: "durga-pujo", page: "cover" },
@@ -243,7 +286,12 @@ export const OCCASIONS: readonly Occasion[] = [
     ["iftar", "eid milan", "ramadan", "ramzan", "iftar party", "dawat"],
     "festivals",
   ),
-  soon("christmas", "festivals", { en: "Christmas", hi: "क्रिसमस" }, ["xmas", "new year"]),
+  live(
+    "christmas",
+    { suite: "christmas-tara", page: "cover" },
+    ["xmas", "carols", "santa"],
+    "festivals",
+  ),
 
   live(
     "shop-opening",

@@ -59,7 +59,7 @@ describe("One Scene", () => {
   });
 
   it("prints an illustrated card's words in its empty space, with no photos", () => {
-    expect(ILLUSTRATED_IDS.length).toBe(64);
+    expect(ILLUSTRATED_IDS.length).toBe(73);
     for (const suite of ILLUSTRATED_IDS) {
       const page = scenePage(suite, 2)!;
       expect(page.style).toBe("bare");

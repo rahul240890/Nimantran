@@ -58,6 +58,14 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   "save-the-date": "envelope",
   anniversary: "storybook",
   housewarming: "jharokha",
+  "naming-ceremony": "gift",
+  holi: "fireworks",
+  christmas: "gift",
+  reunion: "envelope",
+  graduation: "fireworks",
+  "gudi-padwa": "rangoli",
+  baisakhi: "lanterns",
+  bihu: "rangoli",
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 
