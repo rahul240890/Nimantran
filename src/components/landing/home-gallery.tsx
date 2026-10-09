@@ -17,6 +17,7 @@ import {
   type GalleryDesign,
   type Occasion,
 } from "@/lib/gallery/catalog";
+import { designPhotos } from "@/lib/gallery/photos";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
 import { pagePath } from "@/lib/seo/paths";
@@ -160,6 +161,7 @@ export function HomeThemes({ locale }: { locale: UiLocale }) {
                       name={name}
                       description={description}
                       href={designHref(design, { category: suiteOccasion(design.suite) })}
+                      photos={designPhotos(design, suiteOccasion(design.suite))}
                     />
                   </li>
                 );

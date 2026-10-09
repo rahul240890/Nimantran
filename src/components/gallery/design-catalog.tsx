@@ -18,6 +18,7 @@ import { cn } from "@/lib/cn";
 import { WEDDING_KINDS, type WeddingKind } from "@/lib/gallery/catalog";
 import {
   NO_FILTERS,
+  catalogCategory,
   catalogHref,
   designCatalog,
   filterCatalog,
@@ -26,6 +27,7 @@ import {
   type DesignFilters,
   type DesignFormat,
 } from "@/lib/gallery/filters";
+import { designPhotos } from "@/lib/gallery/photos";
 import { normalize } from "@/lib/gallery/search";
 import type { TemplateId } from "@/lib/templates/ids";
 import { DesignCard } from "./design-card";
@@ -249,6 +251,7 @@ export function DesignCatalog({
                   name={name}
                   description={description}
                   href={catalogHref(entry, deferred)}
+                  photos={designPhotos(entry.design, catalogCategory(entry, deferred))}
                   priority={index < 4}
                   cover={
                     entry.design.suite === "classic" ? covers[entry.design.template] : undefined
