@@ -1239,6 +1239,9 @@ export const CATEGORIES = {
     wording: {
       doorLeft: "Happy",
       doorRight: "Raksha Bandhan",
+      first: "Priya",
+      joiner: "&",
+      second: "Rohan",
       blessing: "A thread of love and protection",
       families: "With love from the family",
       line: "invite you to celebrate Raksha Bandhan with rakhi, sweets and lunch",
@@ -1274,6 +1277,7 @@ export const CATEGORIES = {
     wording: {
       doorLeft: "Karva",
       doorRight: "Chauth",
+      joiner: "&",
       blessing: "Akhand saubhagyavati bhava",
       families: "With love from the family",
       line: "invite you to the Karva Chauth puja, moonrise and dinner",
