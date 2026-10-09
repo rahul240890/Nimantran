@@ -415,8 +415,7 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   ideasLabel: (field) => `${field} के सुझाव`,
   useIdea: (text) => `“${text}” लिखें`,
   moreWording: "कार्ड के और शब्द",
-  moreWordingHint:
-    "द्वार के शब्द, परिवार की पंक्ति और नामों के बीच का शब्द। हर एक आपके अवसर के शब्दों से शुरू होता है।",
+  moreWordingHint: "द्वार के शब्द और परिवार की पंक्ति। हर एक आपके अवसर के शब्दों से शुरू होता है।",
   cardIn: "कार्ड की भाषा:",
   changeLanguage: "भाषा बदलें",
 };

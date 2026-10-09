@@ -432,8 +432,7 @@ export const coupleCopy = {
   ideasLabel: (field: string) => `Ideas for ${field}`,
   useIdea: (text: string) => `Use “${text}”`,
   moreWording: "More card words",
-  moreWordingHint:
-    "Gate words, the family line and the word between the names. Each starts with wording for your occasion.",
+  moreWordingHint: "Gate words and the family line. Each starts with wording for your occasion.",
   cardIn: "Card language:",
   changeLanguage: "Change language",
 } as const;
