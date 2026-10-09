@@ -4,6 +4,7 @@ import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { getLocale } from "@/i18n/server";
 import { editorText } from "@/i18n/copy/editor";
 import { includedFunctions, type InviteDraft } from "@/lib/editor/draft";
+import { isCardLanguage } from "@/lib/templates/card-languages";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 import { isSuiteId, type SuiteId } from "@/lib/suites/catalog";
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 
 /*
  * A review page for the themed guest page (Step 12q), not a product screen: the guest page
- * for ?suite=<theme> (and ?lang=hi for a Hindi card) with made-up names, dates and pictures, and nothing saved.
+ * for ?suite=<theme> (and ?lang=hi, mr, gu, bn or ta for a card in that language) with made-up names, dates and pictures, and nothing saved.
  * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
  * ?opening=palace (or any style in lib/opening/catalog.ts) and ?god=ganesha choose the
  * first screen (Step 12x).
@@ -39,7 +40,12 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
   const locale = await getLocale();
   const scene = format === "scene";
   const sceneCount = count === "0" ? 0 : count === "1" ? 1 : 2;
-  const base = sampleDraft(suite, lang === "hi");
+  const language = isCardLanguage(lang) ? lang : "en";
+  const sample = sampleDraft(suite, language === "hi");
+  const base: InviteDraft = {
+    ...sample,
+    languages: language === "en" ? sample.languages : [language],
+  };
   const draft: InviteDraft = {
     ...(scene ? sceneDraft(base, sceneCount) : base),
     opening: {
