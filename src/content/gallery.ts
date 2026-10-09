@@ -210,4 +210,47 @@ export const catalogCopy = {
   count: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
   clear: "Clear filters",
   empty: "No design matches all of these yet. Try fewer filters.",
+  photosLabel: "Art or photos",
+  allPhotos: "Any",
+  photoGroups: { none: "Illustrated", one: "Couple photo", two: "Bride and groom photos" },
+  allDesigns: "All designs",
+};
+
+/** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */
+export const shelfCopy = {
+  groups: {
+    photos: "Illustrated or with your photos",
+    format: "By kind of invitation",
+    tradition: "Weddings by tradition",
+    occasion: "More celebrations",
+  },
+  photos: {
+    none: {
+      title: "Illustrated invitations",
+      intro: "Hand-painted art with your names. No photo needed.",
+    },
+    one: {
+      title: "Couple photo invitations",
+      intro: "Your favourite photo of the two of you, set into the painting.",
+    },
+    two: {
+      title: "Bride and groom photos",
+      intro: "A separate photo of each of you, framed side by side.",
+    },
+  },
+  format: {
+    story: { title: "Stories", intro: "A full-screen painted page for every function." },
+    scene: {
+      title: "Scenes",
+      intro: "Everything on one painting, each function flying in by turn.",
+    },
+    card: { title: "3D cards", intro: "A card that opens in 3D in your guest's hand." },
+  },
+  tradition: (name: string) => `${name} weddings`,
+  traditionsHeading: "Choose your tradition",
+  occasionsHeading: "Or another celebration",
+  viewAll: "View all",
+  viewAllLabel: (title: string, count: number) => `View all ${count} designs: ${title}`,
+  back: "Scroll back",
+  next: "Scroll on",
 };

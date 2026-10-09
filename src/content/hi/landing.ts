@@ -21,6 +21,42 @@ export const nav: Translation<typeof en.nav> = [
   { id: "pricing", label: "क़ीमत" },
 ];
 
+export const menuCopy: Translation<typeof en.menuCopy> = {
+  photos: "चित्रित या फ़ोटो के साथ",
+  kinds: "निमंत्रण के प्रकार से",
+  popular: "लोकप्रिय",
+  regions: "क्षेत्र के हिसाब से",
+  communities: "समुदाय और धर्म के हिसाब से",
+  looks: "रूप के हिसाब से",
+  lookNames: {
+    garden: "बाग़ और फूल",
+    palace: "शाही महल",
+    temple: "मंदिर और आशीर्वाद",
+    lotus: "कमल",
+    peacock: "मोर",
+    sea: "समुद्र और बैकवाटर",
+    night: "रात और दीये",
+    balloon: "गुब्बारे और पार्टी",
+    modern: "आधुनिक और सादे",
+  },
+  functions: "शादी की रस्में",
+  allDesigns: (count: number) => `सभी ${count} डिज़ाइन देखें`,
+  allWeddings: "शादी के सभी डिज़ाइन",
+  allOccasions: "सभी अवसर",
+  designsFeature: {
+    title: "चित्रित या आपकी फ़ोटो के साथ",
+    text: "सिर्फ़ चित्रकारी, जोड़े की फ़ोटो, या आप दोनों की अलग फ़ोटो: हर डिज़ाइन बताता है कौन-सा, और उसकी क़ीमत।",
+  },
+  weddingsFeature: {
+    title: "शादी के निमंत्रण",
+    text: "हर रस्म एक चित्रित निमंत्रण पर, आपकी परंपरा में लिखी, जवाब के साथ।",
+  },
+  occasionsFeature: {
+    title: "हर जश्न",
+    text: "जन्मदिन, गृह प्रवेश, गोद भराई, पूजा और भी बहुत कुछ, हर एक के अपने डिज़ाइन।",
+  },
+};
+
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "मुख्य सामग्री पर जाएँ",
   primaryNav: "मुख्य",

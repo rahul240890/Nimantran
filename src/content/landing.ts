@@ -19,6 +19,43 @@ export const nav = [
   { id: "pricing", label: "Pricing" },
 ] as const;
 
+/** The header's menus for Designs, Weddings and Occasions (src/components/shell/site-menu.ts). */
+export const menuCopy = {
+  photos: "Illustrated or with photos",
+  kinds: "By kind of invitation",
+  popular: "Popular",
+  regions: "By region",
+  communities: "By community and faith",
+  looks: "By look",
+  lookNames: {
+    garden: "Gardens and flowers",
+    palace: "Royal palaces",
+    temple: "Temples and blessings",
+    lotus: "Lotus",
+    peacock: "Peacocks",
+    sea: "Sea and backwaters",
+    night: "Night and lamps",
+    balloon: "Balloons and parties",
+    modern: "Modern and simple",
+  },
+  functions: "Wedding functions",
+  allDesigns: (count: number) => `See all ${count} designs`,
+  allWeddings: "All wedding designs",
+  allOccasions: "All occasions",
+  designsFeature: {
+    title: "Illustrated or with your photos",
+    text: "Painted art alone, your couple photo, or a photo of each of you: every design says which, and its price.",
+  },
+  weddingsFeature: {
+    title: "Wedding invitations",
+    text: "Every function on one painted invite, written in your tradition, with RSVP.",
+  },
+  occasionsFeature: {
+    title: "Every celebration",
+    text: "Birthdays, griha pravesh, baby showers, pujas and more, each with its own designs.",
+  },
+};
+
 export const shell = {
   skipToContent: "Skip to main content",
   primaryNav: "Main",
