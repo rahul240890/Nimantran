@@ -1,6 +1,6 @@
 import type { EditorStep, FunctionId } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
+import { TEMPLATE_IDS, type LeadId, type TaalId, type TemplateId } from "@/lib/templates/ids";
 
 /*
  * English copy for the invite editor (/create). Moves into next-intl in Step 12.
@@ -442,8 +442,7 @@ export const coupleCopy = {
   ideasLabel: (field: string) => `Ideas for ${field}`,
   useIdea: (text: string) => `Use “${text}”`,
   moreWording: "More card words",
-  moreWordingHint:
-    "Gate words, the family line and the word between the names. Each starts with wording for your occasion.",
+  moreWordingHint: "Gate words and the family line. Each starts with wording for your occasion.",
   cardIn: "Card language:",
   changeLanguage: "Change language",
 } as const;
@@ -592,6 +591,21 @@ export const namesCopy = {
   oneHint: "It's printed large on the cover. Say who invites and why in the wording below.",
 } as const;
 
+const LEAD_NAMES: Record<LeadId, string> = {
+  santoor: "Santoor",
+  sitar: "Sitar",
+  bansuri: "Bansuri",
+  shehnai: "Shehnai",
+  veena: "Veena",
+};
+
+const TAAL_NAMES: Record<TaalId, string> = {
+  keherwa: "dholak",
+  dadra: "dholak",
+  garba: "garba dhol and claps",
+  bhangra: "Punjabi dhol",
+};
+
 export const extrasCopy = {
   photosHeading: "Photos",
   photosHint: (max: number) =>
@@ -728,6 +742,9 @@ export const extrasCopy = {
     hamsadhwani: "Raag Hamsadhwani",
     kafi: "Raag Kafi",
   },
+  /** What a raga is played on, then its mood: "Shehnai with dholak · Rajasthani folk". */
+  ragaSound: (sound: { lead: LeadId; taal: TaalId | null }, mood: string) =>
+    `${LEAD_NAMES[sound.lead]}${sound.taal ? ` with ${TAAL_NAMES[sound.taal]}` : ""} · ${mood}`,
   ragaMoods: {
     yaman: "Evening, romantic",
     khamaj: "Light and tender",

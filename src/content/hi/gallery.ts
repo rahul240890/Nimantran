@@ -41,6 +41,14 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} डिज़ाइन, ${price} से प्रकाशित करें` : "फ़्री डिज़ाइन",
+  photoNeeds: {
+    none: "फ़ोटो की ज़रूरत नहीं",
+    one: "एक फ़ोटो",
+    couple: "जोड़े की एक फ़ोटो",
+    two: "दो फ़ोटो, एक-एक",
+    either: "जोड़े की फ़ोटो या दो अलग",
+    optional: "फ़ोटो चाहें तो",
+  },
   sceneBadge: "दृश्य · 1 पन्ना",
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:

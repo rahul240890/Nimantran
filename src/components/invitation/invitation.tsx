@@ -39,8 +39,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CARD_FORMATS, type CardFormatId } from "./formats";
 import { FlatPattern } from "./flat-pattern";
 import { StoryPlayer, type StoryLabels } from "./story/story-player";
-import { useText } from "@/i18n/client";
-import { uiText } from "@/i18n/copy/ui";
+import { useGuestText } from "@/components/guest/guest-language";
 
 const Stage = dynamic(() => import("./three/stage"), { ssr: false });
 
@@ -174,9 +173,9 @@ export function Invitation({
   onFps,
   className,
 }: InvitationProps) {
-  const { uiStrings } = useText(uiText);
-  const labels = labelsProp ?? uiStrings.invitation;
-  const storyLabels = labels.story ?? uiStrings.invitation.story;
+  const { invitation } = useGuestText();
+  const labels = labelsProp ?? invitation;
+  const storyLabels = labels.story ?? invitation.story;
   const format: CardFormatId = template.scene.format;
   const Flat = CARD_FORMATS[format].Flat;
   const still = useReducedMotion();
@@ -486,7 +485,7 @@ export function Invitation({
             }}
             className="absolute end-3 top-3 bg-surface/85 backdrop-blur-sm"
           >
-            {labels.skip ?? uiStrings.invitation.skip}
+            {labels.skip ?? invitation.skip}
           </Button>
         )}
 

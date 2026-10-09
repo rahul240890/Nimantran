@@ -46,6 +46,15 @@ export const galleryCopy = {
   tierPrice: (tier: string, price: string) => `${tier} · ${price}`,
   tierLabel: (tier: string, price: string | null) =>
     price ? `${tier} design, publish from ${price}` : "Free design",
+  /** What photos a design takes (src/lib/gallery/photos.ts), under its name. */
+  photoNeeds: {
+    none: "No photo needed",
+    one: "One photo",
+    couple: "One couple photo",
+    two: "Two photos, one each",
+    either: "Couple photo or two separate",
+    optional: "Photos optional",
+  },
   sceneBadge: "Scene · 1 page",
   storyBadge: (count: number) => `Story · ${count} pages`,
   sceneNote:

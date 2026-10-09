@@ -7,8 +7,7 @@ import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import { Button } from "@/components/ui/button";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
@@ -226,7 +225,7 @@ function Welcome({
   onShower: () => void;
   showered: boolean;
 }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const words = guestCopy.themed;
   const cardWords = CARD_THEMED_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
@@ -380,7 +379,7 @@ function Celebrations({
   functions: readonly GuestFunction[];
   allIcsUrl: string | null;
 }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
   return (
@@ -467,7 +466,7 @@ function Dusk({
   look: GuestLook;
   lang: CardLanguage;
 }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   return (
     <div data-mood="dusk" className="guest-sky relative isolate pb-16">
@@ -552,7 +551,7 @@ function Night({
   look: GuestLook;
   reply: ReactNode;
 }) {
-  const { guestCopy, rsvpCopy } = useText(publishText);
+  const { guestCopy, rsvpCopy } = useGuestText();
   const words = guestCopy.themed;
   const cardWords = CARD_THEMED_WORDS[lang];
   const [lit, setLit] = useState(false);
@@ -621,7 +620,7 @@ function Night({
 
 /** The music, one tap away while the guest reads on. */
 function FloatingMusic({ music }: { music: Music }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const words = guestCopy.themed.music;
   return (
     <button

@@ -22,12 +22,16 @@ import {
   type SuiteId,
 } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
+import { paintedDesign, sceneDesign, type GalleryDesign } from "@/lib/gallery/catalog";
+import { designPhotos, mixDesigns } from "@/lib/gallery/photos";
+import { galleryText } from "@/i18n/copy/gallery";
 import { OpeningPicker } from "@/components/editor/opening-picker";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
 export function DesignStep({ draft, update }: StepProps) {
   const { designCopy, occasionCopy, stepCopy, suiteCopy } = useText(editorText);
+  const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const category = draftCategory(draft);
   // The tradition's designs lead, then the occasion's
@@ -57,6 +61,22 @@ export function DesignStep({ draft, update }: StepProps) {
       : (format === "scene" || isSceneTheme(id)) && hasScene(id)
         ? `${id}-scene`
         : id;
+  // The design each theme makes in the host's chosen kind, for its photo line and its place
+  const galleryDesign = (id: SuiteId): GalleryDesign =>
+    id === "classic"
+      ? { id: `card-${draft.templateId}`, suite: id, template: draft.templateId }
+      : (draft.format === "scene" || isSceneTheme(id)) && hasScene(id)
+        ? sceneDesign(id)
+        : paintedDesign(id);
+  // Themes for this occasion, the card colours and whatever is chosen, with each kind and
+  // photo need mixed through the list as the gallery shows them; the suggested one leads
+  const suites = mixDesigns(
+    SUITE_IDS.filter(
+      (id) => suiteSuits(id, draft.categoryId) || id === "classic" || id === suite,
+    ).map(galleryDesign),
+  )
+    .map((design) => design.suite)
+    .sort((x, y) => Number(y === suggestedSuite) - Number(x === suggestedSuite));
 
   return (
     <div className="flex flex-col gap-10">
@@ -138,10 +158,7 @@ export function DesignStep({ draft, update }: StepProps) {
           }}
           className="grid-cols-1 min-[400px]:grid-cols-2"
         >
-          {SUITE_IDS.filter(
-            // Themes painted for this occasion, the card colours, and whatever is chosen
-            (id) => suiteSuits(id, draft.categoryId) || id === "classic" || id === suite,
-          ).map((id) => {
+          {suites.map((id) => {
             const pair = SUITES[id].template;
             const isSuggested = id === suggestedSuite;
             // Only a chosen tradition can be "yours"; otherwise the occasion's design suggests it
@@ -166,6 +183,9 @@ export function DesignStep({ draft, update }: StepProps) {
                       className="mb-1.5 flex w-fit"
                     />
                     {suiteCopy.descriptions[id]}
+                    <span className="mt-1 block text-sm">
+                      {galleryCopy.photoNeeds[designPhotos(galleryDesign(id), draft.categoryId)]}
+                    </span>
                     {pair && pair !== draft.templateId && (
                       <span className="mt-1 block text-sm">
                         {suiteCopy.pairs(designCopy[pair].name)}

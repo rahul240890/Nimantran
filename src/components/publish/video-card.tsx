@@ -10,7 +10,7 @@ import { toast } from "@/components/ui/toast";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
-import { cardLanguages, draftCopy, templateWithRaga, type InviteDraft } from "@/lib/editor/draft";
+import { cardLanguages, draftCopy, draftTemplate, type InviteDraft } from "@/lib/editor/draft";
 import { withClip } from "@/lib/editor/music-clip";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
@@ -306,10 +306,7 @@ export function useVideoFilm(
 ) {
   const { videoCopy } = useText(publishText);
   const language = cardLanguages(draft)[0];
-  const template = useMemo(
-    () => templateWithRaga(draft.templateId, draft.music.raga),
-    [draft.templateId, draft.music.raga],
-  );
+  const template = draftTemplate(draft);
   const scene = useMemo(() => {
     const copy = draftCopy(draft, language);
     const suite = draftSuite(draft);

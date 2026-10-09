@@ -58,7 +58,7 @@ export function kindsOf(design: GalleryDesign): WeddingKind[] {
   });
 }
 
-/** Every design in the gallery with what it can be filtered by, painted first. */
+/** Every design in the gallery with what it can be filtered by, each kind mixed through. */
 export function designCatalog(): CatalogEntry[] {
   return allDesigns().map((design) => ({
     design,
@@ -88,15 +88,19 @@ export function filterCatalog(
   );
 }
 
+/** The occasion a design opens for: the one the host filtered by, else its own. */
+export function catalogCategory(entry: CatalogEntry, filters: DesignFilters): CategoryId {
+  const wanted = filters.kind ? "wedding" : filters.occasion;
+  return wanted && entry.occasions.includes(wanted)
+    ? wanted
+    : entry.design.suite === "classic"
+      ? (entry.occasions[0] ?? "wedding")
+      : suiteOccasion(entry.design.suite);
+}
+
 /** Use this design, set up for what the host filtered by: their occasion and tradition. */
 export function catalogHref(entry: CatalogEntry, filters: DesignFilters): string {
-  const wanted = filters.kind ? "wedding" : filters.occasion;
-  const category =
-    wanted && entry.occasions.includes(wanted)
-      ? wanted
-      : entry.design.suite === "classic"
-        ? (entry.occasions[0] ?? "wedding")
-        : suiteOccasion(entry.design.suite);
+  const category = catalogCategory(entry, filters);
   const kind = category === "wedding" ? filters.kind : null;
   return designHref(entry.design, { category, kind });
 }

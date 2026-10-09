@@ -292,14 +292,15 @@ test.describe("publish and share", () => {
     await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
     await expect(door.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
     await expect(door.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeVisible();
-    // The countdown speaks the card's language too
+    // The countdown and the buttons around the card speak the card's language too
     await expect(door.getByText("દિવસ", { exact: true })).toBeVisible();
+    await expect(guest.getByRole("radiogroup", { name: "કાર્ડની ભાષા" })).toBeVisible();
     expect(await noOverflow(guest)).toBe(true);
     expect((await axe(guest).analyze()).violations).toEqual([]);
 
     // Opening it brings the event pages, in the chosen language and the Gujarati
     // tradition's own theme (in Still mode, straight away)
-    await guest.getByRole("button", { name: "Open the invitation" }).click();
+    await guest.getByRole("button", { name: "આમંત્રણ ખોલો" }).click();
     const story = guest.locator("[data-story-beat]");
     await expect(story).toHaveAttribute("data-story-beat", "cover");
     await expect(story).toHaveAttribute("data-suite", "kutch-toran");
@@ -314,7 +315,7 @@ test.describe("publish and share", () => {
     // The card's time is Gujarati too, never "AM" in English letters
     await expect(story.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
     await guest.keyboard.press("ArrowRight");
-    const reply = story.getByRole("link", { name: "Reply to the invitation" });
+    const reply = story.getByRole("link", { name: "આમંત્રણનો જવાબ આપો" });
     await expect(reply).toHaveAttribute("href", "#rsvp");
     expect((await axe(guest).analyze()).violations).toEqual([]);
     await reply.click();
@@ -324,12 +325,14 @@ test.describe("publish and share", () => {
     const article = guest.getByRole("article", { name: "હસ્તમેળાપ" });
     await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
     await expect(article.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
-    await article.getByRole("button", { name: "Add to calendar" }).click();
+    await article.getByRole("button", { name: "કૅલેન્ડરમાં ઉમેરો" }).click();
     const ics = await guest.getByRole("menuitem", { name: /Apple/ }).getAttribute("href");
     const calendar = await (await guest.request.get(ics!)).text();
     expect(calendar).toContain("DTSTART:20261015T041700Z");
     expect(calendar).toContain("DTEND:20261015T050100Z");
     await guest.keyboard.press("Escape");
+    // The reply form below speaks Gujarati as well
+    await expect(guest.getByRole("button", { name: "જવાબ મોકલો" })).toBeVisible();
     expect(await noOverflow(guest)).toBe(true);
     expect((await axe(guest).analyze()).violations).toEqual([]);
     await guestContext.close();
