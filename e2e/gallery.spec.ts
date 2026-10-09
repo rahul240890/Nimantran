@@ -109,27 +109,37 @@ test.describe("finding a design", () => {
 test.describe("the Designs page", () => {
   test.use({ reducedMotion: "reduce" });
 
+  test("rows show a few designs each, and View all opens the whole list", async ({ page }) => {
+    await page.goto("/designs");
+    const noPhoto = page.locator('[data-shelf="photos-none"]');
+    await expect(noPhoto.locator("[data-design]")).toHaveCount(10);
+    await noPhoto
+      .getByRole("link", { name: /^View all \d+ designs: No photo needed$/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/photos=none/);
+    await expect(
+      page.getByRole("heading", { name: /^No photo needed · \d+ designs$/ }),
+    ).toBeVisible();
+    await expect(page.locator("[data-shelf]")).toHaveCount(0);
+    expect(await page.locator("[data-design]").count()).toBeGreaterThan(10);
+
+    // Back returns to the rows
+    await page.goBack();
+    await expect(noPhoto).toBeVisible();
+    await expect(page).not.toHaveURL(/photos=/);
+  });
+
   test("filters narrow every design, follow the address and open the editor set up", async ({
     page,
   }) => {
     await page.goto("/designs");
-    const count = page.getByText(/^\d+ designs?$/);
-    const all = Number((await count.textContent())!.split(" ")[0]);
-
-    const occasions = page.getByRole("group", { name: "Occasion" });
-    await occasions.getByRole("button", { name: "Birthday" }).click();
-    await expect(page).toHaveURL(/occasion=birthday/);
-    await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
-    await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
-    // A birthday has no wedding traditions to choose from
-    await expect(page.getByRole("group", { name: "Wedding tradition" })).toBeHidden();
-
-    await occasions.getByRole("button", { name: "All occasions" }).click();
-    await page
-      .getByRole("group", { name: "Wedding tradition" })
-      .getByRole("button", { name: "Gujarati" })
-      .click();
+    await page.locator('[data-kind="gujarati"]').getByRole("link").click();
     await expect(page).toHaveURL(/tradition=gujarati/);
+    await expect(
+      page.getByRole("heading", { name: /^Gujarati weddings · \d+ designs$/ }),
+    ).toBeVisible();
+    const occasions = page.getByRole("group", { name: "Occasion" });
     await expect(occasions.getByRole("button", { name: "Wedding" })).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -143,8 +153,26 @@ test.describe("the Designs page", () => {
       page.locator('[data-design="card-bandhani"]').getByRole("link", { name: /Use this design/ }),
     ).toHaveAttribute("href", /category=wedding.*tradition=gujarati/);
 
+    // Clearing every filter goes back to the rows
     await page.getByRole("button", { name: "Clear filters" }).click();
-    await expect(count).toHaveText(`${all} designs`);
+    await expect(page.locator('[data-shelf="photos-none"]')).toBeVisible();
+
+    await page
+      .locator('[data-shelf="occasion-birthday"]')
+      .getByRole("link", { name: /^View all/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/occasion=birthday/);
+    await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
+    await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
+    // A birthday has no wedding traditions to choose from
+    await expect(page.getByRole("group", { name: "Wedding tradition" })).toBeHidden();
+    await page.getByRole("radio", { name: "3D card" }).click();
+    await page
+      .getByRole("group", { name: "Photos you have" })
+      .getByRole("button", { name: "No photo" })
+      .click();
+    await expect(page).toHaveURL(/photos=none/);
   });
 
   test("search finds designs by name, and says so when nothing matches", async ({ page }) => {

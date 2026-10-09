@@ -327,12 +327,10 @@ function Browse({
   entries,
   covers,
   designsPath,
-  onSearch,
 }: {
   entries: readonly CatalogEntry[];
   covers: Covers;
   designsPath: string;
-  onSearch: (query: string) => void;
 }) {
   const locale = useLocale();
   const { shelfCopy, catalogCopy, weddingKindCopy, occasionTaglines } = useText(galleryText);
@@ -363,10 +361,6 @@ function Browse({
 
   return (
     <>
-      <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">
-        <SearchBox value="" onChange={onSearch} />
-      </div>
-
       <section aria-labelledby="traditions-heading" className="flex flex-col gap-3">
         <h2 id="traditions-heading" className="font-display text-2xl sm:text-[1.7rem]">
           {shelfCopy.traditionsHeading}
@@ -524,8 +518,6 @@ function Results({
       </Link>
 
       <div className="flex flex-col gap-5 rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">
-        <SearchBox value={filters.query} onChange={(query) => set({ query })} />
-
         <RadioGroup
           label={galleryCopy.formats.label}
           variant="segment"
@@ -624,6 +616,10 @@ function Catalog({
   const entries = useMemo(() => designCatalog(), []);
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-8">
+      {/* One search box for the rows and the list, so typing the first letter keeps focus */}
+      <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">
+        <SearchBox value={filters.query} onChange={(query) => onChange({ ...filters, query })} />
+      </div>
       {hasFilters(filters) ? (
         <Results
           entries={entries}
@@ -633,12 +629,7 @@ function Catalog({
           onChange={onChange}
         />
       ) : (
-        <Browse
-          entries={entries}
-          covers={covers}
-          designsPath={designsPath}
-          onSearch={(query) => onChange({ ...NO_FILTERS, query })}
-        />
+        <Browse entries={entries} covers={covers} designsPath={designsPath} />
       )}
     </div>
   );
