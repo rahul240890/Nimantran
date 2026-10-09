@@ -74,8 +74,9 @@ export function cardFunctions<T extends StoryFunction>(
         ? siteNames[fn.kind].name
         : (languagePack(language)?.ceremonies[fn.kind]?.native ??
           CARD_FUNCTION_NAMES[language][fn.kind]);
+    // A ceremony the tradition has no word for (a Tamil sangeet) takes the language's plain name
     const name = own
-      ? (local?.native ?? siteNames[fn.kind].name)
+      ? (local?.native ?? plain)
       : english
         ? (local?.latin ?? siteNames[fn.kind].name)
         : plain;

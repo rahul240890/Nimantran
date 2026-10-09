@@ -2806,12 +2806,18 @@
   --color-motion-kite-yellow: var(--motion-kite-yellow);
   --color-motion-kite-green: var(--motion-kite-green);
 
-  --font-display: "Rozha One", "Georgia", "Noto Serif Devanagari", serif;
+  /* Gujarati, Bengali and Tamil fall back to faces only the guest page and the editor load
+     (invitation/type/fonts.css), so a Tamil card's reply form reads in Tamil type there and
+     no other page downloads them */
+  --font-display:
+    "Rozha One", "Georgia", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
+    serif;
   --font-sans:
-    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", system-ui, -apple-system,
-    "Segoe UI", sans-serif;
+    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
+    "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-label:
-    "Tenor Sans", "Noto Sans Devanagari Variable", "Trebuchet MS", system-ui, sans-serif;
+    "Tenor Sans", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2", "Catamaran",
+    "Trebuchet MS", system-ui, sans-serif;
   /* The device's own type, for a few native-script words on English pages (the footer), so
      those pages don't download ~190 KB of Devanagari fonts before they paint */
   --font-system: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -3126,14 +3132,15 @@
 /*
  * Devanagari has no capitals and its letters join along the headline, so the wide
  * tracking of Latin small-caps labels would break words apart. Hindi pages keep labels
- * close-set and a touch larger, and give body text room for the matras.
+ * close-set and a touch larger, and give body text room for the matras. Labels on a guest
+ * page in Marathi, Gujarati, Bengali or Tamil (the card's language) do the same.
  */
-:lang(hi) .font-label {
+:is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) .font-label {
   letter-spacing: 0.02em !important;
   text-transform: none;
 }
 
-:lang(hi) .font-label.text-xs {
+:is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) .font-label.text-xs {
   font-size: 0.8125rem;
 }
 

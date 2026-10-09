@@ -17,7 +17,7 @@ import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
   draftCopy,
-  templateWithRaga,
+  draftTemplate,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -152,13 +152,9 @@ export function PreviewStage({
     [written, pagesKey, language, pageSeconds],
   );
 
-  const { templateId } = draft;
-  const { raga } = draft.music;
   const clipUrl = useClipUrl(draft);
-  const template = useMemo(
-    () => withClip(templateWithRaga(templateId, raga), clipUrl),
-    [templateId, raga, clipUrl],
-  );
+  const designed = draftTemplate(draft);
+  const template = useMemo(() => withClip(designed, clipUrl), [designed, clipUrl]);
 
   if (mini && sceneView) return sceneView;
   if (mini) {

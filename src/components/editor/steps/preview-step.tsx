@@ -11,8 +11,8 @@ import { CategoryIcon } from "@/components/categories/category-icon";
 import { EditionNotice } from "@/components/editions/edition-notice";
 import {
   draftCategory,
+  draftTemplate,
   includedFunctions,
-  templateWithRaga,
   type EditorStep,
 } from "@/lib/editor/draft";
 import { draftProblems } from "@/lib/editor/draft-checks";
@@ -81,7 +81,7 @@ export function PreviewStep({
     draft.photos.map((photo) => photo.id),
     draft.remoteId,
   );
-  const raga = templateWithRaga(draft.templateId, draft.music.raga).music.raga;
+  const raga = draftTemplate(draft).music.raga;
   const [confirming, setConfirming] = useState(false);
 
   return (

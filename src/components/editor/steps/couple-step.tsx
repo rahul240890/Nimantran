@@ -190,14 +190,11 @@ export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
       ? (namesCopy.one[draft.categoryId as keyof typeof namesCopy.one] ?? null)
       : null;
   const names = (one ? ["first" as const] : NAME_SLOTS).filter((id) => used.has(id));
-  // The lines most cards change stay in view; the rest fold under "More card words"
+  // The names and the word between them stay together; of the other lines, the ones most
+  // cards change stay in view and the rest fold under "More card words"
   const wording = COUPLE_SLOTS.filter((id) => used.has(id) && !NAME_SLOTS.includes(id));
   const shown: SlotId[] = wording.filter((id) => id === "blessing" || id === "line");
-  const folded: SlotId[] = [
-    ...(!one && used.has("joiner") ? (["joiner"] as const) : []),
-    ...wording.filter((id) => !shown.includes(id)),
-  ];
-  const mainNames = names.filter((id) => id !== "joiner");
+  const folded: SlotId[] = wording.filter((id) => !shown.includes(id));
 
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
@@ -359,7 +356,7 @@ export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
           </h2>
           <p className="text-sm text-ink-muted">{coupleCopy.anyScript}</p>
         </div>
-        <div className="flex flex-col gap-5">{mainNames.map(field)}</div>
+        <div className="flex flex-col gap-5">{names.map(field)}</div>
       </section>
       {shown.length > 0 && (
         <section

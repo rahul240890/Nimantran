@@ -1,5 +1,6 @@
 import type * as en from "../editor";
 import type { Translation } from "@/i18n/text";
+import type { LeadId, TaalId } from "@/lib/templates/ids";
 
 /* हिन्दी: निमंत्रण एडिटर (/create)। English: src/content/editor.ts. */
 
@@ -415,8 +416,7 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   ideasLabel: (field) => `${field} के सुझाव`,
   useIdea: (text) => `“${text}” लिखें`,
   moreWording: "कार्ड के और शब्द",
-  moreWordingHint:
-    "द्वार के शब्द, परिवार की पंक्ति और नामों के बीच का शब्द। हर एक आपके अवसर के शब्दों से शुरू होता है।",
+  moreWordingHint: "द्वार के शब्द और परिवार की पंक्ति। हर एक आपके अवसर के शब्दों से शुरू होता है।",
   cardIn: "कार्ड की भाषा:",
   changeLanguage: "भाषा बदलें",
 };
@@ -529,6 +529,21 @@ export const namesCopy: Translation<typeof en.namesCopy> = {
   },
   oneHint:
     "यह मुखपृष्ठ पर बड़े अक्षरों में छपता है। कौन बुला रहा है और क्यों, यह नीचे के शब्दों में लिखें।",
+};
+
+const LEAD_NAMES: Record<LeadId, string> = {
+  santoor: "संतूर",
+  sitar: "सितार",
+  bansuri: "बांसुरी",
+  shehnai: "शहनाई",
+  veena: "वीणा",
+};
+
+const TAAL_NAMES: Record<TaalId, string> = {
+  keherwa: "ढोलक",
+  dadra: "ढोलक",
+  garba: "गरबा ढोल और तालियाँ",
+  bhangra: "पंजाबी ढोल",
 };
 
 export const extrasCopy: Translation<typeof en.extrasCopy> = {
@@ -667,6 +682,8 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
     hamsadhwani: "राग हंसध्वनि",
     kafi: "राग काफ़ी",
   },
+  ragaSound: (sound, mood) =>
+    `${LEAD_NAMES[sound.lead]}${sound.taal ? ` और ${TAAL_NAMES[sound.taal]}` : ""} · ${mood}`,
   ragaMoods: {
     yaman: "शाम का, रूमानी",
     khamaj: "हल्का और कोमल",

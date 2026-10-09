@@ -1314,7 +1314,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
 };
 
 /** The painted theme each Scene theme takes its colours, lettering and guest page from. */
-const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
+export const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "udaipur-lake": "rajwada-bagh",
   "pink-haveli": "shahi-savari",
   "char-bagh": "noor-bagh",
