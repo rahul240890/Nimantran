@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ILLUSTRATED_IDS, SCENE_THEME_IDS, isSceneTheme } from "./catalog";
+import { ILLUSTRATED_IDS, PHOTO_CARD_IDS, SCENE_THEME_IDS, isSceneTheme } from "./catalog";
 import type { FrameBox } from "./photo-frames";
 import {
   ENTRANCES,
@@ -9,6 +9,7 @@ import {
   entranceFor,
   hasScene,
   isIllustrated,
+  isPhotoCard,
   sceneFrames,
   scenePage,
 } from "./scene";
@@ -41,7 +42,7 @@ describe("One Scene", () => {
 
   it("gives every Scene theme its painting, its card and words that sit on the card", () => {
     expect(SCENE_SUITES).toEqual(expect.arrayContaining([...SCENE_THEME_IDS]));
-    for (const suite of SCENE_THEME_IDS.filter((id) => !isIllustrated(id))) {
+    for (const suite of SCENE_THEME_IDS.filter((id) => !isIllustrated(id) && !isPhotoCard(id))) {
       const page = scenePage(suite, 2)!;
       expect(page.style).toBe("painted");
       for (const src of [page.image, page.card!.image]) {
@@ -87,10 +88,30 @@ describe("One Scene", () => {
     }
   });
 
+  it("prints a two-photo card's words in its empty space, under the two frames", () => {
+    expect(PHOTO_CARD_IDS.length).toBe(30);
+    for (const suite of PHOTO_CARD_IDS) {
+      const page = scenePage(suite, 2)!;
+      expect(page.style).toBe("bare");
+      expect(page.card).toBeNull();
+      expect(sceneFrames(suite)).toBe(2);
+      expect(page.frames.length).toBe(2);
+      for (const file of ["scene.webp", "cover.webp", "preview.jpg"]) {
+        expect(existsSync(join(process.cwd(), "public", "suites", suite, file)), suite).toBe(true);
+      }
+      // Room enough for a celebration's name, day and place
+      expect(page.slot[2], suite).toBeGreaterThanOrEqual(45);
+      expect(page.slot[3], suite).toBeGreaterThanOrEqual(10);
+      // Its parts cover the whole painting between them, without overlapping
+      const area = page.pieces.reduce((sum, { box: [, , w, h] }) => sum + w * h, 0);
+      expect(area, suite).toBeCloseTo(100 * 100, 3);
+    }
+  });
+
   it("puts the bride's frame on the left and the groom's on the right, apart", () => {
     const pairs = SCENE_THEME_IDS.filter((suite) => sceneFrames(suite) === 2);
     expect(pairs).toEqual(
-      expect.arrayContaining(["kadamb-krishna", "gulmohar", "wisteria-tunnel"]),
+      expect.arrayContaining(["kadamb-krishna", "gulmohar", "wisteria-tunnel", "rakhi-dor"]),
     );
     for (const suite of pairs) {
       const [bride, groom] = scenePage(suite, 1)!.frames;

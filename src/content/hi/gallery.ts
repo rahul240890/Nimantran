@@ -147,6 +147,8 @@ export const occasionTaglines: Translation<typeof en.occasionTaglines> = {
   "gudi-padwa": "गुड़ी, नीम और पूरन पोली",
   baisakhi: "फ़सल, भांगड़ा और गिद्धा",
   bihu: "बिहू गीत, नृत्य और पीठा",
+  "raksha-bandhan": "राखी, मिठाई और परिवार का भोजन",
+  "karva-chauth": "व्रत, चाँद और रात का भोजन",
   christmas: "कैरल और केक",
   "shop-opening": "उद्घाटन और पूजा",
   launch: "कुछ नया",

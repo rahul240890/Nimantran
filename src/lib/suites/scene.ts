@@ -14,9 +14,11 @@
 import type { FunctionId } from "@/lib/events/functions";
 import {
   ILLUSTRATED_IDS,
+  PHOTO_CARD_IDS,
   isSceneTheme,
   pageLook,
   type IllustratedId,
+  type PhotoCardId,
   type Mood,
   type PageArt,
   type SceneThemeId,
@@ -104,7 +106,7 @@ type PaintedEntry = (
   plate?: true;
 };
 
-const PAINTED: Record<Exclude<SceneThemeId, IllustratedId>, PaintedEntry> = {
+const PAINTED: Record<Exclude<SceneThemeId, IllustratedId | PhotoCardId>, PaintedEntry> = {
   // A white marble jharokha panel on Lake Pichola at dusk
   "udaipur-lake": {
     frame: [31.6, 11.4, 36.9, 28.2],
@@ -1129,8 +1131,260 @@ const ILLUSTRATED: Record<IllustratedId, IllustratedEntry> = {
   "retirement-naav": { open: [22, 11, 72, 36] },
 };
 
+/** A two-photo card's painting: the bride's frame and the groom's, and its empty space. */
+type PhotoCardEntry = IllustratedEntry & { pair: readonly [FrameBox, FrameBox] };
+
+const PHOTO_CARDS: Record<PhotoCardId, PhotoCardEntry> = {
+  // Two Phad story panels over plain cream cloth
+  "phad-gatha": {
+    pair: [
+      [10.9, 15.9, 28.1, 27.6],
+      [61.1, 16, 28.1, 27.5],
+    ],
+    open: [8.8, 47.8, 82.4, 32.2],
+  },
+  // Two mandana arches over the sand plaster panel
+  "mandana-lal": {
+    pair: [
+      [9.6, 12.5, 32.9, 29.5],
+      [57.7, 12.5, 32.8, 29.5],
+    ],
+    open: [9.8, 46.6, 80.3, 35.7],
+  },
+  // Two gota ovals over blush silk
+  "gota-patti": {
+    pair: [
+      [7.7, 11.4, 34.5, 27.5],
+      [58.3, 11.4, 34, 27.5],
+    ],
+    open: [10.9, 44.9, 78.2, 35.7],
+  },
+  // Two dotted frames over the whitewashed wall
+  "pithora-ghoda": {
+    pair: [
+      [11.5, 14.9, 29.9, 26.2],
+      [58.7, 14.9, 29.9, 26.2],
+    ],
+    open: [6.7, 45.4, 86.6, 31],
+  },
+  // Two ochre arches over the plain mud wall
+  "sohrai-khovar": {
+    pair: [
+      [10, 11.7, 30.2, 29.7],
+      [59.9, 11.7, 30.2, 29.7],
+    ],
+    open: [10.9, 46, 78.2, 31],
+  },
+  // Two aipan arches over the limewashed panel
+  "aipan-kumaon": {
+    pair: [
+      [11.2, 13.8, 30.2, 28.3],
+      [58.6, 13.8, 30.2, 28.3],
+    ],
+    open: [13, 47.2, 74.1, 36.3],
+  },
+  // Two appliqué arches over the cream cloth
+  "pipli-chhata": {
+    pair: [
+      [11.2, 15.5, 28.3, 26.8],
+      [61.2, 15.5, 28.1, 26.7],
+    ],
+    open: [10.9, 48.4, 78.2, 32.2],
+  },
+  // Two chala-roofed frames over the lime plaster panel
+  "bishnupur-terracotta": {
+    pair: [
+      [13.4, 15.5, 25.5, 26.1],
+      [61.3, 15.5, 25.5, 26.1],
+    ],
+    open: [13, 48.4, 74.1, 34],
+  },
+  // Two round ganjifa cards over ivory lacquer
+  "ganjifa-patte": {
+    pair: [
+      [8.3, 17.7, 33.2, 19.5],
+      [58.3, 17.7, 33.2, 19.5],
+    ],
+    open: [10.9, 46.6, 78.2, 34.5],
+  },
+  // Two zari-bordered arches over the cream silk
+  "kanjivaram-pattu": {
+    pair: [
+      [11.3, 13.1, 30.9, 25.9],
+      [57.9, 13.1, 30.7, 25.9],
+    ],
+    open: [10, 44, 80, 34],
+  },
+  // Two kasavu arches over the handloom cotton
+  "kasavu-sona": {
+    pair: [
+      [13.3, 9.8, 30.1, 31.1],
+      [56.4, 9.7, 30.3, 31.1],
+    ],
+    open: [7.8, 44.3, 84.5, 36.3],
+  },
+  // Two brass mirror frames over the stone wash
+  "urli-pookal": {
+    pair: [
+      [13.3, 14.2, 27.1, 27.3],
+      [59.8, 14.2, 27.1, 27.3],
+    ],
+    open: [12, 45, 76, 34],
+  },
+  // Two painted Persian arches over ivory lacquer
+  "kar-e-kashmir": {
+    pair: [
+      [12.2, 12.3, 27.3, 27.3],
+      [60.4, 12.3, 27.5, 27.3],
+    ],
+    open: [9.8, 44.9, 81.4, 31.6],
+  },
+  // Two zardozi arches over wine velvet
+  "zardozi-mehfil": {
+    pair: [
+      [10.7, 11.3, 29, 31],
+      [60.3, 11.3, 29.2, 31],
+    ],
+    open: [7.8, 46.6, 84.5, 34],
+    dark: true,
+  },
+  // Two patola frames over ivory silk
+  "patola-bandh": {
+    pair: [
+      [12.9, 14.7, 26.8, 28.6],
+      [60.4, 14.7, 26.8, 28.6],
+    ],
+    open: [9.8, 47.8, 80.3, 32.2],
+  },
+  // Two kundan pendants over blush silk
+  "kundan-jhumka": {
+    pair: [
+      [9.8, 16.3, 31.6, 20.1],
+      [58.6, 16.3, 31.8, 20],
+    ],
+    open: [12, 45, 76, 29],
+  },
+  // Two beaded arches over cream cotton
+  "moti-bharat": {
+    pair: [
+      [12.8, 14.8, 26.4, 25.6],
+      [60.9, 14.8, 26.4, 25.6],
+    ],
+    open: [8.8, 44.3, 82.4, 37.5],
+  },
+  // Two instant photos on the fairy lights, over cream paper
+  "polaroid-lights": {
+    pair: [
+      [11.8, 11.8, 30.6, 18.2],
+      [57.7, 11.7, 30.6, 18.2],
+    ],
+    open: [11.9, 39, 74.1, 31],
+  },
+  // Two postage stamps over the envelope paper
+  "dak-tikat": {
+    pair: [
+      [15.2, 12.9, 26.2, 25.7],
+      [58.7, 12.9, 26.2, 25.8],
+    ],
+    open: [13, 43.7, 69.9, 35.1],
+  },
+  // Two embroidery hoops over plain linen
+  "kadhai-hoop": {
+    pair: [
+      [8.2, 15.5, 33.9, 19],
+      [58.1, 15.5, 33.9, 19],
+    ],
+    open: [7.8, 40.2, 83.5, 36.9],
+  },
+  // Two gold lockets over dusty-rose velvet
+  "locket-jodi": {
+    pair: [
+      [15.5, 10.6, 26.2, 22.2],
+      [58.5, 10.6, 26.3, 22.2],
+    ],
+    open: [12, 40, 76, 36],
+  },
+  // Two ink-brush frames over rice paper
+  "syahi-bamboo": {
+    pair: [
+      [11.8, 13, 31.2, 27.9],
+      [57.2, 13, 31.1, 27.8],
+    ],
+    open: [8.8, 43.7, 82.4, 34.5],
+  },
+  // Two lace arches over ivory paper
+  "lace-ivory": {
+    pair: [
+      [12.8, 12.4, 28.8, 29.6],
+      [58.5, 12.5, 28.9, 29.5],
+    ],
+    open: [8.8, 46.6, 82.4, 32.2],
+  },
+  // Two pleated paper frames over white paper
+  "origami-saaras": {
+    pair: [
+      [13.9, 11.1, 28.5, 26.8],
+      [57.8, 11.1, 28.4, 26.9],
+    ],
+    open: [9.8, 42.5, 80.3, 38.6],
+  },
+  // Two majolica arches over the whitewashed wall
+  "nimbu-amalfi": {
+    pair: [
+      [12.4, 13, 28.6, 28],
+      [59.2, 13, 28.6, 28],
+    ],
+    open: [9.8, 46, 80.3, 36.3],
+  },
+  // Two train windows over the cream carriage wall
+  "rail-yatra": {
+    pair: [
+      [12.5, 20.1, 30.3, 20.4],
+      [57.2, 20.1, 30.2, 20.4],
+    ],
+    open: [7.8, 45.4, 84.5, 25.7],
+  },
+  // Two silk-thread frames joined by a rakhi, over saffron cream
+  "rakhi-dor": {
+    pair: [
+      [9.2, 10.6, 31.1, 26.2],
+      [60.2, 10.6, 30.6, 26.2],
+    ],
+    open: [10, 40, 80, 36],
+  },
+  // Two brass sieves under the moon, over the night sky
+  "karva-chandni": {
+    pair: [
+      [7.7, 14.3, 34.5, 19.1],
+      [57.8, 14.3, 34.5, 19.2],
+    ],
+    open: [8.8, 40.2, 82.4, 34],
+    dark: true,
+  },
+  // A pink star and a blue star over cream
+  "judwa-taare": {
+    pair: [
+      [7, 13.6, 37, 20.9],
+      [56.2, 13.6, 36.8, 20.9],
+    ],
+    open: [8.8, 39.6, 82.4, 33.4],
+  },
+  // Two felt clouds from the baby mobile, over the peach sky
+  "naya-mehmaan": {
+    pair: [
+      [7, 13.3, 39.5, 19.8],
+      [53.6, 13.3, 39.3, 19.7],
+    ],
+    open: [9.8, 37.2, 80.3, 37.5],
+  },
+};
+
 export function isIllustrated(suite: SuiteId): suite is IllustratedId {
   return (ILLUSTRATED_IDS as readonly SuiteId[]).includes(suite);
+}
+
+export function isPhotoCard(suite: SuiteId): suite is PhotoCardId {
+  return (PHOTO_CARD_IDS as readonly SuiteId[]).includes(suite);
 }
 
 /**
@@ -1183,14 +1437,14 @@ export type ScenePage = {
 
 /** The painting and places for a theme's scene with this many photos, if it has one. */
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
-  if (isIllustrated(suite)) {
-    const entry = ILLUSTRATED[suite];
+  if (isIllustrated(suite) || isPhotoCard(suite)) {
+    const entry: IllustratedEntry = isPhotoCard(suite) ? PHOTO_CARDS[suite] : ILLUSTRATED[suite];
     return {
       image: `/suites/${suite}/scene.webp`,
       style: "bare",
       dark: Boolean(entry.dark),
       card: null,
-      frames: [],
+      frames: isPhotoCard(suite) ? PHOTO_CARDS[suite].pair : [],
       pieces: openPieces(entry.open),
       ...openLayout(entry),
     };
@@ -1232,6 +1486,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
  */
 export function sceneFrames(suite: SuiteId): 0 | 1 | 2 {
   if (isIllustrated(suite)) return 0;
+  if (isPhotoCard(suite)) return 2;
   return isSceneTheme(suite) && PAINTED[suite].pair ? 2 : 1;
 }
 
@@ -1244,6 +1499,7 @@ export const SCENE_SUITES = [
   ...Object.keys(SCENES),
   ...Object.keys(PAINTED),
   ...ILLUSTRATED_IDS,
+  ...PHOTO_CARD_IDS,
 ] as SuiteId[];
 
 /** The sides a function can come in from; each one leaves the way the next comes in. */

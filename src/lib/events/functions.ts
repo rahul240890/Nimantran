@@ -55,6 +55,8 @@ export const FUNCTION_IDS = [
   "gudi-padwa",
   "baisakhi",
   "bihu",
+  "raksha-bandhan",
+  "karva-chauth",
 ] as const;
 export type FunctionId = (typeof FUNCTION_IDS)[number];
 
@@ -90,6 +92,8 @@ export const OCCASION_FUNCTIONS: readonly FunctionId[] = [
   "gudi-padwa",
   "baisakhi",
   "bihu",
+  "raksha-bandhan",
+  "karva-chauth",
 ];
 
 export function isFunctionId(value: unknown): value is FunctionId {

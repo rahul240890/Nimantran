@@ -14,7 +14,7 @@ import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
 
 /*
  * Free by default: every 3D card, every illustrated card (no photos needed), plus a few
- * Scenes so each kind of celebration has a painted design at no cost. A prayer meet's
+ * Scenes and two-photo cards so each kind of celebration has a painted design at no cost. A prayer meet's
  * Scene is always free to start with.
  */
 const FREE_SCENES: ReadonlySet<string> = new Set([
@@ -30,6 +30,27 @@ const FREE_SCENES: ReadonlySet<string> = new Set([
   "new-year-eve",
   "new-home-modern",
   "shraddhanjali",
+  // Two-photo cards in folk art and modern looks; the jewelled and silk ones are Premium
+  "phad-gatha",
+  "mandana-lal",
+  "pithora-ghoda",
+  "sohrai-khovar",
+  "aipan-kumaon",
+  "pipli-chhata",
+  "kasavu-sona",
+  "urli-pookal",
+  "patola-bandh",
+  "moti-bharat",
+  "polaroid-lights",
+  "dak-tikat",
+  "kadhai-hoop",
+  "syahi-bamboo",
+  "lace-ivory",
+  "origami-saaras",
+  "nimbu-amalfi",
+  "rakhi-dor",
+  "judwa-taare",
+  "naya-mehmaan",
 ]);
 
 /**

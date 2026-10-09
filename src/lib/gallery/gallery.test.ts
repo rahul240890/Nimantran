@@ -32,6 +32,9 @@ describe("gallery catalog", () => {
         .sort(),
     ).toEqual(
       [
+        "pithora-ghoda-scene",
+        "patola-bandh-scene",
+        "moti-bharat-scene",
         "kutch-rang-scene",
         "pichwai-gaay-scene",
         "kutch-bhunga-scene",

@@ -16,7 +16,8 @@ import {
   type FrameBox,
 } from "@/lib/suites/photo-frames";
 import { designLayouts } from "@/lib/suites/photo-layouts";
-import { scenePage } from "@/lib/suites/scene";
+import { isSceneTheme } from "@/lib/suites/catalog";
+import { sceneFrames, scenePage } from "@/lib/suites/scene";
 import { draftShowsScene, draftSuite } from "./story";
 
 /*
@@ -70,10 +71,12 @@ export function draftFrames(draft: InviteDraft): FrameSpot[] {
   const ids = draft.photos.map((photo) => photo.id);
   const scene = draftShowsScene(draft);
   const couple = draftCouple(draft);
-  // One guest of honour has one photo, as the pages show it
-  const chosen = coupleFrameIds(couple, ids).slice(0, draftPeople(draft) === "one" ? 1 : 2);
-  if (chosen.length === 0) return [];
   const suite = draftSuite(draft);
+  // One guest of honour has one photo, as the pages show it, unless the painting has two frames
+  const pair = scene && isSceneTheme(suite) && sceneFrames(suite) === 2;
+  const one = draftPeople(draft) === "one" && !pair;
+  const chosen = coupleFrameIds(couple, ids).slice(0, one ? 1 : 2);
+  if (chosen.length === 0) return [];
   const page = scene ? scenePage(suite, chosen.length) : photoPage(suite, chosen.length);
   if (!page) return chosen.map((id) => ({ id, image: null, box: null, aspect: ARCH_ASPECT }));
   return chosen.slice(0, page.frames.length).map((id, i) => {

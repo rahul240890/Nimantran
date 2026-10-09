@@ -12,9 +12,9 @@ describe("design photos", () => {
     expect(designPhotos(cardDesign("marigold"))).toBe("optional");
   });
 
-  it("asks one guest of honour for one photo", () => {
+  it("asks one guest of honour for one photo, unless the painting has two frames", () => {
     expect(designPhotos(sceneDesign("kayal"), "birthday")).toBe("one");
-    expect(designPhotos(sceneDesign("gulmohar"), "birthday")).toBe("one");
+    expect(designPhotos(sceneDesign("gulmohar"), "birthday")).toBe("two");
   });
 });
 

@@ -154,6 +154,8 @@ export const occasionTaglines: Record<string, string> = {
   "gudi-padwa": "The gudi, neem and puran poli",
   baisakhi: "Harvest, bhangra and giddha",
   bihu: "Bihu songs, dance and pitha",
+  "raksha-bandhan": "Rakhi, sweets and a family lunch",
+  "karva-chauth": "The fast, the moon and dinner",
   christmas: "Carols and cake",
   "shop-opening": "Udghatan and puja",
   launch: "Something new",

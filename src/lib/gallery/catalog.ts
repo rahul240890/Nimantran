@@ -293,6 +293,18 @@ export const OCCASIONS: readonly Occasion[] = [
     ["xmas", "carols", "santa"],
     "festivals",
   ),
+  live(
+    "raksha-bandhan",
+    { suite: "rakhi-dor", page: "cover" },
+    ["rakhi", "rakshabandhan", "rakhri", "bhai behen", "sister", "brother", "bhai dooj"],
+    "festivals",
+  ),
+  live(
+    "karva-chauth",
+    { suite: "karva-chandni", page: "cover" },
+    ["karwa chauth", "karva chouth", "karwachauth", "vrat", "moon", "chaand"],
+    "festivals",
+  ),
 
   live(
     "shop-opening",
@@ -376,6 +388,10 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "aipan-kumaon",
+      "sohrai-khovar",
+      "kar-e-kashmir",
+      "kundan-jhumka",
       "gond-vriksh",
       "kangra-megh",
       "chikankari-awadh",
@@ -411,6 +427,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "pithora-ghoda",
+      "patola-bandh",
+      "moti-bharat",
       "kutch-rang",
       "pichwai-gaay",
       "kutch-bhunga",
@@ -429,6 +448,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "phad-gatha",
+      "mandana-lal",
+      "gota-patti",
       "kathputli-sangeet",
       "rajwada-haathi",
       "pichwai-gaay",
@@ -458,6 +480,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "bishnupur-terracotta",
+      "pipli-chhata",
       "kalighat-pat",
       "axomiya-biya",
       "kantha-silai",
@@ -486,6 +510,10 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "kanjivaram-pattu",
+      "kasavu-sona",
+      "urli-pookal",
+      "ganjifa-patte",
       "cheriyal-talambralu",
       "tholu-bommalata",
       "nalangu-vilayattu",
@@ -531,6 +559,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "zardozi-mehfil",
+      "kar-e-kashmir",
       "hyderabadi-nikah",
       "chikankari-awadh",
       "bidri-raat",
@@ -549,6 +579,16 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "polaroid-lights",
+      "dak-tikat",
+      "kadhai-hoop",
+      "locket-jodi",
+      "syahi-bamboo",
+      "lace-ivory",
+      "origami-saaras",
+      "nimbu-amalfi",
+      "rail-yatra",
+      "kundan-jhumka",
       "goa-azulejo",
       "pressed-phool",
       "tuscan-vineyard",
