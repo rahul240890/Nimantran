@@ -2,6 +2,8 @@
 
 import {
   ArrowRight,
+  Camera,
+  CameraOff,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -21,6 +23,7 @@ import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
+import type { PhotoNeed } from "@/lib/gallery/photos";
 import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
 import { ScenePoster, SceneSample } from "./scene-poster";
 import { StorySample } from "./story-sample";
@@ -31,6 +34,8 @@ type DesignCardProps = {
   description: string;
   /** Where Use this design leads: the editor, set up for this choice. */
   href: string;
+  /** What photos the design takes (designPhotos), shown under its name. */
+  photos: PhotoNeed;
   priority?: boolean;
   /**
    * A card design's cover, drawn on the server: its art uses trigonometry whose last digits
@@ -49,7 +54,15 @@ function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
  * A design in the gallery: its painted cover (or its 3D card), what it is, and two ways
  * on: Preview, which shows every page it has, and Use this design.
  */
-export function DesignCard({ design, name, description, href, priority, cover }: DesignCardProps) {
+export function DesignCard({
+  design,
+  name,
+  description,
+  href,
+  photos,
+  priority,
+  cover,
+}: DesignCardProps) {
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const pages = paintedPages(design);
@@ -126,19 +139,27 @@ export function DesignCard({ design, name, description, href, priority, cover }:
               ? galleryCopy.storyBadge(pages.length)
               : galleryCopy.card}
         </span>
-        {/* Free, or the edition it needs and its price; the eye keeps the other corner */}
-        <TierBadge
-          designId={design.id}
-          className="absolute start-3 bottom-3 max-w-[calc(100%-4.5rem)]"
-        />
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />
         </span>
       </button>
-      <div className="@container flex flex-1 flex-col gap-3 p-3 sm:p-4">
+      {/* Named "tile" so a narrow card's price badge drops its tier name */}
+      <div className="@container/tile flex flex-1 flex-col gap-3 p-3 sm:p-4">
         <div className="flex flex-col gap-1">
           <h3 className="font-display text-xl leading-tight">{name}</h3>
           <p className="line-clamp-2 text-sm text-ink-muted">{description}</p>
+        </div>
+        {/* What it costs and what photos it takes, the two things a host weighs first */}
+        <div className="flex flex-col items-start gap-2">
+          <TierBadge designId={design.id} variant="plain" className="max-w-full" />
+          <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
+            {photos === "none" ? (
+              <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
+            ) : (
+              <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
+            )}
+            {galleryCopy.photoNeeds[photos]}
+          </p>
         </div>
         {/* Two cards to a row on a phone leave little room: the arrow goes and the words
             may wrap before they would ever touch the button's edge */}
@@ -160,6 +181,7 @@ export function DesignCard({ design, name, description, href, priority, cover }:
         name={name}
         description={description}
         href={href}
+        photos={photos}
         pages={pages}
       />
     </article>
@@ -177,6 +199,7 @@ function DesignPreview({
   name,
   description,
   href,
+  photos,
   pages,
 }: DesignCardProps & {
   open: boolean;
@@ -276,6 +299,14 @@ function DesignPreview({
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
                 {name}
               </DialogPrimitive.Title>
+              <p className="flex items-center gap-1.5 text-sm text-card-ivory/80">
+                {photos === "none" ? (
+                  <CameraOff aria-hidden className="size-4 shrink-0" />
+                ) : (
+                  <Camera aria-hidden className="size-4 shrink-0" />
+                )}
+                {galleryCopy.photoNeeds[photos]}
+              </p>
               <p className="text-card-ivory/80">
                 {scene ? galleryCopy.sceneNote : total > 0 ? description : galleryCopy.cardNote}
               </p>

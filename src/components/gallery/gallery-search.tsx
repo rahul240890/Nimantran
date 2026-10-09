@@ -12,6 +12,7 @@ import {
   suiteImage,
   suiteOccasion,
 } from "@/lib/gallery/catalog";
+import { designPhotos } from "@/lib/gallery/photos";
 import { searchGallery, type SearchHit } from "@/lib/gallery/search";
 import { DesignCard } from "./design-card";
 import { designWords, searchWords } from "./design-words";
@@ -133,6 +134,7 @@ export function GallerySearch({ children }: { children: ReactNode }) {
                       name={name}
                       description={description}
                       href={designHref(design, { category: suiteOccasion(design.suite) })}
+                      photos={designPhotos(design, suiteOccasion(design.suite))}
                     />
                   </li>
                 );

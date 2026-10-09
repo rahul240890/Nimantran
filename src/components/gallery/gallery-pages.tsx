@@ -21,6 +21,7 @@ import {
   type Occasion,
   type WeddingKind,
 } from "@/lib/gallery/catalog";
+import { designPhotos } from "@/lib/gallery/photos";
 import { blogPostPath, postsIn } from "@/lib/blog/posts";
 import { pagePath } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
@@ -165,6 +166,7 @@ function DesignGallery({
                 name={name}
                 description={description}
                 href={designHref(design, { category, kind })}
+                photos={designPhotos(design, category)}
                 priority={index < 4}
                 cover={
                   design.suite === "classic" ? (

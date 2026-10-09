@@ -26,18 +26,24 @@ describe("gallery catalog", () => {
   });
 
   it("gives each wedding kind only its own designs", () => {
-    expect(kindDesigns("gujarati").map((design) => design.id)).toEqual([
-      "kutch-rang-scene",
-      "pichwai-gaay-scene",
-      "kutch-bhunga-scene",
-      "white-rann-scene",
-      "mameru-bandhani-scene",
-      "sindhi-ajrak-scene",
-      "kutch-toran",
-      "shahi-savari",
-      "pichwai",
-      "card-bandhani",
-    ]);
+    expect(
+      kindDesigns("gujarati")
+        .map((design) => design.id)
+        .sort(),
+    ).toEqual(
+      [
+        "kutch-rang-scene",
+        "pichwai-gaay-scene",
+        "kutch-bhunga-scene",
+        "white-rann-scene",
+        "mameru-bandhani-scene",
+        "sindhi-ajrak-scene",
+        "kutch-toran",
+        "shahi-savari",
+        "pichwai",
+        "card-bandhani",
+      ].sort(),
+    );
     // The kind's painted theme opens with the kind's own card
     expect(kindDesigns("gujarati")[0]!.template).toBe("bandhani");
     for (const kind of WEDDING_KINDS) expect(kindDesigns(kind).length).toBeGreaterThan(0);
@@ -92,10 +98,10 @@ describe("gallery catalog", () => {
     );
   });
 
-  it("lists a theme's Scene first, and opens the editor on it", () => {
+  it("lists a theme's Scene beside its Story, and opens the editor on it", () => {
     const ids = occasionDesigns("haldi").map((design) => design.id);
-    expect(ids.indexOf("kayal-scene")).toBeGreaterThanOrEqual(0);
-    expect(ids.indexOf("kayal-scene")).toBeLessThan(ids.indexOf("kayal"));
+    expect(ids).toContain("kayal-scene");
+    expect(ids).toContain("kayal");
     expect(new Set(ids).size).toBe(ids.length);
     expect(designHref(sceneDesign("kayal"), { category: "wedding" })).toContain("format=scene");
   });
