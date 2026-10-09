@@ -54,6 +54,17 @@ export function formatCardDate(date: string, language: CardLanguage = "en"): str
   });
 }
 
+/** A short day and date for lists, such as the reply form: "Sat, 12 Dec", "शनि, 12 दिस". */
+export function formatCardDayMonth(date: string, language: CardLanguage = "en"): string {
+  const day = parseISO(date);
+  if (language === "mr") {
+    return `${MARATHI_DAYS[day.getDay()]}, ${day.getDate()} ${MARATHI_MONTHS[day.getMonth()]}`;
+  }
+  return format(day, "EEE, d MMM", {
+    locale: language === "en" ? enIN : DATE_LOCALES[language],
+  });
+}
+
 /*
  * Times the way printed Indian cards write them: the part of the day, then the hour, as in
  * "शाम 6:30 बजे" or "સાંજે 6:30 વાગ્યે", never "PM" in English letters on a Gujarati card.

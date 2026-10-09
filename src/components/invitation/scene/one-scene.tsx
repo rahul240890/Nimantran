@@ -21,8 +21,7 @@ import {
 } from "react";
 import { PageEffects } from "@/components/invitation/story/page-effects";
 import { Button } from "@/components/ui/button";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
@@ -216,7 +215,7 @@ export function OneScene({
   focus = null,
   className,
 }: OneSceneProps) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const words = guestCopy.scene;
   const reduced = useReducedMotion();
 
