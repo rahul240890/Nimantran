@@ -1499,6 +1499,43 @@ export const openingCopy = {
   intro:
     "The first thing guests see, full screen, with your names and a countdown. Tap a style to watch it open.",
   styles: {
+    "rajwada-pol": {
+      name: "Rajasthani palace gate",
+      description:
+        "Carved teak doors in a pink sandstone arch swing open onto a courtyard of diyas.",
+    },
+    "gopuram-kadhavu": {
+      name: "South Indian temple doors",
+      description: "Brass-studded doors with bells open onto a lamp-lit mandapam.",
+    },
+    "noor-darwaza": {
+      name: "Mughal marble gate",
+      description: "Silver jaali doors in a marble arch open onto a moonlit garden of fountains.",
+    },
+    "phoolon-ki-deewar": {
+      name: "Flower wall",
+      description: "A wall of roses and marigolds slides apart onto a mandap under fairy lights.",
+    },
+    "haveli-kiwad": {
+      name: "Haveli doors",
+      description: "Painted Gujarati doors with mirror work open onto a courtyard with a swing.",
+    },
+    "shahi-parda": {
+      name: "Royal curtains",
+      description: "Maroon and gold velvet curtains gather aside onto a chandelier-lit hall.",
+    },
+    "deco-gates": {
+      name: "Art Deco gates",
+      description: "Black and brass gates swing open onto a rooftop party over the city.",
+    },
+    "bagiya-gate": {
+      name: "Rose garden gate",
+      description: "White iron gates wrapped in roses open onto a lantern-lit garden.",
+    },
+    "mela-tamboo": {
+      name: "Fair tent",
+      description: "Striped tent flaps lift onto balloons, a carousel and a big cake.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",
@@ -1581,6 +1618,7 @@ export const openingCopy = {
     },
   },
   groups: {
+    painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",
     light: "Light and blossom",
