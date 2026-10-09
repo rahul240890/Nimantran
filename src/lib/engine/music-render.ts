@@ -1,65 +1,22 @@
 /*
- * The invitation's raga as a finished recording (Step 17c): the same tanpura and santoor
+ * The invitation's raga as a finished recording (Step 17c): the same score and instruments
  * as the live player, every note written out ahead of time and rendered offline, so a
  * video gets its music without playing a sound. The score is pure and unit tested;
  * renderRaga needs a browser.
  */
 
-import { composePhrase, frequency, PHRASE_BEATS, RAGAS, TANPURA } from "./music";
-import { hall, pluck, type MusicChoice } from "./music-player";
-import { seededRandom } from "./particles";
+import { Score, type MusicChoice, type Strike } from "./music";
+import { hall, sound, voiceBuffer } from "./instruments";
 
-export type Strike = {
-  pitch: number;
-  voice: "santoor" | "tanpura";
-  /** Seconds from the start. */
-  at: number;
-  gain: number;
-  pan: number;
-};
+export type { Strike } from "./music";
 
 /** Seconds the music takes to rise at the start and to fade at the end. */
 export const FADE_IN = 1.5;
 export const FADE_OUT = 2.5;
 
-/** Every string struck in `seconds` of the raga, in time order within each voice. */
+/** Every sound in `seconds` of the raga: the drone, the melody and any drum. */
 export function ragaScore(music: MusicChoice, seconds: number): Strike[] {
-  const raga = RAGAS[music.raga];
-  const beat = 60 / (music.tempo ?? raga.tempo);
-  const random = seededRandom(3);
-  const strikes: Strike[] = [];
-
-  for (let i = 0, at = 0.05; at < seconds; i++, at += beat * 1.5) {
-    strikes.push({
-      pitch: TANPURA[i % TANPURA.length]!,
-      voice: "tanpura",
-      at,
-      gain: 0.34,
-      pan: i % 2 ? 0.25 : -0.25,
-    });
-  }
-
-  let pitch = 0;
-  for (let start = 1.2; start < seconds;) {
-    const notes = composePhrase(raga, random, pitch);
-    for (const note of notes) {
-      const at = start + note.beat * beat;
-      // Higher notes sit a little to the right, as on a santoor's bridge
-      const pan = Math.max(-0.5, Math.min(0.5, (note.pitch - 5) / 24));
-      const count = note.tremolo ? 6 : 1;
-      for (let i = 0; i < count; i++) {
-        const when = at + i * beat * 0.125;
-        if (when >= seconds) continue;
-        const gain = note.tremolo ? note.velocity * (0.55 + 0.1 * (i % 2)) : note.velocity;
-        strikes.push({ pitch: note.pitch, voice: "santoor", at: when, gain, pan });
-      }
-    }
-    pitch = notes.at(-1)?.pitch ?? 0;
-    // Every few phrases, leave a bar of drone alone
-    const breath = random() < 0.25 ? PHRASE_BEATS : 0;
-    start += (PHRASE_BEATS + breath) * beat;
-  }
-  return strikes;
+  return new Score(music).until(seconds);
 }
 
 /** Renders `seconds` of the raga to a stereo buffer, fading in and out. */
@@ -91,22 +48,16 @@ export async function renderRaga(
   reverb.connect(wet);
   wet.connect(master);
 
+  const score = new Score(music);
   const buffers = new Map<string, AudioBuffer>();
-  for (const strike of ragaScore(music, seconds)) {
-    const key = `${strike.voice}:${strike.pitch}`;
-    let buffer = buffers.get(key);
+  for (const strike of score.until(seconds)) {
+    const id = `${strike.voice}:${strike.pitch}`;
+    let buffer = buffers.get(id);
     if (!buffer) {
-      buffer = pluck(ctx, frequency(strike.pitch), strike.voice, strike.pitch * 7 + 101);
-      buffers.set(key, buffer);
+      buffer = voiceBuffer(ctx, strike.voice, strike.pitch, score.key);
+      buffers.set(id, buffer);
     }
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    const level = ctx.createGain();
-    level.gain.value = strike.gain;
-    const panner = ctx.createStereoPanner();
-    panner.pan.value = strike.pan;
-    source.connect(level).connect(panner).connect(bus);
-    source.start(strike.at);
+    sound(ctx, bus, buffer, strike, strike.at);
   }
   return ctx.startRendering();
 }

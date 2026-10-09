@@ -1,5 +1,6 @@
 import type * as en from "../editor";
 import type { Translation } from "@/i18n/text";
+import type { LeadId, TaalId } from "@/lib/templates/ids";
 
 /* हिन्दी: निमंत्रण एडिटर (/create)। English: src/content/editor.ts. */
 
@@ -531,6 +532,21 @@ export const namesCopy: Translation<typeof en.namesCopy> = {
     "यह मुखपृष्ठ पर बड़े अक्षरों में छपता है। कौन बुला रहा है और क्यों, यह नीचे के शब्दों में लिखें।",
 };
 
+const LEAD_NAMES: Record<LeadId, string> = {
+  santoor: "संतूर",
+  sitar: "सितार",
+  bansuri: "बांसुरी",
+  shehnai: "शहनाई",
+  veena: "वीणा",
+};
+
+const TAAL_NAMES: Record<TaalId, string> = {
+  keherwa: "ढोलक",
+  dadra: "ढोलक",
+  garba: "गरबा ढोल और तालियाँ",
+  bhangra: "पंजाबी ढोल",
+};
+
 export const extrasCopy: Translation<typeof en.extrasCopy> = {
   photosHeading: "तस्वीरें",
   photosHint: (max) =>
@@ -667,6 +683,8 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
     hamsadhwani: "राग हंसध्वनि",
     kafi: "राग काफ़ी",
   },
+  ragaSound: (sound, mood) =>
+    `${LEAD_NAMES[sound.lead]}${sound.taal ? ` और ${TAAL_NAMES[sound.taal]}` : ""} · ${mood}`,
   ragaMoods: {
     yaman: "शाम का, रूमानी",
     khamaj: "हल्का और कोमल",

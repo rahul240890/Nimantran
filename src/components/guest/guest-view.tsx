@@ -21,8 +21,8 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import {
   cardLanguages,
   draftCopy,
+  draftTemplate,
   mainFunction,
-  templateWithRaga,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -123,10 +123,8 @@ export function GuestView({
     () => languages.find((code) => code === locale) ?? languages[0],
   );
   const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
-  const template = useMemo(
-    () => withClip(templateWithRaga(draft.templateId, draft.music.raga), clipUrl),
-    [draft.templateId, draft.music.raga, clipUrl],
-  );
+  const designed = draftTemplate(draft);
+  const template = useMemo(() => withClip(designed, clipUrl), [designed, clipUrl]);
   // A guest who came by their own link is greeted by name before the invitation opens
   const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;

@@ -97,11 +97,17 @@ describe("invite draft", () => {
     expect(draftProblems(strict).map((problem) => problem.step)).toEqual(["extras"]);
   });
 
-  it("plays the chosen raga at its own tempo", () => {
+  it("plays the theme's own music, or the chosen raga its own way", () => {
     const draft = complete();
-    expect(draftTemplate(draft).music).toEqual({ raga: "khamaj" });
+    draft.suite = "kashi";
+    // Kashi plays Bhairavi on Bismillah Khan's shehnai, slowly
+    expect(draftTemplate(draft).music).toEqual({ raga: "bhairavi", lead: "shehnai", tempo: 58 });
+    draft.music.raga = "bhairavi";
+    expect(draftTemplate(draft).music).toEqual({ raga: "bhairavi", lead: "shehnai", tempo: 58 });
     draft.music.raga = "bhupali";
     expect(draftTemplate(draft).music).toEqual({ raga: "bhupali" });
+    // The same choice is the same object, so memos keep it
+    expect(draftTemplate(draft)).toBe(draftTemplate(draft));
   });
 
   it("round-trips through JSON and repairs damaged fields one by one", () => {
