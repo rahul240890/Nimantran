@@ -22,31 +22,24 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
   const home = homePath(locale);
   const linkClass =
     "inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text";
-  const pageLinks = [
-    {
-      id: "footer-invitations",
-      heading: seoCopy.footerInvitations,
-      links: CATEGORY_IDS.map((id) => ({
-        label: CATEGORIES[id].names[locale],
-        href: pagePath({ kind: "occasion", id }, locale),
-      })),
-    },
-    {
-      id: "footer-more",
-      heading: seoCopy.footerMore,
-      links: [
-        { label: seoCopy.allDesigns, href: pagePath({ kind: "designs" }, locale) },
-        ...TRADITION_IDS.map((id) => ({
-          label: traditionCopy.names[id],
-          href: pagePath({ kind: "tradition", id }, locale),
-        })),
-      ],
-    },
+  // Every occasion is one long list, so it gets a row of its own across the footer in
+  // newspaper columns; the shorter lists sit side by side above it at even heights
+  const occasions = CATEGORY_IDS.map((id) => ({
+    label: CATEGORIES[id].names[locale],
+    href: pagePath({ kind: "occasion", id }, locale),
+  }));
+  const moreLinks = [
+    { label: seoCopy.allDesigns, href: pagePath({ kind: "designs" }, locale) },
+    ...TRADITION_IDS.map((id) => ({
+      label: traditionCopy.names[id],
+      href: pagePath({ kind: "tradition", id }, locale),
+    })),
   ];
+  const headingClass = "font-label text-xs tracking-[0.2em] text-ink-muted uppercase";
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-surface-2/60">
       <Mandala className="pointer-events-none absolute -end-24 -bottom-32 -z-10 size-96 text-line-strong opacity-40" />
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.3fr_1fr_1fr_1.1fr_1.3fr] lg:px-8">
+      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr] lg:px-8">
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
           <p className="font-display text-lg text-ink-muted">{shell.footer.meaning}</p>
@@ -54,10 +47,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
         </div>
 
         <nav aria-labelledby="footer-explore">
-          <h2
-            id="footer-explore"
-            className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-          >
+          <h2 id="footer-explore" className={headingClass}>
             {shell.footer.explore}
           </h2>
           <ul className="-ms-2 mt-3 flex flex-col">
@@ -94,30 +84,23 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           </ul>
         </nav>
 
-        {pageLinks.map((group) => (
-          <nav key={group.id} aria-labelledby={group.id}>
-            <h2
-              id={group.id}
-              className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-            >
-              {group.heading}
-            </h2>
-            <ul className="-ms-2 mt-3 grid grid-cols-2 gap-x-4 sm:flex sm:flex-col">
-              {group.links.map((link) => (
-                <li key={link.href}>
-                  <Link href={link.href} className={linkClass}>
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        ))}
+        <nav aria-labelledby="footer-more">
+          <h2 id="footer-more" className={headingClass}>
+            {seoCopy.footerMore}
+          </h2>
+          <ul className="-ms-2 mt-3 grid grid-cols-2 gap-x-4 sm:flex sm:flex-col">
+            {moreLinks.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className={linkClass}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
 
         <div>
-          <h2 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-            {shell.footer.languages}
-          </h2>
+          <h2 className={headingClass}>{shell.footer.languages}</h2>
           <ul className="mt-4 flex flex-wrap gap-2">
             {languages.map((language) => (
               <li
@@ -133,6 +116,24 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
             ))}
           </ul>
         </div>
+
+        <nav
+          aria-labelledby="footer-invitations"
+          className="border-t border-line pt-8 sm:col-span-2 lg:col-span-4"
+        >
+          <h2 id="footer-invitations" className={headingClass}>
+            {seoCopy.footerInvitations}
+          </h2>
+          <ul className="-ms-2 mt-3 grid grid-cols-2 gap-x-4 sm:block sm:columns-3 md:columns-4 lg:columns-6">
+            {occasions.map((link) => (
+              <li key={link.href} className="break-inside-avoid">
+                <Link href={link.href} className={linkClass}>
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
