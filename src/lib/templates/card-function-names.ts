@@ -59,6 +59,8 @@ export const CARD_FUNCTION_NAMES: Record<
     "gudi-padwa": "गुढीपाडवा",
     baisakhi: "बैसाखी",
     bihu: "बिहू",
+    "raksha-bandhan": "रक्षाबंधन",
+    "karva-chauth": "करवा चौथ",
   },
   gu: {
     roka: "ચાંદલો",
@@ -108,6 +110,8 @@ export const CARD_FUNCTION_NAMES: Record<
     "gudi-padwa": "ગુડી પડવો",
     baisakhi: "બૈસાખી",
     bihu: "બિહુ",
+    "raksha-bandhan": "રક્ષાબંધન",
+    "karva-chauth": "કરવા ચોથ",
   },
   bn: {
     roka: "পাকা দেখা",
@@ -157,6 +161,8 @@ export const CARD_FUNCTION_NAMES: Record<
     "gudi-padwa": "গুড়ি পাড়ওয়া",
     baisakhi: "বৈশাখী",
     bihu: "বিহু",
+    "raksha-bandhan": "রাখী বন্ধন",
+    "karva-chauth": "করবা চৌথ",
   },
   ta: {
     roka: "பரிசம்",
@@ -206,6 +212,8 @@ export const CARD_FUNCTION_NAMES: Record<
     "gudi-padwa": "உகாதி",
     baisakhi: "வைசாகி",
     bihu: "பிஹு",
+    "raksha-bandhan": "ரக்ஷா பந்தன்",
+    "karva-chauth": "கர்வா சௌத்",
   },
 };
 

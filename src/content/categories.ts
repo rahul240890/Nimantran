@@ -58,6 +58,8 @@ export const categoryTaglines: Record<CategoryId, string> = {
   "gudi-padwa": "The gudi, neem and puran poli",
   baisakhi: "Harvest, bhangra and giddha",
   bihu: "Bihu songs, dance and pitha",
+  "raksha-bandhan": "Rakhi, sweets and a family lunch",
+  "karva-chauth": "The fast, the moonrise and dinner together",
 };
 
 export const questionLabels: Record<RsvpQuestionId, string> = {

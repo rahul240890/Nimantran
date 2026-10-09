@@ -41,8 +41,10 @@ export type FrameSpot = {
  * The photo layouts this invite's design offers. A design that paints its own photo frames
  * (every Scene, and the Story themes with photo pages) always shows them, so it asks for its
  * photos: one, or one each where it has a two-frame painting. A Scene theme painted with the
- * bride's and the groom's frames always asks for both. Only a design without painted frames
- * can leave the photo page out, and an illustrated card, with its couple painted, has none.
+ * bride's and the groom's frames always asks for both, as a two-photo card does for the
+ * twins or the parents-to-be on an occasion that leads with one name. Only a design without
+ * painted frames can leave the photo page out, and an illustrated card, with its couple
+ * painted, has none.
  */
 export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
   const one = draftPeople(draft) === "one";
@@ -51,7 +53,7 @@ export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
     if (isSceneTheme(suite)) {
       const frames = sceneFrames(suite);
       if (frames === 0) return ["none"];
-      return [!one && frames === 2 ? "two" : "one"];
+      return [frames === 2 ? "two" : "one"];
     }
     return one ? ["one"] : ["one", "two"];
   }
@@ -91,10 +93,12 @@ export function draftFrames(draft: InviteDraft): FrameSpot[] {
   const ids = draft.photos.map((photo) => photo.id);
   const scene = draftShowsScene(draft);
   const couple = draftCouple(draft);
-  // One guest of honour has one photo, as the pages show it
-  const chosen = coupleFrameIds(couple, ids).slice(0, draftPeople(draft) === "one" ? 1 : 2);
-  if (chosen.length === 0) return [];
   const suite = draftSuite(draft);
+  // One guest of honour has one photo, as the pages show it, unless the painting has two frames
+  const pair = scene && isSceneTheme(suite) && sceneFrames(suite) === 2;
+  const one = draftPeople(draft) === "one" && !pair;
+  const chosen = coupleFrameIds(couple, ids).slice(0, one ? 1 : 2);
+  if (chosen.length === 0) return [];
   const page = scene ? scenePage(suite, chosen.length) : photoPage(suite, chosen.length);
   if (!page) return chosen.map((id) => ({ id, image: null, box: null, aspect: ARCH_ASPECT }));
   return chosen.slice(0, page.frames.length).map((id, i) => {

@@ -852,6 +852,7 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
     case "navratri":
     case "janmashtami":
     case "lohri":
+    case "karva-chauth":
       art = (
         <>
           <Diyas />
@@ -869,6 +870,7 @@ export function StoryScene({ scene, themed = false }: { scene: StorySceneId; the
     case "gudi-padwa":
     case "baisakhi":
     case "bihu":
+    case "raksha-bandhan":
       art = (
         <>
           <Toran />

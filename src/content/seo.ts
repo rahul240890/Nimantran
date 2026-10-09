@@ -365,6 +365,20 @@ export const seoCopy = {
       heading: "Bihu invitations for the Assamese new year",
       intro: "Add the time and the place, and send one link. Guests reply in a tap.",
     },
+    "raksha-bandhan": {
+      title: "Raksha Bandhan invitation card online",
+      description:
+        "Invite the family to Raksha Bandhan with a card that holds the sister's photo and the brother's, and one-tap RSVP on WhatsApp.",
+      heading: "Raksha Bandhan invitations for sisters and brothers",
+      intro: "Add both photos, the time and the place, and send one link. Guests reply in a tap.",
+    },
+    "karva-chauth": {
+      title: "Karva Chauth invitation card online",
+      description:
+        "Invite the family to the Karva Chauth puja and moonrise with a card that holds both your photos, and one-tap RSVP on WhatsApp.",
+      heading: "Karva Chauth invitations under the moon",
+      intro: "Add both photos, the time and the place, and send one link. Guests reply in a tap.",
+    },
   } satisfies Record<CategoryId, PageWords>,
   traditionPages: {
     "north-hindu": {

@@ -10,6 +10,17 @@ describe("design photo frames", () => {
     expect(draftFrameSlots(draft)).toEqual([null, null]);
   });
 
+  it("asks a two-photo card for both photos, even on a one-name occasion", () => {
+    const draft = {
+      ...newDraft(),
+      categoryId: "birthday" as const,
+      suite: "judwa-taare" as const,
+      format: "scene" as const,
+    };
+    expect(coupleLayouts(draft)).toEqual(["two"]);
+    expect(draftFrameSlots(draft)).toEqual([null, null]);
+  });
+
   it("keeps one photo for a one-frame Scene", () => {
     const draft = { ...newDraft(), suite: "udaipur-lake" as const, format: "scene" as const };
     expect(coupleLayouts(draft)).toEqual(["one"]);

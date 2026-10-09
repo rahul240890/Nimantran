@@ -67,6 +67,8 @@ describe("category catalogue", () => {
       "gudi-padwa",
       "baisakhi",
       "bihu",
+      "raksha-bandhan",
+      "karva-chauth",
       "christening",
       "prayer-meet",
     ]);

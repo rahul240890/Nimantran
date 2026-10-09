@@ -352,30 +352,33 @@ export function OneScene({
             aspectRatio: String(PAINTING_ASPECT),
           }}
         >
-          {/* The photos lie under the painting and show through its frames */}
-          {page.frames.map((frame, i) => {
-            const photo = photos[i];
-            const style = box(photoBox(frame));
-            return photo ? (
-              <FramedPhoto
-                key={i}
-                photo={photo}
-                frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
-                className="absolute bg-card-ivory"
-                style={style}
-              />
-            ) : (
-              <div
-                key={i}
-                aria-hidden
-                className="absolute flex items-center justify-center bg-card-ivory font-display text-[9cqw] text-card-gold-text"
-                style={style}
-              >
-                {(names[page.frames.length > 1 ? i : 0] ?? "").slice(0, 1)}
-                {page.frames.length === 1 && names[1] ? ` ${joiner} ${names[1].slice(0, 1)}` : ""}
-              </div>
-            );
-          })}
+          {/* The photos lie under the painting and show through its frames; on a card that
+              comes together from its sides, they appear once its frames are in place */}
+          <div data-after={pieces || undefined} className="absolute inset-0">
+            {page.frames.map((frame, i) => {
+              const photo = photos[i];
+              const style = box(photoBox(frame));
+              return photo ? (
+                <FramedPhoto
+                  key={i}
+                  photo={photo}
+                  frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
+                  className="absolute bg-card-ivory"
+                  style={style}
+                />
+              ) : (
+                <div
+                  key={i}
+                  aria-hidden
+                  className="absolute flex items-center justify-center bg-card-ivory font-display text-[9cqw] text-card-gold-text"
+                  style={style}
+                >
+                  {(names[page.frames.length > 1 ? i : 0] ?? "").slice(0, 1)}
+                  {page.frames.length === 1 && names[1] ? ` ${joiner} ${names[1].slice(0, 1)}` : ""}
+                </div>
+              );
+            })}
+          </div>
           {opening ? (
             <PaintingPieces image={page.image} pieces={page.pieces} />
           ) : (

@@ -375,6 +375,16 @@ export const functionCopy: Record<
     description: "Bihu songs, dance and pitha",
     dressIdeas: ["Mekhela chador", "Gamosa", "Festive ethnic"],
   },
+  "raksha-bandhan": {
+    name: "Raksha Bandhan",
+    description: "Rakhi, aarti, sweets and lunch",
+    dressIdeas: ["Festive ethnic", "Bright colours", "Something comfortable"],
+  },
+  "karva-chauth": {
+    name: "Karva Chauth",
+    description: "The katha, the moonrise and dinner",
+    dressIdeas: ["Reds and golds", "Bridal lehenga or saree", "Something festive"],
+  },
 };
 
 export const functionFields = {
@@ -541,6 +551,12 @@ export const namesCopy = {
       title: "What's your Baisakhi celebration called?",
     },
     bihu: { label: "Celebration", eyebrow: "Bihu", title: "What's your Bihu celebration called?" },
+    "raksha-bandhan": {
+      label: "Sister and brother",
+      eyebrow: "Raksha Bandhan",
+      title: "Whose Raksha Bandhan is it?",
+    },
+    "karva-chauth": { label: "Couple", eyebrow: "Karva Chauth", title: "Who is celebrating?" },
   },
   one: {
     birthday: { label: "Birthday name", example: "Aarav" },
@@ -1041,6 +1057,36 @@ export const suiteCopy = {
     valaikappu: "Valaikappu",
     "shubh-labh": "Shubh Labh",
     "retirement-naav": "Retirement Naav",
+    "phad-gatha": "Phad Gatha",
+    "mandana-lal": "Mandana Lal",
+    "gota-patti": "Gota Patti",
+    "pithora-ghoda": "Pithora Ghoda",
+    "sohrai-khovar": "Sohrai Khovar",
+    "aipan-kumaon": "Aipan Kumaon",
+    "pipli-chhata": "Pipli Chhata",
+    "bishnupur-terracotta": "Bishnupur Terracotta",
+    "ganjifa-patte": "Ganjifa Patte",
+    "kanjivaram-pattu": "Kanjivaram Pattu",
+    "kasavu-sona": "Kasavu Sona",
+    "urli-pookal": "Urli Pookal",
+    "kar-e-kashmir": "Kar-e-Kashmir",
+    "zardozi-mehfil": "Zardozi Mehfil",
+    "patola-bandh": "Patola Bandh",
+    "kundan-jhumka": "Kundan Jhumka",
+    "moti-bharat": "Moti Bharat",
+    "polaroid-lights": "Polaroid Lights",
+    "dak-tikat": "Dak Tikat",
+    "kadhai-hoop": "Kadhai Hoop",
+    "locket-jodi": "Locket Jodi",
+    "syahi-bamboo": "Syahi Bamboo",
+    "lace-ivory": "Lace Ivory",
+    "origami-saaras": "Origami Saaras",
+    "nimbu-amalfi": "Nimbu Amalfi",
+    "rail-yatra": "Rail Yatra",
+    "rakhi-dor": "Rakhi Dor",
+    "karva-chandni": "Karva Chandni",
+    "judwa-taare": "Judwa Taare",
+    "naya-mehmaan": "Naya Mehmaan",
     "mameru-bandhani": "Mameru Bandhani",
     "sindhi-ajrak": "Sindhi Ajrak",
     "hampi-ruins": "Hampi Ruins",
@@ -1311,6 +1357,66 @@ export const suiteCopy = {
       "A shop opening: cutting the ribbon at a door hung with marigolds. No photos needed.",
     "retirement-naav":
       "A retirement as a new journey: setting off by boat at sunrise. No photos needed.",
+    "phad-gatha":
+      "A Rajasthani Phad scroll with camels, a peacock and a horse-and-elephant procession. Two photo frames, one for each of you.",
+    "mandana-lal":
+      "White Mandana peacocks and lotuses on red earth, with plain sand plaster for your words. Two photo frames, one for each of you.",
+    "gota-patti":
+      "Gold gota patti leaves and sequins on rani pink silk, with tassels along the hem. Two photo frames, one for each of you.",
+    "pithora-ghoda":
+      "Bright dotted Pithora horses, birds, a sun and a moon on a whitewashed wall. Two photo frames, one for each of you.",
+    "sohrai-khovar":
+      "A Jharkhand mud wall painted with a peacock, a bull and a cow under a flowering tree. Two photo frames, one for each of you.",
+    "aipan-kumaon":
+      "Kumaoni Aipan in white rice paste on red ochre, with lotuses and hill pines. Two photo frames, one for each of you.",
+    "pipli-chhata":
+      "Odisha's Pipli appliqué: parasols, parrots and elephants with little mirrors. Two photo frames, one for each of you.",
+    "bishnupur-terracotta":
+      "Carved Bengal terracotta, a Bankura horse and a frieze of boats and elephants. Two photo frames, one for each of you.",
+    "ganjifa-patte":
+      "Round Mysuru Ganjifa cards in red, gold and green, with sandalwood boxes. Two photo frames, one for each of you.",
+    "kanjivaram-pattu":
+      "A maroon Kanjivaram silk with a gold zari border of temple towers and peacocks. Two photo frames, one for each of you.",
+    "kasavu-sona":
+      "An ivory Kerala kasavu with a gold border, a brass lamp and jasmine strings. Two photo frames, one for each of you.",
+    "urli-pookal":
+      "Polished brass frames, marigold strings and an urli of floating flowers and lamps. Two photo frames, one for each of you.",
+    "kar-e-kashmir":
+      "Kashmiri papier-mâché painted with chinar leaves, roses, irises and bulbuls. Two photo frames, one for each of you.",
+    "zardozi-mehfil":
+      "Raised gold zardozi and pearls on deep wine velvet, for a nikah or reception. Two photo frames, one for each of you.",
+    "patola-bandh":
+      "Patan Patola silk with woven elephants and parrots in red, green and saffron. Two photo frames, one for each of you.",
+    "kundan-jhumka":
+      "Kundan pendants, a pearl necklace, jhumkas and bangles on blush silk. Two photo frames, one for each of you.",
+    "moti-bharat":
+      "Gujarati beadwork: a beaded toran, parrots and elephants in bright glass beads. Two photo frames, one for each of you.",
+    "polaroid-lights":
+      "Two instant photos pegged to warm fairy lights, with dried flowers and an envelope. Two photo frames, one for each of you.",
+    "dak-tikat":
+      "Two vintage postage stamps, a wax seal, airmail stripes and a bundle of letters. Two photo frames, one for each of you.",
+    "kadhai-hoop":
+      "Two wooden embroidery hoops ringed with tiny stitched flowers, and spools of thread. Two photo frames, one for each of you.",
+    "locket-jodi":
+      "Two antique gold lockets on a chain over dusty-rose velvet, with pearls and roses. Two photo frames, one for each of you.",
+    "syahi-bamboo":
+      "A calm ink wash of plum blossom, bamboo and two small birds on rice paper. Two photo frames, one for each of you.",
+    "lace-ivory":
+      "Ivory lace arches, satin bows and lily of the valley, for a church or garden wedding. Two photo frames, one for each of you.",
+    "origami-saaras":
+      "Paper cranes and folded flowers in soft pastels around two pleated paper frames. Two photo frames, one for each of you.",
+    "nimbu-amalfi":
+      "Sunny lemons and hand-painted blue and yellow tiles, for a bright summer wedding. Two photo frames, one for each of you.",
+    "rail-yatra":
+      "A vintage green train carriage with two windows, suitcases and marigolds on the platform. Two photo frames, one for each of you.",
+    "rakhi-dor":
+      "A rakhi joins the sister's frame and the brother's, over a thali of roli, rice and sweets.",
+    "karva-chandni":
+      "Two brass sieves under the full moon, with a decorated karva, a diya and red bangles. Two photo frames, one for each of you.",
+    "judwa-taare":
+      "A pink star and a blue star for twins, with bunting, balloons and a two-tier cake.",
+    "naya-mehmaan":
+      "Two felt clouds for the parents-to-be, hanging from a baby mobile over a cradle.",
     "mameru-bandhani": "Bandhani silks, brass and gifts for the mameru.",
     "sindhi-ajrak": "Indigo and madder ajrak, roses and tassels for a Sindhi wedding.",
     "hampi-ruins": "Stone steps, brass lamps and jasmine among the old temples.",
