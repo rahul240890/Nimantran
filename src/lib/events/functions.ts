@@ -47,6 +47,14 @@ export const FUNCTION_IDS = [
   "sankranti",
   "lohri",
   "eid",
+  "naming-ceremony",
+  "holi",
+  "christmas",
+  "reunion",
+  "graduation",
+  "gudi-padwa",
+  "baisakhi",
+  "bihu",
 ] as const;
 export type FunctionId = (typeof FUNCTION_IDS)[number];
 
@@ -74,6 +82,14 @@ export const OCCASION_FUNCTIONS: readonly FunctionId[] = [
   "sankranti",
   "lohri",
   "eid",
+  "naming-ceremony",
+  "holi",
+  "christmas",
+  "reunion",
+  "graduation",
+  "gudi-padwa",
+  "baisakhi",
+  "bihu",
 ];
 
 export function isFunctionId(value: unknown): value is FunctionId {

@@ -3,7 +3,9 @@ import {
   Baby,
   Briefcase,
   Cake,
+  Drum,
   Feather,
+  Flag,
   Flame,
   Flower,
   Flower2,
@@ -23,6 +25,7 @@ import {
   Store,
   TreePine,
   Users,
+  Wheat,
   Wind,
   Coffee,
   Music,
@@ -67,6 +70,10 @@ const ICONS: Record<string, LucideIcon> = {
   "shop-opening": Store,
   launch: Rocket,
   "office-party": PartyPopper,
+  graduation: GraduationCap,
+  "gudi-padwa": Flag,
+  baisakhi: Wheat,
+  bihu: Drum,
 };
 
 type TileProps = {

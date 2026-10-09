@@ -46,6 +46,14 @@ export const categoryTaglines: Translation<typeof en.categoryTaglines> = {
   sankranti: "पतंग, तिल और पोंगल",
   lohri: "अलाव, रेवड़ी और भांगड़ा",
   eid: "इफ़्तार दावत और ईद मिलन",
+  "naming-ceremony": "बच्चे का नाम, परिवार का आशीर्वाद",
+  holi: "रंग, संगीत और गुझिया",
+  christmas: "कैरल, केक और क्रिसमस ट्री",
+  reunion: "पुराने दोस्त, एक शाम",
+  graduation: "ग्रेजुएट के नाम एक शाम",
+  "gudi-padwa": "गुड़ी, नीम और पूरन पोली",
+  baisakhi: "फ़सल, भांगड़ा और गिद्धा",
+  bihu: "बिहू गीत, नृत्य और पीठा",
 };
 
 export const questionLabels: Translation<typeof en.questionLabels> = {
