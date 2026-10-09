@@ -169,7 +169,7 @@ export const engagementInvitationMessage: BlogPost = {
       list: [
         "Guests tap RSVP and say how many adults and children are coming, and you see every reply in one place.",
         'Send each guest a personal link that greets them by name ("Dear Neha") and see who has opened it.',
-        "Hosting the roka and the ring ceremony separately? Premium (from ₹499) carries up to three functions, each with its own time, venue, map and dress code. See [pricing](/pricing).",
+        "Hosting the roka and the ring ceremony separately? Every package, free included, carries every function, each with its own time, venue, map and dress code. See [pricing](/pricing).",
         "If the time or venue changes, the same link updates.",
       ],
     },

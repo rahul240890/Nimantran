@@ -21,10 +21,12 @@ export type DashboardView = {
   hostInvites: HostInvite[];
   /** Where co-host links point: <origin>/join/<token>. */
   origin: string;
-  /** The invite's edition, once payments are on (Steps 15 to 17). */
+  /** The invite's package, once payments are on (Steps 15 to 17). */
   plan: PlanId | null;
-  /** Co-hosts the edition includes while editions apply; null for no limit. */
+  /** Co-hosts the package includes while packages apply; null for no limit. */
   cohostLimit: number | null;
+  /** Guests the package allows by link while packages apply; null for no limit. */
+  inviteLimit: number | null;
   /** Planned invitations and reminders (scheduled sending). */
   schedules: ScheduledSend[];
   /** The server's clock when the page was made, so "due now" renders the same in the browser. */

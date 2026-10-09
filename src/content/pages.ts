@@ -6,23 +6,25 @@
 export const pricingPageCopy = {
   title: "Pricing for digital invitations",
   description:
-    "Make and share an invitation free. Premium from ₹499 per invitation, Royal ₹1,999 and the Wedding bundle ₹2,999, GST included. No subscription.",
+    "Make and share an invitation free. Three packages per invitation, Basic, Celebration and Grand, priced on your design with GST included. No subscription.",
   crumb: "Pricing",
   eyebrow: "Pricing",
   heading: "One price per invitation. No subscription.",
   intro:
-    "Make your invitation and share it free. When you want more functions, more photos or the video, upgrade that one invitation.",
-  editionsHeading: "Editions",
-  editionsIntro: "Every edition has every design, WhatsApp sharing and one-tap RSVP for guests.",
-  free: "to start",
-  perInvite: "per invitation",
+    "Make your invitation and share it free. When you want no watermark, the WhatsApp video or more invites, choose a package for that one invitation.",
+  editionsHeading: "Packages",
+  editionsIntro:
+    "Basic is your design's own price. Celebration and Grand add a fixed amount on top. The prices below are for a Premium design.",
+  onDesign: (price: string) => `with a ${price} design`,
+  addOn: (price: string) => `Design + ${price}`,
+  freeDesign: "₹0 with a free design",
   bestFor: "Best for",
   popular: "Most chosen",
   notesHeading: "Good to know",
   notes: [
     "Prices are in rupees and include GST. You get a GST invoice.",
     "Pay by UPI, card or netbanking, securely through Razorpay.",
-    "Start on Free and upgrade later: you pay only the difference.",
+    "Start free and move up later: you pay only the difference.",
     "Full refund within 7 days if your invitation hasn't been sent to any guest.",
   ],
   refundsLink: "Read the refund policy",
@@ -30,15 +32,15 @@ export const pricingPageCopy = {
   faq: [
     {
       q: "Is it really free to make an invitation?",
-      a: 'Yes. You can make an invitation with one function, share it on WhatsApp and collect replies without paying. Free invitations carry a small "Made with Shubh" mark.',
+      a: 'Yes. Make an invitation with any free design, with every function, share it on WhatsApp and collect replies without paying. Free invitations carry a small "Made with Shubh" in the corner.',
     },
     {
       q: "Is this a subscription?",
       a: "No. You pay once for one invitation, and nothing renews or charges again.",
     },
     {
-      q: "Which edition do I need for a wedding?",
-      a: "Premium covers up to three functions. For a wedding with haldi, mehendi, sangeet, the wedding and a reception, choose Royal or the Wedding bundle.",
+      q: "Which package do I need for a wedding?",
+      a: "Every package covers every function. Most families choose Celebration for the WhatsApp video and more invites; Grand adds unlimited invites and a video for every function.",
     },
     {
       q: "Do guests pay anything?",
@@ -70,7 +72,7 @@ export const contactPageCopy = {
     { text: "Payments, cancelling and refunds", id: "refunds" },
     { text: "Your data, and deleting it", id: "privacy" },
     { text: "The rules for using the site", id: "terms" },
-    { text: "What each edition costs", id: "pricing" },
+    { text: "What each package costs", id: "pricing" },
   ],
   includeHeading: "Help us help you quickly",
   include: [

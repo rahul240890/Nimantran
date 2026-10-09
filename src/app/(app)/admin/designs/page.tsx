@@ -33,7 +33,7 @@ function describe(id: string): Omit<DesignRow, "tier" | "defaultTier"> | null {
   };
 }
 
-/** Which designs are Free, Premium or Royal, and what each edition costs. */
+/** Which designs are Free, Premium or Royal, and what each package costs. */
 export default async function DesignsPage() {
   await requireAdmin("/admin/designs");
   const pricing = await getPricing();
@@ -47,9 +47,9 @@ export default async function DesignsPage() {
       <AdminHeading
         eyebrow="Payments"
         title="Designs and prices"
-        intro="Every host can open and try every design. A Premium or Royal design asks for that edition before it is sent without the watermark, and its tile shows the price. Prices include GST and apply once checkout is switched on."
+        intro="Every host can open and try every design. A Premium or Royal design shows its price on its tile, and publishing it asks for a package: Basic at the design's price, or Celebration and Grand on top. Prices include GST and apply once checkout is switched on."
       />
-      <DesignPricingForm rows={rows} prices={pricing.prices} />
+      <DesignPricingForm rows={rows} amounts={pricing} />
     </>
   );
 }

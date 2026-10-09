@@ -160,7 +160,7 @@ export const saveTheDateMessages: BlogPost = {
         "Import guests from your phone contacts or an Excel sheet, and send each one a personal link that greets them by name.",
         "See who has opened it, so you know who still needs a call.",
         "If a detail changes, edit it and the same link updates.",
-        "A save the date video for WhatsApp Status and Instagram Reels comes with paid editions, from ₹499. See [pricing](/pricing).",
+        "A save the date video for WhatsApp Status and Instagram Reels comes with the Celebration and Grand packages. See [pricing](/pricing).",
       ],
     },
     "Browse [save the date designs](/invitations/save-the-date), and when the engagement comes first, read [engagement invitation messages](/blog/engagement-invitation-message).",

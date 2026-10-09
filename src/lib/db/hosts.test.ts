@@ -258,9 +258,10 @@ describe("co-host access", () => {
     // Free includes one co-host, and Mama ji is already one
     const token = await inviteWith("edit");
     await expect(accept(cousin, token)).rejects.toThrow(/all the co-hosts/);
-    await q("insert into event_plans (event_id, plan_id, source) values ($1, 'premium', 'admin')", [
-      event,
-    ]);
+    await q(
+      "insert into event_plans (event_id, plan_id, source) values ($1, 'celebration', 'admin')",
+      [event],
+    );
     expect(await accept(cousin, token)).toBe(event);
     await q("delete from app_settings where key = 'payments'");
   });

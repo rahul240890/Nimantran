@@ -10,19 +10,18 @@ import { Card } from "@/components/ui/card";
 import { useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
 import type { InviteDraft } from "@/lib/editor/draft";
-import { PLAN_IDS, formatRupees, planShortfalls, type PaidPlanId } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, editionAfter, formatRupees, planShortfalls } from "@/lib/plans/catalog";
 import { draftDesignId } from "@/lib/plans/design-defaults";
-import { tierPlan } from "@/lib/plans/design-tiers";
 
 /**
- * In the editor's last step: what this invite uses beyond its edition, while payments are
- * on, with the edition that covers it and its price today. Nothing shows otherwise.
+ * In the editor's last step: what this invite uses beyond its package, while payments are
+ * on, with the package that covers it and its price today. Nothing shows otherwise.
  */
 export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteId: string }) {
   const { limitCopy, planCopy } = useText(editionsText);
   const [edition, setEdition] = useState<InviteEdition>(null);
-  // The design asks for its own edition (Admin, Designs)
-  const design = tierPlan(useDesignTier(draftDesignId(draft)).tier);
+  // A paid design asks for a package at its price (Admin, Designs)
+  const design = useDesignTier(draftDesignId(draft)).tier;
 
   useEffect(() => {
     let live = true;
@@ -35,10 +34,12 @@ export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteI
   }, [inviteId]);
 
   if (!edition) return null;
-  const shortfalls = planShortfalls(draft, edition.plan, design);
+  const shortfalls = planShortfalls(draft, edition.edition, design);
   if (shortfalls.length === 0) return null;
-  const needed = PLAN_IDS.slice(PLAN_IDS.indexOf(edition.plan)).find(
-    (id): id is PaidPlanId => id !== "free" && planShortfalls(draft, id, design).length === 0,
+  const needed = PAID_PLAN_IDS.find(
+    (id) =>
+      edition.prices[id] &&
+      planShortfalls(draft, editionAfter(edition.edition, id, design), design).length === 0,
   );
   const price = needed ? edition.prices[needed] : undefined;
 

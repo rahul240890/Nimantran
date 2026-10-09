@@ -6,12 +6,13 @@ import { checkoutCoupons } from "@/lib/payments/coupons";
 import {
   confirmCheckout,
   editionsActive,
+  inviteDesignTier,
   invitePlan,
   startCheckout,
   type ConfirmResult,
   type StartedCheckout,
 } from "@/lib/payments/editions";
-import { PAID_PLAN_IDS, type PaidPlanId, type PlanId } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, type Edition, type PaidPlanId } from "@/lib/plans/catalog";
 import { getPricing } from "@/lib/plans/pricing";
 import {
   cleanCouponCode,
@@ -22,7 +23,7 @@ import {
 } from "@/lib/plans/offers";
 
 /*
- * Buying an edition for an invite (Step 16). The price comes from the server's catalogue
+ * Buying a package for an invite (Step 16). The price comes from the server's catalogue
  * and the payment counts only once its signature checks out on the server.
  */
 
@@ -69,26 +70,44 @@ export async function tryCoupon(input: unknown): Promise<CouponCheck> {
   const parsed = z.object({ inviteId: z.uuid(), code: z.string().max(30) }).safeParse(input);
   const account = await getAccount();
   if (!parsed.success || !account) return { ok: false, reason: "unknown" };
-  const current = await invitePlan(account, parsed.data.inviteId).catch(() => null);
+  const { inviteId } = parsed.data;
+  const [current, design] = await Promise.all([
+    invitePlan(account, inviteId).catch(() => null),
+    inviteDesignTier(account, inviteId).catch(() => null),
+  ]);
   const typed = cleanCouponCode(parsed.data.code);
-  if (!current || !typed) return { ok: false, reason: "unknown" };
+  if (!current || !design || !typed) return { ok: false, reason: "unknown" };
   const coupons = await checkoutCoupons().catch(() => []);
   const now = new Date();
-  const problem = codeProblem(current, coupons, typed, now);
+  const problem = codeProblem(current, design, coupons, typed, now);
   if (problem) return { ok: false, reason: problem };
-  const { prices } = await getPricing();
-  return { ok: true, code: typed, prices: pricesFor(current, coupons, typed, now, prices) };
+  const pricing = await getPricing();
+  return {
+    ok: true,
+    code: typed,
+    prices: pricesFor(current, design, coupons, typed, now, pricing),
+  };
 }
 
-export type InviteEdition = { plan: PlanId; prices: Partial<Record<PaidPlanId, Price>> } | null;
+export type InviteEdition = {
+  edition: Edition;
+  prices: Partial<Record<PaidPlanId, Price>>;
+} | null;
 
-/** An invite's edition and prices while payments are on, for the editor's notice. */
+/**
+ * An invite's package and the prices of the others while payments are on, for the
+ * editor's notice. Priced on the design saved last, which the notice's own design matches
+ * once the editor has saved.
+ */
 export async function inviteEdition(inviteId: unknown): Promise<InviteEdition> {
   const id = z.uuid().safeParse(inviteId);
   const account = await getAccount();
   if (!id.success || !account || !(await editionsActive())) return null;
-  const plan = await invitePlan(account, id.data);
-  if (!plan) return null;
+  const [edition, design] = await Promise.all([
+    invitePlan(account, id.data),
+    inviteDesignTier(account, id.data),
+  ]);
+  if (!edition || !design) return null;
   const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
-  return { plan, prices: pricesFor(plan, coupons, null, new Date(), pricing.prices) };
+  return { edition, prices: pricesFor(edition, design, coupons, null, new Date(), pricing) };
 }

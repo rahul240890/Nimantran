@@ -94,7 +94,7 @@ export const digitalWeddingInvitationWhatsapp: BlogPost = {
     },
     {
       q: "How much does a digital wedding invitation cost?",
-      a: "You can make and share one free on Shubh. Paid editions start at ₹499 for more functions and photos, a video for WhatsApp Status and no watermark. See the pricing page for details.",
+      a: "You can make and share one free on Shubh with a free design. Paid packages start at ₹499 for a paid design with no watermark, with more invites and a video for WhatsApp Status in the bigger packages. See the pricing page for details.",
     },
   ],
 };

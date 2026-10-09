@@ -443,7 +443,7 @@ export const languageCopy = {
   traditionMatch: "Your tradition's",
   secondHeading: "Add a second language?",
   secondHint:
-    "Guests switch between the two on the invitation. A second language comes with the Premium and Royal editions.",
+    "Guests switch between the two on the invitation. A second language comes with the Celebration and Grand packages.",
   secondNone: "Only one language",
   secondLabel: "Second language",
 } as const;
@@ -830,7 +830,10 @@ export const previewCopy = {
   readyBody:
     "It's saved on this device. Sign in to keep it in your account and publish it, then share the link on WhatsApp.",
   readyBodyAccount:
-    "It's saved to your account, photos included. Publish it to get your link, then share it on WhatsApp.",
+    "It's saved to your account, photos included. See it as your guests will, then publish it to get your link.",
+  seeAsGuest: "See it as your guests will",
+  seeAsGuestBody:
+    "The whole invitation, full screen: the opening, the music, every page and the reply form.",
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",
@@ -1505,7 +1508,7 @@ export const aiCopy = {
     off: "AI wording isn't switched on yet.",
     "not-found": "Sign in so your invite is saved, then AI can write for it.",
     "used-up":
-      "This invite has used its 3 free drafts. Premium, Royal and the Wedding bundle can write as often as you like.",
+      "This invite has used its 3 free drafts. Any package can write as often as you like.",
     failed: "The words couldn't be written just now. Try again.",
   },
 } as const;

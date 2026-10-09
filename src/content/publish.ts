@@ -189,6 +189,8 @@ export const rsvpCopy = {
   failed: "Couldn't send your reply. Check your connection and try again.",
   missing: "This invitation isn't taking replies any more.",
   notInvited: "This link isn't for one of those celebrations. Ask the family to check it.",
+  previewOnly: "This is your preview, so nothing was sent. Guests can reply once you publish.",
+  full: "Replies on this invitation are full for now. Please send your reply to the family directly.",
   fixErrors: (count: number) =>
     count === 1 ? "One answer still needs you." : `${count} answers still need you.`,
   thanksTitle: (name: string) => `Thank you, ${name}!`,
@@ -228,11 +230,21 @@ export const videoCopy = {
     "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",
   noSound:
     "This browser can't add music to videos, so the video will be silent. Chrome or Edge add the raga.",
-  locked: "Premium and Royal include this video.",
-  upgrade: "Choose edition",
+  locked: "The Celebration and Grand packages include this video.",
+  upgrade: "Choose a package",
+  which: "Which video",
+  whole: "The whole invitation",
   ending: {
     open: "Open the invitation",
   },
   shareText: (names: string) => `${names}: our invitation`,
   fileName: (slug: string) => `${slug}-invitation.mp4`,
+} as const;
+
+export const hostPreviewCopy = {
+  metaTitle: "Your invite, as guests will see it",
+  label: "Preview: this is what your guests will see",
+  back: "Keep editing",
+  next: "Choose a package and publish",
+  share: "Share your invite",
 } as const;

@@ -101,8 +101,8 @@ function SingleGuest({ inviteId, functions, guest, onDone }: SingleProps) {
       const ok = guest
         ? await updateGuest(inviteId, guest.id, input).catch(() => false)
         : await addGuests(inviteId, [input]).catch(() => false);
-      if (!ok) {
-        toast({ title: copy.failed, tone: "error" });
+      if (ok !== true) {
+        toast({ title: ok === "limit" ? copy.limit : copy.failed, tone: "error" });
         return;
       }
       toast({ title: guest ? copy.saved : copy.added(1), tone: "success" });
@@ -194,8 +194,8 @@ function PastedList({ inviteId, functions, onDone }: Omit<SingleProps, "guest">)
           functionIds: toStored(functions, picked),
         })),
       ).catch(() => false);
-      if (!ok) {
-        toast({ title: copy.failed, tone: "error" });
+      if (ok !== true) {
+        toast({ title: ok === "limit" ? copy.limit : copy.failed, tone: "error" });
         return;
       }
       toast({ title: copy.added(ready.length), tone: "success" });

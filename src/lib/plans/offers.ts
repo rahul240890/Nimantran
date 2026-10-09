@@ -1,14 +1,9 @@
-import {
-  PLAN_IDS,
-  upgradePricePaise,
-  type EditionPrices,
-  type PaidPlanId,
-  type PlanId,
-} from "./catalog";
+import { PAID_PLAN_IDS, upgradePricePaise, type Edition, type PaidPlanId } from "./catalog";
+import type { DesignTier, Pricing } from "./design-tiers";
 
 /*
  * Coupons and festival offers (Step 17). A coupon takes a percentage or a fixed amount off
- * one or more editions; a festival offer is a coupon that applies by itself between its
+ * one or more packages; a festival offer is a coupon that applies by itself between its
  * dates. The server prices every checkout with these, never the browser.
  */
 
@@ -18,7 +13,7 @@ export type Coupon = {
   label: string;
   percentOff: number | null;
   amountOffPaise: number | null;
-  /** Editions it applies to; empty means every paid edition. */
+  /** Packages it applies to; empty means every package. */
   planIds: PaidPlanId[];
   autoApply: boolean;
   startsAt: string | null;
@@ -35,7 +30,7 @@ export const cleanCouponCode = (value: string) => value.toUpperCase().replace(/[
 
 export type CouponProblem = "inactive" | "not-started" | "ended" | "used-up" | "wrong-plan";
 
-/** Why a coupon can't be used for an edition now, or null when it can. */
+/** Why a coupon can't be used for a package now, or null when it can. */
 export function couponProblem(coupon: Coupon, planId: PaidPlanId, now: Date): CouponProblem | null {
   if (!coupon.active) return "inactive";
   if (coupon.startsAt && now < new Date(coupon.startsAt)) return "not-started";
@@ -65,18 +60,19 @@ export type Price = {
 };
 
 /**
- * What moving from one edition to another costs now: the code the host typed when it
- * works for this edition, else the best festival offer running, else the plain price.
+ * What buying a package costs this invite now: the code the host typed when it works for
+ * this package, else the best festival offer running, else the plain price.
  */
 export function priceFor(
-  from: PlanId,
+  current: Edition,
   to: PaidPlanId,
+  design: DesignTier,
   coupons: readonly Coupon[],
   code: string | null,
   now: Date,
-  prices?: EditionPrices,
+  pricing?: Pick<Pricing, "designs" | "packages">,
 ): Price | null {
-  const listPaise = upgradePricePaise(from, to, prices);
+  const listPaise = upgradePricePaise(current, to, design, pricing);
   if (listPaise === null) return null;
   const usable = coupons.filter((coupon) => couponProblem(coupon, to, now) === null);
   const typed = code ? usable.find((coupon) => coupon.code === code) : undefined;
@@ -97,35 +93,36 @@ export function priceFor(
   };
 }
 
-/** Prices for every edition above the current one, as the plan cards show them. */
+/** Prices for every package this invite can buy, as the package cards show them. */
 export function pricesFor(
-  from: PlanId,
+  current: Edition,
+  design: DesignTier,
   coupons: readonly Coupon[],
   code: string | null,
   now: Date,
-  editionPrices?: EditionPrices,
+  pricing?: Pick<Pricing, "designs" | "packages">,
 ): Partial<Record<PaidPlanId, Price>> {
   const prices: Partial<Record<PaidPlanId, Price>> = {};
-  for (const id of PLAN_IDS) {
-    if (id === "free") continue;
-    const price = priceFor(from, id, coupons, code, now, editionPrices);
+  for (const id of PAID_PLAN_IDS) {
+    const price = priceFor(current, id, design, coupons, code, now, pricing);
     if (price) prices[id] = price;
   }
   return prices;
 }
 
-/** Whether a typed code does anything for any edition above the current one. */
+/** Whether a typed code does anything for any package this invite can buy. */
 export function codeProblem(
-  from: PlanId,
+  current: Edition,
+  design: DesignTier,
   coupons: readonly Coupon[],
   code: string,
   now: Date,
 ): CouponProblem | "unknown" | null {
   const coupon = coupons.find((item) => item.code === code);
   if (!coupon) return "unknown";
-  const problems = PLAN_IDS.filter((id): id is PaidPlanId => id !== "free")
-    .filter((id) => upgradePricePaise(from, id) !== null)
-    .map((id) => couponProblem(coupon, id, now));
+  const problems = PAID_PLAN_IDS.filter(
+    (id) => upgradePricePaise(current, id, design) !== null,
+  ).map((id) => couponProblem(coupon, id, now));
   if (problems.includes(null)) return null;
   return problems.find((problem) => problem !== "wrong-plan") ?? problems[0] ?? "wrong-plan";
 }

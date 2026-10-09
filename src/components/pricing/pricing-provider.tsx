@@ -10,7 +10,7 @@ import {
 } from "@/lib/plans/design-tiers";
 
 /*
- * The admin's design tiers and edition prices (Admin, Designs) for every badge and price
+ * The admin's design tiers and package prices (Admin, Designs) for every badge and price
  * on the page. Pages are built with every design at its default tier; the admin's changes
  * are fetched once the page opens, so a static page never has to be rebuilt for them.
  */
@@ -28,7 +28,7 @@ export function PricingProvider({ pricing, children }: { pricing: Pricing; child
         if (!live || !stored) return;
         // Stored, it lists only the designs the admin moved; the rest keep their default
         const admin = parsePricing(stored);
-        setCurrent({ prices: admin.prices, tiers: { ...pricing.tiers, ...admin.tiers } });
+        setCurrent({ ...admin, tiers: { ...pricing.tiers, ...admin.tiers } });
       })
       .catch(() => undefined);
     return () => {

@@ -1,7 +1,8 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CircleAlert, Clock, MapPin, PartyPopper, Pencil, Shirt } from "lucide-react";
+import { CircleAlert, Clock, Eye, MapPin, PartyPopper, Pencil, Shirt } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -15,6 +16,8 @@ import {
   type EditorStep,
 } from "@/lib/editor/draft";
 import { draftProblems } from "@/lib/editor/draft-checks";
+import { inviteDraft } from "@/lib/editor/store";
+import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
 import { usePhotoUrls } from "../use-photo-urls";
 import type { StepProps } from "./types";
@@ -117,6 +120,8 @@ export function PreviewStep({
           </ul>
         </Card>
       )}
+
+      {signedIn && draft.remoteId && problems.length === 0 && <SeeAsGuest />}
 
       {signedIn && draft.remoteId && <EditionNotice draft={draft} inviteId={draft.remoteId} />}
 
@@ -228,5 +233,31 @@ export function PreviewStep({
         </Dialog>
       </div>
     </div>
+  );
+}
+
+/** Saves the invite, then opens it full screen exactly as a guest will see it. */
+function SeeAsGuest() {
+  const { previewCopy } = useText(editorText);
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  return (
+    <Card elevation="flat" className="gap-3 border-marigold/45 bg-marigold/10 p-5">
+      <p className="text-sm text-ink-muted">{previewCopy.seeAsGuestBody}</p>
+      <Button
+        className="self-start"
+        loading={busy}
+        leadingIcon={<Eye aria-hidden />}
+        onClick={async () => {
+          setBusy(true);
+          await syncDraft();
+          const id = inviteDraft.get().draft.remoteId;
+          if (id) router.push(`/invites/${id}/preview`);
+          else setBusy(false);
+        }}
+      >
+        {previewCopy.seeAsGuest}
+      </Button>
+    </Card>
   );
 }

@@ -175,7 +175,7 @@ export const grihaPraveshNimantranSandesh: BlogPost = {
         "कार्ड हिंदी में, या बुज़ुर्गों और युवाओं के लिए हिंदी और अंग्रेज़ी साथ-साथ बन सकता है।",
       ],
     },
-    "एक कार्यक्रम वाला निमंत्रण बनाना और भेजना मुफ़्त है। [गृह प्रवेश के निमंत्रण डिज़ाइन](/hi/invitations/housewarming) देखें, और ज़्यादा कार्यक्रमों या वीडियो के लिए [कीमतें](/hi/pricing) देखें।",
+    "फ़्री डिज़ाइन से निमंत्रण बनाना और भेजना मुफ़्त है। [गृह प्रवेश के निमंत्रण डिज़ाइन](/hi/invitations/housewarming) देखें, और वीडियो या ज़्यादा इनवाइट के लिए [कीमतें](/hi/pricing) देखें।",
     "नए घर में कथा भी रख रहे हैं? पढ़ें [सत्यनारायण कथा निमंत्रण](/hi/blog/satyanarayan-katha-nimantran)। अंग्रेज़ी पंक्तियों के लिए देखें [griha pravesh invitation message](/blog/griha-pravesh-invitation-message)।",
   ],
   faq: [

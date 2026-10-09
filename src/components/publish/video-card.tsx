@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { useText } from "@/i18n/client";
@@ -46,8 +48,10 @@ type VideoCardProps = {
   url: string;
   slug: string;
   names: string;
-  /** Whether the invite's edition includes the video; else where to choose one. */
+  /** Whether the invite's package includes the video; else where to choose one. */
   allowed: boolean;
+  /** Whether the package also makes a video for each function on its own (Grand). */
+  perFunction?: boolean;
   upgradeHref: string;
   /** Preview mode's tests only: codecs open-source Chromium can encode. */
   testCodecs?: boolean;
@@ -63,6 +67,7 @@ type State =
   | { step: "unsupported" };
 
 const noSubscribe = () => () => {};
+const ALL = "all";
 const TEST_CODECS = { video: "vp9", audio: "opus" } as const;
 
 /**
@@ -72,7 +77,17 @@ const TEST_CODECS = { video: "vp9", audio: "opus" } as const;
  */
 export function VideoCard(props: VideoCardProps) {
   const { videoCopy } = useText(publishText);
-  const { draft, functions, photos, url, slug, names, allowed, upgradeHref, testCodecs } = props;
+  const { draft, photos, url, slug, names, allowed, upgradeHref, testCodecs } = props;
+  // Grand makes a video of one function too: its own date, time and place
+  const [only, setOnly] = useState<string>(ALL);
+  const perFunction = Boolean(props.perFunction) && props.functions.length > 1;
+  const functions = useMemo(
+    () =>
+      perFunction && only !== ALL
+        ? props.functions.filter((fn) => fn.kind === only)
+        : props.functions,
+    [perFunction, only, props.functions],
+  );
   const clipUrl = props.clipUrl ?? null;
   const codecs = testCodecs ? TEST_CODECS : undefined;
   const [music, setMusic] = useState(true);
@@ -273,6 +288,18 @@ export function VideoCard(props: VideoCardProps) {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
+              {perFunction && (
+                <Field label={videoCopy.which} className="max-w-xs">
+                  <Select
+                    value={only}
+                    onValueChange={setOnly}
+                    options={[
+                      { value: ALL, label: videoCopy.whole },
+                      ...props.functions.map((fn) => ({ value: fn.kind, label: fn.name })),
+                    ]}
+                  />
+                </Field>
+              )}
               {silent ? (
                 <p className="text-sm text-ink-muted">{videoCopy.noSound}</p>
               ) : (

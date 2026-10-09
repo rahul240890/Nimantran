@@ -7,6 +7,7 @@ import { GUEST_RULES } from "@/lib/guests/list";
 import { istToIso, SEND_PURPOSES } from "@/lib/guests/schedule";
 import { HOST_ACCESS, hostStore, type AcceptResult, type NewGuest } from "@/lib/invites/hosts";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
+import { hostHasRoom } from "@/lib/payments/invite-room";
 import { cohostLimit } from "@/lib/plans/catalog";
 
 /*
@@ -45,10 +46,12 @@ async function context(inviteId: string) {
   return account ? { store, account } : null;
 }
 
-export async function addGuests(inviteId: string, input: unknown): Promise<boolean> {
+/** True once added; "limit" when the invite's package has no room for this many more. */
+export async function addGuests(inviteId: string, input: unknown): Promise<boolean | "limit"> {
   const parsed = z.array(guestSchema).min(1).max(GUEST_RULES.paste).safeParse(input);
   const ctx = await context(inviteId);
   if (!ctx || !parsed.success) return false;
+  if (!(await hostHasRoom(ctx.account, inviteId, parsed.data.length))) return "limit";
   return ctx.store.addGuests(ctx.account, inviteId, parsed.data as NewGuest[]).catch(() => false);
 }
 
@@ -171,7 +174,7 @@ export async function createHostInvite(
       invitePlan(ctx.account, inviteId),
       ctx.store.dashboard(ctx.account, inviteId),
     ]);
-    const room = plan ? cohostLimit(plan) : null;
+    const room = plan ? cohostLimit(plan.plan) : null;
     const taken = dashboard
       ? dashboard.hosts.filter((host) => host.role === "cohost").length +
         dashboard.hostInvites.length

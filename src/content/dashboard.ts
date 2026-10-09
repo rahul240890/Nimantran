@@ -151,6 +151,8 @@ export const dashboardCopy = {
     added: (count: number) => (count === 1 ? "Guest added" : `${count} guests added`),
     saved: "Guest saved",
     failed: "Couldn't save. Check your connection and try again.",
+    limit:
+      "This invite has used all the invites in its package. Choose a bigger package to add more guests.",
   },
 
   importer: {
@@ -342,9 +344,9 @@ export const dashboardCopy = {
     phoneHint: "The link opens in a chat with them. Leave it empty to choose the chat yourself.",
     phoneInvalid: "That doesn't look like a phone number",
     seats: (used: number, limit: number) => `${used} of ${limit} co-host${limit === 1 ? "" : "s"}`,
-    fullTitle: (limit: number) => `This edition includes ${limit} co-host${limit === 1 ? "" : "s"}`,
+    fullTitle: (limit: number) => `This package includes ${limit} co-host${limit === 1 ? "" : "s"}`,
     fullBody: "Upgrade the invite for more, or withdraw a link you no longer need.",
-    upgrade: "See editions",
+    upgrade: "See packages",
     create: "Make link",
     creating: "Making link…",
     createFailed: "Couldn't make a link. Try again.",
@@ -413,7 +415,7 @@ export const joinCopy = {
   signInNote: "Use your mobile number or Google. It takes a moment.",
   accepting: "Joining…",
   failed: "Couldn't accept just now. Try again.",
-  full: "This invite already has all the co-hosts its edition includes. Ask the family to upgrade it or remove someone, then open this link again.",
+  full: "This invite already has all the co-hosts its package includes. Ask the family to upgrade it or remove someone, then open this link again.",
   usedTitle: "This link has already been used",
   usedBody:
     "Co-host links work once. If you've already joined, the invite is in My invites. Otherwise ask the family for a new link.",

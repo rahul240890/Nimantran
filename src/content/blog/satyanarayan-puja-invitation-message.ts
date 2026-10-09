@@ -149,7 +149,7 @@ export const satyanarayanPujaInvitationMessage: BlogPost = {
         "Guests tap RSVP and say how many adults and children are coming, so you know how much prasad and food to prepare.",
         "The venue has a map pin, and you can add a parking note for your building.",
         "Cards can be in English, Hindi, Marathi, Gujarati and other Indian languages, or two languages side by side.",
-        "If the puja and a housewarming lunch are separate events, Premium from ₹499 covers up to three. See [pricing](/pricing).",
+        "If the puja and a housewarming lunch are separate events, put both on one invitation: every package, free included, covers every function. See [pricing](/pricing).",
       ],
     },
     "For Hindi wording, read [सत्यनारायण कथा निमंत्रण](/hi/blog/satyanarayan-katha-nimantran).",
