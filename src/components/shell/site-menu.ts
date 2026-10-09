@@ -12,7 +12,9 @@ import {
 } from "@/lib/gallery/catalog";
 import { NO_FILTERS, designCatalog, filterCatalog, filtersToParams } from "@/lib/gallery/filters";
 import type { DesignFilters } from "@/lib/gallery/filters";
+import { normalize } from "@/lib/gallery/search";
 import { pagePath } from "@/lib/seo/paths";
+import { searchWords } from "@/components/gallery/design-words";
 
 /*
  * The header's menus, worked out on the server so the header ships only these words and
@@ -53,24 +55,55 @@ const POPULAR: readonly Partial<DesignFilters>[] = [
   { occasion: "birthday" },
 ];
 
+/** Looks a host may want, each a search of every design's words (in every site language). */
+const LOOKS = [
+  "garden",
+  "palace",
+  "temple",
+  "lotus",
+  "peacock",
+  "sea",
+  "night",
+  "balloon",
+  "modern",
+] as const;
+export type Look = (typeof LOOKS)[number];
+
+/** Weddings by where the family is from, then by community and faith. */
+const REGIONS = ["north-indian", "rajasthani", "gujarati", "marathi", "bengali", "tamil"] as const;
+const COMMUNITIES = ["punjabi", "muslim", "modern"] as const;
+
 export function siteMenu(locale: UiLocale): SiteMenu {
   const { menuCopy } = landingText[locale];
   const { shelfCopy, weddingKindCopy, catalogCopy, sectionNames } = galleryText[locale];
   const designs = pagePath({ kind: "designs" }, locale);
   const entries = designCatalog();
+  const words = searchWords();
+  const text = new Map(
+    entries.map((entry) => [entry.design.id, normalize(words.design(entry.design).join(" "))]),
+  );
+  const count = (filters: DesignFilters) =>
+    filterCatalog(entries, filters, (design) => text.get(design.id) ?? "").length;
   const view = (change: Partial<DesignFilters>, label: string): MenuLink => {
     const filters = { ...NO_FILTERS, ...change };
     return {
       label,
       href: `${designs}${filtersToParams(filters)}`,
-      note: catalogCopy.count(filterCatalog(entries, filters, () => "").length),
+      note: catalogCopy.count(count(filters)),
     };
   };
+  const kindLink = (kind: (typeof WEDDING_KINDS)[number]): MenuLink => ({
+    label: weddingKindCopy[kind].name,
+    href: pagePath({ kind: "wedding-kind", id: kind }, locale),
+    native: WEDDING_KIND_ENTRIES[kind].nativeName,
+    note: catalogCopy.count(count({ ...NO_FILTERS, kind })),
+  });
   const occasionName = (id: CategoryId) =>
     OCCASIONS.find((occasion) => occasion.category === id)!.names[locale];
   const occasionLink = (id: CategoryId): MenuLink => ({
     label: occasionName(id),
     href: pagePath({ kind: "occasion", id }, locale),
+    note: catalogCopy.count(count({ ...NO_FILTERS, occasion: id })),
   });
 
   return {
@@ -99,6 +132,10 @@ export function siteMenu(locale: UiLocale): SiteMenu {
             ),
           ),
         },
+        {
+          title: menuCopy.looks,
+          links: LOOKS.map((look) => view({ query: look }, menuCopy.lookNames[look])),
+        },
       ],
       all: { label: menuCopy.allDesigns(entries.length), href: designs },
       feature: {
@@ -109,14 +146,8 @@ export function siteMenu(locale: UiLocale): SiteMenu {
     },
     weddings: {
       groups: [
-        {
-          title: menuCopy.traditions,
-          links: WEDDING_KINDS.map((kind) => ({
-            label: weddingKindCopy[kind].name,
-            href: pagePath({ kind: "wedding-kind", id: kind }, locale),
-            native: WEDDING_KIND_ENTRIES[kind].nativeName,
-          })),
-        },
+        { title: menuCopy.regions, links: REGIONS.map(kindLink) },
+        { title: menuCopy.communities, links: COMMUNITIES.map(kindLink) },
         {
           title: menuCopy.functions,
           links: OCCASIONS.filter(
