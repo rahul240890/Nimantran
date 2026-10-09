@@ -14,15 +14,10 @@ import { toCardCopy, type CardCopy } from "@/lib/templates/content";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
-import {
-  SLOT_IDS,
-  SLOT_RULES,
-  type RagaId,
-  type SlotId,
-  type TemplateId,
-} from "@/lib/templates/ids";
+import { SLOT_IDS, SLOT_RULES, type SlotId, type TemplateId } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
-import { suiteHome, suiteSuits, type SuiteId } from "@/lib/suites/catalog";
+import { suiteFor, suiteHome, suiteSuits, type SuiteId } from "@/lib/suites/catalog";
+import { themeMusic } from "@/lib/suites/music";
 import type { InviteFormat } from "./formats";
 import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
@@ -265,16 +260,35 @@ export function needsTime(draft: InviteDraft): boolean {
   return draftCategory(draft).schedule === "full";
 }
 
-/** The design with the host's music choice applied. */
-export function draftTemplate(draft: InviteDraft): Template {
-  return templateWithRaga(draft.templateId, draft.music.raga);
+/** The music the invite's design plays before the host picks any: its theme's, else its card's. */
+export function designMusic(draft: InviteDraft): Template["music"] {
+  const theme = suiteFor({
+    suite: draft.suite,
+    tradition: draft.tradition.id,
+    templateId: draft.templateId,
+    category: draft.categoryId,
+  });
+  return themeMusic(theme) ?? TEMPLATES[draft.templateId].music;
 }
 
-export function templateWithRaga(templateId: TemplateId, raga: RagaId | null): Template {
-  const template = TEMPLATES[templateId];
-  if (!raga || raga === template.music.raga) return template;
-  // Another raga keeps its own tempo, not this design's
-  return { ...template, music: { raga } };
+/** Designs with their music, kept so the same choice gives the same object to memos. */
+const withMusic = new Map<string, Template>();
+
+/** The design with the host's music choice applied. */
+export function draftTemplate(draft: InviteDraft): Template {
+  const template = TEMPLATES[draft.templateId];
+  const own = designMusic(draft);
+  const { raga } = draft.music;
+  // Another raga is played its own way, not with this design's instrument or tempo
+  const music = !raga || raga === own.raga ? own : { raga };
+  if (music === template.music) return template;
+  const id = `${template.id}:${JSON.stringify(music)}`;
+  let found = withMusic.get(id);
+  if (!found) {
+    found = { ...template, music };
+    withMusic.set(id, found);
+  }
+  return found;
 }
 
 /** The pack this invite follows, if its occasion takes one. */

@@ -31,10 +31,16 @@ import {
   framedDesign,
 } from "@/lib/publish/frames";
 import { FramePreview, PhotoAdjust } from "../photo-adjust";
-import { ASKABLE_QUESTIONS, draftPeople, draftQuestions, MAX_PHOTOS } from "@/lib/editor/draft";
+import {
+  ASKABLE_QUESTIONS,
+  designMusic,
+  draftPeople,
+  draftQuestions,
+  MAX_PHOTOS,
+} from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import type { MusicPlayer } from "@/lib/engine/music-player";
-import { TEMPLATES } from "@/lib/templates/catalog";
+import { arrangement } from "@/lib/engine/music";
 import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
@@ -501,16 +507,19 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const setAside = useRef<MusicClip | null>(null);
   const setClip = (next: MusicClip | null) =>
     update((current) => ({ ...current, music: { ...current.music, clip: next } }));
-  const own = TEMPLATES[draft.templateId].music.raga;
+  const design = designMusic(draft);
+  const own = design.raga;
   const value = draft.music.raga ?? own;
-  const tempo = TEMPLATES[draft.templateId].music.tempo;
+  // The design's own raga is heard as the design plays it; any other, its own way
+  const heard = value === own ? design : { raga: value };
+  const heardKey = JSON.stringify(heard);
 
   // Hosts hear a raga before they choose it; the player loads only on the first tap
   const player = useRef<MusicPlayer | null>(null);
   const [listening, setListening] = useState(false);
   useEffect(() => {
-    player.current?.setTrack({ raga: value, tempo });
-  }, [value, tempo]);
+    player.current?.setTrack(JSON.parse(heardKey) as typeof heard);
+  }, [heardKey]);
   useEffect(() => () => player.current?.dispose(), []);
   const listen = async () => {
     if (listening) {
@@ -521,7 +530,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
     try {
       if (!player.current) {
         const { MusicPlayer } = await import("@/lib/engine/music-player");
-        player.current = new MusicPlayer({ raga: value, tempo });
+        player.current = new MusicPlayer(heard);
       }
       await player.current.play();
       setListening(true);
@@ -613,7 +622,10 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
                     {raga === own && <Badge tone="gold">{extrasCopy.designsOwn}</Badge>}
                   </span>
                 }
-                description={extrasCopy.ragaMoods[raga]}
+                description={extrasCopy.ragaSound(
+                  arrangement(raga === own ? design : { raga }),
+                  extrasCopy.ragaMoods[raga],
+                )}
               />
             ))}
           </RadioGroup>

@@ -5,7 +5,8 @@ describe("raga score", () => {
   it("writes out the drone and melody for exactly the video's length", () => {
     const score = ragaScore({ raga: "yaman" }, 40);
     expect(score.some((strike) => strike.voice === "tanpura")).toBe(true);
-    expect(score.some((strike) => strike.voice === "santoor")).toBe(true);
+    // Yaman is played on the bansuri
+    expect(score.some((strike) => strike.voice === "bansuri")).toBe(true);
     expect(Math.max(...score.map((strike) => strike.at))).toBeLessThan(40);
     expect(Math.min(...score.map((strike) => strike.at))).toBeGreaterThanOrEqual(0);
   });
