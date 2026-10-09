@@ -6,7 +6,7 @@ import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { designCatalog } from "@/lib/gallery/filters";
-import { SHELVES, shelfEntries, shelfHref } from "@/lib/gallery/shelves";
+import { SHELVES, shelfEntries, shelfHref, type Shelf } from "@/lib/gallery/shelves";
 
 /**
  * The Designs page's rows on the home page, with the same names and View all links:
@@ -25,11 +25,19 @@ export function HomeShelves({
   const locale = useLocale();
   const { shelfCopy, occasionTaglines } = useText(galleryText);
   const entries = useMemo(() => designCatalog(), []);
-  const rows =
+  const rows: { shelf: Shelf; title: string; intro: string }[] =
     group === "wedding"
-      ? SHELVES.flatMap((shelf) =>
-          shelf.kind === "photos" ? [{ shelf, ...shelfCopy.photos[shelf.value] }] : [],
-        )
+      ? [
+          // The moving scenes lead the wedding rows
+          ...SHELVES.flatMap((shelf) =>
+            shelf.kind === "format" && shelf.value === "moving"
+              ? [{ shelf, ...shelfCopy.format.moving }]
+              : [],
+          ),
+          ...SHELVES.flatMap((shelf) =>
+            shelf.kind === "photos" ? [{ shelf, ...shelfCopy.photos[shelf.value] }] : [],
+          ),
+        ]
       : SHELVES.flatMap((shelf) =>
           shelf.kind === "occasion"
             ? [

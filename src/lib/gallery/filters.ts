@@ -1,5 +1,6 @@
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { suiteSuits } from "@/lib/suites/catalog";
+import { isMoving } from "@/lib/suites/moving";
 import {
   WEDDING_KINDS,
   WEDDING_KIND_ENTRIES,
@@ -18,7 +19,8 @@ import { normalize } from "./search";
  * whole gallery at once ("Gujarati wedding, Scene") instead of walking occasion by occasion.
  */
 
-export const DESIGN_FORMATS = ["scene", "story", "card"] as const;
+/** "moving" is a Scene painted in layers that move like a short film (moving.ts). */
+export const DESIGN_FORMATS = ["moving", "scene", "story", "card"] as const;
 export type DesignFormat = (typeof DESIGN_FORMATS)[number];
 
 /**
@@ -69,6 +71,7 @@ export function hasFilters(filters: DesignFilters): boolean {
 }
 
 export function formatOf(design: GalleryDesign): DesignFormat {
+  if (isMoving(design.suite)) return "moving";
   return design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
 }
 

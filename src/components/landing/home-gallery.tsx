@@ -1,4 +1,11 @@
-import { ArrowRight, Image as ImageIcon, Layers, LayoutGrid, Rotate3d } from "lucide-react";
+import {
+  ArrowRight,
+  Clapperboard,
+  Image as ImageIcon,
+  Layers,
+  LayoutGrid,
+  Rotate3d,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -179,7 +186,12 @@ function covers(locale: UiLocale) {
   );
 }
 
-const KIND_ICONS = { story: Layers, scene: ImageIcon, card: Rotate3d } as const;
+const KIND_ICONS = {
+  moving: Clapperboard,
+  story: Layers,
+  scene: ImageIcon,
+  card: Rotate3d,
+} as const;
 
 /**
  * The three kinds of invitation as wide banners, each a picture of one and its View all:

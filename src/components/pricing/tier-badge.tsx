@@ -1,6 +1,6 @@
 "use client";
 
-import { Crown, Gift, Sparkles } from "lucide-react";
+import { Clapperboard, Crown, Gift, Sparkles } from "lucide-react";
 import { useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
@@ -8,7 +8,12 @@ import { formatRupees } from "@/lib/plans/catalog";
 import type { DesignTier } from "@/lib/plans/design-tiers";
 import { useDesignTier } from "./pricing-provider";
 
-const ICONS: Record<DesignTier, typeof Gift> = { free: Gift, premium: Sparkles, royal: Crown };
+const ICONS: Record<DesignTier, typeof Gift> = {
+  free: Gift,
+  premium: Sparkles,
+  royal: Crown,
+  signature: Clapperboard,
+};
 
 const TONES = {
   /** On a painting: dark glass for Free, gold for the paid tiers. */
@@ -16,12 +21,15 @@ const TONES = {
     free: "bg-night/70 text-card-ivory ring-1 ring-card-ivory/30 backdrop-blur-sm",
     premium: "bg-marigold text-on-marigold",
     royal: "bg-marigold text-on-marigold",
+    // The moving scenes: ink with a gold ring, so they stand apart from the gold tiers
+    signature: "bg-night text-marigold ring-1 ring-marigold/70",
   },
   /** On the page's own paper, as in the editor's lists. */
   plain: {
     free: "border border-success/35 bg-success/10 text-success",
     premium: "border border-marigold/50 bg-marigold/15 text-accent-text",
     royal: "border border-marigold/50 bg-marigold/15 text-accent-text",
+    signature: "border border-marigold bg-marigold/25 text-accent-text",
   },
 } satisfies Record<string, Record<DesignTier, string>>;
 

@@ -8,6 +8,7 @@ import {
   suiteFor,
   type SuiteId,
 } from "@/lib/suites/catalog";
+import { isMoving } from "@/lib/suites/moving";
 import { hasScene, isIllustrated } from "@/lib/suites/scene";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
@@ -55,12 +56,15 @@ const FREE_SCENES: ReadonlySet<string> = new Set([
 
 /**
  * A design's tier before the admin changes it: 3D cards and illustrated cards are free, the grandest wedding
- * Stories (the ones that open with a painted god) are Royal, and the rest are Premium.
+ * Stories (the ones that open with a painted god) are Royal, the moving scenes Signature,
+ * and the rest are Premium.
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
   if (designId.endsWith("-scene")) {
     const suite = designId.slice(0, -"-scene".length);
+    // The moving scenes are the dearest: painted in layers that move like a short film
+    if (isMoving(suite as SuiteId)) return "signature";
     return FREE_SCENES.has(suite) || isIllustrated(suite as SuiteId) ? "free" : "premium";
   }
   const suite = designId as SuiteId;

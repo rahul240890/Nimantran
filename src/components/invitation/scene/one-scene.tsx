@@ -33,6 +33,7 @@ import { sceneLine } from "@/lib/suites/scene-type";
 import { PAINTING_ASPECT, photoBox, type FrameBox } from "@/lib/suites/photo-frames";
 import { frameAspectOf } from "@/lib/editor/photo-fit";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import { MovingLayers } from "./moving-layers";
 import {
   SCENE_HOLD_MS,
   SCENE_SWAP_MS,
@@ -228,6 +229,9 @@ export function OneScene({
     return () => window.clearTimeout(timer);
   }, [pieces]);
   const opening = pieces && !assembled;
+  // A moving scene plays its layers; its words come in once the layers have landed
+  const moving = page.moving && !reduced ? page.moving : null;
+  const after = pieces || Boolean(moving) || undefined;
 
   // A painting without room for the line opens the slot with it instead
   const typeKey = JSON.stringify(type ?? null);
@@ -353,7 +357,7 @@ export function OneScene({
         >
           {/* The photos lie under the painting and show through its frames; on a card that
               comes together from its sides, they appear once its frames are in place */}
-          <div data-after={pieces || undefined} className="absolute inset-0">
+          <div data-after={after} className="absolute inset-0">
             {page.frames.map((frame, i) => {
               const photo = photos[i];
               const style = box(photoBox(frame));
@@ -378,7 +382,9 @@ export function OneScene({
               );
             })}
           </div>
-          {opening ? (
+          {moving ? (
+            <MovingLayers scene={moving} />
+          ) : opening ? (
             <PaintingPieces image={page.image} pieces={page.pieces} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element -- the painting with its frames cut out
@@ -406,7 +412,7 @@ export function OneScene({
             id="scene-names"
             lang={lang}
             data-tone={tone}
-            data-after={pieces || undefined}
+            data-after={after}
             className="story-print story-print-haze scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
@@ -432,7 +438,7 @@ export function OneScene({
               ref={lineBox}
               lang={lang}
               data-tone={tone}
-              data-after={pieces || undefined}
+              data-after={after}
               className="story-print story-print-haze scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
@@ -451,7 +457,7 @@ export function OneScene({
             role="group"
             aria-roledescription="carousel"
             aria-label={words.label}
-            data-after={pieces || undefined}
+            data-after={after}
             className="absolute [perspective:60rem]"
             style={box(page.slot)}
           >
