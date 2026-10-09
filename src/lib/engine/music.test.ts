@@ -8,8 +8,9 @@ import {
   PHRASE_BEATS,
   RAGAS,
   SA,
+  Score,
 } from "./music";
-import { pluck } from "./music-player";
+import { pluck, voiceBuffer } from "./instruments";
 import { seededRandom } from "./particles";
 
 const inScale = (scale: number[], pitch: number) => scale.includes(((pitch % 12) + 12) % 12);
@@ -96,4 +97,81 @@ describe("pluck", () => {
       expect(Math.abs(data[data.length - 1]!)).toBeLessThan(0.001);
     },
   );
+});
+
+describe("score", () => {
+  it("plays each raga on its own instrument, in its own key", () => {
+    const leads = new Set(Object.values(RAGAS).map((raga) => raga.lead));
+    expect(leads.size).toBeGreaterThanOrEqual(5);
+    const sounds = new Set(
+      Object.values(RAGAS).map((raga) => `${raga.lead}:${raga.key}:${raga.taal}`),
+    );
+    expect(sounds.size).toBe(Object.keys(RAGAS).length);
+  });
+
+  it("brings the drum in after the first phrase and keeps it in time", () => {
+    const strikes = new Score({ raga: "kafi" }).until(30);
+    const drums = strikes.filter((s) =>
+      ["bass", "treble", "ghost", "clap", "tak"].includes(s.voice),
+    );
+    expect(drums.length).toBeGreaterThan(20);
+    const beat = 60 / RAGAS.kafi.tempo;
+    expect(Math.min(...drums.map((s) => s.at))).toBeGreaterThan(1.2 + PHRASE_BEATS * beat - 0.02);
+    expect(Math.max(...strikes.map((s) => s.at))).toBeLessThan(30);
+  });
+
+  it("leaves a quiet raga without a drum, and holds a wind's notes", () => {
+    const strikes = new Score({ raga: "yaman" }).until(20);
+    expect(strikes.some((s) => s.voice === "bass")).toBe(false);
+    const flute = strikes.filter((s) => s.voice === "bansuri");
+    expect(flute.length).toBeGreaterThan(10);
+    expect(flute.every((s) => s.length! > 0)).toBe(true);
+  });
+
+  it("lets a design swap the instrument and the drum", () => {
+    const strikes = new Score({ raga: "yaman", lead: "sitar", taal: "garba" }).until(20);
+    expect(strikes.some((s) => s.voice === "sitar")).toBe(true);
+    expect(strikes.some((s) => s.voice === "clap")).toBe(true);
+    expect(strikes.some((s) => s.voice === "bansuri")).toBe(false);
+  });
+
+  it("writes the same music asked for all at once or a little at a time", () => {
+    const whole = new Score({ raga: "pilu" }).until(20);
+    const live = new Score({ raga: "pilu" });
+    const parts = [];
+    for (let t = 0.6; t <= 20; t += 0.6) parts.push(...live.until(t));
+    parts.push(...live.until(20));
+    const order = (list: typeof whole) => list.map((s) => `${s.voice}@${s.at.toFixed(4)}`).sort();
+    expect(order(parts)).toEqual(order(whole));
+  });
+});
+
+describe("instruments", () => {
+  const context = {
+    sampleRate: 22050,
+    createBuffer: (_channels: number, length: number, sampleRate: number) => {
+      const data = new Float32Array(length);
+      return { length, sampleRate, getChannelData: () => data };
+    },
+  } as unknown as BaseAudioContext;
+
+  it.each([
+    "santoor",
+    "sitar",
+    "veena",
+    "bansuri",
+    "shehnai",
+    "bass",
+    "treble",
+    "clap",
+    "tak",
+  ] as const)("draws a clean %s", (voice) => {
+    const data = voiceBuffer(context, voice, 12, 2).getChannelData(0);
+    expect(data.every(Number.isFinite)).toBe(true);
+    let peak = 0;
+    for (const value of data) peak = Math.max(peak, Math.abs(value));
+    expect(peak).toBeGreaterThan(0.05);
+    expect(peak).toBeLessThanOrEqual(1.2);
+    expect(Math.abs(data[data.length - 1]!)).toBeLessThan(0.001);
+  });
 });

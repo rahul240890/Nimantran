@@ -33,6 +33,23 @@ describe("pages in the card's language", () => {
     expect(wedding!.date).toBe("Saturday, 12 December 2026");
   });
 
+  it("names a ceremony the tradition has no word for in the card's language", () => {
+    const base = newDraft();
+    const draft: InviteDraft = {
+      ...base,
+      tradition: { ...base.tradition, id: "tamil" },
+      languages: ["ta"],
+      functions: {
+        ...base.functions,
+        sangeet: { ...base.functions.sangeet, included: true, date: "2026-12-11" },
+      },
+    };
+    const sangeet = cardFunctions(storyFunctions(draft, "en"), draft, "ta").find(
+      (fn) => fn.kind === "sangeet",
+    );
+    expect(sangeet?.name).toBe("சங்கீத்");
+  });
+
   it("has the pages' own words in every card language", () => {
     expect(CARD_STORY_WORDS.gu.saveTheDate).toBe("તારીખ યાદ રાખજો");
     for (const words of Object.values(CARD_STORY_WORDS)) {

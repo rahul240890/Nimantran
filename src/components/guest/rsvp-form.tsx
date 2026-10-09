@@ -27,10 +27,10 @@ import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import type { GuestReply, ReplyStatus } from "@/lib/invites/rsvp";
 import { cn } from "@/lib/cn";
-import { useLocale, useText } from "@/i18n/client";
-import { dateLocale } from "@/i18n/dates";
-import { categoriesText } from "@/i18n/copy/categories";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestLanguage, useGuestText } from "@/components/guest/guest-language";
+import { formatCardDayMonth, type CardLanguage } from "@/lib/templates/card-languages";
+import type { DayPickerLocale } from "react-day-picker";
+import { bn, enIN, gu, hi, ta } from "react-day-picker/locale";
 
 export type RsvpFunction = {
   /** The function's id for replies. */
@@ -43,6 +43,9 @@ export type RsvpFunction = {
 type Choice = { status: ReplyStatus | null; adults: number; children: number };
 
 const MAX_PEOPLE = 20;
+
+/** The arrival calendar in the guest's language; date-fns has no Marathi, so Devanagari Hindi stands in. */
+const PICKER_LOCALES: Record<CardLanguage, DayPickerLocale> = { en: enIN, hi, mr: hi, gu, bn, ta };
 
 const statusIcons = {
   attending: <CircleCheck />,
@@ -61,7 +64,7 @@ function Counter({
   min: number;
   onChange: (value: number) => void;
 }) {
-  const { rsvpCopy } = useText(publishText);
+  const { rsvpCopy } = useGuestText();
   const id = useId();
   return (
     <div role="group" aria-labelledby={id} className="flex items-center justify-between gap-3">
@@ -105,8 +108,8 @@ export function RsvpForm({
   functions: RsvpFunction[];
   questions: RsvpQuestionId[];
 }) {
-  const locale = useLocale();
-  const { rsvpCopy } = useText(publishText);
+  const language = useGuestLanguage();
+  const { rsvpCopy } = useGuestText();
   const [token, setToken] = useState<string | null>(null);
   const [invitedTo, setInvitedTo] = useState<string[]>([]);
   const [name, setName] = useState("");
@@ -312,7 +315,7 @@ export function RsvpForm({
         <Button
           variant="secondary"
           leadingIcon={<CircleCheck aria-hidden />}
-          className="self-start"
+          className="h-auto min-h-12 max-w-full self-start py-2 whitespace-normal"
           onClick={acceptAll}
         >
           {rsvpCopy.acceptAll}
@@ -338,7 +341,7 @@ export function RsvpForm({
                 </h3>
                 {fn.date && (
                   <span className="text-sm text-ink-muted">
-                    {format(parseISO(fn.date), "EEE, d MMM", { locale: dateLocale[locale] })}
+                    {formatCardDayMonth(fn.date, language)}
                   </span>
                 )}
               </div>
@@ -449,8 +452,8 @@ function Question({
   value: string;
   onChange: (value: string) => void;
 }) {
-  const { questionLabels } = useText(categoriesText);
-  const { rsvpCopy } = useText(publishText);
+  const { questionLabels, rsvpCopy } = useGuestText();
+  const language = useGuestLanguage();
   const spec = RSVP_QUESTIONS[id];
   const label = questionLabels[id];
   if (spec.kind === "choice") {
@@ -485,6 +488,7 @@ function Question({
     return (
       <Field label={label} optionalLabel={rsvpCopy.optional}>
         <DatePicker
+          locale={PICKER_LOCALES[language]}
           value={value ? parseISO(value) : undefined}
           onValueChange={(date) => onChange(date ? format(date, "yyyy-MM-dd") : "")}
           placeholder={rsvpCopy.choose}

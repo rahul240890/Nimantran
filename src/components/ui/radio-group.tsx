@@ -46,7 +46,7 @@ export function RadioGroup({
           variant === "card"
             ? "grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]"
             : variant === "segment"
-              ? "flex gap-1 rounded-lg border border-line-strong bg-surface-2 p-1 aria-invalid:border-danger"
+              ? "flex flex-wrap gap-1 rounded-lg border border-line-strong bg-surface-2 p-1 aria-invalid:border-danger"
               : cn("flex", orientation === "vertical" ? "flex-col" : "flex-wrap gap-x-6"),
           className,
         )}
@@ -90,8 +90,11 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
         value={value}
         disabled={disabled}
         className={cn(
-          // On the narrowest phones the icon sits above the word, so words never break apart
-          "group/radio flex min-h-12 min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-md border border-transparent px-1 py-1.5 text-center text-sm leading-tight font-semibold text-ink-muted min-[400px]:flex-row min-[400px]:gap-1.5 min-[400px]:px-2",
+          // On the narrowest phones the icon sits above the word, and a choice never narrows past
+          // its longest word, so words never break apart
+          "group/radio flex min-h-12 min-w-min flex-1 cursor-pointer flex-col items-center justify-center gap-0.5 rounded-md border border-transparent px-1 py-1.5 text-center text-sm leading-tight font-semibold text-ink-muted min-[400px]:flex-row min-[400px]:gap-1.5 min-[400px]:px-2",
+          // Tamil words run long and don't hyphenate: on the narrowest phones they set smaller
+          "max-[399px]:[&:lang(ta)]:text-xs",
           "transition-[background-color,border-color,color,box-shadow] duration-200",
           "hover:bg-surface hover:text-ink",
           "data-[state=checked]:border-marigold data-[state=checked]:bg-[color-mix(in_srgb,var(--marigold)_16%,var(--surface))] data-[state=checked]:text-ink data-[state=checked]:shadow-raised",
