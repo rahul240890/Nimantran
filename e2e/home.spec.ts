@@ -202,22 +202,28 @@ test.describe("landing page", () => {
     await expect(question).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("a painted theme previews every page, and the Scene and Story switch filters", async ({
-    page,
-  }) => {
+  test("the design rows preview a design and lead to View all", async ({ page }) => {
     await visit(page);
-    const designs = page.locator("#templates");
-    await designs.getByRole("radio", { name: "Scene" }).click();
-    await expect(designs.locator('[data-format="story"]').first()).toBeHidden();
-    await designs.getByRole("radio", { name: "Story" }).click();
-    await expect(designs.locator('[data-format="scene"]').first()).toBeHidden();
-    await page
-      .locator('article[data-design="kayal"]')
-      .getByRole("button", { name: "Preview Kayal" })
+    const row = page.locator('[data-shelf="home-photos-none"]');
+    const first = row.locator("article").first();
+    const name = (await first.locator("h3").first().textContent())!.trim();
+    await first.getByRole("button", { name: `Preview ${name}` }).click();
+    await expect(page.getByRole("dialog", { name })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await row
+      .getByRole("link", { name: /^View all \d+ designs: Illustrated invitations$/ })
+      .first()
       .click();
-    await expect(
-      page.getByRole("dialog", { name: "Kayal" }).getByText("Page 1 of 9"),
-    ).toBeVisible();
+    await expect(page).toHaveURL(/\/designs\?photos=none$/);
+  });
+
+  test("a tradition and a kind of invitation open their designs", async ({ page }) => {
+    await visit(page);
+    await page.locator('#templates [data-kind="gujarati"]').getByRole("link").click();
+    await expect(page).toHaveURL(/\/designs\?tradition=gujarati$/);
+    await page.goBack();
+    await page.locator('[data-kind-banner="scene"]').getByRole("link").click();
+    await expect(page).toHaveURL(/\/designs\?format=scene$/);
   });
 
   test("every control is at least 44px tall", async ({ page }) => {

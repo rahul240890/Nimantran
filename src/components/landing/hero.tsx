@@ -1,6 +1,7 @@
 import { ArrowRight, Check, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
@@ -10,9 +11,11 @@ import { HeroDeck } from "./hero-deck";
 /**
  * The first screen: what Shubh Invitation is and a search for any occasion or design, so the
  * way in is above the fold on every phone. A fanned deck of the painted themes stands beside
- * it, before a painted doorway that fades into the page behind the words.
+ * it, before a painted doorway that fades into the page behind the words. The occasions
+ * (children) come straight after the search on a phone, before the deck, and run under
+ * both on a wide screen.
  */
-export function Hero({ locale }: { locale: UiLocale }) {
+export function Hero({ locale, children }: { locale: UiLocale; children?: ReactNode }) {
   const { hero, homeGallery } = landingText[locale];
   const gallery = pagePath({ kind: "gallery" }, locale);
   return (
@@ -30,8 +33,8 @@ export function Hero({ locale }: { locale: UiLocale }) {
           className="object-cover object-[78%_center] opacity-20 lg:object-right lg:opacity-60 dark:opacity-15 lg:dark:opacity-35"
         />
       </div>
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-8 pb-6 sm:px-6 sm:pt-12 lg:min-h-[calc(100svh-4rem)] lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:px-8 lg:py-10">
-        <div className="flex min-w-0 animate-rise flex-col gap-5 sm:gap-6">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 pt-8 pb-6 sm:px-6 sm:pt-12 lg:grid-cols-[1fr_1.05fr] lg:gap-x-12 lg:gap-y-10 lg:px-8 lg:pt-10 lg:pb-8">
+        <div className="order-1 flex min-w-0 animate-rise flex-col gap-5 sm:gap-6">
           <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
             {hero.eyebrow}
           </p>
@@ -103,7 +106,10 @@ export function Hero({ locale }: { locale: UiLocale }) {
             </ul>
           </div>
         </div>
-        <HeroDeck />
+        <div className="order-3 min-w-0 lg:order-2">
+          <HeroDeck />
+        </div>
+        {children && <div className="order-2 min-w-0 lg:order-3 lg:col-span-2">{children}</div>}
       </div>
     </section>
   );

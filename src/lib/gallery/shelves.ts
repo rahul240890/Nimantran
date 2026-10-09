@@ -83,11 +83,21 @@ export const traditionShelf = (value: WeddingKind): Shelf => ({
 /** How many designs a row shows before View all. */
 export const SHELF_SIZE = 10;
 
-/** A row's designs: the first few, and how many there are in all. */
+/**
+ * A row's designs: the first few, and how many there are in all. An occasion's row leads
+ * with the designs painted for it; the 3D cards every occasion shares come after them.
+ */
 export function shelfEntries(
   entries: readonly CatalogEntry[],
   shelf: Shelf,
 ): { shown: CatalogEntry[]; total: number } {
   const all = filterCatalog(entries, shelfFilters(shelf), () => "");
-  return { shown: all.slice(0, SHELF_SIZE), total: all.length };
+  const ordered =
+    shelf.kind === "occasion"
+      ? [
+          ...all.filter((entry) => entry.format !== "card"),
+          ...all.filter((entry) => entry.format === "card"),
+        ]
+      : all;
+  return { shown: ordered.slice(0, SHELF_SIZE), total: all.length };
 }

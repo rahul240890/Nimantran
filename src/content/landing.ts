@@ -105,27 +105,27 @@ export const hero = {
   },
 } as const;
 
-/** The home page's painted deck, occasions and themes (Step 12g). */
+/** The home page's painted deck, occasion strip and rows of designs. */
 export const homeGallery = {
   deckLabel: "Painted invitation themes",
   showTheme: (name: string) => `Show ${name}`,
   previousTheme: "Previous theme",
   nextTheme: "Next theme",
   coverDate: "12 December 2026",
-  occasionsEyebrow: "Start here",
   occasionsTitle: "What are you celebrating?",
-  occasionsIntro: "Pick the occasion and see only the designs made for it.",
   searchLabel: "Search occasions and designs",
   searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
   search: "Search",
-  weddingHeading: "Wedding functions",
-  moreHeading: "More celebrations",
-  soonHeading: "Coming next",
   allOccasions: "Every occasion",
-  themesEyebrow: "Designs",
-  themesTitle: "Popular designs",
-  themesIntro:
-    "A Scene is one painting where every celebration flies in by turn. A Story gives each celebration its own full-screen page.",
+  designsEyebrow: "Designs",
+  designsTitle: "Find your invitation",
+  designsIntro: "Start with your tradition, or with how many photos you want on the invite.",
+  kindsEyebrow: "Three ways to invite",
+  kindsTitle: "Pick how it opens",
+  kindsIntro: "Every design comes as one of these. Tap one to see them all.",
+  moreEyebrow: "More celebrations",
+  moreTitle: "Birthdays, anniversaries and more",
+  moreIntro: "Painted designs for the family's other big days.",
   allDesigns: "See all designs",
 };
 

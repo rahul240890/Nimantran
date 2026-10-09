@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-/* The home page's occasions: the wedding journey as paintings, each opening its designs. */
+/* The home page's occasion strip: every main occasion as a round painting, each opening its designs. */
 const tiles = (page: Page) => page.locator("#occasions ul").first().getByRole("listitem");
 
 for (const colorScheme of ["light", "dark"] as const) {
@@ -12,7 +12,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await page.goto("/");
     const section = page.locator("#occasions");
     await section.scrollIntoViewIfNeeded();
-    await expect(tiles(page)).toHaveCount(8);
+    await expect(tiles(page)).toHaveCount(14);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
@@ -24,14 +24,12 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
-test("each occasion names itself in both site languages and says what's coming next", async ({
-  page,
-}) => {
+test("the strip starts with the wedding and ends with every occasion", async ({ page }) => {
   await page.goto("/");
   await expect(tiles(page).first()).toContainText("Wedding");
-  await expect(tiles(page).filter({ hasText: "Sangeet" })).toHaveCount(1);
-  await expect(page.locator("#occasions")).toContainText("Coming next");
-  await expect(page.locator("#occasions")).toContainText("Birthday");
+  await expect(tiles(page).filter({ hasText: "Birthday" })).toHaveCount(1);
+  await tiles(page).last().getByRole("link").click();
+  await expect(page).toHaveURL(/\/invitations$/);
 });
 
 test("an occasion opens its own designs", async ({ page }) => {
