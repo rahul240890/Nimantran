@@ -6,6 +6,7 @@ import {
   filterCatalog,
   filtersFromParams,
   filtersToParams,
+  hasFilters,
 } from "./filters";
 
 const entries = designCatalog();
@@ -62,8 +63,37 @@ describe("design filters", () => {
       occasion: "haldi",
       kind: null,
       format: "story",
+      photos: "none",
     } as const;
     expect(filtersFromParams(new URLSearchParams(filtersToParams(filters)))).toEqual(filters);
     expect(filtersFromParams(new URLSearchParams("occasion=moon&format=x"))).toEqual(NO_FILTERS);
+  });
+});
+
+describe("photo filters", () => {
+  it("no photo shows designs that need none, or take photos only if wanted", () => {
+    const none = filterCatalog(entries, { ...NO_FILTERS, photos: "none" }, () => "");
+    expect(none.length).toBeGreaterThan(0);
+    expect(none.every((entry) => ["none", "optional"].includes(entry.photos))).toBe(true);
+  });
+
+  it("a design taking a couple photo or two separate is in both the one and two lists", () => {
+    const either = entries.find((entry) => entry.photos === "either")!;
+    for (const photos of ["one", "two"] as const) {
+      const ids = filterCatalog(entries, { ...NO_FILTERS, photos }, () => "").map(
+        (entry) => entry.design.id,
+      );
+      expect(ids).toContain(either.design.id);
+    }
+  });
+
+  it("round-trips through the address", () => {
+    const filters = { ...NO_FILTERS, photos: "two" } as const;
+    expect(filtersToParams(filters)).toBe("?photos=two");
+    expect(filtersFromParams(new URLSearchParams("photos=two"))).toEqual(filters);
+    expect(filtersFromParams(new URLSearchParams("photos=nine"))).toEqual(NO_FILTERS);
+    expect(hasFilters(NO_FILTERS)).toBe(false);
+    expect(hasFilters(filters)).toBe(true);
+    expect(hasFilters({ ...NO_FILTERS, query: "  " })).toBe(false);
   });
 });

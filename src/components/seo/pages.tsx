@@ -297,6 +297,7 @@ export function DesignsPage({ locale }: { locale: UiLocale }) {
         intro={seoCopy.gallery.intro}
       />
       <DesignCatalog
+        designsPath={pagePath({ kind: "designs" }, locale)}
         covers={Object.fromEntries(
           TEMPLATE_IDS.map((id) => [
             id,

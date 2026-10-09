@@ -202,4 +202,40 @@ export const catalogCopy: Translation<typeof en.catalogCopy> = {
   count: (count: number) => `${count} डिज़ाइन`,
   clear: "फ़िल्टर हटाएँ",
   empty: "इन सब से मेल खाता कोई डिज़ाइन अभी नहीं है। कम फ़िल्टर आज़माइए।",
+  photosLabel: "आपके पास फ़ोटो",
+  allPhotos: "कोई भी",
+  photoGroups: { none: "फ़ोटो नहीं", one: "एक फ़ोटो", two: "दो फ़ोटो" },
+  allDesigns: "सभी डिज़ाइन",
+};
+
+export const shelfCopy: Translation<typeof en.shelfCopy> = {
+  groups: {
+    photos: "आपके पास जितनी फ़ोटो हैं",
+    format: "निमंत्रण के प्रकार से",
+    tradition: "परंपरा के हिसाब से शादी",
+    occasion: "और भी मौक़े",
+  },
+  photos: {
+    none: { title: "फ़ोटो की ज़रूरत नहीं", intro: "चित्रित कार्ड, जो बस आपके नामों से तैयार हैं।" },
+    one: {
+      title: "एक फ़ोटो के साथ",
+      intro: "जोड़े की एक फ़ोटो, या जिसका जश्न है उसकी।",
+    },
+    two: { title: "दो फ़ोटो के साथ", intro: "आप दोनों की एक-एक फ़ोटो, साथ-साथ।" },
+  },
+  format: {
+    story: { title: "स्टोरी", intro: "हर रस्म का अपना पूरा चित्रित पन्ना।" },
+    scene: {
+      title: "सीन",
+      intro: "एक ही चित्र पर सब कुछ, हर रस्म बारी-बारी से आती है।",
+    },
+    card: { title: "3D कार्ड", intro: "मेहमान के हाथ में 3D में खुलने वाला कार्ड।" },
+  },
+  tradition: (name: string) => `${name} शादी`,
+  traditionsHeading: "अपनी परंपरा चुनिए",
+  occasionsHeading: "या कोई और जश्न",
+  viewAll: "सभी देखें",
+  viewAllLabel: (title: string, count: number) => `सभी ${count} डिज़ाइन देखें: ${title}`,
+  back: "पीछे",
+  next: "आगे",
 };

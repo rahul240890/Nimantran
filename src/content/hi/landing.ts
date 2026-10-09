@@ -21,6 +21,29 @@ export const nav: Translation<typeof en.nav> = [
   { id: "pricing", label: "क़ीमत" },
 ];
 
+export const menuCopy: Translation<typeof en.menuCopy> = {
+  photos: "आपके पास जितनी फ़ोटो हैं",
+  kinds: "निमंत्रण के प्रकार से",
+  popular: "लोकप्रिय",
+  traditions: "परंपरा के हिसाब से",
+  functions: "शादी की रस्में",
+  allDesigns: (count: number) => `सभी ${count} डिज़ाइन देखें`,
+  allWeddings: "शादी के सभी डिज़ाइन",
+  allOccasions: "सभी अवसर",
+  designsFeature: {
+    title: "जो आपके पास है, उसके हिसाब से",
+    text: "फ़ोटो नहीं, एक फ़ोटो या दो: हर डिज़ाइन बताता है उसे क्या चाहिए, और उसकी क़ीमत।",
+  },
+  weddingsFeature: {
+    title: "शादी के निमंत्रण",
+    text: "हर रस्म एक चित्रित निमंत्रण पर, आपकी परंपरा में लिखी, जवाब के साथ।",
+  },
+  occasionsFeature: {
+    title: "हर जश्न",
+    text: "जन्मदिन, गृह प्रवेश, गोद भराई, पूजा और भी बहुत कुछ, हर एक के अपने डिज़ाइन।",
+  },
+};
+
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "मुख्य सामग्री पर जाएँ",
   primaryNav: "मुख्य",

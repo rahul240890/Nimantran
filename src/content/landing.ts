@@ -19,6 +19,30 @@ export const nav = [
   { id: "pricing", label: "Pricing" },
 ] as const;
 
+/** The header's menus for Designs, Weddings and Occasions (src/components/shell/site-menu.ts). */
+export const menuCopy = {
+  photos: "By the photos you have",
+  kinds: "By kind of invitation",
+  popular: "Popular",
+  traditions: "By tradition",
+  functions: "Wedding functions",
+  allDesigns: (count: number) => `See all ${count} designs`,
+  allWeddings: "All wedding designs",
+  allOccasions: "All occasions",
+  designsFeature: {
+    title: "Browse by what you have",
+    text: "No photo, one photo or two: every design says what it needs, and its price.",
+  },
+  weddingsFeature: {
+    title: "Wedding invitations",
+    text: "Every function on one painted invite, written in your tradition, with RSVP.",
+  },
+  occasionsFeature: {
+    title: "Every celebration",
+    text: "Birthdays, griha pravesh, baby showers, pujas and more, each with its own designs.",
+  },
+};
+
 export const shell = {
   skipToContent: "Skip to main content",
   primaryNav: "Main",

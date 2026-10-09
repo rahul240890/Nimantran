@@ -9,6 +9,7 @@ import {
   type GalleryDesign,
   type WeddingKind,
 } from "./catalog";
+import { designPhotos, type PhotoNeed } from "./photos";
 import { normalize } from "./search";
 
 /*
@@ -20,9 +21,24 @@ import { normalize } from "./search";
 export const DESIGN_FORMATS = ["scene", "story", "card"] as const;
 export type DesignFormat = (typeof DESIGN_FORMATS)[number];
 
+/**
+ * The photos a host has to hand, as the Designs page groups them: none, one photo (of the
+ * couple, or of the one being celebrated) or two (one each). A design that takes either a
+ * couple photo or two separate ones is in both of the last two.
+ */
+export const PHOTO_GROUPS = ["none", "one", "two"] as const;
+export type PhotoGroup = (typeof PHOTO_GROUPS)[number];
+
+const PHOTO_GROUP_NEEDS: Record<PhotoGroup, readonly PhotoNeed[]> = {
+  none: ["none", "optional"],
+  one: ["one", "couple", "either"],
+  two: ["two", "either"],
+};
+
 export type CatalogEntry = {
   design: GalleryDesign;
   format: DesignFormat;
+  photos: PhotoNeed;
   occasions: readonly CategoryId[];
   kinds: readonly WeddingKind[];
 };
@@ -33,9 +49,24 @@ export type DesignFilters = {
   /** A kind of wedding; choosing one means a wedding. */
   kind: WeddingKind | null;
   format: DesignFormat | null;
+  photos: PhotoGroup | null;
 };
 
-export const NO_FILTERS: DesignFilters = { query: "", occasion: null, kind: null, format: null };
+export const NO_FILTERS: DesignFilters = {
+  query: "",
+  occasion: null,
+  kind: null,
+  format: null,
+  photos: null,
+};
+
+/** Whether any filter is chosen: if not, the Designs page shows its rows instead of a grid. */
+export function hasFilters(filters: DesignFilters): boolean {
+  return (
+    filters.query.trim() !== "" ||
+    !!(filters.occasion || filters.kind || filters.format || filters.photos)
+  );
+}
 
 export function formatOf(design: GalleryDesign): DesignFormat {
   return design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
@@ -63,6 +94,7 @@ export function designCatalog(): CatalogEntry[] {
   return allDesigns().map((design) => ({
     design,
     format: formatOf(design),
+    photos: designPhotos(design),
     occasions: occasionsOf(design),
     kinds: kindsOf(design),
   }));
@@ -84,6 +116,7 @@ export function filterCatalog(
       (!filters.format || entry.format === filters.format) &&
       (!occasion || entry.occasions.includes(occasion)) &&
       (!filters.kind || entry.kinds.includes(filters.kind)) &&
+      (!filters.photos || PHOTO_GROUP_NEEDS[filters.photos].includes(entry.photos)) &&
       (terms.length === 0 || terms.every((term) => words(entry.design).includes(term))),
   );
 }
@@ -105,11 +138,12 @@ export function catalogHref(entry: CatalogEntry, filters: DesignFilters): string
   return designHref(entry.design, { category, kind });
 }
 
-/** The filters in an address (?occasion=haldi&format=scene&q=red), ignoring unknown values. */
+/** The filters in an address (?occasion=haldi&format=scene&photos=none&q=red), ignoring unknown values. */
 export function filtersFromParams(params: URLSearchParams): DesignFilters {
   const occasion = params.get("occasion");
   const kind = params.get("tradition");
   const format = params.get("format");
+  const photos = params.get("photos");
   return {
     query: params.get("q") ?? "",
     occasion: (CATEGORY_IDS as readonly string[]).includes(occasion ?? "")
@@ -118,6 +152,9 @@ export function filtersFromParams(params: URLSearchParams): DesignFilters {
     kind: (WEDDING_KINDS as readonly string[]).includes(kind ?? "") ? (kind as WeddingKind) : null,
     format: (DESIGN_FORMATS as readonly string[]).includes(format ?? "")
       ? (format as DesignFormat)
+      : null,
+    photos: (PHOTO_GROUPS as readonly string[]).includes(photos ?? "")
+      ? (photos as PhotoGroup)
       : null,
   };
 }
@@ -128,6 +165,7 @@ export function filtersToParams(filters: DesignFilters): string {
   if (filters.occasion) params.set("occasion", filters.occasion);
   if (filters.kind) params.set("tradition", filters.kind);
   if (filters.format) params.set("format", filters.format);
+  if (filters.photos) params.set("photos", filters.photos);
   const text = params.toString();
   return text ? `?${text}` : "";
 }
