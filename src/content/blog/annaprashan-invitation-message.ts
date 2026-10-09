@@ -158,7 +158,7 @@ export const annaprashanInvitationMessage: BlogPost = {
         "Guests can add their photos to a shared photo wall after the day.",
       ],
     },
-    "Making and sharing an invitation with one function is free. See [annaprashan invitation designs](/invitations/annaprashan) and [pricing](/pricing).",
+    "Making and sharing an invitation with a free design is free. See [annaprashan invitation designs](/invitations/annaprashan) and [pricing](/pricing).",
     "Celebrating more of the first year? Read [baby shower invitation messages](/blog/baby-shower-invitation-message) and [1st birthday invitation messages](/blog/first-birthday-invitation-message).",
   ],
   faq: [

@@ -67,6 +67,11 @@ export async function GuestDashboard({
                   {limitCopy.edition(planCopy[view.plan].name)}
                 </Badge>
               )}
+              {view.plan && view.inviteLimit !== null && (
+                <Badge tone={view.guests.length >= view.inviteLimit ? "warning" : "neutral"}>
+                  {limitCopy.invitesUsed(view.guests.length, view.inviteLimit)}
+                </Badge>
+              )}
             </p>
             <h1 className="font-display text-[2rem] leading-[1.08] break-words sm:text-[2.6rem]">
               {view.names}
@@ -84,7 +89,7 @@ export async function GuestDashboard({
                 </Link>
               </Button>
             )}
-            {view.plan && view.plan !== "bundle" && view.role === "owner" && (
+            {view.plan && view.plan !== "grand" && view.role === "owner" && (
               <Button asChild size="sm" variant="secondary">
                 <Link href={`/invites/${view.id}/edition`}>
                   <Sparkles aria-hidden />

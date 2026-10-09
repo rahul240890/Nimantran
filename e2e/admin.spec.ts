@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { axe, noOverflow, numberFor, publish, signIn, writeInvite } from "./invite-helpers";
 
-/* The master admin and editions (Steps 15 to 17), in preview mode. */
+/* The master admin and packages (Steps 15 to 17), in preview mode. */
 
 // Preview mode's admin number (src/lib/auth/mode.ts)
 const ADMIN = "9999900000";
@@ -98,10 +98,10 @@ test.describe("designs and prices", () => {
   });
 });
 
-test.describe("editions", () => {
+test.describe("packages", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("a host pays for the edition their invite needs, then publishes", async ({
+  test("a host sees the packages before publishing, pays, then publishes", async ({
     page,
     context,
   }, info) => {
@@ -110,39 +110,37 @@ test.describe("editions", () => {
     await context.addCookies([
       { name: "shubh-preview-checkout", value: "on", url: info.project.use.baseURL! },
     ]);
-    // Two functions: more than Free's one
     await writeInvite(page, numberFor(info), ["Aarav", "Meera"]);
-    await page.getByRole("button", { name: "Publish" }).click();
-    const dialog = page.getByRole("dialog", { name: "Choose your link" });
-    await dialog
-      .getByRole("textbox", { name: /Invitation link/ })
-      .fill(`aarav-edition-${Date.now()}`);
-    await expect(dialog.getByText("This link is free.")).toBeVisible();
-    await dialog.getByRole("button", { name: "Publish invitation" }).click();
-    await expect(dialog.getByText("This invite needs a bigger edition")).toBeVisible();
-    await expect(dialog.getByText("2 functions")).toBeVisible();
-    await dialog.getByRole("link", { name: "Choose edition" }).click();
-
-    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/edition\?plan=premium$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Choose your edition");
-    const premium = page.getByRole("article", { name: "Premium" });
-    await expect(premium.getByText("Fits your invite")).toBeVisible();
+    // A Free invite goes to the packages first
+    await expect(async () => {
+      await page.getByRole("button", { name: "Publish" }).click();
+      await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/edition\?publish=1$/, {
+        timeout: 5_000,
+      });
+    }).toPass({ timeout: 30_000 });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Choose your package");
+    const basic = page.getByRole("article", { name: "Basic" });
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
-    await premium.getByRole("button", { name: "Pay ₹499" }).click();
+    await basic.getByRole("button", { name: "Pay ₹499" }).click();
     const pay = page.getByRole("dialog", { name: "Test payment" });
     await pay.getByRole("button", { name: "Pay (test)" }).click();
-    await expect(page.getByText("Premium is on. Thank you!").first()).toBeVisible();
-    await expect(premium.getByText("Your edition")).toBeVisible();
+    await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    await expect(basic.getByText("Your package")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Receipts" })).toBeVisible();
     await expect(
-      page.getByRole("article", { name: "Royal" }).getByRole("button", {
-        name: "Upgrade for ₹1,500",
+      page.getByRole("article", { name: "Celebration" }).getByRole("button", {
+        name: "Upgrade for ₹500",
       }),
     ).toBeVisible();
 
+    // Back to the editor with the link dialog open
     const id = new URL(page.url()).pathname.split("/")[2];
-    await page.goto(`/create?invite=${id}&quality=2d`);
+    await expect(page.getByRole("link", { name: "Publish your invite" })).toHaveAttribute(
+      "href",
+      `/create?invite=${id}&publish=1`,
+    );
+    await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
     const path = await publish(page, "aarav-paid");
     await page.goto(`${path}?quality=2d`);
     await expect(page.locator("[data-watermark]")).toHaveCount(0);
@@ -219,9 +217,9 @@ test.describe("coupons, invoices and refunds", () => {
     await context.addCookies([{ name: "shubh-preview-checkout", value: "on", url: baseURL }]);
     await writeInvite(page, numberFor(info), ["Rohan", "Tara"]);
     const notice = page.locator("[data-edition-notice]");
-    await expect(notice.getByText("This invite needs a bigger edition")).toBeVisible();
-    await notice.getByRole("link", { name: "Get Premium" }).click();
-    await expect(page).toHaveURL(/\/edition\?plan=premium$/);
+    await expect(notice.getByText("This invite needs a package")).toBeVisible();
+    await notice.getByRole("link", { name: "Get Basic" }).click();
+    await expect(page).toHaveURL(/\/edition\?plan=basic$/);
 
     await page.getByRole("textbox", { name: "Coupon code" }).fill("NOPE123");
     await page.getByRole("button", { name: "Apply" }).click();
@@ -232,13 +230,13 @@ test.describe("coupons, invoices and refunds", () => {
     await page.getByRole("textbox", { name: "Coupon code" }).fill(code);
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page.getByText(`Coupon ${code} applied`).first()).toBeVisible();
-    const premium = page.getByRole("article", { name: "Premium" });
-    await premium.getByRole("button", { name: "Pay ₹399" }).click();
+    const basic = page.getByRole("article", { name: "Basic" });
+    await basic.getByRole("button", { name: "Pay ₹399" }).click();
     await page
       .getByRole("dialog", { name: "Test payment" })
       .getByRole("button", { name: "Pay (test)" })
       .click();
-    await expect(page.getByText("Premium is on. Thank you!").first()).toBeVisible();
+    await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
 
     await page.getByRole("link", { name: "Invoice" }).first().click();
     await expect(page.getByRole("heading", { name: "Tax invoice" })).toBeVisible();

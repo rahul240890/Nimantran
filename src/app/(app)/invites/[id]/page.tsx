@@ -7,7 +7,8 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { hostStore } from "@/lib/invites/hosts";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { cohostLimit } from "@/lib/plans/catalog";
+import { cohostLimit, inviteLimit } from "@/lib/plans/catalog";
+import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
@@ -32,7 +33,8 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
   if (!data) notFound();
 
   const origin = await requestOrigin();
-  const plan = (await editionsActive()) ? await invitePlan(account, id) : null;
+  const edition = (await editionsActive()) ? await invitePlan(account, id) : null;
+  const plan = edition?.plan ?? null;
   return (
     <PageTransition>
       <AccountShell>
@@ -54,6 +56,7 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
             origin: origin.replace(/\/+$/, ""),
             plan,
             cohostLimit: plan ? cohostLimit(plan) : null,
+            inviteLimit: plan ? inviteLimit(plan, await getPricing()) : null,
             schedules: data.schedules,
             now: new Date().toISOString(),
           }}

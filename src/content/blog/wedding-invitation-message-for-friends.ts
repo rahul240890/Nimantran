@@ -151,7 +151,7 @@ export const weddingInvitationMessageForFriends: BlogPost = {
         "Invite friends to the sangeet and wedding, and colleagues only to the reception: each guest sees only the functions you choose.",
         "Friends tap RSVP for each function, so you know who is coming to what.",
         "Friends can upload their photos of the wedding to a shared photo wall through the same link.",
-        "A video of your invitation for WhatsApp Status and Instagram Reels comes with paid editions. See [pricing](/pricing).",
+        "A video of your invitation for WhatsApp Status and Instagram Reels comes with the Celebration and Grand packages. See [pricing](/pricing).",
       ],
     },
     "Browse [wedding invitation designs](/invitations/wedding), read the family wording in [wedding invitation wording](/blog/wedding-invitation-wording), or see [how to send a wedding invitation on WhatsApp](/blog/digital-wedding-invitation-whatsapp).",

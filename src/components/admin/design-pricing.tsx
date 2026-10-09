@@ -23,13 +23,13 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Select } from "@/components/ui/select";
 import { toast } from "@/components/ui/toast";
 import { planCopy } from "@/content/editions";
-import { PAID_PLAN_IDS, formatRupees, type PaidPlanId } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, formatRupees, packagePrice } from "@/lib/plans/catalog";
 import {
   DESIGN_TIERS,
   isDesignTier,
   pricesInOrder,
   type DesignTier,
-  type PlanPrices,
+  type Pricing,
 } from "@/lib/plans/design-tiers";
 
 export type DesignRow = {
@@ -51,17 +51,40 @@ const KIND_ICONS = { scene: ImageIcon, story: Layers, card: Rotate3d };
 const TIER_NAMES: Record<DesignTier, string> = { free: "Free", premium: "Premium", royal: "Royal" };
 const TIER_ICONS = { free: Gift, premium: Sparkles, royal: Crown };
 
-const toRupees = (paise: number) => String(paise / 100);
+type Amounts = Pick<Pricing, "designs" | "packages" | "invites">;
 
-/** Edition prices and every design's tier, saved together. */
-export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices: PlanPrices }) {
+/** The six numbers above the designs: two design prices, two package add-ons, two invite counts. */
+const FIELDS = [
+  { id: "premium", label: "Premium design (₹)", rupees: true },
+  { id: "royal", label: "Royal design (₹)", rupees: true },
+  { id: "celebration", label: "Celebration adds (₹)", rupees: true },
+  { id: "grand", label: "Grand adds (₹)", rupees: true },
+  { id: "basicInvites", label: "Invites in Basic and free designs", rupees: false },
+  { id: "celebrationInvites", label: "Invites in Celebration", rupees: false },
+] as const;
+type FieldId = (typeof FIELDS)[number]["id"];
+
+const fieldValues = (amounts: Amounts): Record<FieldId, number> => ({
+  premium: amounts.designs.premium / 100,
+  royal: amounts.designs.royal / 100,
+  celebration: amounts.packages.celebration / 100,
+  grand: amounts.packages.grand / 100,
+  basicInvites: amounts.invites.basic,
+  celebrationInvites: amounts.invites.celebration,
+});
+
+/** Package prices, invite counts and every design's tier, saved together. */
+export function DesignPricingForm({ rows, amounts }: { rows: DesignRow[]; amounts: Amounts }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
-  const [rupees, setRupees] = useState<Record<PaidPlanId, string>>({
-    premium: toRupees(prices.premium),
-    royal: toRupees(prices.royal),
-    bundle: toRupees(prices.bundle),
-  });
+  const saved = fieldValues(amounts);
+  const [typed, setTyped] = useState<Record<FieldId, string>>(
+    () =>
+      Object.fromEntries(FIELDS.map(({ id }) => [id, String(saved[id])])) as Record<
+        FieldId,
+        string
+      >,
+  );
   const [tiers, setTiers] = useState<Record<string, DesignTier>>(() =>
     Object.fromEntries(rows.map((row) => [row.id, row.tier])),
   );
@@ -71,18 +94,23 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
   const [bulk, setBulk] = useState<DesignTier>("premium");
   const [tried, setTried] = useState(false);
 
-  // Whole rupees from ₹1 to ₹1,00,000
-  const paise = Object.fromEntries(
-    PAID_PLAN_IDS.map((id) => {
-      const value = rupees[id].trim();
+  // Whole numbers from 1 to 1,00,000
+  const numbers = Object.fromEntries(
+    FIELDS.map(({ id }) => {
+      const value = typed[id].trim();
       const number = /^\d{1,6}$/.test(value) ? Number(value) : NaN;
-      return [id, number >= 1 && number <= 100_000 ? number * 100 : NaN];
+      return [id, number >= 1 && number <= 100_000 ? number : NaN];
     }),
-  ) as PlanPrices;
-  const priceError = (id: PaidPlanId) =>
-    Number.isNaN(paise[id]) ? "Enter whole rupees, from 1 to 1,00,000." : undefined;
-  const pricesValid = PAID_PLAN_IDS.every((id) => !priceError(id));
-  const ordered = pricesValid && pricesInOrder(paise);
+  ) as Record<FieldId, number>;
+  const fieldError = (id: FieldId) =>
+    Number.isNaN(numbers[id]) ? "Enter a whole number, from 1 to 1,00,000." : undefined;
+  const pricesValid = FIELDS.every(({ id }) => !fieldError(id));
+  const next: Amounts = {
+    designs: { premium: numbers.premium * 100, royal: numbers.royal * 100 },
+    packages: { celebration: numbers.celebration * 100, grand: numbers.grand * 100 },
+    invites: { basic: numbers.basicInvites, celebration: numbers.celebrationInvites },
+  };
+  const ordered = pricesValid && pricesInOrder(next);
 
   const shown = useMemo(() => {
     const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -99,12 +127,12 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
   );
   const changed =
     rows.filter((row) => tiers[row.id] !== row.tier).length +
-    PAID_PLAN_IDS.filter((id) => paise[id] !== prices[id]).length;
+    FIELDS.filter(({ id }) => numbers[id] !== saved[id]).length;
 
   const save = () => {
     setTried(true);
     if (!pricesValid || !ordered) {
-      toast({ title: "Check the edition prices first.", tone: "error" });
+      toast({ title: "Check the prices and invites first.", tone: "error" });
       return;
     }
     startTransition(async () => {
@@ -112,7 +140,7 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
       const changes = Object.fromEntries(
         rows.filter((row) => tiers[row.id] !== row.tier).map((row) => [row.id, tiers[row.id]]),
       );
-      const result = await saveDesignPricing({ prices: paise, tiers: changes }).catch(() => null);
+      const result = await saveDesignPricing({ ...next, tiers: changes }).catch(() => null);
       if (result === "saved") {
         toast({
           title: "Designs and prices saved",
@@ -124,7 +152,7 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
         toast({
           title:
             result === "out-of-order"
-              ? "Each edition must cost more than the one before it."
+              ? "Royal must cost more than Premium, Grand add more than Celebration, and Celebration allow more invites than Basic."
               : result === "invalid"
                 ? "Check the prices and try again."
                 : "Couldn't save. Try again.",
@@ -138,33 +166,34 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
     <div className="flex flex-col gap-6 pb-24">
       <Card>
         <CardHeader>
-          <CardTitle>Edition prices</CardTitle>
+          <CardTitle>Packages</CardTitle>
           <CardDescription>
-            What each edition costs for one invite, GST included. A Premium design shows the Premium
-            price on its tile, and a Royal design the Royal price. Hosts who upgrade pay only the
+            Every invite chooses one of three packages. Basic is the design&apos;s own price (free
+            designs are free, with a small &ldquo;Made with Shubh&rdquo; in the corner). Celebration
+            and Grand add a fixed amount on top. Prices include GST; hosts who move up pay only the
             difference.
           </CardDescription>
         </CardHeader>
         <CardBody className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-3">
-            {PAID_PLAN_IDS.map((id) => (
+          <div className="grid gap-4 sm:grid-cols-2">
+            {FIELDS.map(({ id, label, rupees }) => (
               <Field
                 key={id}
-                label={`${planCopy[id].name} (₹)`}
-                error={tried ? priceError(id) : undefined}
+                label={label}
+                error={tried ? fieldError(id) : undefined}
                 hint={
-                  paise[id] !== prices[id] && !priceError(id)
-                    ? `Now ${formatRupees(prices[id])}`
+                  numbers[id] !== saved[id] && !fieldError(id)
+                    ? `Now ${rupees ? formatRupees(saved[id] * 100) : saved[id]}`
                     : undefined
                 }
                 required
               >
                 <Input
                   inputMode="numeric"
-                  value={rupees[id]}
+                  value={typed[id]}
                   maxLength={6}
                   onChange={(event) =>
-                    setRupees((current) => ({
+                    setTyped((current) => ({
                       ...current,
                       [id]: event.target.value.replace(/[^\d]/g, ""),
                     }))
@@ -176,9 +205,23 @@ export function DesignPricingForm({ rows, prices }: { rows: DesignRow[]; prices:
           </div>
           {pricesValid && !ordered && (
             <p role="alert" className="text-sm font-semibold text-danger">
-              Each edition must cost more than the one before it: Premium, then Royal, then the
-              Wedding bundle.
+              Royal must cost more than Premium, Grand must add more than Celebration, and
+              Celebration must allow more invites than Basic.
             </p>
+          )}
+          {ordered && (
+            <ul className="flex flex-col gap-1 text-sm text-ink-muted">
+              {(["free", "premium", "royal"] as const).map((tier) => (
+                <li key={tier}>
+                  <span className="font-semibold text-ink">{TIER_NAMES[tier]} design:</span>{" "}
+                  {PAID_PLAN_IDS.map((plan) => {
+                    const paise = packagePrice(plan, tier, next);
+                    return `${planCopy[plan].name} ${paise ? formatRupees(paise) : "free"}`;
+                  }).join(" · ")}
+                </li>
+              ))}
+              <li>Grand has no limit on invites.</li>
+            </ul>
           )}
         </CardBody>
       </Card>

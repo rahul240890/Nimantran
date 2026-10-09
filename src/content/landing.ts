@@ -143,8 +143,8 @@ export const templates = {
 export const pricing = {
   eyebrow: "Pricing",
   /** Premium's price as Admin, Designs sets it. */
-  title: (price: string) => `Free to start, premium from ${price}`,
-  intro: "Make your invite and share it for free. Upgrade one event when you want more.",
+  title: (price: string) => `Free to start, paid designs from ${price}`,
+  intro: "Make your invite and share it for free. Choose a package when you want more.",
   free: {
     name: "Free",
     price: "₹0",
@@ -156,19 +156,19 @@ export const pricing = {
     ],
   },
   premium: {
-    name: "Premium",
+    name: "Packages",
     price: (price: string) => `from ${price}`,
-    per: "per event",
+    per: "per invitation",
     badge: "Best for weddings",
     points: [
-      "Up to 3 functions and 20 photos",
-      "Video for WhatsApp Status and Reels",
-      "No watermark on your invite",
+      "Basic: your design, with no watermark",
+      "Celebration: the WhatsApp Status and Reels video, and more invites",
+      "Grand: unlimited invites, and a video for every function",
     ],
   },
-  note: "One payment per invitation, GST included. Never a subscription. Royal and the Wedding bundle cover every function.",
+  note: "One payment per invitation, GST included. Never a subscription. Every package covers every function.",
   cta: "Start your invite",
-  compare: "Compare every edition",
+  compare: "Compare the packages",
 } as const;
 
 export const faq = {
@@ -213,7 +213,7 @@ export const waitlist = {
     "You can make and send invites today. Leave your details and we will write once when Shubh launches publicly, with your first-event offer.",
   perks: [
     "One email on launch day",
-    "Premium free for your first event",
+    "Celebration free for your first event",
     "A say in the designs we make next",
   ],
   form: {

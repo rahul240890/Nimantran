@@ -100,6 +100,8 @@ type GuestViewProps = {
   watermark?: boolean;
   /** A fixed moment for the event-day banner, on review pages. */
   previewNow?: number;
+  /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
+  preview?: boolean;
 };
 
 export function GuestView({
@@ -113,6 +115,7 @@ export function GuestView({
   questions,
   watermark = false,
   previewNow,
+  preview = false,
 }: GuestViewProps) {
   const { guestCopy, rsvpCopy } = useText(publishText);
   const { uiStrings } = useText(uiText);
@@ -207,7 +210,7 @@ export function GuestView({
   const family = storyFamily(draft, language);
   const rsvp =
     rsvpFunctions.length > 0 ? (
-      <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} />
+      <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} preview={preview} />
     ) : null;
 
   return (
@@ -396,7 +399,7 @@ export function GuestView({
               )}
             </>
           )}
-          <PhotoWall slug={slug} />
+          {!preview && <PhotoWall slug={slug} />}
         </main>
 
         <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">

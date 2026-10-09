@@ -1,4 +1,4 @@
-import { ArrowLeft, FileText, ReceiptText, Users } from "lucide-react";
+import { ArrowLeft, FileText, Globe, PartyPopper, ReceiptText, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -6,14 +6,14 @@ import { z } from "zod";
 import { AccountShell } from "@/components/account/account-shell";
 import { EditionPicker } from "@/components/editions/edition-picker";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { checkoutCoupons } from "@/lib/payments/coupons";
-import { formatRupees, isPlanId, planNeeded } from "@/lib/plans/catalog";
+import { formatRupees, isPlanId, planNeeded, planShortfalls } from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
-import { tierPlan } from "@/lib/plans/design-tiers";
 import { pricesFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
@@ -25,13 +25,16 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: upgradeCopy.metaTitle, robots: { index: false, follow: false } };
 }
 
-/** Choosing and paying for an invite's edition (Steps 15 to 17), with its receipts. */
+/**
+ * Choosing and paying for an invite's package (Steps 15 to 17), with its receipts. The
+ * editor's Publish button comes here first (?publish=1) and is sent back to publish.
+ */
 export default async function EditionPage({
   params,
   searchParams,
 }: PageProps<"/invites/[id]/edition">) {
   const { id } = await params;
-  const { plan: focus } = await searchParams;
+  const { plan: focus, publish } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/edition`)}`);
@@ -51,7 +54,11 @@ export default async function EditionPage({
       getPricing(),
     ],
   );
-  const design = tierPlan(designTier(pricing, draftDesignId(draft)));
+  const design = designTier(pricing, draftDesignId(draft));
+  // Back to the editor to publish, once the package covers the invite
+  const ready = planShortfalls(draft, current, design).length === 0;
+  const publishHref =
+    publish === "1" && !draft.slug && owner ? `/create?invite=${id}&publish=1` : null;
 
   return (
     <PageTransition>
@@ -59,11 +66,11 @@ export default async function EditionPage({
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="flex flex-col gap-4">
             <Link
-              href={`/invites/${id}`}
+              href={publishHref ? `/create?invite=${id}` : `/invites/${id}`}
               className="-ms-2 inline-flex min-h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
             >
               <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
-              {upgradeCopy.back}
+              {publishHref ? upgradeCopy.backToEditor : upgradeCopy.back}
             </Link>
             <div className="flex max-w-2xl flex-col gap-2">
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
@@ -88,15 +95,33 @@ export default async function EditionPage({
               </div>
             </div>
           )}
+          {publishHref && ready && current.plan !== "free" && (
+            <div
+              role="status"
+              className="flex max-w-2xl flex-col gap-4 rounded-lg border border-success/40 bg-success/5 p-5 sm:flex-row sm:items-center"
+            >
+              <PartyPopper aria-hidden className="size-6 shrink-0 text-success" />
+              <p className="flex-1 font-semibold">{upgradeCopy.publishBody}</p>
+              <Button asChild>
+                <Link href={publishHref}>
+                  <Globe aria-hidden />
+                  {upgradeCopy.publishNow}
+                </Link>
+              </Button>
+            </div>
+          )}
           <EditionPicker
             inviteId={id}
-            current={current}
+            edition={current}
+            design={design}
             needed={planNeeded(draft, design)}
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
             canPay={owner}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
-            prices={pricesFor(current, coupons, null, new Date(), pricing.prices)}
+            prices={pricesFor(current, design, coupons, null, new Date(), pricing)}
+            pricing={pricing}
+            publishHref={ready ? publishHref : null}
           />
 
           {receipts.length > 0 && (

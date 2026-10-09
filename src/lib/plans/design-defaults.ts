@@ -82,11 +82,11 @@ export function allDesignIds(): string[] {
 export function resolvePricing(stored: Pricing): Pricing {
   const tiers: Record<string, DesignTier> = {};
   for (const id of allDesignIds()) tiers[id] = designTier(stored, id);
-  return { prices: stored.prices, tiers };
+  return { ...stored, tiers };
 }
 
 /**
- * Every design at its default tier and the list prices: what pages are built with. The
+ * Every design at its default tier and the default prices: what pages are built with. The
  * admin's changes arrive in the browser (PricingProvider, /api/pricing).
  */
 export const BUILT_PRICING: Pricing = resolvePricing(DEFAULT_PRICING);

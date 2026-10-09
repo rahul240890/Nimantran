@@ -100,10 +100,13 @@ export function RsvpForm({
   slug,
   functions: allFunctions,
   questions,
+  preview = false,
 }: {
   slug: string;
   functions: RsvpFunction[];
   questions: RsvpQuestionId[];
+  /** The host's own look before publishing: the form works, but nothing is sent. */
+  preview?: boolean;
 }) {
   const locale = useLocale();
   const { rsvpCopy } = useText(publishText);
@@ -198,6 +201,10 @@ export function RsvpForm({
       });
       return;
     }
+    if (preview) {
+      setError(rsvpCopy.previewOnly);
+      return;
+    }
     setBusy(true);
     const result = await sendReply(slug, token, {
       name: name.trim(),
@@ -220,7 +227,9 @@ export function RsvpForm({
           ? rsvpCopy.missing
           : result.reason === "not-invited"
             ? rsvpCopy.notInvited
-            : rsvpCopy.failed,
+            : result.reason === "full"
+              ? rsvpCopy.full
+              : rsvpCopy.failed,
       );
       return;
     }

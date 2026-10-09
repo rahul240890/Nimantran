@@ -1,101 +1,93 @@
-import { frameCount } from "@/lib/editor/couple-photos";
-import { cardLanguages, includedFunctions, type InviteDraft } from "@/lib/editor/draft";
-import { draftCouple } from "@/lib/publish/frames";
+import { cardLanguages, type InviteDraft } from "@/lib/editor/draft";
+import {
+  DEFAULT_PRICING,
+  higherTier,
+  tierPricePaise,
+  tierRank,
+  type DesignTier,
+  type Pricing,
+} from "./design-tiers";
 
 /*
- * The editions a host can buy for one invite (docs/PRICING.md, section 2). Prices are in
- * paise and include GST; the server charges from this table, never from the browser.
- * Family Plus and the business plans come with Steps 16a and 26.
+ * The three packages a host chooses from for one invite (docs/PRICING.md, section 2):
+ * Basic is the design's own price, and Celebration and Grand add a fixed amount on top,
+ * all set by the admin (Admin, Designs). "free" is an invite nobody has paid for: a free
+ * design's Basic, with "Made with Shubh" in a corner. The server charges from these
+ * prices, never from the browser.
  */
 
-export const PLAN_IDS = ["free", "premium", "royal", "bundle"] as const;
+export const PLAN_IDS = ["free", "basic", "celebration", "grand"] as const;
 export type PlanId = (typeof PLAN_IDS)[number];
 export type PaidPlanId = Exclude<PlanId, "free">;
 
-export const PAID_PLAN_IDS = ["premium", "royal", "bundle"] as const satisfies PaidPlanId[];
+/** The packages, in the order the checkout shows them. */
+export const PAID_PLAN_IDS = ["basic", "celebration", "grand"] as const satisfies PaidPlanId[];
 
-export type PlanLimits = {
-  /** Functions on one invite (haldi, wedding, reception…). */
-  functions: number;
-  /** Photos on one invite. */
-  photos: number;
-  /** Languages on the card. */
-  languages: number;
-  /** Frames on the couple photo page. */
-  couplePhotos: number;
-  /** Guests with RSVP; shown on the plan, enforced with the guest list later. */
-  guests: number;
-};
+/** How many videos for WhatsApp Status and Reels: none, one of the whole invite, or one per function too. */
+export type VideoAllowance = "none" | "one" | "every";
 
-/** Names and selling points are copy, in each site language (src/content/editions.ts). */
 export type Plan = {
   id: PlanId;
-  pricePaise: number;
-  /** "Made with Shubh" across the guest's pages. */
+  /** A small "Made with Shubh" in the corner of the guest's pages. */
   watermark: boolean;
+  /** Languages on the card. */
+  languages: number;
+  /** The host's own song instead of the design's raga. */
+  ownSong: boolean;
   /** The story as an MP4 for WhatsApp Status and Reels (Step 17c). */
-  video: boolean;
+  video: VideoAllowance;
   /** Days the guest photo wall stays open after the last function (Step 24); 0 for none. */
   albumDays: number;
-  limits: PlanLimits;
+  /** Co-hosts besides the owner; null for no limit. */
+  cohosts: number | null;
 };
-
-const UNLIMITED = Number.POSITIVE_INFINITY;
 
 export const PLANS: Record<PlanId, Plan> = {
   free: {
     id: "free",
-    albumDays: 0,
-    pricePaise: 0,
     watermark: true,
-    video: false,
-    limits: { functions: 1, photos: 3, languages: 1, couplePhotos: 1, guests: 50 },
+    languages: 1,
+    ownSong: false,
+    video: "none",
+    albumDays: 0,
+    cohosts: 1,
   },
-  premium: {
-    id: "premium",
+  basic: {
+    id: "basic",
+    watermark: false,
+    languages: 1,
+    ownSong: false,
+    video: "none",
+    albumDays: 0,
+    cohosts: 1,
+  },
+  celebration: {
+    id: "celebration",
+    watermark: false,
+    languages: 2,
+    ownSong: true,
+    video: "one",
     albumDays: 30,
-    pricePaise: 49_900,
-    watermark: false,
-    video: true,
-    limits: { functions: 3, photos: 20, languages: 2, couplePhotos: 1, guests: 500 },
+    cohosts: 3,
   },
-  royal: {
-    id: "royal",
+  grand: {
+    id: "grand",
+    watermark: false,
+    languages: 2,
+    ownSong: true,
+    video: "every",
     albumDays: 365,
-    pricePaise: 1_99_900,
-    watermark: false,
-    video: true,
-    limits: {
-      functions: UNLIMITED,
-      photos: UNLIMITED,
-      languages: 2,
-      couplePhotos: 2,
-      guests: UNLIMITED,
-    },
-  },
-  bundle: {
-    id: "bundle",
-    albumDays: UNLIMITED,
-    pricePaise: 2_99_900,
-    watermark: false,
-    video: true,
-    limits: {
-      functions: UNLIMITED,
-      photos: UNLIMITED,
-      languages: 2,
-      couplePhotos: 2,
-      guests: UNLIMITED,
-    },
+    cohosts: null,
   },
 };
 
-/**
- * Co-hosts each edition includes (docs/PRICING.md); null for no limit. Kept apart from
- * PlanLimits because the database counts them (cohost_limit()), not the invite's draft.
- */
-const COHOSTS: Record<PlanId, number | null> = { free: 1, premium: 3, royal: null, bundle: null };
+export const cohostLimit = (plan: PlanId): number | null => PLANS[plan].cohosts;
 
-export const cohostLimit = (plan: PlanId): number | null => COHOSTS[plan];
+/** Guests an invite can have by link (personal links and open-link replies); null for no limit. */
+export function inviteLimit(plan: PlanId, pricing: Pick<Pricing, "invites">): number | null {
+  if (plan === "grand") return null;
+  return plan === "celebration" ? pricing.invites.celebration : pricing.invites.basic;
+}
 
 export function isPlanId(value: unknown): value is PlanId {
   return typeof value === "string" && (PLAN_IDS as readonly string[]).includes(value);
@@ -107,27 +99,54 @@ export function isPaidPlanId(value: unknown): value is PaidPlanId {
 
 export const planRank = (id: PlanId) => PLAN_IDS.indexOf(id);
 
-/** Each paid edition's price in paise; the admin can change them (Admin, Designs). */
-export type EditionPrices = Record<PaidPlanId, number>;
+/**
+ * What an invite has: its package, and the dearest design tier paid for. A free invite's
+ * tier is "free"; Basic bought for a ₹499 design is { basic, premium }.
+ */
+export type Edition = { plan: PlanId; tier: DesignTier };
 
-const LIST_PRICES: EditionPrices = {
-  premium: PLANS.premium.pricePaise,
-  royal: PLANS.royal.pricePaise,
-  bundle: PLANS.bundle.pricePaise,
-};
+export const FREE_EDITION: Edition = { plan: "free", tier: "free" };
 
-/** An edition's price today: nothing for Free, else the admin's price or the list price. */
-export const editionPrice = (id: PlanId, prices: EditionPrices = LIST_PRICES): number =>
-  id === "free" ? 0 : prices[id];
+/** A package's price for a design of this tier: the design, plus what the package adds. */
+export function packagePrice(
+  plan: PaidPlanId,
+  tier: DesignTier,
+  pricing: Pick<Pricing, "designs" | "packages"> = DEFAULT_PRICING,
+): number {
+  return tierPricePaise(pricing, tier) + (plan === "basic" ? 0 : pricing.packages[plan]);
+}
 
-/** What moving from one edition to a higher one costs: the difference, never less than ₹1. */
+/** What an invite's edition is worth at today's prices: what moving up is counted against. */
+export function editionValue(
+  edition: Edition,
+  pricing: Pick<Pricing, "designs" | "packages"> = DEFAULT_PRICING,
+): number {
+  return edition.plan === "free" ? 0 : packagePrice(edition.plan, edition.tier, pricing);
+}
+
+/** The edition an invite has after buying a package for its design; the tier never goes down. */
+export const editionAfter = (current: Edition, plan: PaidPlanId, design: DesignTier): Edition => ({
+  plan,
+  tier: higherTier(current.tier, design),
+});
+
+/**
+ * What buying a package costs an invite with this edition and design: the package's price
+ * less what the invite already has, never less than ₹1. Null when there is nothing to buy:
+ * a lower package, the same one already covering the design, or Basic on a free design.
+ */
 export function upgradePricePaise(
-  from: PlanId,
-  to: PaidPlanId,
-  prices: EditionPrices = LIST_PRICES,
+  current: Edition,
+  plan: PaidPlanId,
+  design: DesignTier,
+  pricing: Pick<Pricing, "designs" | "packages"> = DEFAULT_PRICING,
 ): number | null {
-  if (planRank(to) <= planRank(from)) return null;
-  return Math.max(100, editionPrice(to, prices) - editionPrice(from, prices));
+  if (planRank(plan) < planRank(current.plan)) return null;
+  const next = editionAfter(current, plan, design);
+  const target = packagePrice(plan, next.tier, pricing);
+  if (target === 0) return null;
+  if (next.plan === current.plan && next.tier === current.tier) return null;
+  return Math.max(100, target - editionValue(current, pricing));
 }
 
 /** "₹499", "₹1,999": whole rupees in Indian grouping, paise only when there are any. */
@@ -140,38 +159,39 @@ export function formatRupees(paise: number): string {
 }
 
 /**
- * Something an invite uses beyond its edition: a limit and how much of it is used, or its
- * design, which asks for an edition of its own (`used` is then that edition's rank).
+ * Something an invite uses beyond its edition: its design, when it costs more than the
+ * tier paid for (`used` is then the design's tier rank), a second card language, or the
+ * host's own song.
  */
-export type PlanNeed = { limit: keyof PlanLimits | "design"; used: number };
+export type PlanNeed = { limit: "design" | "languages" | "ownSong"; used: number };
 
-/**
- * What an invite uses that the edition doesn't cover; empty when it fits. `design` is the
- * edition the invite's design asks for (src/lib/plans/design-tiers.ts).
- */
+/** What an invite uses that its edition doesn't cover; empty when it fits. */
 export function planShortfalls(
   draft: InviteDraft,
-  plan: PlanId,
-  design: PlanId = "free",
+  edition: Edition,
+  design: DesignTier = "free",
 ): PlanNeed[] {
-  const limits = PLANS[plan].limits;
-  const needsDesign: PlanNeed[] =
-    planRank(plan) < planRank(design) ? [{ limit: "design", used: planRank(design) }] : [];
-  const used: Pick<PlanLimits, "functions" | "photos" | "languages" | "couplePhotos"> = {
-    functions: includedFunctions(draft).length,
-    photos: draft.photos.length,
-    languages: cardLanguages(draft).length,
-    couplePhotos: draft.photos.length ? frameCount(draftCouple(draft).layout) : 0,
-  };
-  return [
-    ...needsDesign,
-    ...(Object.keys(used) as (keyof typeof used)[]).flatMap((limit) =>
-      used[limit] > limits[limit] ? [{ limit, used: used[limit] }] : [],
-    ),
-  ];
+  const plan = PLANS[edition.plan];
+  const needs: PlanNeed[] = [];
+  if (tierRank(design) > tierRank(edition.tier)) {
+    needs.push({ limit: "design", used: tierRank(design) });
+  }
+  const languages = cardLanguages(draft).length;
+  if (languages > plan.languages) needs.push({ limit: "languages", used: languages });
+  if (draft.music.clip && !plan.ownSong) needs.push({ limit: "ownSong", used: 1 });
+  return needs;
 }
 
-/** The lowest edition an invite fits in, as the host has made it, with its design's edition. */
-export function planNeeded(draft: InviteDraft, design: PlanId = "free"): PlanId {
-  return PLAN_IDS.find((id) => planShortfalls(draft, id, design).length === 0) ?? "royal";
+/**
+ * The lowest package that covers what the invite uses, as the host has made it, for its
+ * design. "free" when a free design needs nothing paid.
+ */
+export function planNeeded(draft: InviteDraft, design: DesignTier = "free"): PlanId {
+  return (
+    PLAN_IDS.find(
+      (plan) =>
+        (plan !== "free" || design === "free") &&
+        planShortfalls(draft, { plan, tier: design }, design).length === 0,
+    ) ?? "grand"
+  );
 }

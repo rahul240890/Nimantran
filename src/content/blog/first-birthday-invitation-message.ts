@@ -186,7 +186,7 @@ export const firstBirthdayInvitationMessage: BlogPost = {
         "After the party, guests can add their photos to a shared photo wall through the same link.",
       ],
     },
-    "Making one invitation with one function is free. Paid editions, from ₹499 per invitation, remove the watermark, add more functions and photos, and include a video for WhatsApp Status. See [first birthday invitation designs](/invitations/birthday) and [pricing](/pricing).",
+    "Making an invitation with a free design is free. Paid packages, from ₹499 per invitation, remove the watermark, add more invites, and the Celebration package includes a video for WhatsApp Status. See [first birthday invitation designs](/invitations/birthday) and [pricing](/pricing).",
     "For other ages, read [birthday invitation messages](/blog/birthday-invitation-messages). Planning the baby's first rice feeding too? See [annaprashan invitation messages](/blog/annaprashan-invitation-message).",
   ],
   faq: [

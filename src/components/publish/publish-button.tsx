@@ -4,6 +4,7 @@ import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send, Sparkles } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { inviteEdition } from "@/actions/checkout";
 import { checkSlug, publishInvite, type PublishOutcome, type SlugCheck } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -21,19 +22,43 @@ import { editionsText } from "@/i18n/copy/editions";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 
-/** The last step's main action: publish the invite, or share it once it's live. */
+/**
+ * The last step's main action: publish the invite, or share it once it's live. While
+ * payments are on, a free invite goes to its packages first and comes back here to publish.
+ */
 export function PublishButton({
   draft,
   signedIn,
   onNotReady,
+  autoOpen = false,
 }: {
   draft: InviteDraft;
   signedIn: boolean;
   /** Called instead of opening when steps still need finishing. */
   onNotReady: () => void;
+  /** Open the dialog straight away: the host is back from choosing a package. */
+  autoOpen?: boolean;
 }) {
   const { publishCopy } = useText(publishText);
-  const [open, setOpen] = useState(false);
+  const router = useRouter();
+  const [open, setOpen] = useState(autoOpen && signedIn && draftProblems(draft).length === 0);
+  const [gating, setGating] = useState(false);
+
+  // Packages before publishing: a free invite chooses one (or carries on free) first
+  const start = async () => {
+    if (draftProblems(draft).length > 0) return onNotReady();
+    setGating(true);
+    const synced = await syncDraft();
+    const remoteId = remoteIdNow();
+    const packages =
+      synced === "synced" && remoteId ? await inviteEdition(remoteId).catch(() => null) : null;
+    if (remoteId && packages?.edition.plan === "free") {
+      router.push(`/invites/${remoteId}/edition?publish=1`);
+      return;
+    }
+    setGating(false);
+    setOpen(true);
+  };
 
   if (!signedIn) {
     return (
@@ -59,13 +84,7 @@ export function PublishButton({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button
-        leadingIcon={<Globe aria-hidden />}
-        onClick={() => {
-          if (draftProblems(draft).length > 0) onNotReady();
-          else setOpen(true);
-        }}
-      >
+      <Button leadingIcon={<Globe aria-hidden />} loading={gating} onClick={() => void start()}>
         {publishCopy.publish}
       </Button>
       {open && <PublishDialog draft={draft} onClose={() => setOpen(false)} />}

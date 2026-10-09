@@ -190,7 +190,7 @@ export const janmdinNimantranSandesh: BlogPost = {
         "पार्टी के बाद मेहमान अपनी फ़ोटो एक साझा फ़ोटो वॉल पर डाल सकते हैं।",
       ],
     },
-    "एक कार्यक्रम वाला निमंत्रण बनाना और भेजना मुफ़्त है। Premium ₹499 से है, हर निमंत्रण के लिए एक बार, बिना वॉटरमार्क के। देखें [जन्मदिन के निमंत्रण के डिज़ाइन](/hi/invitations/birthday) और [कीमतें](/hi/pricing)।",
+    "फ़्री डिज़ाइन से निमंत्रण बनाना और भेजना मुफ़्त है। पेड डिज़ाइन ₹499 से हैं, हर निमंत्रण के लिए एक बार, बिना वॉटरमार्क के। देखें [जन्मदिन के निमंत्रण के डिज़ाइन](/hi/invitations/birthday) और [कीमतें](/hi/pricing)।",
     "अंग्रेज़ी में संदेश चाहिए? पढ़ें [birthday invitation messages](/blog/birthday-invitation-messages) और [1st birthday invitation messages](/blog/first-birthday-invitation-message)।",
   ],
   faq: [

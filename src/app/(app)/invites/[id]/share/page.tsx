@@ -56,13 +56,13 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
   const names = inviteNames(draft);
   const locale = await getLocale();
   const occasion = occasionName(draft, locale);
-  // The video is part of the paid editions once payments are on (Step 17c)
+  // The video comes with Celebration and Grand once payments are on (Step 17c)
   const [active, plan, published] = await Promise.all([
     editionsActive(),
     invitePlan(account, id),
     findPublishedInvite(draft.slug),
   ]);
-  const videoAllowed = !active || PLANS[plan ?? "free"].video;
+  const video = active ? PLANS[plan?.plan ?? "free"].video : "every";
 
   return (
     <PageTransition>
@@ -86,8 +86,9 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
               url={url}
               slug={draft.slug}
               names={names}
-              allowed={videoAllowed}
-              upgradeHref={`/invites/${id}/edition?plan=premium`}
+              allowed={video !== "none"}
+              perFunction={video === "every"}
+              upgradeHref={`/invites/${id}/edition?plan=celebration`}
               testCodecs={authMode() === "preview"}
             />
           }

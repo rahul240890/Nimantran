@@ -149,7 +149,7 @@ export const ganeshChaturthiInvitationMessage: BlogPost = {
     {
       list: [
         'One event, such as darshan, is free to make and share; free invitations carry a small "Made with Shubh" mark.',
-        "For sthapana, a special aarti and visarjan on one invitation, Premium from ₹499 covers up to three events, each with its own time and map. See [pricing](/pricing).",
+        "Put sthapana, a special aarti and visarjan on one invitation: every package, free included, covers every event, each with its own time and map. See [pricing](/pricing).",
         "Cards can be in Marathi, Hindi, English or another Indian language, or two side by side, with regional music.",
         "If the visarjan time changes, the same link updates for everyone.",
         "Guests can add their darshan photos to a shared photo wall through their invitation link.",

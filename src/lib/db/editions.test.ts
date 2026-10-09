@@ -80,14 +80,14 @@ describe("orders and editions", () => {
       t.as(host, () =>
         q(
           `insert into orders (event_id, user_id, plan_id, amount_paise, provider_order_id, mode)
-           values ($1, $2, 'royal', 100, 'order_fake', 'test')`,
+           values ($1, $2, 'grand', 100, 'order_fake', 'test')`,
           [event, host],
         ),
       ),
     ).rejects.toThrow(/permission denied/);
     await expect(
       t.as(host, () =>
-        q("insert into event_plans (event_id, plan_id, source) values ($1, 'royal', 'admin')", [
+        q("insert into event_plans (event_id, plan_id, source) values ($1, 'grand', 'admin')", [
           event,
         ]),
       ),
@@ -107,15 +107,15 @@ describe("orders and editions", () => {
     await t.as("service", async () => {
       const [order] = await q<{ id: string }>(
         `insert into orders (event_id, user_id, plan_id, amount_paise, provider_order_id, mode, status)
-         values ($1, $2, 'premium', 49900, 'order_1', 'test', 'paid') returning id`,
+         values ($1, $2, 'celebration', 49900, 'order_1', 'test', 'paid') returning id`,
         [event, host],
       );
       await q(
-        "insert into event_plans (event_id, plan_id, source, order_id) values ($1, 'premium', 'purchase', $2)",
+        "insert into event_plans (event_id, plan_id, source, order_id) values ($1, 'celebration', 'purchase', $2)",
         [event, order!.id],
       );
     });
-    expect(await plan()).toBe("premium");
+    expect(await plan()).toBe("celebration");
     const [none] = await t.as(null, () =>
       q<{ plan: string | null }>("select public.published_invite_plan('nobody') as plan"),
     );
@@ -127,7 +127,7 @@ describe("orders and editions", () => {
     expect(await t.as(owner, () => q("select id from orders"))).toHaveLength(1);
     expect(await t.as(stranger, () => q("select id from orders"))).toEqual([]);
     expect(await t.as(host, () => q("select plan_id from event_plans"))).toEqual([
-      { plan_id: "premium" },
+      { plan_id: "celebration" },
     ]);
     expect(await t.as(stranger, () => q("select plan_id from event_plans"))).toEqual([]);
     expect(await t.as(owner, () => q("select plan_id from event_plans"))).toHaveLength(1);

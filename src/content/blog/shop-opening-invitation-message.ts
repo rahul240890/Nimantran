@@ -159,7 +159,7 @@ export const shopOpeningInvitationMessage: BlogPost = {
         "Put a map pin on the shop, with a parking note for the market or the building.",
         "Guests open the link in their phone's browser without any app, and tap RSVP with how many are coming, so you can plan the refreshments.",
         "Import a guest list from your phone contacts or an Excel sheet of clients, and send each person their own link that greets them by name.",
-        "Paid editions add a video of the invitation for WhatsApp Status and Instagram Reels.",
+        "The Celebration and Grand packages add a video of the invitation for WhatsApp Status and Instagram Reels.",
       ],
     },
     "It is free to make and share an invitation with one function. See [shop opening invitation designs](/invitations/shop-opening), or [launch invitation designs](/invitations/launch) for a product or company launch. For a home, read [griha pravesh invitation messages](/blog/griha-pravesh-invitation-message), and for a katha at the shop see [Satyanarayan puja invitation messages](/blog/satyanarayan-puja-invitation-message).",

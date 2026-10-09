@@ -177,7 +177,7 @@ export const diwaliPartyInvitationMessage: BlogPost = {
     {
       list: [
         'One event, such as a Diwali party, is free to make and share; free invitations carry a small "Made with Shubh" mark.',
-        "For puja, a card party and a Diwali Milan on one invitation, Premium from ₹499 covers up to three functions, with no watermark. See [pricing](/pricing).",
+        "Put puja, a card party and a Diwali Milan on one invitation: every package, free included, covers every function, and paid packages have no watermark. See [pricing](/pricing).",
         "Guests reply per event with how many adults and children are coming, and you see the head count.",
         "Each guest can get a personal link that greets them by name, and you can see who has opened it.",
         "If the time or venue changes, the same link updates.",

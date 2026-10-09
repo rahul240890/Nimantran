@@ -4,14 +4,20 @@ import { cookies } from "next/headers";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { previewDb, previewHosts } from "@/lib/invites/preview-db";
+import { inviteStore } from "@/lib/invites/store";
 import {
+  FREE_EDITION,
   PLANS,
+  editionAfter,
   isPaidPlanId,
   isPlanId,
   planRank,
+  type Edition,
   type PaidPlanId,
   type PlanId,
 } from "@/lib/plans/catalog";
+import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { higherTier, isDesignTier, type DesignTier } from "@/lib/plans/design-tiers";
 import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
 import { supabasePublic } from "@/lib/supabase/public";
@@ -28,8 +34,8 @@ import {
 } from "./razorpay";
 
 /*
- * Editions (Steps 15 to 17): each invite is Free until its host buys Premium, Royal or the
- * Wedding bundle for it. The server records a payment only after checking Razorpay's
+ * Packages (Steps 15 to 17): each invite is free until its host buys Basic, Celebration or
+ * Grand for it, priced on its design (src/lib/plans/catalog.ts). The server records a payment only after checking Razorpay's
  * signature, and writes orders and editions as itself (the service role): no signed-in
  * connection can mark anything paid. Preview mode keeps the same flow in memory, with a
  * stand-in checkout, so tests can follow a purchase.
@@ -43,6 +49,9 @@ export type Order = {
   userId: string | null;
   planId: PaidPlanId;
   fromPlanId: PlanId;
+  /** The design tier this order paid for, and the one the invite had before. */
+  designTier: DesignTier;
+  fromDesignTier: DesignTier;
   /** The upgrade's price before any coupon. */
   listPricePaise: number;
   discountPaise: number;
@@ -64,7 +73,7 @@ export type Order = {
 export type AdminOrder = Order & { slug: string | null; names: string };
 
 type PreviewPayments = {
-  plans: Map<string, { planId: PaidPlanId; source: "purchase" | "admin"; orderId?: string }>;
+  plans: Map<string, { edition: Edition; source: "purchase" | "admin"; orderId?: string }>;
   orders: Map<string, Order>;
   invoices?: number;
 };
@@ -144,12 +153,18 @@ export async function ownsInvite(account: Account, eventId: string): Promise<boo
   return data?.owner_id === account.id;
 }
 
-/** The edition a host's invite has; null when this person can't see the invite. */
-export async function invitePlan(account: Account, eventId: string): Promise<PlanId | null> {
+/** An event_plans row as the app reads it; no row is a free invite. */
+function editionFromRow(row: { plan_id?: unknown; design_tier?: unknown } | null): Edition {
+  if (!row || !isPaidPlanId(row.plan_id)) return FREE_EDITION;
+  return { plan: row.plan_id, tier: isDesignTier(row.design_tier) ? row.design_tier : "royal" };
+}
+
+/** The package a host's invite has; null when this person can't see the invite. */
+export async function invitePlan(account: Account, eventId: string): Promise<Edition | null> {
   if (isPreview()) {
     const stored = previewDb.invites.get(eventId);
     if (!stored || !previewHosts(stored, account.id)) return null;
-    return preview.plans.get(eventId)?.planId ?? "free";
+    return preview.plans.get(eventId)?.edition ?? FREE_EDITION;
   }
   const supabase = await supabaseServer();
   if (!supabase) return null;
@@ -161,15 +176,24 @@ export async function invitePlan(account: Account, eventId: string): Promise<Pla
   if (!event) return null;
   const { data } = await supabase
     .from("event_plans")
-    .select("plan_id")
+    .select("plan_id, design_tier")
     .eq("event_id", eventId)
     .maybeSingle();
-  return isPlanId(data?.plan_id) ? data.plan_id : "free";
+  return editionFromRow(data);
 }
 
-/** A published invite's edition, for its guest page. */
+/** The design tier an invite is made with, as the admin has priced it. */
+export async function inviteDesignTier(
+  account: Account,
+  eventId: string,
+): Promise<DesignTier | null> {
+  const [draft, pricing] = await Promise.all([inviteStore()?.get(account, eventId), getPricing()]);
+  return draft ? designTier(pricing, draftDesignId(draft)) : null;
+}
+
+/** A published invite's package, for its guest page. */
 export async function publishedPlan(slug: string, eventId: string): Promise<PlanId> {
-  if (isPreview()) return preview.plans.get(eventId)?.planId ?? "free";
+  if (isPreview()) return preview.plans.get(eventId)?.edition.plan ?? "free";
   const supabase = supabasePublic();
   if (!supabase) return "free";
   const { data, error } = await supabase.rpc("published_invite_plan", { p_slug: slug });
@@ -196,8 +220,8 @@ export type StartedCheckout =
   | { ok: false; reason: "off" | "not-found" | "already" | "failed" };
 
 /**
- * Opens an order for the difference between the invite's edition and the one chosen, less
- * the coupon the host typed or the festival offer running.
+ * Opens an order for the package chosen, priced on the invite's design, less what the
+ * invite already has and the coupon the host typed or the festival offer running.
  */
 export async function startCheckout(
   account: Account,
@@ -207,27 +231,32 @@ export async function startCheckout(
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
-  const [current, owner, pricing] = await Promise.all([
+  const [current, owner, pricing, design] = await Promise.all([
     invitePlan(account, eventId),
     ownsInvite(account, eventId),
     getPricing(),
+    inviteDesignTier(account, eventId),
   ]);
-  if (!current || !owner) return { ok: false, reason: "not-found" };
+  if (!current || !owner || !design) return { ok: false, reason: "not-found" };
   const price = priceFor(
     current,
     planId,
+    design,
     await checkoutCoupons(),
     code ? cleanCouponCode(code) : null,
     new Date(),
-    pricing.prices,
+    pricing,
   );
   if (!price) return { ok: false, reason: "already" };
   const { amountPaise } = price;
+  const next = editionAfter(current, planId, design);
   const base = {
     eventId,
     userId: account.id,
     planId,
-    fromPlanId: current,
+    fromPlanId: current.plan,
+    designTier: next.tier,
+    fromDesignTier: current.tier,
     listPricePaise: price.listPaise,
     discountPaise: price.discountPaise,
     couponId: price.coupon?.id ?? null,
@@ -261,7 +290,8 @@ export async function startCheckout(
     notes: {
       event_id: eventId,
       plan_id: planId,
-      from_plan_id: current,
+      design_tier: next.tier,
+      from_plan_id: current.plan,
       coupon: price.coupon?.code ?? "",
     },
   });
@@ -270,7 +300,9 @@ export async function startCheckout(
     event_id: eventId,
     user_id: account.id,
     plan_id: planId,
-    from_plan_id: current,
+    from_plan_id: current.plan,
+    design_tier: next.tier,
+    from_design_tier: current.tier,
     list_price_paise: price.listPaise,
     discount_paise: price.discountPaise,
     coupon_id: price.coupon?.id ?? null,
@@ -336,7 +368,14 @@ export async function fulfilOrder(
         invoiceNo: invoiceNumber(new Date(now), preview.invoices),
       });
       if (order.couponId) await countCouponUse(order.couponId);
-      if (order.eventId) raisePreviewPlan(order.eventId, order.planId, "purchase", order.id);
+      if (order.eventId) {
+        raisePreviewPlan(
+          order.eventId,
+          { plan: order.planId, tier: order.designTier },
+          "purchase",
+          order.providerOrderId,
+        );
+      }
     }
     return order.planId;
   }
@@ -344,7 +383,7 @@ export async function fulfilOrder(
   if (!service) return null;
   const { data: order } = await service
     .from("orders")
-    .select("id, event_id, plan_id, status, coupon_id")
+    .select("id, event_id, plan_id, design_tier, status, coupon_id")
     .eq("provider_order_id", providerOrderId)
     .maybeSingle();
   if (!order || !isPaidPlanId(order.plan_id)) return null;
@@ -365,7 +404,11 @@ export async function fulfilOrder(
   // Numbered once; a second call returns the same number
   await service.rpc("assign_invoice_no", { p_order: order.id });
   if (order.event_id) {
-    const raised = await raisePlan(order.event_id, order.plan_id, "purchase", order.id);
+    const edition: Edition = {
+      plan: order.plan_id,
+      tier: isDesignTier(order.design_tier) ? order.design_tier : "royal",
+    };
+    const raised = await raisePlan(order.event_id, edition, "purchase", order.id);
     if (!raised) return null;
   }
   return order.plan_id;
@@ -385,20 +428,31 @@ export async function markOrderFailed(providerOrderId: string): Promise<void> {
     .eq("status", "created");
 }
 
+/** The higher of two editions, package by package and tier by tier. */
+function raised(current: Edition, next: Edition): Edition {
+  return {
+    plan: planRank(next.plan) > planRank(current.plan) ? next.plan : current.plan,
+    tier: higherTier(current.tier, next.tier),
+  };
+}
+
+const sameEdition = (a: Edition, b: Edition) => a.plan === b.plan && a.tier === b.tier;
+
 function raisePreviewPlan(
   eventId: string,
-  planId: PaidPlanId,
+  edition: Edition,
   source: "purchase" | "admin",
   orderId?: string,
 ) {
-  const current = preview.plans.get(eventId)?.planId ?? "free";
-  if (planRank(planId) > planRank(current)) preview.plans.set(eventId, { planId, source, orderId });
+  const current = preview.plans.get(eventId)?.edition ?? FREE_EDITION;
+  const next = raised(current, edition);
+  if (!sameEdition(next, current)) preview.plans.set(eventId, { edition: next, source, orderId });
 }
 
-/** Gives an invite an edition, never lowering one it already has. */
+/** Gives an invite a package, never lowering what it already has. */
 async function raisePlan(
   eventId: string,
-  planId: PaidPlanId,
+  edition: Edition,
   source: "purchase" | "admin",
   orderId: string | null,
 ): Promise<boolean> {
@@ -406,13 +460,16 @@ async function raisePlan(
   if (!service) return false;
   const { data: existing } = await service
     .from("event_plans")
-    .select("plan_id")
+    .select("plan_id, design_tier")
     .eq("event_id", eventId)
     .maybeSingle();
-  if (isPlanId(existing?.plan_id) && planRank(existing.plan_id) >= planRank(planId)) return true;
+  const current = editionFromRow(existing);
+  const next = raised(current, edition);
+  if (sameEdition(next, current)) return true;
   const { error } = await service.from("event_plans").upsert({
     event_id: eventId,
-    plan_id: planId,
+    plan_id: next.plan,
+    design_tier: next.tier,
     source,
     order_id: orderId,
     updated_at: new Date().toISOString(),
@@ -428,6 +485,8 @@ type OrderRow = {
   user_id: string | null;
   plan_id: string;
   from_plan_id: string;
+  design_tier: string | null;
+  from_design_tier: string | null;
   list_price_paise: number | null;
   discount_paise: number;
   coupon_id: string | null;
@@ -445,15 +504,17 @@ type OrderRow = {
 };
 
 const ORDER_COLUMNS =
-  "id, event_id, user_id, plan_id, from_plan_id, list_price_paise, discount_paise, coupon_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at, invoice_no, refunded_at, coupons(code)";
+  "id, event_id, user_id, plan_id, from_plan_id, design_tier, from_design_tier, list_price_paise, discount_paise, coupon_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at, invoice_no, refunded_at, coupons(code)";
 
 function orderFromRow(row: OrderRow): Order {
   return {
     id: row.id,
     eventId: row.event_id,
     userId: row.user_id,
-    planId: isPaidPlanId(row.plan_id) ? row.plan_id : "premium",
+    planId: isPaidPlanId(row.plan_id) ? row.plan_id : "basic",
     fromPlanId: isPlanId(row.from_plan_id) ? row.from_plan_id : "free",
+    designTier: isDesignTier(row.design_tier) ? row.design_tier : "free",
+    fromDesignTier: isDesignTier(row.from_design_tier) ? row.from_design_tier : "free",
     listPricePaise: row.list_price_paise ?? row.amount_paise + row.discount_paise,
     discountPaise: row.discount_paise,
     couponId: row.coupon_id,
@@ -527,12 +588,16 @@ export async function adminOrders(limit = 100): Promise<AdminOrder[]> {
 export type GrantResult =
   { ok: true; names: string } | { ok: false; reason: "not-found" | "failed" };
 
-/** An admin gives an invite an edition without payment (pilot families, support). */
+/**
+ * An admin gives an invite a package without payment (pilot families, support). It covers
+ * every design, so the host can change design freely.
+ */
 export async function grantPlan(slug: string, planId: PaidPlanId): Promise<GrantResult> {
+  const edition: Edition = { plan: planId, tier: "royal" };
   if (isPreview()) {
     const stored = [...previewDb.invites.values()].find((invite) => invite.event.slug === slug);
     if (!stored) return { ok: false, reason: "not-found" };
-    raisePreviewPlan(stored.event.id, planId, "admin");
+    raisePreviewPlan(stored.event.id, edition, "admin");
     return { ok: true, names: namesOf(stored.event.content) };
   }
   const service = supabaseService();
@@ -543,8 +608,8 @@ export async function grantPlan(slug: string, planId: PaidPlanId): Promise<Grant
     .eq("slug", slug)
     .maybeSingle();
   if (!event) return { ok: false, reason: "not-found" };
-  const raised = await raisePlan(event.id as string, planId, "admin", null);
-  return raised
+  const given = await raisePlan(event.id as string, edition, "admin", null);
+  return given
     ? { ok: true, names: namesOf(event.content as Record<string, string>) }
     : { ok: false, reason: "failed" };
 }
@@ -587,7 +652,7 @@ export type RefundResult =
 
 /**
  * Refunds a paid order in full through Razorpay (Admin, Orders) and takes the invite back
- * to the edition it had before, when this order is what gave it its edition.
+ * to the package it had before, when this order is what gave it its package.
  */
 export async function refundOrder(orderId: string): Promise<RefundResult> {
   const now = new Date().toISOString();
@@ -599,7 +664,12 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
     const plan = order.eventId ? preview.plans.get(order.eventId) : undefined;
     if (order.eventId && plan?.orderId === order.providerOrderId) {
       if (order.fromPlanId === "free") preview.plans.delete(order.eventId);
-      else preview.plans.set(order.eventId, { planId: order.fromPlanId, source: "purchase" });
+      else {
+        preview.plans.set(order.eventId, {
+          edition: { plan: order.fromPlanId, tier: order.fromDesignTier },
+          source: "purchase",
+        });
+      }
     }
     return { ok: true };
   }
@@ -607,7 +677,9 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
   if (!service) return { ok: false, reason: "failed" };
   const { data: order } = await service
     .from("orders")
-    .select("id, event_id, from_plan_id, amount_paise, status, provider_payment_id, mode")
+    .select(
+      "id, event_id, from_plan_id, from_design_tier, amount_paise, status, provider_payment_id, mode",
+    )
     .eq("id", orderId)
     .maybeSingle();
   if (!order) return { ok: false, reason: "not-found" };
@@ -638,7 +710,12 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
       if (isPaidPlanId(order.from_plan_id)) {
         await service
           .from("event_plans")
-          .update({ plan_id: order.from_plan_id, order_id: null, updated_at: now })
+          .update({
+            plan_id: order.from_plan_id,
+            design_tier: isDesignTier(order.from_design_tier) ? order.from_design_tier : "free",
+            order_id: null,
+            updated_at: now,
+          })
           .eq("event_id", order.event_id);
       } else {
         await service.from("event_plans").delete().eq("event_id", order.event_id);
@@ -674,7 +751,7 @@ export async function adminInvites(
         categoryId: stored.event.category_id,
         status: stored.event.status,
         slug: stored.event.slug,
-        plan: preview.plans.get(stored.event.id)?.planId ?? "free",
+        plan: preview.plans.get(stored.event.id)?.edition.plan ?? "free",
         createdAt: stored.publishedAt ?? stored.event.updated_at,
         owner: stored.owner.replace(/^preview-/, ""),
       })),

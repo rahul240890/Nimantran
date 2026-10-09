@@ -1,27 +1,19 @@
-/*
- * "Made with Shubh" on a Free invite (Step 17): a faint diagonal pattern over everything the
- * guest sees: the card, the event pages and the couple photo pages. The footer already says
- * "Made with Shubh" on every invite. Drawn as a masked colour, not text, so readers and the contrast check skip it;
- * blended by difference so it shows on the dark paintings and the light pages alike.
- */
+import { BrandMark } from "@/components/brand/brand-mark";
 
-const TILE = encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="260" height="180" viewBox="0 0 260 180"><g transform="rotate(-24 130 90)" font-family="Georgia, serif" font-size="19" letter-spacing="3" text-anchor="middle"><text x="130" y="84">MADE WITH SHUBH</text></g></svg>`,
-);
-const MASK = `url("data:image/svg+xml,${TILE}")`;
+/*
+ * "Made with Shubh" on a free invite (Step 17): a small mark in the bottom corner of the
+ * guest's screen, across the card, the event pages and the couple photo pages, opposite
+ * the music button. Any paid package takes it away.
+ */
 
 export function WatermarkLayer() {
   return (
-    <div
-      aria-hidden
+    <p
       data-watermark
-      className="pointer-events-none fixed inset-0 z-20 bg-card-ivory opacity-[0.16] mix-blend-difference print:hidden"
-      style={{
-        maskImage: MASK,
-        WebkitMaskImage: MASK,
-        maskRepeat: "repeat",
-        WebkitMaskRepeat: "repeat",
-      }}
-    />
+      className="pointer-events-none fixed start-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 flex items-center gap-1.5 rounded-full bg-night/70 px-3 py-1.5 font-label text-[0.65rem] tracking-[0.12em] text-card-ivory uppercase ring-1 ring-card-ivory/30 backdrop-blur-sm print:hidden"
+    >
+      <BrandMark className="size-4" />
+      Made with Shubh
+    </p>
   );
 }

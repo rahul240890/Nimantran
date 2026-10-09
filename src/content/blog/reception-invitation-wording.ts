@@ -154,7 +154,7 @@ export const receptionInvitationWording: BlogPost = {
         "Guests tap RSVP per function and say how many adults and children are coming, so you have a head count for the caterer.",
         "Send each guest a personal link that greets them by name, and see who has opened it.",
         'On the day, guests see the map, directions, parking and a "happening now" banner.',
-        "Paid editions are per invitation, with no subscription: Premium from ₹499 carries up to three functions, and there is a Wedding bundle at ₹2,999. See [pricing](/pricing).",
+        "Packages are per invitation, with no subscription, and every package covers every function: Basic is the design's price, and Celebration and Grand add the video and more invites. See [pricing](/pricing).",
       ],
     },
     "Browse [reception invitation designs](/invitations/reception), or see [wedding invitation wording](/blog/wedding-invitation-wording) for the other functions. After the reception, these [wedding thank you messages](/blog/wedding-thank-you-messages) will help.",

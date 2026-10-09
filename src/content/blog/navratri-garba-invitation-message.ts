@@ -162,10 +162,10 @@ export const navratriGarbaInvitationMessage: BlogPost = {
     {
       list: [
         'One event, such as a garba night, is free to make and share; free invitations carry a small "Made with Shubh" mark.',
-        "For aarti, garba and kanya pujan on one invitation, Premium from ₹499 covers up to three events, each with its own time, venue and dress code. See [pricing](/pricing).",
+        "Put aarti, garba and kanya pujan on one invitation: every package, free included, covers every event, each with its own time, venue and dress code. See [pricing](/pricing).",
         "Guests reply per event with how many adults and children are coming.",
         "You can add a Gujarati tradition and regional music, or write the card in Gujarati and English side by side.",
-        "Paid editions also make a video of the invitation for WhatsApp Status and Instagram Reels.",
+        "The Celebration and Grand packages also make a video of the invitation for WhatsApp Status and Instagram Reels.",
       ],
     },
     "Planning for the next festival? Read [Diwali party invitation messages](/blog/diwali-party-invitation-message) and [Ganpati invitation messages](/blog/ganesh-chaturthi-invitation-message).",
