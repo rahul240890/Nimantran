@@ -22,7 +22,7 @@ export const nav: Translation<typeof en.nav> = [
 ];
 
 export const menuCopy: Translation<typeof en.menuCopy> = {
-  photos: "आपके पास जितनी फ़ोटो हैं",
+  photos: "चित्रित या फ़ोटो के साथ",
   kinds: "निमंत्रण के प्रकार से",
   popular: "लोकप्रिय",
   traditions: "परंपरा के हिसाब से",
@@ -31,8 +31,8 @@ export const menuCopy: Translation<typeof en.menuCopy> = {
   allWeddings: "शादी के सभी डिज़ाइन",
   allOccasions: "सभी अवसर",
   designsFeature: {
-    title: "जो आपके पास है, उसके हिसाब से",
-    text: "फ़ोटो नहीं, एक फ़ोटो या दो: हर डिज़ाइन बताता है उसे क्या चाहिए, और उसकी क़ीमत।",
+    title: "चित्रित या आपकी फ़ोटो के साथ",
+    text: "सिर्फ़ चित्रकारी, जोड़े की फ़ोटो, या आप दोनों की अलग फ़ोटो: हर डिज़ाइन बताता है कौन-सा, और उसकी क़ीमत।",
   },
   weddingsFeature: {
     title: "शादी के निमंत्रण",

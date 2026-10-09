@@ -21,7 +21,7 @@ export const nav = [
 
 /** The header's menus for Designs, Weddings and Occasions (src/components/shell/site-menu.ts). */
 export const menuCopy = {
-  photos: "By the photos you have",
+  photos: "Illustrated or with photos",
   kinds: "By kind of invitation",
   popular: "Popular",
   traditions: "By tradition",
@@ -30,8 +30,8 @@ export const menuCopy = {
   allWeddings: "All wedding designs",
   allOccasions: "All occasions",
   designsFeature: {
-    title: "Browse by what you have",
-    text: "No photo, one photo or two: every design says what it needs, and its price.",
+    title: "Illustrated or with your photos",
+    text: "Painted art alone, your couple photo, or a photo of each of you: every design says which, and its price.",
   },
   weddingsFeature: {
     title: "Wedding invitations",

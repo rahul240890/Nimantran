@@ -210,27 +210,33 @@ export const catalogCopy = {
   count: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
   clear: "Clear filters",
   empty: "No design matches all of these yet. Try fewer filters.",
-  photosLabel: "Photos you have",
+  photosLabel: "Art or photos",
   allPhotos: "Any",
-  photoGroups: { none: "No photo", one: "One photo", two: "Two photos" },
+  photoGroups: { none: "Illustrated", one: "Couple photo", two: "Bride and groom photos" },
   allDesigns: "All designs",
 };
 
 /** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */
 export const shelfCopy = {
   groups: {
-    photos: "By the photos you have",
+    photos: "Illustrated or with your photos",
     format: "By kind of invitation",
     tradition: "Weddings by tradition",
     occasion: "More celebrations",
   },
   photos: {
-    none: { title: "No photo needed", intro: "Painted cards that are ready with just your names." },
-    one: {
-      title: "With one photo",
-      intro: "One photo of the couple, or of the one you are celebrating.",
+    none: {
+      title: "Illustrated invitations",
+      intro: "Hand-painted art with your names. No photo needed.",
     },
-    two: { title: "With two photos", intro: "A photo of each of you, side by side." },
+    one: {
+      title: "Couple photo invitations",
+      intro: "Your favourite photo of the two of you, set into the painting.",
+    },
+    two: {
+      title: "Bride and groom photos",
+      intro: "A separate photo of each of you, framed side by side.",
+    },
   },
   format: {
     story: { title: "Stories", intro: "A full-screen painted page for every function." },

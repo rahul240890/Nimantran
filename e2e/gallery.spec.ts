@@ -114,12 +114,12 @@ test.describe("the Designs page", () => {
     const noPhoto = page.locator('[data-shelf="photos-none"]');
     await expect(noPhoto.locator("[data-design]")).toHaveCount(10);
     await noPhoto
-      .getByRole("link", { name: /^View all \d+ designs: No photo needed$/ })
+      .getByRole("link", { name: /^View all \d+ designs: Illustrated invitations$/ })
       .first()
       .click();
     await expect(page).toHaveURL(/photos=none/);
     await expect(
-      page.getByRole("heading", { name: /^No photo needed · \d+ designs$/ }),
+      page.getByRole("heading", { name: /^Illustrated invitations · \d+ designs$/ }),
     ).toBeVisible();
     await expect(page.locator("[data-shelf]")).toHaveCount(0);
     expect(await page.locator("[data-design]").count()).toBeGreaterThan(10);
@@ -169,8 +169,8 @@ test.describe("the Designs page", () => {
     await expect(page.getByRole("group", { name: "Wedding tradition" })).toBeHidden();
     await page.getByRole("radio", { name: "3D card" }).click();
     await page
-      .getByRole("group", { name: "Photos you have" })
-      .getByRole("button", { name: "No photo" })
+      .getByRole("group", { name: "Art or photos" })
+      .getByRole("button", { name: "Illustrated" })
       .click();
     await expect(page).toHaveURL(/photos=none/);
   });

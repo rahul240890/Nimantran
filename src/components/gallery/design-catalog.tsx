@@ -493,7 +493,7 @@ function Results({
   );
   const set = (change: Partial<DesignFilters>) => onChange({ ...filters, ...change });
   const showKinds = !filters.occasion || filters.occasion === "wedding";
-  // A View all names its row: "No photo needed · 89 designs"
+  // A View all names its row: "Illustrated invitations · 89 designs"
   const { query, kind, photos, format, occasion } = filters;
   const only = (chosen: unknown) =>
     !query.trim() && [kind ?? occasion, photos, format].filter(Boolean).length === 1 && !!chosen;
