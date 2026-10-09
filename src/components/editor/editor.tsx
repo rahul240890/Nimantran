@@ -70,6 +70,9 @@ const WIDE = "(min-width: 64rem)";
  * photos part shows each photo in its own frame already, and a floating phone there would
  * sit over the photo buttons.
  */
+/** Opening the link dialog survives the remount that leaving ?invite= in the address causes. */
+let publishOnArrival = false;
+
 const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions"]);
 
 /*
@@ -235,7 +238,10 @@ export function Editor({
 
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
-  const [autoPublish, setAutoPublish] = useState(false);
+  const [autoPublish, setAutoPublish] = useState(() => publishOnArrival);
+  useEffect(() => {
+    publishOnArrival = false;
+  }, []);
   const [sheet, setSheet] = useState(false);
   const miniHidden = useSyncExternalStore(miniStore.subscribe, miniStore.get, () => false);
   const mini = !wide && MINI_STEPS.has(step) && !sheet;
@@ -257,6 +263,7 @@ export function Editor({
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
         else if (openPublish) {
           inviteDraft.update((current) => ({ ...current, step: "preview" }), { touch: false });
+          publishOnArrival = true;
           setAutoPublish(true);
         }
       }
