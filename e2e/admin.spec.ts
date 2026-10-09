@@ -141,6 +141,9 @@ test.describe("packages", () => {
       `/create?invite=${id}&publish=1`,
     );
     await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
+    await expect(page.getByRole("dialog", { name: "Choose your link" })).toBeVisible({
+      timeout: 30_000,
+    });
     const path = await publish(page, "aarav-paid");
     await page.goto(`${path}?quality=2d`);
     await expect(page.locator("[data-watermark]")).toHaveCount(0);
