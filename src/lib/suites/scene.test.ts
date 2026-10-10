@@ -118,7 +118,7 @@ describe("One Scene", () => {
   });
 
   it("plays a moving scene's layers, with its words in the sky's calm space", () => {
-    expect(MOVING_IDS.length).toBe(45);
+    expect(MOVING_IDS.length).toBe(65);
     for (const suite of MOVING_IDS) {
       const page = scenePage(suite, 2)!;
       expect(page.style).toBe("bare");
