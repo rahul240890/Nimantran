@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Clapperboard,
   ArrowLeft,
   ArrowRight,
   Image as ImageIcon,
@@ -57,7 +58,13 @@ const CHIP_OCCASIONS = [
   "shop-opening",
 ] as const satisfies readonly CategoryId[];
 
-const FORMAT_ICONS = { all: LayoutGrid, scene: ImageIcon, story: Layers, card: Rotate3d } as const;
+const FORMAT_ICONS = {
+  all: LayoutGrid,
+  moving: Clapperboard,
+  scene: ImageIcon,
+  story: Layers,
+  card: Rotate3d,
+} as const;
 
 const chipClass = (pressed: boolean) =>
   cn(
@@ -174,9 +181,13 @@ function Browse({
   const { shelfCopy, catalogCopy, weddingKindCopy, occasionTaglines } = useText(galleryText);
   const occasionsPath = pagePath({ kind: "gallery" }, locale);
   const kindTitle = (kind: WeddingKind) => shelfCopy.tradition(weddingKindCopy[kind].name);
-  const groups = (["photos", "format", "occasion"] as const).map((group) => ({
+  // The moving scenes head the page in a group of their own
+  const featured = (shelf: Shelf) => shelf.kind === "format" && shelf.value === "moving";
+  const groups = (["moving", "photos", "format", "occasion"] as const).map((group) => ({
     group,
-    shelves: SHELVES.filter((shelf) => shelf.kind === group),
+    shelves: SHELVES.filter((shelf) =>
+      group === "moving" ? featured(shelf) : shelf.kind === group && !featured(shelf),
+    ),
   }));
   const words = (shelf: Shelf) => {
     switch (shelf.kind) {
@@ -322,7 +333,7 @@ function Results({
           }
           className="w-full max-w-xl"
         >
-          {(["all", "scene", "story", "card"] as const).map((choice) => {
+          {(["all", "moving", "scene", "story", "card"] as const).map((choice) => {
             const Icon = FORMAT_ICONS[choice];
             return (
               <RadioItem

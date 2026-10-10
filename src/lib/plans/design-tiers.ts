@@ -10,7 +10,11 @@ import { z } from "zod";
  * design catalogue, live in design-defaults.ts and are worked out on the server.
  */
 
-export const DESIGN_TIERS = ["free", "premium", "royal"] as const;
+/**
+ * Signature is the moving scenes' tier (owner, 2026-10-09): painted in layers that move
+ * like a short film, priced above Royal.
+ */
+export const DESIGN_TIERS = ["free", "premium", "royal", "signature"] as const;
 export type DesignTier = (typeof DESIGN_TIERS)[number];
 
 export function isDesignTier(value: unknown): value is DesignTier {
@@ -45,7 +49,7 @@ export type Pricing = {
 };
 
 export const DEFAULT_PRICING: Pricing = {
-  designs: { premium: 49_900, royal: 59_900 },
+  designs: { premium: 49_900, royal: 59_900, signature: 79_900 },
   packages: { celebration: 50_000, grand: 1_50_000 },
   invites: { basic: 50, celebration: 500 },
   tiers: {},
@@ -62,7 +66,12 @@ const pricePaise = z
 const inviteCount = z.number().int().min(1).max(1_00_000);
 
 export const pricingSchema = z.object({
-  designs: z.object({ premium: pricePaise, royal: pricePaise }),
+  // Settings saved before Signature existed keep their prices, with Signature at its default
+  designs: z.object({
+    premium: pricePaise,
+    royal: pricePaise,
+    signature: pricePaise.default(DEFAULT_PRICING.designs.signature),
+  }),
   packages: z.object({ celebration: pricePaise, grand: pricePaise }),
   invites: z.object({ basic: inviteCount, celebration: inviteCount }),
   tiers: z.record(z.string().regex(/^[a-z0-9-]{1,60}$/), z.enum(DESIGN_TIERS)),
@@ -83,10 +92,14 @@ export function parsePricing(value: unknown): Pricing {
   return tiers.success ? { ...DEFAULT_PRICING, tiers: tiers.data.tiers } : DEFAULT_PRICING;
 }
 
-/** Royal designs cost more than Premium ones, and Grand adds more than Celebration. */
+/**
+ * Royal designs cost more than Premium ones, Signature no less than Royal, and Grand adds
+ * more than Celebration.
+ */
 export function pricesInOrder(pricing: Pick<Pricing, "designs" | "packages" | "invites">): boolean {
   return (
     pricing.designs.royal > pricing.designs.premium &&
+    pricing.designs.signature >= pricing.designs.royal &&
     pricing.packages.grand > pricing.packages.celebration &&
     pricing.invites.celebration > pricing.invites.basic
   );

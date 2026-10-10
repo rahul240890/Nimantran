@@ -121,7 +121,7 @@ export const upgradeCopy = {
   refunds: "Full refund within 7 days if the invite hasn't been sent to any guest.",
 } as const;
 
-const TIER_NAMES = ["Free", "Premium", "Royal"];
+const TIER_NAMES = ["Free", "Premium", "Royal", "Signature"];
 
 export const limitCopy = {
   title: "This invite needs a package",
@@ -129,7 +129,7 @@ export const limitCopy = {
   used: {
     languages: (count: number) => `${count} card languages`,
     ownSong: () => "Your own song",
-    /** The design's tier, by its place in the list (1 Premium, 2 Royal). */
+    /** The design's tier, by its place in the list (1 Premium, 2 Royal, 3 Signature). */
     design: (rank: number) => `A ${TIER_NAMES[rank] ?? "Premium"} design`,
   } satisfies Record<PlanNeed["limit"], (count: number) => string>,
   choose: "Choose a package",

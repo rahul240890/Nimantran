@@ -33,11 +33,12 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   formats: {
     label: "निमंत्रण का प्रकार",
     all: "सभी",
+    moving: "चलते दृश्य",
     scene: "दृश्य",
     story: "कहानी",
     card: "3D कार्ड",
   },
-  tiers: { free: "फ़्री", premium: "प्रीमियम", royal: "रॉयल" },
+  tiers: { free: "फ़्री", premium: "प्रीमियम", royal: "रॉयल", signature: "सिग्नेचर" },
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} डिज़ाइन, ${price} से प्रकाशित करें` : "फ़्री डिज़ाइन",
@@ -50,6 +51,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     optional: "फ़ोटो चाहें तो",
   },
   sceneBadge: "दृश्य · 1 पन्ना",
+  movingBadge: "चलचित्र",
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:
     "आपकी फ़ोटो और नामों वाला एक चित्र। हर रस्म बारी-बारी से उड़कर आती है, और चित्र की रोशनी सुबह से रात तक उसके साथ बदलती है।",
@@ -212,6 +214,7 @@ export const catalogCopy: Translation<typeof en.catalogCopy> = {
 
 export const shelfCopy: Translation<typeof en.shelfCopy> = {
   groups: {
+    moving: "नया: चलते दृश्य",
     photos: "चित्रित या आपकी फ़ोटो के साथ",
     format: "निमंत्रण के प्रकार से",
     tradition: "परंपरा के हिसाब से शादी",
@@ -232,6 +235,11 @@ export const shelfCopy: Translation<typeof en.shelfCopy> = {
     },
   },
   format: {
+    moving: {
+      title: "चलते दृश्य",
+      intro:
+        "छोटी फ़िल्म की तरह चलते चित्र: पंखुड़ियाँ गिरती हैं, कंदील उड़ते हैं, पानी लहराता है। फ़ोटो की ज़रूरत नहीं।",
+    },
     story: { title: "स्टोरी", intro: "हर रस्म का अपना पूरा चित्रित पन्ना।" },
     scene: {
       title: "सीन",

@@ -14,16 +14,19 @@
 import type { FunctionId } from "@/lib/events/functions";
 import {
   ILLUSTRATED_IDS,
+  MOVING_IDS,
   PHOTO_CARD_IDS,
   isSceneTheme,
   pageLook,
   type IllustratedId,
+  type MovingId,
   type PhotoCardId,
   type Mood,
   type PageArt,
   type SceneThemeId,
   type SuiteId,
 } from "./catalog";
+import { isMoving, movingOpen, movingScene, type MovingScene } from "./moving";
 import { photoPage, type FrameBox } from "./photo-frames";
 
 /**
@@ -106,7 +109,10 @@ type PaintedEntry = (
   plate?: true;
 };
 
-const PAINTED: Record<Exclude<SceneThemeId, IllustratedId | PhotoCardId>, PaintedEntry> = {
+const PAINTED: Record<
+  Exclude<SceneThemeId, IllustratedId | PhotoCardId | MovingId>,
+  PaintedEntry
+> = {
   // A white marble jharokha panel on Lake Pichola at dusk
   "udaipur-lake": {
     frame: [31.6, 11.4, 36.9, 28.2],
@@ -1433,10 +1439,25 @@ export type ScenePage = {
   dark: boolean;
   /** An illustrated card's painting in parts, as it comes together; empty for every other. */
   pieces: readonly Piece[];
+  /** A moving scene's layers, which play over its flat painting; null for every other. */
+  moving: MovingScene | null;
 } & SceneLayout;
 
 /** The painting and places for a theme's scene with this many photos, if it has one. */
 export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
+  if (isMoving(suite)) {
+    const entry = movingOpen(suite);
+    return {
+      image: `/suites/${suite}/scene.webp`,
+      style: "bare",
+      dark: Boolean(entry.dark),
+      card: null,
+      frames: [],
+      pieces: [],
+      moving: movingScene(suite),
+      ...openLayout(entry),
+    };
+  }
   if (isIllustrated(suite) || isPhotoCard(suite)) {
     const entry: IllustratedEntry = isPhotoCard(suite) ? PHOTO_CARDS[suite] : ILLUSTRATED[suite];
     return {
@@ -1446,6 +1467,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       card: null,
       frames: isPhotoCard(suite) ? PHOTO_CARDS[suite].pair : [],
       pieces: openPieces(entry.open),
+      moving: null,
       ...openLayout(entry),
     };
   }
@@ -1459,6 +1481,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       card: { image: `/suites/${suite}/card.webp`, text, plate: Boolean(plate) },
       frames: pair ?? [frame],
       pieces: [],
+      moving: null,
       names,
       line,
       slot: card,
@@ -1476,6 +1499,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
     frames: page.frames,
     dark: false,
     pieces: [],
+    moving: null,
     ...layout,
   };
 }
@@ -1485,7 +1509,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
  * groom's, or none on an illustrated card.
  */
 export function sceneFrames(suite: SuiteId): 0 | 1 | 2 {
-  if (isIllustrated(suite)) return 0;
+  if (isIllustrated(suite) || isMoving(suite)) return 0;
   if (isPhotoCard(suite)) return 2;
   return isSceneTheme(suite) && PAINTED[suite].pair ? 2 : 1;
 }
@@ -1500,6 +1524,7 @@ export const SCENE_SUITES = [
   ...Object.keys(PAINTED),
   ...ILLUSTRATED_IDS,
   ...PHOTO_CARD_IDS,
+  ...MOVING_IDS,
 ] as SuiteId[];
 
 /** The sides a function can come in from; each one leaves the way the next comes in. */

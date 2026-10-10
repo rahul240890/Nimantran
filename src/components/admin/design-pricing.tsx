@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Clapperboard,
   Crown,
   Gift,
   Image as ImageIcon,
@@ -48,15 +49,21 @@ const KIND_NAMES: Record<DesignRow["kind"], string> = {
   card: "3D card",
 };
 const KIND_ICONS = { scene: ImageIcon, story: Layers, card: Rotate3d };
-const TIER_NAMES: Record<DesignTier, string> = { free: "Free", premium: "Premium", royal: "Royal" };
-const TIER_ICONS = { free: Gift, premium: Sparkles, royal: Crown };
+const TIER_NAMES: Record<DesignTier, string> = {
+  free: "Free",
+  premium: "Premium",
+  royal: "Royal",
+  signature: "Signature",
+};
+const TIER_ICONS = { free: Gift, premium: Sparkles, royal: Crown, signature: Clapperboard };
 
 type Amounts = Pick<Pricing, "designs" | "packages" | "invites">;
 
-/** The six numbers above the designs: two design prices, two package add-ons, two invite counts. */
+/** The seven numbers above the designs: three design prices, two package add-ons, two invite counts. */
 const FIELDS = [
   { id: "premium", label: "Premium design (₹)", rupees: true },
   { id: "royal", label: "Royal design (₹)", rupees: true },
+  { id: "signature", label: "Signature design (₹)", rupees: true },
   { id: "celebration", label: "Celebration adds (₹)", rupees: true },
   { id: "grand", label: "Grand adds (₹)", rupees: true },
   { id: "basicInvites", label: "Invites in Basic and free designs", rupees: false },
@@ -67,6 +74,7 @@ type FieldId = (typeof FIELDS)[number]["id"];
 const fieldValues = (amounts: Amounts): Record<FieldId, number> => ({
   premium: amounts.designs.premium / 100,
   royal: amounts.designs.royal / 100,
+  signature: amounts.designs.signature / 100,
   celebration: amounts.packages.celebration / 100,
   grand: amounts.packages.grand / 100,
   basicInvites: amounts.invites.basic,
@@ -106,7 +114,11 @@ export function DesignPricingForm({ rows, amounts }: { rows: DesignRow[]; amount
     Number.isNaN(numbers[id]) ? "Enter a whole number, from 1 to 1,00,000." : undefined;
   const pricesValid = FIELDS.every(({ id }) => !fieldError(id));
   const next: Amounts = {
-    designs: { premium: numbers.premium * 100, royal: numbers.royal * 100 },
+    designs: {
+      premium: numbers.premium * 100,
+      royal: numbers.royal * 100,
+      signature: numbers.signature * 100,
+    },
     packages: { celebration: numbers.celebration * 100, grand: numbers.grand * 100 },
     invites: { basic: numbers.basicInvites, celebration: numbers.celebrationInvites },
   };
@@ -152,7 +164,7 @@ export function DesignPricingForm({ rows, amounts }: { rows: DesignRow[]; amount
         toast({
           title:
             result === "out-of-order"
-              ? "Royal must cost more than Premium, Grand add more than Celebration, and Celebration allow more invites than Basic."
+              ? "Royal must cost more than Premium, Signature at least as much as Royal, Grand add more than Celebration, and Celebration allow more invites than Basic."
               : result === "invalid"
                 ? "Check the prices and try again."
                 : "Couldn't save. Try again.",
@@ -205,13 +217,13 @@ export function DesignPricingForm({ rows, amounts }: { rows: DesignRow[]; amount
           </div>
           {pricesValid && !ordered && (
             <p role="alert" className="text-sm font-semibold text-danger">
-              Royal must cost more than Premium, Grand must add more than Celebration, and
-              Celebration must allow more invites than Basic.
+              Royal must cost more than Premium, Signature at least as much as Royal, Grand must add
+              more than Celebration, and Celebration must allow more invites than Basic.
             </p>
           )}
           {ordered && (
             <ul className="flex flex-col gap-1 text-sm text-ink-muted">
-              {(["free", "premium", "royal"] as const).map((tier) => (
+              {DESIGN_TIERS.map((tier) => (
                 <li key={tier}>
                   <span className="font-semibold text-ink">{TIER_NAMES[tier]} design:</span>{" "}
                   {PAID_PLAN_IDS.map((plan) => {
@@ -238,7 +250,8 @@ export function DesignPricingForm({ rows, amounts }: { rows: DesignRow[]; amount
           </CardTitle>
           <CardDescription>
             New designs start as Premium Scenes or Stories and free 3D cards until you change them.
-            The grandest wedding Stories, which open with a painted god, start as Royal.
+            The grandest wedding Stories, which open with a painted god, start as Royal, and the
+            moving scenes start as Signature.
           </CardDescription>
         </CardHeader>
         <CardBody className="flex flex-col gap-5">

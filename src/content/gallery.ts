@@ -37,12 +37,13 @@ export const galleryCopy = {
   formats: {
     label: "Kind of invitation",
     all: "All",
+    moving: "Moving",
     scene: "Scene",
     story: "Story",
     card: "3D card",
   },
   /** Each design's tier (Admin, Designs) and what it costs, on its tile. */
-  tiers: { free: "Free", premium: "Premium", royal: "Royal" },
+  tiers: { free: "Free", premium: "Premium", royal: "Royal", signature: "Signature" },
   tierPrice: (tier: string, price: string) => `${tier} · ${price}`,
   tierLabel: (tier: string, price: string | null) =>
     price ? `${tier} design, publish from ${price}` : "Free design",
@@ -56,6 +57,7 @@ export const galleryCopy = {
     optional: "Photos optional",
   },
   sceneBadge: "Scene · 1 page",
+  movingBadge: "Moving",
   storyBadge: (count: number) => `Story · ${count} pages`,
   sceneNote:
     "One painting with your photos and names. Every celebration flies in by turn, and the painting's light follows it from morning to night.",
@@ -221,6 +223,7 @@ export const catalogCopy = {
 /** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */
 export const shelfCopy = {
   groups: {
+    moving: "New: moving scenes",
     photos: "Illustrated or with your photos",
     format: "By kind of invitation",
     tradition: "Weddings by tradition",
@@ -241,6 +244,11 @@ export const shelfCopy = {
     },
   },
   format: {
+    moving: {
+      title: "Moving scenes",
+      intro:
+        "Painted scenes that move like a short film: petals fall, lanterns rise, water ripples. No photo needed.",
+    },
     story: { title: "Stories", intro: "A full-screen painted page for every function." },
     scene: {
       title: "Scenes",

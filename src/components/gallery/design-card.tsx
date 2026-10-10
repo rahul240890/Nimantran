@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Clapperboard,
   ArrowRight,
   Camera,
   CameraOff,
@@ -22,6 +23,7 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
+import { isMoving } from "@/lib/suites/moving";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
 import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
@@ -67,6 +69,7 @@ export function DesignCard({
   const locale = useLocale();
   const pages = paintedPages(design);
   const scene = design.format === "scene";
+  const moving = isMoving(design.suite);
   const painted = pages.length > 0;
   const [open, setOpen] = useState(false);
 
@@ -125,19 +128,23 @@ export function DesignCard({
             )}
           </span>
         )}
-        <span className="absolute start-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
-          {scene ? (
+        <span className="absolute start-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 overflow-hidden rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
+          {moving ? (
+            <Clapperboard aria-hidden className="size-3.5" />
+          ) : scene ? (
             <ImageIcon aria-hidden className="size-3.5" />
           ) : painted ? (
             <Layers aria-hidden className="size-3.5" />
           ) : (
             <Rotate3d aria-hidden className="size-3.5" />
           )}
-          {scene
-            ? galleryCopy.sceneBadge
-            : painted
-              ? galleryCopy.storyBadge(pages.length)
-              : galleryCopy.card}
+          {moving
+            ? galleryCopy.movingBadge
+            : scene
+              ? galleryCopy.sceneBadge
+              : painted
+                ? galleryCopy.storyBadge(pages.length)
+                : galleryCopy.card}
         </span>
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />

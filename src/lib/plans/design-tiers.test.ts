@@ -55,11 +55,33 @@ describe("design tiers", () => {
     expect(old.tiers).toEqual({ "card-marigold": "royal" });
   });
 
+  it("price the moving scenes as Signature, at ₹799 unless the admin changes it", () => {
+    expect(defaultTier("jal-mahal-scene")).toBe("signature");
+    expect(tierPricePaise(DEFAULT_PRICING, "signature")).toBe(79_900);
+    // Settings saved before Signature existed keep their prices and gain Signature's default
+    const saved = parsePricing({
+      designs: { premium: 59_900, royal: 69_900 },
+      packages: { celebration: 60_000, grand: 2_00_000 },
+      invites: { basic: 40, celebration: 400 },
+      tiers: {},
+    });
+    expect(saved.designs).toEqual({ premium: 59_900, royal: 69_900, signature: 79_900 });
+  });
+
   it("need Royal dearer than Premium, Grand above Celebration and more invites in Celebration", () => {
     expect(pricesInOrder(DEFAULT_PRICING)).toBe(true);
-    expect(pricesInOrder({ ...DEFAULT_PRICING, designs: { premium: 99_900, royal: 49_900 } })).toBe(
-      false,
-    );
+    expect(
+      pricesInOrder({
+        ...DEFAULT_PRICING,
+        designs: { premium: 99_900, royal: 49_900, signature: 1_49_900 },
+      }),
+    ).toBe(false);
+    expect(
+      pricesInOrder({
+        ...DEFAULT_PRICING,
+        designs: { premium: 49_900, royal: 59_900, signature: 39_900 },
+      }),
+    ).toBe(false);
     expect(
       pricesInOrder({ ...DEFAULT_PRICING, packages: { celebration: 50_000, grand: 50_000 } }),
     ).toBe(false);
@@ -92,7 +114,7 @@ describe("design tiers", () => {
 
   it("charge the admin's prices", () => {
     const pricing = {
-      designs: { premium: 59_900, royal: 79_900 },
+      designs: { premium: 59_900, royal: 79_900, signature: 99_900 },
       packages: { celebration: 60_000, grand: 2_00_000 },
     };
     const free = { plan: "free", tier: "free" } as const;

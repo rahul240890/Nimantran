@@ -33,7 +33,8 @@ export const SHELF_OCCASIONS = [
 ] as const satisfies readonly CategoryId[];
 
 /**
- * Every row, in order: by photos, then by kind of invitation, then other occasions. Wedding
+ * Every row, in order: by photos, then by kind of invitation (the moving scenes first, which
+ * the Designs page shows at its head), then other occasions. Wedding
  * traditions head the page as tiles instead (each opens its View all), so the page stays short.
  */
 export const SHELVES: readonly Shelf[] = [
@@ -42,11 +43,13 @@ export const SHELVES: readonly Shelf[] = [
     kind: "photos" as const,
     value,
   })),
-  ...(["story", "scene", "card"] as const satisfies readonly DesignFormat[]).map((value) => ({
-    id: `format-${value}` as const,
-    kind: "format" as const,
-    value,
-  })),
+  ...(["moving", "story", "scene", "card"] as const satisfies readonly DesignFormat[]).map(
+    (value) => ({
+      id: `format-${value}` as const,
+      kind: "format" as const,
+      value,
+    }),
+  ),
   ...SHELF_OCCASIONS.map((value) => ({
     id: `occasion-${value}` as const,
     kind: "occasion" as const,
