@@ -1,13 +1,37 @@
 import { describe, expect, it } from "vitest";
-import { SCENE_FLY, SCENE_HOLD, SCENE_INTRO, sceneTimeline, shotsAt } from "./scene-timeline";
-import { END_SECONDS, VIDEO_BEAT_MIN, VIDEO_MAX_SECONDS, VIDEO_MIN_SECONDS } from "./timeline";
+import {
+  SCENE_FLY,
+  SCENE_HOLD,
+  SCENE_HOLD_MIN,
+  SCENE_INTRO,
+  sceneTimeline,
+  shotsAt,
+} from "./scene-timeline";
+import {
+  END_SECONDS,
+  VIDEO_BEAT_MIN,
+  VIDEO_LONGEST_SECONDS,
+  VIDEO_MAX_SECONDS,
+  VIDEO_MIN_SECONDS,
+} from "./timeline";
 
 describe("sceneTimeline", () => {
-  it.each([0, 1, 2, 3, 5, 6, 8, 12, 15])("lasts 30 to 45 seconds with %i cards", (count) => {
+  it.each([0, 1, 2, 3, 5, 6, 8])("lasts 30 to 45 seconds with %i cards", (count) => {
     const { total, end } = sceneTimeline(count);
     expect(total).toBeGreaterThanOrEqual(VIDEO_MIN_SECONDS - 0.01);
     expect(total).toBeLessThanOrEqual(VIDEO_MAX_SECONDS + 0.01);
     expect(total - end).toBeCloseTo(END_SECONDS);
+  });
+
+  it.each([9, 10, 12])("grows towards a minute rather than rush %i cards", (count) => {
+    const { total, shots } = sceneTimeline(count);
+    expect(total).toBeGreaterThan(VIDEO_MAX_SECONDS);
+    expect(total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);
+    shots.forEach((shot) => expect(shot.seconds).toBeGreaterThanOrEqual(SCENE_HOLD_MIN));
+  });
+
+  it("never runs past a minute, however many cards", () => {
+    expect(sceneTimeline(20).total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);
   });
 
   it("shows every card in order, back to back after the intro", () => {

@@ -1536,8 +1536,11 @@ export function entranceFor(index: number): Entrance {
   return ENTRANCES[index % ENTRANCES.length]!;
 }
 
-/** How long each function stays in the slot before the next comes in. */
-export const SCENE_HOLD_MS = 4200;
+/**
+ * How long each function stays in the slot before the next comes in: its way in, then
+ * time to read its name, day, hour and place. The scene's video holds each card as long.
+ */
+export const SCENE_HOLD_MS = 5500;
 /** How long one function takes to leave and the next to arrive. */
 export const SCENE_SWAP_MS = 900;
 

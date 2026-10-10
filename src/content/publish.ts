@@ -213,7 +213,7 @@ export const repliesCopy = {
 
 export const videoCopy = {
   heading: "Video for WhatsApp Status and Reels",
-  body: "Your invitation's pages as a 30 to 45 second vertical video, with its raga. It's made on this phone or computer, so nothing is uploaded.",
+  body: "Your invitation's pages as a 30 to 45 second vertical video with its raga, up to a minute when there are many functions. It's made on this phone or computer, so nothing is uploaded.",
   poster: "The video's first page",
   music: "With the raga",
   make: "Make video",
