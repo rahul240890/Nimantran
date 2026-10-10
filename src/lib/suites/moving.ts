@@ -331,6 +331,272 @@ const MOVING: Record<MovingId, MovingEntry> = {
       twinkle(5, 3, 6, [10, 60]),
     ],
   },
+  // The clean moving cards (shubhdwar/clean-moving-card-prompts.md): soft paper with a wide
+  // calm space for the words, and the art and its movement kept to the edges
+  // Lanterns and flower chandeliers swing over the garden lounge, petals drift and lights float up
+  "baithak-bagh": {
+    open: [10.0, 19.0, 80.0, 35.0],
+    floats: [
+      fall(0, 3, 4),
+      fall(1, 2, 4),
+      fall(2, 1, 5),
+      fall(3, 1, 4),
+      rise(4, 3, 2.5, { band: [10.0, 70.0] }),
+      fall(5, 1, 4),
+    ],
+  },
+  // Roses rock in two corners, petals drift and gold flecks twinkle
+  "do-kone": {
+    open: [11.1, 27.1, 77.6, 46.3],
+    floats: [
+      fall(0, 2, 3.5),
+      fall(1, 2, 3.5),
+      fall(2, 1, 3),
+      twinkle(3, 4, 2, [3.0, 97.0]),
+      fall(4, 1, 4),
+      fall(5, 1, 3),
+    ],
+  },
+  // The jasmine wreath turns slowly, buds and petals fall and a butterfly circles
+  "gajra-ghera": {
+    open: [27.5, 33, 45, 30],
+    floats: [
+      fall(0, 3, 2.5),
+      fall(1, 2, 3.5),
+      fall(2, 2, 3.5),
+      fall(3, 1, 3.5),
+      glide(4, 1, 6, { pair: 5, band: [10.0, 90.0] }),
+    ],
+  },
+  // Folk birds on deep green: gold leaves drift, blossoms twinkle and a bird crosses
+  "bulbul-jaal": {
+    open: [17.3, 15.4, 65.1, 64.5],
+    dark: true,
+    floats: [
+      fall(0, 2, 3.5),
+      fall(1, 2, 3.5),
+      fall(2, 1, 3.5),
+      twinkle(3, 3, 3, [5.0, 95.0]),
+      glide(4, 1, 7, { pair: 5, band: [3.0, 18.0] }),
+    ],
+  },
+  // Bougainvillea sways over the white arch, bracts flutter down and a sparrow hops on the steps
+  baganbilas: {
+    open: [24.6, 16.6, 51.6, 59.8],
+    floats: [
+      fall(0, 3, 4),
+      fall(1, 2, 4),
+      fall(2, 1, 6),
+      fall(3, 1, 3.5),
+      fall(4, 1, 3),
+      { sprite: 5, kind: "bob", count: 1, size: 7, band: [84.0, 90.0] },
+    ],
+  },
+  // Pearl strands swing and sparkle, orchid petals drift and pearls drop
+  "moti-lari": {
+    open: [7.9, 26.0, 83.8, 47.5],
+    floats: [
+      fall(0, 2, 2),
+      fall(1, 2, 2),
+      fall(2, 1, 4),
+      fall(3, 2, 3),
+      twinkle(4, 4, 3, [2.0, 24.0]),
+      fall(5, 1, 3),
+    ],
+  },
+  // Eucalyptus sprigs sway down both sides and round leaves spin as they fall
+  "safeda-patti": {
+    open: [22.5, 11.3, 58.8, 69.7],
+    floats: [
+      fall(0, 2, 3.5),
+      fall(1, 2, 3),
+      fall(2, 1, 3),
+      fall(3, 1, 3),
+      fall(4, 1, 3),
+      twinkle(5, 3, 2, [3.0, 97.0]),
+    ],
+  },
+  // Rose and jasmine strings swing from the brass rod and petals fall
+  "phool-ladi": {
+    open: [13.2, 23.6, 73.4, 50.4],
+    floats: [fall(0, 3, 3.5), fall(1, 2, 3.5), fall(2, 2, 2.5), fall(3, 1, 5), fall(5, 1, 3.5)],
+  },
+  // Lanterns swing over the pomegranate garden, blossoms drift and gold stars twinkle
+  "anar-bagh": {
+    open: [21.5, 23.6, 56.8, 58.6],
+    water: [88.0, 97.0],
+    floats: [
+      fall(0, 1, 4),
+      fall(1, 2, 3),
+      fall(2, 2, 3),
+      twinkle(3, 3, 3, [3.0, 30.0]),
+      fall(4, 1, 3),
+      fall(5, 1, 3),
+    ],
+  },
+  // The olive swag sways, white petals fall and a dove glides across
+  "zaitoon-mala": {
+    open: [14.2, 13.7, 71.3, 64.5],
+    floats: [
+      fall(0, 3, 3.5),
+      fall(1, 2, 3.5),
+      fall(2, 2, 3),
+      glide(3, 1, 9, { pair: 4, band: [3.0, 20.0] }),
+      fall(5, 1, 4),
+    ],
+  },
+  // Jacaranda branches sway and lilac flowers tumble down
+  neelgulmohar: {
+    open: [22.5, 19.5, 66.1, 56.3],
+    floats: [
+      fall(0, 3, 3),
+      fall(1, 2, 3),
+      fall(2, 1, 5),
+      fall(3, 3, 2.5),
+      fall(4, 1, 3),
+      glide(5, 1, 4, { band: [10.0, 80.0] }),
+    ],
+  },
+  // Blue pottery bells swing on their cords and small blue flowers drift
+  "neeli-pottery": {
+    open: [8.0, 18.0, 80.0, 39.0],
+    floats: [fall(0, 2, 3), fall(1, 2, 3), fall(2, 1, 4), fall(4, 1, 3), fall(5, 2, 3)],
+  },
+  // Chrysanthemum garlands swing, yellow petals shower and turmeric dust rises
+  "shevanti-haldi": {
+    open: [19.4, 14.2, 60.9, 56.3],
+    floats: [
+      fall(0, 4, 3),
+      fall(1, 2, 4.5),
+      fall(2, 3, 3),
+      fall(3, 1, 5),
+      fall(4, 1, 4),
+      rise(5, 3, 1.5, { band: [60.0, 100.0] }),
+    ],
+  },
+  // Bangle strings swing and sparkle, henna leaves and petals drift down
+  "choodi-jhalar": {
+    open: [15.2, 28.3, 71.3, 44.5],
+    floats: [fall(2, 3, 3), fall(3, 1, 4), fall(4, 3, 3), twinkle(5, 4, 3, [2.0, 26.0])],
+  },
+  // Ghungroo strings swing, bulbs twinkle and golden sparkles rise
+  "ghungroo-raat": {
+    open: [10.0, 22.5, 79.7, 46.9],
+    dark: true,
+    floats: [
+      rise(4, 4, 3, { band: [20.0, 96.0] }),
+      rise(5, 2, 6, { band: [20.0, 96.0] }),
+      fall(2, 3, 3),
+      twinkle(3, 3, 2.5, [2.0, 24.0]),
+      fall(0, 1, 3),
+    ],
+  },
+  // Hanging lamps swing and flicker, sparks rise and marigold petals fall
+  "deep-lari": {
+    open: [17.3, 30.1, 66.1, 50.4],
+    floats: [
+      rise(0, 4, 2, { band: [5.0, 60.0] }),
+      rise(1, 2, 3, { band: [5.0, 60.0] }),
+      fall(2, 3, 3),
+      fall(3, 1, 4),
+      fall(4, 1, 4),
+    ],
+  },
+  // The full moon glows, jasmine petals drift and fireflies blink
+  "sharad-poonam": {
+    open: [20, 24, 62, 47],
+    floats: [
+      fall(0, 2, 3),
+      fall(1, 2, 3),
+      twinkle(2, 3, 3, [60.0, 98.0]),
+      twinkle(3, 3, 2, [30.0, 98.0]),
+      fall(4, 1, 3),
+      fall(5, 1, 3),
+    ],
+  },
+  // Baubles swing on their ribbons, snow falls and stars twinkle
+  "holly-ribbon": {
+    open: [18.4, 23.0, 64.1, 52.2],
+    floats: [
+      fall(0, 4, 2.5),
+      fall(1, 5, 1.6),
+      twinkle(3, 3, 3, [2.0, 26.0]),
+      fall(2, 1, 4),
+      fall(4, 1, 3),
+    ],
+  },
+  // The bunting sways, feathers drift and a little bird flutters across
+  "chidiya-ghonsla": {
+    open: [22.0, 15.0, 70.0, 58.0],
+    floats: [
+      fall(0, 2, 4),
+      fall(1, 1, 4),
+      fall(2, 2, 3),
+      fall(3, 1, 3.5),
+      glide(4, 1, 6, { pair: 5, band: [4.0, 22.0] }),
+    ],
+  },
+  // The awning sways, balloons bob, and sprinkles and sweets float down
+  "kulfi-thela": {
+    open: [19.4, 11.9, 62.0, 53.3],
+    floats: [
+      fall(3, 3, 3),
+      fall(2, 2, 3),
+      fall(5, 1, 3),
+      rise(4, 1, 5),
+      fall(0, 1, 4, { pace: 1.4 }),
+      fall(1, 1, 4, { pace: 1.4 }),
+    ],
+  },
+  // Paper fans sway, candles flicker, macarons and sprinkles float down
+  "meetha-bakery": {
+    open: [14.2, 18.9, 71.3, 50.4],
+    floats: [
+      fall(3, 3, 3),
+      fall(4, 2, 2.5),
+      fall(0, 1, 4, { pace: 1.4 }),
+      fall(1, 1, 4, { pace: 1.4 }),
+      fall(5, 1, 3),
+    ],
+  },
+  // Wildflowers sway, dandelion seeds float up and a butterfly flutters
+  "khargosh-bagicha": {
+    open: [20.4, 13.1, 58.8, 61.0],
+    floats: [
+      rise(0, 3, 2.5),
+      fall(1, 1, 3),
+      glide(2, 1, 5, { pair: 3, band: [20.0, 70.0] }),
+      fall(5, 2, 2.5),
+    ],
+  },
+  // The bulbs sway and glow, the rose vine sways and petals blow past
+  "cycle-basket": {
+    open: [6.9, 19.5, 77.6, 45.7],
+    floats: [
+      fall(0, 3, 3),
+      fall(1, 1, 3),
+      fall(2, 1, 3),
+      fall(3, 1, 3),
+      fall(4, 1, 4),
+      twinkle(5, 3, 3, [2.0, 20.0]),
+    ],
+  },
+  // The toran sways with its bells, geraniums nod and leaves drift down
+  "khidki-gamla": {
+    open: [24.6, 15.4, 51.6, 61.5],
+    floats: [fall(0, 1, 4), fall(1, 3, 3), fall(2, 1, 4), fall(3, 2, 3), fall(4, 1, 2.5)],
+  },
+  // Kachnar branches sway, petals spin down and a sunbird darts past
+  kachnar: {
+    open: [6.9, 20.1, 74.5, 53.9],
+    floats: [
+      fall(0, 3, 3.5),
+      fall(1, 2, 3.5),
+      fall(2, 1, 5),
+      fall(3, 1, 3.5),
+      glide(4, 1, 5, { pair: 5, band: [4.0, 26.0] }),
+    ],
+  },
 };
 
 export function isMoving(suite: SuiteId): suite is MovingId {
