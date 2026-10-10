@@ -35,6 +35,7 @@ describe("gallery catalog", () => {
         "pithora-ghoda-scene",
         "patola-bandh-scene",
         "moti-bharat-scene",
+        "phool-ladi-scene",
         "kutch-rang-scene",
         "pichwai-gaay-scene",
         "kutch-bhunga-scene",

@@ -33,11 +33,12 @@ test.describe("finding a design", () => {
     await page.locator('[data-kind="gujarati"]').click();
     await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/);
     const designs = page.locator("[data-design]");
-    await expect(designs).toHaveCount(13);
+    await expect(designs).toHaveCount(14);
     for (const scene of [
       "pithora-ghoda",
       "patola-bandh",
       "moti-bharat",
+      "phool-ladi",
       "kutch-rang",
       "pichwai-gaay",
       "kutch-bhunga",
