@@ -92,15 +92,20 @@ export function kindsOf(design: GalleryDesign): WeddingKind[] {
   });
 }
 
-/** Every design in the gallery with what it can be filtered by, each kind mixed through. */
-export function designCatalog(): CatalogEntry[] {
-  return allDesigns().map((design) => ({
+/** One design with what it can be filtered by. */
+export function catalogEntry(design: GalleryDesign): CatalogEntry {
+  return {
     design,
     format: formatOf(design),
     photos: designPhotos(design),
     occasions: occasionsOf(design),
     kinds: kindsOf(design),
-  }));
+  };
+}
+
+/** Every design in the gallery with what it can be filtered by, each kind mixed through. */
+export function designCatalog(): CatalogEntry[] {
+  return allDesigns().map(catalogEntry);
 }
 
 /**
