@@ -485,6 +485,8 @@ function Question({
       <div className="flex flex-col gap-1">
         <span aria-hidden className="font-semibold">
           {label}
+          {/* Optional, like every other question, so nobody thinks it holds up the reply */}
+          <span className="ms-2 text-sm font-normal text-ink-muted">{rsvpCopy.optional}</span>
         </span>
         <RadioGroup label={label} orientation="horizontal" value={value} onValueChange={onChange}>
           <RadioItem value="yes" label={rsvpCopy.yes} />

@@ -96,9 +96,9 @@ export const stepCopy: Record<
   design: {
     label: "Design",
     eyebrow: "Choose a design",
-    title: "Pick the card your guests will open",
+    title: "Pick the design your guests will open",
     intro:
-      "Every design opens in 3D with its own ornaments, petals and raga. You can switch at any time without losing your words.",
+      "Each design has its own painting, opening and raga. Switch at any time: every word you've typed stays.",
   },
   language: {
     label: "Language",
@@ -853,6 +853,7 @@ export const previewCopy = {
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",
+  namesHeading: "Names",
   functionsHeading: "Functions",
   photosHeading: "Photos",
   noPhotos: "No photos added",
@@ -874,9 +875,12 @@ export const previewCopy = {
 
 /** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */
 export const suiteCopy = {
-  heading: "Event pages",
+  heading: "Designs for your occasion",
   intro:
-    "After the invitation opens, each function gets its own full-screen page in this theme. Your tradition's ceremony names, blessing and symbol stay the same in every theme.",
+    "After the opening, guests see your names, every function and the reply form in this design. Your tradition's ceremony names, blessing and symbol stay the same in every design.",
+  /** Only for Card colours, whose pages take the chosen card's paper and colours. */
+  cardHeading: "Card paper and colours",
+  cardIntro: "Card colours pages take the paper, colours and raga of the card you pick here.",
   suggested: "Suits your tradition",
   pairs: (design: string) => `Also switches the card to ${design}`,
   preview: "Play the pages",

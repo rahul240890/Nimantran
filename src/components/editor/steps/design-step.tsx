@@ -30,7 +30,7 @@ import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
 export function DesignStep({ draft, update }: StepProps) {
-  const { designCopy, occasionCopy, stepCopy, suiteCopy } = useText(editorText);
+  const { designCopy, occasionCopy, suiteCopy } = useText(editorText);
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const category = draftCategory(draft);
@@ -80,61 +80,6 @@ export function DesignStep({ draft, update }: StepProps) {
 
   return (
     <div className="flex flex-col gap-10">
-      <RadioGroup
-        label={stepCopy.design.eyebrow}
-        variant="card"
-        value={draft.templateId}
-        onValueChange={(value) => {
-          if (isTemplateId(value)) update((current) => ({ ...current, templateId: value }));
-        }}
-        className="grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3"
-      >
-        {order.map((id) => {
-          const isSuggested = !allSuggested && suggested.includes(id);
-          return (
-            <RadioItem
-              key={id}
-              value={id}
-              label={
-                <>
-                  {designCopy[id].name}
-                  {isSuggested && (
-                    <span className="sr-only">
-                      , {occasionCopy.suggestedFor(category.names[locale])}
-                    </span>
-                  )}
-                </>
-              }
-              description={
-                <>
-                  {/* A card's own price counts only when the card is the whole design */}
-                  {suite === "classic" && (
-                    <TierBadge
-                      designId={`card-${id}`}
-                      variant="plain"
-                      className="mb-1.5 flex w-fit"
-                    />
-                  )}
-                  {designCopy[id].description}
-                </>
-              }
-              badge={
-                isSuggested ? (
-                  <Badge aria-hidden tone="gold" className="h-6 px-2 text-xs">
-                    {occasionCopy.suggestedBadge}
-                  </Badge>
-                ) : undefined
-              }
-              icon={
-                <span className="block w-16 sm:w-20">
-                  <TemplateCover id={id} className="rounded-sm shadow-raised" />
-                </span>
-              }
-            />
-          );
-        })}
-      </RadioGroup>
-
       <section aria-labelledby="suite-heading" className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
           <h3 id="suite-heading" className="font-display text-2xl leading-tight">
@@ -156,7 +101,7 @@ export function DesignStep({ draft, update }: StepProps) {
               templateId: pair ?? current.templateId,
             }));
           }}
-          className="grid-cols-1 min-[400px]:grid-cols-2"
+          className="grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3"
         >
           {suites.map((id) => {
             const pair = SUITES[id].template;
@@ -186,7 +131,7 @@ export function DesignStep({ draft, update }: StepProps) {
                     <span className="mt-1 block text-sm">
                       {galleryCopy.photoNeeds[designPhotos(galleryDesign(id), draft.categoryId)]}
                     </span>
-                    {pair && pair !== draft.templateId && (
+                    {suite === "classic" && pair && pair !== draft.templateId && (
                       <span className="mt-1 block text-sm">
                         {suiteCopy.pairs(designCopy[pair].name)}
                       </span>
@@ -196,7 +141,7 @@ export function DesignStep({ draft, update }: StepProps) {
                 badge={
                   isSuggested ? (
                     <Badge aria-hidden tone="gold" className="h-6 px-2 text-xs">
-                      {suiteCopy.suggested}
+                      {suggestion}
                     </Badge>
                   ) : undefined
                 }
@@ -261,6 +206,70 @@ export function DesignStep({ draft, update }: StepProps) {
           />
         )}
       </section>
+
+      {/* The card behind the pages matters only when the design is Card colours */}
+      {suite === "classic" && (
+        <section aria-labelledby="card-heading" className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <h3 id="card-heading" className="font-display text-2xl leading-tight">
+              {suiteCopy.cardHeading}
+            </h3>
+            <p className="max-w-2xl text-ink-muted">{suiteCopy.cardIntro}</p>
+          </div>
+          <RadioGroup
+            label={suiteCopy.cardHeading}
+            variant="card"
+            value={draft.templateId}
+            onValueChange={(value) => {
+              if (isTemplateId(value)) update((current) => ({ ...current, templateId: value }));
+            }}
+            className="grid-cols-1 min-[400px]:grid-cols-2 sm:grid-cols-2 xl:grid-cols-3"
+          >
+            {order.map((id) => {
+              const isSuggested = !allSuggested && suggested.includes(id);
+              return (
+                <RadioItem
+                  key={id}
+                  value={id}
+                  label={
+                    <>
+                      {designCopy[id].name}
+                      {isSuggested && (
+                        <span className="sr-only">
+                          , {occasionCopy.suggestedFor(category.names[locale])}
+                        </span>
+                      )}
+                    </>
+                  }
+                  description={
+                    <>
+                      {/* With Card colours, the card is the whole design and has its price */}
+                      <TierBadge
+                        designId={`card-${id}`}
+                        variant="plain"
+                        className="mb-1.5 flex w-fit"
+                      />
+                      {designCopy[id].description}
+                    </>
+                  }
+                  badge={
+                    isSuggested ? (
+                      <Badge aria-hidden tone="gold" className="h-6 px-2 text-xs">
+                        {occasionCopy.suggestedBadge}
+                      </Badge>
+                    ) : undefined
+                  }
+                  icon={
+                    <span className="block w-16 sm:w-20">
+                      <TemplateCover id={id} className="rounded-sm shadow-raised" />
+                    </span>
+                  }
+                />
+              );
+            })}
+          </RadioGroup>
+        </section>
+      )}
 
       <OpeningPicker
         draft={draft}

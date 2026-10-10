@@ -73,7 +73,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
       await next(page);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        "Pick the card your guests will open",
+        "Pick the design your guests will open",
       );
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
@@ -129,7 +129,8 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("radio", { name: /Wedding/ })).toBeChecked();
     await next(page);
     await next(page);
-    await page.getByRole("radio", { name: /^Rose Garden/ }).click();
+    // A wedding opens on its painted design; the card list is only for Card colours
+    await expect(page.getByRole("radiogroup", { name: "Card paper and colours" })).toHaveCount(0);
     await next(page);
     await next(page); // language
 
@@ -219,9 +220,13 @@ test.describe("invite editor", () => {
     await page.goto("/create?quality=2d&category=roka");
     // The occasion is chosen, so the host starts on the designs, the roka's first
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the card your guests will open",
+      "Pick the design your guests will open",
     );
-    const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
+    // The cards behind the pages show once Card colours is the design
+    await page.getByRole("radio", { name: /^Card colours/ }).click();
+    const designs = page
+      .getByRole("radiogroup", { name: "Card paper and colours" })
+      .getByRole("radio");
     // Only the roka's own designs are offered, not a Kerala wedding card
     await expect(designs.first()).toHaveAccessibleName(/Marigold Gate/);
     await expect(designs.filter({ hasText: "Kerala Kasavu" })).toHaveCount(0);
@@ -281,7 +286,11 @@ test.describe("invite editor", () => {
 
     // The tradition's designs lead the list
     await next(page);
-    const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
+    // The cards behind the pages show once Card colours is the design
+    await page.getByRole("radio", { name: /^Card colours/ }).click();
+    const designs = page
+      .getByRole("radiogroup", { name: "Card paper and colours" })
+      .getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
   });
 

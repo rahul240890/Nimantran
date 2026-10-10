@@ -16,6 +16,7 @@ import {
   type EditorStep,
 } from "@/lib/editor/draft";
 import { draftProblems } from "@/lib/editor/draft-checks";
+import { inviteNames } from "@/lib/publish/describe";
 import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
@@ -131,6 +132,13 @@ export function PreviewStep({
             <CategoryIcon icon={category.icon} className="size-4.5" />
           </span>
           <span className="font-display text-lg leading-tight">{category.names[locale]}</span>
+        </p>
+      </Section>
+
+      {/* The names lead the card, so they get their own check before sharing */}
+      <Section title={previewCopy.namesHeading} step="couple" goTo={goTo}>
+        <p className="font-display text-lg leading-tight break-words">
+          {draft.content.first?.trim() ? inviteNames(draft) : "—"}
         </p>
       </Section>
 

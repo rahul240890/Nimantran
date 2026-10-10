@@ -28,6 +28,9 @@ import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
+/** Where an empty time list opens: mid-morning, so the rest of the day is a short scroll. */
+const DAY_STARTS = "10:00";
+
 function FunctionFields({
   id,
   fn,
@@ -77,6 +80,8 @@ function FunctionFields({
         value={fn.endTime || undefined}
         onValueChange={(endTime) => set({ endTime })}
         placeholder={functionFields.timePlaceholder}
+        // Opens at the start time, not at midnight
+        openAt={fn.time || DAY_STARTS}
         step={muhurat ? 1 : 15}
       />
     </Field>
@@ -105,6 +110,8 @@ function FunctionFields({
             value={fn.time || undefined}
             onValueChange={(time) => set({ time })}
             placeholder={functionFields.timePlaceholder}
+            // Opens at a likely hour, so nobody scrolls past midnight to find the evening
+            openAt={DAY_STARTS}
             // A muhurat is set to the minute, never rounded
             step={muhurat ? 1 : 15}
           />

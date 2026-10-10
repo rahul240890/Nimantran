@@ -296,7 +296,8 @@ export function Editor({
       update((draft) => {
         let next = initialCategory ? withCategory(draft, initialCategory) : draft;
         if (draft.step === "occasion") next = { ...next, step: "design" };
-        if (initialTemplate) next = { ...next, templateId: initialTemplate };
+        // A card picked on its own page is the whole design: its pages take its colours
+        if (initialTemplate) next = { ...next, templateId: initialTemplate, suite: "classic" };
         if (initialTradition) next = withTradition(next, initialTradition);
         return next;
       });
