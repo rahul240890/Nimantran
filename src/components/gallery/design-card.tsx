@@ -47,7 +47,7 @@ type DesignCardProps = {
 };
 
 /** The pages a design has paintings for, in the order guests see them. */
-function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
+export function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
   const { images } = SUITES[design.suite];
   return PAGE_ARTS.flatMap((page) => (images[page] ? [{ page, src: images[page]! }] : []));
 }
@@ -197,9 +197,10 @@ export function DesignCard({
 
 /**
  * Every page of a design, full height like the guest's phone: step through them with the
- * arrows, the thumbnails or the arrow keys, then Use this design.
+ * arrows, the thumbnails or the arrow keys, then Use this design. Admin, Designs shows it
+ * with its own badge and, in place of Use this design, the design's tier.
  */
-function DesignPreview({
+export function DesignPreview({
   open,
   onOpenChange,
   design,
@@ -208,14 +209,27 @@ function DesignPreview({
   href,
   photos,
   pages,
-}: DesignCardProps & {
+  badge,
+  action,
+}: Omit<DesignCardProps, "href" | "priority" | "cover"> & {
+  href?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   pages: { page: PageArt; src: string }[];
+  /** In place of the design's live tier badge. */
+  badge?: ReactNode;
+  /** In place of Use this design. */
+  action?: ReactNode;
 }) {
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
   const [index, setIndex] = useState(0);
+  // Moved on to another design while open: start on its first page
+  const [shownId, setShownId] = useState(design.id);
+  if (shownId !== design.id) {
+    setShownId(design.id);
+    setIndex(0);
+  }
   // A Scene plays itself; a Story steps through its pages
   const scene = design.format === "scene";
   const total = scene ? 0 : pages.length;
@@ -234,7 +248,8 @@ function DesignPreview({
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-night/90 backdrop-blur-md data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in" />
         <DialogPrimitive.Content
           onKeyDown={(event) => {
-            if (total < 2) return;
+            // Arrow keys inside a choice (a tier) move that choice, not the page
+            if (total < 2 || (event.target as HTMLElement).closest("[role=radiogroup]")) return;
             const rtl = document.dir === "rtl";
             if (event.key === "ArrowRight") go(index + (rtl ? -1 : 1));
             if (event.key === "ArrowLeft") go(index + (rtl ? 1 : -1));
@@ -302,7 +317,7 @@ function DesignPreview({
           {/* What it is, every page as a thumbnail, and the way into the editor */}
           <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:px-0 lg:py-0">
             <div className="flex flex-col gap-2">
-              <TierBadge designId={design.id} className="self-start" />
+              {badge ?? <TierBadge designId={design.id} className="self-start" />}
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
                 {name}
               </DialogPrimitive.Title>
@@ -343,12 +358,15 @@ function DesignPreview({
                 ))}
               </ul>
             )}
-            <Button asChild size="lg" fullWidth>
-              <Link href={href}>
-                {galleryCopy.useDesign}
-                <ArrowRight aria-hidden className="rtl:rotate-180" />
-              </Link>
-            </Button>
+            {action ??
+              (href && (
+                <Button asChild size="lg" fullWidth>
+                  <Link href={href}>
+                    {galleryCopy.useDesign}
+                    <ArrowRight aria-hidden className="rtl:rotate-180" />
+                  </Link>
+                </Button>
+              ))}
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

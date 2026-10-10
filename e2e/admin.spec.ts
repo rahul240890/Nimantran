@@ -80,6 +80,15 @@ test.describe("designs and prices", () => {
     const search = page.getByRole("searchbox", { name: "Search designs" });
     const tiers = page.getByRole("radiogroup", { name: `${name} (Scene) tier` });
     await search.fill(word);
+    // Its demo shows every page, and its tier can be set there too
+    await page
+      .getByRole("button", { name: `Preview ${name}`, exact: true })
+      .first()
+      .click();
+    const demo = page.getByRole("dialog");
+    await expect(demo.getByRole("radiogroup", { name: /tier$/ })).toBeVisible();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await page.keyboard.press("Escape");
     await tiers.getByRole("radio", { name: "Free" }).click();
     await expect(page.getByText("1 change not saved yet.")).toBeVisible();
     await page.getByRole("button", { name: "Save" }).click();
