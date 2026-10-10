@@ -331,6 +331,249 @@ const MOVING: Record<MovingId, MovingEntry> = {
       twinkle(5, 3, 6, [10, 60]),
     ],
   },
+  // Pigeons circle the blue city, kites bob high up, petals fall and lamps glow below
+  "neeli-nagri": {
+    open: [18, 12, 70, 26],
+    floats: [
+      glide(0, 2, 7, { pair: 1, band: [6, 40] }),
+      { sprite: 2, kind: "bob", count: 1, size: 5, band: [3, 11] },
+      { sprite: 3, kind: "bob", count: 1, size: 5, band: [4, 12] },
+      fall(4, 4, 3),
+      twinkle(5, 3, 5, [42, 80]),
+    ],
+  },
+  // Chinar leaves spin down over the saffron, mist drifts on the lake, a sparrow crosses
+  "kesar-kyari": {
+    open: [10, 14, 70, 22],
+    water: [60, 74],
+    floats: [
+      fall(0, 2, 4),
+      fall(1, 2, 4),
+      fall(2, 2, 4),
+      fall(3, 1, 3),
+      glide(4, 2, 22, { band: [58, 70], pace: 1.8 }),
+      glide(5, 1, 5, { band: [8, 40] }),
+    ],
+  },
+  // Seagulls glide over the Konkan coast, foam slides in, flowers fall
+  "konkan-kinara": {
+    open: [8, 13, 54, 28],
+    water: [50, 88],
+    floats: [
+      glide(0, 2, 8, { pair: 1, band: [6, 44] }),
+      fall(2, 2, 4),
+      glide(4, 2, 14, { band: [70, 86], pace: 1.6 }),
+      twinkle(5, 3, 5, [46, 70]),
+    ],
+  },
+  // Mist rolls past the waterfall, orchids and ferns fall, a butterfly flits
+  "megh-jharna": {
+    open: [12, 12, 76, 24],
+    water: [84, 96],
+    floats: [
+      glide(0, 1, 30, { band: [36, 62], pace: 1.8 }),
+      glide(1, 1, 40, { band: [44, 72], pace: 1.8 }),
+      fall(2, 2, 4),
+      fall(3, 2, 4),
+      glide(4, 2, 6, { pair: 5, band: [20, 80] }),
+    ],
+  },
+  // Droplets rise from the fountains by moonlight, rose petals fall, fireflies glow
+  "fawwara-bagh": {
+    open: [32, 6, 54, 26],
+    dark: true,
+    water: [70, 100],
+    floats: [
+      rise(1, 4, 1.5, { band: [62, 96] }),
+      fall(2, 3, 3),
+      fall(3, 2, 3),
+      twinkle(4, 4, 3, [50, 95]),
+      twinkle(5, 4, 3, [3, 36]),
+    ],
+  },
+  // Clouds drift through the valley, chimney smoke rises, an eagle circles
+  "deodar-sanjh": {
+    open: [12, 14, 76, 24],
+    floats: [
+      glide(0, 1, 40, { band: [42, 60], pace: 1.8 }),
+      glide(1, 1, 26, { band: [38, 56], pace: 1.8 }),
+      rise(2, 1, 6, { band: [44, 64], pace: 1.3 }),
+      fall(3, 2, 4),
+      glide(4, 1, 10, { band: [6, 30], pace: 1.4 }),
+      fall(5, 1, 3),
+    ],
+  },
+  // Rose petals drift down the chandelier hall, crystals and sequins glitter
+  "jhoomar-mahal": {
+    open: [18, 14, 64, 28],
+    dark: true,
+    floats: [
+      fall(0, 3, 3),
+      fall(1, 3, 3),
+      twinkle(2, 3, 3, [2, 40]),
+      twinkle(3, 5, 4, [2, 40]),
+      twinkle(4, 2, 8, [44, 70]),
+      fall(5, 4, 1.5),
+    ],
+  },
+  // Champa flowers spin down to the temple pool and float, a parrot flies past
+  "champa-baag": {
+    open: [12, 11, 64, 24],
+    water: [64, 100],
+    floats: [
+      fall(0, 2, 5),
+      fall(1, 2, 5),
+      fall(2, 2, 3),
+      glide(3, 2, 7, { band: [72, 95], pace: 1.6 }),
+      glide(4, 1, 8, { band: [6, 36] }),
+      fall(5, 1, 3),
+    ],
+  },
+  // Parrots fly between the mango branches, petals and leaves fall
+  "tota-bagh": {
+    open: [10, 13, 80, 24],
+    floats: [
+      glide(0, 2, 8, { pair: 1, band: [8, 50] }),
+      fall(2, 2, 3),
+      fall(3, 1, 4),
+      fall(4, 2, 3),
+      fall(5, 2, 3),
+    ],
+  },
+  // Fireworks bloom above the fort, sparks fall and the lake shimmers
+  aatishbaazi: {
+    open: [8, 12, 84, 28],
+    dark: true,
+    water: [62, 80],
+    floats: [
+      twinkle(0, 2, 24, [0, 12]),
+      twinkle(1, 2, 20, [0, 12]),
+      twinkle(2, 1, 16, [38, 48]),
+      fall(3, 2, 3),
+      twinkle(4, 5, 2, [2, 60]),
+    ],
+  },
+  // Shooting stars streak across, stars twinkle and fireflies wander in the grass
+  "toota-taara": {
+    open: [12, 13, 76, 26],
+    dark: true,
+    floats: [
+      glide(0, 1, 22, { band: [2, 30], pace: 0.3 }),
+      glide(1, 1, 14, { band: [4, 34], pace: 0.35 }),
+      twinkle(2, 4, 4, [2, 40]),
+      twinkle(3, 6, 1.5, [2, 40]),
+      twinkle(4, 5, 3, [60, 95]),
+    ],
+  },
+  // Clouds of gulal drift and petals shower down on the Holi of flowers
+  "phoolon-ki-holi": {
+    open: [12, 13, 74, 24],
+    floats: [
+      glide(0, 1, 20, { band: [42, 74], pace: 1.8 }),
+      glide(1, 1, 18, { band: [42, 74], pace: 1.8 }),
+      glide(2, 1, 18, { band: [42, 74], pace: 1.8 }),
+      fall(3, 4, 3),
+      fall(4, 4, 3),
+      twinkle(5, 1, 16, [46, 70]),
+    ],
+  },
+  // Peacock feathers float down the lane, marigolds fall and glows drift up
+  "dahi-handi": {
+    open: [8, 13, 52, 27],
+    dark: true,
+    floats: [
+      fall(0, 2, 5),
+      fall(1, 2, 4),
+      fall(2, 3, 3.5),
+      fall(4, 1, 4),
+      rise(5, 3, 4, { band: [50, 95] }),
+    ],
+  },
+  // Petals fall over the snake boats, water splashes and an egret crosses
+  "vallam-kali": {
+    open: [12, 13, 76, 26],
+    water: [60, 80],
+    floats: [
+      fall(0, 3, 3),
+      fall(1, 2, 4),
+      fall(2, 2, 3),
+      twinkle(3, 3, 6, [64, 80]),
+      fall(4, 1, 4),
+      glide(5, 1, 9, { band: [6, 34] }),
+    ],
+  },
+  // Steam rises from the pongal pot, sparks fly up and kites bob in the sky
+  "pongal-paanai": {
+    open: [8, 14, 84, 24],
+    floats: [
+      rise(0, 1, 10, { band: [50, 72], pace: 0.8 }),
+      rise(1, 1, 8, { band: [50, 72], pace: 0.8 }),
+      { sprite: 2, kind: "bob", count: 1, size: 6, band: [3, 11] },
+      { sprite: 3, kind: "bob", count: 1, size: 6, band: [4, 12] },
+      fall(4, 1, 4),
+      rise(5, 4, 1.5, { band: [60, 85] }),
+    ],
+  },
+  // Seagulls fly over treasure island and gold coins sparkle on the sand
+  "khazana-dweep": {
+    open: [16, 13, 72, 20],
+    water: [55, 90],
+    floats: [
+      glide(3, 2, 8, { pair: 4, band: [8, 45] }),
+      twinkle(0, 2, 4, [70, 95]),
+      twinkle(1, 2, 3, [70, 95]),
+      twinkle(2, 1, 3, [70, 95]),
+      twinkle(5, 4, 4, [55, 95]),
+    ],
+  },
+  // Paper boats sail down the stream in soft rain, rings open on the water
+  "kaagaz-ki-kashti": {
+    open: [10, 13, 80, 24],
+    water: [82, 100],
+    floats: [
+      glide(0, 1, 10, { band: [86, 94], pace: 1.8 }),
+      glide(1, 1, 9, { band: [88, 96], pace: 1.8 }),
+      fall(2, 10, 1.2, { pace: 0.25 }),
+      fall(3, 3, 1.5, { pace: 0.35 }),
+      twinkle(4, 3, 6, [84, 98]),
+      fall(5, 1, 4),
+    ],
+  },
+  // Snow falls under the northern lights and a penguin waddles past the igloo
+  "aurora-igloo": {
+    open: [10, 15, 80, 28],
+    dark: true,
+    water: [66, 82],
+    floats: [
+      glide(0, 1, 5, { pair: 1, band: [60, 64], pace: 2 }),
+      fall(2, 5, 2.5),
+      fall(3, 4, 3),
+      twinkle(5, 4, 2, [2, 40]),
+    ],
+  },
+  // Balloons float up from the teddy bears' picnic, bubbles drift and a kite bobs
+  "teddy-picnic": {
+    open: [8, 15, 84, 24],
+    floats: [
+      rise(0, 1, 7, { pace: 1.4 }),
+      rise(1, 1, 7, { pace: 1.4 }),
+      rise(2, 1, 7, { pace: 1.4 }),
+      rise(3, 4, 4),
+      { sprite: 5, kind: "bob", count: 1, size: 7, band: [3, 13] },
+    ],
+  },
+  // Confetti and marigold petals fall on the new shop, balloons float up
+  "dukaan-mahurat": {
+    open: [10, 15, 80, 22],
+    floats: [
+      fall(0, 4, 2),
+      fall(1, 4, 2),
+      fall(2, 3, 3),
+      fall(3, 1, 4),
+      rise(4, 2, 7, { pace: 1.4 }),
+      twinkle(5, 4, 3, [3, 60]),
+    ],
+  },
 };
 
 export function isMoving(suite: SuiteId): suite is MovingId {

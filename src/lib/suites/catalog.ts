@@ -163,6 +163,26 @@ export const MOVING_IDS = [
   "sea-bubbles",
   "badal-sapne",
   "aangan-subah",
+  "neeli-nagri",
+  "kesar-kyari",
+  "konkan-kinara",
+  "megh-jharna",
+  "fawwara-bagh",
+  "deodar-sanjh",
+  "jhoomar-mahal",
+  "champa-baag",
+  "tota-bagh",
+  "aatishbaazi",
+  "toota-taara",
+  "phoolon-ki-holi",
+  "dahi-handi",
+  "vallam-kali",
+  "pongal-paanai",
+  "khazana-dweep",
+  "kaagaz-ki-kashti",
+  "aurora-igloo",
+  "teddy-picnic",
+  "dukaan-mahurat",
 ] as const;
 export type MovingId = (typeof MOVING_IDS)[number];
 
@@ -1605,6 +1625,26 @@ export const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "sea-bubbles": "sagar",
   "badal-sapne": "palna",
   "aangan-subah": "peshwai-wada",
+  "neeli-nagri": "neel",
+  "kesar-kyari": "chinar",
+  "konkan-kinara": "sagar",
+  "megh-jharna": "van",
+  "fawwara-bagh": "noor-bagh",
+  "deodar-sanjh": "chai-bagan",
+  "jhoomar-mahal": "ivory-arch",
+  "champa-baag": "mysuru",
+  "tota-bagh": "gulaab",
+  aatishbaazi: "deco-noir",
+  "toota-taara": "taara",
+  "phoolon-ki-holi": "pichwai",
+  "dahi-handi": "mitti",
+  "vallam-kali": "kayal",
+  "pongal-paanai": "tanjore",
+  "khazana-dweep": "jungle-party",
+  "kaagaz-ki-kashti": "kaagaz",
+  "aurora-igloo": "himani",
+  "teddy-picnic": "gubbara",
+  "dukaan-mahurat": "peshwai-wada",
 };
 
 /** The occasions a Scene theme is painted for beyond weddings. */
@@ -1684,6 +1724,15 @@ const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
   "sea-bubbles": ["birthday", "party"],
   "badal-sapne": ["baby-shower", "naming-ceremony", "birthday"],
   "aangan-subah": ["housewarming", "puja"],
+  "phoolon-ki-holi": ["holi"],
+  "dahi-handi": ["janmashtami"],
+  "vallam-kali": ["onam"],
+  "pongal-paanai": ["sankranti"],
+  "khazana-dweep": ["birthday", "party"],
+  "kaagaz-ki-kashti": ["birthday", "baby-shower", "naming-ceremony"],
+  "aurora-igloo": ["birthday", "christmas", "party"],
+  "teddy-picnic": ["birthday", "baby-shower", "naming-ceremony"],
+  "dukaan-mahurat": ["shop-opening", "launch"],
 };
 
 /** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
@@ -1801,6 +1850,10 @@ const WEDDING_FIT: Partial<Record<SuiteId, readonly JourneyId[]>> = {
   "shamiana-raat": ["sangeet", "reception", "mehendi"],
   "hans-jheel": ["engagement", "roka", "save-the-date", "reception"],
   "wedding-bells": ["wedding", "engagement", "save-the-date", "reception"],
+  "tota-bagh": ["mehendi", "haldi", "sangeet"],
+  aatishbaazi: ["sangeet", "reception", "wedding"],
+  "toota-taara": ["engagement", "save-the-date", "reception", "sangeet"],
+  "jhoomar-mahal": ["wedding", "reception", "sangeet", "engagement"],
 };
 
 /**
@@ -1847,6 +1900,8 @@ const NO_ROKA: readonly SuiteId[] = [
   "malli-mazhai",
   "shiuli-bhor",
   "kettuvallam-raat",
+  "fawwara-bagh",
+  "champa-baag",
 ];
 
 /** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */

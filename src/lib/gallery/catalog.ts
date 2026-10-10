@@ -388,6 +388,10 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "kesar-kyari",
+      "deodar-sanjh",
+      "tota-bagh",
+      "aatishbaazi",
       "jal-mahal",
       "gulmohar-rasta",
       "diya-dhara",
@@ -434,6 +438,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "tota-bagh",
       "genda-barsaat",
       "saawan-bundein",
       "pithora-ghoda",
@@ -457,6 +462,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "neeli-nagri",
+      "aatishbaazi",
+      "jhoomar-mahal",
       "jal-mahal",
       "genda-barsaat",
       "saawan-bundein",
@@ -483,7 +491,14 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "marathi",
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
-    suites: ["ganesh-genda", "warli-vivah", "antarpat-mangal", "pune-wada", "peshwai-wada"],
+    suites: [
+      "konkan-kinara",
+      "ganesh-genda",
+      "warli-vivah",
+      "antarpat-mangal",
+      "pune-wada",
+      "peshwai-wada",
+    ],
     cards: ["paithani"],
     keywords: ["maharashtrian", "lagna", "mumbai", "pune"],
   },
@@ -523,6 +538,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "champa-baag",
       "malli-mazhai",
       "kettuvallam-raat",
       "kanjivaram-pattu",
@@ -565,6 +581,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
     suites: [
+      "tota-bagh",
       "sarson-khet",
       "genda-barsaat",
       "shamiana-raat",
@@ -582,6 +599,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "fawwara-bagh",
+      "jhoomar-mahal",
+      "kesar-kyari",
       "saawan-bundein",
       "shamiana-raat",
       "zardozi-mehfil",
@@ -604,6 +624,10 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "toota-taara",
+      "megh-jharna",
+      "jhoomar-mahal",
+      "aatishbaazi",
       "wedding-bells",
       "gulmohar-rasta",
       "hans-jheel",
