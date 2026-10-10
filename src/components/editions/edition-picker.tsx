@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, LockOpen, ShieldCheck, Sparkles } from "lucide-react";
+import { Check, Globe, LockOpen, ShieldCheck, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { beginCheckout, finishCheckout, tryCoupon } from "@/actions/checkout";
@@ -13,20 +14,21 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import { site } from "@/lib/site";
-import { usePricing } from "@/components/pricing/pricing-provider";
 import {
-  PLAN_IDS,
-  editionPrice,
+  PAID_PLAN_IDS,
   formatRupees,
-  planRank,
+  inviteLimit,
+  packagePrice,
+  type Edition,
   type PaidPlanId,
   type PlanId,
 } from "@/lib/plans/catalog";
+import type { DesignTier, Pricing } from "@/lib/plans/design-tiers";
 import { useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
 
 /*
- * The plan cards for one invite, and paying for one. Razorpay's own checkout window takes
+ * The three package cards for one invite, and paying for one. Razorpay's own checkout window takes
  * the payment (UPI, cards, netbanking); the server then checks it before anything unlocks.
  */
 
@@ -64,17 +66,23 @@ const brandColour = () =>
 
 export type EditionPickerProps = {
   inviteId: string;
-  current: PlanId;
-  /** The lowest edition the invite fits in as it stands. */
+  /** The package the invite has, and the design tier paid for. */
+  edition: Edition;
+  /** The tier of the design the invite is made with. */
+  design: DesignTier;
+  /** The lowest package the invite fits in as it stands. */
   needed: PlanId;
-  /** A plan to point at, from the publish dialog's link. */
+  /** A package to point at, from a link. */
   focus: PlanId | null;
   active: boolean;
-  /** Only the invite's owner pays; co-hosts see the editions and prices. */
+  /** Only the invite's owner pays; co-hosts see the packages and prices. */
   canPay?: boolean;
   prefill: { name: string; email: string | null; phone: string | null };
-  /** Each edition's price now, with any festival offer running. */
+  /** What each package costs this invite now, with any festival offer running. */
   prices: Partial<Record<PaidPlanId, Price>>;
+  pricing: Pick<Pricing, "designs" | "packages" | "invites">;
+  /** Back to the editor to publish, when the host came from its Publish button. */
+  publishHref: string | null;
 };
 
 type Pending = { plan: PaidPlanId; stage: "opening" | "checking" } | null;
@@ -82,16 +90,18 @@ type PreviewPay = { plan: PaidPlanId; orderId: string; amountPaise: number } | n
 
 export function EditionPicker({
   inviteId,
-  current,
+  edition,
+  design,
   needed,
   focus,
   active,
   canPay = true,
   prefill,
   prices: offerPrices,
+  pricing,
+  publishHref,
 }: EditionPickerProps) {
-  const { upgradeCopy, planCopy } = useText(editionsText);
-  const pricing = usePricing();
+  const { upgradeCopy, planCopy, invitesLine } = useText(editionsText);
   const router = useRouter();
   const [coupon, setCoupon] = useState<{
     code: string;
@@ -100,6 +110,9 @@ export function EditionPicker({
   const prices = coupon?.prices ?? offerPrices;
   const [pending, setPending] = useState<Pending>(null);
   const [previewPay, setPreviewPay] = useState<PreviewPay>(null);
+  // A free invite's Basic is the free design as it is, with the small mark
+  const current: PlanId = edition.plan;
+  const pointAt = (focus ?? needed) === "free" ? "basic" : (focus ?? needed);
 
   const confirm = async (plan: PaidPlanId, response: RazorpayResponse) => {
     setPending({ plan, stage: "checking" });
@@ -171,6 +184,8 @@ export function EditionPicker({
     checkout.open();
   };
 
+  const freeDesign = design === "free";
+
   return (
     <div className="flex flex-col gap-6">
       {!active && (
@@ -181,23 +196,27 @@ export function EditionPicker({
           {upgradeCopy.off}
         </p>
       )}
-      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {PLAN_IDS.map((id) => {
-          const copy = planCopy[id];
-          const isCurrent = id === current;
-          const below = planRank(id) < planRank(current);
-          const price = id === "free" ? null : (prices[id] ?? null);
+      <ul className="grid gap-4 lg:grid-cols-3">
+        {PAID_PLAN_IDS.map((id) => {
+          // On a free design, Basic costs nothing: the free invite with the small mark
+          const freeBasic = id === "basic" && freeDesign;
+          const copy = freeBasic ? { ...planCopy.free, name: planCopy.basic.name } : planCopy[id];
+          const listPaise = packagePrice(id, design, pricing);
+          const price = prices[id] ?? null;
+          const isCurrent = id === current || (id === "basic" && current === "free");
           const isDifference = price !== null && current !== "free";
           const offer = price?.coupon && price.discountPaise > 0 ? price.coupon : null;
-          const highlighted = (focus ?? needed) === id && planRank(id) > planRank(current);
+          const highlighted = pointAt === id && price !== null;
+          const popular = id === "celebration";
           const busy = pending?.plan === id;
+          const invites = inviteLimit(freeBasic ? "free" : id, pricing);
           return (
             <li key={id} className="flex">
               <article
                 aria-labelledby={`plan-${id}`}
                 className={cn(
                   "relative flex w-full flex-col gap-4 rounded-lg border bg-surface p-5 shadow-raised sm:p-6",
-                  highlighted
+                  highlighted || (popular && !isCurrent && price !== null)
                     ? "border-marigold-edge ring-2 ring-marigold/45"
                     : isCurrent
                       ? "border-line-strong"
@@ -208,10 +227,13 @@ export function EditionPicker({
                 <div
                   className={cn(
                     "min-h-7 flex-wrap items-center gap-2",
-                    isCurrent || highlighted ? "flex" : "hidden sm:flex",
+                    isCurrent || highlighted || popular ? "flex" : "hidden lg:flex",
                   )}
                 >
-                  {isCurrent && <Badge tone="gold">{upgradeCopy.currentBadge}</Badge>}
+                  {isCurrent && price === null && (
+                    <Badge tone="gold">{upgradeCopy.currentBadge}</Badge>
+                  )}
+                  {popular && <Badge tone="gold">{upgradeCopy.popular}</Badge>}
                   {highlighted && (
                     <Badge tone="success" dot>
                       {upgradeCopy.needed}
@@ -227,11 +249,11 @@ export function EditionPicker({
                 <div className="flex flex-col gap-1.5">
                   <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <span className="font-display text-[2.2rem] leading-none tabular-nums">
-                      {formatRupees(
-                        offer && price && !isDifference
-                          ? price.amountPaise
-                          : editionPrice(id, pricing.prices),
-                      )}
+                      {listPaise === 0
+                        ? upgradeCopy.free
+                        : formatRupees(
+                            offer && price && !isDifference ? price.amountPaise : listPaise,
+                          )}
                     </span>
                     {offer && price && !isDifference && (
                       <s className="text-lg text-ink-muted tabular-nums">
@@ -240,6 +262,11 @@ export function EditionPicker({
                       </s>
                     )}
                   </p>
+                  {id !== "basic" && (
+                    <p className="text-sm text-ink-muted">
+                      {upgradeCopy.addOn(formatRupees(pricing.packages[id]))}
+                    </p>
+                  )}
                   {offer && (
                     <p className="text-sm font-semibold text-success">
                       {upgradeCopy.offer(
@@ -250,26 +277,35 @@ export function EditionPicker({
                   )}
                 </div>
                 <ul className="flex flex-1 flex-col gap-2 text-sm">
-                  {copy.highlights.map((line) => (
+                  {[invitesLine(invites), ...copy.highlights].map((line, index) => (
                     <li key={line} className="flex items-start gap-2">
                       <Check
                         aria-hidden
                         className="mt-0.5 size-4 shrink-0 text-accent-text"
                         strokeWidth={2.5}
                       />
-                      <span>{line}</span>
+                      <span className={cn(index === 0 && "font-semibold")}>{line}</span>
                     </li>
                   ))}
                 </ul>
-                {id === "free" || isCurrent || below ? (
-                  <p className="flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-muted">
-                    <LockOpen aria-hidden className="size-4" />
-                    {isCurrent ? upgradeCopy.current : upgradeCopy.included}
-                  </p>
+                {price === null ? (
+                  freeBasic && isCurrent && publishHref ? (
+                    <Button asChild variant="secondary" className="w-full">
+                      <Link href={publishHref}>
+                        <Globe aria-hidden />
+                        {upgradeCopy.continueFree}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <p className="flex min-h-11 items-center gap-2 text-sm font-semibold text-ink-muted">
+                      <LockOpen aria-hidden className="size-4" />
+                      {isCurrent ? upgradeCopy.current : upgradeCopy.included}
+                    </p>
+                  )
                 ) : (
                   <div className="flex flex-col gap-1.5">
                     <Button
-                      variant={highlighted ? "primary" : "secondary"}
+                      variant={highlighted || popular ? "primary" : "secondary"}
                       disabled={!active || !canPay || (pending !== null && !busy)}
                       loading={busy}
                       onClick={() => void buy(id)}
@@ -277,8 +313,8 @@ export function EditionPicker({
                       className="w-full"
                     >
                       {isDifference
-                        ? upgradeCopy.payDifference(formatRupees(price!.amountPaise))
-                        : upgradeCopy.pay(formatRupees(price!.amountPaise))}
+                        ? upgradeCopy.payDifference(formatRupees(price.amountPaise))
+                        : upgradeCopy.pay(formatRupees(price.amountPaise))}
                     </Button>
                     {isDifference && (
                       <p className="text-center text-xs text-ink-muted">{upgradeCopy.difference}</p>
@@ -290,7 +326,7 @@ export function EditionPicker({
           );
         })}
       </ul>
-      {active && canPay && current !== "bundle" && (
+      {active && canPay && current !== "grand" && (
         <CouponForm inviteId={inviteId} applied={coupon?.code ?? null} onApply={setCoupon} />
       )}
       <p role="status" aria-live="polite" className="sr-only">

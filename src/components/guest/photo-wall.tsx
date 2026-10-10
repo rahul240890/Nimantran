@@ -9,8 +9,7 @@ import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { useLocale, useText } from "@/i18n/client";
-import { photoWallText } from "@/i18n/copy/photo-wall";
+import { useGuestLanguage, useGuestText } from "@/components/guest/guest-language";
 import { PHOTO_ACCEPT, preparePhoto } from "@/lib/editor/photos";
 import type { WallPhoto } from "@/lib/invites/photo-wall";
 import { WALL_RULES, formatWallDate, type WallWindow } from "@/lib/photo-wall/rules";
@@ -56,8 +55,8 @@ function storedName(): string {
 type Loaded = { window: WallWindow; photos: WallPhoto[] };
 
 export function PhotoWall({ slug }: { slug: string }) {
-  const { wallCopy: copy } = useText(photoWallText);
-  const locale = useLocale();
+  const { wallCopy: copy } = useGuestText();
+  const language = useGuestLanguage();
   const headingId = useId();
   const statusId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -203,7 +202,7 @@ export function PhotoWall({ slug }: { slug: string }) {
             {wall.state === "open"
               ? copy.intro
               : wall.state === "soon"
-                ? copy.soon(formatWallDate(wall.opensOn, locale))
+                ? copy.soon(formatWallDate(wall.opensOn, language))
                 : copy.closed}
           </p>
         </div>

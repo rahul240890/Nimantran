@@ -60,10 +60,10 @@ function PlanCard({ plan, featured }: { plan: Plan; featured?: boolean }) {
   );
 }
 
-/** Free and Premium side by side, at the admin's price; every edition is on the pricing page. */
+/** Free and the packages side by side, from the admin's Premium design price; the rest is on the pricing page. */
 export async function Pricing({ locale }: { locale: UiLocale }) {
   const { pricing } = landingText[locale];
-  const premium = formatRupees((await getPricing()).prices.premium);
+  const premium = formatRupees((await getPricing()).designs.premium);
   return (
     <Section
       id="pricing"

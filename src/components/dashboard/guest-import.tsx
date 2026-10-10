@@ -225,13 +225,13 @@ export function GuestImport({
     for (let start = 0; start < input.length; start += GUEST_BATCH) {
       const batch = input.slice(start, start + GUEST_BATCH);
       const ok = await addGuests(inviteId, batch).catch(() => false);
-      if (!ok) {
+      if (ok !== true) {
         setProgress(null);
         if (done) {
           toast({ title: copy.partial(done, input.length), tone: "error" });
           router.refresh();
           onDone();
-        } else toast({ title: form.failed, tone: "error" });
+        } else toast({ title: ok === "limit" ? form.limit : form.failed, tone: "error" });
         return;
       }
       done += batch.length;

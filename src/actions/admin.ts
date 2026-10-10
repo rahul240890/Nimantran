@@ -156,7 +156,7 @@ export async function refundPayment(orderId: unknown): Promise<RefundResult | nu
 export type PricingSaveResult = "saved" | "invalid" | "out-of-order" | "failed";
 
 /**
- * Edition prices and the designs whose tier the admin changed (Admin, Designs), laid over
+ * Package prices, invite counts and the designs whose tier the admin changed (Admin, Designs), laid over
  * what is saved, so two admins changing different designs don't undo each other. Only
  * tiers that differ from the default are kept, so a design added later starts at its
  * default until changed.
@@ -166,7 +166,7 @@ export async function saveDesignPricing(input: unknown): Promise<PricingSaveResu
   if (!admin) return null;
   const parsed = pricingSchema.safeParse(input);
   if (!parsed.success) return "invalid";
-  if (!pricesInOrder(parsed.data.prices)) return "out-of-order";
+  if (!pricesInOrder(parsed.data)) return "out-of-order";
   const known = new Set(allDesignIds());
   const saved = (await getPricing()).tiers;
   const tiers = Object.fromEntries(
@@ -174,7 +174,8 @@ export async function saveDesignPricing(input: unknown): Promise<PricingSaveResu
       ([id, tier]) => known.has(id) && tier !== defaultTier(id),
     ),
   );
-  if (!(await savePricing({ prices: parsed.data.prices, tiers }, admin.account))) return "failed";
+  const { designs, packages, invites } = parsed.data;
+  if (!(await savePricing({ designs, packages, invites, tiers }, admin.account))) return "failed";
   // Badges and prices show on nearly every page, and checkout charges by them: every page
   // that read them carries the tag, so this refreshes them all
   revalidateTag(PRICING_TAG, { expire: 0 });

@@ -59,6 +59,14 @@ export const RAGA_IDS = [
 ] as const;
 export type RagaId = (typeof RAGA_IDS)[number];
 
+/** The instrument that carries a raga's melody (src/lib/engine/instruments.ts). */
+export const LEAD_IDS = ["santoor", "sitar", "bansuri", "shehnai", "veena"] as const;
+export type LeadId = (typeof LEAD_IDS)[number];
+
+/** The drum patterns a raga can be played over (src/lib/engine/music.ts). */
+export const TAAL_IDS = ["keherwa", "dadra", "garba", "bhangra"] as const;
+export type TaalId = (typeof TAAL_IDS)[number];
+
 /** The parts of the card stock a template colours. */
 export const STOCK_ROLES = [
   "paper",

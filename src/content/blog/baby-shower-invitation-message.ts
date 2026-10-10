@@ -184,7 +184,7 @@ export const babyShowerInvitationMessage: BlogPost = {
         "After the day, guests can add their photos to a shared photo wall through their invitation link.",
       ],
     },
-    "Making and sharing an invitation with one function is free. See [baby shower invitation designs](/invitations/baby-shower) and [pricing](/pricing).",
+    "Making and sharing an invitation with a free design is free. See [baby shower invitation designs](/invitations/baby-shower) and [pricing](/pricing).",
     "When the baby arrives, read [annaprashan invitation messages](/blog/annaprashan-invitation-message) and [1st birthday invitation messages](/blog/first-birthday-invitation-message).",
   ],
   faq: [

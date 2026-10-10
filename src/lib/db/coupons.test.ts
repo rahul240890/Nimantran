@@ -22,7 +22,7 @@ const order = (paidAt: string, id: string) =>
   t.as("service", () =>
     q<{ id: string }>(
       `insert into orders (user_id, plan_id, amount_paise, provider_order_id, mode, status, paid_at)
-       values ($1, 'premium', 49900, $2, 'test', 'paid', $3) returning id`,
+       values ($1, 'celebration', 49900, $2, 'test', 'paid', $3) returning id`,
       [host, id, paidAt],
     ).then((rows) => rows[0]!.id),
   );

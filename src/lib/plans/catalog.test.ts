@@ -1,55 +1,86 @@
 import { describe, expect, it } from "vitest";
 import { newDraft, type InviteDraft } from "@/lib/editor/draft";
-import { PLANS, formatRupees, planNeeded, planShortfalls, upgradePricePaise } from "./catalog";
+import {
+  PLANS,
+  formatRupees,
+  inviteLimit,
+  packagePrice,
+  planNeeded,
+  planShortfalls,
+  upgradePricePaise,
+} from "./catalog";
+import { DEFAULT_PRICING } from "./design-tiers";
 
-const photo = (id: string) => ({ id, width: 10, height: 10 }) as InviteDraft["photos"][number];
+const bilingual = (): InviteDraft => ({ ...newDraft(), languages: ["en", "hi"] });
 
-function wedding(functions: number, photos = 0): InviteDraft {
-  const draft = newDraft();
-  const kinds = Object.keys(draft.functions) as (keyof InviteDraft["functions"])[];
-  kinds.forEach((kind, index) => {
-    draft.functions[kind] = { ...draft.functions[kind], included: index < functions };
+describe("packages", () => {
+  it("cost the design, plus ₹500 for Celebration and ₹1,500 for Grand", () => {
+    expect(formatRupees(packagePrice("basic", "premium"))).toBe("₹499");
+    expect(formatRupees(packagePrice("celebration", "premium"))).toBe("₹999");
+    expect(formatRupees(packagePrice("grand", "premium"))).toBe("₹1,999");
+    expect(formatRupees(packagePrice("basic", "royal"))).toBe("₹599");
+    expect(formatRupees(packagePrice("grand", "royal"))).toBe("₹2,099");
+    expect(packagePrice("basic", "free")).toBe(0);
+    expect(formatRupees(packagePrice("celebration", "free"))).toBe("₹500");
   });
-  draft.photos = Array.from({ length: photos }, (_, i) => photo(`p${i}`));
-  return draft;
-}
 
-describe("plans", () => {
-  it("charge the prices in docs/PRICING.md, GST included", () => {
-    expect(formatRupees(PLANS.premium.pricePaise)).toBe("₹499");
-    expect(formatRupees(PLANS.royal.pricePaise)).toBe("₹1,999");
-    expect(formatRupees(PLANS.bundle.pricePaise)).toBe("₹2,999");
+  it("mark only free invites", () => {
     expect(PLANS.free.watermark).toBe(true);
-    expect(PLANS.premium.watermark).toBe(false);
+    expect(PLANS.basic.watermark).toBe(false);
+    expect(PLANS.celebration.video).toBe("one");
+    expect(PLANS.grand.video).toBe("every");
   });
 
-  it("charge only the difference on an upgrade, and never a downgrade", () => {
-    expect(upgradePricePaise("free", "royal")).toBe(1_99_900);
-    expect(upgradePricePaise("premium", "royal")).toBe(1_50_000);
-    expect(upgradePricePaise("royal", "bundle")).toBe(1_00_000);
-    expect(upgradePricePaise("royal", "premium")).toBeNull();
-    expect(upgradePricePaise("bundle", "bundle")).toBeNull();
+  it("allow 50 invites, 500 with Celebration and no limit with Grand", () => {
+    expect(inviteLimit("free", DEFAULT_PRICING)).toBe(50);
+    expect(inviteLimit("basic", DEFAULT_PRICING)).toBe(50);
+    expect(inviteLimit("celebration", DEFAULT_PRICING)).toBe(500);
+    expect(inviteLimit("grand", DEFAULT_PRICING)).toBeNull();
   });
 
-  it("find the smallest edition an invite fits in", () => {
-    expect(planNeeded(wedding(1))).toBe("free");
-    expect(planNeeded(wedding(3))).toBe("premium");
-    expect(planNeeded(wedding(5))).toBe("royal");
-    expect(planNeeded(wedding(1, 4))).toBe("premium");
+  it("charge only the difference when moving up, and never for moving down", () => {
+    const free = { plan: "free", tier: "free" } as const;
+    const basic = { plan: "basic", tier: "premium" } as const;
+    expect(upgradePricePaise(free, "basic", "premium")).toBe(49_900);
+    expect(upgradePricePaise(free, "celebration", "free")).toBe(50_000);
+    expect(upgradePricePaise(basic, "celebration", "premium")).toBe(50_000);
+    expect(upgradePricePaise(basic, "grand", "royal")).toBe(1_60_000);
+    expect(upgradePricePaise({ plan: "grand", tier: "royal" }, "basic", "premium")).toBeNull();
   });
 
-  it("say what an invite uses beyond its edition", () => {
-    expect(planShortfalls(wedding(3, 5), "free")).toEqual([
-      { limit: "functions", used: 3 },
-      { limit: "photos", used: 5 },
+  it("have nothing to buy for Basic on a free design, or a package already covering the design", () => {
+    const free = { plan: "free", tier: "free" } as const;
+    expect(upgradePricePaise(free, "basic", "free")).toBeNull();
+    expect(upgradePricePaise({ plan: "basic", tier: "royal" }, "basic", "premium")).toBeNull();
+  });
+
+  it("charge the design's difference when a paid invite moves to a dearer design", () => {
+    expect(upgradePricePaise({ plan: "basic", tier: "premium" }, "basic", "royal")).toBe(10_000);
+  });
+
+  it("ask a paid design for its package, and a second language for Celebration", () => {
+    const draft = newDraft();
+    const free = { plan: "free", tier: "free" } as const;
+    expect(planShortfalls(draft, free, "free")).toEqual([]);
+    expect(planShortfalls(draft, free, "premium")).toEqual([{ limit: "design", used: 1 }]);
+    expect(planNeeded(draft, "free")).toBe("free");
+    expect(planNeeded(draft, "royal")).toBe("basic");
+    const two = bilingual();
+    expect(planShortfalls(two, { plan: "basic", tier: "premium" }, "premium")).toEqual([
+      { limit: "languages", used: 2 },
     ]);
-    expect(planShortfalls(wedding(3, 5), "premium")).toEqual([]);
+    expect(planNeeded(two, "premium")).toBe("celebration");
   });
 
-  it("put two couple photos in Royal", () => {
-    const draft = wedding(1, 2);
-    draft.couplePhotos = { layout: "two", ids: [] };
-    expect(planShortfalls(draft, "premium")).toEqual([{ limit: "couplePhotos", used: 2 }]);
-    expect(planNeeded(draft)).toBe("royal");
+  it("put the host's own song in Celebration", () => {
+    const draft = newDraft();
+    draft.music = {
+      ...draft.music,
+      clip: { id: "c1", name: "Song", type: "audio/mp4", seconds: 30 },
+    } as InviteDraft["music"];
+    expect(planShortfalls(draft, { plan: "basic", tier: "free" }, "free")).toEqual([
+      { limit: "ownSong", used: 1 },
+    ]);
+    expect(planNeeded(draft, "free")).toBe("celebration");
   });
 });

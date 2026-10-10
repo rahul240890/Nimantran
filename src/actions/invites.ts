@@ -8,7 +8,6 @@ import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { planNeeded, planShortfalls, type PlanId, type PlanNeed } from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
-import { tierPlan } from "@/lib/plans/design-tiers";
 import { getPricing } from "@/lib/plans/pricing";
 import { isSlug, slugAlternatives } from "@/lib/publish/slug";
 
@@ -89,7 +88,7 @@ export async function checkSlug(slug: string): Promise<SlugCheck> {
 export type PublishOutcome =
   | { status: "published"; slug: string }
   | { status: "taken"; suggestions: string[] }
-  /** Payments are on and the invite uses more than its edition covers (Step 17). */
+  /** Payments are on and the invite uses more than its package covers (Step 17). */
   | { status: "needs-plan"; plan: PlanId; shortfalls: PlanNeed[] }
   | { status: "not-ready" | "signed-out" | "failed" };
 
@@ -104,9 +103,9 @@ export async function publishInvite(inviteId: string, slug: string): Promise<Pub
   if (draftProblems(draft).length > 0) return { status: "not-ready" };
   if (await editionsActive()) {
     const [plan, pricing] = await Promise.all([invitePlan(account, inviteId), getPricing()]);
-    // The design asks for its own edition, whatever else the invite uses
-    const design = tierPlan(designTier(pricing, draftDesignId(draft)));
-    const shortfalls = planShortfalls(draft, plan ?? "free", design);
+    // A paid design asks for at least Basic at its price, whatever else the invite uses
+    const design = designTier(pricing, draftDesignId(draft));
+    const shortfalls = planShortfalls(draft, plan ?? { plan: "free", tier: "free" }, design);
     if (shortfalls.length > 0)
       return { status: "needs-plan", plan: planNeeded(draft, design), shortfalls };
   }

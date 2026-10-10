@@ -27,14 +27,24 @@ const inviteId = z.uuid();
 
 /*
  * The invite editor. Drafts save on this device, and to the account once signed in.
- * ?invite=<id> opens an invite from My invites; ?new=1 starts another, keeping the open
- * one in the account. ?category=<id> starts a fresh invite for that occasion (roka,
+ * ?invite=<id> opens an invite from My invites (with &publish=1, back from choosing its
+ * package, its Publish dialog too); ?new=1 starts another, keeping the open one in the
+ * account. ?category=<id> starts a fresh invite for that occasion (roka,
  * engagement, save-the-date…); ?template=<id> starts one with that design, and
  * ?tradition=<id> with that tradition, ?suite=<id> with that page theme (the gallery's
  * Use this design sends all four);
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const { template, category, tradition, suite, format, invite, new: fresh } = await searchParams;
+  const {
+    template,
+    category,
+    tradition,
+    suite,
+    format,
+    invite,
+    new: fresh,
+    publish,
+  } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -76,6 +86,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
         signedIn={Boolean(account)}
         initialInvite={initialInvite}
         missing={Boolean(wanted && !initialInvite)}
+        openPublish={Boolean(initialInvite) && publish === "1"}
       />
     </PageTransition>
   );

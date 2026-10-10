@@ -4,8 +4,7 @@ import { Navigation, X } from "lucide-react";
 import { useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import { eventDayStatus } from "@/lib/publish/event-day";
 import type { GuestFunction } from "./guest-view";
@@ -33,7 +32,7 @@ export function EventDayBanner({
   /** A fixed moment, for review pages. */
   previewNow?: number;
 }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const words = guestCopy.eventDay;
   const live = useSyncExternalStore(subscribe, clock, noClock);
   const now = previewNow ?? live;

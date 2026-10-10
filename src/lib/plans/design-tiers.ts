@@ -1,48 +1,61 @@
 import { z } from "zod";
-import { PAID_PLAN_IDS, PLANS, type EditionPrices, type PlanId } from "./catalog";
 
 /*
- * Which designs are free and which need a paid edition, and what each edition costs. The
- * admin decides both (Admin, Designs); until they change one, the defaults below apply.
- * A design's tier is the lowest edition that sends it without the watermark: anyone can
- * open and try every design, and only publishing asks for the tier's edition.
+ * Which designs are free and which cost money, and what the three packages cost on top
+ * (docs/PRICING.md). The admin decides all of it (Admin, Designs); until they change
+ * something, the defaults below apply. Anyone can open and try every design: only
+ * publishing asks for a package.
  *
  * This file stays light, for every page's badges; the defaults, which need the whole
  * design catalogue, live in design-defaults.ts and are worked out on the server.
  */
 
-export const DESIGN_TIERS = ["free", "premium", "royal"] as const;
+/**
+ * Signature is the moving scenes' tier (owner, 2026-10-09): painted in layers that move
+ * like a short film, priced above Royal.
+ */
+export const DESIGN_TIERS = ["free", "premium", "royal", "signature"] as const;
 export type DesignTier = (typeof DESIGN_TIERS)[number];
 
 export function isDesignTier(value: unknown): value is DesignTier {
   return typeof value === "string" && (DESIGN_TIERS as readonly string[]).includes(value);
 }
 
-/** The edition a tier asks for; the tiers share the editions' names. */
-export const tierPlan = (tier: DesignTier): PlanId => tier;
+export const tierRank = (tier: DesignTier) => DESIGN_TIERS.indexOf(tier);
 
-/** Prices in paise, GST included, for each paid edition. */
-export type PlanPrices = EditionPrices;
+/** The dearer of two tiers: what an invite has paid for never goes down. */
+export const higherTier = (a: DesignTier, b: DesignTier): DesignTier =>
+  tierRank(a) >= tierRank(b) ? a : b;
 
-export const DEFAULT_PRICES: PlanPrices = {
-  premium: PLANS.premium.pricePaise,
-  royal: PLANS.royal.pricePaise,
-  bundle: PLANS.bundle.pricePaise,
-};
+export type PaidTier = Exclude<DesignTier, "free">;
+
+/** The two packages that cost more than the design itself. */
+export type AddOnPackage = "celebration" | "grand";
 
 /**
- * Edition prices and design tiers. Stored, `tiers` holds only the designs the admin has
- * changed; handed to pages (resolvePricing), it holds every design.
+ * Prices in paise, GST included, and the invite counts each package allows. Stored,
+ * `tiers` holds only the designs the admin has changed; handed to pages
+ * (resolvePricing), it holds every design.
  */
 export type Pricing = {
-  prices: PlanPrices;
+  /** What a paid design costs: its Basic package. Free designs cost nothing. */
+  designs: Record<PaidTier, number>;
+  /** What Celebration and Grand add on top of the design's price. */
+  packages: Record<AddOnPackage, number>;
+  /** Invites by link in Basic (and on a free design) and in Celebration; Grand has no limit. */
+  invites: { basic: number; celebration: number };
   /** Gallery design ids ("kayal", "kayal-scene", "card-marigold") to their tier. */
   tiers: Record<string, DesignTier>;
 };
 
-export const DEFAULT_PRICING: Pricing = { prices: DEFAULT_PRICES, tiers: {} };
+export const DEFAULT_PRICING: Pricing = {
+  designs: { premium: 49_900, royal: 59_900, signature: 79_900 },
+  packages: { celebration: 50_000, grand: 1_50_000 },
+  invites: { basic: 50, celebration: 500 },
+  tiers: {},
+};
 
-/** Whole rupees from ₹1 to ₹1,00,000, so a typo can't price an edition at nothing. */
+/** Whole rupees from ₹1 to ₹1,00,000, so a typo can't price anything at nothing. */
 const pricePaise = z
   .number()
   .int()
@@ -50,24 +63,49 @@ const pricePaise = z
   .max(1_00_000_00)
   .refine((paise) => paise % 100 === 0);
 
+const inviteCount = z.number().int().min(1).max(1_00_000);
+
 export const pricingSchema = z.object({
-  prices: z.object({ premium: pricePaise, royal: pricePaise, bundle: pricePaise }),
+  // Settings saved before Signature existed keep their prices, with Signature at its default
+  designs: z.object({
+    premium: pricePaise,
+    royal: pricePaise,
+    signature: pricePaise.default(DEFAULT_PRICING.designs.signature),
+  }),
+  packages: z.object({ celebration: pricePaise, grand: pricePaise }),
+  invites: z.object({ basic: inviteCount, celebration: inviteCount }),
   tiers: z.record(z.string().regex(/^[a-z0-9-]{1,60}$/), z.enum(DESIGN_TIERS)),
 });
 
-/** Stored settings, read leniently: anything missing or broken falls back to the defaults. */
+const tiersSchema = z.object({
+  tiers: z.record(z.string().regex(/^[a-z0-9-]{1,60}$/), z.enum(DESIGN_TIERS)),
+});
+
+/**
+ * Stored settings, read leniently: anything missing or broken falls back to the defaults.
+ * Settings saved before the packages (one price per edition) keep only their design tiers.
+ */
 export function parsePricing(value: unknown): Pricing {
   const parsed = pricingSchema.safeParse(value);
-  if (!parsed.success) return DEFAULT_PRICING;
-  return { prices: { ...DEFAULT_PRICES, ...parsed.data.prices }, tiers: parsed.data.tiers };
+  if (parsed.success) return parsed.data;
+  const tiers = tiersSchema.safeParse(value);
+  return tiers.success ? { ...DEFAULT_PRICING, tiers: tiers.data.tiers } : DEFAULT_PRICING;
 }
 
-/** Every paid edition costs more than the one below it, so upgrades always cost something. */
-export function pricesInOrder(prices: PlanPrices): boolean {
-  return PAID_PLAN_IDS.every((id, i) => i === 0 || prices[id] > prices[PAID_PLAN_IDS[i - 1]!]);
+/**
+ * Royal designs cost more than Premium ones, Signature no less than Royal, and Grand adds
+ * more than Celebration.
+ */
+export function pricesInOrder(pricing: Pick<Pricing, "designs" | "packages" | "invites">): boolean {
+  return (
+    pricing.designs.royal > pricing.designs.premium &&
+    pricing.designs.signature >= pricing.designs.royal &&
+    pricing.packages.grand > pricing.packages.celebration &&
+    pricing.invites.celebration > pricing.invites.basic
+  );
 }
 
-/** What a tier costs on its own: nothing, or its edition's price. */
-export function tierPricePaise(pricing: Pricing, tier: DesignTier): number {
-  return tier === "free" ? 0 : pricing.prices[tier];
+/** What a design of this tier costs on its own: nothing, or the admin's price. */
+export function tierPricePaise(pricing: Pick<Pricing, "designs">, tier: DesignTier): number {
+  return tier === "free" ? 0 : pricing.designs[tier];
 }

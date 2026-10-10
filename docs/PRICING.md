@@ -24,36 +24,32 @@ Principles:
 - **Upgrade any time by paying the difference.**
 - **Cancel subscriptions in two taps,** with a reminder 7 days before every renewal.
 
-## 2. Personal: per-event passes
+## 2. Personal: packages per invite (decided 2026-10-09)
 
-An **event** is one occasion with all its functions (a wedding with haldi, mehendi, sangeet and reception is one event; a birthday party is one event).
+Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹599) or Signature (default ₹799, for the moving scenes, whose painting plays in layers like a short film). Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
 
-|                                     | Free                        | Premium                                            | Royal                                           | Wedding bundle                                    |
-| ----------------------------------- | --------------------------- | -------------------------------------------------- | ----------------------------------------------- | ------------------------------------------------- |
-| **Price (India, incl. GST)**        | ₹0                          | **₹499**                                           | **₹1,999**                                      | **₹2,999**                                        |
-| **Price (international)**           | $0                          | $9                                                 | $29                                             | $49                                               |
-| Best for                            | Trying it, small gatherings | Most birthdays, pujas, engagements                 | Big weddings and receptions                     | Multi-day Indian weddings                         |
-| Designs                             | Basic set                   | All standard                                       | All, including exclusive and artist collections | All, including exclusive                          |
-| Watermark                           | Yes, "Made with Shubh"      | No                                                 | No                                              | No                                                |
-| Functions per event                 | 1                           | Up to 3                                            | Unlimited                                       | Unlimited, plus save-the-date and thank-you cards |
-| Card languages                      | 1                           | 2                                                  | 2, with AI wording in each                      | 2, with AI wording in each                        |
-| Guests with RSVP                    | 50                          | 500                                                | Unlimited                                       | Unlimited                                         |
-| Tradition packs and regional motion | Yes                         | Yes                                                | Yes                                             | Yes                                               |
-| Music                               | 3 tracks                    | Full library                                       | Full library + own upload                       | Full library + own upload                         |
-| Photos                              | 3                           | 20                                                 | Unlimited + short video clips                   | Unlimited + short video clips                     |
-| Couple photos on event pages        | Try it, with watermark      | 1 photo                                            | 1 or 2 photos, plus one per function            | 1 or 2 photos, plus one per function              |
-| AI wording                          | 3 tries                     | Unlimited                                          | Unlimited                                       | Unlimited                                         |
-| AI couple art                       | —                           | 2 images                                           | 10 images                                       | 15 images                                         |
-| WhatsApp teaser video (MP4)         | —                           | 1                                                  | One per function                                | One per function                                  |
-| Co-hosts                            | 1                           | 3                                                  | Unlimited                                       | Unlimited                                         |
-| Guest dashboard                     | Counts only                 | Full list, meals, plus-ones, custom questions, CSV | Plus seating, travel and stay details           | Plus seating, travel and stay details             |
-| Reminders to non-responders         | —                           | Email and SMS                                      | Email, SMS and WhatsApp (when available)        | Email, SMS and WhatsApp                           |
-| Shagun ledger (direct UPI)          | Yes                         | Yes                                                | Yes                                             | Yes                                               |
-| Custom link (`/i/aarav-weds-meera`) | —                           | Yes                                                | Yes                                             | Yes                                               |
-| Guest photo album after the event   | —                           | 30 days                                            | 1 year                                          | Forever                                           |
-| Support                             | Help centre                 | Chat                                               | Personal designer help                          | Personal designer help                            |
+|                                       | Free                    | Basic                      | Celebration (most chosen) | Grand               |
+| ------------------------------------- | ----------------------- | -------------------------- | ------------------------- | ------------------- |
+| **Price (India, incl. GST)**          | ₹0, free designs only   | **The design's price**     | **Design + ₹500**         | **Design + ₹1,500** |
+| On a ₹499 design                      | —                       | ₹499                       | ₹999                      | ₹1,999              |
+| On a ₹599 design                      | —                       | ₹599                       | ₹1,099                    | ₹2,099              |
+| On a ₹799 design                      | —                       | ₹799                       | ₹1,299                    | ₹2,299              |
+| On a free design                      | ₹0                      | ₹0 (same as Free, no mark) | ₹500                      | ₹1,500              |
+| Watermark                             | Small “Made with Shubh” | No                         | No                        | No                  |
+| Invites by link (guests + open link)  | 50                      | 50                         | 500                       | Unlimited           |
+| Functions, RSVP, guest list, own link | Every function          | Every function             | Every function            | Every function      |
+| Card languages                        | 1                       | 1                          | 2                         | 2                   |
+| Own song                              | —                       | —                          | Yes                       | Yes                 |
+| WhatsApp Status and Reels video       | —                       | —                          | One video                 | One per function    |
+| Guest photo wall                      | —                       | —                          | 30 days                   | 1 year              |
+| Co-hosts                              | 1                       | 1                          | 3                         | Unlimited           |
 
-Extras without upgrading: +250 guests ₹199, +20 photos ₹99, +5 AI images ₹199, extra MP4 ₹299.
+Rules:
+
+- **Full preview, then pay, then publish.** The editor's last step shows the invite as guests will see it (`/invites/<id>/preview`). Publishing a Free invite while checkout is on opens the packages first; a free design can continue free from the Basic card.
+- **Upgrades pay the difference** between packages, and between designs when a paid invite moves to a dearer one.
+- An invite remembers the design tier it was bought on (`event_plans.design_tier`), so its package price stays fair if the admin later changes the design's tier.
+- Not in any package yet, because they are not built: save-the-date and thank-you cards, PDF and printable QR. Add them to Grand when they exist.
 
 ## 3. Personal: Family Plus (yearly)
 
@@ -138,11 +134,11 @@ On top, and repeating every month: Family Plus renewals, business subscriptions,
 
 ## 9. Build steps
 
-| Step    | Scope                                                                                                                                               |
-| ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **15**  | Plan catalogue and entitlements for Free, Premium, Royal, Wedding bundle, Family Plus and business plans; limits enforced in editor and guest pages |
-| **16**  | One-time checkout for passes and extras (UPI, cards), receipts, GST invoices                                                                        |
-| **16a** | Family Plus subscription: UPI AutoPay and cards, renewals, reminders, cancel, family member sharing, wedding discount                               |
-| **17**  | Watermark, locked-feature prompts, upgrade by paying the difference, coupons and festival offers                                                    |
-| **26**  | Business Starter and Pro subscriptions, trials, team members, client workspaces, reseller pass purchases                                            |
-| **26a** | Enterprise: white-label on own domain, SSO, API, custom pricing                                                                                     |
+| Step    | Scope                                                                                                                                          |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| **15**  | Plan catalogue and entitlements for Free, Basic, Celebration, Grand, Family Plus and business plans; limits enforced in editor and guest pages |
+| **16**  | One-time checkout for passes and extras (UPI, cards), receipts, GST invoices                                                                   |
+| **16a** | Family Plus subscription: UPI AutoPay and cards, renewals, reminders, cancel, family member sharing, wedding discount                          |
+| **17**  | Watermark, locked-feature prompts, upgrade by paying the difference, coupons and festival offers                                               |
+| **26**  | Business Starter and Pro subscriptions, trials, team members, client workspaces, reseller pass purchases                                       |
+| **26a** | Enterprise: white-label on own domain, SSO, API, custom pricing                                                                                |

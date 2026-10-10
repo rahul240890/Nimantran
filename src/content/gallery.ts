@@ -37,16 +37,27 @@ export const galleryCopy = {
   formats: {
     label: "Kind of invitation",
     all: "All",
+    moving: "Moving",
     scene: "Scene",
     story: "Story",
     card: "3D card",
   },
   /** Each design's tier (Admin, Designs) and what it costs, on its tile. */
-  tiers: { free: "Free", premium: "Premium", royal: "Royal" },
+  tiers: { free: "Free", premium: "Premium", royal: "Royal", signature: "Signature" },
   tierPrice: (tier: string, price: string) => `${tier} · ${price}`,
   tierLabel: (tier: string, price: string | null) =>
     price ? `${tier} design, publish from ${price}` : "Free design",
+  /** What photos a design takes (src/lib/gallery/photos.ts), under its name. */
+  photoNeeds: {
+    none: "No photo needed",
+    one: "One photo",
+    couple: "One couple photo",
+    two: "Two photos, one each",
+    either: "Couple photo or two separate",
+    optional: "Photos optional",
+  },
   sceneBadge: "Scene · 1 page",
+  movingBadge: "Moving",
   storyBadge: (count: number) => `Story · ${count} pages`,
   sceneNote:
     "One painting with your photos and names. Every celebration flies in by turn, and the painting's light follows it from morning to night.",
@@ -54,6 +65,8 @@ export const galleryCopy = {
   sample: {
     first: "Arjun",
     second: "Sia",
+    /** The one name on a birthday's or a party's sample. */
+    one: "Aanya",
     blessing: "With the blessings of Lord Ganesha",
     families: "Together with their families",
     line: "invite you to celebrate their wedding",
@@ -64,6 +77,8 @@ export const galleryCopy = {
       baraat: "From the hotel gate",
       wedding: "Rambagh Palace, Jaipur",
       reception: "Jai Mahal, Jaipur",
+      /** Any other occasion's one celebration. */
+      other: "The Garden Lawns, Jaipur",
     },
   },
   preview: (name: string) => `Preview ${name}`,
@@ -145,6 +160,8 @@ export const occasionTaglines: Record<string, string> = {
   "gudi-padwa": "The gudi, neem and puran poli",
   baisakhi: "Harvest, bhangra and giddha",
   bihu: "Bihu songs, dance and pitha",
+  "raksha-bandhan": "Rakhi, sweets and a family lunch",
+  "karva-chauth": "The fast, the moon and dinner",
   christmas: "Carols and cake",
   "shop-opening": "Udghatan and puja",
   launch: "Something new",
@@ -201,4 +218,53 @@ export const catalogCopy = {
   count: (count: number) => (count === 1 ? "1 design" : `${count} designs`),
   clear: "Clear filters",
   empty: "No design matches all of these yet. Try fewer filters.",
+  photosLabel: "Art or photos",
+  allPhotos: "Any",
+  photoGroups: { none: "Illustrated", one: "Couple photo", two: "Bride and groom photos" },
+  allDesigns: "All designs",
+};
+
+/** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */
+export const shelfCopy = {
+  groups: {
+    moving: "New: moving scenes",
+    photos: "Illustrated or with your photos",
+    format: "By kind of invitation",
+    tradition: "Weddings by tradition",
+    occasion: "More celebrations",
+  },
+  photos: {
+    none: {
+      title: "Illustrated invitations",
+      intro: "Hand-painted art with your names. No photo needed.",
+    },
+    one: {
+      title: "Couple photo invitations",
+      intro: "Your favourite photo of the two of you, set into the painting.",
+    },
+    two: {
+      title: "Bride and groom photos",
+      intro: "A separate photo of each of you, framed side by side.",
+    },
+  },
+  format: {
+    moving: {
+      title: "Moving scenes",
+      intro:
+        "Painted scenes that move like a short film: petals fall, lanterns rise, water ripples. No photo needed.",
+    },
+    story: { title: "Stories", intro: "A full-screen painted page for every function." },
+    scene: {
+      title: "Scenes",
+      intro: "Everything on one painting, each function flying in by turn.",
+    },
+    card: { title: "3D cards", intro: "A card that opens in 3D in your guest's hand." },
+  },
+  tradition: (name: string) => `${name} weddings`,
+  traditionsHeading: "Choose your tradition",
+  occasionsHeading: "Or another celebration",
+  viewAll: "View all",
+  viewAllLabel: (title: string, count: number) => `View all ${count} designs: ${title}`,
+  back: "Scroll back",
+  next: "Scroll on",
 };

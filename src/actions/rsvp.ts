@@ -9,6 +9,7 @@ import {
   type GuestReply,
   type SubmitResult,
 } from "@/lib/invites/rsvp";
+import { openLinkHasRoom } from "@/lib/payments/invite-room";
 import { isSlug } from "@/lib/publish/slug";
 
 /*
@@ -41,7 +42,7 @@ export async function loadReply(slug: string, guestToken: string): Promise<Guest
   return findReply(slug, guestToken).catch(() => null);
 }
 
-export type SendResult = SubmitResult | { ok: false; reason: "invalid" };
+export type SendResult = SubmitResult | { ok: false; reason: "invalid" | "full" };
 
 export async function sendReply(
   slug: string,
@@ -51,6 +52,10 @@ export async function sendReply(
   const parsed = replySchema.safeParse(input);
   if (!isSlug(slug) || !parsed.success) return { ok: false, reason: "invalid" };
   const known = guestToken && token.safeParse(guestToken).success ? guestToken : null;
+  // A new guest from the open link counts towards the package's invites
+  if (!known && !(await openLinkHasRoom(slug).catch(() => true))) {
+    return { ok: false, reason: "full" };
+  }
   const answers = Object.fromEntries(
     Object.entries(parsed.data.answers).filter(([, value]) => value),
   ) as Record<string, string>;

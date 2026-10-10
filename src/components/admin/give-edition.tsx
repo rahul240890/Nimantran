@@ -23,7 +23,7 @@ function slugFrom(value: string): string {
 export function GiveEdition() {
   const router = useRouter();
   const [link, setLink] = useState("");
-  const [plan, setPlan] = useState<PaidPlanId>("royal");
+  const [plan, setPlan] = useState<PaidPlanId>("grand");
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 

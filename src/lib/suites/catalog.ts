@@ -98,6 +98,95 @@ export const ILLUSTRATED_IDS = [
 export type IllustratedId = (typeof ILLUSTRATED_IDS)[number];
 
 /**
+ * Two-photo cards: painted like the illustrated cards, with the words in the painting's own
+ * empty space and the art flying in from its sides, but with a frame at the top for each of
+ * two people (the bride's on the left, the groom's on the right) instead of a painted couple.
+ */
+export const PHOTO_CARD_IDS = [
+  "phad-gatha",
+  "mandana-lal",
+  "gota-patti",
+  "pithora-ghoda",
+  "sohrai-khovar",
+  "aipan-kumaon",
+  "pipli-chhata",
+  "bishnupur-terracotta",
+  "ganjifa-patte",
+  "kanjivaram-pattu",
+  "kasavu-sona",
+  "urli-pookal",
+  "kar-e-kashmir",
+  "zardozi-mehfil",
+  "patola-bandh",
+  "kundan-jhumka",
+  "moti-bharat",
+  "polaroid-lights",
+  "dak-tikat",
+  "kadhai-hoop",
+  "locket-jodi",
+  "syahi-bamboo",
+  "lace-ivory",
+  "origami-saaras",
+  "nimbu-amalfi",
+  "rail-yatra",
+  "rakhi-dor",
+  "karva-chandni",
+  "judwa-taare",
+  "naya-mehmaan",
+] as const;
+export type PhotoCardId = (typeof PHOTO_CARD_IDS)[number];
+
+/**
+ * Moving scenes (owner, 2026-10-09): no photos, the words in the painting's own sky, and
+ * the painting in layers (a sky, the place, the pieces in front, small things that float)
+ * that move like a short film: petals fall, lanterns rise, branches sway, water ripples.
+ * They are Scene themes with no photo frame (scene.ts, moving.ts), priced as Signature.
+ */
+export const MOVING_IDS = [
+  "jal-mahal",
+  "gulmohar-rasta",
+  "genda-barsaat",
+  "akash-kandil",
+  "chand-raat",
+  "titli-bagh",
+  "malli-mazhai",
+  "shiuli-bhor",
+  "sarson-khet",
+  "shamiana-raat",
+  "kettuvallam-raat",
+  "diya-dhara",
+  "wedding-bells",
+  "saawan-bundein",
+  "hans-jheel",
+  "navratri-garbi",
+  "snow-globe",
+  "sea-bubbles",
+  "badal-sapne",
+  "aangan-subah",
+  "neeli-nagri",
+  "kesar-kyari",
+  "konkan-kinara",
+  "megh-jharna",
+  "fawwara-bagh",
+  "deodar-sanjh",
+  "jhoomar-mahal",
+  "champa-baag",
+  "tota-bagh",
+  "aatishbaazi",
+  "toota-taara",
+  "phoolon-ki-holi",
+  "dahi-handi",
+  "vallam-kali",
+  "pongal-paanai",
+  "khazana-dweep",
+  "kaagaz-ki-kashti",
+  "aurora-igloo",
+  "teddy-picnic",
+  "dukaan-mahurat",
+] as const;
+export type MovingId = (typeof MOVING_IDS)[number];
+
+/**
  * Scene themes: one painting each, with a painted card that flies in with each celebration
  * (scene.ts). They have no pages of their own, so they only show as a Scene, and take the
  * rest of their look (colours, lettering, guest page) from the painted theme they're kin to.
@@ -200,6 +289,8 @@ export const SCENE_THEME_IDS = [
   "magnolia-moon",
   "phool-chandelier",
   ...ILLUSTRATED_IDS,
+  ...PHOTO_CARD_IDS,
+  ...MOVING_IDS,
 ] as const;
 export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
@@ -1314,7 +1405,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
 };
 
 /** The painted theme each Scene theme takes its colours, lettering and guest page from. */
-const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
+export const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "udaipur-lake": "rajwada-bagh",
   "pink-haveli": "shahi-savari",
   "char-bagh": "noor-bagh",
@@ -1484,6 +1575,76 @@ const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   valaikappu: "palna",
   "shubh-labh": "peshwai-wada",
   "retirement-naav": "saath",
+  "phad-gatha": "shahi-savari",
+  "mandana-lal": "shahi-savari",
+  "gota-patti": "shahi-savari",
+  "pithora-ghoda": "kutch-toran",
+  "sohrai-khovar": "mitti",
+  "aipan-kumaon": "rajbari",
+  "pipli-chhata": "pattachitra",
+  "bishnupur-terracotta": "rajbari",
+  "ganjifa-patte": "mysuru",
+  "kanjivaram-pattu": "tanjore",
+  "kasavu-sona": "kayal",
+  "urli-pookal": "kayal",
+  "kar-e-kashmir": "chinar",
+  "zardozi-mehfil": "noor-bagh",
+  "patola-bandh": "kutch-toran",
+  "kundan-jhumka": "gulaab",
+  "moti-bharat": "kutch-toran",
+  "polaroid-lights": "rooftop",
+  "dak-tikat": "ivory-arch",
+  "kadhai-hoop": "gulaab",
+  "locket-jodi": "saath",
+  "syahi-bamboo": "sakura",
+  "lace-ivory": "chapel",
+  "origami-saaras": "kaagaz",
+  "nimbu-amalfi": "sagar",
+  "rail-yatra": "van",
+  "rakhi-dor": "shahi-savari",
+  "karva-chandni": "taara",
+  "judwa-taare": "gubbara",
+  "naya-mehmaan": "palna",
+  "jal-mahal": "rajwada-bagh",
+  "gulmohar-rasta": "gulaab",
+  "genda-barsaat": "shahi-savari",
+  "akash-kandil": "deepotsav",
+  "chand-raat": "noor-bagh",
+  "titli-bagh": "gubbara",
+  "malli-mazhai": "tanjore",
+  "shiuli-bhor": "rajbari",
+  "sarson-khet": "phulkari-haveli",
+  "shamiana-raat": "rooftop",
+  "kettuvallam-raat": "kayal",
+  "diya-dhara": "kashi",
+  "wedding-bells": "chapel",
+  "saawan-bundein": "van",
+  "hans-jheel": "gulaab",
+  "navratri-garbi": "kutch-toran",
+  "snow-globe": "himani",
+  "sea-bubbles": "sagar",
+  "badal-sapne": "palna",
+  "aangan-subah": "peshwai-wada",
+  "neeli-nagri": "neel",
+  "kesar-kyari": "chinar",
+  "konkan-kinara": "sagar",
+  "megh-jharna": "van",
+  "fawwara-bagh": "noor-bagh",
+  "deodar-sanjh": "chai-bagan",
+  "jhoomar-mahal": "ivory-arch",
+  "champa-baag": "mysuru",
+  "tota-bagh": "gulaab",
+  aatishbaazi: "deco-noir",
+  "toota-taara": "taara",
+  "phoolon-ki-holi": "pichwai",
+  "dahi-handi": "mitti",
+  "vallam-kali": "kayal",
+  "pongal-paanai": "tanjore",
+  "khazana-dweep": "jungle-party",
+  "kaagaz-ki-kashti": "kaagaz",
+  "aurora-igloo": "himani",
+  "teddy-picnic": "gubbara",
+  "dukaan-mahurat": "peshwai-wada",
 };
 
 /** The occasions a Scene theme is painted for beyond weddings. */
@@ -1551,6 +1712,27 @@ const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
   valaikappu: ["baby-shower"],
   "shubh-labh": ["shop-opening"],
   "retirement-naav": ["retirement", "farewell-party"],
+  "rakhi-dor": ["raksha-bandhan"],
+  "karva-chandni": ["karva-chauth", "anniversary"],
+  "judwa-taare": ["birthday"],
+  "naya-mehmaan": ["baby-shower"],
+  "akash-kandil": ["diwali"],
+  "chand-raat": ["eid"],
+  "navratri-garbi": ["navratri"],
+  "snow-globe": ["christmas", "party"],
+  "titli-bagh": ["birthday", "baby-shower", "naming-ceremony"],
+  "sea-bubbles": ["birthday", "party"],
+  "badal-sapne": ["baby-shower", "naming-ceremony", "birthday"],
+  "aangan-subah": ["housewarming", "puja"],
+  "phoolon-ki-holi": ["holi"],
+  "dahi-handi": ["janmashtami"],
+  "vallam-kali": ["onam"],
+  "pongal-paanai": ["sankranti"],
+  "khazana-dweep": ["birthday", "party"],
+  "kaagaz-ki-kashti": ["birthday", "baby-shower", "naming-ceremony"],
+  "aurora-igloo": ["birthday", "christmas", "party"],
+  "teddy-picnic": ["birthday", "baby-shower", "naming-ceremony"],
+  "dukaan-mahurat": ["shop-opening", "launch"],
 };
 
 /** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
@@ -1651,6 +1833,27 @@ const WEDDING_FIT: Partial<Record<SuiteId, readonly JourneyId[]>> = {
   "kathputli-sangeet": ["sangeet", "mehendi"],
   sehrabandi: ["wedding"],
   "laxmi-aagman": ["reception", "wedding"],
+  // Two-photo cards in a modern look, or for a church wedding or a nikah
+  "polaroid-lights": ["save-the-date", "engagement", "wedding", "reception"],
+  "dak-tikat": ["save-the-date", "engagement", "wedding"],
+  "kadhai-hoop": ["engagement", "wedding", "save-the-date", "mehendi"],
+  "locket-jodi": ["engagement", "wedding", "reception", "save-the-date"],
+  "syahi-bamboo": ["wedding", "engagement", "save-the-date", "reception"],
+  "lace-ivory": ["wedding", "engagement", "save-the-date", "reception"],
+  "origami-saaras": ["engagement", "wedding", "save-the-date"],
+  "nimbu-amalfi": ["wedding", "engagement", "save-the-date", "sangeet", "reception"],
+  "rail-yatra": ["save-the-date", "wedding", "engagement"],
+  "zardozi-mehfil": ["wedding", "reception", "engagement", "mehendi"],
+  // Moving scenes painted for a function, or for a church wedding
+  "genda-barsaat": ["haldi"],
+  "saawan-bundein": ["mehendi", "sangeet"],
+  "shamiana-raat": ["sangeet", "reception", "mehendi"],
+  "hans-jheel": ["engagement", "roka", "save-the-date", "reception"],
+  "wedding-bells": ["wedding", "engagement", "save-the-date", "reception"],
+  "tota-bagh": ["mehendi", "haldi", "sangeet"],
+  aatishbaazi: ["sangeet", "reception", "wedding"],
+  "toota-taara": ["engagement", "save-the-date", "reception", "sangeet"],
+  "jhoomar-mahal": ["wedding", "reception", "sangeet", "engagement"],
 };
 
 /**
@@ -1688,6 +1891,17 @@ const NO_ROKA: readonly SuiteId[] = [
   "goa-azulejo",
   "kantha-silai",
   "tholu-bommalata",
+  "pipli-chhata",
+  "bishnupur-terracotta",
+  "ganjifa-patte",
+  "kanjivaram-pattu",
+  "kasavu-sona",
+  "urli-pookal",
+  "malli-mazhai",
+  "shiuli-bhor",
+  "kettuvallam-raat",
+  "fawwara-bagh",
+  "champa-baag",
 ];
 
 /** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */
@@ -1795,6 +2009,8 @@ const FUNCTION_PAGES: Record<FunctionId, { art: PageArt; mood: Mood }> = {
   "gudi-padwa": { art: "reception", mood: "day" },
   baisakhi: { art: "reception", mood: "day" },
   bihu: { art: "reception", mood: "day" },
+  "raksha-bandhan": { art: "reception", mood: "day" },
+  "karva-chauth": { art: "reception", mood: "night" },
 };
 
 /**

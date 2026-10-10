@@ -7,9 +7,7 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import { StoryPlayer } from "@/components/invitation/story/story-player";
 import { musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
-import { uiText } from "@/i18n/copy/ui";
+import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
@@ -311,8 +309,7 @@ export function Opening({
   guest,
   after,
 }: OpeningProps) {
-  const { guestCopy } = useText(publishText);
-  const { uiStrings } = useText(uiText);
+  const { guestCopy, invitation } = useGuestText();
   const still = useReducedMotion();
   const [open, setOpen] = useState(false);
   const [pages, setPages] = useState(false);
@@ -596,14 +593,14 @@ export function Opening({
           textBox={after.textBox}
           type={type}
           still={still}
-          labels={uiStrings.invitation.story}
+          labels={invitation.story}
           lang={lang}
           reply={reply}
           music={{
             playing: music.playing,
             toggle: music.toggle,
-            play: uiStrings.invitation.playMusic,
-            pause: uiStrings.invitation.pauseMusic,
+            play: invitation.playMusic,
+            pause: invitation.pauseMusic,
           }}
           onDone={leave}
           onFinished={music.rest}

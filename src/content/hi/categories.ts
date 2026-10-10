@@ -54,6 +54,8 @@ export const categoryTaglines: Translation<typeof en.categoryTaglines> = {
   "gudi-padwa": "गुड़ी, नीम और पूरन पोली",
   baisakhi: "फ़सल, भांगड़ा और गिद्धा",
   bihu: "बिहू गीत, नृत्य और पीठा",
+  "raksha-bandhan": "राखी, मिठाई और परिवार का भोजन",
+  "karva-chauth": "व्रत, चाँद का दीदार और साथ में भोजन",
 };
 
 export const questionLabels: Translation<typeof en.questionLabels> = {

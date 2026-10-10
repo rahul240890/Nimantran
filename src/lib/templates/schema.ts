@@ -2,11 +2,13 @@ import { z } from "zod";
 import {
   FONT_ROLES,
   FORMAT_IDS,
+  LEAD_IDS,
   MOTIF_IDS,
   RAGA_IDS,
   SLOT_IDS,
   SLOT_RULES,
   STOCK_ROLES,
+  TAAL_IDS,
   TEMPLATE_IDS,
 } from "./ids";
 
@@ -65,6 +67,10 @@ export const templateSchema = z.object({
     raga: z.enum(RAGA_IDS),
     /** Beats per minute; the raga's own tempo when left out. */
     tempo: z.number().int().min(48).max(100).optional(),
+    /** The instrument for the melody; the raga's own when left out. */
+    lead: z.enum(LEAD_IDS).optional(),
+    /** The drum under it, null for none; the raga's own when left out. */
+    taal: z.enum(TAAL_IDS).nullable().optional(),
     /**
      * A link to the host's own music clip, played instead of the raga. Never set in the
      * catalogue: the editor and the guest page add it to the invite's design (music-clip.ts).

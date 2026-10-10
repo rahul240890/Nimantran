@@ -58,9 +58,9 @@ export async function writeWording(
 ): Promise<WordingResult> {
   const config = aiConfig();
   if (!config) return { ok: false, reason: "off" };
-  const plan = await invitePlan(account, eventId);
-  if (!plan) return { ok: false, reason: "not-found" };
-  const free = plan === "free" ? FREE_DRAFTS : null;
+  const edition = await invitePlan(account, eventId);
+  if (!edition) return { ok: false, reason: "not-found" };
+  const free = edition.plan === "free" ? FREE_DRAFTS : null;
   const used = await takeDraft(eventId, free);
   if (used === null) return { ok: false, reason: "used-up" };
 

@@ -3,10 +3,11 @@ import { Faq } from "./faq";
 import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
-import { HomeOccasions, HomeThemes } from "./home-gallery";
+import { HomeDesigns, HomeKinds, HomeMore, HomeOccasions } from "./home-gallery";
 import { Waitlist } from "./waitlist";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
+import { siteMenu } from "@/components/shell/site-menu";
 import { JsonLd } from "@/components/seo/json-ld";
 import { landingText } from "@/i18n/copy/landing";
 import { homePath, type UiLocale } from "@/i18n/locales";
@@ -18,11 +19,14 @@ export function HomePage({ locale }: { locale: UiLocale }) {
   return (
     <PageTransition>
       <div className="relative isolate flex min-h-dvh flex-col">
-        <SiteHeader />
+        <SiteHeader menu={siteMenu(locale)} />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
-          <Hero locale={locale} />
-          <HomeOccasions locale={locale} />
-          <HomeThemes locale={locale} />
+          <Hero locale={locale}>
+            <HomeOccasions locale={locale} />
+          </Hero>
+          <HomeDesigns locale={locale} />
+          <HomeKinds locale={locale} />
+          <HomeMore locale={locale} />
           <HowItWorks locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />

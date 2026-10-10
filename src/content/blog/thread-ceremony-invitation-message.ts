@@ -156,7 +156,7 @@ export const threadCeremonyInvitationMessage: BlogPost = {
         "If the muhurat time changes, the same link updates for everyone.",
       ],
     },
-    "Making and sharing an invitation with one function is free; Premium, from ₹499 per invitation, covers up to three functions. See [thread ceremony invitation designs](/invitations/thread-ceremony) and [pricing](/pricing).",
+    "Making and sharing an invitation with a free design is free, with every function; paid designs start at ₹499 per invitation. See [thread ceremony invitation designs](/invitations/thread-ceremony) and [pricing](/pricing).",
     "For other family ceremonies, read [Satyanarayan puja invitation messages](/blog/satyanarayan-puja-invitation-message) and [griha pravesh invitation messages](/blog/griha-pravesh-invitation-message).",
   ],
   faq: [

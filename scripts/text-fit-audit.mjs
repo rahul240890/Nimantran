@@ -75,12 +75,16 @@ if (kind === "scenes") {
         );
         const slotRect = slot?.getBoundingClientRect();
         for (const print of c.querySelectorAll(".scene-print")) {
-          const words = print.firstElementChild?.getBoundingClientRect();
+          // A bare slot's first child is display: contents, with no box of its own
+          const words = (
+            print.querySelector(".scene-card-words") ?? print.firstElementChild
+          )?.getBoundingClientRect();
           if (!words) continue;
           const name = print.id ? "names" : "line";
           if (!inside(words, innerOf(print))) out.push(`${name} runs out of its box`);
           if (
             slotRect &&
+            !print.classList.contains("scene-slot") &&
             Math.min(words.bottom, slotRect.bottom) - Math.max(words.top, slotRect.top) > 1 &&
             Math.min(words.right, slotRect.right) - Math.max(words.left, slotRect.left) > 1
           )

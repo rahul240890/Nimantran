@@ -105,6 +105,8 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   bihu: "rangoli",
   christening: "bagiya-gate",
   "naming-ceremony": "mela-tamboo",
+  "raksha-bandhan": "gift",
+  "karva-chauth": "moonlit",
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 

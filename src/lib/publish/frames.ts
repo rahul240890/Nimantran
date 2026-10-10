@@ -13,9 +13,9 @@ import {
   PAINTING_ASPECT,
   photoBox,
   photoPage,
-  PHOTO_PAGE_SUITES,
   type FrameBox,
 } from "@/lib/suites/photo-frames";
+import { designLayouts } from "@/lib/suites/photo-layouts";
 import { isSceneTheme } from "@/lib/suites/catalog";
 import { sceneFrames, scenePage } from "@/lib/suites/scene";
 import { draftShowsScene, draftSuite } from "./story";
@@ -37,29 +37,9 @@ export type FrameSpot = {
   aspect: number;
 };
 
-/**
- * The photo layouts this invite's design offers. A design that paints its own photo frames
- * (every Scene, and the Story themes with photo pages) always shows them, so it asks for its
- * photos: one, or one each where it has a two-frame painting. A Scene theme painted with the
- * bride's and the groom's frames always asks for both. Only a design without painted frames
- * can leave the photo page out, and an illustrated card, with its couple painted, has none.
- */
+/** The photo layouts this invite's design offers (see designLayouts). */
 export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
-  const one = draftPeople(draft) === "one";
-  const suite = draftSuite(draft);
-  if (draftShowsScene(draft)) {
-    if (isSceneTheme(suite)) {
-      const frames = sceneFrames(suite);
-      if (frames === 0) return ["none"];
-      return [!one && frames === 2 ? "two" : "one"];
-    }
-    return one ? ["one"] : ["one", "two"];
-  }
-  if (PHOTO_PAGE_SUITES.includes(suite)) {
-    const two = photoPage(suite, 2)?.frames.length === 2;
-    return one || !two ? ["one"] : ["one", "two"];
-  }
-  return one ? ["none", "one"] : ["none", "one", "two"];
+  return designLayouts(draftSuite(draft), draftShowsScene(draft), draftPeople(draft) === "one");
 }
 
 /** Whether the design paints its own photo frames, which then must be filled. */
@@ -91,10 +71,12 @@ export function draftFrames(draft: InviteDraft): FrameSpot[] {
   const ids = draft.photos.map((photo) => photo.id);
   const scene = draftShowsScene(draft);
   const couple = draftCouple(draft);
-  // One guest of honour has one photo, as the pages show it
-  const chosen = coupleFrameIds(couple, ids).slice(0, draftPeople(draft) === "one" ? 1 : 2);
-  if (chosen.length === 0) return [];
   const suite = draftSuite(draft);
+  // One guest of honour has one photo, as the pages show it, unless the painting has two frames
+  const pair = scene && isSceneTheme(suite) && sceneFrames(suite) === 2;
+  const one = draftPeople(draft) === "one" && !pair;
+  const chosen = coupleFrameIds(couple, ids).slice(0, one ? 1 : 2);
+  if (chosen.length === 0) return [];
   const page = scene ? scenePage(suite, chosen.length) : photoPage(suite, chosen.length);
   if (!page) return chosen.map((id) => ({ id, image: null, box: null, aspect: ARCH_ASPECT }));
   return chosen.slice(0, page.frames.length).map((id, i) => {

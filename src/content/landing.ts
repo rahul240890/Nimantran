@@ -19,6 +19,43 @@ export const nav = [
   { id: "pricing", label: "Pricing" },
 ] as const;
 
+/** The header's menus for Designs, Weddings and Occasions (src/components/shell/site-menu.ts). */
+export const menuCopy = {
+  photos: "Illustrated or with photos",
+  kinds: "By kind of invitation",
+  popular: "Popular",
+  regions: "By region",
+  communities: "By community and faith",
+  looks: "By look",
+  lookNames: {
+    garden: "Gardens and flowers",
+    palace: "Royal palaces",
+    temple: "Temples and blessings",
+    lotus: "Lotus",
+    peacock: "Peacocks",
+    sea: "Sea and backwaters",
+    night: "Night and lamps",
+    balloon: "Balloons and parties",
+    modern: "Modern and simple",
+  },
+  functions: "Wedding functions",
+  allDesigns: (count: number) => `See all ${count} designs`,
+  allWeddings: "All wedding designs",
+  allOccasions: "All occasions",
+  designsFeature: {
+    title: "Illustrated or with your photos",
+    text: "Painted art alone, your couple photo, or a photo of each of you: every design says which, and its price.",
+  },
+  weddingsFeature: {
+    title: "Wedding invitations",
+    text: "Every function on one painted invite, written in your tradition, with RSVP.",
+  },
+  occasionsFeature: {
+    title: "Every celebration",
+    text: "Birthdays, griha pravesh, baby showers, pujas and more, each with its own designs.",
+  },
+};
+
 export const shell = {
   skipToContent: "Skip to main content",
   primaryNav: "Main",
@@ -68,27 +105,27 @@ export const hero = {
   },
 } as const;
 
-/** The home page's painted deck, occasions and themes (Step 12g). */
+/** The home page's painted deck, occasion strip and rows of designs. */
 export const homeGallery = {
   deckLabel: "Painted invitation themes",
   showTheme: (name: string) => `Show ${name}`,
   previousTheme: "Previous theme",
   nextTheme: "Next theme",
   coverDate: "12 December 2026",
-  occasionsEyebrow: "Start here",
   occasionsTitle: "What are you celebrating?",
-  occasionsIntro: "Pick the occasion and see only the designs made for it.",
   searchLabel: "Search occasions and designs",
   searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
   search: "Search",
-  weddingHeading: "Wedding functions",
-  moreHeading: "More celebrations",
-  soonHeading: "Coming next",
   allOccasions: "Every occasion",
-  themesEyebrow: "Designs",
-  themesTitle: "Popular designs",
-  themesIntro:
-    "A Scene is one painting where every celebration flies in by turn. A Story gives each celebration its own full-screen page.",
+  designsEyebrow: "Designs",
+  designsTitle: "Find your invitation",
+  designsIntro: "Start with your tradition, or with how many photos you want on the invite.",
+  kindsEyebrow: "Three ways to invite",
+  kindsTitle: "Pick how it opens",
+  kindsIntro: "Every design comes as one of these. Tap one to see them all.",
+  moreEyebrow: "More celebrations",
+  moreTitle: "Birthdays, anniversaries and more",
+  moreIntro: "Painted designs for the family's other big days.",
   allDesigns: "See all designs",
 };
 
@@ -143,8 +180,8 @@ export const templates = {
 export const pricing = {
   eyebrow: "Pricing",
   /** Premium's price as Admin, Designs sets it. */
-  title: (price: string) => `Free to start, premium from ${price}`,
-  intro: "Make your invite and share it for free. Upgrade one event when you want more.",
+  title: (price: string) => `Free to start, paid designs from ${price}`,
+  intro: "Make your invite and share it for free. Choose a package when you want more.",
   free: {
     name: "Free",
     price: "₹0",
@@ -156,19 +193,19 @@ export const pricing = {
     ],
   },
   premium: {
-    name: "Premium",
+    name: "Packages",
     price: (price: string) => `from ${price}`,
-    per: "per event",
+    per: "per invitation",
     badge: "Best for weddings",
     points: [
-      "Up to 3 functions and 20 photos",
-      "Video for WhatsApp Status and Reels",
-      "No watermark on your invite",
+      "Basic: your design, with no watermark",
+      "Celebration: the WhatsApp Status and Reels video, and more invites",
+      "Grand: unlimited invites, and a video for every function",
     ],
   },
-  note: "One payment per invitation, GST included. Never a subscription. Royal and the Wedding bundle cover every function.",
+  note: "One payment per invitation, GST included. Never a subscription. Every package covers every function.",
   cta: "Start your invite",
-  compare: "Compare every edition",
+  compare: "Compare the packages",
 } as const;
 
 export const faq = {
@@ -213,7 +250,7 @@ export const waitlist = {
     "You can make and send invites today. Leave your details and we will write once when Shubh launches publicly, with your first-event offer.",
   perks: [
     "One email on launch day",
-    "Premium free for your first event",
+    "Celebration free for your first event",
     "A say in the designs we make next",
   ],
   form: {

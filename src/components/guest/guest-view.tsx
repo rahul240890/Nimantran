@@ -21,8 +21,8 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import {
   cardLanguages,
   draftCopy,
+  draftTemplate,
   mainFunction,
-  templateWithRaga,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -55,9 +55,9 @@ import { scenePage } from "@/lib/suites/scene";
 import { openingGod, openingStyle } from "@/lib/opening/catalog";
 import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
-import { useLocale, useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
-import { uiText } from "@/i18n/copy/ui";
+import { useLocale } from "@/i18n/client";
+import { guestText } from "@/i18n/copy/guest";
+import { GuestLanguage, useGuestText } from "@/components/guest/guest-language";
 
 const noSubscribe = () => () => {};
 
@@ -100,6 +100,8 @@ type GuestViewProps = {
   watermark?: boolean;
   /** A fixed moment for the event-day banner, on review pages. */
   previewNow?: number;
+  /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
+  preview?: boolean;
 };
 
 export function GuestView({
@@ -113,29 +115,32 @@ export function GuestView({
   questions,
   watermark = false,
   previewNow,
+  preview = false,
 }: GuestViewProps) {
-  const { guestCopy, rsvpCopy } = useText(publishText);
-  const { uiStrings } = useText(uiText);
   const locale = useLocale();
   const languages = cardLanguages(draft);
   // A two-language card opens in the guest's own language when it has it
   const [language, setLanguage] = useState<CardLanguage>(
     () => languages.find((code) => code === locale) ?? languages[0],
   );
+  // Everything around the card speaks the card's language too, and switches with it
+  const { guestCopy, rsvpCopy, invitation, theme } = guestText[language];
   const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
-  const template = useMemo(
-    () => withClip(templateWithRaga(draft.templateId, draft.music.raga), clipUrl),
-    [draft.templateId, draft.music.raga, clipUrl],
-  );
+  const designed = draftTemplate(draft);
+  const template = useMemo(() => withClip(designed, clipUrl), [designed, clipUrl]);
   // A guest who came by their own link is greeted by name before the invitation opens
   const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
   const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
-  // The pages speak the card's language, not the site's
+  // The pages and the details below them, named and dated as the card names and dates them
+  const details = useMemo(
+    () => cardFunctions(functions, draft, language),
+    [functions, draft, language],
+  );
   const told = useMemo(
     () =>
-      cardFunctions(functions, draft, language).map((fn) => ({
+      details.map((fn) => ({
         ...fn,
         countdown: today
           ? daysAway(
@@ -144,7 +149,15 @@ export function GuestView({
             )
           : undefined,
       })),
-    [functions, draft, language, today],
+    [details, draft, language, today],
+  );
+  const replyFunctions = useMemo(
+    () =>
+      rsvpFunctions.map((fn) => ({
+        ...fn,
+        name: details.find((item) => item.kind === fn.kind)?.name ?? fn.name,
+      })),
+    [rsvpFunctions, details],
   );
   const story = useMemo<InvitationStory>(
     () => ({
@@ -207,211 +220,211 @@ export function GuestView({
   const family = storyFamily(draft, language);
   const rsvp =
     rsvpFunctions.length > 0 ? (
-      <RsvpForm slug={slug} functions={rsvpFunctions} questions={questions} />
+      <RsvpForm slug={slug} functions={replyFunctions} questions={questions} preview={preview} />
     ) : null;
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <EventDayBanner functions={functions} previewNow={previewNow} />
-      <div className="relative flex flex-1 flex-col">
-        <div className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30">
-          <ThemeMenu labels={uiStrings.theme} />
-        </div>
+    <GuestLanguage language={language}>
+      <div lang={language} className="flex min-h-dvh flex-col">
+        <EventDayBanner functions={details} previewNow={previewNow} />
+        <div className="relative flex flex-1 flex-col">
+          <div className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30">
+            <ThemeMenu labels={theme} />
+          </div>
 
-        {watermark && <WatermarkLayer />}
-        <main id="main" className="flex flex-1 flex-col">
-          {scene && !showOpening ? (
-            <OneScene
-              suite={suite}
-              page={scene}
-              copy={copy}
-              lang={language}
-              functions={told}
-              photos={scenePhotos}
-              reply={story.reply ?? null}
-              type={story.type}
-              detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
-              header={
-                (guestName || languages.length > 1) && (
-                  <>
-                    {guestName && (
-                      <p
-                        lang={language}
-                        className="rounded-full bg-card-ivory/85 px-4 py-1 text-center text-sm text-card-ink shadow-raised backdrop-blur"
-                      >
-                        {CARD_GREETING_WORDS[language].dear}{" "}
-                        <span className="font-semibold">{guestName}</span>
-                      </p>
-                    )}
-                    {languages.length > 1 && (
-                      <CardLanguageToggle
-                        label={guestCopy.cardLanguage}
-                        languages={languages}
-                        value={language}
-                        onValueChange={setLanguage}
-                      />
-                    )}
-                  </>
-                )
-              }
-              extra={
-                <SceneButton
-                  label={
-                    music.playing ? uiStrings.invitation.pauseMusic : uiStrings.invitation.playMusic
-                  }
-                  pressed={music.playing}
-                  onClick={music.toggle}
-                >
-                  {music.playing ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
-                </SceneButton>
-              }
-            />
-          ) : (
-            <Opening
-              suite={suite}
-              style={opening}
-              god={god}
-              copy={copy}
-              lang={language}
-              languages={languages}
-              onLanguage={setLanguage}
-              type={story.type!}
-              main={main}
-              reply={story.reply ?? null}
-              music={music}
-              musicOnOpen={draft.music.playOnOpen}
-              guest={guestName}
-              after={
-                scene
-                  ? { kind: "enter", onEnter: () => setEntered(true) }
-                  : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
-              }
-            />
-          )}
-
-          {look ? (
-            <ThemedDetails
-              suite={suite}
-              look={look}
-              copy={copy}
-              lang={language}
-              functions={cardFunctions(functions, draft, language)}
-              main={
-                mainKind && mainDate
-                  ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
-                  : null
-              }
-              photos={photos}
-              family={family}
-              familyLang={language}
-              allIcsUrl={allIcsUrl}
-              music={music}
-              reply={rsvp}
-            />
-          ) : (
-            <>
-              <FamilyWording family={family} lang={language} />
-
-              <section
-                aria-labelledby="guest-functions"
-                className="border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
-              >
-                <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                  <div className="flex flex-wrap items-end justify-between gap-4">
-                    <h2
-                      id="guest-functions"
-                      className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                    >
-                      {guestCopy.functions}
-                    </h2>
-                    {allIcsUrl && (
-                      <Button asChild variant="secondary">
-                        <a href={allIcsUrl} download>
-                          <CalendarPlus aria-hidden />
-                          {guestCopy.addAll}
-                        </a>
-                      </Button>
-                    )}
-                  </div>
-                  <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-                    {functions.map((fn) => (
-                      <li key={fn.kind}>
-                        <FunctionCard fn={fn} />
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </section>
-
-              {photos.length > 0 && (
-                <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
-                  <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                    <h2
-                      id="guest-photos"
-                      className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                    >
-                      {guestCopy.photos}
-                    </h2>
-                    <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                      {photos.map((photo, index) => (
-                        <li
-                          key={photo.id}
-                          className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
+          {watermark && <WatermarkLayer />}
+          <main id="main" className="flex flex-1 flex-col">
+            {scene && !showOpening ? (
+              <OneScene
+                suite={suite}
+                page={scene}
+                copy={copy}
+                lang={language}
+                functions={told}
+                photos={scenePhotos}
+                reply={story.reply ?? null}
+                type={story.type}
+                detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
+                header={
+                  (guestName || languages.length > 1) && (
+                    <>
+                      {guestName && (
+                        <p
+                          lang={language}
+                          className="rounded-full bg-card-ivory/85 px-4 py-1 text-center text-sm text-card-ink shadow-raised backdrop-blur"
                         >
-                          {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
-                          <img
-                            src={photo.url}
-                            alt={guestCopy.photoAlt(index + 1)}
-                            width={photo.width}
-                            height={photo.height}
-                            loading="lazy"
-                            decoding="async"
-                            className="aspect-[4/5] h-full w-full object-cover"
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </section>
-              )}
-              {rsvpFunctions.length > 0 && (
+                          {CARD_GREETING_WORDS[language].dear}{" "}
+                          <span className="font-semibold">{guestName}</span>
+                        </p>
+                      )}
+                      {languages.length > 1 && (
+                        <CardLanguageToggle
+                          label={guestCopy.cardLanguage}
+                          languages={languages}
+                          value={language}
+                          onValueChange={setLanguage}
+                        />
+                      )}
+                    </>
+                  )
+                }
+                extra={
+                  <SceneButton
+                    label={music.playing ? invitation.pauseMusic : invitation.playMusic}
+                    pressed={music.playing}
+                    onClick={music.toggle}
+                  >
+                    {music.playing ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+                  </SceneButton>
+                }
+              />
+            ) : (
+              <Opening
+                suite={suite}
+                style={opening}
+                god={god}
+                copy={copy}
+                lang={language}
+                languages={languages}
+                onLanguage={setLanguage}
+                type={story.type!}
+                main={main}
+                reply={story.reply ?? null}
+                music={music}
+                musicOnOpen={draft.music.playOnOpen}
+                guest={guestName}
+                after={
+                  scene
+                    ? { kind: "enter", onEnter: () => setEntered(true) }
+                    : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
+                }
+              />
+            )}
+
+            {look ? (
+              <ThemedDetails
+                suite={suite}
+                look={look}
+                copy={copy}
+                lang={language}
+                functions={details}
+                main={
+                  mainKind && mainDate
+                    ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
+                    : null
+                }
+                photos={photos}
+                family={family}
+                familyLang={language}
+                allIcsUrl={allIcsUrl}
+                music={music}
+                reply={rsvp}
+              />
+            ) : (
+              <>
+                <FamilyWording family={family} lang={language} />
+
                 <section
-                  id="rsvp"
-                  aria-labelledby="guest-rsvp"
-                  className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                  aria-labelledby="guest-functions"
+                  className="border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
                 >
-                  <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-                    <div className="flex flex-col gap-2">
+                  <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                    <div className="flex flex-wrap items-end justify-between gap-4">
                       <h2
-                        id="guest-rsvp"
+                        id="guest-functions"
                         className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
                       >
-                        {rsvpCopy.heading}
+                        {guestCopy.functions}
                       </h2>
-                      <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                      {allIcsUrl && (
+                        <Button asChild variant="secondary">
+                          <a href={allIcsUrl} download>
+                            <CalendarPlus aria-hidden />
+                            {guestCopy.addAll}
+                          </a>
+                        </Button>
+                      )}
                     </div>
-                    {rsvp}
+                    <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
+                      {details.map((fn) => (
+                        <li key={fn.kind}>
+                          <FunctionCard fn={fn} />
+                        </li>
+                      ))}
+                    </ol>
                   </div>
                 </section>
-              )}
-            </>
-          )}
-          <PhotoWall slug={slug} />
-        </main>
 
-        <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
-            <p className="flex items-center gap-2 text-sm text-ink-muted">
-              <BrandMark className="size-6 text-accent-text" />
-              {guestCopy.madeWith}
-            </p>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/">{guestCopy.createYours}</Link>
-            </Button>
-          </div>
-        </footer>
+                {photos.length > 0 && (
+                  <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
+                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                      <h2
+                        id="guest-photos"
+                        className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                      >
+                        {guestCopy.photos}
+                      </h2>
+                      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                        {photos.map((photo, index) => (
+                          <li
+                            key={photo.id}
+                            className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
+                            <img
+                              src={photo.url}
+                              alt={guestCopy.photoAlt(index + 1)}
+                              width={photo.width}
+                              height={photo.height}
+                              loading="lazy"
+                              decoding="async"
+                              className="aspect-[4/5] h-full w-full object-cover"
+                            />
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </section>
+                )}
+                {rsvpFunctions.length > 0 && (
+                  <section
+                    id="rsvp"
+                    aria-labelledby="guest-rsvp"
+                    className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                  >
+                    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+                      <div className="flex flex-col gap-2">
+                        <h2
+                          id="guest-rsvp"
+                          className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                        >
+                          {rsvpCopy.heading}
+                        </h2>
+                        <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                      </div>
+                      {rsvp}
+                    </div>
+                  </section>
+                )}
+              </>
+            )}
+            {!preview && <PhotoWall slug={slug} />}
+          </main>
+
+          <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
+            <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
+              <p className="flex items-center gap-2 text-sm text-ink-muted">
+                <BrandMark className="size-6 text-accent-text" />
+                {guestCopy.madeWith}
+              </p>
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/">{guestCopy.createYours}</Link>
+              </Button>
+            </div>
+          </footer>
+        </div>
       </div>
-    </div>
+    </GuestLanguage>
   );
 }
 
@@ -423,7 +436,7 @@ function FamilyWording({
   family: readonly { id: string; title: string; text: string }[];
   lang: string;
 }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   if (family.length === 0) return null;
   return (
     <section aria-labelledby="guest-family" className="px-4 pb-12 sm:px-6">

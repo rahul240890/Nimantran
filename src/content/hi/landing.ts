@@ -21,6 +21,42 @@ export const nav: Translation<typeof en.nav> = [
   { id: "pricing", label: "क़ीमत" },
 ];
 
+export const menuCopy: Translation<typeof en.menuCopy> = {
+  photos: "चित्रित या फ़ोटो के साथ",
+  kinds: "निमंत्रण के प्रकार से",
+  popular: "लोकप्रिय",
+  regions: "क्षेत्र के हिसाब से",
+  communities: "समुदाय और धर्म के हिसाब से",
+  looks: "रूप के हिसाब से",
+  lookNames: {
+    garden: "बाग़ और फूल",
+    palace: "शाही महल",
+    temple: "मंदिर और आशीर्वाद",
+    lotus: "कमल",
+    peacock: "मोर",
+    sea: "समुद्र और बैकवाटर",
+    night: "रात और दीये",
+    balloon: "गुब्बारे और पार्टी",
+    modern: "आधुनिक और सादे",
+  },
+  functions: "शादी की रस्में",
+  allDesigns: (count: number) => `सभी ${count} डिज़ाइन देखें`,
+  allWeddings: "शादी के सभी डिज़ाइन",
+  allOccasions: "सभी अवसर",
+  designsFeature: {
+    title: "चित्रित या आपकी फ़ोटो के साथ",
+    text: "सिर्फ़ चित्रकारी, जोड़े की फ़ोटो, या आप दोनों की अलग फ़ोटो: हर डिज़ाइन बताता है कौन-सा, और उसकी क़ीमत।",
+  },
+  weddingsFeature: {
+    title: "शादी के निमंत्रण",
+    text: "हर रस्म एक चित्रित निमंत्रण पर, आपकी परंपरा में लिखी, जवाब के साथ।",
+  },
+  occasionsFeature: {
+    title: "हर जश्न",
+    text: "जन्मदिन, गृह प्रवेश, गोद भराई, पूजा और भी बहुत कुछ, हर एक के अपने डिज़ाइन।",
+  },
+};
+
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "मुख्य सामग्री पर जाएँ",
   primaryNav: "मुख्य",
@@ -80,20 +116,20 @@ export const homeGallery: Translation<typeof en.homeGallery> = {
   previousTheme: "पिछली थीम",
   nextTheme: "अगली थीम",
   coverDate: "12 दिसंबर 2026",
-  occasionsEyebrow: "यहाँ से शुरू करें",
   occasionsTitle: "आप क्या मना रहे हैं?",
-  occasionsIntro: "अवसर चुनिए और सिर्फ़ उसी के लिए बने डिज़ाइन देखिए।",
   searchLabel: "अवसर और डिज़ाइन खोजें",
   searchPlaceholder: "जैसे गुजराती शादी, हल्दी, जन्मदिन…",
   search: "खोजें",
-  weddingHeading: "शादी की रस्में",
-  moreHeading: "और उत्सव",
-  soonHeading: "जल्द आ रहे हैं",
   allOccasions: "सभी अवसर",
-  themesEyebrow: "डिज़ाइन",
-  themesTitle: "लोकप्रिय डिज़ाइन",
-  themesIntro:
-    "सीन एक चित्र है जिसमें हर रस्म बारी-बारी से आती है। स्टोरी में हर रस्म का अपना पूरा पन्ना होता है।",
+  designsEyebrow: "डिज़ाइन",
+  designsTitle: "अपना निमंत्रण चुनिए",
+  designsIntro: "अपनी परंपरा से शुरू करें, या इससे कि निमंत्रण पर कितनी फ़ोटो चाहिए।",
+  kindsEyebrow: "न्योता देने के तीन तरीक़े",
+  kindsTitle: "चुनिए कि यह कैसे खुले",
+  kindsIntro: "हर डिज़ाइन इनमें से किसी एक रूप में आता है। सब देखने के लिए किसी पर टैप करें।",
+  moreEyebrow: "और उत्सव",
+  moreTitle: "जन्मदिन, सालगिरह और भी बहुत कुछ",
+  moreIntro: "परिवार के बाक़ी बड़े दिनों के लिए चित्रित डिज़ाइन।",
   allDesigns: "सभी डिज़ाइन देखें",
 };
 
@@ -146,8 +182,8 @@ export const templates: Translation<typeof en.templates> = {
 
 export const pricing: Translation<typeof en.pricing> = {
   eyebrow: "क़ीमत",
-  title: (price) => `शुरुआत मुफ़्त, प्रीमियम ${price} से`,
-  intro: "निमंत्रण बनाइए और मुफ़्त भेजिए। जब ज़्यादा चाहिए, तब एक उत्सव अपग्रेड कीजिए।",
+  title: (price) => `शुरुआत मुफ़्त, पेड डिज़ाइन ${price} से`,
+  intro: "निमंत्रण बनाइए और मुफ़्त भेजिए। जब ज़्यादा चाहिए, तब एक पैकेज चुनिए।",
   free: {
     name: "मुफ़्त",
     price: "₹0",
@@ -159,19 +195,19 @@ export const pricing: Translation<typeof en.pricing> = {
     ],
   },
   premium: {
-    name: "प्रीमियम",
+    name: "पैकेज",
     price: (price) => `${price} से`,
-    per: "प्रति उत्सव",
+    per: "प्रति निमंत्रण",
     badge: "शादियों के लिए सबसे अच्छा",
     points: [
-      "3 कार्यक्रम तक और 20 फ़ोटो",
-      "WhatsApp स्टेटस और रील्स के लिए वीडियो",
-      "निमंत्रण पर कोई वॉटरमार्क नहीं",
+      "बेसिक: आपका डिज़ाइन, बिना वॉटरमार्क",
+      "सेलिब्रेशन: WhatsApp स्टेटस और रील्स का वीडियो, और ज़्यादा इनवाइट",
+      "ग्रैंड: असीमित इनवाइट, और हर कार्यक्रम का वीडियो",
     ],
   },
-  note: "हर निमंत्रण के लिए एक बार भुगतान, GST सहित। कभी सब्सक्रिप्शन नहीं। रॉयल और वेडिंग बंडल में हर कार्यक्रम शामिल है।",
+  note: "हर निमंत्रण के लिए एक बार भुगतान, GST सहित। कभी सब्सक्रिप्शन नहीं। हर पैकेज में हर कार्यक्रम शामिल है।",
   cta: "अपना निमंत्रण बनाएँ",
-  compare: "सभी संस्करण देखें",
+  compare: "सभी पैकेज देखें",
 };
 
 export const faq: Translation<typeof en.faq> = {
@@ -216,7 +252,7 @@ export const waitlist: Translation<typeof en.waitlist> = {
     "आप आज ही निमंत्रण बनाकर भेज सकते हैं। अपना ब्योरा छोड़िए, सार्वजनिक लॉन्च पर हम एक बार लिखेंगे, आपके पहले उत्सव के ऑफ़र के साथ।",
   perks: [
     "लॉन्च के दिन एक ईमेल",
-    "पहले उत्सव के लिए प्रीमियम मुफ़्त",
+    "पहले उत्सव के लिए सेलिब्रेशन मुफ़्त",
     "अगले डिज़ाइन चुनने में आपकी राय",
   ],
   form: {

@@ -21,8 +21,7 @@ import {
 } from "react";
 import { PageEffects } from "@/components/invitation/story/page-effects";
 import { Button } from "@/components/ui/button";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
@@ -34,6 +33,7 @@ import { sceneLine } from "@/lib/suites/scene-type";
 import { PAINTING_ASPECT, photoBox, type FrameBox } from "@/lib/suites/photo-frames";
 import { frameAspectOf } from "@/lib/editor/photo-fit";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import { MovingLayers } from "./moving-layers";
 import {
   SCENE_HOLD_MS,
   SCENE_SWAP_MS,
@@ -216,7 +216,7 @@ export function OneScene({
   focus = null,
   className,
 }: OneSceneProps) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const words = guestCopy.scene;
   const reduced = useReducedMotion();
 
@@ -229,6 +229,9 @@ export function OneScene({
     return () => window.clearTimeout(timer);
   }, [pieces]);
   const opening = pieces && !assembled;
+  // A moving scene plays its layers; its words come in once the layers have landed
+  const moving = page.moving && !reduced ? page.moving : null;
+  const after = pieces || Boolean(moving) || undefined;
 
   // A painting without room for the line opens the slot with it instead
   const typeKey = JSON.stringify(type ?? null);
@@ -352,31 +355,36 @@ export function OneScene({
             aspectRatio: String(PAINTING_ASPECT),
           }}
         >
-          {/* The photos lie under the painting and show through its frames */}
-          {page.frames.map((frame, i) => {
-            const photo = photos[i];
-            const style = box(photoBox(frame));
-            return photo ? (
-              <FramedPhoto
-                key={i}
-                photo={photo}
-                frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
-                className="absolute bg-card-ivory"
-                style={style}
-              />
-            ) : (
-              <div
-                key={i}
-                aria-hidden
-                className="absolute flex items-center justify-center bg-card-ivory font-display text-[9cqw] text-card-gold-text"
-                style={style}
-              >
-                {(names[page.frames.length > 1 ? i : 0] ?? "").slice(0, 1)}
-                {page.frames.length === 1 && names[1] ? ` ${joiner} ${names[1].slice(0, 1)}` : ""}
-              </div>
-            );
-          })}
-          {opening ? (
+          {/* The photos lie under the painting and show through its frames; on a card that
+              comes together from its sides, they appear once its frames are in place */}
+          <div data-after={after} className="absolute inset-0">
+            {page.frames.map((frame, i) => {
+              const photo = photos[i];
+              const style = box(photoBox(frame));
+              return photo ? (
+                <FramedPhoto
+                  key={i}
+                  photo={photo}
+                  frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
+                  className="absolute bg-card-ivory"
+                  style={style}
+                />
+              ) : (
+                <div
+                  key={i}
+                  aria-hidden
+                  className="absolute flex items-center justify-center bg-card-ivory font-display text-[9cqw] text-card-gold-text"
+                  style={style}
+                >
+                  {(names[page.frames.length > 1 ? i : 0] ?? "").slice(0, 1)}
+                  {page.frames.length === 1 && names[1] ? ` ${joiner} ${names[1].slice(0, 1)}` : ""}
+                </div>
+              );
+            })}
+          </div>
+          {moving ? (
+            <MovingLayers scene={moving} />
+          ) : opening ? (
             <PaintingPieces image={page.image} pieces={page.pieces} />
           ) : (
             // eslint-disable-next-line @next/next/no-img-element -- the painting with its frames cut out
@@ -404,7 +412,7 @@ export function OneScene({
             id="scene-names"
             lang={lang}
             data-tone={tone}
-            data-after={pieces || undefined}
+            data-after={after}
             className="story-print story-print-haze scene-print scene-words absolute flex items-center justify-center text-center text-card-ink"
             style={box(page.names)}
           >
@@ -430,7 +438,7 @@ export function OneScene({
               ref={lineBox}
               lang={lang}
               data-tone={tone}
-              data-after={pieces || undefined}
+              data-after={after}
               className="story-print story-print-haze scene-print scene-words absolute flex items-start justify-center text-center text-card-ink-muted"
               style={box(page.line)}
             >
@@ -449,7 +457,7 @@ export function OneScene({
             role="group"
             aria-roledescription="carousel"
             aria-label={words.label}
-            data-after={pieces || undefined}
+            data-after={after}
             className="absolute [perspective:60rem]"
             style={box(page.slot)}
           >

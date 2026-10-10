@@ -8,13 +8,14 @@ import {
   suiteFor,
   type SuiteId,
 } from "@/lib/suites/catalog";
+import { isMoving } from "@/lib/suites/moving";
 import { hasScene, isIllustrated } from "@/lib/suites/scene";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
 
 /*
  * Free by default: every 3D card, every illustrated card (no photos needed), plus a few
- * Scenes so each kind of celebration has a painted design at no cost. A prayer meet's
+ * Scenes and two-photo cards so each kind of celebration has a painted design at no cost. A prayer meet's
  * Scene is always free to start with.
  */
 const FREE_SCENES: ReadonlySet<string> = new Set([
@@ -30,16 +31,40 @@ const FREE_SCENES: ReadonlySet<string> = new Set([
   "new-year-eve",
   "new-home-modern",
   "shraddhanjali",
+  // Two-photo cards in folk art and modern looks; the jewelled and silk ones are Premium
+  "phad-gatha",
+  "mandana-lal",
+  "pithora-ghoda",
+  "sohrai-khovar",
+  "aipan-kumaon",
+  "pipli-chhata",
+  "kasavu-sona",
+  "urli-pookal",
+  "patola-bandh",
+  "moti-bharat",
+  "polaroid-lights",
+  "dak-tikat",
+  "kadhai-hoop",
+  "syahi-bamboo",
+  "lace-ivory",
+  "origami-saaras",
+  "nimbu-amalfi",
+  "rakhi-dor",
+  "judwa-taare",
+  "naya-mehmaan",
 ]);
 
 /**
  * A design's tier before the admin changes it: 3D cards and illustrated cards are free, the grandest wedding
- * Stories (the ones that open with a painted god) are Royal, and the rest are Premium.
+ * Stories (the ones that open with a painted god) are Royal, the moving scenes Signature,
+ * and the rest are Premium.
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
   if (designId.endsWith("-scene")) {
     const suite = designId.slice(0, -"-scene".length);
+    // The moving scenes are the dearest: painted in layers that move like a short film
+    if (isMoving(suite as SuiteId)) return "signature";
     return FREE_SCENES.has(suite) || isIllustrated(suite as SuiteId) ? "free" : "premium";
   }
   const suite = designId as SuiteId;
@@ -82,11 +107,11 @@ export function allDesignIds(): string[] {
 export function resolvePricing(stored: Pricing): Pricing {
   const tiers: Record<string, DesignTier> = {};
   for (const id of allDesignIds()) tiers[id] = designTier(stored, id);
-  return { prices: stored.prices, tiers };
+  return { ...stored, tiers };
 }
 
 /**
- * Every design at its default tier and the list prices: what pages are built with. The
+ * Every design at its default tier and the default prices: what pages are built with. The
  * admin's changes arrive in the browser (PricingProvider, /api/pricing).
  */
 export const BUILT_PRICING: Pricing = resolvePricing(DEFAULT_PRICING);

@@ -1,6 +1,6 @@
 import type { EditorStep, FunctionId } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
+import { TEMPLATE_IDS, type LeadId, type TaalId, type TemplateId } from "@/lib/templates/ids";
 
 /*
  * English copy for the invite editor (/create). Moves into next-intl in Step 12.
@@ -96,9 +96,9 @@ export const stepCopy: Record<
   design: {
     label: "Design",
     eyebrow: "Choose a design",
-    title: "Pick the card your guests will open",
+    title: "Pick the design your guests will open",
     intro:
-      "Every design opens in 3D with its own ornaments, petals and raga. You can switch at any time without losing your words.",
+      "Each design has its own painting, opening and raga. Switch at any time: every word you've typed stays.",
   },
   language: {
     label: "Language",
@@ -375,6 +375,16 @@ export const functionCopy: Record<
     description: "Bihu songs, dance and pitha",
     dressIdeas: ["Mekhela chador", "Gamosa", "Festive ethnic"],
   },
+  "raksha-bandhan": {
+    name: "Raksha Bandhan",
+    description: "Rakhi, aarti, sweets and lunch",
+    dressIdeas: ["Festive ethnic", "Bright colours", "Something comfortable"],
+  },
+  "karva-chauth": {
+    name: "Karva Chauth",
+    description: "The katha, the moonrise and dinner",
+    dressIdeas: ["Reds and golds", "Bridal lehenga or saree", "Something festive"],
+  },
 };
 
 export const functionFields = {
@@ -432,8 +442,7 @@ export const coupleCopy = {
   ideasLabel: (field: string) => `Ideas for ${field}`,
   useIdea: (text: string) => `Use “${text}”`,
   moreWording: "More card words",
-  moreWordingHint:
-    "Gate words, the family line and the word between the names. Each starts with wording for your occasion.",
+  moreWordingHint: "Gate words and the family line. Each starts with wording for your occasion.",
   cardIn: "Card language:",
   changeLanguage: "Change language",
 } as const;
@@ -444,7 +453,7 @@ export const languageCopy = {
   traditionMatch: "Your tradition's",
   secondHeading: "Add a second language?",
   secondHint:
-    "Guests switch between the two on the invitation. A second language comes with the Premium and Royal editions.",
+    "Guests switch between the two on the invitation. A second language comes with the Celebration and Grand packages.",
   secondNone: "Only one language",
   secondLabel: "Second language",
 } as const;
@@ -541,6 +550,12 @@ export const namesCopy = {
       title: "What's your Baisakhi celebration called?",
     },
     bihu: { label: "Celebration", eyebrow: "Bihu", title: "What's your Bihu celebration called?" },
+    "raksha-bandhan": {
+      label: "Sister and brother",
+      eyebrow: "Raksha Bandhan",
+      title: "Whose Raksha Bandhan is it?",
+    },
+    "karva-chauth": { label: "Couple", eyebrow: "Karva Chauth", title: "Who is celebrating?" },
   },
   one: {
     birthday: { label: "Birthday name", example: "Aarav" },
@@ -575,6 +590,21 @@ export const namesCopy = {
   },
   oneHint: "It's printed large on the cover. Say who invites and why in the wording below.",
 } as const;
+
+const LEAD_NAMES: Record<LeadId, string> = {
+  santoor: "Santoor",
+  sitar: "Sitar",
+  bansuri: "Bansuri",
+  shehnai: "Shehnai",
+  veena: "Veena",
+};
+
+const TAAL_NAMES: Record<TaalId, string> = {
+  keherwa: "dholak",
+  dadra: "dholak",
+  garba: "garba dhol and claps",
+  bhangra: "Punjabi dhol",
+};
 
 export const extrasCopy = {
   photosHeading: "Photos",
@@ -712,6 +742,9 @@ export const extrasCopy = {
     hamsadhwani: "Raag Hamsadhwani",
     kafi: "Raag Kafi",
   },
+  /** What a raga is played on, then its mood: "Shehnai with dholak · Rajasthani folk". */
+  ragaSound: (sound: { lead: LeadId; taal: TaalId | null }, mood: string) =>
+    `${LEAD_NAMES[sound.lead]}${sound.taal ? ` with ${TAAL_NAMES[sound.taal]}` : ""} · ${mood}`,
   ragaMoods: {
     yaman: "Evening, romantic",
     khamaj: "Light and tender",
@@ -813,10 +846,14 @@ export const previewCopy = {
   readyBody:
     "It's saved on this device. Sign in to keep it in your account and publish it, then share the link on WhatsApp.",
   readyBodyAccount:
-    "It's saved to your account, photos included. Publish it to get your link, then share it on WhatsApp.",
+    "It's saved to your account, photos included. See it as your guests will, then publish it to get your link.",
+  seeAsGuest: "See it as your guests will",
+  seeAsGuestBody:
+    "The whole invitation, full screen: the opening, the music, every page and the reply form.",
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",
+  namesHeading: "Names",
   functionsHeading: "Functions",
   photosHeading: "Photos",
   noPhotos: "No photos added",
@@ -838,9 +875,12 @@ export const previewCopy = {
 
 /** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */
 export const suiteCopy = {
-  heading: "Event pages",
+  heading: "Designs for your occasion",
   intro:
-    "After the invitation opens, each function gets its own full-screen page in this theme. Your tradition's ceremony names, blessing and symbol stay the same in every theme.",
+    "After the opening, guests see your names, every function and the reply form in this design. Your tradition's ceremony names, blessing and symbol stay the same in every design.",
+  /** Only for Card colours, whose pages take the chosen card's paper and colours. */
+  cardHeading: "Card paper and colours",
+  cardIntro: "Card colours pages take the paper, colours and raga of the card you pick here.",
   suggested: "Suits your tradition",
   pairs: (design: string) => `Also switches the card to ${design}`,
   preview: "Play the pages",
@@ -1041,6 +1081,76 @@ export const suiteCopy = {
     valaikappu: "Valaikappu",
     "shubh-labh": "Shubh Labh",
     "retirement-naav": "Retirement Naav",
+    "phad-gatha": "Phad Gatha",
+    "mandana-lal": "Mandana Lal",
+    "gota-patti": "Gota Patti",
+    "pithora-ghoda": "Pithora Ghoda",
+    "sohrai-khovar": "Sohrai Khovar",
+    "aipan-kumaon": "Aipan Kumaon",
+    "pipli-chhata": "Pipli Chhata",
+    "bishnupur-terracotta": "Bishnupur Terracotta",
+    "ganjifa-patte": "Ganjifa Patte",
+    "kanjivaram-pattu": "Kanjivaram Pattu",
+    "kasavu-sona": "Kasavu Sona",
+    "urli-pookal": "Urli Pookal",
+    "kar-e-kashmir": "Kar-e-Kashmir",
+    "zardozi-mehfil": "Zardozi Mehfil",
+    "patola-bandh": "Patola Bandh",
+    "kundan-jhumka": "Kundan Jhumka",
+    "moti-bharat": "Moti Bharat",
+    "polaroid-lights": "Polaroid Lights",
+    "dak-tikat": "Dak Tikat",
+    "kadhai-hoop": "Kadhai Hoop",
+    "locket-jodi": "Locket Jodi",
+    "syahi-bamboo": "Syahi Bamboo",
+    "lace-ivory": "Lace Ivory",
+    "origami-saaras": "Origami Saaras",
+    "nimbu-amalfi": "Nimbu Amalfi",
+    "rail-yatra": "Rail Yatra",
+    "rakhi-dor": "Rakhi Dor",
+    "karva-chandni": "Karva Chandni",
+    "judwa-taare": "Judwa Taare",
+    "naya-mehmaan": "Naya Mehmaan",
+    "jal-mahal": "Jal Mahal",
+    "gulmohar-rasta": "Gulmohar Rasta",
+    "genda-barsaat": "Genda Barsaat",
+    "akash-kandil": "Akash Kandil",
+    "chand-raat": "Chand Raat",
+    "titli-bagh": "Titli Bagh",
+    "malli-mazhai": "Malli Mazhai",
+    "shiuli-bhor": "Shiuli Bhor",
+    "sarson-khet": "Sarson Khet",
+    "shamiana-raat": "Shamiana Raat",
+    "kettuvallam-raat": "Kettuvallam Raat",
+    "diya-dhara": "Diya Dhara",
+    "wedding-bells": "Wedding Bells",
+    "saawan-bundein": "Saawan Bundein",
+    "hans-jheel": "Hans Jheel",
+    "navratri-garbi": "Navratri Garbi",
+    "snow-globe": "Snow Globe",
+    "sea-bubbles": "Sea Bubbles",
+    "badal-sapne": "Badal Sapne",
+    "aangan-subah": "Aangan Subah",
+    "neeli-nagri": "Neeli Nagri",
+    "kesar-kyari": "Kesar Kyari",
+    "konkan-kinara": "Konkan Kinara",
+    "megh-jharna": "Megh Jharna",
+    "fawwara-bagh": "Fawwara Bagh",
+    "deodar-sanjh": "Deodar Sanjh",
+    "jhoomar-mahal": "Jhoomar Mahal",
+    "champa-baag": "Champa Baag",
+    "tota-bagh": "Tota Bagh",
+    aatishbaazi: "Aatishbaazi",
+    "toota-taara": "Toota Taara",
+    "phoolon-ki-holi": "Phoolon ki Holi",
+    "dahi-handi": "Dahi Handi",
+    "vallam-kali": "Vallam Kali",
+    "pongal-paanai": "Pongal Paanai",
+    "khazana-dweep": "Khazana Dweep",
+    "kaagaz-ki-kashti": "Kaagaz ki Kashti",
+    "aurora-igloo": "Aurora Igloo",
+    "teddy-picnic": "Teddy Picnic",
+    "dukaan-mahurat": "Dukaan Mahurat",
     "mameru-bandhani": "Mameru Bandhani",
     "sindhi-ajrak": "Sindhi Ajrak",
     "hampi-ruins": "Hampi Ruins",
@@ -1311,6 +1421,114 @@ export const suiteCopy = {
       "A shop opening: cutting the ribbon at a door hung with marigolds. No photos needed.",
     "retirement-naav":
       "A retirement as a new journey: setting off by boat at sunrise. No photos needed.",
+    "phad-gatha":
+      "A Rajasthani Phad scroll with camels, a peacock and a horse-and-elephant procession. Two photo frames, one for each of you.",
+    "mandana-lal":
+      "White Mandana peacocks and lotuses on red earth, with plain sand plaster for your words. Two photo frames, one for each of you.",
+    "gota-patti":
+      "Gold gota patti leaves and sequins on rani pink silk, with tassels along the hem. Two photo frames, one for each of you.",
+    "pithora-ghoda":
+      "Bright dotted Pithora horses, birds, a sun and a moon on a whitewashed wall. Two photo frames, one for each of you.",
+    "sohrai-khovar":
+      "A Jharkhand mud wall painted with a peacock, a bull and a cow under a flowering tree. Two photo frames, one for each of you.",
+    "aipan-kumaon":
+      "Kumaoni Aipan in white rice paste on red ochre, with lotuses and hill pines. Two photo frames, one for each of you.",
+    "pipli-chhata":
+      "Odisha's Pipli appliqué: parasols, parrots and elephants with little mirrors. Two photo frames, one for each of you.",
+    "bishnupur-terracotta":
+      "Carved Bengal terracotta, a Bankura horse and a frieze of boats and elephants. Two photo frames, one for each of you.",
+    "ganjifa-patte":
+      "Round Mysuru Ganjifa cards in red, gold and green, with sandalwood boxes. Two photo frames, one for each of you.",
+    "kanjivaram-pattu":
+      "A maroon Kanjivaram silk with a gold zari border of temple towers and peacocks. Two photo frames, one for each of you.",
+    "kasavu-sona":
+      "An ivory Kerala kasavu with a gold border, a brass lamp and jasmine strings. Two photo frames, one for each of you.",
+    "urli-pookal":
+      "Polished brass frames, marigold strings and an urli of floating flowers and lamps. Two photo frames, one for each of you.",
+    "kar-e-kashmir":
+      "Kashmiri papier-mâché painted with chinar leaves, roses, irises and bulbuls. Two photo frames, one for each of you.",
+    "zardozi-mehfil":
+      "Raised gold zardozi and pearls on deep wine velvet, for a nikah or reception. Two photo frames, one for each of you.",
+    "patola-bandh":
+      "Patan Patola silk with woven elephants and parrots in red, green and saffron. Two photo frames, one for each of you.",
+    "kundan-jhumka":
+      "Kundan pendants, a pearl necklace, jhumkas and bangles on blush silk. Two photo frames, one for each of you.",
+    "moti-bharat":
+      "Gujarati beadwork: a beaded toran, parrots and elephants in bright glass beads. Two photo frames, one for each of you.",
+    "polaroid-lights":
+      "Two instant photos pegged to warm fairy lights, with dried flowers and an envelope. Two photo frames, one for each of you.",
+    "dak-tikat":
+      "Two vintage postage stamps, a wax seal, airmail stripes and a bundle of letters. Two photo frames, one for each of you.",
+    "kadhai-hoop":
+      "Two wooden embroidery hoops ringed with tiny stitched flowers, and spools of thread. Two photo frames, one for each of you.",
+    "locket-jodi":
+      "Two antique gold lockets on a chain over dusty-rose velvet, with pearls and roses. Two photo frames, one for each of you.",
+    "syahi-bamboo":
+      "A calm ink wash of plum blossom, bamboo and two small birds on rice paper. Two photo frames, one for each of you.",
+    "lace-ivory":
+      "Ivory lace arches, satin bows and lily of the valley, for a church or garden wedding. Two photo frames, one for each of you.",
+    "origami-saaras":
+      "Paper cranes and folded flowers in soft pastels around two pleated paper frames. Two photo frames, one for each of you.",
+    "nimbu-amalfi":
+      "Sunny lemons and hand-painted blue and yellow tiles, for a bright summer wedding. Two photo frames, one for each of you.",
+    "rail-yatra":
+      "A vintage green train carriage with two windows, suitcases and marigolds on the platform. Two photo frames, one for each of you.",
+    "rakhi-dor":
+      "A rakhi joins the sister's frame and the brother's, over a thali of roli, rice and sweets.",
+    "karva-chandni":
+      "Two brass sieves under the full moon, with a decorated karva, a diya and red bangles. Two photo frames, one for each of you.",
+    "judwa-taare":
+      "A pink star and a blue star for twins, with bunting, balloons and a two-tier cake.",
+    "naya-mehmaan":
+      "Two felt clouds for the parents-to-be, hanging from a baby mobile over a cradle.",
+    "jal-mahal": "The lake palace at dusk: the water ripples, creepers sway and rose petals fall.",
+    "gulmohar-rasta": "A gulmohar avenue in bloom, with red blossoms falling all the way down.",
+    "genda-barsaat": "A marigold shower for the haldi, with toran strings swaying.",
+    "akash-kandil": "Sky lanterns rising over a town lit with diyas on Diwali night.",
+    "chand-raat": "Eid night in a Mughal courtyard, lanterns swaying and stars twinkling.",
+    "titli-bagh": "A sunny garden where butterflies flutter and bubbles float up.",
+    "malli-mazhai": "Jasmine rain at a temple tank, with lamps drifting on the water.",
+    "shiuli-bhor": "Night jasmine falling at dawn by a Bengal village pond.",
+    "sarson-khet": "Mustard fields in bloom, phulkari dupattas fluttering and kites in the sky.",
+    "shamiana-raat": "A wedding tent under the stars, with twinkling lights and rising sparks.",
+    "kettuvallam-raat":
+      "Kerala backwaters by moonlight, a houseboat bobbing and fireflies wandering.",
+    "diya-dhara": "Lamps on leaf boats floating down the river past the ghats at twilight.",
+    "wedding-bells": "A white chapel on a hill, with bells swinging and doves gliding past.",
+    "saawan-bundein": "Monsoon rain on a mehendi courtyard, with an empty swing rocking.",
+    "hans-jheel": "A pair of swans on a sunset lake, willow leaves drifting down.",
+    "navratri-garbi": "Garbo lamp pots glowing in a village chowk, sparks spiralling up.",
+    "snow-globe": "A snowy village in a glass globe, with snow swirling down.",
+    "sea-bubbles": "Under the sea: fish swim across and bubbles rise through the light.",
+    "badal-sapne": "A cradle on soft pastel clouds, with a baby mobile swaying above.",
+    "aangan-subah": "Morning in a new home's courtyard: the toran sways and sparrows visit.",
+    "neeli-nagri": "The blue city at dusk: pigeons circle the fort, kites bob and lanterns sway.",
+    "kesar-kyari":
+      "Saffron fields in Kashmir: chinar leaves spin down and mist drifts over the lake.",
+    "konkan-kinara": "The Konkan coast at sunset: palms sway, boats bob and seagulls glide.",
+    "megh-jharna":
+      "A waterfall in the clouds: mist rolls through, orchids sway and a butterfly flits.",
+    "fawwara-bagh": "Mughal fountains by moonlight: petals float down and fireflies wander.",
+    "deodar-sanjh":
+      "Evening in the deodar hills: clouds drift through the valley and an eagle circles.",
+    "jhoomar-mahal":
+      "The chandelier hall: crystal chandeliers sway and glitter, rose petals drift.",
+    "champa-baag": "Frangipani by the temple pool: champa flowers spin down and parrots fly past.",
+    "tota-bagh": "Parrots in the mehendi garden: they flit between the branches as petals fall.",
+    aatishbaazi: "Fireworks over the fort: bursts bloom in the sky and the lake shimmers.",
+    "toota-taara": "Shooting stars over a quiet meadow: stars twinkle and fireflies wander.",
+    "phoolon-ki-holi":
+      "Holi of flowers in Vrindavan: clouds of gulal drift and petals shower down.",
+    "dahi-handi": "The pot swings over the lane: marigolds sway and peacock feathers float down.",
+    "vallam-kali": "Snake boats on Onam: palms sway, petals fall and an egret crosses the river.",
+    "pongal-paanai": "The pot boils over: steam rises, sugarcane sways and kites bob in the sky.",
+    "khazana-dweep": "Treasure island: the ship bobs, seagulls fly and gold coins sparkle.",
+    "kaagaz-ki-kashti": "Paper boats in the rain: they sail down the stream as soft rain falls.",
+    "aurora-igloo":
+      "Northern lights over an igloo: the aurora ripples, snow falls and penguins waddle past.",
+    "teddy-picnic":
+      "A teddy bears' picnic: balloons float up, bubbles drift and the bunting flutters.",
+    "dukaan-mahurat": "A shop's first morning: the toran sways, petals fall and balloons float up.",
     "mameru-bandhani": "Bandhani silks, brass and gifts for the mameru.",
     "sindhi-ajrak": "Indigo and madder ajrak, roses and tassels for a Sindhi wedding.",
     "hampi-ruins": "Stone steps, brass lamps and jasmine among the old temples.",
@@ -1488,7 +1706,7 @@ export const aiCopy = {
     off: "AI wording isn't switched on yet.",
     "not-found": "Sign in so your invite is saved, then AI can write for it.",
     "used-up":
-      "This invite has used its 3 free drafts. Premium, Royal and the Wedding bundle can write as often as you like.",
+      "This invite has used its 3 free drafts. Any package can write as often as you like.",
     failed: "The words couldn't be written just now. Try again.",
   },
 } as const;

@@ -168,24 +168,24 @@ export const privacy: LegalDoc = {
 export const refunds: LegalDoc = {
   title: "Refund and cancellation policy",
   description:
-    "How paid editions are delivered, when you can cancel, and how to get a full refund within 7 days if your invitation hasn't been sent.",
+    "How paid packages are delivered, when you can cancel, and how to get a full refund within 7 days if your invitation hasn't been sent.",
   intro:
-    "Paid editions on Shubh Invitation are digital: they unlock features on one invitation the moment your payment is confirmed. This page says when you can get your money back, and how.",
+    "Paid packages on Shubh Invitation are digital: they unlock features on one invitation the moment your payment is confirmed. This page says when you can get your money back, and how.",
   sections: [
     {
       id: "what-you-buy",
       heading: "What you buy",
       body: [
-        "An edition (Premium, Royal or the Wedding bundle) unlocks more for one invitation: more functions and photos, a second card language, the video for WhatsApp Status and Reels, and no watermark. Our pricing page lists what each includes.",
-        "Each edition is a one-time payment for one invitation. There is no subscription, and nothing is charged again.",
+        "A package (Basic, Celebration or Grand) unlocks more for one invitation: a paid design without the watermark, more invites, a second card language and the video for WhatsApp Status and Reels. Our pricing page lists what each includes.",
+        "Each package is a one-time payment for one invitation. There is no subscription, and nothing is charged again.",
       ],
     },
     {
       id: "delivery",
       heading: "Delivery",
       body: [
-        "Nothing is shipped. The edition is delivered online, on the invitation you paid for, usually within a minute of the payment being confirmed, and you get a receipt or GST invoice on screen.",
-        "If the edition hasn't unlocked within an hour of paying, write to us with the payment ID and we will put it right or refund you in full.",
+        "Nothing is shipped. The package is delivered online, on the invitation you paid for, usually within a minute of the payment being confirmed, and you get a receipt or GST invoice on screen.",
+        "If the package hasn't unlocked within an hour of paying, write to us with the payment ID and we will put it right or refund you in full.",
       ],
     },
     {
@@ -196,27 +196,27 @@ export const refunds: LegalDoc = {
         "Whatever the date, we also refund in full when:",
         {
           list: [
-            "you were charged twice for the same edition;",
-            "you paid but the edition never unlocked;",
+            "you were charged twice for the same package;",
+            "you paid but the package never unlocked;",
             "a fault on our side stopped the invitation from working and we couldn't fix it in time for your event.",
           ],
         },
-        "Once guests have opened the invitation, or after 7 days, the edition has been used and isn't refunded.",
+        "Once guests have opened the invitation, or after 7 days, the package has been used and isn't refunded.",
       ],
     },
     {
       id: "cancelling",
       heading: "Cancelling",
       body: [
-        "To cancel a paid edition, ask for a refund as above. When it is refunded, the invitation goes back to the edition it had before, usually Free, and keeps working within that edition's limits.",
-        "You can stop sharing or delete a free invitation, or your whole account, at any time from the site. Deleting does not refund an edition by itself; ask us first if a refund applies.",
+        "To cancel a paid package, ask for a refund as above. When it is refunded, the invitation goes back to the package it had before, usually free, and keeps working within that package's limits.",
+        "You can stop sharing or delete a free invitation, or your whole account, at any time from the site. Deleting does not refund a package by itself; ask us first if a refund applies.",
       ],
     },
     {
       id: "upgrades",
       heading: "Upgrades, coupons and offers",
       body: [
-        "When you move up to a bigger edition you pay only the difference, and a refund of an upgrade returns that difference.",
+        "When you move up to a bigger package you pay only the difference, and a refund of an upgrade returns that difference.",
         "A refund returns what you actually paid, after any coupon or festival offer. Coupons can't be exchanged for cash.",
       ],
     },
@@ -287,10 +287,10 @@ export const terms: LegalDoc = {
       id: "money",
       heading: "Money",
       body: [
-        "Making and sharing an invitation is free. Paid editions (Premium, Royal and the Wedding bundle) unlock more for one invitation, such as more functions and photos, the video and no watermark. Our pricing page lists what each includes.",
+        "Making and sharing an invitation is free. Paid packages (Basic, Celebration and Grand) unlock more for one invitation, such as paid designs, more invites, the video and no watermark. Our pricing page lists what each includes.",
         "Prices are in Indian rupees and include GST. You pay once per invitation, through Razorpay, by UPI, card or netbanking; there is no subscription and nothing renews by itself. We never see or store your card details.",
-        "The edition unlocks as soon as the payment is confirmed. Refunds follow our refund and cancellation policy: a full refund within 7 days if the invitation hasn't been sent to any guest.",
-        "We may change prices for future purchases, never for an edition you have already bought. Shubh Invitation never holds money sent between guests and families.",
+        "The package unlocks as soon as the payment is confirmed. Refunds follow our refund and cancellation policy: a full refund within 7 days if the invitation hasn't been sent to any guest.",
+        "We may change prices for future purchases, never for a package you have already bought. Shubh Invitation never holds money sent between guests and families.",
       ],
     },
     {

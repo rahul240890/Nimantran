@@ -9,8 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useText } from "@/i18n/client";
-import { publishText } from "@/i18n/copy/publish";
+import { useGuestText } from "@/components/guest/guest-language";
 import type { GuestFunction } from "./guest-view";
 
 /**
@@ -18,7 +17,7 @@ import type { GuestFunction } from "./guest-view";
  * guest opens when they want it (nothing loads from Google before), and "add to calendar".
  */
 export function FunctionFacts({ fn }: { fn: GuestFunction }) {
-  const { guestCopy } = useText(publishText);
+  const { guestCopy } = useGuestText();
   const [mapOpen, setMapOpen] = useState(false);
   const mapId = useId();
   return (

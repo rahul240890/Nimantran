@@ -50,14 +50,23 @@ alter default privileges in schema public grant all on sequences to anon, authen
 
 export type TestDb = Awaited<ReturnType<typeof createTestDb>>;
 
-export async function createTestDb({ seed = true } = {}) {
-  const db = await PGlite.create({ extensions: { pgcrypto } });
-  await db.exec(SUPABASE_BASE);
-  const migrations = readdirSync(join(root, "migrations"))
+/** Every migration file, oldest first. */
+export const migrationFiles = () =>
+  readdirSync(join(root, "migrations"))
     .filter((f) => f.endsWith(".sql"))
     .sort();
-  for (const file of migrations)
-    await db.exec(readFileSync(join(root, "migrations", file), "utf8"));
+
+export const migrationSql = (file: string) => readFileSync(join(root, "migrations", file), "utf8");
+
+/** `before` stops short of the migration named, to test what it does to existing rows. */
+export async function createTestDb({
+  seed = true,
+  before,
+}: { seed?: boolean; before?: string } = {}) {
+  const db = await PGlite.create({ extensions: { pgcrypto } });
+  await db.exec(SUPABASE_BASE);
+  const migrations = migrationFiles().filter((file) => !before || file < before);
+  for (const file of migrations) await db.exec(migrationSql(file));
   if (seed) await db.exec(readFileSync(join(root, "seed.sql"), "utf8"));
 
   /** Creates a sign-in, which creates its profile through the trigger. */

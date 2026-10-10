@@ -96,8 +96,9 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
   for (const english of ["You are invited", "Save the date", "The celebrations", "November"]) {
     await expect(themed.getByText(english, { exact: false })).toHaveCount(0);
   }
-  // The buttons follow the site's language
-  await expect(page.getByRole("button", { name: "Shower flowers on the couple" })).toBeVisible();
+  // The buttons around the card speak the card's language too
+  await expect(page.getByRole("button", { name: "जोड़े पर फूल बरसाएँ" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Shower flowers on the couple" })).toHaveCount(0);
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 

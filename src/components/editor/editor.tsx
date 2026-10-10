@@ -70,6 +70,9 @@ const WIDE = "(min-width: 64rem)";
  * photos part shows each photo in its own frame already, and a floating phone there would
  * sit over the photo buttons.
  */
+/** Opening the link dialog survives the remount that leaving ?invite= in the address causes. */
+let publishOnArrival = false;
+
 const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions"]);
 
 /*
@@ -189,6 +192,7 @@ export function Editor({
   initialInvite = null,
   fresh = false,
   missing = false,
+  openPublish = false,
 }: {
   initialTemplate: TemplateId | null;
   initialCategory: CategoryId | null;
@@ -206,6 +210,8 @@ export function Editor({
   fresh?: boolean;
   /** ?invite= named an invite this person can't open. */
   missing?: boolean;
+  /** Back from choosing a package (?publish=1): open the invite's Publish dialog. */
+  openPublish?: boolean;
 }) {
   const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
   const { publishCopy } = useText(publishText);
@@ -232,6 +238,10 @@ export function Editor({
 
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
+  const [autoPublish, setAutoPublish] = useState(() => publishOnArrival);
+  useEffect(() => {
+    publishOnArrival = false;
+  }, []);
   const [sheet, setSheet] = useState(false);
   const miniHidden = useSyncExternalStore(miniStore.subscribe, miniStore.get, () => false);
   const mini = !wide && MINI_STEPS.has(step) && !sheet;
@@ -251,6 +261,11 @@ export function Editor({
       if (initialInvite || fresh) {
         const switched = await switchDraft(initialInvite, { signedIn });
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
+        else if (openPublish) {
+          inviteDraft.update((current) => ({ ...current, step: "preview" }), { touch: false });
+          publishOnArrival = true;
+          setAutoPublish(true);
+        }
       }
       if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
       if (initialSuite) {
@@ -281,7 +296,8 @@ export function Editor({
       update((draft) => {
         let next = initialCategory ? withCategory(draft, initialCategory) : draft;
         if (draft.step === "occasion") next = { ...next, step: "design" };
-        if (initialTemplate) next = { ...next, templateId: initialTemplate };
+        // A card picked on its own page is the whole design: its pages take its colours
+        if (initialTemplate) next = { ...next, templateId: initialTemplate, suite: "classic" };
         if (initialTradition) next = withTradition(next, initialTradition);
         return next;
       });
@@ -290,6 +306,7 @@ export function Editor({
     initialInvite,
     fresh,
     missing,
+    openPublish,
     signedIn,
     initialTemplate,
     initialCategory,
@@ -601,6 +618,8 @@ export function Editor({
                   )}
                   {last && (
                     <PublishButton
+                      key={autoPublish ? "back" : "first"}
+                      autoOpen={autoPublish}
                       draft={draft}
                       signedIn={signedIn}
                       onNotReady={() => toast({ title: publishCopy.finishFirst, tone: "error" })}

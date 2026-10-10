@@ -56,7 +56,7 @@ export const albumCopy = {
       date ? `Guests can add photos until ${date}.` : "Guests can add photos now.",
     soon: (date: string) => `The wall opens to guests on ${date}.`,
     closed: "The wall is closed to new photos. You can still see and download them all.",
-    off: "The photo wall comes with Premium, Royal and the Wedding bundle.",
+    off: "The photo wall comes with the Celebration and Grand packages.",
     notLive: "Publish the invitation first; guests add photos through its link.",
   },
   openWall: "Open the wall",

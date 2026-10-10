@@ -55,7 +55,7 @@ export const weddingInvitationVideo: BlogPost = {
       ],
     },
     {
-      tip: "The video is part of the Premium, Royal and Wedding bundle editions. See the [pricing page](/pricing) for what each edition includes.",
+      tip: "The video comes with the Celebration and Grand packages; Grand makes one for every function. See the [pricing page](/pricing) for what each package includes.",
     },
 
     { h2: "Video and link together", id: "video-and-link" },

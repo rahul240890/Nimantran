@@ -6,7 +6,7 @@ import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import type { Business } from "@/lib/payments/business-details";
-import { PLAN_IDS, editionPrice, formatRupees } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, formatRupees, inviteLimit, packagePrice } from "@/lib/plans/catalog";
 import { getPricing } from "@/lib/plans/pricing";
 import { pagePath } from "@/lib/seo/paths";
 import { faqPage } from "@/lib/seo/structured-data";
@@ -25,9 +25,10 @@ function crumbs(locale: UiLocale, last: Crumb): Crumb[] {
 
 export async function PricingPage({ locale }: { locale: UiLocale }) {
   const { pricingPageCopy: copy } = pagesText[locale];
-  // The admin's prices (Admin, Designs)
-  const { prices } = await getPricing();
-  const { planCopy } = editionsText[locale];
+  // The admin's prices (Admin, Designs), shown for a Premium design
+  const pricing = await getPricing();
+  const { planCopy, invitesLine } = editionsText[locale];
+  const design = formatRupees(pricing.designs.premium);
   return (
     <PublicShell
       locale={locale}
@@ -48,11 +49,11 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
         intro={copy.editionsIntro}
         className="pt-0 sm:pt-0"
       >
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {PLAN_IDS.map((id) => {
-            const pricePaise = editionPrice(id, prices);
+        <ul className="grid gap-4 lg:grid-cols-3">
+          {PAID_PLAN_IDS.map((id) => {
+            const pricePaise = packagePrice(id, "premium", pricing);
             const words = planCopy[id];
-            const popular = id === "royal";
+            const popular = id === "celebration";
             return (
               <li key={id} className="flex">
                 <article
@@ -72,19 +73,24 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
                       </Badge>
                     )}
                   </div>
-                  <p className="flex flex-wrap items-baseline gap-x-2">
-                    <span className="font-display text-4xl leading-none">
-                      {pricePaise ? formatRupees(pricePaise) : "₹0"}
-                    </span>
-                    <span className="text-sm text-ink-muted">
-                      {pricePaise ? copy.perInvite : copy.free}
-                    </span>
-                  </p>
+                  <div className="flex flex-col gap-1">
+                    <p className="flex flex-wrap items-baseline gap-x-2">
+                      <span className="font-display text-4xl leading-none">
+                        {formatRupees(pricePaise)}
+                      </span>
+                      <span className="text-sm text-ink-muted">{copy.onDesign(design)}</span>
+                    </p>
+                    <p className="text-sm text-ink-muted">
+                      {id === "basic"
+                        ? copy.freeDesign
+                        : copy.addOn(formatRupees(pricing.packages[id]))}
+                    </p>
+                  </div>
                   <p className="text-sm text-ink-muted">
                     {copy.bestFor}: {words.bestFor}
                   </p>
                   <ul className="flex flex-col gap-2 border-t border-line pt-4">
-                    {words.highlights.map((point) => (
+                    {[invitesLine(inviteLimit(id, pricing)), ...words.highlights].map((point) => (
                       <li key={point} className="flex items-start gap-2">
                         <Check
                           aria-hidden

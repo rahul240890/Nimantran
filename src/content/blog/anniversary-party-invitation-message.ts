@@ -152,7 +152,7 @@ export const anniversaryPartyInvitationMessage: BlogPost = {
         "Add a puja in the morning and a dinner in the evening as separate functions, and invite some guests only to one.",
         "Put a map pin on the venue, with a parking note and dress code.",
         "Guests open the link on their phone, without an app, and tap RSVP with how many adults and children are coming.",
-        "Add old wedding photos; paid editions carry more photos and a video for WhatsApp Status.",
+        "Add old wedding photos; the Celebration and Grand packages add a video for WhatsApp Status.",
         "After the party, guests can upload their photos to a shared photo wall through the same link.",
       ],
     },

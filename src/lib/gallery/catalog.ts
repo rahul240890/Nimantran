@@ -12,6 +12,7 @@ import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { WeddingKind } from "./ids";
+import { mixDesigns } from "./photos";
 
 export { WEDDING_KINDS, isWeddingKind, type WeddingKind } from "./ids";
 
@@ -292,6 +293,18 @@ export const OCCASIONS: readonly Occasion[] = [
     ["xmas", "carols", "santa"],
     "festivals",
   ),
+  live(
+    "raksha-bandhan",
+    { suite: "rakhi-dor", page: "cover" },
+    ["rakhi", "rakshabandhan", "rakhri", "bhai behen", "sister", "brother", "bhai dooj"],
+    "festivals",
+  ),
+  live(
+    "karva-chauth",
+    { suite: "karva-chandni", page: "cover" },
+    ["karwa chauth", "karva chouth", "karwachauth", "vrat", "moon", "chaand"],
+    "festivals",
+  ),
 
   live(
     "shop-opening",
@@ -375,6 +388,21 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "kesar-kyari",
+      "deodar-sanjh",
+      "tota-bagh",
+      "aatishbaazi",
+      "jal-mahal",
+      "gulmohar-rasta",
+      "diya-dhara",
+      "genda-barsaat",
+      "saawan-bundein",
+      "shamiana-raat",
+      "hans-jheel",
+      "aipan-kumaon",
+      "sohrai-khovar",
+      "kar-e-kashmir",
+      "kundan-jhumka",
       "gond-vriksh",
       "kangra-megh",
       "chikankari-awadh",
@@ -410,6 +438,12 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "tota-bagh",
+      "genda-barsaat",
+      "saawan-bundein",
+      "pithora-ghoda",
+      "patola-bandh",
+      "moti-bharat",
       "kutch-rang",
       "pichwai-gaay",
       "kutch-bhunga",
@@ -428,6 +462,15 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "neeli-nagri",
+      "aatishbaazi",
+      "jhoomar-mahal",
+      "jal-mahal",
+      "genda-barsaat",
+      "saawan-bundein",
+      "phad-gatha",
+      "mandana-lal",
+      "gota-patti",
       "kathputli-sangeet",
       "rajwada-haathi",
       "pichwai-gaay",
@@ -448,7 +491,14 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     id: "marathi",
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
-    suites: ["ganesh-genda", "warli-vivah", "antarpat-mangal", "pune-wada", "peshwai-wada"],
+    suites: [
+      "konkan-kinara",
+      "ganesh-genda",
+      "warli-vivah",
+      "antarpat-mangal",
+      "pune-wada",
+      "peshwai-wada",
+    ],
     cards: ["paithani"],
     keywords: ["maharashtrian", "lagna", "mumbai", "pune"],
   },
@@ -457,6 +507,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "shiuli-bhor",
+      "bishnupur-terracotta",
+      "pipli-chhata",
       "kalighat-pat",
       "axomiya-biya",
       "kantha-silai",
@@ -485,6 +538,13 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "champa-baag",
+      "malli-mazhai",
+      "kettuvallam-raat",
+      "kanjivaram-pattu",
+      "kasavu-sona",
+      "urli-pookal",
+      "ganjifa-patte",
       "cheriyal-talambralu",
       "tholu-bommalata",
       "nalangu-vilayattu",
@@ -520,7 +580,16 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     tradition: null,
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
-    suites: ["jaago-gagar", "phulkari-lavan", "punjab-haveli", "phulkari-haveli"],
+    suites: [
+      "tota-bagh",
+      "sarson-khet",
+      "genda-barsaat",
+      "shamiana-raat",
+      "jaago-gagar",
+      "phulkari-lavan",
+      "punjab-haveli",
+      "phulkari-haveli",
+    ],
     cards: ["phulkari"],
     keywords: ["sikh", "anand karaj", "punjab", "sardar"],
   },
@@ -530,6 +599,13 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "fawwara-bagh",
+      "jhoomar-mahal",
+      "kesar-kyari",
+      "saawan-bundein",
+      "shamiana-raat",
+      "zardozi-mehfil",
+      "kar-e-kashmir",
       "hyderabadi-nikah",
       "chikankari-awadh",
       "bidri-raat",
@@ -548,6 +624,24 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "toota-taara",
+      "megh-jharna",
+      "jhoomar-mahal",
+      "aatishbaazi",
+      "wedding-bells",
+      "gulmohar-rasta",
+      "hans-jheel",
+      "shamiana-raat",
+      "polaroid-lights",
+      "dak-tikat",
+      "kadhai-hoop",
+      "locket-jodi",
+      "syahi-bamboo",
+      "lace-ivory",
+      "origami-saaras",
+      "nimbu-amalfi",
+      "rail-yatra",
+      "kundan-jhumka",
       "goa-azulejo",
       "pressed-phool",
       "tuscan-vineyard",
@@ -604,19 +698,21 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
   },
 };
 
-/** The designs a wedding kind offers: its painted themes, then its 3D cards. */
+/** The designs a wedding kind offers: its painted themes and its 3D cards, mixed. */
 export function kindDesigns(kind: WeddingKind): GalleryDesign[] {
   const entry = WEDDING_KIND_ENTRIES[kind];
-  return withScenes([
-    // A kind's painted theme pairs with the kind's own card (Shahi Savari with Bandhani)
-    ...entry.suites
-      .filter((suite) => suite !== "classic" && suiteSuits(suite, "wedding"))
-      .map((suite) => ({
-        ...paintedDesign(suite),
-        template: entry.cards[0] ?? paintedDesign(suite).template,
-      })),
-    ...entry.cards.map(cardDesign),
-  ]);
+  return mixDesigns(
+    withScenes([
+      // A kind's painted theme pairs with the kind's own card (Shahi Savari with Bandhani)
+      ...entry.suites
+        .filter((suite) => suite !== "classic" && suiteSuits(suite, "wedding"))
+        .map((suite) => ({
+          ...paintedDesign(suite),
+          template: entry.cards[0] ?? paintedDesign(suite).template,
+        })),
+      ...entry.cards.map(cardDesign),
+    ]),
+  );
 }
 
 /** Painted themes with pictures, in the order the gallery shows them. */
@@ -624,12 +720,14 @@ export const PAINTED_SUITES: readonly SuiteId[] = (Object.keys(SUITES) as SuiteI
   (id) => SUITES[id].images.cover,
 );
 
-/** Every design for an occasion: the painted themes made for it, then the cards that suit it. */
+/** Every design for an occasion: the painted themes made for it and the cards that suit it, mixed. */
 export function occasionDesigns(category: CategoryId): GalleryDesign[] {
-  return withScenes([
-    ...PAINTED_SUITES.filter((suite) => suiteSuits(suite, category)).map(paintedDesign),
-    ...CATEGORIES[category].templates.map(cardDesign),
-  ]);
+  return mixDesigns(
+    withScenes([
+      ...PAINTED_SUITES.filter((suite) => suiteSuits(suite, category)).map(paintedDesign),
+      ...CATEGORIES[category].templates.map(cardDesign),
+    ]),
+  );
 }
 
 /** The occasion a theme opens in the editor: its own, else the wedding step it suits. */
@@ -637,9 +735,11 @@ export function suiteOccasion(suite: SuiteId): CategoryId {
   return suiteHome(suite);
 }
 
-/** Every design in the gallery, painted first. */
+/** Every design in the gallery, each kind spread through the list. */
 export function allDesigns(): GalleryDesign[] {
-  return withScenes([...PAINTED_SUITES.map(paintedDesign), ...TEMPLATE_IDS.map(cardDesign)]);
+  return mixDesigns(
+    withScenes([...PAINTED_SUITES.map(paintedDesign), ...TEMPLATE_IDS.map(cardDesign)]),
+  );
 }
 
 /** Where "Use this design" takes the host: the editor, set up for this choice. */

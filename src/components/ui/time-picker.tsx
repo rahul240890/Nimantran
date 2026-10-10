@@ -25,6 +25,8 @@ type TimePickerProps = {
   name?: string;
   className?: string;
   "aria-label"?: string;
+  /** With no time chosen, the time the list opens at, as "HH:mm". */
+  openAt?: string;
 };
 
 /**
@@ -47,5 +49,15 @@ export function TimePicker({
     [step, min, max, locale],
   );
 
-  return <Select {...props} options={options} leading={<Clock />} contentClassName="max-h-72" />;
+  // Snap the opening time onto the list's own steps (a muhurat lists every minute)
+  const openAt = props.openAt && options.find((option) => option.value >= props.openAt!)?.value;
+  return (
+    <Select
+      {...props}
+      openAt={openAt}
+      options={options}
+      leading={<Clock />}
+      contentClassName="max-h-72"
+    />
+  );
 }

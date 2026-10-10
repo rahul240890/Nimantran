@@ -33,21 +33,32 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   formats: {
     label: "निमंत्रण का प्रकार",
     all: "सभी",
+    moving: "चलते दृश्य",
     scene: "दृश्य",
     story: "कहानी",
     card: "3D कार्ड",
   },
-  tiers: { free: "फ़्री", premium: "प्रीमियम", royal: "रॉयल" },
+  tiers: { free: "फ़्री", premium: "प्रीमियम", royal: "रॉयल", signature: "सिग्नेचर" },
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} डिज़ाइन, ${price} से प्रकाशित करें` : "फ़्री डिज़ाइन",
+  photoNeeds: {
+    none: "फ़ोटो की ज़रूरत नहीं",
+    one: "एक फ़ोटो",
+    couple: "जोड़े की एक फ़ोटो",
+    two: "दो फ़ोटो, एक-एक",
+    either: "जोड़े की फ़ोटो या दो अलग",
+    optional: "फ़ोटो चाहें तो",
+  },
   sceneBadge: "दृश्य · 1 पन्ना",
+  movingBadge: "चलचित्र",
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:
     "आपकी फ़ोटो और नामों वाला एक चित्र। हर रस्म बारी-बारी से उड़कर आती है, और चित्र की रोशनी सुबह से रात तक उसके साथ बदलती है।",
   sample: {
     first: "अर्जुन",
     second: "सिया",
+    one: "आन्या",
     blessing: "श्री गणेश जी के आशीर्वाद से",
     families: "अपने परिवारों के साथ",
     line: "आपको सपरिवार सादर आमंत्रित करते हैं",
@@ -58,6 +69,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
       baraat: "होटल के द्वार से",
       wedding: "रामबाग पैलेस, जयपुर",
       reception: "जय महल, जयपुर",
+      other: "गार्डन लॉन्स, जयपुर",
     },
   },
   pagesCount: (count: number) => `${count} पन्ने`,
@@ -139,6 +151,8 @@ export const occasionTaglines: Translation<typeof en.occasionTaglines> = {
   "gudi-padwa": "गुड़ी, नीम और पूरन पोली",
   baisakhi: "फ़सल, भांगड़ा और गिद्धा",
   bihu: "बिहू गीत, नृत्य और पीठा",
+  "raksha-bandhan": "राखी, मिठाई और परिवार का भोजन",
+  "karva-chauth": "व्रत, चाँद और रात का भोजन",
   christmas: "कैरल और केक",
   "shop-opening": "उद्घाटन और पूजा",
   launch: "कुछ नया",
@@ -194,4 +208,52 @@ export const catalogCopy: Translation<typeof en.catalogCopy> = {
   count: (count: number) => `${count} डिज़ाइन`,
   clear: "फ़िल्टर हटाएँ",
   empty: "इन सब से मेल खाता कोई डिज़ाइन अभी नहीं है। कम फ़िल्टर आज़माइए।",
+  photosLabel: "चित्र या फ़ोटो",
+  allPhotos: "कोई भी",
+  photoGroups: { none: "चित्रित", one: "जोड़े की फ़ोटो", two: "दूल्हा-दुल्हन की फ़ोटो" },
+  allDesigns: "सभी डिज़ाइन",
+};
+
+export const shelfCopy: Translation<typeof en.shelfCopy> = {
+  groups: {
+    moving: "नया: चलते दृश्य",
+    photos: "चित्रित या आपकी फ़ोटो के साथ",
+    format: "निमंत्रण के प्रकार से",
+    tradition: "परंपरा के हिसाब से शादी",
+    occasion: "और भी मौक़े",
+  },
+  photos: {
+    none: {
+      title: "चित्रित निमंत्रण",
+      intro: "हाथ से बनी चित्रकारी, आपके नामों के साथ। फ़ोटो की ज़रूरत नहीं।",
+    },
+    one: {
+      title: "जोड़े की फ़ोटो वाले निमंत्रण",
+      intro: "आप दोनों की पसंदीदा फ़ोटो, चित्र के बीच सजी हुई।",
+    },
+    two: {
+      title: "दूल्हा-दुल्हन की फ़ोटो",
+      intro: "आप दोनों की अलग-अलग फ़ोटो, साथ-साथ फ़्रेम में।",
+    },
+  },
+  format: {
+    moving: {
+      title: "चलते दृश्य",
+      intro:
+        "छोटी फ़िल्म की तरह चलते चित्र: पंखुड़ियाँ गिरती हैं, कंदील उड़ते हैं, पानी लहराता है। फ़ोटो की ज़रूरत नहीं।",
+    },
+    story: { title: "स्टोरी", intro: "हर रस्म का अपना पूरा चित्रित पन्ना।" },
+    scene: {
+      title: "सीन",
+      intro: "एक ही चित्र पर सब कुछ, हर रस्म बारी-बारी से आती है।",
+    },
+    card: { title: "3D कार्ड", intro: "मेहमान के हाथ में 3D में खुलने वाला कार्ड।" },
+  },
+  tradition: (name: string) => `${name} शादी`,
+  traditionsHeading: "अपनी परंपरा चुनिए",
+  occasionsHeading: "या कोई और जश्न",
+  viewAll: "सभी देखें",
+  viewAllLabel: (title: string, count: number) => `सभी ${count} डिज़ाइन देखें: ${title}`,
+  back: "पीछे",
+  next: "आगे",
 };

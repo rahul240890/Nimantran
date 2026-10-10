@@ -17,8 +17,10 @@ import {
   Leaf,
   Lamp,
   Moon,
+  MoonStar,
   Palette,
   PartyPopper,
+  Ribbon,
   Rocket,
   Scissors,
   Sparkles,
@@ -74,6 +76,8 @@ const ICONS: Record<string, LucideIcon> = {
   "gudi-padwa": Flag,
   baisakhi: Wheat,
   bihu: Drum,
+  "raksha-bandhan": Ribbon,
+  "karva-chauth": MoonStar,
 };
 
 type TileProps = {

@@ -1,4 +1,5 @@
 import type { UiLocale } from "@/i18n/locales";
+import type { CardLanguage } from "@/lib/templates/card-languages";
 import { daysBetween } from "@/lib/publish/countdown";
 
 /*
@@ -57,11 +58,14 @@ export function wallWindow(dates: readonly string[], albumDays: number, today: s
   return daysBetween(today, closesOn) >= 0 ? { state: "open", closesOn } : { state: "closed" };
 }
 
-/** "12 December 2026", in the site's language. */
-export function formatWallDate(date: string, locale: UiLocale): string {
+/** "12 December 2026", in the site's language or the card's, with Western digits as on the card. */
+export function formatWallDate(date: string, language: UiLocale | CardLanguage): string {
   const [y, m, d] = date.split("-").map(Number);
-  return new Date(Date.UTC(y!, m! - 1, d!)).toLocaleDateString(
-    locale === "hi" ? "hi-IN" : "en-IN",
-    { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" },
-  );
+  return new Date(Date.UTC(y!, m! - 1, d!)).toLocaleDateString(`${language}-IN`, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+    numberingSystem: "latn",
+  });
 }
