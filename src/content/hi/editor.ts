@@ -85,9 +85,9 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
   design: {
     label: "डिज़ाइन",
     eyebrow: "डिज़ाइन चुनें",
-    title: "वह कार्ड चुनें जिसे मेहमान खोलेंगे",
+    title: "वह डिज़ाइन चुनें जिसे मेहमान खोलेंगे",
     intro:
-      "हर डिज़ाइन 3D में खुलता है, अपने बेल-बूटों, पंखुड़ियों और राग के साथ। कभी भी बदलें, आपके शब्द नहीं खोएँगे।",
+      "हर डिज़ाइन की अपनी पेंटिंग, अपना खुलना और अपना राग है। कभी भी बदलें, आपके लिखे सारे शब्द बने रहेंगे।",
   },
   language: {
     label: "भाषा",
@@ -849,6 +849,7 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
   notReady: "कुछ ब्योरा बाक़ी है",
   fix: (label) => `${label} पूरा करें`,
   occasionHeading: "अवसर",
+  namesHeading: "नाम",
   functionsHeading: "रस्में",
   photosHeading: "तस्वीरें",
   noPhotos: "कोई तस्वीर नहीं जोड़ी",
@@ -869,9 +870,11 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
 };
 
 export const suiteCopy: Translation<typeof en.suiteCopy> = {
-  heading: "रस्मों के पन्ने",
+  heading: "आपके अवसर के डिज़ाइन",
   intro:
-    "निमंत्रण खुलने के बाद हर रस्म का अपना पूरे पर्दे का पन्ना इसी थीम में दिखता है। आपकी परंपरा के रस्मों के नाम, आशीर्वचन और चिह्न हर थीम में वही रहते हैं।",
+    "खुलने के बाद मेहमान इसी डिज़ाइन में आपके नाम, हर रस्म और जवाब का फ़ॉर्म देखते हैं। आपकी परंपरा के रस्मों के नाम, आशीर्वचन और चिह्न हर डिज़ाइन में वही रहते हैं।",
+  cardHeading: "कार्ड का काग़ज़ और रंग",
+  cardIntro: "कार्ड के रंग वाले पन्ने यहाँ चुने कार्ड का काग़ज़, रंग और राग लेते हैं।",
   suggested: "आपकी परंपरा के अनुरूप",
   pairs: (design) => `कार्ड भी ${design} में बदल जाएगा`,
   preview: "पन्ने चलाएँ",

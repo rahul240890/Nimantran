@@ -32,7 +32,7 @@ export function StorySample({ suite, art }: { suite: SuiteId; art: PageArt }) {
   const still = useReducedMotion();
   const { images } = SUITES[suite];
   const kinds = FUNCTION_ARTS.filter((kind) => images[kind]);
-  const { copy, functions, lang } = useSampleInvite(kinds);
+  const { copy, functions, lang } = useSampleInvite(kinds, SUITES[suite].occasions?.[0]);
   const blessing = Boolean(images.blessing);
   const beats = useMemo(
     () =>

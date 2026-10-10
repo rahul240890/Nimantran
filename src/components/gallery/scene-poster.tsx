@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { OneScene } from "@/components/invitation/scene/one-scene";
+import type { CategoryId } from "@/lib/categories/catalog";
 import { cn } from "@/lib/cn";
 import type { StoryPhoto } from "@/lib/engine/story";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
@@ -21,6 +22,35 @@ const SAMPLE_PHOTOS: StoryPhoto[] = [
   { src: "/occasions/mehendi.webp", alt: "" },
 ];
 
+/**
+ * A design painted for another occasion shows a picture of that occasion in its frames:
+ * a birthday a cake, not a wedding's rings. A prayer meet's frames stay plain.
+ */
+const OCCASION_PHOTO: Partial<Record<CategoryId, string>> = {
+  birthday: "birthday",
+  anniversary: "anniversary",
+  "baby-shower": "baby",
+  annaprashan: "baby",
+  christening: "baby",
+  "naming-ceremony": "baby",
+  party: "party",
+  "farewell-party": "party",
+  retirement: "party",
+  reunion: "party",
+  graduation: "party",
+  housewarming: "housewarming",
+  "shop-opening": "business",
+  launch: "business",
+};
+
+function samplePhotos(suite: SuiteId): StoryPhoto[] {
+  const occasion = SUITES[suite].occasions?.[0];
+  if (!occasion) return SAMPLE_PHOTOS;
+  if (occasion === "prayer-meet") return [];
+  const picture = OCCASION_PHOTO[occasion] ?? "festival";
+  return SAMPLE_PHOTOS.map(() => ({ src: `/occasions/${picture}.webp`, alt: "" }));
+}
+
 export function ScenePoster({
   suite,
   priority,
@@ -32,29 +62,32 @@ export function ScenePoster({
 }) {
   const page = scenePage(suite, 2);
   if (!page) return null;
+  const photos = samplePhotos(suite);
   return (
     <span
       className={cn("absolute inset-x-0 top-0 block", className)}
       style={{ aspectRatio: String(PAINTING_ASPECT) }}
     >
       {/* The sample photos show through the frames, as the couple's own will */}
-      {page.frames.map(([x, y, width, height], i) => (
-        // eslint-disable-next-line @next/next/no-img-element -- a small stand-in under the painting
-        <img
-          key={i}
-          src={SAMPLE_PHOTOS[i]!.src}
-          alt=""
-          aria-hidden
-          loading={priority ? undefined : "lazy"}
-          className="absolute bg-card-ivory object-cover"
-          style={{
-            left: `${x - 0.8}%`,
-            top: `${y - 0.5}%`,
-            width: `${width + 1.6}%`,
-            height: `${height + 1}%`,
-          }}
-        />
-      ))}
+      {page.frames.map(([x, y, width, height], i) =>
+        photos[i] ? (
+          // eslint-disable-next-line @next/next/no-img-element -- a small stand-in under the painting
+          <img
+            key={i}
+            src={photos[i].src}
+            alt=""
+            aria-hidden
+            loading={priority ? undefined : "lazy"}
+            className="absolute bg-card-ivory object-cover"
+            style={{
+              left: `${x - 0.8}%`,
+              top: `${y - 0.5}%`,
+              width: `${width + 1.6}%`,
+              height: `${height + 1}%`,
+            }}
+          />
+        ) : null,
+      )}
       {/* A Scene theme shows its painting with the card in place */}
       <Image
         src={(page.card && SUITES[suite].images.cover) || page.image}
@@ -108,8 +141,9 @@ const SCENE_DAYS = ["haldi", "mehendi", "sangeet", "wedding"] as const;
 
 /** The scene itself, playing in the preview with sample names, photos and celebrations. */
 export function SceneSample({ suite }: { suite: SuiteId }) {
-  const { copy, functions, lang } = useSampleInvite(SCENE_DAYS);
-  const page = scenePage(suite, SAMPLE_PHOTOS.length);
+  const { copy, functions, lang } = useSampleInvite(SCENE_DAYS, SUITES[suite].occasions?.[0]);
+  const photos = samplePhotos(suite);
+  const page = scenePage(suite, photos.length);
   if (!page) return null;
   return (
     <OneScene
@@ -118,7 +152,7 @@ export function SceneSample({ suite }: { suite: SuiteId }) {
       copy={copy}
       lang={lang}
       functions={functions}
-      photos={SAMPLE_PHOTOS}
+      photos={photos}
       reply={null}
       framed
       miniature

@@ -89,9 +89,13 @@ test.describe("moving around", () => {
     await page.getByRole("link", { name: "Create your invitation" }).click();
     await expect(page).toHaveURL(/\/create/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the card your guests will open",
+      "Pick the design your guests will open",
     );
-    const designs = page.getByRole("radiogroup", { name: "Choose a design" }).getByRole("radio");
+    // The cards behind the pages show once Card colours is the design
+    await page.getByRole("radio", { name: /^Card colours/ }).click();
+    const designs = page
+      .getByRole("radiogroup", { name: "Card paper and colours" })
+      .getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Bandhani Utsav/);
   });
 

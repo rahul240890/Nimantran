@@ -2,7 +2,7 @@
 
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
-import type { ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
 
@@ -31,6 +31,11 @@ type SelectProps = {
   contentClassName?: string;
   /** Needed when there is no surrounding Field. */
   "aria-label"?: string;
+  /**
+   * With nothing chosen yet, the option the list opens at, so a long list (times of
+   * day) doesn't start at its very top.
+   */
+  openAt?: string;
 };
 
 /** A styled, accessible single choice list with typeahead and full keyboard use. */
@@ -48,14 +53,33 @@ export function Select({
   className,
   contentClassName,
   "aria-label": ariaLabel,
+  openAt,
 }: SelectProps) {
   const field = useField();
+  const [open, setOpen] = useState(false);
+  const viewport = useRef<HTMLDivElement>(null);
+  const empty = !(value ?? defaultValue);
+
+  useEffect(() => {
+    if (!open || !openAt || !empty) return;
+    // The list mounts and settles over a few frames (Radix scrolls it to the top as it
+    // positions), so keep placing it until it has settled
+    let frames = 0;
+    let frame = requestAnimationFrame(function place() {
+      const list = viewport.current;
+      const item = list?.querySelector<HTMLElement>(`[data-value="${CSS.escape(openAt)}"]`);
+      if (list && item) list.scrollTop = item.offsetTop;
+      if (++frames < 8) frame = requestAnimationFrame(place);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, openAt, empty]);
 
   return (
     <SelectPrimitive.Root
       value={value}
       defaultValue={defaultValue}
       onValueChange={onValueChange}
+      onOpenChange={setOpen}
       disabled={disabled ?? field?.disabled}
       required={required ?? field?.required}
       name={name}
@@ -99,11 +123,12 @@ export function Select({
           <SelectPrimitive.ScrollUpButton className="flex h-8 items-center justify-center text-ink-muted">
             <ChevronUp className="size-4" />
           </SelectPrimitive.ScrollUpButton>
-          <SelectPrimitive.Viewport className="p-1.5">
+          <SelectPrimitive.Viewport ref={viewport} className="p-1.5">
             {options.map((option) => (
               <SelectPrimitive.Item
                 key={option.value}
                 value={option.value}
+                data-value={option.value}
                 textValue={option.textValue}
                 disabled={option.disabled}
                 className={cn(

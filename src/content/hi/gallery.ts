@@ -56,6 +56,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sample: {
     first: "अर्जुन",
     second: "सिया",
+    one: "आन्या",
     blessing: "श्री गणेश जी के आशीर्वाद से",
     families: "अपने परिवारों के साथ",
     line: "आपको सपरिवार सादर आमंत्रित करते हैं",
@@ -66,6 +67,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
       baraat: "होटल के द्वार से",
       wedding: "रामबाग पैलेस, जयपुर",
       reception: "जय महल, जयपुर",
+      other: "गार्डन लॉन्स, जयपुर",
     },
   },
   pagesCount: (count: number) => `${count} पन्ने`,

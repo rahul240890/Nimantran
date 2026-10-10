@@ -63,6 +63,8 @@ export const galleryCopy = {
   sample: {
     first: "Arjun",
     second: "Sia",
+    /** The one name on a birthday's or a party's sample. */
+    one: "Aanya",
     blessing: "With the blessings of Lord Ganesha",
     families: "Together with their families",
     line: "invite you to celebrate their wedding",
@@ -73,6 +75,8 @@ export const galleryCopy = {
       baraat: "From the hotel gate",
       wedding: "Rambagh Palace, Jaipur",
       reception: "Jai Mahal, Jaipur",
+      /** Any other occasion's one celebration. */
+      other: "The Garden Lawns, Jaipur",
     },
   },
   preview: (name: string) => `Preview ${name}`,
