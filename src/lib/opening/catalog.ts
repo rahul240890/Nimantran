@@ -5,10 +5,47 @@ import { SUITES } from "@/lib/suites/catalog";
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
  * the pages, the One Scene or the colour card. Each style is drawn in code from the
- * theme's own colours, except "doors", which splits the theme's cover painting.
+ * theme's own colours, except "doors", which splits the theme's cover painting, and the
+ * painted gates, which are paintings of their own in three layers.
  */
 
+/**
+ * The painted gates: the place beyond, the two doors and the arch in front, each a painting.
+ * The hole is where the doors hang inside the arch, in % of the painting (941 x 1672). The
+ * move is how they open: doors swing in, flowers slide apart, curtains gather, flaps lift.
+ */
+export const PAINTED_GATES = {
+  "rajwada-pol": { move: "swing", hole: { left: 19.7, top: 12.1, width: 60.6, height: 87.9 } },
+  "gopuram-kadhavu": {
+    move: "swing",
+    hole: { left: 15.4, top: 4.9, width: 69, height: 95.1 },
+  },
+  "noor-darwaza": { move: "swing", hole: { left: 17.9, top: 17.1, width: 64.2, height: 82.9 } },
+  "phoolon-ki-deewar": {
+    move: "slide",
+    hole: { left: 16.8, top: 1.8, width: 66.4, height: 98.2 },
+  },
+  "haveli-kiwad": { move: "swing", hole: { left: 21.1, top: 19.3, width: 57.5, height: 80.7 } },
+  "shahi-parda": { move: "gather", hole: { left: 13.4, top: 2.8, width: 73.1, height: 97.2 } },
+  "deco-gates": { move: "swing", hole: { left: 19.8, top: 0.8, width: 60.4, height: 99.2 } },
+  "bagiya-gate": { move: "swing", hole: { left: 22.8, top: 6.3, width: 54.6, height: 93.7 } },
+  "mela-tamboo": { move: "lift", hole: { left: 9.8, top: 6.2, width: 80.3, height: 93.8 } },
+} as const satisfies Record<
+  string,
+  {
+    move: "swing" | "slide" | "gather" | "lift";
+    hole: { left: number; top: number; width: number; height: number };
+  }
+>;
+export type PaintedGate = keyof typeof PAINTED_GATES;
+const GATE_IDS = Object.keys(PAINTED_GATES) as PaintedGate[];
+
+export function isPaintedGate(style: string): style is PaintedGate {
+  return style in PAINTED_GATES;
+}
+
 export const OPENING_STYLES = [
+  ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
   "doors",
   "palace",
   "temple",
@@ -33,6 +70,7 @@ export const OPENING_STYLES = [
 
 /** How the editor groups the styles, so twenty choices stay easy to scan. */
 export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
+  { id: "painted", styles: GATE_IDS },
   { id: "doors", styles: ["doors", "palace", "temple", "jharokha", "mandap", "storybook"] },
   { id: "reveals", styles: ["curtain", "phool", "envelope", "scroll", "gift"] },
   { id: "light", styles: ["lotus", "diyas", "rangoli", "peacock", "lanterns", "moonlit"] },
@@ -41,24 +79,23 @@ export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyl
 
 /** Each occasion's own opening, when the host hasn't picked one and there is no cover. */
 const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
-  birthday: "balloons",
-  party: "fireworks",
-  "farewell-party": "fireworks",
-  launch: "fireworks",
+  birthday: "mela-tamboo",
+  party: "deco-gates",
+  "farewell-party": "deco-gates",
+  launch: "deco-gates",
   "shop-opening": "gift",
   "baby-shower": "gift",
   diwali: "diyas",
-  eid: "moonlit",
+  eid: "noor-darwaza",
   janmashtami: "peacock",
   onam: "rangoli",
   sankranti: "rangoli",
   lohri: "lanterns",
   navratri: "lanterns",
-  engagement: "mandap",
+  engagement: "phoolon-ki-deewar",
   "save-the-date": "envelope",
-  anniversary: "storybook",
-  housewarming: "jharokha",
-  "naming-ceremony": "gift",
+  anniversary: "shahi-parda",
+  housewarming: "haveli-kiwad",
   holi: "fireworks",
   christmas: "gift",
   reunion: "envelope",
@@ -66,6 +103,8 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   "gudi-padwa": "rangoli",
   baisakhi: "lanterns",
   bihu: "rangoli",
+  christening: "bagiya-gate",
+  "naming-ceremony": "mela-tamboo",
   "raksha-bandhan": "gift",
   "karva-chauth": "moonlit",
 };
@@ -89,7 +128,7 @@ export const OPENING_GODS = [
 export type OpeningGod = (typeof OPENING_GODS)[number];
 
 export type OpeningChoice = {
-  /** Null follows the design: the cover's doors on a painted theme, else palace gates. */
+  /** Null follows the design: the cover's doors on a painted theme, else a painted gate. */
   style: OpeningStyle | null;
   /** Null opens without a god or symbol. */
   god: OpeningGod | null;
@@ -143,7 +182,7 @@ export function openingStyle(
   const offered = openingStyles(suite, scene);
   if (choice.style && offered.includes(choice.style)) return choice.style;
   if (hasCoverDoors(suite) && !scene) return "doors";
-  return (category && OCCASION_OPENING[category]) ?? "palace";
+  return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }
 
 /** The god the guest sees, dropped where the occasion doesn't offer one. */

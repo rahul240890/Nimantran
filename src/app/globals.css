@@ -6981,6 +6981,200 @@
       center / 100% 1px no-repeat;
 }
 
+/* Painted gates: the owner's paintings in three layers (opening-gate.tsx) */
+.gate {
+  animation: gate-breathe 9s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .gate {
+  animation-play-state: paused;
+}
+.gate-canvas {
+  width: max(100cqw, calc(100cqh * 941 / 1672));
+  aspect-ratio: 941 / 1672;
+  translate: -50% -50%;
+  transform-origin: 50% 58%;
+  transition: scale 2600ms cubic-bezier(0.45, 0, 0.2, 1);
+}
+.opening-stage[data-open="true"] .gate-canvas {
+  scale: 1.1;
+}
+/* Round the arch the place beyond waits in the dark, then lights up as the doors open */
+.gate-around {
+  filter: brightness(0.38) saturate(0.8) blur(0.35cqw);
+  transition: filter 1400ms ease 700ms;
+}
+.opening-stage[data-open="true"] .gate-around {
+  filter: none;
+}
+.gate-hole {
+  mask-image: var(--gate-hole);
+  mask-size: 100% 100%;
+}
+.gate-inside {
+  filter: brightness(1.12) saturate(1.05);
+}
+.gate-door {
+  backface-visibility: hidden;
+  transition: transform 1500ms cubic-bezier(0.6, 0, 0.25, 1) 250ms;
+}
+.gate-door-left {
+  left: 0;
+  transform-origin: left center;
+}
+.gate-door-right {
+  right: 0;
+  transform-origin: right center;
+}
+.opening-stage[data-open="true"] .gate-door {
+  animation: gate-unlatch 260ms ease-in-out;
+}
+.gate-door-shade {
+  background: linear-gradient(90deg, transparent 40%, var(--open-shadow));
+  opacity: 0;
+  transition: opacity 1200ms ease 300ms;
+}
+.gate-door-right .gate-door-shade {
+  scale: -1 1;
+}
+.opening-stage[data-open="true"] .gate-door-shade {
+  opacity: 1;
+}
+/* Doors swing in; flowers slide apart; curtains gather to the sides; tent flaps lift */
+.opening-stage[data-open="true"] [data-move="swing"] .gate-door-left {
+  transform: rotateY(96deg);
+}
+.opening-stage[data-open="true"] [data-move="swing"] .gate-door-right {
+  transform: rotateY(-96deg);
+}
+.opening-stage[data-open="true"] [data-move="slide"] .gate-door-left {
+  transform: translateX(-104%) rotate(-2deg);
+}
+.opening-stage[data-open="true"] [data-move="slide"] .gate-door-right {
+  transform: translateX(104%) rotate(2deg);
+}
+.opening-stage[data-open="true"] [data-move="gather"] .gate-door-left {
+  transform: scaleX(0.16) skewY(-1.5deg);
+}
+.opening-stage[data-open="true"] [data-move="gather"] .gate-door-right {
+  transform: scaleX(0.16) skewY(1.5deg);
+}
+[data-move="lift"] .gate-door-left {
+  transform-origin: left top;
+}
+[data-move="lift"] .gate-door-right {
+  transform-origin: right top;
+}
+.opening-stage[data-open="true"] [data-move="lift"] .gate-door-left {
+  transform: rotate(72deg) scaleY(0.85);
+}
+.opening-stage[data-open="true"] [data-move="lift"] .gate-door-right {
+  transform: rotate(-72deg) scaleY(0.85);
+}
+/* A line of warm light through the seam, breathing, that flares as the latch lifts */
+.gate-seam {
+  width: 0.5cqw;
+  translate: -50% 0;
+  background: linear-gradient(
+    180deg,
+    transparent,
+    var(--open-light) 20%,
+    var(--marigold) 70%,
+    transparent
+  );
+  box-shadow:
+    0 0 2cqw 0.6cqw color-mix(in oklab, var(--marigold) 55%, transparent),
+    0 0 7cqw 2cqw color-mix(in oklab, var(--open-light) 30%, transparent);
+  mix-blend-mode: screen;
+  animation: opening-twinkle 2.4s ease-in-out infinite alternate;
+  transition:
+    scale 500ms ease,
+    opacity 700ms ease 500ms;
+}
+.opening-stage[data-open="true"] .gate-seam {
+  animation: none;
+  scale: 6 1;
+  opacity: 0;
+}
+/* The arch passes the guest by, as if they walk through */
+.gate-arch {
+  transform-origin: 50% 60%;
+  transition:
+    scale 1700ms cubic-bezier(0.55, 0, 0.3, 1) 800ms,
+    opacity 900ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .gate-arch {
+  scale: 1.9;
+  opacity: 0;
+}
+/* Specks of dust drifting up in the light from the seam */
+.gate-mote {
+  width: 0.7cqw;
+  aspect-ratio: 1;
+  background: var(--open-light);
+  box-shadow: 0 0 1.2cqw var(--marigold);
+  opacity: 0;
+  animation: gate-mote 7s ease-in-out calc(var(--i) * -700ms) infinite;
+  transition: opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .gate-mote {
+  visibility: hidden;
+}
+/* The words split with the doors (opening.tsx) */
+.gate-plate-half {
+  visibility: hidden;
+}
+.opening-stage[data-open="true"] .gate-plate-whole {
+  visibility: hidden;
+}
+.opening-stage[data-open="true"] .gate-plate-half {
+  visibility: visible;
+  opacity: 0;
+  transition:
+    translate 1300ms cubic-bezier(0.6, 0, 0.25, 1) 250ms,
+    opacity 900ms ease 500ms;
+}
+.gate-plate-half[data-side="left"] {
+  clip-path: inset(-20% 50% -20% -20%);
+}
+.gate-plate-half[data-side="right"] {
+  clip-path: inset(-20% -20% -20% 50%);
+}
+.opening-stage[data-open="true"] .gate-plate-half[data-side="left"] {
+  translate: -45cqw 0;
+}
+.opening-stage[data-open="true"] .gate-plate-half[data-side="right"] {
+  translate: 45cqw 0;
+}
+@keyframes gate-breathe {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.025;
+  }
+}
+@keyframes gate-unlatch {
+  30% {
+    translate: -0.4cqw 0;
+  }
+  70% {
+    translate: 0.4cqw 0;
+  }
+}
+@keyframes gate-mote {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(2cqw, -14cqh);
+  }
+}
+
 /* Still mode: no drifting or swaying, and each move lands at once */
 @media (prefers-reduced-motion: reduce) {
   .opening-stage *,

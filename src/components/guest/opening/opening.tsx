@@ -11,7 +11,7 @@ import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
-import type { OpeningGod, OpeningStyle } from "@/lib/opening/catalog";
+import { isPaintedGate, type OpeningGod, type OpeningStyle } from "@/lib/opening/catalog";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
@@ -24,6 +24,8 @@ import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from 
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
+/** A painted gate takes longer: the doors open, then the guest walks through the arch. */
+const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 3200;
 
@@ -314,6 +316,7 @@ export function Opening({
   const theme = SUITES[suite];
   const cover = theme.images.cover;
   const painted = style === "doors" && Boolean(cover);
+  const gate = isPaintedGate(style);
   const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
@@ -348,10 +351,10 @@ export function Opening({
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
       () => (still ? goInLatest.current() : setWelcome(true)),
-      still ? 0 : OPEN_MS,
+      still ? 0 : gate ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still]);
+  }, [open, pages, welcome, still, gate]);
   useEffect(() => {
     if (!welcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -378,6 +381,81 @@ export function Opening({
     setOpen(false);
   };
 
+  const plate = (half?: "left" | "right") => {
+    const Names = half ? "p" : "h1";
+    return (
+      <div
+        lang={lang}
+        aria-hidden={half ? true : undefined}
+        data-side={half}
+        data-tone={painted ? "light" : undefined}
+        className={cn(
+          // On a painted gate the plate splits with the doors (globals.css), so it doesn't fade
+          half ? "gate-plate-half absolute inset-0" : "relative",
+          gate ? !half && "gate-plate-whole" : "opening-fade",
+          "isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
+          painted
+            ? "story-print w-full px-[3cqw]"
+            : gate
+              ? // Smaller on a painted gate, so the doors themselves show round it
+                "opening-plate w-auto max-w-[min(68cqw,24rem)] px-[5cqw] py-[1.6cqh]"
+              : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
+        )}
+      >
+        {painted && (
+          <span
+            aria-hidden
+            className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
+          />
+        )}
+        {copy.blessing && (
+          <p
+            className="text-[clamp(0.85rem,4.2cqw,1.5rem)] text-card-accent-text"
+            style={face("script", type.words)}
+          >
+            {copy.blessing}
+          </p>
+        )}
+        <Names
+          id={half ? undefined : "guest-names"}
+          className={cn(
+            "flex flex-col items-center break-words text-card-ink",
+            !painted && "opening-names",
+          )}
+          style={{
+            ...face("names", type.names),
+            ...(type.bold ? { fontWeight: 700 } : {}),
+            fontStyle: type.italic ? "italic" : undefined,
+            color: type.colour,
+          }}
+        >
+          <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
+            {copy.first}
+          </span>{" "}
+          {joiner && (
+            <>
+              <span className="text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))] text-card-accent-text">
+                {joiner}
+              </span>{" "}
+              <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
+                {copy.second}
+              </span>
+            </>
+          )}
+        </Names>
+        {!painted && copy.date && <span aria-hidden className="opening-rule" />}
+        {copy.date && (
+          <p
+            className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
+            style={face("body", type.words)}
+          >
+            {copy.date}
+          </p>
+        )}
+      </div>
+    );
+  };
+
   return (
     <section
       aria-labelledby="guest-names"
@@ -390,9 +468,10 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {cover ? (
+        {gate || cover ? (
           <Image
-            src={cover}
+            // A painted gate's own place beyond, so the wide screen matches the gate
+            src={gate ? `/openings/gates/${style}/beyond.webp` : (cover as string)}
             alt=""
             fill
             sizes="100vw"
@@ -441,67 +520,15 @@ export function Opening({
           {/* The names, on a plate (drawn styles) or printed on the painting (its own doors) */}
           <div className="relative flex min-h-0 flex-1 items-center justify-center px-[7cqw]">
             {style === "lotus" && <LotusBloom />}
-            <div
-              lang={lang}
-              data-tone={painted ? "light" : undefined}
-              className={cn(
-                "opening-fade relative isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
-                painted
-                  ? "story-print w-full px-[3cqw]"
-                  : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
-              )}
-            >
-              {painted && (
-                <span
-                  aria-hidden
-                  className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
-                />
-              )}
-              {copy.blessing && (
-                <p
-                  className="text-[clamp(0.85rem,4.2cqw,1.5rem)] text-card-accent-text"
-                  style={face("script", type.words)}
-                >
-                  {copy.blessing}
-                </p>
-              )}
-              <h1
-                id="guest-names"
-                className={cn(
-                  "flex flex-col items-center break-words text-card-ink",
-                  !painted && "opening-names",
-                )}
-                style={{
-                  ...face("names", type.names),
-                  ...(type.bold ? { fontWeight: 700 } : {}),
-                  fontStyle: type.italic ? "italic" : undefined,
-                  color: type.colour,
-                }}
-              >
-                <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
-                  {copy.first}
-                </span>{" "}
-                {joiner && (
-                  <>
-                    <span className="text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))] text-card-accent-text">
-                      {joiner}
-                    </span>{" "}
-                    <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
-                      {copy.second}
-                    </span>
-                  </>
-                )}
-              </h1>
-              {!painted && copy.date && <span aria-hidden className="opening-rule" />}
-              {copy.date && (
-                <p
-                  className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
-                  style={face("body", type.words)}
-                >
-                  {copy.date}
-                </p>
-              )}
-            </div>
+            {gate ? (
+              <div className="relative flex max-h-full">
+                {plate()}
+                {plate("left")}
+                {plate("right")}
+              </div>
+            ) : (
+              plate()
+            )}
           </div>
 
           {/* The countdown and the way in, over the ground */}
@@ -608,7 +635,7 @@ export function OpeningSample({
       className="opening-page relative aspect-[9/16] w-full overflow-hidden rounded-lg"
     >
       <div data-open={open} className="opening-stage [container-type:size] absolute inset-0">
-        <OpeningArt style={style} cover={SUITES[suite].images.cover} seal={seal} />
+        <OpeningArt style={style} cover={SUITES[suite].images.cover} seal={seal} sample />
         <div className="absolute inset-0 z-30 flex flex-col">
           <div
             className="opening-crest flex flex-none items-end justify-center px-[10cqw] pt-[5cqh] pb-[1.5cqh]"
