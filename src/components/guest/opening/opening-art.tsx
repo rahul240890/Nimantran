@@ -20,11 +20,15 @@ import {
 } from "./opening-art-more";
 import {
   GOD_PAINTINGS,
+  THEMED_OPENINGS,
   isPaintedGate,
+  isThemedOpening,
   type OpeningGod,
   type OpeningStyle,
+  type ThemedOpening,
 } from "@/lib/opening/catalog";
 import { PaintedGateArt } from "./opening-gate";
+import { ThemedOpeningArt } from "./opening-themed";
 
 /*
  * The drawn pieces of each opening (Step 12x). Everything is sized in container units of the
@@ -35,6 +39,9 @@ import { PaintedGateArt } from "./opening-gate";
 
 /** Where the god sits and how much room the middle keeps, per style, in % of the stage. */
 export const OPENING_LAYOUT: Record<OpeningStyle, { crest: number; gap: number }> = {
+  ...(Object.fromEntries(
+    Object.keys(THEMED_OPENINGS).map((id) => [id, { crest: 22, gap: 0 }]),
+  ) as Record<ThemedOpening, { crest: number; gap: number }>),
   "rajwada-pol": { crest: 22, gap: 0 },
   "gopuram-kadhavu": { crest: 22, gap: 0 },
   "noor-darwaza": { crest: 22, gap: 0 },
@@ -528,6 +535,7 @@ export function OpeningArt({
   sample?: boolean;
 }): ReactNode {
   if (isPaintedGate(style)) return <PaintedGateArt gate={style} sample={sample} />;
+  if (isThemedOpening(style)) return <ThemedOpeningArt opening={style} sample={sample} />;
   switch (style) {
     case "doors":
       return cover ? <CoverDoors cover={cover} /> : <Palace />;

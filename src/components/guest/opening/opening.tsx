@@ -11,7 +11,12 @@ import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
-import { isPaintedGate, type OpeningGod, type OpeningStyle } from "@/lib/opening/catalog";
+import {
+  isPaintedGate,
+  isThemedOpening,
+  type OpeningGod,
+  type OpeningStyle,
+} from "@/lib/opening/catalog";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
@@ -24,7 +29,10 @@ import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from 
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
-/** A painted gate takes longer: the doors open, then the guest walks through the arch. */
+/**
+ * A painted gate takes longer: the doors open, then the guest walks through the arch. A
+ * themed opening takes as long, its painting going its own way.
+ */
 const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 3200;
@@ -320,6 +328,7 @@ export function Opening({
   const cover = theme.images.cover;
   const painted = style === "doors" && Boolean(cover);
   const gate = isPaintedGate(style);
+  const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
@@ -354,10 +363,10 @@ export function Opening({
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
       () => (still ? goInLatest.current() : setWelcome(true)),
-      still ? 0 : gate ? GATE_OPEN_MS : OPEN_MS,
+      still ? 0 : gate || themed ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate]);
+  }, [open, pages, welcome, still, gate, themed]);
   useEffect(() => {
     if (!welcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -471,10 +480,16 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || cover ? (
+        {gate || themed || cover ? (
           <Image
-            // A painted gate's own place beyond, so the wide screen matches the gate
-            src={gate ? `/openings/gates/${style}/beyond.webp` : (cover as string)}
+            // A painted gate's or themed opening's own place beyond, so the wide screen matches
+            src={
+              gate
+                ? `/openings/gates/${style}/beyond.webp`
+                : themed
+                  ? `/suites/${style}/scene.webp`
+                  : (cover as string)
+            }
             alt=""
             fill
             sizes="100vw"

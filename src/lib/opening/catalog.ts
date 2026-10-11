@@ -1,6 +1,6 @@
 import type { CategoryId } from "@/lib/categories/catalog";
-import type { SuiteId } from "@/lib/suites/catalog";
-import { SUITES } from "@/lib/suites/catalog";
+import type { SuiteId, ThemedId } from "@/lib/suites/catalog";
+import { SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
@@ -44,8 +44,49 @@ export function isPaintedGate(style: string): style is PaintedGate {
   return style in PAINTED_GATES;
 }
 
+/**
+ * The themed openings (catalog.ts THEMED_IDS): each theme's own opening, one painting that
+ * moves its own way and opens onto the theme's scene. The move is how the painting goes:
+ * zoom (fly through it), threads (falls away in strips), deal (bands slide off to either
+ * side), rows (bands swing down one by one), roll (rolls up from the bottom), drop (falls in
+ * folds), sink, wheel (the wheel rolls away), fold (folds in half and flies off), wave (a
+ * wave washes it off), scratch (wiped away in rubs), frost (wiped clear, then melts), flip
+ * (pages flip up), puzzle (its tiles lift out), tumble (blocks fall), colour (the colour
+ * sweeps in), gather (drawn up to the top), slide (tips back and slides down), spots (lit
+ * up spot by spot).
+ */
+export const THEMED_OPENINGS = {
+  "jaali-vriksh": "zoom",
+  pachchikari: "sink",
+  "chik-baradari": "roll",
+  "baori-deep": "zoom",
+  "ikat-dhaaga": "threads",
+  "olai-chuvadi": "deal",
+  "konark-chakra": "wheel",
+  "mandvi-dhow": "drop",
+  shekhawati: "scratch",
+  lehar: "wave",
+  "naksha-pangong": "fold",
+  "toran-mala": "rows",
+  jhilmil: "spots",
+  "howrah-tareekh": "flip",
+  "barf-khidki": "frost",
+  "pondy-gali": "puzzle",
+  "irani-carrom": "slide",
+  channapatna: "tumble",
+  "ped-ghar": "colour",
+  "jhalar-palna": "gather",
+} as const satisfies Record<ThemedId, string>;
+export type ThemedOpening = keyof typeof THEMED_OPENINGS;
+export type ThemedMove = (typeof THEMED_OPENINGS)[ThemedOpening];
+
+export function isThemedOpening(style: string): style is ThemedOpening {
+  return style in THEMED_OPENINGS;
+}
+
 export const OPENING_STYLES = [
   ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
+  ...THEMED_IDS,
   "doors",
   "palace",
   "temple",
@@ -68,8 +109,9 @@ export const OPENING_STYLES = [
   "none",
 ] as const;
 
-/** How the editor groups the styles, so twenty choices stay easy to scan. */
+/** How the editor groups the styles, so many choices stay easy to scan. */
 export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
+  { id: "themed", styles: THEMED_IDS },
   { id: "painted", styles: GATE_IDS },
   { id: "doors", styles: ["doors", "palace", "temple", "jharokha", "mandap", "storybook"] },
   { id: "reveals", styles: ["curtain", "phool", "envelope", "scroll", "gift"] },
@@ -181,6 +223,8 @@ export function openingStyle(
 ): OpeningStyle {
   const offered = openingStyles(suite, scene);
   if (choice.style && offered.includes(choice.style)) return choice.style;
+  // A themed opening's own theme opens with it
+  if (isThemedOpening(suite)) return suite;
   if (hasCoverDoors(suite) && !scene) return "doors";
   return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }

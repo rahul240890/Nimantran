@@ -445,6 +445,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "mandvi-dhow",
       "phool-ladi",
       "shevanti-haldi",
       "choodi-jhalar",
@@ -473,6 +474,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "jaali-vriksh",
+      "baori-deep",
+      "shekhawati",
       "baithak-bagh",
       "phool-ladi",
       "neeli-pottery",
@@ -526,6 +530,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "howrah-tareekh",
+      "konark-chakra",
       "shiuli-bhor",
       "bishnupur-terracotta",
       "pipli-chhata",
@@ -557,6 +563,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "olai-chuvadi",
+      "toran-mala",
+      "ikat-dhaaga",
       "gajra-ghera",
       "champa-baag",
       "malli-mazhai",
@@ -622,6 +631,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "pachchikari",
+      "chik-baradari",
       "moti-lari",
       "anar-bagh",
       "choodi-jhalar",
@@ -650,6 +661,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "jhilmil",
+      "lehar",
+      "naksha-pangong",
       "baithak-bagh",
       "do-kone",
       "gajra-ghera",

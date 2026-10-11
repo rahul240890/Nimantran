@@ -42,6 +42,7 @@ describe("gallery catalog", () => {
         "white-rann-scene",
         "mameru-bandhani-scene",
         "sindhi-ajrak-scene",
+        "mandvi-dhow-scene",
         "kutch-toran",
         "shahi-savari",
         "pichwai",

@@ -1,8 +1,12 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { THEMED_IDS } from "@/lib/suites/catalog";
 import {
   OPENING_GROUPS,
   OPENING_STYLES,
   PAINTED_GATES,
+  THEMED_OPENINGS,
   isPaintedGate,
   noOpening,
   offersGods,
@@ -18,6 +22,18 @@ describe("openings", () => {
     expect(openingStyle(noOpening, "classic", false)).toBe("rajwada-pol");
     expect(openingStyle(noOpening, "rajwada-bagh", true)).toBe("rajwada-pol");
     expect(openingStyle({ style: "lotus", god: null }, "classic", false)).toBe("lotus");
+  });
+
+  it("opens each themed design with its own painting, which any card can also pick", () => {
+    for (const suite of THEMED_IDS) {
+      expect(openingStyle(noOpening, suite, true)).toBe(suite);
+      expect(openingStyle(noOpening, suite, false)).toBe(suite);
+      expect(openingStyle({ style: "lotus", god: null }, suite, true)).toBe("lotus");
+      expect(openingStyle({ style: suite, god: null }, "classic", false)).toBe(suite);
+      expect(THEMED_OPENINGS[suite]).toBeTruthy();
+      const art = join(process.cwd(), "public", "openings", "themed", `${suite}.webp`);
+      expect(existsSync(art), art).toBe(true);
+    }
   });
 
   it("offers the cover's doors only with a cover, and going straight in only for a Scene", () => {
