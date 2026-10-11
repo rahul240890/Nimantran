@@ -112,6 +112,10 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
       await page.getByRole("button", { name: "Open the invitation" }).click();
       const scene = page.locator("section[data-scene-mood]");
       await expect(page.getByRole("heading", { level: 1, name: /Arjun/ })).toBeVisible();
+      // The painting fills the screen like a reel (on the narrowest phones its width sets the height)
+      const viewport = page.viewportSize()!;
+      const painting = (await scene.locator(".scene-painting").boundingBox())!;
+      expect(painting.height).toBeGreaterThan(viewport.height * 0.9);
       // Still with reduced motion: the arrows step through the celebrations
       const slot = page.getByRole("group", { name: "The celebrations, one by one" });
       const first = await slot.innerText();
