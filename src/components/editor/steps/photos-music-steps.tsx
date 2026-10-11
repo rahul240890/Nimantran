@@ -46,6 +46,7 @@ import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
 import { PagePacing } from "../page-pacing";
+import { ContactsSection } from "./family-section";
 import { draftShowsScene } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
@@ -684,16 +685,32 @@ function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
-export function ExtrasStep({ draft, update, errors }: StepProps) {
+/** The first section of a step needs no rule above it. */
+const sections =
+  "flex flex-col gap-8 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0";
+
+/** The photos section: the design's own frames, then more photos for guests to scroll. */
+export function PhotosStep({ draft, update, errors }: StepProps) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className={sections}>
       {/* An illustrated card paints its couple, so it has no photos to ask for */}
       {coupleLayouts(draft).some((layout) => layout !== "none") && (
         <DesignPhotos draft={draft} update={update} errors={errors} />
       )}
       <MorePhotos draft={draft} update={update} />
+    </div>
+  );
+}
+
+/** The music and replies section: what plays, what the reply asks, and whom to call. */
+export function MusicStep({ draft, update }: StepProps) {
+  return (
+    <div className={sections}>
       <Music draft={draft} update={update} />
       <Questions draft={draft} update={update} />
+      <section className="flex flex-col gap-3 border-t border-line pt-6" data-page-target="family">
+        <ContactsSection draft={draft} update={update} />
+      </section>
     </div>
   );
 }
