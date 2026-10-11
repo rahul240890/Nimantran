@@ -97,7 +97,17 @@ export type StoryInput = {
 };
 
 /** One labelled block of the family's wording: "आशीर्वाद" over the grandparents' names. */
-export type FamilyLine = { title: string; text: string; lang?: string };
+export type FamilyLine = {
+  title: string;
+  text: string;
+  lang?: string;
+  /**
+   * A side's parents in parts ("Son of", the names, the words after them, the home town),
+   * so the names can be set on their own line, larger than the words round them.
+   */
+  parts?: FamilyParts;
+};
+export type FamilyParts = { lead: string; names: string; tail: string; place: string };
 
 /** The few words the story adds of its own, in the page's language. */
 export type StoryWords = {
@@ -107,8 +117,8 @@ export type StoryWords = {
   and: string;
 };
 
-/** The family's labelled blocks one page holds before they spill onto a second. */
-export const FAMILY_PER_PAGE = 3;
+/** The lines of family wording one page holds before they spill onto a second. */
+export const FAMILY_LINES_PER_PAGE = 8;
 
 /** Each line after the first waits this long before it rises in. */
 export const LINE_STAGGER = 0.45;
@@ -145,6 +155,41 @@ export function beatSeconds(lines: readonly StoryLine[], symbol = false): number
 /** When a line (by its place in the beat) starts to rise in. */
 export function lineDelay(index: number): number {
   return Number((index * LINE_STAGGER).toFixed(2));
+}
+
+/**
+ * Parents' names as they should break: between the two people, before the "&", never
+ * inside one person's name, so a narrow page reads "Smt. Meenakshi / & Shri Rajendra
+ * Prasad Sharma".
+ */
+export function keepPeople(names: string): string {
+  // A very long name keeps only its title with the first word ("& Shri Rajendra …")
+  const whole = (part: string) =>
+    part.length <= 34
+      ? part.replace(/ /g, "\u00a0")
+      : part.replace(/^(\S+) (\S+) /, "$1\u00a0$2\u00a0");
+  return names
+    .split(/\s+&\s+/)
+    .map((person, i) => whole(i === 0 ? person : `& ${person}`))
+    .join(" ");
+}
+
+/** Where a family's blocks (given as line counts) break onto a second page, if they do. */
+export function familySplit(counts: readonly number[]): number {
+  const total = counts.reduce((sum, n) => sum + n, 0);
+  if (total <= FAMILY_LINES_PER_PAGE || counts.length < 2) return counts.length;
+  let best = 1;
+  let bestMax = Infinity;
+  let first = 0;
+  for (let i = 1; i < counts.length; i++) {
+    first += counts[i - 1]!;
+    const most = Math.max(first, total - first);
+    if (most < bestMax) {
+      bestMax = most;
+      best = i;
+    }
+  }
+  return best;
 }
 
 const line = (text: string, style: LineStyle, lang?: string): StoryLine[] =>
@@ -207,13 +252,23 @@ export function storyBeats({
   }
 
   // The family page: who invites, their words, and the day itself
-  const lines = (blocks: readonly FamilyLine[]) =>
-    blocks.flatMap((block) => [
-      ...line(block.title, "label", block.lang),
-      ...line(block.text, "body", block.lang),
-    ]);
-  // More than three blocks (blessings, both sides' parents, hosts…) share two pages
-  const half = family.length > FAMILY_PER_PAGE ? Math.ceil(family.length / 2) : family.length;
+  // A side's parents read as a name of their own: "Son of" small, the parents' names, then
+  // the home town small beneath, rather than one long sentence that wraps anywhere
+  const blockLines = (block: FamilyLine) => [
+    ...line(block.title, "label", block.lang),
+    ...(block.parts
+      ? [
+          ...line(block.parts.lead, "small", block.lang),
+          ...line(keepPeople(block.parts.names), "body", block.lang),
+          ...line(block.parts.tail, "small", block.lang),
+          ...line(block.parts.place, "small", block.lang),
+        ]
+      : line(block.text, "body", block.lang)),
+  ];
+  const lines = (blocks: readonly FamilyLine[]) => blocks.flatMap(blockLines);
+  // A long family (blessings, both sides' parents, hosts…) shares two pages, split where
+  // the two hold the most even number of lines
+  const half = familySplit(family.map((block) => blockLines(block).length));
   const blessings = [...line(copy.families, "small"), ...lines(family.slice(0, half))];
   const more = lines(family.slice(half));
   const invite = [

@@ -1520,7 +1520,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
     };
   }
   const entry = SCENES[suite];
-  // With no photos the one-frame painting still shows the names' initials in its frame
+  // With no photos the one-frame painting still shows its frame, with a flower in it
   const page = entry ? photoPage(suite, Math.max(1, photos)) : null;
   if (!entry || !page) return null;
   const layout = page.frames.length > 1 ? entry.two : entry.one;

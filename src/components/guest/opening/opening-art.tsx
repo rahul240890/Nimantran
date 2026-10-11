@@ -85,7 +85,7 @@ function Beyond({ className }: { className?: string }) {
 }
 
 /** A string of marigolds and mango leaves across the top. */
-function Toran({ count = 11, className }: { count?: number; className?: string }) {
+export function Toran({ count = 11, className }: { count?: number; className?: string }) {
   return (
     <div aria-hidden className={cn("absolute inset-x-0 flex justify-around", className)}>
       {range(count).map((i) => (
@@ -345,8 +345,30 @@ function Curtain() {
   );
 }
 
+/** A pressed flower for the wax seal: the seal carries no letters, only the flower. */
+function SealFlower() {
+  return (
+    <svg aria-hidden viewBox="-20 -20 40 40" className="size-[62%] text-(--open-seal-ink)">
+      {range(8).map((i) => (
+        <ellipse
+          key={i}
+          cx="0"
+          cy="-9"
+          rx="3.6"
+          ry="7.4"
+          transform={`rotate(${i * 45})`}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.6"
+        />
+      ))}
+      <circle r="3.6" fill="currentColor" />
+    </svg>
+  );
+}
+
 /** A royal envelope: the flap lifts, the wax seal breaks and the card rises. */
-function Envelope({ seal }: { seal: string }) {
+function Envelope() {
   return (
     <div className="absolute inset-0 [perspective:1600px]">
       <div className="opening-envelope-back absolute inset-0" />
@@ -390,8 +412,8 @@ function Envelope({ seal }: { seal: string }) {
                 : "opening-seal-right [clip-path:inset(0_0_0_50%)]",
             )}
           >
-            <span className="grid size-[76%] place-items-center rounded-full border-[0.5cqw] border-(--open-seal-ring) font-display text-[8cqw] leading-none text-(--open-seal-ink)">
-              {seal}
+            <span className="grid size-[76%] place-items-center rounded-full border-[0.5cqw] border-(--open-seal-ring)">
+              <SealFlower />
             </span>
           </span>
         ))}
@@ -518,12 +540,10 @@ export function OpeningPetals() {
 export function OpeningArt({
   style,
   cover,
-  seal,
   sample,
 }: {
   style: OpeningStyle;
   cover?: string;
-  seal: string;
   /** A small tile in the editor: small files, loaded lazily. */
   sample?: boolean;
 }): ReactNode {
@@ -538,7 +558,7 @@ export function OpeningArt({
     case "curtain":
       return <Curtain />;
     case "envelope":
-      return <Envelope seal={seal} />;
+      return <Envelope />;
     case "lotus":
       return (
         <>

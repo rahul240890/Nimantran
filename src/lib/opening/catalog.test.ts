@@ -9,6 +9,7 @@ import {
   openingGod,
   openingStyle,
   openingStyles,
+  welcomeKind,
 } from "./catalog";
 
 describe("openings", () => {
@@ -57,5 +58,15 @@ describe("openings", () => {
     expect(offersGods("party")).toBe(false);
     expect(openingGod({ style: null, god: "ganesha" }, "wedding")).toBe("ganesha");
     expect(openingGod({ style: null, god: "ganesha" }, "farewell-party")).toBeNull();
+  });
+
+  it("gives every opening a welcome of its own feeling", () => {
+    expect(welcomeKind("rajwada-pol")).toBe("royal");
+    expect(welcomeKind("lotus")).toBe("bloom");
+    expect(welcomeKind("diyas")).toBe("lamps");
+    expect(welcomeKind("moonlit")).toBe("night");
+    expect(welcomeKind("balloons")).toBe("party");
+    expect(welcomeKind("envelope")).toBe("letter");
+    for (const style of OPENING_STYLES) expect(welcomeKind(style)).toBeTruthy();
   });
 });

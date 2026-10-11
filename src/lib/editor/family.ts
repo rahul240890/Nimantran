@@ -39,9 +39,15 @@ export type DraftFamily = {
 export const noSide: FamilySide = { relation: "child", parents: "", town: "" };
 export const noFamily: DraftFamily = { first: noSide, second: noSide, memory: "", contacts: [] };
 
+/**
+ * "Son of" around the parents' names: the words before them (English, Hindi) or after them
+ * (Tamil, Bengali). A tail starting with "-" joins the last name with no space (Bengali).
+ */
+type RelationWords = { lead: string; tail: string };
+
 type FamilyWords = {
-  /** The line under a name: "Son of Smt. Sunita & Shri Ramesh Patel". */
-  relation: Record<Relation, (parents: string) => string>;
+  /** The words round the parents under a name: "Son of" Smt. Sunita & Shri Ramesh Patel. */
+  relation: Record<Relation, RelationWords>;
   /** Headings for the tradition's wording blocks when the card has no pack of its own. */
   titles: Record<WordingId, string>;
   memory: string;
@@ -55,9 +61,9 @@ type FamilyWords = {
 export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   en: {
     relation: {
-      child: (p) => `Child of ${p}`,
-      daughter: (p) => `Daughter of ${p}`,
-      son: (p) => `Son of ${p}`,
+      child: { lead: "Child of", tail: "" },
+      daughter: { lead: "Daughter of", tail: "" },
+      son: { lead: "Son of", tail: "" },
     },
     titles: {
       blessingsFrom: "With the blessings of",
@@ -70,9 +76,9 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   },
   hi: {
     relation: {
-      child: (p) => `संतान: ${p}`,
-      daughter: (p) => `सुपुत्री ${p}`,
-      son: (p) => `सुपुत्र ${p}`,
+      child: { lead: "संतान:", tail: "" },
+      daughter: { lead: "सुपुत्री", tail: "" },
+      son: { lead: "सुपुत्र", tail: "" },
     },
     titles: {
       blessingsFrom: "आशीर्वाद",
@@ -85,9 +91,9 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   },
   mr: {
     relation: {
-      child: (p) => `अपत्य: ${p}`,
-      daughter: (p) => `कन्या ${p}`,
-      son: (p) => `सुपुत्र ${p}`,
+      child: { lead: "अपत्य:", tail: "" },
+      daughter: { lead: "कन्या", tail: "" },
+      son: { lead: "सुपुत्र", tail: "" },
     },
     titles: {
       blessingsFrom: "आशीर्वाद",
@@ -100,9 +106,9 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   },
   gu: {
     relation: {
-      child: (p) => `સંતાન: ${p}`,
-      daughter: (p) => `સુપુત્રી ${p}`,
-      son: (p) => `સુપુત્ર ${p}`,
+      child: { lead: "સંતાન:", tail: "" },
+      daughter: { lead: "સુપુત્રી", tail: "" },
+      son: { lead: "સુપુત્ર", tail: "" },
     },
     titles: {
       blessingsFrom: "આશીર્વાદ",
@@ -115,9 +121,9 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   },
   bn: {
     relation: {
-      child: (p) => `${p}-এর সন্তান`,
-      daughter: (p) => `${p}-এর কন্যা`,
-      son: (p) => `${p}-এর পুত্র`,
+      child: { lead: "", tail: "-এর সন্তান" },
+      daughter: { lead: "", tail: "-এর কন্যা" },
+      son: { lead: "", tail: "-এর পুত্র" },
     },
     titles: {
       blessingsFrom: "আশীর্বাদে",
@@ -130,9 +136,9 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
   },
   ta: {
     relation: {
-      child: (p) => `${p} அவர்களின் அன்புப் பிள்ளை`,
-      daughter: (p) => `${p} அவர்களின் அன்பு மகள்`,
-      son: (p) => `${p} அவர்களின் அன்பு மகன்`,
+      child: { lead: "", tail: "அவர்களின் அன்புப் பிள்ளை" },
+      daughter: { lead: "", tail: "அவர்களின் அன்பு மகள்" },
+      son: { lead: "", tail: "அவர்களின் அன்பு மகன்" },
     },
     titles: {
       blessingsFrom: "ஆசீர்வாதத்துடன்",
@@ -144,6 +150,13 @@ export const FAMILY_WORDS: Record<CardLanguage, FamilyWords> = {
     contacts: "தொடர்புக்கு",
   },
 };
+
+/** "Son of Smt. Sunita & Shri Ramesh Patel", in the order the language puts it. */
+export function relationText(lead: string, tail: string, parents: string): string {
+  const before = lead ? `${lead} ${parents}` : parents;
+  if (!tail) return before;
+  return tail.startsWith("-") ? `${before}${tail}` : `${before} ${tail}`;
+}
 
 /** The order the family page reads in: blessings first, then each side, then the hosts. */
 const BEFORE_SIDES: readonly WordingId[] = ["blessingsFrom"];
@@ -183,9 +196,14 @@ export function familyBlocks({
     const who = parents.trim();
     if (!who) return [];
     const place = town.trim();
-    const text = words.relation[relation](place ? `${who}, ${place}` : who);
+    const { lead, tail } = words.relation[relation];
+    const text = relationText(lead, tail, place ? `${who}, ${place}` : who);
+    // The same words in parts, so a page can set the parents' names apart from "son of";
+    // a tail joined to the last name (Bengali) stays with the names
+    const joined = tail.startsWith("-");
+    const parts = { lead, names: joined ? `${who}${tail}` : who, tail: joined ? "" : tail, place };
     // A card led by one name (a birthday) still names the parents, under that name
-    return name.trim() ? [{ id: key, title: name.trim(), text, lang: language }] : [];
+    return name.trim() ? [{ id: key, title: name.trim(), text, parts, lang: language }] : [];
   };
   const memory = family.memory.trim();
   const contacts = family.contacts

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { storyBeats } from "@/lib/engine/story";
+import { familySplit, keepPeople, storyBeats } from "@/lib/engine/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import { familyBlocks, noFamily, type DraftFamily } from "./family";
@@ -88,5 +88,82 @@ describe("the family page", () => {
       family: blocks,
     });
     expect(beats.map((b) => b.id)).toEqual(["cover", "family", "family-more", "invite", "reply"]);
+  });
+
+  it("sets the parents apart from the words round them", () => {
+    const english = familyBlocks({
+      family,
+      wording: {},
+      names: ["Aarav", "Diya"],
+      pack: null,
+      language: "en",
+    });
+    expect(english[0]!.parts).toEqual({
+      lead: "Son of",
+      names: "Smt. Sunita & Shri Ramesh Patel",
+      tail: "",
+      place: "Ahmedabad",
+    });
+    // Bengali joins its words to the last name, so they stay with the names
+    const bengali = familyBlocks({
+      family,
+      wording: {},
+      names: ["Aarav", "Diya"],
+      pack: null,
+      language: "bn",
+    });
+    expect(bengali[0]!.parts).toMatchObject({ lead: "", tail: "" });
+    expect(bengali[0]!.parts!.names).toMatch(/^Smt\. Sunita & Shri Ramesh Patel-এর/);
+    expect(bengali[0]!.text).toBe("Smt. Sunita & Shri Ramesh Patel, Ahmedabad-এর পুত্র");
+  });
+
+  it("prints a side's parents on their own line on the page", () => {
+    const blocks = familyBlocks({
+      family,
+      wording: {},
+      names: ["Aarav", "Diya"],
+      pack: null,
+      language: "en",
+    });
+    const [, page] = storyBeats({
+      copy: {
+        doors: ["", ""],
+        blessing: "",
+        families: "",
+        first: "Aarav",
+        joiner: "&",
+        second: "Diya",
+        line: "",
+        date: "",
+        venue: "",
+      },
+      functions: [],
+      replies: true,
+      words: CARD_STORY_WORDS.en,
+      family: blocks.slice(0, 1),
+    });
+    expect(page!.lines).toEqual([
+      { text: "Aarav", style: "label", lang: "en" },
+      { text: "Son of", style: "small", lang: "en" },
+      // Each parent stays whole on a line; the page breaks between them
+      { text: "Smt.\u00a0Sunita &\u00a0Shri\u00a0Ramesh\u00a0Patel", style: "body", lang: "en" },
+      { text: "Ahmedabad", style: "small", lang: "en" },
+    ]);
+  });
+
+  it("splits a long family where the two pages hold the most even share", () => {
+    expect(familySplit([2, 4])).toBe(2);
+    expect(familySplit([2, 4, 4, 2, 2])).toBe(2);
+    expect(familySplit([4, 4, 2])).toBe(1);
+  });
+
+  it("keeps each parent's name whole, breaking before the &", () => {
+    expect(keepPeople("Smt. Asha & Shri Vijay Shah")).toBe(
+      "Smt.\u00a0Asha &\u00a0Shri\u00a0Vijay\u00a0Shah",
+    );
+    // A very long name keeps only its title with the first word
+    expect(keepPeople("Smt. Asha & Shri Rajendra Prasad Venkataraman Sharma")).toBe(
+      "Smt.\u00a0Asha &\u00a0Shri\u00a0Rajendra Prasad Venkataraman Sharma",
+    );
   });
 });

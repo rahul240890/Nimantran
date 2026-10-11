@@ -9,6 +9,7 @@ import type { GuestFunction } from "@/components/guest/guest-view";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
+import { FamilyWords, type FamilyBlock } from "@/components/guest/family-words";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
@@ -38,8 +39,6 @@ const useMounted = () =>
   );
 
 type Music = { playing: boolean; toggle: () => void };
-
-type FamilyBlock = { id: string; title: string; text: string };
 
 /**
  * The guest page below a painted theme's pages (Step 12q). Scrolling down, the guest lives
@@ -528,7 +527,11 @@ function Dusk({
                   <dt className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
                     {block.title}
                   </dt>
-                  <dd className="font-display text-xl break-words text-ink">{block.text}</dd>
+                  <FamilyWords
+                    block={block}
+                    className="font-display text-xl text-ink"
+                    soft="text-ink-muted"
+                  />
                 </div>
               ))}
             </dl>

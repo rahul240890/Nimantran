@@ -291,7 +291,11 @@ export function lineSpace(beat: StoryBeat, index: number, symbol: boolean): numb
   if (index === ruleAt(beat)) return 2.2;
   const role = roleOf(beat, beat.lines[index]!.style);
   if (index === 0) return symbol ? spaceBefore(role, "display") : 0;
-  return spaceBefore(role, roleOf(beat, beat.lines[index - 1]!.style));
+  const previous = roleOf(beat, beat.lines[index - 1]!.style);
+  // On the family page "Son of", the parents' names and their town read as one group
+  const pair = new Set([role, previous]);
+  if (beat.scene === "family" && pair.has("small") && pair.has("body")) return 0.5;
+  return spaceBefore(role, previous);
 }
 
 /**
