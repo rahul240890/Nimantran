@@ -180,7 +180,9 @@ test.describe("event pages", () => {
         beats.push((await story.getAttribute("data-story-beat"))!);
         const next = page.getByRole("button", { name: "Next page", exact: true });
         if ((await next.count()) === 0) break;
-        await next.click();
+        // Next stays out of sight on a phone until the keyboard reaches it
+        await next.focus();
+        await page.keyboard.press("Enter");
       }
       expect(beats).toEqual([
         "cover",
@@ -219,7 +221,7 @@ test.describe("event pages", () => {
     const story = page.locator("[data-story-beat]");
     await expect(story).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: "Pause the pages" }).click();
-    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    await page.keyboard.press("ArrowRight");
     await expect(story).toHaveAttribute("data-story-beat", "couple");
     const photos = story.locator(
       '[data-page="couple"] img[src*="/suites/kayal/"], [data-page="couple"] img[src*="/suites/rajbari/"]',
@@ -282,7 +284,11 @@ test.describe("event pages", () => {
     await expect(page.getByRole("button", { name: "Pause the pages" })).toHaveCount(0);
     await page.waitForTimeout(6_000);
     await expect(story).toHaveAttribute("data-story-beat", first!);
-    await page.getByRole("button", { name: "Next page", exact: true }).click();
+    // In still mode Next shows at the page's edge, for a tap or a click
+    const nextButton = page.getByRole("button", { name: "Next page", exact: true });
+    await expect(nextButton).toHaveCSS("opacity", "1");
+    const at = (await nextButton.boundingBox())!;
+    await page.mouse.click(at.x + at.width / 2, at.y + at.height / 2);
     await expect(story).not.toHaveAttribute("data-story-beat", first!);
     expect((await axe(page).analyze()).violations).toEqual([]);
   });

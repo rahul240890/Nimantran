@@ -107,7 +107,7 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
     test(`${suite} as One Scene, ${colorScheme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
       await page.goto(`/engine/guest?suite=${suite}&format=scene&photos=2`);
-      // A Scene opens at a painted gate too, unless the host chose to go straight in
+      // A Scene opens behind the wedding's painted gate too, unless the host chose to go straight in
       await expect(page.locator("[data-opening]")).toHaveAttribute("data-opening", "rajwada-pol");
       await page.getByRole("button", { name: "Open the invitation" }).click();
       const scene = page.locator("section[data-scene-mood]");

@@ -5,6 +5,7 @@ import {
   Copy,
   Download,
   ExternalLink,
+  Eye,
   Link2Off,
   MessageCircle,
   Pencil,
@@ -206,6 +207,12 @@ export function SharePanel({
               </div>
             </div>
             <p className="text-sm text-ink-muted">{shareCopy.previewNote}</p>
+            <Button asChild variant="secondary" className="self-start">
+              <Link href={`/invites/${inviteId}/preview`}>
+                <Eye aria-hidden />
+                {shareCopy.guestView}
+              </Link>
+            </Button>
           </section>
 
           <Card className="gap-4 p-5 sm:p-6">
