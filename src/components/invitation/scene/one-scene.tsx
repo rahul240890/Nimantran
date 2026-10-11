@@ -177,7 +177,7 @@ export type OneSceneProps = {
   photos: readonly StoryPhoto[];
   /** Above the painting: the guest's greeting, the card's language. */
   header?: ReactNode;
-  /** Beside the slot's arrows: the music button. */
+  /** Beside the pause button over the scene: the music button. */
   extra?: ReactNode;
   reply: { href: string; label: string } | null;
   /** Where "All the details" scrolls to; left out, there is no link. */
@@ -299,12 +299,20 @@ export function OneScene({
     [count, shown],
   );
 
+  // Once every function has had its turn, the way to reply stays in view
+  const [rounded, setRounded] = useState(false);
   // The next function comes in after each one has had its time
   useEffect(() => {
     if (!playing) return;
-    const timer = window.setTimeout(() => go(index + 1), SCENE_HOLD_MS);
+    const timer = window.setTimeout(() => {
+      if (index + 1 >= count) setRounded(true);
+      go(index + 1);
+    }, SCENE_HOLD_MS);
     return () => window.clearTimeout(timer);
-  }, [playing, index, go]);
+  }, [playing, index, count, go]);
+
+  // A swipe across the scene moves to the next or last function; the tap it ends in is ignored
+  const swipe = useRef<{ x: number; y: number; swiped: boolean } | null>(null);
 
   // The one pushed out is gone once its way out is over
   useEffect(() => {
@@ -343,17 +351,50 @@ export function OneScene({
     },
   });
 
+  // While the scene plays only the painting and a few small buttons show; the reply and
+  // details come in when it pauses, once every function has had its turn, or in still mode
+  const actions = !still && (reply || detailsHref) && (!playing || rounded || count < 2);
+  const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
+
   return (
     <section
       data-suite={suite}
       data-mood={light.mood}
       data-scene-mood={light.mood}
       className={cn(
-        "relative isolate flex flex-col overflow-hidden bg-card-ink",
+        "relative isolate overflow-hidden bg-card-ink select-none",
         framed ? "h-full" : "h-dvh min-h-[34rem]",
         className,
       )}
       style={miniature ? ({ "--scene-floor": 0 } as CSSProperties) : undefined}
+      onPointerDown={
+        still || count < 2
+          ? undefined
+          : (event) => {
+              swipe.current = { x: event.clientX, y: event.clientY, swiped: false };
+            }
+      }
+      onPointerUp={
+        still || count < 2
+          ? undefined
+          : (event) => {
+              const start = swipe.current;
+              if (!start) return;
+              const dx = event.clientX - start.x;
+              const dy = event.clientY - start.y;
+              if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
+                start.swiped = true;
+                // Swiping left brings the next function (reversed right to left)
+                go(dx < 0 !== rtl ? index + 1 : index - 1);
+              }
+            }
+      }
+      onClickCapture={(event) => {
+        if (!swipe.current?.swiped) return;
+        swipe.current = null;
+        event.stopPropagation();
+        event.preventDefault();
+      }}
     >
       {/* The painting again, blurred, fills whatever the painting's own shape leaves */}
       {/* eslint-disable-next-line @next/next/no-img-element -- a blurred fill, not content */}
@@ -363,17 +404,14 @@ export function OneScene({
         aria-hidden
         className="absolute inset-0 -z-10 size-full scale-110 object-cover opacity-80 blur-2xl"
       />
-      {header && (
-        <div className="relative z-10 flex shrink-0 flex-col items-center gap-2 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-1">
-          {header}
-        </div>
-      )}
 
-      <div className="[container-type:size] relative min-h-0 flex-1">
+      {/* The painting fills the screen's height; on a narrow phone it also reaches both
+          edges, letting a sliver of its sides (never the words' boxes) fall outside */}
+      <div className="[container-type:size] absolute inset-0">
         <div
           className="scene-painting [container-type:size] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
           style={{
-            width: `min(100cqw, calc(100cqh * ${PAINTING_ASPECT}))`,
+            width: `min(calc(100cqh * ${PAINTING_ASPECT}), calc(100cqw * ${SIDE_BLEED}))`,
             aspectRatio: String(PAINTING_ASPECT),
           }}
         >
@@ -548,72 +586,111 @@ export function OneScene({
               : ""}
           </p>
         </div>
-      </div>
 
-      <div className="relative z-10 flex shrink-0 flex-col items-center gap-2 px-3 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
-        {!still && (count > 1 || shownFn?.mapsUrl || extra) && (
-          <div className="flex items-center gap-1 rounded-full bg-card-ivory/85 px-1 text-card-ink shadow-raised backdrop-blur">
-            {count > 1 && (
-              <>
-                <SceneButton label={words.previous} onClick={() => go(index - 1)}>
-                  <ChevronLeft aria-hidden />
-                </SceneButton>
-                <span aria-hidden className="flex items-center gap-1.5 px-1">
+        {/* The controls keep to the painting's own column, and to the screen on a phone */}
+        <div
+          className="pointer-events-none absolute inset-y-0 left-1/2 z-10 -translate-x-1/2"
+          style={{ width: `min(calc(100cqh * ${PAINTING_ASPECT}), 100cqw)` }}
+        >
+          {!still && (
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex flex-col items-center gap-2 bg-linear-to-b from-night/35 to-transparent px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-6">
+              {/* One bar per function, filling as each has its turn */}
+              {count > 1 && (
+                <span aria-hidden className="flex w-full gap-1">
                   {items.map((_, i) => (
                     <span
                       key={i}
-                      className={cn(
-                        "h-1.5 rounded-full transition-[width,background-color] duration-300",
-                        i === index ? "w-4 bg-card-accent-text" : "w-1.5 bg-card-ink-muted/50",
+                      className="h-1 flex-1 overflow-hidden rounded-full bg-card-ivory/40 shadow-raised"
+                    >
+                      {(i < index || (rounded && i !== index)) && (
+                        <span className="block h-full w-full bg-card-gold" />
                       )}
-                    />
+                      {i === index && (
+                        <span
+                          key={`${shown.turn}-${playing}`}
+                          className={cn(
+                            "block h-full w-full bg-card-gold",
+                            playing && "story-progress",
+                          )}
+                          style={{ "--story-duration": `${SCENE_HOLD_MS}ms` } as CSSProperties}
+                        />
+                      )}
+                    </span>
                   ))}
                 </span>
-                <SceneButton label={words.next} onClick={() => go(index + 1)}>
-                  <ChevronRight aria-hidden />
-                </SceneButton>
-                {!reduced && (
-                  <SceneButton
-                    label={playing ? words.pause : words.play}
-                    pressed={!playing}
-                    onClick={() => setHeld((h) => !h)}
-                  >
-                    {playing ? <Pause aria-hidden /> : <Play aria-hidden />}
-                  </SceneButton>
-                )}
-              </>
-            )}
-            {shownFn?.mapsUrl && (
-              <a
-                href={shownFn.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={`${guestCopy.directions}: ${shownFn.name}`}
-                title={guestCopy.directions}
-                className="inline-flex size-11 items-center justify-center rounded-full transition-colors hover:bg-card-ink/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring [&_svg]:size-5"
-              >
-                <Navigation aria-hidden />
-              </a>
-            )}
-            {extra}
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          {reply && (
-            <Button asChild size="sm">
-              <a href={reply.href}>
-                <MailCheck aria-hidden />
-                {reply.label}
-              </a>
-            </Button>
+              )}
+              {(shownFn?.mapsUrl || extra || (count > 1 && !reduced)) && (
+                <div className="pointer-events-auto flex items-center gap-1 self-end">
+                  {shownFn?.mapsUrl && (
+                    <a
+                      href={shownFn.mapsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${guestCopy.directions}: ${shownFn.name}`}
+                      title={guestCopy.directions}
+                      className={SCENE_GLASS}
+                    >
+                      <Navigation aria-hidden />
+                    </a>
+                  )}
+                  {extra}
+                  {count > 1 && !reduced && (
+                    <SceneButton
+                      label={playing ? words.pause : words.play}
+                      pressed={!playing}
+                      onClick={() => setHeld((h) => !h)}
+                    >
+                      {playing ? <Pause aria-hidden /> : <Play aria-hidden />}
+                    </SceneButton>
+                  )}
+                </div>
+              )}
+              {header && (
+                <div className="pointer-events-auto flex flex-col items-center gap-2">{header}</div>
+              )}
+            </div>
           )}
-          {detailsHref && (
-            <Button asChild variant="secondary" size="sm">
-              <a href={detailsHref}>
-                <ChevronDown aria-hidden />
-                {words.details}
-              </a>
-            </Button>
+
+          {/* Back and Next at the edges: for the keyboard, and always in still mode */}
+          {!still && count > 1 && (
+            <>
+              <SceneArrow
+                side="start"
+                label={words.previous}
+                shown={reduced}
+                beside={!framed}
+                onClick={() => go(index - 1)}
+              />
+              <SceneArrow
+                side="end"
+                label={words.next}
+                shown={reduced}
+                beside={!framed}
+                onClick={() => go(index + 1)}
+              />
+            </>
+          )}
+
+          {actions && (
+            <div className="pointer-events-auto absolute inset-x-0 bottom-0 flex animate-fade-in flex-wrap items-center justify-center gap-2 bg-linear-to-t from-night/60 via-night/30 to-transparent px-3 pt-12 pb-[max(0.75rem,env(safe-area-inset-bottom))] motion-still:animate-none">
+              {reply && (
+                <Button asChild size="sm">
+                  <a href={reply.href}>
+                    <MailCheck aria-hidden />
+                    {reply.label}
+                  </a>
+                </Button>
+              )}
+              {detailsHref && (
+                <a
+                  href={detailsHref}
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm text-card-ivory underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  {words.details}
+                  <ChevronDown aria-hidden className="size-4" />
+                </a>
+              )}
+            </div>
           )}
         </div>
       </div>
@@ -674,7 +751,55 @@ function SlotHolder({
   );
 }
 
-/** A round 44px button on the scene's control bar. */
+/** The scene's small round glass buttons, so the painting stays the picture. */
+const SCENE_GLASS =
+  "inline-flex size-11 cursor-pointer items-center justify-center rounded-full bg-night/35 text-card-ivory backdrop-blur-sm transition-colors hover:bg-night/55 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring [&_svg]:size-5";
+
+/**
+ * How much wider than the screen a narrow phone may set the painting so it also fills the
+ * height: up to 7% of it falls outside each side, clear of every words' box (8% in).
+ */
+const SIDE_BLEED = 1 / 0.86;
+
+/** Back or Next at the scene's edge: out of sight until the keyboard reaches it, unless `shown`. */
+function SceneArrow({
+  side,
+  label,
+  shown,
+  beside,
+  onClick,
+}: {
+  side: "start" | "end";
+  label: string;
+  shown: boolean;
+  /** The scene fills the screen, so a wide one has room beside it. */
+  beside: boolean;
+  onClick: () => void;
+}) {
+  const Icon = side === "start" ? ChevronLeft : ChevronRight;
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      onClick={onClick}
+      className={cn(
+        SCENE_GLASS,
+        "absolute top-1/2 -translate-y-1/2",
+        side === "start" ? "start-2" : "end-2",
+        shown
+          ? "pointer-events-auto"
+          : "pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100",
+        // On a wide screen they sit beside the painting, in plain sight
+        beside && side === "start" && "lg:pointer-events-auto lg:-start-16 lg:opacity-100",
+        beside && side === "end" && "lg:pointer-events-auto lg:-end-16 lg:opacity-100",
+      )}
+    >
+      <Icon aria-hidden className="rtl:rotate-180" />
+    </button>
+  );
+}
+
+/** A round 44px glass button over the scene. */
 export function SceneButton({
   label,
   pressed,
@@ -692,7 +817,7 @@ export function SceneButton({
       aria-label={label}
       aria-pressed={pressed}
       onClick={onClick}
-      className="inline-flex size-11 cursor-pointer items-center justify-center rounded-full transition-colors hover:bg-card-ink/10 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-ring [&_svg]:size-5"
+      className={SCENE_GLASS}
     >
       {children}
     </button>
