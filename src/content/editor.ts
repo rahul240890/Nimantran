@@ -1821,6 +1821,110 @@ export const openingCopy = {
       name: "Fair tent",
       description: "Striped tent flaps lift onto balloons, a carousel and a big cake.",
     },
+    pankhi: {
+      name: "Painted fan",
+      description:
+        "A silk hand fan of lotuses and parrots folds shut onto a lantern-lit palace terrace.",
+    },
+    "sheesh-mahal": {
+      name: "Mirror palace",
+      description: "A wall of tiny mirrors turns like louvres onto a candle-lit sheesh mahal.",
+    },
+    "popup-mahal": {
+      name: "Pop-up palace",
+      description: "A cut-paper lake palace stands up like a pop-up book, then you step inside.",
+    },
+    odhni: {
+      name: "Bridal veil",
+      description:
+        "A red bandhani odhni ripples in the breeze, then lifts away onto a moonlit courtyard.",
+    },
+    "kavad-peti": {
+      name: "Story box",
+      description: "A painted Mewar kavad unfolds twice, onto a garden pavilion at golden hour.",
+    },
+    "chhatri-utsav": {
+      name: "Royal parasol",
+      description: "An embroidered parasol turns overhead, then spins up into the sky.",
+    },
+    "jal-darpan": {
+      name: "Still lake",
+      description: "Ripples spread from a floating diya and the lake opens onto a lamp-lit ghat.",
+    },
+    "pushp-varsha": {
+      name: "Petal shower",
+      description: "A wall of rose petals comes apart in a whirl onto the varmala stage.",
+    },
+    "moti-seep": {
+      name: "Pearl shell",
+      description: "A great shell lifts its lid on a glowing pearl, onto a beach pavilion.",
+    },
+    "badal-raag": {
+      name: "Monsoon clouds",
+      description: "Rain clouds part, sun breaks through and a rainbow draws itself over a palace.",
+    },
+    "jugnu-van": {
+      name: "Firefly forest",
+      description:
+        "Fireflies gather round your names, then burst as the forest parts onto a lit banyan.",
+    },
+    "uday-surya": {
+      name: "Sunrise",
+      description: "The sun rises over the hills and they sink away onto your new home.",
+    },
+    taaramandal: {
+      name: "Constellation",
+      description:
+        "Stars join in gold round your names, then you fly through them to the observatory.",
+    },
+    "thar-ki-ret": {
+      name: "Desert sands",
+      description: "A wind sweeps the dunes away onto a fort camp under lanterns.",
+    },
+    "sheher-ki-raat": {
+      name: "City lights",
+      description: "The city's windows wake one by one, then the whole skyline lights up.",
+    },
+    "choodi-chakra": {
+      name: "Bangle rings",
+      description: "Rings of glass bangles turn round your names, then spread like ripples.",
+    },
+    "sanjhi-roshni": {
+      name: "Sanjhi lantern",
+      description: "A lamp glows through a cut-paper stencil, then the sheet turns like a page.",
+    },
+    "chhaya-parda": {
+      name: "Shadow screen",
+      description: "Puppet shadows sway on a lamp-lit screen, then it rolls up onto the stage.",
+    },
+    "athangudi-tiles": {
+      name: "Chettinad tiles",
+      description: "Glossy Athangudi tiles turn over in a wave onto a Chettinad courtyard.",
+    },
+    "gulaal-bindu": {
+      name: "Colour drops",
+      description: "Drops of gulaal bloom across the paper into a bright Holi courtyard.",
+    },
+    bioscope: {
+      name: "Bioscope",
+      description: "A kaleidoscope turns in an old bioscope's lens, then the lens opens round you.",
+    },
+    "kaanch-ka-gola": {
+      name: "Snow globe",
+      description: "Snow falls in a globe; it shakes and you fall into the winter village.",
+    },
+    phirki: {
+      name: "Paper pinwheel",
+      description: "A folded paper square opens flap by flap onto a village fair.",
+    },
+    bulbule: {
+      name: "Soap bubbles",
+      description: "A big bubble wobbles round your names, then pops onto a garden party.",
+    },
+    "chhuk-chhuk": {
+      name: "Toy train",
+      description: "A little steam train puffs past, and the steam clears onto a party station.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",
@@ -1903,6 +2007,10 @@ export const openingCopy = {
     },
   },
   groups: {
+    fresh: "Fresh openings",
+    skies: "Skies and nature",
+    crafts: "Crafts and colour",
+    play: "Fun and playful",
     painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",

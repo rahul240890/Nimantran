@@ -19,11 +19,15 @@ import {
   Storybook,
 } from "./opening-art-more";
 import {
+  FRESH_OPENINGS,
   GOD_PAINTINGS,
+  isFreshOpening,
   isPaintedGate,
+  type FreshOpening,
   type OpeningGod,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
+import { FreshOpeningArt } from "./opening-fresh";
 import { PaintedGateArt } from "./opening-gate";
 
 /*
@@ -44,6 +48,10 @@ export const OPENING_LAYOUT: Record<OpeningStyle, { crest: number; gap: number }
   "deco-gates": { crest: 22, gap: 0 },
   "bagiya-gate": { crest: 22, gap: 0 },
   "mela-tamboo": { crest: 22, gap: 0 },
+  ...(Object.fromEntries(FRESH_OPENINGS.map((id) => [id, { crest: 22, gap: 0 }])) as Record<
+    FreshOpening,
+    { crest: number; gap: number }
+  >),
   doors: { crest: 22, gap: 0 },
   palace: { crest: 23, gap: 3 },
   temple: { crest: 24, gap: 4 },
@@ -528,6 +536,7 @@ export function OpeningArt({
   sample?: boolean;
 }): ReactNode {
   if (isPaintedGate(style)) return <PaintedGateArt gate={style} sample={sample} />;
+  if (isFreshOpening(style)) return <FreshOpeningArt id={style} sample={sample} />;
   switch (style) {
     case "doors":
       return cover ? <CoverDoors cover={cover} /> : <Palace />;

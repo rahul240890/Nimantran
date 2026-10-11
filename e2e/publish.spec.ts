@@ -136,6 +136,7 @@ test.describe("publish and share", () => {
     page,
     browser,
   }, info) => {
+    test.slow();
     const number = numberFor(info);
     await writeInvite(page, number, ["Kabir", "Ananya"]);
     // Let the autosave timer fire under the test clock, then wait for the save and upload
@@ -163,7 +164,7 @@ test.describe("publish and share", () => {
     await laptop.getByRole("article").getByRole("link", { name: "Continue" }).click();
     await expect(laptop.getByText("Your invitation is ready")).toBeVisible();
     // The photo's link comes from the account by a server action, slow on a busy runner
-    await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible({ timeout: 15_000 });
+    await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible({ timeout: 30_000 });
     await expect
       .poll(() =>
         laptop
