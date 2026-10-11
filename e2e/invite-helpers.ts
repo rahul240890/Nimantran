@@ -104,13 +104,19 @@ export async function openPublish(page: Page) {
     }
     await expect(dialog).toBeVisible({ timeout: 5_000 });
   }).toPass({ timeout: 60_000 });
+  // Back from the packages, the editor reopens the invite and then the dialog, once
+  await expect(page).not.toHaveURL(/[?&]invite=/);
+  await expect(dialog).toBeVisible();
   return dialog;
 }
 
 /** Publishes the invite open in the editor under a unique link; ends on the share page. */
 export async function publish(page: Page, base: string): Promise<string> {
   const dialog = await openPublish(page);
-  await dialog.getByRole("textbox", { name: /Invitation link/ }).fill(`${base}-${Date.now()}`);
+  const link = dialog.getByRole("textbox", { name: /Invitation link/ });
+  const wanted = `${base}-${Date.now()}`;
+  await link.fill(wanted);
+  await expect(link).toHaveValue(wanted);
   await expect(dialog.getByText("This link is free.")).toBeVisible();
   await dialog.getByRole("button", { name: "Publish invitation" }).click();
   await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);
