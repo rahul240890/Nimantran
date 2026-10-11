@@ -43,9 +43,10 @@ export type SceneTimeline = {
 
 /**
  * Times `count` cards so the whole video, closing card included, is 30 to 45 seconds; with
- * more cards than fit there at a readable pace, up to a minute.
+ * more cards than fit there at a readable pace, up to a minute, `lead` seconds of opening
+ * included.
  */
-export function sceneTimeline(count: number): SceneTimeline {
+export function sceneTimeline(count: number, lead = 0): SceneTimeline {
   if (count < 1) {
     const end = VIDEO_MIN_SECONDS - END_SECONDS;
     return { shots: [], end, total: VIDEO_MIN_SECONDS };
@@ -55,7 +56,8 @@ export function sceneTimeline(count: number): SceneTimeline {
   let rounds = 1;
   let hold = SCENE_HOLD;
   if (count * hold > most) {
-    const longest = VIDEO_LONGEST_SECONDS - END_SECONDS - SCENE_INTRO;
+    // The opening before the scene (`lead` seconds) counts towards the minute
+    const longest = VIDEO_LONGEST_SECONDS - END_SECONDS - SCENE_INTRO - lead;
     hold = Math.max(most / count, Math.min(SCENE_HOLD_MIN, longest / count));
   } else if (count * hold < least) {
     // Stretch each card, up to a point; past it the cards come round again

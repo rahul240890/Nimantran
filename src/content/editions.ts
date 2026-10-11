@@ -32,7 +32,7 @@ export const planCopy = {
     bestFor: "Most weddings and big birthdays",
     highlights: [
       "Everything in Basic",
-      "A video for WhatsApp Status and Instagram Reels",
+      "An invitation video to share anywhere",
       "2 card languages",
       "Your own song",
       "Guest photo wall for 30 days",

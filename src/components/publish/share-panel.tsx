@@ -38,7 +38,7 @@ type SharePanelProps = {
   qr: string;
   /** Guests' replies so far, drawn on the server. */
   replies?: ReactNode;
-  /** The video for WhatsApp Status and Reels (Step 17c). */
+  /** The invitation video (Step 17c). */
   video?: ReactNode;
 };
 

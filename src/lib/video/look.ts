@@ -64,6 +64,74 @@ export function paletteReader(suite: SuiteId, template: Template) {
   };
 }
 
+/** The opening's colours (globals.css, "Openings"): the theme's jewel, gilt, light and plate. */
+export type OpeningPalette = Record<
+  | "jewel"
+  | "gilt"
+  | "giltBright"
+  | "giltDark"
+  | "light"
+  | "plate"
+  | "deep"
+  | "petal"
+  | "petalFall"
+  | "marigold"
+  | "ink"
+  | "inkMuted"
+  | "accentText"
+  | "ivory"
+  | "wood"
+  | "woodDark",
+  string
+>;
+
+const OPENING_TOKENS: Record<keyof OpeningPalette, string> = {
+  jewel: "var(--open-jewel)",
+  gilt: "var(--open-gilt)",
+  giltBright: "var(--open-gilt-bright)",
+  giltDark: "var(--open-gilt-dark)",
+  light: "var(--open-light)",
+  plate: "var(--open-plate)",
+  deep: "var(--open-deep)",
+  petal: "var(--open-petal)",
+  petalFall: "var(--open-petal-fall)",
+  marigold: "var(--marigold)",
+  ink: "var(--card-ink)",
+  inkMuted: "var(--card-ink-muted)",
+  accentText: "var(--card-accent-text)",
+  ivory: "var(--card-ivory)",
+  wood: "var(--open-wood)",
+  woodDark: "var(--open-wood-dark)",
+};
+
+/** Reads the opening's colours for a theme, as the guest's first screen resolves them. */
+export function openingPalette(suite: SuiteId, template: Template, style: string): OpeningPalette {
+  const root = document.createElement("div");
+  root.dataset.suite = suite;
+  root.dataset.opening = style;
+  root.setAttribute("aria-hidden", "true");
+  root.style.cssText = "position:fixed;left:-9999px;top:0;width:1px;height:1px;overflow:hidden;";
+  if (SUITES[suite].art === "card") {
+    for (const [name, value] of Object.entries(stockStyle(template))) {
+      root.style.setProperty(name, String(value));
+    }
+  }
+  const probes = (Object.entries(OPENING_TOKENS) as [keyof OpeningPalette, string][]).map(
+    ([name, token]) => {
+      const probe = document.createElement("span");
+      probe.style.transition = "none";
+      probe.style.color = token;
+      root.append(probe);
+      return [name, probe] as const;
+    },
+  );
+  document.body.append(root);
+  const palette = {} as OpeningPalette;
+  for (const [name, probe] of probes) palette[name] = toRgb(getComputedStyle(probe).color);
+  root.remove();
+  return palette;
+}
+
 let pixel: CanvasRenderingContext2D | null = null;
 
 /** Any CSS colour (oklab from a color-mix, say) as rgb(), which the drawing code can fade. */

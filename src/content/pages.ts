@@ -11,7 +11,7 @@ export const pricingPageCopy = {
   eyebrow: "Pricing",
   heading: "One price per invitation. No subscription.",
   intro:
-    "Make your invitation and share it free. When you want no watermark, the WhatsApp video or more invites, choose a package for that one invitation.",
+    "Make your invitation and share it free. When you want no watermark, the invitation video or more invites, choose a package for that one invitation.",
   editionsHeading: "Packages",
   editionsIntro:
     "Basic is your design's own price. Celebration and Grand add a fixed amount on top. The prices below are for a Premium design.",
@@ -40,7 +40,7 @@ export const pricingPageCopy = {
     },
     {
       q: "Which package do I need for a wedding?",
-      a: "Every package covers every function. Most families choose Celebration for the WhatsApp video and more invites; Grand adds unlimited invites and a video for every function.",
+      a: "Every package covers every function. Most families choose Celebration for the invitation video and more invites; Grand adds unlimited invites and a video for every function.",
     },
     {
       q: "Do guests pay anything?",

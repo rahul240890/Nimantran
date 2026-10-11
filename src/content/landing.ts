@@ -199,7 +199,7 @@ export const pricing = {
     badge: "Best for weddings",
     points: [
       "Basic: your design, with no watermark",
-      "Celebration: the WhatsApp Status and Reels video, and more invites",
+      "Celebration: the invitation video, and more invites",
       "Grand: unlimited invites, and a video for every function",
     ],
   },

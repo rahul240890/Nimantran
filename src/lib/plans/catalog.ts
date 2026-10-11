@@ -23,7 +23,7 @@ export type PaidPlanId = Exclude<PlanId, "free">;
 /** The packages, in the order the checkout shows them. */
 export const PAID_PLAN_IDS = ["basic", "celebration", "grand"] as const satisfies PaidPlanId[];
 
-/** How many videos for WhatsApp Status and Reels: none, one of the whole invite, or one per function too. */
+/** How many invitation videos: none, one of the whole invite, or one per function too. */
 export type VideoAllowance = "none" | "one" | "every";
 
 export type Plan = {
@@ -34,7 +34,7 @@ export type Plan = {
   languages: number;
   /** The host's own song instead of the design's raga. */
   ownSong: boolean;
-  /** The story as an MP4 for WhatsApp Status and Reels (Step 17c). */
+  /** The invitation video, an MP4 to share anywhere (Step 17c). */
   video: VideoAllowance;
   /** Days the guest photo wall stays open after the last function (Step 24); 0 for none. */
   albumDays: number;

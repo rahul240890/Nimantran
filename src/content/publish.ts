@@ -213,15 +213,17 @@ export const repliesCopy = {
 } as const;
 
 export const videoCopy = {
-  heading: "Video for WhatsApp Status and Reels",
-  body: "Your invitation's pages as a 30 to 45 second vertical video with its raga, up to a minute when there are many functions. It's made on this phone or computer, so nothing is uploaded.",
-  poster: "The video's first page",
+  heading: "Invitation video",
+  body: "Your invitation as a vertical video with its raga: the opening as guests see it, the welcome with your names, then every page. Share it on WhatsApp, Instagram or anywhere else. It's made on this phone or computer, so nothing is uploaded, and it stays here when you come back.",
+  poster: "The video's first moment",
   music: "With the raga",
   make: "Make video",
   making: (percent: number) => `Making your video: ${percent}%`,
   stop: "Stop",
   stopped: "Video stopped",
   ready: "Your video is ready",
+  changed:
+    "Your invitation has changed since this video was made. Make it again to include the changes.",
   player: (names: string) => `Video invitation for ${names}`,
   share: "Share video",
   download: "Download MP4",
