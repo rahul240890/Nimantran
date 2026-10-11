@@ -6,15 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
-import { Languages } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { slotLabels } from "@/content/templates-review";
 import {
   cardLanguages,
   COUPLE_SLOTS,
+  NAME_SLOTS,
   draftPeople,
   coupleValue,
-  draftCopy,
   type CardLanguage,
 } from "@/lib/editor/draft";
 import {
@@ -31,16 +30,15 @@ import { defaultType } from "@/lib/editor/type";
 import { isLatinName, type ScriptLanguage } from "@/lib/names/transliterate";
 import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
-import { FamilySection } from "./family-section";
+import { CardLanguagePicker } from "./language-step";
 import { Fold } from "./fold";
 import { Ideas } from "./ideas";
+import { cn } from "@/lib/cn";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
-const NAME_SLOTS: readonly SlotId[] = ["first", "joiner", "second"];
-
 /** What a slot shows on a card, for the second language's placeholders. */
-function shownOn(copy: CardCopy, id: SlotId): string {
+export function shownOn(copy: CardCopy, id: SlotId): string {
   if (id === "doorLeft") return copy.doors[0];
   if (id === "doorRight") return copy.doors[1];
   if (id === "date" || id === "venue") return "";
@@ -108,7 +106,7 @@ function ScriptChoices({
   );
 }
 
-function SlotField({
+export function SlotField({
   id,
   template,
   value,
@@ -180,8 +178,9 @@ function SlotField({
   );
 }
 
-export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
-  const { coupleCopy, namesCopy, studioCopy } = useText(editorText);
+/** The names in a card's language, for the second language's fields too. */
+export function useNames(draft: StepProps["draft"]) {
+  const { namesCopy } = useText(editorText);
   const template = TEMPLATES[draft.templateId];
   const used = new Set(slotsOf(template));
   // A birthday or a party is led by one name: no second name and nothing to join them
@@ -190,61 +189,62 @@ export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
       ? (namesCopy.one[draft.categoryId as keyof typeof namesCopy.one] ?? null)
       : null;
   const names = (one ? ["first" as const] : NAME_SLOTS).filter((id) => used.has(id));
-  // The names and the word between them stay together; of the other lines, the ones most
-  // cards change stay in view and the rest fold under "More card words"
-  const wording = COUPLE_SLOTS.filter((id) => used.has(id) && !NAME_SLOTS.includes(id));
-  const shown: SlotId[] = wording.filter((id) => id === "blessing" || id === "line");
-  const folded: SlotId[] = wording.filter((id) => !shown.includes(id));
+  // Every other line the design shows: the blessing and invitation line first
+  const wording = COUPLE_SLOTS.filter((id) => used.has(id) && !NAME_SLOTS.includes(id)).sort(
+    (a, b) => Number(b === "blessing" || b === "line") - Number(a === "blessing" || a === "line"),
+  );
+  return { template, one, names, wording };
+}
 
+/** Ready wording for a line in the given language, under its field. */
+export function lineIdeas(
+  draft: StepProps["draft"],
+  id: SlotId,
+  language: CardLanguage,
+  value: string,
+  pick: (v: string) => void,
+) {
+  return (SUGGESTED_SLOTS as readonly string[]).includes(id) ? (
+    <Ideas
+      field={slotLabels[id]}
+      ideas={cardSuggestions(draft.categoryId, language, id as SuggestedSlot).filter(
+        (idea) => idea.length <= SLOT_RULES[id].maxLength,
+      )}
+      value={value}
+      language={language}
+      onPick={pick}
+    />
+  ) : null;
+}
+
+/** The names section: the card's language, then the names in large letters. */
+export function CoupleStep({ draft, update, errors }: StepProps) {
+  const { coupleCopy, namesCopy } = useText(editorText);
+  const { template, one, names } = useNames(draft);
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
-
-  const [main, second] = cardLanguages(draft);
-  const secondCopy = second ? draftCopy(draft, second) : null;
-  const setTranslation = (id: SlotId, value: string) =>
-    update((current) => ({
-      ...current,
-      translation: { ...current.translation, [id]: value },
-    }));
+  const [main] = cardLanguages(draft);
 
   // A card in an Indian language suggests names in its own script, and says so when a name
   // is typed in English letters only, since guests will read it exactly as typed
   const ownSamples = main === "en" ? null : CARD_SAMPLES[main];
   const scriptNote = (id: SlotId): string | undefined => {
-    if (main === "en" || !NAME_SLOTS.includes(id)) return undefined;
+    if (main === "en" || id === "joiner") return undefined;
     const value = coupleValue(draft, template, id);
     return /[A-Za-z]/.test(value) && !/[^ -~]/.test(value)
       ? coupleCopy.latinOnCard(languageName(main))
       : undefined;
   };
 
-  const ideasFor = (
-    id: SlotId,
-    language: CardLanguage,
-    value: string,
-    pick: (v: string) => void,
-  ) =>
-    (SUGGESTED_SLOTS as readonly string[]).includes(id) ? (
-      <Ideas
-        field={slotLabels[id]}
-        ideas={cardSuggestions(draft.categoryId, language, id as SuggestedSlot).filter(
-          (idea) => idea.length <= SLOT_RULES[id].maxLength,
-        )}
-        value={value}
-        language={language}
-        onPick={pick}
-      />
-    ) : null;
-
   const field = (id: SlotId) => {
+    const value = coupleValue(draft, template, id);
     const slot = (
       <SlotField
-        key={id}
         id={id}
         template={template}
-        value={coupleValue(draft, template, id)}
+        value={value}
         error={errors[id]}
-        onChange={(value) => set(id, value)}
+        onChange={(next) => set(id, next)}
         {...(id === "first" && one
           ? { label: one.label, example: one.example, hint: namesCopy.oneHint }
           : {})}
@@ -252,103 +252,31 @@ export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
         {...(scriptNote(id) ? { hint: scriptNote(id) } : {})}
       />
     );
-    if (!NAME_SLOTS.includes(id) || id === "joiner") {
-      const ideas = ideasFor(id, main, coupleValue(draft, template, id), (value) => set(id, value));
-      return ideas ? (
+    if (id === "joiner") {
+      return (
         <div key={id} className="flex flex-col gap-2.5">
           {slot}
-          {ideas}
+          {lineIdeas(draft, id, main, value, (next) => set(id, next))}
         </div>
-      ) : (
-        slot
       );
     }
-    if (main === "en") return slot;
     return (
       <div key={id} className="flex flex-col gap-2">
         {slot}
-        <ScriptChoices
-          value={coupleValue(draft, template, id)}
-          language={main}
-          onPick={(name) => set(id, name)}
-        />
+        {main !== "en" && (
+          <ScriptChoices value={value} language={main} onPick={(name) => set(id, name)} />
+        )}
       </div>
     );
   };
-
-  const translatedField = (id: SlotId) => {
-    if (!second || !secondCopy) return null;
-    const slot = (
-      <SlotField
-        key={id}
-        id={id}
-        template={template}
-        value={draft.translation[id] ?? ""}
-        onChange={(value) => setTranslation(id, value)}
-        translation={{ language: second, placeholder: shownOn(secondCopy, id) }}
-        label={id === "first" && one ? one.label : undefined}
-      />
-    );
-    const ideas = NAME_SLOTS.includes(id)
-      ? null
-      : ideasFor(id, second, draft.translation[id] ?? "", (value) => setTranslation(id, value));
-    return ideas ? (
-      <div key={id} className="flex flex-col gap-2.5">
-        {slot}
-        {ideas}
-      </div>
-    ) : (
-      slot
-    );
-  };
-
-  const wordingGrid = (render: (id: SlotId) => ReactNode, ids: readonly SlotId[] = wording) => (
-    <div className="grid gap-5 sm:grid-cols-2">
-      {ids.map((id) => (
-        <div
-          key={id}
-          data-page-target={id === "line" || id === "families" ? "family" : "cover"}
-          className={id === "doorLeft" || id === "doorRight" ? undefined : "sm:col-span-2"}
-        >
-          {render(id)}
-        </div>
-      ))}
-    </div>
-  );
-
-  const languages = cardLanguages(draft);
-  const foldedFilled = folded.some((id) => draft.content[id] !== undefined);
-  const typeChanged = JSON.stringify(draft.type) !== JSON.stringify(defaultType);
 
   return (
     <div className="flex flex-col gap-8">
-      {/* The language was chosen a step back; it shows here with the way back to it */}
-      <p className="-mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
-        <Languages aria-hidden className="size-4 text-accent-text" />
-        <span>
-          {coupleCopy.cardIn}{" "}
-          <span className="font-semibold text-ink">
-            {languages.map((language, i) => (
-              <span key={language} lang={language}>
-                {i > 0 && " + "}
-                {languageName(language)}
-              </span>
-            ))}
-          </span>
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => goTo("language")}
-          className="-ms-2 text-accent-text"
-        >
-          {coupleCopy.changeLanguage}
-        </Button>
-      </p>
+      <CardLanguagePicker draft={draft} update={update} />
       <section
         aria-labelledby="names-heading"
         data-page-target="cover"
-        className="flex flex-col gap-5"
+        className="flex flex-col gap-5 border-t border-line pt-6"
       >
         <div className="flex flex-col gap-1">
           <h2 id="names-heading" className="font-display text-xl">
@@ -358,43 +286,52 @@ export function CoupleStep({ draft, update, errors, goTo }: StepProps) {
         </div>
         <div className="flex flex-col gap-5">{names.map(field)}</div>
       </section>
-      {shown.length > 0 && (
-        <section
-          aria-labelledby="wording-heading"
-          className="flex flex-col gap-5 border-t border-line pt-6"
-        >
-          <h2 id="wording-heading" className="font-display text-xl">
-            {coupleCopy.wordingHeading}
-          </h2>
-          {wordingGrid(field, shown)}
-        </section>
+    </div>
+  );
+}
+
+/**
+ * The card words section: every line the design shows besides the names, each starting
+ * with wording for the occasion, then how the letters look.
+ */
+export function WordsStep({ draft, update, errors }: StepProps) {
+  const { studioCopy } = useText(editorText);
+  const { template, wording } = useNames(draft);
+  const set = (id: SlotId, value: string) =>
+    update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
+  const [main] = cardLanguages(draft);
+  const ownSamples = main === "en" ? null : CARD_SAMPLES[main];
+  const typeChanged = JSON.stringify(draft.type) !== JSON.stringify(defaultType);
+
+  return (
+    <div className="flex flex-col gap-8">
+      {wording.length > 0 && (
+        <div className="grid gap-5 sm:grid-cols-2">
+          {wording.map((id) => {
+            const value = coupleValue(draft, template, id);
+            return (
+              <div
+                key={id}
+                data-page-target={id === "line" || id === "families" ? "family" : "cover"}
+                className={cn(
+                  "flex flex-col gap-2.5",
+                  id !== "doorLeft" && id !== "doorRight" && "sm:col-span-2",
+                )}
+              >
+                <SlotField
+                  id={id}
+                  template={template}
+                  value={value}
+                  error={errors[id]}
+                  onChange={(next) => set(id, next)}
+                  {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
+                />
+                {lineIdeas(draft, id, main, value, (next) => set(id, next))}
+              </div>
+            );
+          })}
+        </div>
       )}
-      {folded.length > 0 && (
-        <Fold
-          title={coupleCopy.moreWording}
-          intro={coupleCopy.moreWordingHint}
-          filled={foldedFilled}
-          pageTarget="cover"
-        >
-          {wordingGrid(field, folded)}
-        </Fold>
-      )}
-      {second && (
-        <section
-          aria-labelledby="second-heading"
-          className="flex flex-col gap-5 rounded-xl border border-line bg-surface-2/60 p-4 sm:p-6"
-        >
-          <div className="flex flex-col gap-1">
-            <h2 id="second-heading" className="font-display text-xl">
-              {coupleCopy.secondHeading(languageName(second))}
-            </h2>
-            <p className="text-sm text-ink-muted">{coupleCopy.secondHint(languageName(main))}</p>
-          </div>
-          <div className="flex flex-col gap-5">{names.map(translatedField)}</div>
-          {wording.length > 0 && wordingGrid(translatedField)}
-        </section>
-      )}
-      <FamilySection draft={draft} update={update} />
       <Fold
         title={studioCopy.lettering}
         intro={studioCopy.letteringIntro}

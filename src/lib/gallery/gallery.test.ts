@@ -173,9 +173,9 @@ describe("a design chosen in the gallery", () => {
       suite: "shahi-savari",
       template: "bandhani",
     });
-    // The card's language is asked next, set to the tradition's own
+    // The names come next, with the card in the tradition's own language
     expect(next).toMatchObject({
-      step: "language",
+      step: "couple",
       suite: "shahi-savari",
       templateId: "bandhani",
       languages: ["gu"],

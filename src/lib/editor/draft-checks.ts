@@ -36,7 +36,7 @@ import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { CARD_LANGUAGES } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { contentSchema } from "@/lib/templates/content-schema";
-import { RAGA_IDS, SLOT_IDS, TEMPLATE_IDS } from "@/lib/templates/ids";
+import { RAGA_IDS, SLOT_IDS, TEMPLATE_IDS, type SlotId } from "@/lib/templates/ids";
 import {
   INVOCATION_MODES,
   SYMBOL_IDS,
@@ -48,6 +48,7 @@ import {
   EDITOR_STEPS,
   FUNCTION_RULES,
   MAX_PHOTOS,
+  NAME_SLOTS,
   coupleValue,
   defaultFunctions,
   emptyFunction,
@@ -167,7 +168,13 @@ const pagesSchema = z.object({
 /** Saved drafts are read leniently: a bad field falls back to its default, never the whole draft. */
 export const draftSchema = z.object({
   version: z.literal(1),
-  step: z.enum(EDITOR_STEPS).catch("occasion"),
+  /** Drafts saved before the six detail sections stood on the language or extras step. */
+  step: z
+    .preprocess(
+      (value) => (value === "language" ? "couple" : value === "extras" ? "photos" : value),
+      z.enum(EDITOR_STEPS),
+    )
+    .catch("occasion"),
   /** Drafts saved before categories existed were weddings. */
   categoryId: z.enum(CATEGORY_IDS as [CategoryId, ...CategoryId[]]).catch("wedding"),
   templateId: z.enum(TEMPLATE_IDS).catch("marigold"),
@@ -247,7 +254,7 @@ export type StepErrors = Record<string, "required" | "too-long" | "no-functions"
 /** What stops the host moving past a step. Keys are field ids (slot ids or "haldi.date"). */
 export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
   const errors: StepErrors = {};
-  if (step === "couple") {
+  if (step === "couple" || step === "words") {
     const template = TEMPLATES[draft.templateId];
     const schema = contentSchema(template);
     // Only the couple slots are checked here; date and venue belong to the functions step.
@@ -266,11 +273,13 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
     if (!result.success) {
       for (const issue of result.error.issues) {
         const key = String(issue.path[0]);
+        // The names are the names section's; every other line is the card words section's
+        if (NAME_SLOTS.includes(key as SlotId) !== (step === "couple")) continue;
         errors[key] = issue.message === "too-long" ? "too-long" : "required";
       }
     }
   }
-  if (step === "extras") {
+  if (step === "photos") {
     // A design that shows photos in its frames needs each one
     draftFrameSlots(draft).forEach((id, frame) => {
       if (!id) errors[`frame-${frame}`] = "photo-needed";

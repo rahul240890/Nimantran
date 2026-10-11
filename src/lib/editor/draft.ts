@@ -49,15 +49,20 @@ export const EDITOR_STEPS = [
   "occasion",
   "tradition",
   "design",
-  "language",
   "couple",
+  "family",
   "functions",
-  "extras",
+  "photos",
+  "words",
+  "music",
   "preview",
 ] as const;
 export type EditorStep = (typeof EDITOR_STEPS)[number];
 
-/** The slots the couple step asks for. Date and venue come from the functions instead. */
+/** The slots the names section asks for; the card words section has the other lines. */
+export const NAME_SLOTS: readonly SlotId[] = ["first", "joiner", "second"];
+
+/** The slots the names and card words sections ask for. Date and venue come from the functions. */
 export const COUPLE_SLOTS: readonly SlotId[] = SLOT_IDS.filter(
   (id) => id !== "date" && id !== "venue",
 );
@@ -193,7 +198,7 @@ export function withGalleryChoice(
     format: choice.format ?? "story",
     templateId: choice.template ?? next.templateId,
     languages,
-    step: "language",
+    step: "couple",
   };
 }
 

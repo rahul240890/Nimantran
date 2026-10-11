@@ -86,15 +86,15 @@ describe("invite draft", () => {
     expect(draftProblems(newDraft()).map((problem) => problem.step)).toEqual([
       "couple",
       "functions",
-      "extras",
+      "photos",
     ]);
-    expect(draftProblems(complete()).map((problem) => problem.step)).toEqual(["extras"]);
+    expect(draftProblems(complete()).map((problem) => problem.step)).toEqual(["photos"]);
     const photo = { id: "p1", width: 800, height: 1000 };
     expect(draftProblems({ ...complete(), photos: [photo] })).toEqual([]);
     // Once the frames have their own fields, another photo never stands in for one
     const strict = { ...complete(), photos: [photo] };
     strict.couplePhotos = { layout: "one", ids: [""], strict: true };
-    expect(draftProblems(strict).map((problem) => problem.step)).toEqual(["extras"]);
+    expect(draftProblems(strict).map((problem) => problem.step)).toEqual(["photos"]);
   });
 
   it("plays the theme's own music, or the chosen raga its own way", () => {
@@ -125,6 +125,20 @@ describe("invite draft", () => {
     expect(damaged?.functions.haldi.date).toBe("");
     expect(damaged?.functions.wedding.venue).toBe("Taj Falaknuma, Hyderabad");
     expect(parseDraft({ version: 2 })).toBeNull();
+  });
+
+  it("reopens drafts saved on the old language and extras steps in the new sections", () => {
+    expect(parseDraft({ ...complete(), step: "language" })?.step).toBe("couple");
+    expect(parseDraft({ ...complete(), step: "extras" })?.step).toBe("photos");
+  });
+
+  it("checks the names in their own section and the other lines with the card words", () => {
+    const draft = complete();
+    draft.content.line = "x".repeat(400);
+    expect(stepErrors(draft, "couple")).toEqual({});
+    expect(stepErrors(draft, "words")).toEqual({ line: "too-long" });
+    draft.content.first = "";
+    expect(stepErrors(draft, "couple")).toEqual({ first: "required" });
   });
 
   it("reads drafts saved before occasions existed as weddings", () => {
