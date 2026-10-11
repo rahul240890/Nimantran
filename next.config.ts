@@ -19,7 +19,20 @@ const SECURITY_HEADERS = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
-  headers: async () => [{ source: "/:path*", headers: SECURITY_HEADERS }],
+  headers: async () => [
+    { source: "/:path*", headers: SECURITY_HEADERS },
+    // The host's preview plays the guest page inside a phone on its own page (wide screens)
+    {
+      source: "/invites/:id/preview",
+      headers: [
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        {
+          key: "Content-Security-Policy",
+          value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'",
+        },
+      ],
+    },
+  ],
   // The site has several root layouts, so unmatched addresses need their own page
   experimental: { globalNotFound: true },
   // Link-preview images read these at request time (src/lib/og/assets.ts)

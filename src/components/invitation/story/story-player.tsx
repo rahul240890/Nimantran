@@ -5,11 +5,12 @@ import {
   ChevronLeft,
   ChevronRight,
   MailCheck,
-  Music,
   Navigation,
   Pause,
   Play,
   RectangleHorizontal,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 import {
@@ -116,13 +117,21 @@ const TURN_CLASS = {
 } as const;
 /** How long the page underneath stays while the next one turns over it. */
 const TURN_MS = 1300;
+/** A press held this long pauses the pages, as in a reel; letting go carries on. */
+const HOLD_MS = 220;
+
+/* The controls over the pages: small round glass buttons, so the painting stays the picture */
+const GLASS =
+  "rounded-full border-transparent bg-night/35 text-card-ivory shadow-none backdrop-blur-sm hover:bg-night/55 hover:text-card-ivory";
 
 const subscribeNothing = () => () => {};
 
 /**
- * Plays an invitation's event pages over the whole screen, one page at a time, with a
- * progress bar like a status update. Tap the right of the page (or swipe, or Next) to move
- * on, the left to go back; it pauses in a background tab. Each page sits in its theme's
+ * Plays an invitation's event pages over the whole screen like a reel, one page at a time,
+ * with a progress bar like a status update. Tap the right of the page (or swipe, or the
+ * arrow keys) to move on, the left to go back; press and hold to pause. It pauses in a
+ * background tab. Only the music, pause and close sit over the page; Back and Next show
+ * beside the page on a wide screen, and on a phone only for the keyboard or in still mode. Each page sits in its theme's
  * landscape, with the words on a reading plate so they stay clear over any art.
  */
 export function StoryPlayer({
@@ -161,9 +170,10 @@ export function StoryPlayer({
   const index = turn.index;
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
+  const [held, setHeld] = useState(false);
   const beat = beats[index];
   const last = index >= beats.length - 1;
-  const running = !still && !paused && !hidden;
+  const running = !still && !paused && !hidden && !held;
 
   const go = useCallback(
     (to: number) =>
@@ -236,8 +246,20 @@ export function StoryPlayer({
     };
   }, [mounted]);
 
-  // A swipe turns the page; the click that follows it is ignored
+  // A swipe turns the page and a long press pauses it; the click that follows either is ignored
   const swipe = useRef<{ x: number; y: number; swiped: boolean } | null>(null);
+  const holdTimer = useRef<number | null>(null);
+  const letGo = () => {
+    if (holdTimer.current !== null) window.clearTimeout(holdTimer.current);
+    holdTimer.current = null;
+    setHeld(false);
+  };
+  useEffect(
+    () => () => {
+      if (holdTimer.current !== null) window.clearTimeout(holdTimer.current);
+    },
+    [],
+  );
 
   if (!beat || !mounted) return null;
   const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
@@ -295,13 +317,20 @@ export function StoryPlayer({
       )}
 
       <div
-        className="[container-type:size] relative h-full w-full overflow-hidden md:max-w-[min(100%,calc(100dvh*0.62))] md:shadow-overlay"
+        className="[container-type:size] relative h-full w-full overflow-hidden select-none [-webkit-touch-callout:none] md:max-w-[min(100%,calc(100dvh*768/1365))] md:shadow-overlay"
         onPointerDown={(event) => {
           swipe.current = { x: event.clientX, y: event.clientY, swiped: false };
+          if ((event.target as HTMLElement).closest("button, a") || still) return;
+          holdTimer.current = window.setTimeout(() => {
+            holdTimer.current = null;
+            if (swipe.current) swipe.current.swiped = true;
+            setHeld(true);
+          }, HOLD_MS);
         }}
         onPointerUp={(event) => {
+          letGo();
           const start = swipe.current;
-          if (!start) return;
+          if (!start || start.swiped) return;
           const dx = event.clientX - start.x;
           const dy = event.clientY - start.y;
           if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.4) {
@@ -310,6 +339,12 @@ export function StoryPlayer({
             if (dx < 0 !== rtl) next();
             else previous();
           }
+        }}
+        onPointerCancel={letGo}
+        onPointerLeave={letGo}
+        onContextMenu={(event) => {
+          // A long press on a phone pauses, rather than opening the picture's menu
+          if (!(event.target as HTMLElement).closest("a")) event.preventDefault();
         }}
         onClick={(event) => {
           if (swipe.current?.swiped) {
@@ -379,80 +414,132 @@ export function StoryPlayer({
           ))}
         </div>
 
-        {/* Back and Next at the start; music, Pause and Skip at the end */}
-        <div className="absolute inset-x-2 top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-10 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-1">
+        {/* Over the page only what a reel has: the music, pause and the way out */}
+        <div
+          className={cn(
+            "absolute end-2 top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-10 flex items-center gap-1 transition-opacity duration-200 motion-still:transition-none",
+            held && "pointer-events-none opacity-0",
+          )}
+        >
+          {onTextBox && themed && (
             <IconButton
-              label={labels.previous}
-              icon={<ChevronLeft className="rtl:rotate-180" />}
+              label={labels.textBox}
+              aria-pressed={textBox}
+              icon={<RectangleHorizontal />}
               size="sm"
-              onClick={previous}
-              disabled={index === 0}
-              className="bg-surface/85 backdrop-blur-sm"
+              onClick={() => onTextBox(!textBox)}
+              className={cn(GLASS, textBox && "bg-marigold text-on-marigold hover:bg-marigold")}
             />
-            {!last && (
-              <IconButton
-                label={labels.next}
-                icon={<ChevronRight className="rtl:rotate-180" />}
-                size="sm"
-                onClick={next}
-                className="bg-surface/85 backdrop-blur-sm"
-              />
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            {onTextBox && themed && (
-              <IconButton
-                label={labels.textBox}
-                aria-pressed={textBox}
-                icon={<RectangleHorizontal />}
-                size="sm"
-                onClick={() => onTextBox(!textBox)}
-                className={cn(
-                  "backdrop-blur-sm",
-                  textBox ? "bg-marigold text-on-marigold" : "bg-surface/85",
-                )}
-              />
-            )}
-            {music && (
-              <IconButton
-                label={music.playing ? music.pause : music.play}
-                icon={music.playing ? <Pause /> : <Music />}
-                size="sm"
-                onClick={music.toggle}
-                className="bg-surface/85 backdrop-blur-sm"
-              />
-            )}
-            {!still && !last && (
-              <IconButton
-                label={paused ? labels.play : labels.pause}
-                icon={paused ? <Play /> : <Pause />}
-                size="sm"
-                onClick={() => setPaused((p) => !p)}
-                className="bg-surface/85 backdrop-blur-sm"
-              />
-            )}
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={onDone}
-              className="bg-surface/85 backdrop-blur-sm @max-[22rem]:hidden"
-            >
-              {last ? labels.done : labels.skip}
-            </Button>
-            {/* On the narrowest phones the way back to the card is an icon, so every control fits */}
+          )}
+          {music && (
             <IconButton
-              label={last ? labels.done : labels.skip}
-              icon={<X />}
+              label={music.playing ? music.pause : music.play}
+              icon={music.playing ? <Volume2 /> : <VolumeX />}
               size="sm"
-              onClick={onDone}
-              className="hidden bg-surface/85 backdrop-blur-sm @max-[22rem]:inline-flex"
+              onClick={music.toggle}
+              className={GLASS}
             />
-          </div>
+          )}
+          {!still && !last && (
+            <IconButton
+              label={paused ? labels.play : labels.pause}
+              icon={paused ? <Play /> : <Pause />}
+              size="sm"
+              onClick={() => setPaused((p) => !p)}
+              className={GLASS}
+            />
+          )}
+          <IconButton
+            label={last ? labels.done : labels.skip}
+            icon={<X />}
+            size="sm"
+            onClick={onDone}
+            className={GLASS}
+          />
         </div>
+
+        {/* Back and Next at the page's edges: for the keyboard, and always in still mode */}
+        <PageArrow
+          side="start"
+          label={labels.previous}
+          onClick={previous}
+          hidden={index === 0}
+          shown={still}
+          className="lg:hidden"
+        />
+        <PageArrow
+          side="end"
+          label={labels.next}
+          onClick={next}
+          hidden={last}
+          shown={still}
+          className="lg:hidden"
+        />
+      </div>
+
+      {/* On a wide screen Back and Next sit beside the page, out of the picture */}
+      <div className="pointer-events-none absolute inset-y-0 left-1/2 hidden w-[min(100%,calc(100dvh*768/1365))] -translate-x-1/2 lg:block">
+        <PageArrow
+          side="start"
+          label={labels.previous}
+          onClick={previous}
+          hidden={index === 0}
+          shown
+          outside
+        />
+        <PageArrow side="end" label={labels.next} onClick={next} hidden={last} shown outside />
       </div>
     </section>,
     document.body,
+  );
+}
+
+/**
+ * Back or Next at one side of the page. Kept out of sight on a phone (taps and swipes turn
+ * the pages there) until the keyboard reaches it, unless `shown`; `outside` sets it beside
+ * the page on a wide screen.
+ */
+function PageArrow({
+  side,
+  label,
+  onClick,
+  hidden,
+  shown,
+  outside = false,
+  className,
+}: {
+  side: "start" | "end";
+  label: string;
+  onClick: () => void;
+  hidden: boolean;
+  shown: boolean;
+  outside?: boolean;
+  className?: string;
+}) {
+  if (hidden) return null;
+  const Icon = side === "start" ? ChevronLeft : ChevronRight;
+  return (
+    <IconButton
+      label={label}
+      icon={<Icon className="rtl:rotate-180" />}
+      size={outside ? "md" : "sm"}
+      showTooltip={false}
+      onClick={onClick}
+      className={cn(
+        "absolute top-1/2 z-10 -translate-y-1/2",
+        outside
+          ? cn(
+              "rounded-full border-card-ivory/30 bg-night/40 text-card-ivory backdrop-blur-sm hover:bg-night/60 hover:text-card-ivory",
+              side === "start" ? "-start-16" : "-end-16",
+            )
+          : cn(GLASS, side === "start" ? "start-2" : "end-2"),
+        // Out of sight (and out of the way of taps) but still reachable by Tab; it shows when focused
+        shown
+          ? "pointer-events-auto"
+          : "pointer-events-none opacity-0 focus-visible:pointer-events-auto focus-visible:opacity-100",
+        className,
+      )}
+    />
   );
 }
 
@@ -465,12 +552,13 @@ function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
 /** Places a painting's words in its calm area, clear of the controls and the phone's edges. */
 function areaStyle(area: TextArea, whole = false, lifted = false): CSSProperties {
   if (lifted) {
-    // The whole painting sits at the foot of the page, below the controls
-    const height = `min(calc(100cqh - ${CONTROLS_CLEAR}), calc(100cqw / ${PAINTING_ASPECT}))`;
-    const at = (percent: number) => `calc(100cqh - ${height} + ${height} * ${percent / 100})`;
+    // The painting starts below the controls and covers the rest of the page; its foot may
+    // run past the bottom (by `over`), so the area is measured from the painting's top
+    const height = `max(calc(100cqh - ${CONTROLS_CLEAR}), calc(100cqw / ${PAINTING_ASPECT}))`;
+    const over = `(${CONTROLS_CLEAR} + ${height} - 100cqh)`;
     return {
-      top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), ${at(area.top)})`,
-      bottom: `max(calc(${height} * ${area.bottom / 100}), env(safe-area-inset-bottom))`,
+      top: `max(calc(max(0.75rem, env(safe-area-inset-top)) + 4.25rem), calc(${CONTROLS_CLEAR} + ${height} * ${area.top / 100}))`,
+      bottom: `max(calc(${height} * ${area.bottom / 100} - ${over}), env(safe-area-inset-bottom))`,
       left: `${area.left}%`,
       right: `${area.right}%`,
     };

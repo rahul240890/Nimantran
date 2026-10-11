@@ -39,6 +39,7 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   whatsapp: "WhatsApp पर भेजें",
   moreWays: "भेजने के और तरीक़े",
   open: "निमंत्रण खोलें",
+  guestView: "देखें, टैप करने पर मेहमान क्या देखेंगे",
   edit: "निमंत्रण बदलें",
   messageLabel: "संदेश",
   messageHint: "लिंक के साथ जाता है। जैसे चाहें बदलें।",
@@ -247,4 +248,9 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   back: "बदलाव जारी रखें",
   next: "पैकेज चुनें और प्रकाशित करें",
   share: "निमंत्रण भेजें",
+  heading: "आपके मेहमान यही देखेंगे",
+  body: "मेहमान WhatsApp में आपका लिंक खोलते हैं और निमंत्रण रील की तरह पूरे फ़ोन पर आपके संगीत के साथ चलता है। फ़ोन में निमंत्रण खोलें दबाकर इसे वैसे ही देखें जैसे वे देखेंगे।",
+  phone: "फ़ोन पर आपका निमंत्रण",
+  fullScreen: "पूरी स्क्रीन पर देखें",
+  menu: "प्रीव्यू के विकल्प",
 };
