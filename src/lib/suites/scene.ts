@@ -16,6 +16,7 @@ import {
   ILLUSTRATED_IDS,
   MOVING_IDS,
   PHOTO_CARD_IDS,
+  THEMED_IDS,
   isSceneTheme,
   pageLook,
   type IllustratedId,
@@ -25,6 +26,7 @@ import {
   type PageArt,
   type SceneThemeId,
   type SuiteId,
+  type ThemedId,
 } from "./catalog";
 import { isMoving, movingOpen, movingScene, type MovingScene } from "./moving";
 import { photoPage, type FrameBox } from "./photo-frames";
@@ -112,7 +114,7 @@ type PaintedEntry = (
 };
 
 const PAINTED: Record<
-  Exclude<SceneThemeId, IllustratedId | PhotoCardId | MovingId>,
+  Exclude<SceneThemeId, IllustratedId | PhotoCardId | MovingId | ThemedId>,
   PaintedEntry
 > = {
   // A white marble jharokha panel on Lake Pichola at dusk
@@ -1387,6 +1389,147 @@ const PHOTO_CARDS: Record<PhotoCardId, PhotoCardEntry> = {
   },
 };
 
+/**
+ * A themed opening's scene (catalog.ts THEMED_IDS): the place its opening opens onto, with
+ * no photo frame. The names sit in the sky above the theme's own card, which was painted on
+ * a copy of the same place and cut out, so it lands where it was painted.
+ */
+type ThemedEntry = Pick<PaintedEntry, "names" | "card" | "text" | "dark" | "plate">;
+
+const THEMED: Record<ThemedId, ThemedEntry> = {
+  // Carved stone card with lamp niches at the bottom of the stepwell
+  "baori-deep": {
+    names: [8, 7.5, 84, 12],
+    card: [7.3, 26.2, 86.3, 37.0],
+    text: [13.2, 7.9, 74.0, 83.8],
+  },
+  // Frosted card over the snowy hill-station street
+  "barf-khidki": {
+    names: [8, 7.5, 84, 12],
+    card: [3.5, 28.4, 92.0, 38.0],
+    text: [11.0, 9.7, 80.2, 85.3],
+    dark: true,
+  },
+  // Wooden-bead frame over the toy town
+  channapatna: {
+    names: [8, 7.5, 84, 12],
+    card: [5.9, 24.2, 89.1, 29.2],
+    text: [10.0, 14.6, 79.7, 73.6],
+  },
+  // A scalloped plaster arch over the baradari on the moonlit lake
+  "chik-baradari": {
+    names: [8, 7.5, 84, 12.0],
+    card: [9.0, 21.0, 82.8, 47.0],
+    text: [6.4, 12.6, 86.5, 83.7],
+    dark: true,
+  },
+  // Kalighat-bordered calendar card over the Hooghly
+  "howrah-tareekh": {
+    names: [8, 7.5, 84, 12],
+    card: [4.0, 25.6, 90.6, 31.1],
+    text: [11.7, 13.5, 77.5, 70.6],
+  },
+  // Ikat-bordered card over the weavers' courtyard
+  "ikat-dhaaga": {
+    names: [8, 7.5, 84, 12],
+    card: [4.6, 28.4, 91.7, 39.3],
+    text: [10.0, 11.6, 80.4, 75.9],
+  },
+  // Carrom-board card in the Irani cafe
+  "irani-carrom": {
+    names: [8, 7.5, 84, 12],
+    card: [9.4, 24.8, 82.7, 29.3],
+    text: [9.9, 13.3, 80.6, 73.0],
+  },
+  // Sandstone jaali card over the palace garden's apricot sky
+  "jaali-vriksh": {
+    names: [8, 7.5, 84, 12],
+    card: [10.8, 22.2, 77.0, 50.7],
+    text: [5.7, 6.5, 88.6, 86.7],
+  },
+  // Lace card over the dawn garden and the cradle
+  "jhalar-palna": {
+    names: [8, 7.5, 84, 12],
+    card: [3.0, 27.5, 94.0, 30.7],
+    text: [12.1, 16.2, 76.0, 64.1],
+  },
+  // Gilded velvet card under the mirror ball
+  jhilmil: {
+    names: [8, 7.5, 84, 12],
+    card: [10.3, 27.9, 79.2, 29.5],
+    text: [9.2, 11.1, 81.6, 76.0],
+    dark: true,
+    // The velvet is too deep a red for words, so they sit on a sheet laid over it
+    plate: true,
+  },
+  // Carved khondalite frame over the Odisha beach
+  "konark-chakra": {
+    names: [8, 7.5, 84, 12],
+    card: [3.1, 26.0, 95.3, 36.0],
+    text: [12.5, 17.9, 73.2, 66.2],
+  },
+  // Shell-bordered card over the Andaman lagoon
+  lehar: {
+    names: [8, 7.5, 84, 12],
+    card: [3.3, 22.7, 92.0, 31.1],
+    text: [7.6, 9.6, 86.0, 81.4],
+  },
+  // Rope-framed card over the Mandvi shipyard at sunset
+  "mandvi-dhow": {
+    names: [8, 7.5, 84, 12],
+    card: [6.0, 22.0, 88.0, 33.0],
+    text: [8.7, 12.9, 83.3, 78.8],
+  },
+  // Map-paper card over Pangong lake at dusk
+  "naksha-pangong": {
+    names: [8, 7.5, 84, 12],
+    card: [2.9, 30.0, 94.9, 34.9],
+    text: [8.9, 11.6, 82.3, 77.0],
+    dark: true,
+  },
+  // Lacquered red board over the Kaveri mandapam at dawn
+  "olai-chuvadi": {
+    names: [8, 7.5, 84, 12.0],
+    card: [4.4, 21.0, 91.8, 32.5],
+    text: [10.0, 15.8, 80.4, 71.6],
+  },
+  // Marble card with inlaid flowers over the moonlit ship palace
+  pachchikari: {
+    names: [8, 7.5, 84, 12],
+    card: [4.2, 23.3, 92.8, 32.2],
+    text: [10.3, 15.2, 79.6, 71.6],
+    dark: true,
+  },
+  // Crayon-scribbled card over the treehouse garden
+  "ped-ghar": {
+    names: [8, 7.5, 84, 12],
+    card: [2.9, 34.9, 93.5, 32.2],
+    text: [8.0, 6.5, 83.9, 83.3],
+  },
+  // Yellow shutter window over the Pondicherry lane
+  "pondy-gali": {
+    names: [8, 7.5, 84, 12],
+    card: [4.2, 28.4, 95.4, 35.8],
+    text: [16.1, 13.0, 68.1, 74.9],
+  },
+  // Fresco-bordered card on the painted haveli's ochre wall
+  shekhawati: {
+    names: [8, 7.5, 84, 12],
+    card: [6.5, 31.8, 87.0, 30.5],
+    text: [8.2, 7.3, 83.8, 76.4],
+  },
+  // Card under a toran in the Kerala courtyard
+  "toran-mala": {
+    names: [8, 7.5, 84, 12],
+    card: [9.8, 29.1, 80.0, 30.3],
+    text: [8.0, 23.0, 84.0, 69.0],
+  },
+};
+
+export function isThemed(suite: SuiteId): suite is ThemedId {
+  return (THEMED_IDS as readonly SuiteId[]).includes(suite);
+}
+
 export function isIllustrated(suite: SuiteId): suite is IllustratedId {
   return (ILLUSTRATED_IDS as readonly SuiteId[]).includes(suite);
 }
@@ -1503,6 +1646,21 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       ...openLayout(entry),
     };
   }
+  if (isThemed(suite)) {
+    const { names, card, text, dark, plate } = THEMED[suite];
+    return {
+      image: `/suites/${suite}/scene.webp`,
+      style: "painted",
+      dark: Boolean(dark),
+      card: { image: `/suites/${suite}/card.webp`, text, plate: Boolean(plate) },
+      frames: [],
+      pieces: [],
+      moving: null,
+      names,
+      line: null,
+      slot: card,
+    };
+  }
   if (isSceneTheme(suite)) {
     // One frame: with two photos, the first (the couple, or the bride) shows
     const { frame, pair, names, line, card, text, dark, plate } = PAINTED[suite];
@@ -1541,7 +1699,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
  * groom's, or none on an illustrated card.
  */
 export function sceneFrames(suite: SuiteId): 0 | 1 | 2 {
-  if (isIllustrated(suite) || isMoving(suite)) return 0;
+  if (isIllustrated(suite) || isMoving(suite) || isThemed(suite)) return 0;
   if (isPhotoCard(suite)) return 2;
   return isSceneTheme(suite) && PAINTED[suite].pair ? 2 : 1;
 }
@@ -1557,6 +1715,7 @@ export const SCENE_SUITES = [
   ...ILLUSTRATED_IDS,
   ...PHOTO_CARD_IDS,
   ...MOVING_IDS,
+  ...THEMED_IDS,
 ] as SuiteId[];
 
 /** The sides a function can come in from; each one leaves the way the next comes in. */

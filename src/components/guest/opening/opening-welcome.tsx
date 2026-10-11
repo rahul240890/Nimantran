@@ -310,6 +310,7 @@ export function OpeningWelcome({
   script,
   skip,
   seconds,
+  over = false,
   onSkip,
 }: {
   kind: WelcomeKind;
@@ -321,11 +322,14 @@ export function OpeningWelcome({
   skip: string;
   /** How long it stays before moving on, for the thin line that fills along the bottom. */
   seconds: number;
+  /** Over a painting the guest should still see round the names (the fresh openings). */
+  over?: boolean;
   onSkip: () => void;
 }) {
   const words = CARD_GREETING_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
-  const dark = DARK[kind];
+  // Over a painting the words sit on a veil of card stock, so they are always ink
+  const dark = DARK[kind] && !over;
   const Art = ART[kind];
   const button = useRef<HTMLButtonElement>(null);
   useEffect(() => button.current?.focus({ preventScroll: true }), []);
@@ -338,6 +342,7 @@ export function OpeningWelcome({
       lang={lang}
       data-testid="opening-welcome"
       data-welcome={kind}
+      data-over={over ? "art" : undefined}
       data-tone={dark ? "dark" : "light"}
       onClick={onSkip}
       className="opening-welcome absolute inset-0 z-40 overflow-hidden"

@@ -315,7 +315,9 @@ export function OneScene({
 
   const current = items[index];
   const light = sceneLight(current?.kind === "function" ? current.fn.kind : "line");
-  const tone = page.dark || light.mood === "night" ? "dark" : "light";
+  // The words keep the painting's own tone at every hour: switching them light for a night
+  // function left them pale on art that the night's light had not darkened enough
+  const tone = page.dark ? "dark" : "light";
   const names = [copy.first, copy.second].filter((name) => name.trim());
   const joiner = !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   const shownFn = current?.kind === "function" ? current.fn : null;
@@ -697,6 +699,80 @@ export function SceneButton({
   );
 }
 
+/** When the card has landed enough for its words to start writing themselves in. */
+const REVEAL_AT_MS = 380;
+/** The name's letters come in this far apart, closer together for a long name. */
+const LETTER_MS = 55;
+const LETTERS_MS = 950;
+/** Each line after the name follows the one before by this much. */
+const LINE_MS = 160;
+/** How long one letter or line takes to settle. */
+const SETTLE_MS = 650;
+
+// Letters split cleanly only in scripts that don't join them; the others come in a word at a time
+const SPLITS_BY_LETTER = /^[\p{Script=Latin}\p{Script=Common}\p{M}\s]*$/u;
+const letters =
+  typeof Intl !== "undefined" && "Segmenter" in Intl
+    ? (word: string) =>
+        [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(word)].map(
+          (part) => part.segment,
+        )
+    : (word: string) => Array.from(word);
+
+/**
+ * Words that write themselves in: each letter (or, in a script whose letters join, each
+ * word) rises out of a soft blur after the one before. Words keep together, so lines break
+ * where they would for the plain text.
+ */
+function Reveal({ text, at, step }: { text: string; at: number; step: number }) {
+  const byLetter = SPLITS_BY_LETTER.test(text);
+  let unit = 0;
+  const parts = text.split(/(\s+)/);
+  return (
+    <>
+      {parts.map((part, i) => {
+        if (!part) return null;
+        if (/^\s+$/.test(part)) return part;
+        if (!byLetter) {
+          const delay = at + unit++ * step;
+          return (
+            <span
+              key={i}
+              className="scene-reveal"
+              style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}
+            >
+              {part}
+            </span>
+          );
+        }
+        return (
+          <span key={i} className="scene-reveal-word">
+            {letters(part).map((letter, j) => {
+              const delay = at + unit++ * step;
+              return (
+                <span
+                  key={j}
+                  className="scene-reveal"
+                  style={{ "--reveal-delay": `${delay}ms` } as CSSProperties}
+                >
+                  {letter}
+                </span>
+              );
+            })}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+/** How many letters (or joined words) `text` reveals, as `Reveal` splits it. */
+function revealUnits(text: string): number {
+  const words = text.split(/\s+/).filter(Boolean);
+  if (!SPLITS_BY_LETTER.test(text)) return words.length;
+  return words.reduce((sum, word) => sum + letters(word).length, 0);
+}
+
 /** One function (or the opening line) on the slot's own card, arriving or leaving. */
 function SlotCard({
   item,
@@ -739,6 +815,34 @@ function SlotCard({
   });
   const fn = item.kind === "function" ? item.fn : null;
   const when = Boolean(fn && (fn.date || fn.time));
+  // Arriving, the words write themselves in once the card has landed: the name a letter at a
+  // time, then each line below it. Once they have, they are plain words again, so a detail
+  // typed in the editor simply appears.
+  const title = fn ? fn.name : item.kind === "line" ? item.blessing || item.text : "";
+  const units = Math.max(1, revealUnits(title));
+  const step = Math.min(LETTER_MS, LETTERS_MS / units);
+  const after = REVEAL_AT_MS + units * step + 120;
+  const [revealing, setRevealing] = useState(motion === "in" && !reduced);
+  // The countdown, the local name, the rule, the day and hour, and the place
+  const lastLine = after + 4 * LINE_MS;
+  useEffect(() => {
+    if (!revealing) return;
+    const timer = window.setTimeout(() => setRevealing(false), lastLine + SETTLE_MS + 150);
+    return () => window.clearTimeout(timer);
+  }, [revealing, lastLine]);
+  /** The card's headline, writing itself in as the card arrives. */
+  const write = (text: string) =>
+    revealing ? <Reveal text={text} at={REVEAL_AT_MS} step={step} /> : text;
+  /** A line round the headline, rising in at `delay`: its class and style. */
+  const rise = (delay: number, style?: CSSProperties) =>
+    revealing
+      ? ([
+          "scene-reveal-line",
+          { ...style, "--reveal-delay": `${delay}ms` } as CSSProperties,
+        ] as const)
+      : ([undefined, style] as const);
+  /** The `order`th line after the headline. */
+  const next = (order: number) => after + order * LINE_MS;
   return (
     <div
       ref={card}
@@ -791,17 +895,27 @@ function SlotCard({
                   )}
                   style={sceneLine(voice, "blessing-card", lang, type)}
                 >
-                  {item.blessing}
+                  {write(item.blessing)}
                 </p>
               )}
-              {item.blessing && item.text && <span aria-hidden className="story-rule scene-rule" />}
+              {item.blessing && item.text && (
+                <span
+                  aria-hidden
+                  className={cn("story-rule scene-rule", rise(next(0))[0])}
+                  style={rise(next(0))[1]}
+                />
+              )}
               {item.text && (
                 <p
                   lang={lang}
-                  className="text-balance"
-                  style={sceneLine(voice, "line", lang, type)}
+                  className={cn("text-balance", item.blessing && rise(next(1))[0])}
+                  style={
+                    item.blessing
+                      ? rise(next(1), sceneLine(voice, "line", lang, type))[1]
+                      : sceneLine(voice, "line", lang, type)
+                  }
                 >
-                  {item.text}
+                  {item.blessing ? item.text : write(item.text)}
                 </p>
               )}
             </>
@@ -813,8 +927,8 @@ function SlotCard({
                   <p
                     lang={lang}
                     data-fit-optional={painted ? "" : undefined}
-                    className="mb-[0.45em] text-card-gold-text"
-                    style={sceneLine(voice, "countdown", lang, type)}
+                    className={cn("mb-[0.45em] text-card-gold-text", rise(REVEAL_AT_MS)[0])}
+                    style={rise(REVEAL_AT_MS, sceneLine(voice, "countdown", lang, type))[1]}
                   >
                     {fn.countdown}
                   </p>
@@ -824,25 +938,35 @@ function SlotCard({
                   className="max-w-full text-balance"
                   style={sceneLine(voice, "function", lang, type)}
                 >
-                  {fn.name}
+                  {write(fn.name)}
                 </p>
                 {fn.localName && (
                   <p
                     lang={fn.localName.lang}
-                    className="text-card-accent-text"
-                    style={sceneLine(voice, "detail", fn.localName.lang, type)}
+                    className={cn("text-card-accent-text", rise(next(0))[0])}
+                    style={rise(next(0), sceneLine(voice, "detail", fn.localName.lang, type))[1]}
                   >
                     {fn.localName.text}
                   </p>
                 )}
                 {(fn.date || fn.time || fn.venue) && (
-                  <span aria-hidden className="story-rule scene-rule" />
+                  <span
+                    aria-hidden
+                    className={cn("story-rule scene-rule", rise(next(1))[0])}
+                    style={rise(next(1))[1]}
+                  />
                 )}
                 {/* Then the day with its weekday, the hour, and the place below, unlabelled */}
                 {/* The day and its hour share a line where the card is wide enough, and the
                     hour wraps under the day where it is not */}
                 {when && (
-                  <div className="flex max-w-full flex-wrap items-baseline justify-center gap-x-[0.6em]">
+                  <div
+                    className={cn(
+                      "flex max-w-full flex-wrap items-baseline justify-center gap-x-[0.6em]",
+                      rise(next(2))[0],
+                    )}
+                    style={rise(next(2))[1]}
+                  >
                     {fn.date && (
                       <p
                         lang={lang}
@@ -871,8 +995,12 @@ function SlotCard({
                 {fn.venue && (
                   <p
                     lang={lang}
-                    className={cn("scene-venue max-w-full text-balance", when && "mt-[0.55em]")}
-                    style={sceneLine(voice, "venue", lang, type)}
+                    className={cn(
+                      "scene-venue max-w-full text-balance",
+                      when && "mt-[0.55em]",
+                      rise(next(3))[0],
+                    )}
+                    style={rise(next(3), sceneLine(voice, "venue", lang, type))[1]}
                   >
                     {fn.venue}
                   </p>

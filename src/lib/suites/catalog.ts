@@ -214,6 +214,36 @@ export const MOVING_IDS = [
 export type MovingId = (typeof MOVING_IDS)[number];
 
 /**
+ * Themed openings (owner, 2026-10-11): a Scene theme that comes with its own opening,
+ * painted as one set: the opening (a jaali, a cane blind, a sail, a wall of toy blocks),
+ * the place it opens onto, and the theme's own card for each celebration. The opening is
+ * opening/catalog.ts THEMED_OPENINGS; the scene and card are scene.ts THEMED.
+ */
+export const THEMED_IDS = [
+  "jaali-vriksh",
+  "pachchikari",
+  "chik-baradari",
+  "baori-deep",
+  "ikat-dhaaga",
+  "olai-chuvadi",
+  "konark-chakra",
+  "mandvi-dhow",
+  "shekhawati",
+  "lehar",
+  "naksha-pangong",
+  "toran-mala",
+  "jhilmil",
+  "howrah-tareekh",
+  "barf-khidki",
+  "pondy-gali",
+  "irani-carrom",
+  "channapatna",
+  "ped-ghar",
+  "jhalar-palna",
+] as const;
+export type ThemedId = (typeof THEMED_IDS)[number];
+
+/**
  * Scene themes: one painting each, with a painted card that flies in with each celebration
  * (scene.ts). They have no pages of their own, so they only show as a Scene, and take the
  * rest of their look (colours, lettering, guest page) from the painted theme they're kin to.
@@ -318,6 +348,7 @@ export const SCENE_THEME_IDS = [
   ...ILLUSTRATED_IDS,
   ...PHOTO_CARD_IDS,
   ...MOVING_IDS,
+  ...THEMED_IDS,
 ] as const;
 export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
@@ -1697,6 +1728,26 @@ export const SCENE_KIN: Record<SceneThemeId, Exclude<SuiteId, SceneThemeId>> = {
   "aurora-igloo": "himani",
   "teddy-picnic": "gubbara",
   "dukaan-mahurat": "peshwai-wada",
+  "jaali-vriksh": "rajwada-bagh",
+  pachchikari: "noor-bagh",
+  "chik-baradari": "sufi-raat",
+  "baori-deep": "shahi-savari",
+  "ikat-dhaaga": "kalamkari",
+  "olai-chuvadi": "tanjore",
+  "konark-chakra": "pattachitra",
+  "mandvi-dhow": "kutch-toran",
+  shekhawati: "shahi-savari",
+  lehar: "sagar",
+  "naksha-pangong": "himani",
+  "toran-mala": "kayal",
+  jhilmil: "rooftop",
+  "howrah-tareekh": "rajbari",
+  "barf-khidki": "himani",
+  "pondy-gali": "gulaab",
+  "irani-carrom": "saath",
+  channapatna: "gubbara",
+  "ped-ghar": "jungle-party",
+  "jhalar-palna": "palna",
 };
 
 /** The occasions a Scene theme is painted for beyond weddings. */
@@ -1794,6 +1845,12 @@ const SCENE_OCCASIONS: Partial<Record<SceneThemeId, readonly CategoryId[]>> = {
   "aurora-igloo": ["birthday", "christmas", "party"],
   "teddy-picnic": ["birthday", "baby-shower", "naming-ceremony"],
   "dukaan-mahurat": ["shop-opening", "launch"],
+  "barf-khidki": ["christmas", "party"],
+  "pondy-gali": ["anniversary", "reunion"],
+  "irani-carrom": ["reunion", "retirement", "birthday", "party"],
+  channapatna: ["birthday", "naming-ceremony"],
+  "ped-ghar": ["birthday", "party"],
+  "jhalar-palna": ["baby-shower", "naming-ceremony"],
 };
 
 /** A Scene theme: its kin's look, and its painting with the card for thumbnails and link previews. */
@@ -1932,6 +1989,13 @@ const WEDDING_FIT: Partial<Record<SuiteId, readonly JourneyId[]>> = {
   aatishbaazi: ["sangeet", "reception", "wedding"],
   "toota-taara": ["engagement", "save-the-date", "reception", "sangeet"],
   "jhoomar-mahal": ["wedding", "reception", "sangeet", "engagement"],
+  // Themed openings painted for a function, or for some steps of the journey
+  "chik-baradari": ["wedding", "engagement", "mehendi", "sangeet", "reception"],
+  lehar: ["wedding", "engagement", "save-the-date", "reception"],
+  "naksha-pangong": ["wedding", "engagement", "save-the-date", "reception"],
+  "toran-mala": ["haldi", "mehendi"],
+  jhilmil: ["sangeet", "reception", "engagement"],
+  "howrah-tareekh": ["save-the-date", "engagement", "wedding", "reception"],
 };
 
 /**
@@ -1980,6 +2044,10 @@ const NO_ROKA: readonly SuiteId[] = [
   "kettuvallam-raat",
   "fawwara-bagh",
   "champa-baag",
+  "pachchikari",
+  "ikat-dhaaga",
+  "olai-chuvadi",
+  "konark-chakra",
 ];
 
 /** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */

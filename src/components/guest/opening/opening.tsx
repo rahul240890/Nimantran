@@ -12,7 +12,9 @@ import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
 import {
+  isFreshOpening,
   isPaintedGate,
+  isThemedOpening,
   welcomeKind,
   type OpeningGod,
   type OpeningStyle,
@@ -26,11 +28,15 @@ import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
+import { freshBackdrop } from "./opening-fresh";
 import { OpeningWelcome } from "./opening-welcome";
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
-/** A painted gate takes longer: the doors open, then the guest walks through the arch. */
+/**
+ * A painted gate takes longer: the doors open, then the guest walks through the arch. A
+ * fresh or themed opening takes as long, its painting going its own way.
+ */
 const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
@@ -200,6 +206,8 @@ export function Opening({
   const cover = theme.images.cover;
   const painted = style === "doors" && Boolean(cover);
   const gate = isPaintedGate(style);
+  const fresh = isFreshOpening(style);
+  const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
@@ -234,10 +242,10 @@ export function Opening({
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
       () => (still ? goInLatest.current() : setWelcome(true)),
-      still ? 0 : gate ? GATE_OPEN_MS : OPEN_MS,
+      still ? 0 : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate]);
+  }, [open, pages, welcome, still, gate, fresh, themed]);
   useEffect(() => {
     if (!welcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -279,8 +287,8 @@ export function Opening({
           "isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
           painted
             ? "story-print w-full px-[3cqw]"
-            : gate
-              ? // Smaller on a painted gate, so the doors themselves show round it
+            : gate || fresh
+              ? // Smaller on a painted gate or fresh opening, so the painting shows round it
                 "opening-plate w-auto max-w-[min(68cqw,24rem)] px-[5cqw] py-[1.6cqh]"
               : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
         )}
@@ -351,10 +359,18 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || cover ? (
+        {gate || fresh || themed || cover ? (
           <Image
-            // A painted gate's own place beyond, so the wide screen matches the gate
-            src={gate ? `/openings/gates/${style}/beyond.webp` : (cover as string)}
+            // A painted opening's own place beyond, so the wide screen matches it
+            src={
+              gate
+                ? `/openings/gates/${style}/beyond.webp`
+                : fresh
+                  ? freshBackdrop(style)
+                  : themed
+                    ? `/suites/${style}/scene.webp`
+                    : (cover as string)
+            }
             alt=""
             fill
             sizes="100vw"
@@ -461,6 +477,7 @@ export function Opening({
             names={face("names", type.names)}
             script={face("script", type.words)}
             skip={guestCopy.doorway.skip}
+            over={fresh}
             onSkip={goIn}
           />
         )}

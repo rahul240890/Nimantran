@@ -1,12 +1,13 @@
 import type { CategoryId } from "@/lib/categories/catalog";
-import type { SuiteId } from "@/lib/suites/catalog";
-import { SUITES } from "@/lib/suites/catalog";
+import type { SuiteId, ThemedId } from "@/lib/suites/catalog";
+import { SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
  * the pages, the One Scene or the colour card. Each style is drawn in code from the
- * theme's own colours, except "doors", which splits the theme's cover painting, and the
- * painted gates, which are paintings of their own in three layers.
+ * theme's own colours, except "doors", which splits the theme's cover painting, the
+ * painted gates, which are paintings of their own in three layers, and the fresh openings,
+ * paintings in four or five layers that each open with a movement of their own.
  */
 
 /**
@@ -44,8 +45,89 @@ export function isPaintedGate(style: string): style is PaintedGate {
   return style in PAINTED_GATES;
 }
 
+/**
+ * The fresh openings (owner's paintings, 2026-10-11): not gates but a fan that folds shut,
+ * mirror panels that turn, a pop-up palace, clouds that part, a snow globe to fall into.
+ * Each is a place beyond, the thing that opens, edge pieces and loose pieces
+ * (shubhdwar/fresh-opening-prompts.md); how each moves is in opening-fresh.tsx.
+ */
+export const FRESH_OPENINGS = [
+  "pankhi",
+  "sheesh-mahal",
+  "popup-mahal",
+  "odhni",
+  "kavad-peti",
+  "chhatri-utsav",
+  "jal-darpan",
+  "pushp-varsha",
+  "moti-seep",
+  "badal-raag",
+  "jugnu-van",
+  "uday-surya",
+  "taaramandal",
+  "thar-ki-ret",
+  "sheher-ki-raat",
+  "choodi-chakra",
+  "sanjhi-roshni",
+  "chhaya-parda",
+  "athangudi-tiles",
+  "gulaal-bindu",
+  "bioscope",
+  "kaanch-ka-gola",
+  "phirki",
+  "bulbule",
+  "chhuk-chhuk",
+] as const;
+export type FreshOpening = (typeof FRESH_OPENINGS)[number];
+
+export function isFreshOpening(style: string): style is FreshOpening {
+  return (FRESH_OPENINGS as readonly string[]).includes(style);
+}
+
+/**
+ * The themed openings (catalog.ts THEMED_IDS): each theme's own opening, one painting that
+ * moves its own way and opens onto the theme's scene. The move is how the painting goes:
+ * zoom (fly through it), threads (falls away in strips), deal (bands slide off to either
+ * side), rows (bands swing down one by one), roll (rolls up from the bottom), drop (falls in
+ * folds), sink, wheel (the wheel rolls away), fold (folds in half and flies off), wave (a
+ * wave washes it off), scratch (wiped away in rubs), frost (wiped clear, then melts), flip
+ * (pages flip up), puzzle (its tiles lift out), tumble (blocks fall), colour (the colour
+ * sweeps in), gather (drawn up to the top), slide (tips back and slides down), spots (lit
+ * up spot by spot).
+ */
+export const THEMED_OPENINGS = {
+  "jaali-vriksh": "zoom",
+  pachchikari: "sink",
+  "chik-baradari": "roll",
+  "baori-deep": "zoom",
+  "ikat-dhaaga": "threads",
+  "olai-chuvadi": "deal",
+  "konark-chakra": "wheel",
+  "mandvi-dhow": "drop",
+  shekhawati: "scratch",
+  lehar: "wave",
+  "naksha-pangong": "fold",
+  "toran-mala": "rows",
+  jhilmil: "spots",
+  "howrah-tareekh": "flip",
+  "barf-khidki": "frost",
+  "pondy-gali": "puzzle",
+  "irani-carrom": "slide",
+  channapatna: "tumble",
+  "ped-ghar": "colour",
+  "jhalar-palna": "gather",
+} as const satisfies Record<ThemedId, string>;
+export type ThemedOpening = keyof typeof THEMED_OPENINGS;
+export type ThemedMove = (typeof THEMED_OPENINGS)[ThemedOpening];
+
+export function isThemedOpening(style: string): style is ThemedOpening {
+  return style in THEMED_OPENINGS;
+}
+
 export const OPENING_STYLES = [
   ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
+  ...FRESH_OPENINGS,
+  ...THEMED_IDS,
   "doors",
   "palace",
   "temple",
@@ -68,8 +150,46 @@ export const OPENING_STYLES = [
   "none",
 ] as const;
 
-/** How the editor groups the styles, so twenty choices stay easy to scan. */
+/** How the editor groups the styles, so many choices stay easy to scan. */
 export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
+  { id: "themed", styles: THEMED_IDS },
+  {
+    id: "fresh",
+    styles: [
+      "pankhi",
+      "sheesh-mahal",
+      "popup-mahal",
+      "odhni",
+      "kavad-peti",
+      "chhatri-utsav",
+      "jal-darpan",
+      "pushp-varsha",
+      "moti-seep",
+    ],
+  },
+  {
+    id: "skies",
+    styles: [
+      "badal-raag",
+      "jugnu-van",
+      "uday-surya",
+      "taaramandal",
+      "thar-ki-ret",
+      "sheher-ki-raat",
+    ],
+  },
+  {
+    id: "crafts",
+    styles: [
+      "choodi-chakra",
+      "sanjhi-roshni",
+      "chhaya-parda",
+      "athangudi-tiles",
+      "gulaal-bindu",
+      "bioscope",
+    ],
+  },
+  { id: "play", styles: ["kaanch-ka-gola", "phirki", "bulbule", "chhuk-chhuk"] },
   { id: "painted", styles: GATE_IDS },
   { id: "doors", styles: ["doors", "palace", "temple", "jharokha", "mandap", "storybook"] },
   { id: "reveals", styles: ["curtain", "phool", "envelope", "scroll", "gift"] },
@@ -82,23 +202,30 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   birthday: "mela-tamboo",
   party: "deco-gates",
   "farewell-party": "deco-gates",
-  launch: "deco-gates",
+  launch: "sheher-ki-raat",
   "shop-opening": "gift",
-  "baby-shower": "gift",
+  "baby-shower": "bulbule",
   diwali: "diyas",
   eid: "noor-darwaza",
-  janmashtami: "peacock",
+  janmashtami: "sanjhi-roshni",
   onam: "rangoli",
-  sankranti: "rangoli",
+  sankranti: "uday-surya",
   lohri: "lanterns",
   navratri: "lanterns",
   engagement: "phoolon-ki-deewar",
+  roka: "jugnu-van",
+  haldi: "badal-raag",
+  mehendi: "choodi-chakra",
+  sangeet: "jugnu-van",
+  reception: "sheesh-mahal",
   "save-the-date": "envelope",
-  anniversary: "shahi-parda",
+  anniversary: "popup-mahal",
   housewarming: "haveli-kiwad",
-  holi: "fireworks",
-  christmas: "gift",
-  reunion: "envelope",
+  annaprashan: "uday-surya",
+  holi: "gulaal-bindu",
+  christmas: "kaanch-ka-gola",
+  reunion: "bioscope",
+  retirement: "bioscope",
   graduation: "fireworks",
   "gudi-padwa": "rangoli",
   baisakhi: "lanterns",
@@ -106,7 +233,7 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   christening: "bagiya-gate",
   "naming-ceremony": "mela-tamboo",
   "raksha-bandhan": "gift",
-  "karva-chauth": "moonlit",
+  "karva-chauth": "odhni",
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 
@@ -181,6 +308,8 @@ export function openingStyle(
 ): OpeningStyle {
   const offered = openingStyles(suite, scene);
   if (choice.style && offered.includes(choice.style)) return choice.style;
+  // A themed opening's own theme opens with it
+  if (isThemedOpening(suite)) return suite;
   if (hasCoverDoors(suite) && !scene) return "doors";
   return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }
@@ -199,6 +328,51 @@ export const WELCOME_KINDS = ["royal", "bloom", "lamps", "night", "party", "lett
 export type WelcomeKind = (typeof WELCOME_KINDS)[number];
 
 const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
+  pankhi: "royal",
+  "sheesh-mahal": "royal",
+  "popup-mahal": "royal",
+  "uday-surya": "royal",
+  "athangudi-tiles": "royal",
+  pachchikari: "royal",
+  "chik-baradari": "royal",
+  "konark-chakra": "royal",
+  shekhawati: "royal",
+  "toran-mala": "royal",
+  odhni: "bloom",
+  "jal-darpan": "bloom",
+  "pushp-varsha": "bloom",
+  "moti-seep": "bloom",
+  "jaali-vriksh": "bloom",
+  lehar: "bloom",
+  "ped-ghar": "bloom",
+  "jhalar-palna": "bloom",
+  "jugnu-van": "lamps",
+  "sanjhi-roshni": "lamps",
+  "chhaya-parda": "lamps",
+  "baori-deep": "lamps",
+  jhilmil: "lamps",
+  "badal-raag": "night",
+  taaramandal: "night",
+  "thar-ki-ret": "night",
+  "sheher-ki-raat": "night",
+  "mandvi-dhow": "night",
+  "barf-khidki": "night",
+  "chhatri-utsav": "party",
+  "choodi-chakra": "party",
+  "gulaal-bindu": "party",
+  "kaanch-ka-gola": "party",
+  phirki: "party",
+  bulbule: "party",
+  "chhuk-chhuk": "party",
+  "irani-carrom": "party",
+  channapatna: "party",
+  "kavad-peti": "letter",
+  bioscope: "letter",
+  "ikat-dhaaga": "letter",
+  "olai-chuvadi": "letter",
+  "naksha-pangong": "letter",
+  "howrah-tareekh": "letter",
+  "pondy-gali": "letter",
   "rajwada-pol": "royal",
   "gopuram-kadhavu": "royal",
   "haveli-kiwad": "royal",

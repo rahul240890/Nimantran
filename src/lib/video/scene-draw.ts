@@ -97,7 +97,8 @@ function drawScene(ctx: CanvasRenderingContext2D, film: SceneFilm, seconds: numb
   if (before && change < 1) drawLight(ctx, film, moodOf(film, before), 1 - change);
   drawLight(ctx, film, mood, change);
 
-  const tone = page.dark || mood === "night" ? "dark" : "light";
+  // The words keep the painting's own tone at every hour, as the live scene does
+  const tone = page.dark ? "dark" : "light";
   const printed = film.palette(mood, tone);
   const blessing = film.copy.blessing.trim();
   if (page.blessing && blessing) {
@@ -165,12 +166,13 @@ function drawLight(ctx: CanvasRenderingContext2D, film: SceneFilm, mood: Mood, w
   if (mood === "dawn") {
     ctx.globalCompositeOperation = "soft-light";
     const wash = ctx.createLinearGradient(0, 0, 0, PAGE_H * 0.85);
-    wash.addColorStop(0, withAlpha(colours.glow, 0.7 * weight));
+    wash.addColorStop(0, withAlpha(colours.glow, 0.5 * weight));
     wash.addColorStop(1, withAlpha(colours.glow, 0));
     ctx.fillStyle = wash;
   } else {
     ctx.globalCompositeOperation = "multiply";
-    const deep = mood === "night" ? 0.55 : 0.28;
+    // Light enough that the painting, and the words on it, never sink into the dark
+    const deep = mood === "night" ? 0.3 : 0.16;
     const wash = ctx.createLinearGradient(0, 0, 0, PAGE_H);
     wash.addColorStop(0, withAlpha(colours.near, deep * weight));
     wash.addColorStop(1, withAlpha(colours.near, deep * 0.6 * weight));
@@ -486,7 +488,7 @@ function drawCard(
   const mood = sceneLight(item.kind === "function" ? item.fn.kind : "line").mood;
   // With no card (an illustrated card), the words print on the painting in its own tone
   const bare = film.page.style === "bare";
-  const tone = film.page.dark || mood === "night" ? "dark" : "light";
+  const tone = film.page.dark ? "dark" : "light";
   const colours = film.palette(mood, bare ? tone : null);
   const inner = bare
     ? { x: -slot.w / 2, y: -slot.h / 2, w: slot.w, h: slot.h, painted: true }
