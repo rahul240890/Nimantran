@@ -49,10 +49,10 @@ import { PreviewStage } from "./preview-stage";
 import { DesignBar } from "./design-bar";
 import { DETAIL_STEPS, SectionMark, SectionRow, isDetailStep } from "./detail-sections";
 import "@/components/invitation/type/fonts.css";
-import { CoupleStep } from "./steps/couple-step";
+import { CoupleStep, WordsStep } from "./steps/couple-step";
 import { DesignStep } from "./steps/design-step";
-import { ExtrasStep } from "./steps/extras-step";
-import { LanguageStep } from "./steps/language-step";
+import { FamilySection } from "./steps/family-section";
+import { MusicStep, PhotosStep } from "./steps/photos-music-steps";
 import { FunctionsStep } from "./steps/functions-step";
 import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
@@ -73,16 +73,16 @@ const WIDE = "(min-width: 64rem)";
 /** Opening the link dialog survives the remount that leaving ?invite= in the address causes. */
 let publishOnArrival = false;
 
-const MINI_STEPS = new Set<EditorStep>(["language", "couple", "functions"]);
+const MINI_STEPS = new Set<EditorStep>(["couple", "family", "functions", "words"]);
 
 /*
- * The progress shows three stages, not eight steps: pick a design (occasion, tradition,
- * design and the card's language), add your details (names, functions, photos and music,
- * as three parts of one page), then preview and share. A host arriving from the gallery
- * starts on the design stage's last step, the language, with the design already chosen.
+ * The progress shows three stages, not ten steps: pick a design (occasion, tradition and
+ * design), add your details (names, family, functions, photos, card words, and music and
+ * replies, as six parts of one page), then preview and share. A host arriving from the
+ * gallery starts on the names, with the design already chosen.
  */
 const STAGES = ["design", "details", "preview"] as const;
-const SETUP = new Set<EditorStep>(["occasion", "tradition", "design", "language"]);
+const SETUP = new Set<EditorStep>(["occasion", "tradition", "design"]);
 /** The steps where the design is still being picked; past them, it shows with a way back. */
 const PICKING = new Set<EditorStep>(["occasion", "tradition", "design"]);
 const stageOf = (step: EditorStep) => (SETUP.has(step) ? 0 : isDetailStep(step) ? 1 : 2);
@@ -128,7 +128,7 @@ function stepPage(draft: InviteDraft, step: EditorStep): string {
     const first = functionOrder(draft).suggested.find((id) => draft.functions[id].included);
     return first ? `fn-${first}` : "cover";
   }
-  return "cover";
+  return step === "family" ? "family" : "cover";
 }
 
 /** Where the draft is saved: this device, or the account once signed in. */
@@ -452,10 +452,12 @@ export function Editor({
       {step === "occasion" && <OccasionStep {...props} />}
       {step === "tradition" && <TraditionStep {...props} />}
       {step === "design" && <DesignStep {...props} />}
-      {step === "language" && <LanguageStep {...props} />}
       {step === "couple" && <CoupleStep {...props} />}
+      {step === "family" && <FamilySection {...props} />}
       {step === "functions" && <FunctionsStep {...props} />}
-      {step === "extras" && <ExtrasStep {...props} />}
+      {step === "photos" && <PhotosStep {...props} />}
+      {step === "words" && <WordsStep {...props} />}
+      {step === "music" && <MusicStep {...props} />}
       {step === "preview" && (
         <PreviewStep
           {...props}
@@ -530,7 +532,7 @@ export function Editor({
               className="flex flex-1 flex-col"
             >
               {isDetailStep(step) ? (
-                // The details: three parts of one page, the open one in full, the others
+                // The details: six parts of one page, the open one in full, the others
                 // folded to a line that says what's in them
                 <div
                   role="group"

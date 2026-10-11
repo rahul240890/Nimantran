@@ -8,6 +8,7 @@ import { EditionPicker } from "@/components/editions/edition-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/motion/page-transition";
+import { getAdmin } from "@/lib/admin/access";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
@@ -38,10 +39,11 @@ export default async function EditionPage({
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/edition`)}`);
-  const [draft, current, owner] = await Promise.all([
+  const [draft, current, owner, admin] = await Promise.all([
     inviteStore()?.get(account, id),
     invitePlan(account, id),
     ownsInvite(account, id),
+    getAdmin(),
   ]);
   if (!draft || !current) notFound();
   const [active, receipts, locale, { upgradeCopy, planCopy }, coupons, pricing] = await Promise.all(
@@ -55,8 +57,9 @@ export default async function EditionPage({
     ],
   );
   const design = designTier(pricing, draftDesignId(draft));
-  // Back to the editor to publish, once the package covers the invite
-  const ready = planShortfalls(draft, current, design).length === 0;
+  // Back to the editor to publish, once the package covers the invite. Until payments are
+  // switched on every invite publishes with everything, so it's ready as it is.
+  const ready = !active || planShortfalls(draft, current, design).length === 0;
   const publishHref =
     publish === "1" && !draft.slug && owner ? `/create?invite=${id}&publish=1` : null;
 
@@ -95,13 +98,26 @@ export default async function EditionPage({
               </div>
             </div>
           )}
-          {publishHref && ready && current.plan !== "free" && (
+          {!active && admin && (
+            <div
+              role="note"
+              className="flex max-w-2xl flex-col gap-3 rounded-lg border border-line bg-surface-2 p-5 sm:flex-row sm:items-center"
+            >
+              <p className="flex-1 text-sm text-ink-muted">{upgradeCopy.adminOff}</p>
+              <Button asChild variant="secondary" size="sm">
+                <Link href="/admin/razorpay">{upgradeCopy.adminOffLink}</Link>
+              </Button>
+            </div>
+          )}
+          {publishHref && ready && (current.plan !== "free" || !active) && (
             <div
               role="status"
               className="flex max-w-2xl flex-col gap-4 rounded-lg border border-success/40 bg-success/5 p-5 sm:flex-row sm:items-center"
             >
               <PartyPopper aria-hidden className="size-6 shrink-0 text-success" />
-              <p className="flex-1 font-semibold">{upgradeCopy.publishBody}</p>
+              <p className="flex-1 font-semibold">
+                {active ? upgradeCopy.publishBody : upgradeCopy.publishFreeBody}
+              </p>
               <Button asChild>
                 <Link href={publishHref}>
                   <Globe aria-hidden />

@@ -76,6 +76,11 @@ export const upgradeCopy = {
   continueFree: "Continue free",
   publishNow: "Publish your invite",
   publishBody: "Your package is ready. Publish the invite to get its link.",
+  publishFreeBody:
+    "Payments open very soon, so your invite publishes free with everything for now.",
+  adminOff:
+    "Only you see this: checkout is switched off, so hosts can't pay yet. Add the Razorpay keys and turn checkout on.",
+  adminOffLink: "Open Admin, Razorpay",
   opening: "Opening payment…",
   checking: "Confirming your payment…",
   paid: (plan: string) => `${plan} is on. Thank you!`,

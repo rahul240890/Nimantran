@@ -188,7 +188,8 @@ export function EditionPicker({
 
   return (
     <div className="flex flex-col gap-6">
-      {!active && (
+      {/* On the way to publishing, the page's own banner already says so */}
+      {!active && !publishHref && (
         <p
           role="status"
           className="rounded-md border border-line bg-surface-2 px-4 py-3 text-sm text-ink-muted"
