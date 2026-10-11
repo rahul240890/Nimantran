@@ -44,6 +44,9 @@ test.describe("host preview", () => {
     await expect(page.getByRole("button", { name: "Next page" })).toHaveCSS("opacity", "0");
     await expect(menu).toBeVisible();
     if (shots) await page.screenshot({ path: `${shots}/preview-phone-pages.png` });
+    // Opening asked the browser for the whole screen; a window can only be resized out of it
+    await expect.poll(() => page.evaluate(() => Boolean(document.fullscreenElement))).toBe(true);
+    await page.evaluate(() => document.exitFullscreen());
 
     // On a computer: the same page inside a phone, with the notes and next step beside it
     await page.setViewportSize({ width: 1440, height: 900 });
