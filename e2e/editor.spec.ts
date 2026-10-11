@@ -57,6 +57,8 @@ for (const colorScheme of ["light", "dark"] as const) {
     test.use({ colorScheme, reducedMotion: "reduce" });
 
     test("every step fits the screen and passes an accessibility check", async ({ page }) => {
+      // Eight steps, each with its own accessibility check: about 30s on a quiet machine
+      test.slow();
       await page.goto("/create?quality=2d");
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
       expect(await noOverflow(page)).toBe(true);
