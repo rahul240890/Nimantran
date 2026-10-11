@@ -5,6 +5,8 @@ import { FUNCTION_IDS, type FunctionId } from "@/lib/events/functions";
 import { uiStrings } from "@/lib/ui-strings";
 import {
   BEAT_MIN,
+  FUNCTION_BEAT_MIN,
+  isFunctionBeat,
   STORY_MAX_SECONDS,
   STORY_SCENES,
   beatAt,
@@ -244,9 +246,26 @@ describe("event pages", () => {
     const functions = FUNCTION_IDS.map((kind) => fn(kind, { venue: "Kankotri Vadi, Rajkot" }));
     const beats = storyBeats({ copy, functions, replies: true, words });
     for (const beat of beats) expect(beat.seconds).toBeGreaterThanOrEqual(BEAT_MIN);
-    expect(storyLength(beats)).toBeLessThanOrEqual(
-      Math.max(STORY_MAX_SECONDS, beats.length * BEAT_MIN) + 0.5,
+    const floors = beats.reduce(
+      (sum, beat) => sum + (isFunctionBeat(beat) ? FUNCTION_BEAT_MIN : BEAT_MIN),
+      0,
     );
+    expect(storyLength(beats)).toBeLessThanOrEqual(Math.max(STORY_MAX_SECONDS, floors) + 0.5);
+  });
+
+  it("shortens the cover and family before any function's page", () => {
+    const eight = ["roka", "engagement", "haldi", "mehendi", "sangeet", "wedding", "reception"];
+    const functions = FUNCTION_IDS.filter((kind) => eight.includes(kind)).map((kind) =>
+      fn(kind, { venue: "Shree Banquet Hall, MG Road, Ahmedabad" }),
+    );
+    const family = [
+      { title: "Blessings", text: "Late Shri Ramniklal Shah and family" },
+      { title: "Bride's parents", text: "Mr and Mrs Shah" },
+      { title: "Groom's parents", text: "Mr and Mrs Patel" },
+    ];
+    const beats = storyBeats({ copy, functions, replies: true, words, family });
+    for (const beat of beats.filter(isFunctionBeat))
+      expect(beat.seconds).toBeGreaterThanOrEqual(FUNCTION_BEAT_MIN);
   });
 
   it("finds the beat playing at any moment", () => {

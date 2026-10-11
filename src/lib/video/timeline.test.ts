@@ -7,6 +7,9 @@ import {
   pagesAt,
   VIDEO_BEAT_MIN,
   VIDEO_FIXED_MAX_SECONDS,
+  VIDEO_FUNCTION_MIN,
+  VIDEO_FUNCTION_SECONDS,
+  VIDEO_LONGEST_SECONDS,
   VIDEO_MAX_SECONDS,
   VIDEO_MIN_SECONDS,
   videoTimeline,
@@ -76,6 +79,52 @@ describe("video timeline", () => {
     });
     expect(pagesAt(timeline, timeline.end + 0.1)).toMatchObject({ current: "end", previous: 1 });
     expect(pagesAt(timeline, 0)).toMatchObject({ current: 0, previous: null, fade: 1 });
+  });
+});
+
+describe("several functions", () => {
+  // A wedding as hosts write it: blessing, cover, photo, family, invitation, then functions
+  const wedding = (functions: number) => [
+    beat("blessing", 1),
+    beat("cover", 3),
+    { ...beat("couple", 3), seconds: 6 },
+    beat("family", 8),
+    beat("invite", 3),
+    ...Array.from({ length: functions }, (_, i) => beat(`fn-${i}`, 5)),
+    beat("reply", 1),
+  ];
+  const pages = (count: number) => videoTimeline(wedding(count)).beats;
+  const fns = (count: number) => pages(count).filter((entry) => entry.beat.id.startsWith("fn-"));
+  const others = (count: number) =>
+    pages(count).filter((entry) => !entry.beat.id.startsWith("fn-"));
+
+  it("keeps up to four functions within 45 seconds, each long enough to read", () => {
+    for (const count of [1, 2, 3, 4]) {
+      expect(videoTimeline(wedding(count)).total).toBeLessThanOrEqual(VIDEO_MAX_SECONDS + 0.01);
+      for (const entry of fns(count))
+        expect(entry.seconds).toBeGreaterThanOrEqual(VIDEO_FUNCTION_SECONDS - 0.01);
+    }
+  });
+
+  it("grows towards a minute for more, rather than flash their pages by", () => {
+    for (const count of [5, 6, 8]) {
+      const total = videoTimeline(wedding(count)).total;
+      expect(total).toBeGreaterThan(VIDEO_MAX_SECONDS);
+      expect(total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);
+      for (const entry of fns(count))
+        expect(entry.seconds).toBeGreaterThanOrEqual(VIDEO_FUNCTION_MIN - 0.01);
+      for (const entry of others(count))
+        expect(entry.seconds).toBeGreaterThanOrEqual(VIDEO_BEAT_MIN - 0.01);
+    }
+  });
+
+  it("gives a function's page more time than the cover or family's", () => {
+    const longestOther = Math.max(...others(5).map((entry) => entry.seconds));
+    for (const entry of fns(5)) expect(entry.seconds).toBeGreaterThan(longestOther);
+  });
+
+  it("never runs past a minute, however many functions", () => {
+    expect(videoTimeline(wedding(16)).total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);
   });
 });
 

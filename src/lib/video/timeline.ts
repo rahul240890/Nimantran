@@ -1,18 +1,29 @@
 /*
  * The story reveal as a short vertical video (Step 17c) for WhatsApp Status and Instagram
  * Reels: the same pages in the same order, timed to land between 30 and 45 seconds, then
- * a closing card with the invitation's link. Pure timing, shared by the renderer and tests.
+ * a closing card with the invitation's link. Many functions stretch it towards a minute
+ * rather than flash their pages by. Pure timing, shared by the renderer and tests.
  */
 
-import { LINE_IN, LINE_STAGGER, type StoryBeat } from "@/lib/engine/story";
+import { isFunctionBeat, LINE_IN, LINE_STAGGER, squeeze, type StoryBeat } from "@/lib/engine/story";
 
 /** WhatsApp Status takes up to about a minute per update; Reels feel right under 45 seconds. */
 export const VIDEO_MIN_SECONDS = 30;
 export const VIDEO_MAX_SECONDS = 45;
+/** WhatsApp Status cuts a video at a minute, so no video runs longer, however many functions. */
+export const VIDEO_LONGEST_SECONDS = 60;
 /** With the host's fixed time on each page, the video runs as long as that, up to a minute. */
-export const VIDEO_FIXED_MAX_SECONDS = 60;
+export const VIDEO_FIXED_MAX_SECONDS = VIDEO_LONGEST_SECONDS;
 /** The closing card with the link. */
 export const END_SECONDS = 4;
+/**
+ * A function's page (name, day, hour, place) holds this long before the video grows past
+ * 45 seconds, and never shorter than its minimum unless it would pass a minute.
+ */
+export const VIDEO_FUNCTION_SECONDS = 5;
+export const VIDEO_FUNCTION_MIN = 4;
+/** The cover, family and closing pages, the same way: they give up their time first. */
+export const VIDEO_PAGE_SECONDS = 3.4;
 /** No page flashes by faster than this, however many functions there are. */
 export const VIDEO_BEAT_MIN = 2.6;
 /** One page fades into the next over this long. */
@@ -44,8 +55,10 @@ export type VideoTimeline = {
 };
 
 /**
- * Times each page so the whole video, closing card included, is 30 to 45 seconds. With
- * `fixed` (the host set a time for every page) each page keeps it, so the video and its
+ * Times each page so the whole video, closing card included, is 30 to 45 seconds. When the
+ * pages need more than that at a comfortable pace (five functions or so), the video grows
+ * towards a minute instead. A function's page keeps more time than the cover or family's.
+ * With `fixed` (the host set a time for every page) each page keeps it, so the video and its
  * music run exactly as long as the pages need, squeezed only past a minute.
  */
 export function videoTimeline(
@@ -53,14 +66,21 @@ export function videoTimeline(
   { fixed = false }: { fixed?: boolean } = {},
 ): VideoTimeline {
   const room = (fixed ? VIDEO_FIXED_MAX_SECONDS : VIDEO_MAX_SECONDS) - END_SECONDS;
-  const floor = Math.min(VIDEO_BEAT_MIN, room / Math.max(story.length, 1));
+  const longest = VIDEO_LONGEST_SECONDS - END_SECONDS;
   const natural = story.reduce((sum, beat) => sum + beat.seconds, 0);
+  const functions = story.map((beat) => isFunctionBeat(beat));
+  const floors = (fn: number, page: number) =>
+    story.map((beat, i) => Math.min(beat.seconds, functions[i] ? fn : page));
   let lengths = story.map((beat) => beat.seconds);
   if (natural > room) {
-    // Only the time above each page's floor shrinks, as fitStory does for the live story
-    const spare = natural - story.length * floor;
-    const scale = Math.max(0, (room - story.length * floor) / Math.max(spare, 0.001));
-    lengths = story.map((beat) => floor + Math.max(0, beat.seconds - floor) * scale);
+    const every = story.map(() => true);
+    // Every page gives up its time above a comfortable read, evenly, to fit 45 seconds
+    lengths = squeeze(lengths, floors(VIDEO_FUNCTION_SECONDS, VIDEO_PAGE_SECONDS), every, room);
+    // Still too long: grow towards a minute, each page shortening towards its least
+    lengths = squeeze(lengths, floors(VIDEO_FUNCTION_MIN, VIDEO_BEAT_MIN), every, longest);
+    // So many functions that even their least is over a minute: all shorten alike
+    const over = lengths.reduce((sum, length) => sum + length, 0);
+    if (over > longest) lengths = lengths.map((length) => (length * longest) / over);
   } else if (!fixed && natural + END_SECONDS < VIDEO_MIN_SECONDS && natural > 0) {
     // A short story lingers a little on each page instead of ending early
     const scale = (VIDEO_MIN_SECONDS - END_SECONDS) / natural;

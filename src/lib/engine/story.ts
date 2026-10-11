@@ -118,10 +118,18 @@ export const LINE_IN = 0.9;
 const READ_PER_WORD = 0.32;
 const READ_MIN = 3;
 const READ_MAX = 5.5;
-/** A whole story never runs longer than this; long lists of functions read faster. */
+/** A whole story aims to run no longer than this; long lists of functions read faster. */
 export const STORY_MAX_SECONDS = 75;
 /** Nor any page shorter than this, however it is squeezed. */
 export const BEAT_MIN = 4.5;
+/**
+ * A function's page (its name, day, hour and place) is what a guest comes back for, so it
+ * keeps at least this long: the cover, family and closing pages give up their time first.
+ */
+export const FUNCTION_BEAT_MIN = 6;
+
+/** Whether a page is one of the host's functions rather than the cover, family or close. */
+export const isFunctionBeat = (beat: Pick<StoryBeat, "id">) => beat.id.startsWith("fn-");
 
 const words = (lines: readonly StoryLine[]) =>
   lines.reduce((sum, line) => sum + line.text.split(/\s+/).filter(Boolean).length, 0);
@@ -253,21 +261,52 @@ export function storyBeats({
 }
 
 /**
- * Squeezes a long story so it stays under STORY_MAX_SECONDS, each beat keeping its share.
- * No beat drops below its floor, so a kankotri with a dozen functions runs a little longer
- * rather than too fast to read.
+ * Squeezes a long story so it stays under STORY_MAX_SECONDS. The cover, family and closing
+ * pages give up their time first, down to BEAT_MIN; only then do the functions shorten, and
+ * never below FUNCTION_BEAT_MIN. A kankotri with a dozen functions runs longer rather than
+ * too fast to read.
  */
 export function fitStory(beats: StoryBeat[]): StoryBeat[] {
-  const total = storyLength(beats);
-  if (total <= STORY_MAX_SECONDS) return beats;
-  // Only the time above each beat's floor shrinks, so the whole lands on the limit
-  const floor = beats.length * BEAT_MIN;
-  const scale = Math.max(0, (STORY_MAX_SECONDS - floor) / Math.max(total - floor, 0.001));
-  return beats.map((b) => ({
-    ...b,
-    seconds: Number((BEAT_MIN + Math.max(0, b.seconds - BEAT_MIN) * scale).toFixed(2)),
-  }));
+  const floors = beats.map((b) =>
+    Math.min(b.seconds, isFunctionBeat(b) ? FUNCTION_BEAT_MIN : BEAT_MIN),
+  );
+  const lengths = squeeze(
+    beats.map((b) => b.seconds),
+    floors,
+    beats.map((b) => !isFunctionBeat(b)),
+    STORY_MAX_SECONDS,
+  );
+  return beats.map((b, i) => ({ ...b, seconds: Number(lengths[i]!.toFixed(2)) }));
 }
+
+/**
+ * Shortens `lengths` to add up to `room`, taking time from the pages marked `first` before
+ * the rest, and from no page below its floor. Floors that alone overflow the room are kept.
+ */
+export function squeeze(
+  lengths: readonly number[],
+  floors: readonly number[],
+  first: readonly boolean[],
+  room: number,
+): number[] {
+  let result = [...lengths];
+  for (const group of [true, false]) {
+    const over = sum(result) - room;
+    if (over <= 0) break;
+    const spare = result.reduce(
+      (total, length, i) => total + (first[i] === group ? Math.max(0, length - floors[i]!) : 0),
+      0,
+    );
+    if (spare <= 0) continue;
+    const keep = Math.max(0, 1 - over / spare);
+    result = result.map((length, i) =>
+      first[i] === group ? floors[i]! + Math.max(0, length - floors[i]!) * keep : length,
+    );
+  }
+  return result;
+}
+
+const sum = (values: readonly number[]) => values.reduce((total, value) => total + value, 0);
 
 /** The times a host can fix for every page (Step 12y); null lets each page take its own. */
 export const PAGE_SECONDS = [4, 5, 6, 8, 10] as const;
