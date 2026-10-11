@@ -228,10 +228,6 @@ export function GuestView({
       <div lang={language} className="flex min-h-dvh flex-col">
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
-          <div className="absolute end-3 top-[max(0.75rem,env(safe-area-inset-top))] z-30">
-            <ThemeMenu labels={theme} />
-          </div>
-
           {watermark && <WatermarkLayer />}
           <main id="main" className="flex flex-1 flex-col">
             {scene && !showOpening ? (
@@ -417,9 +413,13 @@ export function GuestView({
                 <BrandMark className="size-6 text-accent-text" />
                 {guestCopy.madeWith}
               </p>
-              <Button asChild variant="ghost" size="sm">
-                <Link href="/">{guestCopy.createYours}</Link>
-              </Button>
+              {/* Light or dark for the details; kept off the invitation's own full-screen pages */}
+              <div className="flex items-center gap-2">
+                <ThemeMenu labels={theme} />
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/">{guestCopy.createYours}</Link>
+                </Button>
+              </div>
             </div>
           </footer>
         </div>

@@ -598,7 +598,11 @@ export function SuiteBackdrop({
   under?: ReactNode;
   /** Show the whole painting (its frames must not be cropped), a blurred copy filling round it. */
   contain?: boolean;
-  /** With contain: the painting stands at the foot of the page, clear of the controls above. */
+  /**
+   * With contain: the painting starts just below the controls, so they never cover the god
+   * at its top, and fills the rest of the page edge to edge (a little of its foot or sides
+   * may fall outside, never its top).
+   */
   lifted?: boolean;
   children?: ReactNode;
 }) {
@@ -630,7 +634,7 @@ export function SuiteBackdrop({
               alt=""
               decoding="async"
               draggable={false}
-              className="pointer-events-none size-full [mask-image:linear-gradient(to_bottom,transparent,black_4%)] object-contain object-bottom select-none"
+              className="pointer-events-none size-full [mask-image:linear-gradient(to_bottom,transparent,black_4%)] object-cover object-top select-none"
             />
           </div>
         ) : image ? (

@@ -31,6 +31,9 @@ export const WELCOME_MS = 3200;
 
 const noSubscribe = () => () => {};
 
+const QUIET_LINK =
+  "inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm text-card-ivory/90 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring";
+
 /** Seconds since 1970, ticking once a second (once a minute in still mode). */
 function useClock(still: boolean): number | null {
   return useSyncExternalStore(
@@ -464,7 +467,7 @@ export function Opening({
       data-doorway={open ? "open" : "closed"}
       data-opening={style}
       style={{ "--story-scale": type.scale } as CSSProperties}
-      className="opening-page relative isolate flex min-h-svh items-center justify-center overflow-hidden sm:py-6"
+      className="opening-page relative isolate flex min-h-svh items-center justify-center overflow-hidden"
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
@@ -483,7 +486,7 @@ export function Opening({
 
       <div
         data-open={open}
-        className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:h-[min(calc(100svh-3rem),58rem)] sm:w-auto sm:rounded-[1.75rem] sm:border sm:border-card-ivory/40 sm:shadow-overlay"
+        className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
         <OpeningArt style={style} cover={cover} seal={initials(copy)} />
         {open && !still && <OpeningPetals />}
@@ -542,33 +545,30 @@ export function Opening({
                 label={guestCopy.doorway.counting}
               />
             )}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <Button
-                ref={button}
-                size="lg"
-                leadingIcon={<DoorOpen aria-hidden />}
-                onClick={enter}
-                aria-expanded={open}
-                disabled={open}
-              >
-                {guestCopy.doorway.open}
-              </Button>
-              {reply && (
-                <Button asChild size="lg" variant="secondary">
-                  <a href={reply.href}>
-                    <MailCheck aria-hidden />
-                    {reply.label}
-                  </a>
-                </Button>
-              )}
-            </div>
-            <a
-              href="#guest-functions"
-              className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm text-card-ivory/90 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+            <Button
+              ref={button}
+              size="lg"
+              leadingIcon={<DoorOpen aria-hidden />}
+              onClick={enter}
+              aria-expanded={open}
+              disabled={open}
+              className="min-w-[min(16rem,80cqw)]"
             >
-              {guestCopy.doorway.details}
-              <ChevronDown aria-hidden className="size-4" />
-            </a>
+              {guestCopy.doorway.open}
+            </Button>
+            {/* The quieter ways on, in one line under the way in */}
+            <div className="flex flex-wrap items-center justify-center gap-x-1">
+              {reply && (
+                <a href={reply.href} className={QUIET_LINK}>
+                  <MailCheck aria-hidden className="size-4" />
+                  {reply.label}
+                </a>
+              )}
+              <a href="#guest-functions" className={QUIET_LINK}>
+                {guestCopy.doorway.details}
+                <ChevronDown aria-hidden className="size-4" />
+              </a>
+            </div>
           </div>
         </div>
         {welcome && (

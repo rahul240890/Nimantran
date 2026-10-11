@@ -38,6 +38,7 @@ export const shareCopy = {
   whatsapp: "Share on WhatsApp",
   moreWays: "More ways to share",
   open: "Open invitation",
+  guestView: "See what guests see",
   edit: "Edit invite",
   messageLabel: "Message",
   messageHint: "Sent with the link. Change it however you like.",
@@ -247,4 +248,9 @@ export const hostPreviewCopy = {
   back: "Keep editing",
   next: "Choose a package and publish",
   share: "Share your invite",
+  heading: "This is what your guests will see",
+  body: "Guests tap your link in WhatsApp and the invitation fills their phone screen like a reel, with your music. Press Open the invitation on the phone to watch it the way they will.",
+  phone: "Your invitation on a phone",
+  fullScreen: "See it full screen",
+  menu: "Preview options",
 } as const;
