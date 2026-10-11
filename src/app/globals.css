@@ -5202,14 +5202,15 @@
   );
   mix-blend-mode: screen;
 }
+/* A hint of the hour, never so deep that the painting or its words sink into the dark */
 [data-scene-mood="dawn"] .scene-wash[data-mood="dawn"] {
-  opacity: 0.7;
+  opacity: 0.5;
 }
 [data-scene-mood="dusk"] .scene-wash[data-mood="dusk"] {
-  opacity: 0.42;
+  opacity: 0.22;
 }
 [data-scene-mood="night"] .scene-wash[data-mood="night"] {
-  opacity: 0.8;
+  opacity: 0.38;
 }
 .scene-print.story-print-haze {
   /* A busy painting gets a firmer, wider haze behind the names, so they always read */
@@ -5372,6 +5373,72 @@
     opacity: 1;
   }
 }
+/*
+ * A function's words writing themselves in as its card lands (one-scene.tsx Reveal): the
+ * name's letters rise one after another out of a soft blur, then each line below follows.
+ * Letters stay inside their word, so the name breaks where it would as plain text.
+ */
+.scene-reveal-word {
+  white-space: nowrap;
+}
+.scene-words[data-overflow] .scene-reveal-word {
+  white-space: normal;
+}
+.scene-reveal {
+  display: inline-block;
+  animation: scene-letter 650ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.scene-reveal-line {
+  animation: scene-line 650ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+.scene-rule.scene-reveal-line {
+  animation-name: scene-rule-draw;
+}
+@keyframes scene-letter {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em) scale(0.85);
+    filter: blur(0.12em);
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+@keyframes scene-line {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes scene-rule-draw {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-reveal,
+  .scene-reveal-line {
+    animation: none;
+  }
+}
+
 /*
  * An illustrated card coming together (scene.ts openPieces): its empty space glows in,
  * then the art above drops in, the art at the sides slides in and the art below rises,
