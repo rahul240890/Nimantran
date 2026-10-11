@@ -177,6 +177,23 @@ export type OpeningProps = {
 };
 
 /**
+ * Opening the invitation fills the whole screen where the browser allows it, so the
+ * browser's own bars don't crowd the card. Only a guest's tap may ask, and a page shown
+ * inside another (the host's phone preview) leaves its frame alone. Phones that can't
+ * (an iPhone's Safari) simply carry on as they were.
+ */
+function fillScreen() {
+  const root = document.documentElement;
+  if (window.self !== window.top || document.fullscreenElement || !root.requestFullscreen) return;
+  root.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+}
+
+/** Closing the invitation again gives the browser its bars back. */
+function leaveFullScreen() {
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+
+/**
  * The guest's first screen (Step 12x): a full-height opening in the style the host chose,
  * with the god or symbol they chose top-centre, the names, and a countdown to the main
  * event. Opening it plays the style's move (doors swing, curtains gather, the flap lifts,
@@ -263,10 +280,12 @@ export function Opening({
 
   const enter = () => {
     setOpen(true);
+    fillScreen();
     if (musicOnOpen && !music.playing && !musicMuted()) void music.play();
   };
   const leave = (hadFocus: boolean) => {
     returnFocus.current = hadFocus;
+    leaveFullScreen();
     setWelcome(false);
     setPages(false);
     setOpen(false);
