@@ -39,6 +39,7 @@ import {
   SCENE_SWAP_MS,
   entranceFor,
   sceneLight,
+  withBlessing,
   type Entrance,
   type PaintedCard,
   type Piece,
@@ -56,7 +57,9 @@ import "@/components/invitation/type/fonts.css";
  * With reduced motion nothing moves by itself; the arrows step through the functions.
  */
 
-type SceneItem = { kind: "line"; text: string } | { kind: "function"; fn: StoryFunction };
+/** The slot's opening card (the blessing, the line, or both) or one function. */
+type SceneItem =
+  { kind: "line"; text: string; blessing: string } | { kind: "function"; fn: StoryFunction };
 
 /** The function in the slot, the side it came from, and which turn brought it. */
 type Shown = { index: number; from: Entrance; turn: number };
@@ -151,6 +154,9 @@ type FitOptions = {
 /** How long an illustrated card takes to come together, its words appearing at the end. */
 const OPEN_MS = 1500;
 
+/** A blessing up to this long (॥ श्री गणेशाय नमः ॥) is kept on one line. */
+const SHORT_BLESSING = 28;
+
 /** Below this share of its size, the line under the names opens the slot instead. */
 const LINE_MIN = 0.9;
 
@@ -200,7 +206,7 @@ export type OneSceneProps = {
 
 export function OneScene({
   suite,
-  page,
+  page: painting,
   copy,
   lang,
   functions,
@@ -219,6 +225,12 @@ export function OneScene({
   const { guestCopy } = useGuestText();
   const words = guestCopy.scene;
   const reduced = useReducedMotion();
+  // The blessing over the names gets a line of its own on the painting
+  const blessing = copy.blessing.trim();
+  const blessed = blessing ? withBlessing(painting) : null;
+  const page = blessed ?? painting;
+  // A painting with no line for it opens the slot with the blessing instead
+  const slotBlessing = blessing && !blessed ? blessing : "";
 
   // An illustrated card comes together from its sides once, then shows as one painting
   const pieces = page.pieces.length > 0 && !reduced;
@@ -239,8 +251,11 @@ export function OneScene({
   // The line under the names that couldn't fit its place on the painting, by its words
   const [crowded, setCrowded] = useState<string | null>(null);
   const lineOnPainting = Boolean(page.line) && crowded !== lineKey;
+  const slotLine = lineOnPainting ? "" : copy.line.trim();
   const items: SceneItem[] = [
-    ...(lineOnPainting || !copy.line.trim() ? [] : [{ kind: "line" as const, text: copy.line }]),
+    ...(slotLine || slotBlessing
+      ? [{ kind: "line" as const, text: slotLine, blessing: slotBlessing }]
+      : []),
     ...functions.map((fn) => ({ kind: "function" as const, fn })),
   ];
   const count = items.length;
@@ -312,6 +327,10 @@ export function OneScene({
   const namesWords = useRef<HTMLSpanElement>(null);
   const lineBox = useRef<HTMLParagraphElement>(null);
   const lineWords = useRef<HTMLSpanElement>(null);
+  const blessingBox = useRef<HTMLParagraphElement>(null);
+  const blessingWords = useRef<HTMLSpanElement>(null);
+  // A long blessing shrinks to its line rather than wrap into the names
+  useFit(blessingBox, blessingWords, `${blessing}${lang}${typeKey}`, { max: 1, floor: 0.45 });
   // Long names shrink further rather than run into the photo or the slot
   useFit(namesBox, namesWords, `${names.join("|")}${joiner}${lang}${typeKey}`, { floor: 0.42 });
   // A line that would set too small for its place opens the slot instead, at a size to read
@@ -407,6 +426,27 @@ export function OneScene({
             </div>
           )}
 
+          {page.blessing && blessing && (
+            <p
+              ref={blessingBox}
+              lang={lang}
+              data-tone={tone}
+              data-after={after}
+              className="story-print scene-print scene-words absolute flex items-center justify-center text-center text-card-accent-text"
+              style={box(page.blessing)}
+            >
+              <span
+                ref={blessingWords}
+                className={cn(
+                  "block max-w-full text-balance",
+                  blessing.length <= SHORT_BLESSING && "whitespace-nowrap",
+                )}
+                style={sceneLine(voice, "blessing", lang, type)}
+              >
+                {blessing}
+              </span>
+            </p>
+          )}
           <Names
             ref={namesBox}
             id="scene-names"
@@ -687,7 +727,7 @@ function SlotCard({
   const words = useRef<HTMLDivElement>(null);
   const key =
     item.kind === "line"
-      ? item.text
+      ? `${item.blessing}|${item.text}`
       : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
   // A painted card's words fit its writing area; a drawn card's, the card inside its padding
   // A painted card's writing area is fixed by its painting, so its words may set a little smaller
@@ -738,9 +778,32 @@ function SlotCard({
         {/* The card's spacing is set in em of this size, so it shrinks with the words */}
         <div ref={words} className="scene-card-words flex w-full flex-col items-center">
           {item.kind === "line" ? (
-            <p lang={lang} className="text-balance" style={sceneLine(voice, "line", lang, type)}>
-              {item.text}
-            </p>
+            <>
+              {/* As a printed card opens: the blessing, a rule, then the invitation */}
+              {item.blessing && (
+                <p
+                  lang={lang}
+                  className={cn(
+                    "max-w-full text-balance text-card-accent-text",
+                    // A short invocation stays on one line, shrinking rather than breaking
+                    item.blessing.length <= SHORT_BLESSING && "whitespace-nowrap",
+                  )}
+                  style={sceneLine(voice, "blessing-card", lang, type)}
+                >
+                  {item.blessing}
+                </p>
+              )}
+              {item.blessing && item.text && <span aria-hidden className="story-rule scene-rule" />}
+              {item.text && (
+                <p
+                  lang={lang}
+                  className="text-balance"
+                  style={sceneLine(voice, "line", lang, type)}
+                >
+                  {item.text}
+                </p>
+              )}
+            </>
           ) : (
             fn && (
               <>

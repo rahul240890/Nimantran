@@ -31,7 +31,7 @@ import { drawFrame, videoImages } from "@/lib/video/draw";
 import type { VideoFilm } from "@/lib/video/encode";
 import { drawSceneFrame, sceneVideoImages, type SceneItem } from "@/lib/video/scene-draw";
 import { SCENE_FLY, sceneTimeline } from "@/lib/video/scene-timeline";
-import { scenePage } from "@/lib/suites/scene";
+import { scenePage, withBlessing } from "@/lib/suites/scene";
 import { SUITES } from "@/lib/suites/catalog";
 import { voiceFaces } from "@/lib/suites/lettering";
 import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/look";
@@ -374,11 +374,19 @@ export function useVideoFilm(
       copy,
       (id) => photoAspect(photos, id),
     );
-    const page = scenePage(suite, scenePhotos.length);
-    if (!page) return null;
+    const painting = scenePage(suite, scenePhotos.length);
+    if (!painting) return null;
+    // The blessing has its own line over the names, or opens the slot, as the live scene does
+    const blessing = copy.blessing.trim();
+    const blessed = blessing ? withBlessing(painting) : null;
+    const page = blessed ?? painting;
+    const slotBlessing = blessing && !blessed ? blessing : "";
     // A painting without room for the line opens the slot with it, as the live scene does
+    const slotLine = page.line ? "" : copy.line.trim();
     const items: SceneItem[] = [
-      ...(page.line || !copy.line.trim() ? [] : [{ kind: "line" as const, text: copy.line }]),
+      ...(slotLine || slotBlessing
+        ? [{ kind: "line" as const, text: slotLine, blessing: slotBlessing }]
+        : []),
       // Watched days later, so no "In 5 days"
       ...cardFunctions(functions, draft, language).map((fn) => ({
         kind: "function" as const,

@@ -45,6 +45,8 @@ export type PaintedCard = {
 };
 
 type SceneLayout = {
+  /** The blessing over the names (श्री गणेशाय नमः), when there is one; see `withBlessing`. */
+  blessing?: FrameBox;
   /** The names, printed on the painting. */
   names: FrameBox;
   /** The line under the names; null when the painting has no room, so it opens the slot. */
@@ -1032,7 +1034,7 @@ const ILLUSTRATED: Record<IllustratedId, IllustratedEntry> = {
   // The wall under the toran, above the doorway
   "griha-kalash": { open: [8, 16, 84, 26] },
   // The evening sky beside the neem tree
-  "sona-saath": { open: [6, 6, 54, 44] },
+  "sona-saath": { open: [6, 17, 50, 33] },
   // Cream under the lamps, the names between the two swastiks
   "bagh-reception": { open: [14, 15, 72, 35], names: [14, 19, 72, 7.5] },
   // Pale sky between the hanging cranes, under the moon
@@ -1407,6 +1409,32 @@ function openLayout({ open, names: placed }: IllustratedEntry): SceneLayout {
   return { names, line, slot: [x, from, w, end - from] };
 }
 
+/** The blessing's own line, in percent of the painting's height. */
+const BLESSING_HEIGHT = 3.4;
+
+/**
+ * Gives the blessing (॥ श्री गणेशाय नमः ॥, "With the blessings of…") its own line, centred
+ * over the names, as a printed card sets it: on an illustrated or moving card it takes the
+ * top of the empty space and everything else moves down. A painting with photo frames
+ * keeps its names close under the frame's carving, so it has no line for the blessing
+ * here (null): the blessing opens the slot instead, on the card's own writing area.
+ */
+export function withBlessing(page: ScenePage): ScenePage | null {
+  if (!page.open) return null;
+  const [nx, ny, nw, nh] = page.names;
+  const [x, y, w, h] = page.open;
+  // Room above names set apart in the space (between two symbols) takes it as it is
+  if (ny - y >= BLESSING_HEIGHT) {
+    return { ...page, blessing: [nx, ny - BLESSING_HEIGHT, nw, BLESSING_HEIGHT] };
+  }
+  const placed = ny > y + 0.5 ? ([nx, ny + BLESSING_HEIGHT, nw, nh] as FrameBox) : undefined;
+  return {
+    ...page,
+    ...openLayout({ open: [x, y + BLESSING_HEIGHT, w, h - BLESSING_HEIGHT], names: placed }),
+    blessing: [x, y, w, BLESSING_HEIGHT],
+  };
+}
+
 /**
  * How an illustrated card opens: its empty space first, then the art above it drops in,
  * the art at its sides slides in and the art below it rises, so the painting comes
@@ -1441,6 +1469,8 @@ export type ScenePage = {
   pieces: readonly Piece[];
   /** A moving scene's layers, which play over its flat painting; null for every other. */
   moving: MovingScene | null;
+  /** The empty space an illustrated or moving card's words share, when it has one. */
+  open?: FrameBox;
 } & SceneLayout;
 
 /** The painting and places for a theme's scene with this many photos, if it has one. */
@@ -1455,6 +1485,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       frames: [],
       pieces: [],
       moving: movingScene(suite),
+      open: entry.open,
       ...openLayout(entry),
     };
   }
@@ -1468,6 +1499,7 @@ export function scenePage(suite: SuiteId, photos: number): ScenePage | null {
       frames: isPhotoCard(suite) ? PHOTO_CARDS[suite].pair : [],
       pieces: openPieces(entry.open),
       moving: null,
+      open: entry.open,
       ...openLayout(entry),
     };
   }

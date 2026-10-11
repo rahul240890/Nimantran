@@ -18,6 +18,7 @@ import {
   isIllustrated,
   isPhotoCard,
   sceneFrames,
+  withBlessing,
   scenePage,
 } from "./scene";
 
@@ -170,5 +171,30 @@ describe("One Scene", () => {
   it("brings each function in from a different side than the one before", () => {
     for (let i = 1; i < 12; i++) expect(entranceFor(i)).not.toBe(entranceFor(i - 1));
     expect(new Set(ENTRANCES.map((_, i) => entranceFor(i))).size).toBe(ENTRANCES.length);
+  });
+});
+
+describe("the blessing's line", () => {
+  const inside = ([x, y, w, h]: FrameBox, [ox, oy, ow, oh]: FrameBox) =>
+    x >= ox - 0.01 && y >= oy - 0.01 && x + w <= ox + ow + 0.01 && y + h <= oy + oh + 0.01;
+
+  it("sits over the names inside every illustrated and moving card's empty space", () => {
+    for (const suite of [...ILLUSTRATED_IDS, ...PHOTO_CARD_IDS, ...MOVING_IDS]) {
+      const page = scenePage(suite, 2)!;
+      const blessed = withBlessing(page)!;
+      expect(blessed.blessing, suite).toBeDefined();
+      const [, by, , bh] = blessed.blessing!;
+      expect(by + bh, suite).toBeLessThanOrEqual(blessed.names[1] + 0.01);
+      for (const box of [blessed.blessing!, blessed.names, blessed.slot]) {
+        expect(inside(box, page.open!), suite).toBe(true);
+      }
+    }
+  });
+
+  it("opens the slot instead under a photo frame", () => {
+    for (const suite of SCENE_THEME_IDS.filter((id) => !isIllustrated(id) && !isPhotoCard(id))) {
+      if (isMoving(suite)) continue;
+      expect(withBlessing(scenePage(suite, 1)!), suite).toBeNull();
+    }
   });
 });

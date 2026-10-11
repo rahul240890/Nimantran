@@ -5288,7 +5288,8 @@
   }
   /* An illustrated card has no card: the words print straight onto the painting's empty space */
   .scene-slot[data-slot="bare"] {
-    padding: 1cqw 2cqw;
+    /* A margin in from the empty space's sides, so the words never touch the art round it */
+    padding: 1cqw 6%;
     background: none;
     border-radius: 0;
     box-shadow: none;

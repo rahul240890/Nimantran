@@ -428,3 +428,15 @@ describe("designs that suit the occasion", () => {
     expect(draft.suite).toBe("rajwada-bagh");
   });
 });
+
+describe("the blessing on a card in another language", () => {
+  it("is written in the card's own script, never the design's English sample", () => {
+    const draft: InviteDraft = { ...newDraft("scroll", "janmashtami"), languages: ["hi"] };
+    expect(draftCopy(draft).blessing).toBe("॥ श्री गणेशाय नमः ॥");
+  });
+
+  it("stays empty on a design without a sample blessing", () => {
+    const draft: InviteDraft = { ...newDraft("marigold"), languages: ["gu"] };
+    expect(draftCopy(draft).blessing).toBe("");
+  });
+});

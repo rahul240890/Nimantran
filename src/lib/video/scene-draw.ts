@@ -32,8 +32,9 @@ import {
 import { shotsAt, type SceneShot, type SceneTimeline } from "./scene-timeline";
 import { CROSSFADE } from "./timeline";
 
-/** What the slot carries in turn: the invitation's line, or a celebration. */
-export type SceneItem = { kind: "line"; text: string } | { kind: "function"; fn: StoryFunction };
+/** What the slot carries in turn: its opening card (the blessing, the line, or both), or a celebration. */
+export type SceneItem =
+  { kind: "line"; text: string; blessing: string } | { kind: "function"; fn: StoryFunction };
 
 export type SceneFilm = EndingScene & {
   page: ScenePage;
@@ -97,6 +98,10 @@ function drawScene(ctx: CanvasRenderingContext2D, film: SceneFilm, seconds: numb
 
   const tone = page.dark || mood === "night" ? "dark" : "light";
   const printed = film.palette(mood, tone);
+  const blessing = film.copy.blessing.trim();
+  if (page.blessing && blessing) {
+    drawPrinted(ctx, film, voice, printed, page.blessing, blessing, rise(seconds, 0.2), "blessing");
+  }
   drawNames(ctx, film, voice, printed, rise(seconds, 0.3));
   if (page.line && film.copy.line.trim()) {
     drawPrinted(ctx, film, voice, printed, page.line, film.copy.line, rise(seconds, 0.75));
@@ -420,7 +425,7 @@ function glowing(row: Row, glow: string): Row {
   return { ...row, glow };
 }
 
-/** The invitation's line printed on the painting under the names. */
+/** The invitation's line printed on the painting under the names, or the blessing over them. */
 function drawPrinted(
   ctx: CanvasRenderingContext2D,
   film: SceneFilm,
@@ -429,15 +434,15 @@ function drawPrinted(
   where: FrameBox,
   text: string,
   alpha: number,
+  role: "line" | "blessing" = "line",
 ) {
   if (alpha <= 0) return;
   const box = px(where);
-  const font = sceneFont(voice, "line", film.lang, PAGE_W, film.type);
+  const font = sceneFont(voice, role, film.lang, PAGE_W, film.type);
+  const ink = role === "blessing" ? colours.accentText : colours.inkMuted;
   const { blocks } = fitBlocks(
     ctx,
-    (fit) => [
-      glowing(textRow(ctx, text, font, fit, box.w, colours.inkMuted, film.lang), colours.glow),
-    ],
+    (fit) => [glowing(textRow(ctx, text, font, fit, box.w, ink, film.lang), colours.glow)],
     box.w,
     box.h,
   );
@@ -608,8 +613,25 @@ function drawCardWords(
   const { lang, type } = film;
   const font = (role: SceneRole, script = lang) => sceneFont(voice, role, script, PAGE_W, type);
   const build = (fit: number): Block[] => {
-    if (item.kind === "line")
-      return [textRow(ctx, item.text, font("line"), fit, box.w, colours.ink, lang)];
+    if (item.kind === "line") {
+      // As a printed card opens: the blessing, a rule, then the invitation
+      const blocks: Block[] = [];
+      if (item.blessing) {
+        const blessing = font("blessing-card");
+        blocks.push(textRow(ctx, item.blessing, blessing, fit, box.w, colours.accentText, lang));
+        if (item.text) {
+          blocks.push({
+            kind: "rule",
+            width: Math.min(112, Math.max(40, 20 * CQW)) * fit,
+            gap: blessing.size * fit * 0.6,
+            colour: colours.goldText,
+          });
+        }
+      }
+      if (item.text)
+        blocks.push(textRow(ctx, item.text, font("line"), fit, box.w, colours.ink, lang));
+      return blocks;
+    }
     const fn = item.fn;
     const blocks: Block[] = [
       textRow(ctx, fn.name, font("function"), headingFit(fit), box.w, colours.ink, lang),

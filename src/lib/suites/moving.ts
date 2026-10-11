@@ -240,7 +240,7 @@ const MOVING: Record<MovingId, MovingEntry> = {
   },
   // White doves glide past the chapel, petals drift down
   "wedding-bells": {
-    open: [18, 22, 64, 22],
+    open: [14, 14, 72, 18],
     floats: [
       glide(0, 2, 9, { pair: 1, band: [6, 44] }),
       fall(2, 3, 3),
@@ -357,7 +357,7 @@ const MOVING: Record<MovingId, MovingEntry> = {
   },
   // Seagulls glide over the Konkan coast, foam slides in, flowers fall
   "konkan-kinara": {
-    open: [8, 13, 54, 28],
+    open: [10, 15, 52, 26],
     water: [50, 88],
     floats: [
       glide(0, 2, 8, { pair: 1, band: [6, 44] }),
@@ -613,7 +613,7 @@ const MOVING: Record<MovingId, MovingEntry> = {
   },
   // Folk birds on deep green: gold leaves drift, blossoms twinkle and a bird crosses
   "bulbul-jaal": {
-    open: [17.3, 15.4, 65.1, 64.5],
+    open: [20, 20, 60, 56],
     dark: true,
     floats: [
       fall(0, 2, 3.5),
