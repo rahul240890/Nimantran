@@ -261,6 +261,7 @@
 [data-suite="mor-bagh"],
 [data-suite="jal-mahal"],
 [data-suite="baithak-bagh"],
+[data-suite="jaali-vriksh"],
 [data-suite="rajwada-bagh"] {
   --suite-plate: #fbf4e4;
   --suite-ink: #1f3a2e;
@@ -281,6 +282,7 @@
 [data-suite="mor-bagh"] [data-mood="dawn"],
 [data-suite="jal-mahal"] [data-mood="dawn"],
 [data-suite="baithak-bagh"] [data-mood="dawn"],
+[data-suite="jaali-vriksh"] [data-mood="dawn"],
 [data-suite="rajwada-bagh"] [data-mood="dawn"],
 [data-suite="udaipur-lake"][data-mood="dawn"],
 [data-suite="baraat-band"][data-mood="dawn"],
@@ -290,6 +292,7 @@
 [data-suite="mor-bagh"][data-mood="dawn"],
 [data-suite="jal-mahal"][data-mood="dawn"],
 [data-suite="baithak-bagh"][data-mood="dawn"],
+[data-suite="jaali-vriksh"][data-mood="dawn"],
 [data-suite="rajwada-bagh"][data-mood="dawn"],
 [data-suite="glass-house"] [data-mood="dawn"],
 [data-suite="minimal-white"] [data-mood="dawn"],
@@ -342,6 +345,7 @@
 [data-suite="tota-bagh"] [data-mood="dawn"],
 [data-suite="gajra-ghera"] [data-mood="dawn"],
 [data-suite="baganbilas"] [data-mood="dawn"],
+[data-suite="pondy-gali"] [data-mood="dawn"],
 [data-suite="gulaab"] [data-mood="dawn"],
 [data-suite="love-letter"][data-mood="dawn"],
 [data-suite="parsi-chalk"][data-mood="dawn"],
@@ -358,6 +362,7 @@
 [data-suite="tota-bagh"][data-mood="dawn"],
 [data-suite="gajra-ghera"][data-mood="dawn"],
 [data-suite="baganbilas"][data-mood="dawn"],
+[data-suite="pondy-gali"][data-mood="dawn"],
 [data-suite="gulaab"][data-mood="dawn"],
 [data-suite="origami-saaras"] [data-mood="dawn"],
 [data-suite="kaagaz-ki-kashti"] [data-mood="dawn"],
@@ -376,12 +381,14 @@
 [data-suite="cricket-stadium"] [data-mood="dawn"],
 [data-suite="khazana-dweep"] [data-mood="dawn"],
 [data-suite="khargosh-bagicha"] [data-mood="dawn"],
+[data-suite="ped-ghar"] [data-mood="dawn"],
 [data-suite="jungle-party"] [data-mood="dawn"],
 [data-suite="dino-jungle"][data-mood="dawn"],
 [data-suite="little-racer"][data-mood="dawn"],
 [data-suite="cricket-stadium"][data-mood="dawn"],
 [data-suite="khazana-dweep"][data-mood="dawn"],
 [data-suite="khargosh-bagicha"][data-mood="dawn"],
+[data-suite="ped-ghar"][data-mood="dawn"],
 [data-suite="jungle-party"][data-mood="dawn"],
 [data-suite="oh-baby"] [data-mood="dawn"],
 [data-suite="annaprashan"] [data-mood="dawn"],
@@ -392,6 +399,7 @@
 [data-suite="naya-mehmaan"] [data-mood="dawn"],
 [data-suite="badal-sapne"] [data-mood="dawn"],
 [data-suite="chidiya-ghonsla"] [data-mood="dawn"],
+[data-suite="jhalar-palna"] [data-mood="dawn"],
 [data-suite="palna"] [data-mood="dawn"],
 [data-suite="oh-baby"][data-mood="dawn"],
 [data-suite="annaprashan"][data-mood="dawn"],
@@ -402,6 +410,7 @@
 [data-suite="naya-mehmaan"][data-mood="dawn"],
 [data-suite="badal-sapne"][data-mood="dawn"],
 [data-suite="chidiya-ghonsla"][data-mood="dawn"],
+[data-suite="jhalar-palna"][data-mood="dawn"],
 [data-suite="palna"][data-mood="dawn"],
 [data-suite="rainbow-unicorn"] [data-mood="dawn"],
 [data-suite="ocean-pearl"] [data-mood="dawn"],
@@ -422,6 +431,7 @@
 [data-suite="teddy-picnic"] [data-mood="dawn"],
 [data-suite="kulfi-thela"] [data-mood="dawn"],
 [data-suite="meetha-bakery"] [data-mood="dawn"],
+[data-suite="channapatna"] [data-mood="dawn"],
 [data-suite="gubbara"] [data-mood="dawn"],
 [data-suite="rainbow-unicorn"][data-mood="dawn"],
 [data-suite="ocean-pearl"][data-mood="dawn"],
@@ -442,6 +452,7 @@
 [data-suite="teddy-picnic"][data-mood="dawn"],
 [data-suite="kulfi-thela"][data-mood="dawn"],
 [data-suite="meetha-bakery"][data-mood="dawn"],
+[data-suite="channapatna"][data-mood="dawn"],
 [data-suite="gubbara"][data-mood="dawn"],
 [data-suite="amrit-utsav"] [data-mood="dawn"],
 [data-suite="silver-jubilee"] [data-mood="dawn"],
@@ -453,6 +464,7 @@
 [data-suite="retirement-naav"] [data-mood="dawn"],
 [data-suite="locket-jodi"] [data-mood="dawn"],
 [data-suite="cycle-basket"] [data-mood="dawn"],
+[data-suite="irani-carrom"] [data-mood="dawn"],
 [data-suite="saath"] [data-mood="dawn"],
 [data-suite="amrit-utsav"][data-mood="dawn"],
 [data-suite="silver-jubilee"][data-mood="dawn"],
@@ -464,6 +476,7 @@
 [data-suite="retirement-naav"][data-mood="dawn"],
 [data-suite="locket-jodi"][data-mood="dawn"],
 [data-suite="cycle-basket"][data-mood="dawn"],
+[data-suite="irani-carrom"][data-mood="dawn"],
 [data-suite="saath"][data-mood="dawn"],
 [data-suite="char-bagh"] [data-mood="dawn"],
 [data-suite="iftar-dawat"] [data-mood="dawn"],
@@ -474,6 +487,7 @@
 [data-suite="chand-raat"] [data-mood="dawn"],
 [data-suite="fawwara-bagh"] [data-mood="dawn"],
 [data-suite="anar-bagh"] [data-mood="dawn"],
+[data-suite="pachchikari"] [data-mood="dawn"],
 [data-suite="noor-bagh"] [data-mood="dawn"],
 [data-suite="char-bagh"][data-mood="dawn"],
 [data-suite="iftar-dawat"][data-mood="dawn"],
@@ -484,6 +498,7 @@
 [data-suite="chand-raat"][data-mood="dawn"],
 [data-suite="fawwara-bagh"][data-mood="dawn"],
 [data-suite="anar-bagh"][data-mood="dawn"],
+[data-suite="pachchikari"][data-mood="dawn"],
 [data-suite="noor-bagh"][data-mood="dawn"],
 [data-suite="pune-wada"] [data-mood="dawn"],
 [data-suite="ganesh-utsav"] [data-mood="dawn"],
@@ -524,6 +539,7 @@
 [data-suite="mor-bagh"] [data-mood="day"],
 [data-suite="jal-mahal"] [data-mood="day"],
 [data-suite="baithak-bagh"] [data-mood="day"],
+[data-suite="jaali-vriksh"] [data-mood="day"],
 [data-suite="rajwada-bagh"] [data-mood="day"],
 [data-suite="udaipur-lake"][data-mood="day"],
 [data-suite="baraat-band"][data-mood="day"],
@@ -533,6 +549,7 @@
 [data-suite="mor-bagh"][data-mood="day"],
 [data-suite="jal-mahal"][data-mood="day"],
 [data-suite="baithak-bagh"][data-mood="day"],
+[data-suite="jaali-vriksh"][data-mood="day"],
 [data-suite="rajwada-bagh"][data-mood="day"],
 [data-suite="glass-house"] [data-mood="day"],
 [data-suite="minimal-white"] [data-mood="day"],
@@ -585,6 +602,7 @@
 [data-suite="tota-bagh"] [data-mood="day"],
 [data-suite="gajra-ghera"] [data-mood="day"],
 [data-suite="baganbilas"] [data-mood="day"],
+[data-suite="pondy-gali"] [data-mood="day"],
 [data-suite="gulaab"] [data-mood="day"],
 [data-suite="love-letter"][data-mood="day"],
 [data-suite="parsi-chalk"][data-mood="day"],
@@ -601,6 +619,7 @@
 [data-suite="tota-bagh"][data-mood="day"],
 [data-suite="gajra-ghera"][data-mood="day"],
 [data-suite="baganbilas"][data-mood="day"],
+[data-suite="pondy-gali"][data-mood="day"],
 [data-suite="gulaab"][data-mood="day"],
 [data-suite="origami-saaras"] [data-mood="day"],
 [data-suite="kaagaz-ki-kashti"] [data-mood="day"],
@@ -619,12 +638,14 @@
 [data-suite="cricket-stadium"] [data-mood="day"],
 [data-suite="khazana-dweep"] [data-mood="day"],
 [data-suite="khargosh-bagicha"] [data-mood="day"],
+[data-suite="ped-ghar"] [data-mood="day"],
 [data-suite="jungle-party"] [data-mood="day"],
 [data-suite="dino-jungle"][data-mood="day"],
 [data-suite="little-racer"][data-mood="day"],
 [data-suite="cricket-stadium"][data-mood="day"],
 [data-suite="khazana-dweep"][data-mood="day"],
 [data-suite="khargosh-bagicha"][data-mood="day"],
+[data-suite="ped-ghar"][data-mood="day"],
 [data-suite="jungle-party"][data-mood="day"],
 [data-suite="oh-baby"] [data-mood="day"],
 [data-suite="annaprashan"] [data-mood="day"],
@@ -635,6 +656,7 @@
 [data-suite="naya-mehmaan"] [data-mood="day"],
 [data-suite="badal-sapne"] [data-mood="day"],
 [data-suite="chidiya-ghonsla"] [data-mood="day"],
+[data-suite="jhalar-palna"] [data-mood="day"],
 [data-suite="palna"] [data-mood="day"],
 [data-suite="oh-baby"][data-mood="day"],
 [data-suite="annaprashan"][data-mood="day"],
@@ -645,6 +667,7 @@
 [data-suite="naya-mehmaan"][data-mood="day"],
 [data-suite="badal-sapne"][data-mood="day"],
 [data-suite="chidiya-ghonsla"][data-mood="day"],
+[data-suite="jhalar-palna"][data-mood="day"],
 [data-suite="palna"][data-mood="day"],
 [data-suite="rainbow-unicorn"] [data-mood="day"],
 [data-suite="ocean-pearl"] [data-mood="day"],
@@ -665,6 +688,7 @@
 [data-suite="teddy-picnic"] [data-mood="day"],
 [data-suite="kulfi-thela"] [data-mood="day"],
 [data-suite="meetha-bakery"] [data-mood="day"],
+[data-suite="channapatna"] [data-mood="day"],
 [data-suite="gubbara"] [data-mood="day"],
 [data-suite="rainbow-unicorn"][data-mood="day"],
 [data-suite="ocean-pearl"][data-mood="day"],
@@ -685,6 +709,7 @@
 [data-suite="teddy-picnic"][data-mood="day"],
 [data-suite="kulfi-thela"][data-mood="day"],
 [data-suite="meetha-bakery"][data-mood="day"],
+[data-suite="channapatna"][data-mood="day"],
 [data-suite="gubbara"][data-mood="day"],
 [data-suite="amrit-utsav"] [data-mood="day"],
 [data-suite="silver-jubilee"] [data-mood="day"],
@@ -696,6 +721,7 @@
 [data-suite="retirement-naav"] [data-mood="day"],
 [data-suite="locket-jodi"] [data-mood="day"],
 [data-suite="cycle-basket"] [data-mood="day"],
+[data-suite="irani-carrom"] [data-mood="day"],
 [data-suite="saath"] [data-mood="day"],
 [data-suite="amrit-utsav"][data-mood="day"],
 [data-suite="silver-jubilee"][data-mood="day"],
@@ -707,6 +733,7 @@
 [data-suite="retirement-naav"][data-mood="day"],
 [data-suite="locket-jodi"][data-mood="day"],
 [data-suite="cycle-basket"][data-mood="day"],
+[data-suite="irani-carrom"][data-mood="day"],
 [data-suite="saath"][data-mood="day"],
 [data-suite="char-bagh"] [data-mood="day"],
 [data-suite="iftar-dawat"] [data-mood="day"],
@@ -717,6 +744,7 @@
 [data-suite="chand-raat"] [data-mood="day"],
 [data-suite="fawwara-bagh"] [data-mood="day"],
 [data-suite="anar-bagh"] [data-mood="day"],
+[data-suite="pachchikari"] [data-mood="day"],
 [data-suite="noor-bagh"] [data-mood="day"],
 [data-suite="char-bagh"][data-mood="day"],
 [data-suite="iftar-dawat"][data-mood="day"],
@@ -727,6 +755,7 @@
 [data-suite="chand-raat"][data-mood="day"],
 [data-suite="fawwara-bagh"][data-mood="day"],
 [data-suite="anar-bagh"][data-mood="day"],
+[data-suite="pachchikari"][data-mood="day"],
 [data-suite="noor-bagh"][data-mood="day"],
 [data-suite="pune-wada"] [data-mood="day"],
 [data-suite="ganesh-utsav"] [data-mood="day"],
@@ -767,6 +796,7 @@
 [data-suite="mor-bagh"] [data-mood="dusk"],
 [data-suite="jal-mahal"] [data-mood="dusk"],
 [data-suite="baithak-bagh"] [data-mood="dusk"],
+[data-suite="jaali-vriksh"] [data-mood="dusk"],
 [data-suite="rajwada-bagh"] [data-mood="dusk"],
 [data-suite="udaipur-lake"][data-mood="dusk"],
 [data-suite="baraat-band"][data-mood="dusk"],
@@ -776,6 +806,7 @@
 [data-suite="mor-bagh"][data-mood="dusk"],
 [data-suite="jal-mahal"][data-mood="dusk"],
 [data-suite="baithak-bagh"][data-mood="dusk"],
+[data-suite="jaali-vriksh"][data-mood="dusk"],
 [data-suite="rajwada-bagh"][data-mood="dusk"],
 [data-suite="glass-house"] [data-mood="dusk"],
 [data-suite="minimal-white"] [data-mood="dusk"],
@@ -828,6 +859,7 @@
 [data-suite="tota-bagh"] [data-mood="dusk"],
 [data-suite="gajra-ghera"] [data-mood="dusk"],
 [data-suite="baganbilas"] [data-mood="dusk"],
+[data-suite="pondy-gali"] [data-mood="dusk"],
 [data-suite="gulaab"] [data-mood="dusk"],
 [data-suite="love-letter"][data-mood="dusk"],
 [data-suite="parsi-chalk"][data-mood="dusk"],
@@ -844,6 +876,7 @@
 [data-suite="tota-bagh"][data-mood="dusk"],
 [data-suite="gajra-ghera"][data-mood="dusk"],
 [data-suite="baganbilas"][data-mood="dusk"],
+[data-suite="pondy-gali"][data-mood="dusk"],
 [data-suite="gulaab"][data-mood="dusk"],
 [data-suite="origami-saaras"] [data-mood="dusk"],
 [data-suite="kaagaz-ki-kashti"] [data-mood="dusk"],
@@ -862,12 +895,14 @@
 [data-suite="cricket-stadium"] [data-mood="dusk"],
 [data-suite="khazana-dweep"] [data-mood="dusk"],
 [data-suite="khargosh-bagicha"] [data-mood="dusk"],
+[data-suite="ped-ghar"] [data-mood="dusk"],
 [data-suite="jungle-party"] [data-mood="dusk"],
 [data-suite="dino-jungle"][data-mood="dusk"],
 [data-suite="little-racer"][data-mood="dusk"],
 [data-suite="cricket-stadium"][data-mood="dusk"],
 [data-suite="khazana-dweep"][data-mood="dusk"],
 [data-suite="khargosh-bagicha"][data-mood="dusk"],
+[data-suite="ped-ghar"][data-mood="dusk"],
 [data-suite="jungle-party"][data-mood="dusk"],
 [data-suite="oh-baby"] [data-mood="dusk"],
 [data-suite="annaprashan"] [data-mood="dusk"],
@@ -878,6 +913,7 @@
 [data-suite="naya-mehmaan"] [data-mood="dusk"],
 [data-suite="badal-sapne"] [data-mood="dusk"],
 [data-suite="chidiya-ghonsla"] [data-mood="dusk"],
+[data-suite="jhalar-palna"] [data-mood="dusk"],
 [data-suite="palna"] [data-mood="dusk"],
 [data-suite="oh-baby"][data-mood="dusk"],
 [data-suite="annaprashan"][data-mood="dusk"],
@@ -888,6 +924,7 @@
 [data-suite="naya-mehmaan"][data-mood="dusk"],
 [data-suite="badal-sapne"][data-mood="dusk"],
 [data-suite="chidiya-ghonsla"][data-mood="dusk"],
+[data-suite="jhalar-palna"][data-mood="dusk"],
 [data-suite="palna"][data-mood="dusk"],
 [data-suite="rainbow-unicorn"] [data-mood="dusk"],
 [data-suite="ocean-pearl"] [data-mood="dusk"],
@@ -908,6 +945,7 @@
 [data-suite="teddy-picnic"] [data-mood="dusk"],
 [data-suite="kulfi-thela"] [data-mood="dusk"],
 [data-suite="meetha-bakery"] [data-mood="dusk"],
+[data-suite="channapatna"] [data-mood="dusk"],
 [data-suite="gubbara"] [data-mood="dusk"],
 [data-suite="rainbow-unicorn"][data-mood="dusk"],
 [data-suite="ocean-pearl"][data-mood="dusk"],
@@ -928,6 +966,7 @@
 [data-suite="teddy-picnic"][data-mood="dusk"],
 [data-suite="kulfi-thela"][data-mood="dusk"],
 [data-suite="meetha-bakery"][data-mood="dusk"],
+[data-suite="channapatna"][data-mood="dusk"],
 [data-suite="gubbara"][data-mood="dusk"],
 [data-suite="amrit-utsav"] [data-mood="dusk"],
 [data-suite="silver-jubilee"] [data-mood="dusk"],
@@ -939,6 +978,7 @@
 [data-suite="retirement-naav"] [data-mood="dusk"],
 [data-suite="locket-jodi"] [data-mood="dusk"],
 [data-suite="cycle-basket"] [data-mood="dusk"],
+[data-suite="irani-carrom"] [data-mood="dusk"],
 [data-suite="saath"] [data-mood="dusk"],
 [data-suite="amrit-utsav"][data-mood="dusk"],
 [data-suite="silver-jubilee"][data-mood="dusk"],
@@ -950,6 +990,7 @@
 [data-suite="retirement-naav"][data-mood="dusk"],
 [data-suite="locket-jodi"][data-mood="dusk"],
 [data-suite="cycle-basket"][data-mood="dusk"],
+[data-suite="irani-carrom"][data-mood="dusk"],
 [data-suite="saath"][data-mood="dusk"],
 [data-suite="char-bagh"] [data-mood="dusk"],
 [data-suite="iftar-dawat"] [data-mood="dusk"],
@@ -960,6 +1001,7 @@
 [data-suite="chand-raat"] [data-mood="dusk"],
 [data-suite="fawwara-bagh"] [data-mood="dusk"],
 [data-suite="anar-bagh"] [data-mood="dusk"],
+[data-suite="pachchikari"] [data-mood="dusk"],
 [data-suite="noor-bagh"] [data-mood="dusk"],
 [data-suite="char-bagh"][data-mood="dusk"],
 [data-suite="iftar-dawat"][data-mood="dusk"],
@@ -970,6 +1012,7 @@
 [data-suite="chand-raat"][data-mood="dusk"],
 [data-suite="fawwara-bagh"][data-mood="dusk"],
 [data-suite="anar-bagh"][data-mood="dusk"],
+[data-suite="pachchikari"][data-mood="dusk"],
 [data-suite="noor-bagh"][data-mood="dusk"],
 [data-suite="pune-wada"] [data-mood="dusk"],
 [data-suite="ganesh-utsav"] [data-mood="dusk"],
@@ -1010,6 +1053,7 @@
 [data-suite="mor-bagh"] [data-mood="night"],
 [data-suite="jal-mahal"] [data-mood="night"],
 [data-suite="baithak-bagh"] [data-mood="night"],
+[data-suite="jaali-vriksh"] [data-mood="night"],
 [data-suite="rajwada-bagh"] [data-mood="night"],
 [data-suite="udaipur-lake"][data-mood="night"],
 [data-suite="baraat-band"][data-mood="night"],
@@ -1019,6 +1063,7 @@
 [data-suite="mor-bagh"][data-mood="night"],
 [data-suite="jal-mahal"][data-mood="night"],
 [data-suite="baithak-bagh"][data-mood="night"],
+[data-suite="jaali-vriksh"][data-mood="night"],
 [data-suite="rajwada-bagh"][data-mood="night"],
 [data-suite="glass-house"] [data-mood="night"],
 [data-suite="minimal-white"] [data-mood="night"],
@@ -1071,6 +1116,7 @@
 [data-suite="tota-bagh"] [data-mood="night"],
 [data-suite="gajra-ghera"] [data-mood="night"],
 [data-suite="baganbilas"] [data-mood="night"],
+[data-suite="pondy-gali"] [data-mood="night"],
 [data-suite="gulaab"] [data-mood="night"],
 [data-suite="love-letter"][data-mood="night"],
 [data-suite="parsi-chalk"][data-mood="night"],
@@ -1087,6 +1133,7 @@
 [data-suite="tota-bagh"][data-mood="night"],
 [data-suite="gajra-ghera"][data-mood="night"],
 [data-suite="baganbilas"][data-mood="night"],
+[data-suite="pondy-gali"][data-mood="night"],
 [data-suite="gulaab"][data-mood="night"],
 [data-suite="origami-saaras"] [data-mood="night"],
 [data-suite="kaagaz-ki-kashti"] [data-mood="night"],
@@ -1105,12 +1152,14 @@
 [data-suite="cricket-stadium"] [data-mood="night"],
 [data-suite="khazana-dweep"] [data-mood="night"],
 [data-suite="khargosh-bagicha"] [data-mood="night"],
+[data-suite="ped-ghar"] [data-mood="night"],
 [data-suite="jungle-party"] [data-mood="night"],
 [data-suite="dino-jungle"][data-mood="night"],
 [data-suite="little-racer"][data-mood="night"],
 [data-suite="cricket-stadium"][data-mood="night"],
 [data-suite="khazana-dweep"][data-mood="night"],
 [data-suite="khargosh-bagicha"][data-mood="night"],
+[data-suite="ped-ghar"][data-mood="night"],
 [data-suite="jungle-party"][data-mood="night"],
 [data-suite="oh-baby"] [data-mood="night"],
 [data-suite="annaprashan"] [data-mood="night"],
@@ -1121,6 +1170,7 @@
 [data-suite="naya-mehmaan"] [data-mood="night"],
 [data-suite="badal-sapne"] [data-mood="night"],
 [data-suite="chidiya-ghonsla"] [data-mood="night"],
+[data-suite="jhalar-palna"] [data-mood="night"],
 [data-suite="palna"] [data-mood="night"],
 [data-suite="oh-baby"][data-mood="night"],
 [data-suite="annaprashan"][data-mood="night"],
@@ -1131,6 +1181,7 @@
 [data-suite="naya-mehmaan"][data-mood="night"],
 [data-suite="badal-sapne"][data-mood="night"],
 [data-suite="chidiya-ghonsla"][data-mood="night"],
+[data-suite="jhalar-palna"][data-mood="night"],
 [data-suite="palna"][data-mood="night"],
 [data-suite="rainbow-unicorn"] [data-mood="night"],
 [data-suite="ocean-pearl"] [data-mood="night"],
@@ -1151,6 +1202,7 @@
 [data-suite="teddy-picnic"] [data-mood="night"],
 [data-suite="kulfi-thela"] [data-mood="night"],
 [data-suite="meetha-bakery"] [data-mood="night"],
+[data-suite="channapatna"] [data-mood="night"],
 [data-suite="gubbara"] [data-mood="night"],
 [data-suite="rainbow-unicorn"][data-mood="night"],
 [data-suite="ocean-pearl"][data-mood="night"],
@@ -1171,6 +1223,7 @@
 [data-suite="teddy-picnic"][data-mood="night"],
 [data-suite="kulfi-thela"][data-mood="night"],
 [data-suite="meetha-bakery"][data-mood="night"],
+[data-suite="channapatna"][data-mood="night"],
 [data-suite="gubbara"][data-mood="night"],
 [data-suite="amrit-utsav"] [data-mood="night"],
 [data-suite="silver-jubilee"] [data-mood="night"],
@@ -1182,6 +1235,7 @@
 [data-suite="retirement-naav"] [data-mood="night"],
 [data-suite="locket-jodi"] [data-mood="night"],
 [data-suite="cycle-basket"] [data-mood="night"],
+[data-suite="irani-carrom"] [data-mood="night"],
 [data-suite="saath"] [data-mood="night"],
 [data-suite="amrit-utsav"][data-mood="night"],
 [data-suite="silver-jubilee"][data-mood="night"],
@@ -1193,6 +1247,7 @@
 [data-suite="retirement-naav"][data-mood="night"],
 [data-suite="locket-jodi"][data-mood="night"],
 [data-suite="cycle-basket"][data-mood="night"],
+[data-suite="irani-carrom"][data-mood="night"],
 [data-suite="saath"][data-mood="night"],
 [data-suite="char-bagh"] [data-mood="night"],
 [data-suite="iftar-dawat"] [data-mood="night"],
@@ -1203,6 +1258,7 @@
 [data-suite="chand-raat"] [data-mood="night"],
 [data-suite="fawwara-bagh"] [data-mood="night"],
 [data-suite="anar-bagh"] [data-mood="night"],
+[data-suite="pachchikari"] [data-mood="night"],
 [data-suite="noor-bagh"] [data-mood="night"],
 [data-suite="char-bagh"][data-mood="night"],
 [data-suite="iftar-dawat"][data-mood="night"],
@@ -1213,6 +1269,7 @@
 [data-suite="chand-raat"][data-mood="night"],
 [data-suite="fawwara-bagh"][data-mood="night"],
 [data-suite="anar-bagh"][data-mood="night"],
+[data-suite="pachchikari"][data-mood="night"],
 [data-suite="noor-bagh"][data-mood="night"],
 [data-suite="pune-wada"] [data-mood="night"],
 [data-suite="ganesh-utsav"] [data-mood="night"],
@@ -1264,6 +1321,8 @@
 [data-suite="genda-barsaat"],
 [data-suite="phool-ladi"],
 [data-suite="shevanti-haldi"],
+[data-suite="baori-deep"],
+[data-suite="shekhawati"],
 [data-suite="shahi-savari"] {
   --suite-plate: #fdf1e2;
   --suite-ink: #3a1420;
@@ -1295,6 +1354,8 @@
 [data-suite="genda-barsaat"] [data-mood="dawn"],
 [data-suite="phool-ladi"] [data-mood="dawn"],
 [data-suite="shevanti-haldi"] [data-mood="dawn"],
+[data-suite="baori-deep"] [data-mood="dawn"],
+[data-suite="shekhawati"] [data-mood="dawn"],
 [data-suite="shahi-savari"] [data-mood="dawn"],
 [data-suite="pink-haveli"][data-mood="dawn"],
 [data-suite="jaisalmer-dunes"][data-mood="dawn"],
@@ -1315,6 +1376,8 @@
 [data-suite="genda-barsaat"][data-mood="dawn"],
 [data-suite="phool-ladi"][data-mood="dawn"],
 [data-suite="shevanti-haldi"][data-mood="dawn"],
+[data-suite="baori-deep"][data-mood="dawn"],
+[data-suite="shekhawati"][data-mood="dawn"],
 [data-suite="shahi-savari"][data-mood="dawn"],
 [data-suite="palash-van"] [data-mood="dawn"],
 [data-suite="madhubani-machhli"] [data-mood="dawn"],
@@ -1344,6 +1407,7 @@
 [data-suite="moti-bharat"] [data-mood="dawn"],
 [data-suite="navratri-garbi"] [data-mood="dawn"],
 [data-suite="choodi-jhalar"] [data-mood="dawn"],
+[data-suite="mandvi-dhow"] [data-mood="dawn"],
 [data-suite="kutch-toran"] [data-mood="dawn"],
 [data-suite="kutch-bhunga"][data-mood="dawn"],
 [data-suite="white-rann"][data-mood="dawn"],
@@ -1357,6 +1421,7 @@
 [data-suite="moti-bharat"][data-mood="dawn"],
 [data-suite="navratri-garbi"][data-mood="dawn"],
 [data-suite="choodi-jhalar"][data-mood="dawn"],
+[data-suite="mandvi-dhow"][data-mood="dawn"],
 [data-suite="kutch-toran"][data-mood="dawn"],
 [data-suite="punjab-haveli"] [data-mood="dawn"],
 [data-suite="chooda-ceremony"] [data-mood="dawn"],
@@ -1402,6 +1467,8 @@
 [data-suite="genda-barsaat"] [data-mood="day"],
 [data-suite="phool-ladi"] [data-mood="day"],
 [data-suite="shevanti-haldi"] [data-mood="day"],
+[data-suite="baori-deep"] [data-mood="day"],
+[data-suite="shekhawati"] [data-mood="day"],
 [data-suite="shahi-savari"] [data-mood="day"],
 [data-suite="pink-haveli"][data-mood="day"],
 [data-suite="jaisalmer-dunes"][data-mood="day"],
@@ -1422,6 +1489,8 @@
 [data-suite="genda-barsaat"][data-mood="day"],
 [data-suite="phool-ladi"][data-mood="day"],
 [data-suite="shevanti-haldi"][data-mood="day"],
+[data-suite="baori-deep"][data-mood="day"],
+[data-suite="shekhawati"][data-mood="day"],
 [data-suite="shahi-savari"][data-mood="day"],
 [data-suite="palash-van"] [data-mood="day"],
 [data-suite="madhubani-machhli"] [data-mood="day"],
@@ -1451,6 +1520,7 @@
 [data-suite="moti-bharat"] [data-mood="day"],
 [data-suite="navratri-garbi"] [data-mood="day"],
 [data-suite="choodi-jhalar"] [data-mood="day"],
+[data-suite="mandvi-dhow"] [data-mood="day"],
 [data-suite="kutch-toran"] [data-mood="day"],
 [data-suite="kutch-bhunga"][data-mood="day"],
 [data-suite="white-rann"][data-mood="day"],
@@ -1464,6 +1534,7 @@
 [data-suite="moti-bharat"][data-mood="day"],
 [data-suite="navratri-garbi"][data-mood="day"],
 [data-suite="choodi-jhalar"][data-mood="day"],
+[data-suite="mandvi-dhow"][data-mood="day"],
 [data-suite="kutch-toran"][data-mood="day"],
 [data-suite="punjab-haveli"] [data-mood="day"],
 [data-suite="chooda-ceremony"] [data-mood="day"],
@@ -1509,6 +1580,8 @@
 [data-suite="genda-barsaat"] [data-mood="dusk"],
 [data-suite="phool-ladi"] [data-mood="dusk"],
 [data-suite="shevanti-haldi"] [data-mood="dusk"],
+[data-suite="baori-deep"] [data-mood="dusk"],
+[data-suite="shekhawati"] [data-mood="dusk"],
 [data-suite="shahi-savari"] [data-mood="dusk"],
 [data-suite="pink-haveli"][data-mood="dusk"],
 [data-suite="jaisalmer-dunes"][data-mood="dusk"],
@@ -1529,6 +1602,8 @@
 [data-suite="genda-barsaat"][data-mood="dusk"],
 [data-suite="phool-ladi"][data-mood="dusk"],
 [data-suite="shevanti-haldi"][data-mood="dusk"],
+[data-suite="baori-deep"][data-mood="dusk"],
+[data-suite="shekhawati"][data-mood="dusk"],
 [data-suite="shahi-savari"][data-mood="dusk"],
 [data-suite="palash-van"] [data-mood="dusk"],
 [data-suite="madhubani-machhli"] [data-mood="dusk"],
@@ -1558,6 +1633,7 @@
 [data-suite="moti-bharat"] [data-mood="dusk"],
 [data-suite="navratri-garbi"] [data-mood="dusk"],
 [data-suite="choodi-jhalar"] [data-mood="dusk"],
+[data-suite="mandvi-dhow"] [data-mood="dusk"],
 [data-suite="kutch-toran"] [data-mood="dusk"],
 [data-suite="kutch-bhunga"][data-mood="dusk"],
 [data-suite="white-rann"][data-mood="dusk"],
@@ -1571,6 +1647,7 @@
 [data-suite="moti-bharat"][data-mood="dusk"],
 [data-suite="navratri-garbi"][data-mood="dusk"],
 [data-suite="choodi-jhalar"][data-mood="dusk"],
+[data-suite="mandvi-dhow"][data-mood="dusk"],
 [data-suite="kutch-toran"][data-mood="dusk"],
 [data-suite="punjab-haveli"] [data-mood="dusk"],
 [data-suite="chooda-ceremony"] [data-mood="dusk"],
@@ -1616,6 +1693,8 @@
 [data-suite="genda-barsaat"] [data-mood="night"],
 [data-suite="phool-ladi"] [data-mood="night"],
 [data-suite="shevanti-haldi"] [data-mood="night"],
+[data-suite="baori-deep"] [data-mood="night"],
+[data-suite="shekhawati"] [data-mood="night"],
 [data-suite="shahi-savari"] [data-mood="night"],
 [data-suite="pink-haveli"][data-mood="night"],
 [data-suite="jaisalmer-dunes"][data-mood="night"],
@@ -1636,6 +1715,8 @@
 [data-suite="genda-barsaat"][data-mood="night"],
 [data-suite="phool-ladi"][data-mood="night"],
 [data-suite="shevanti-haldi"][data-mood="night"],
+[data-suite="baori-deep"][data-mood="night"],
+[data-suite="shekhawati"][data-mood="night"],
 [data-suite="shahi-savari"][data-mood="night"],
 [data-suite="palash-van"] [data-mood="night"],
 [data-suite="madhubani-machhli"] [data-mood="night"],
@@ -1665,6 +1746,7 @@
 [data-suite="moti-bharat"] [data-mood="night"],
 [data-suite="navratri-garbi"] [data-mood="night"],
 [data-suite="choodi-jhalar"] [data-mood="night"],
+[data-suite="mandvi-dhow"] [data-mood="night"],
 [data-suite="kutch-toran"] [data-mood="night"],
 [data-suite="kutch-bhunga"][data-mood="night"],
 [data-suite="white-rann"][data-mood="night"],
@@ -1678,6 +1760,7 @@
 [data-suite="moti-bharat"][data-mood="night"],
 [data-suite="navratri-garbi"][data-mood="night"],
 [data-suite="choodi-jhalar"][data-mood="night"],
+[data-suite="mandvi-dhow"][data-mood="night"],
 [data-suite="kutch-toran"][data-mood="night"],
 [data-suite="punjab-haveli"] [data-mood="night"],
 [data-suite="chooda-ceremony"] [data-mood="night"],
@@ -1712,6 +1795,7 @@
 [data-suite="urli-pookal"],
 [data-suite="kettuvallam-raat"],
 [data-suite="vallam-kali"],
+[data-suite="toran-mala"],
 [data-suite="kayal"] {
   --suite-plate: #f8f3e3;
   --suite-ink: #13332c;
@@ -1732,6 +1816,7 @@
 [data-suite="urli-pookal"] [data-mood="dawn"],
 [data-suite="kettuvallam-raat"] [data-mood="dawn"],
 [data-suite="vallam-kali"] [data-mood="dawn"],
+[data-suite="toran-mala"] [data-mood="dawn"],
 [data-suite="kayal"] [data-mood="dawn"],
 [data-suite="temple-pond"][data-mood="dawn"],
 [data-suite="onam-pookalam"][data-mood="dawn"],
@@ -1741,6 +1826,7 @@
 [data-suite="urli-pookal"][data-mood="dawn"],
 [data-suite="kettuvallam-raat"][data-mood="dawn"],
 [data-suite="vallam-kali"][data-mood="dawn"],
+[data-suite="toran-mala"][data-mood="dawn"],
 [data-suite="kayal"][data-mood="dawn"],
 [data-suite="jazz-lounge"] [data-mood="dawn"],
 [data-suite="launch-stage"] [data-mood="dawn"],
@@ -1785,6 +1871,7 @@
 [data-suite="kanjivaram-pattu"] [data-mood="dawn"],
 [data-suite="malli-mazhai"] [data-mood="dawn"],
 [data-suite="pongal-paanai"] [data-mood="dawn"],
+[data-suite="olai-chuvadi"] [data-mood="dawn"],
 [data-suite="tanjore"] [data-mood="dawn"],
 [data-suite="pongal-kolam"][data-mood="dawn"],
 [data-suite="kalyana-vazhai"][data-mood="dawn"],
@@ -1793,6 +1880,7 @@
 [data-suite="kanjivaram-pattu"][data-mood="dawn"],
 [data-suite="malli-mazhai"][data-mood="dawn"],
 [data-suite="pongal-paanai"][data-mood="dawn"],
+[data-suite="olai-chuvadi"][data-mood="dawn"],
 [data-suite="tanjore"][data-mood="dawn"],
 [data-suite="kashi-ghat"] [data-mood="dawn"],
 [data-suite="rishikesh-ganga"] [data-mood="dawn"],
@@ -1833,6 +1921,8 @@
 [data-suite="aurora-igloo"] [data-mood="dawn"],
 [data-suite="sharad-poonam"] [data-mood="dawn"],
 [data-suite="holly-ribbon"] [data-mood="dawn"],
+[data-suite="naksha-pangong"] [data-mood="dawn"],
+[data-suite="barf-khidki"] [data-mood="dawn"],
 [data-suite="himani"] [data-mood="dawn"],
 [data-suite="kailash-kamal"][data-mood="dawn"],
 [data-suite="rhododendron-himalaya"][data-mood="dawn"],
@@ -1841,6 +1931,8 @@
 [data-suite="aurora-igloo"][data-mood="dawn"],
 [data-suite="sharad-poonam"][data-mood="dawn"],
 [data-suite="holly-ribbon"][data-mood="dawn"],
+[data-suite="naksha-pangong"][data-mood="dawn"],
+[data-suite="barf-khidki"][data-mood="dawn"],
 [data-suite="himani"][data-mood="dawn"],
 [data-suite="fairy-forest"] [data-mood="dawn"],
 [data-suite="vat-vriksha"] [data-mood="dawn"],
@@ -1886,13 +1978,17 @@
 [data-suite="mysuru"][data-mood="dawn"],
 [data-suite="arati-mandap"] [data-mood="dawn"],
 [data-suite="tholu-bommalata"] [data-mood="dawn"],
+[data-suite="ikat-dhaaga"] [data-mood="dawn"],
 [data-suite="kalamkari"] [data-mood="dawn"],
 [data-suite="arati-mandap"][data-mood="dawn"],
 [data-suite="tholu-bommalata"][data-mood="dawn"],
+[data-suite="ikat-dhaaga"][data-mood="dawn"],
 [data-suite="kalamkari"][data-mood="dawn"],
 [data-suite="pipli-chhata"] [data-mood="dawn"],
+[data-suite="konark-chakra"] [data-mood="dawn"],
 [data-suite="pattachitra"] [data-mood="dawn"],
 [data-suite="pipli-chhata"][data-mood="dawn"],
+[data-suite="konark-chakra"][data-mood="dawn"],
 [data-suite="pattachitra"][data-mood="dawn"],
 [data-suite="chinar-dal"] [data-mood="dawn"],
 [data-suite="tulip-kashmir"] [data-mood="dawn"],
@@ -1914,7 +2010,9 @@
 [data-suite="bihu-utsav"][data-mood="dawn"],
 [data-suite="deodar-sanjh"][data-mood="dawn"],
 [data-suite="chai-bagan"][data-mood="dawn"],
+[data-suite="chik-baradari"] [data-mood="dawn"],
 [data-suite="sufi-raat"] [data-mood="dawn"],
+[data-suite="chik-baradari"][data-mood="dawn"],
 [data-suite="sufi-raat"][data-mood="dawn"],
 [data-suite="christening-lilies"] [data-mood="dawn"],
 [data-suite="stained-glass"] [data-mood="dawn"],
@@ -1936,6 +2034,7 @@
 [data-suite="nimbu-amalfi"] [data-mood="dawn"],
 [data-suite="sea-bubbles"] [data-mood="dawn"],
 [data-suite="konkan-kinara"] [data-mood="dawn"],
+[data-suite="lehar"] [data-mood="dawn"],
 [data-suite="sagar"] [data-mood="dawn"],
 [data-suite="bali-garden"][data-mood="dawn"],
 [data-suite="santorini-white"][data-mood="dawn"],
@@ -1945,6 +2044,7 @@
 [data-suite="nimbu-amalfi"][data-mood="dawn"],
 [data-suite="sea-bubbles"][data-mood="dawn"],
 [data-suite="konkan-kinara"][data-mood="dawn"],
+[data-suite="lehar"][data-mood="dawn"],
 [data-suite="sagar"][data-mood="dawn"],
 [data-suite="space-voyage"] [data-mood="dawn"],
 [data-suite="gold-gala"] [data-mood="dawn"],
@@ -1960,6 +2060,7 @@
 [data-suite="polaroid-lights"] [data-mood="dawn"],
 [data-suite="shamiana-raat"] [data-mood="dawn"],
 [data-suite="ghungroo-raat"] [data-mood="dawn"],
+[data-suite="jhilmil"] [data-mood="dawn"],
 [data-suite="rooftop"] [data-mood="dawn"],
 [data-suite="space-voyage"][data-mood="dawn"],
 [data-suite="gold-gala"][data-mood="dawn"],
@@ -1975,6 +2076,7 @@
 [data-suite="polaroid-lights"][data-mood="dawn"],
 [data-suite="shamiana-raat"][data-mood="dawn"],
 [data-suite="ghungroo-raat"][data-mood="dawn"],
+[data-suite="jhilmil"][data-mood="dawn"],
 [data-suite="rooftop"][data-mood="dawn"],
 [data-suite="zamindar-bari"] [data-mood="dawn"],
 [data-suite="durga-pujo"] [data-mood="dawn"],
@@ -1984,6 +2086,7 @@
 [data-suite="aipan-kumaon"] [data-mood="dawn"],
 [data-suite="bishnupur-terracotta"] [data-mood="dawn"],
 [data-suite="shiuli-bhor"] [data-mood="dawn"],
+[data-suite="howrah-tareekh"] [data-mood="dawn"],
 [data-suite="rajbari"] [data-mood="dawn"],
 [data-suite="zamindar-bari"][data-mood="dawn"],
 [data-suite="durga-pujo"][data-mood="dawn"],
@@ -1993,6 +2096,7 @@
 [data-suite="aipan-kumaon"][data-mood="dawn"],
 [data-suite="bishnupur-terracotta"][data-mood="dawn"],
 [data-suite="shiuli-bhor"][data-mood="dawn"],
+[data-suite="howrah-tareekh"][data-mood="dawn"],
 [data-suite="rajbari"][data-mood="dawn"] {
   --suite-sky-top: #f5b98e;
   --suite-sky-bottom: #fce6c8;
@@ -2011,6 +2115,7 @@
 [data-suite="urli-pookal"] [data-mood="day"],
 [data-suite="kettuvallam-raat"] [data-mood="day"],
 [data-suite="vallam-kali"] [data-mood="day"],
+[data-suite="toran-mala"] [data-mood="day"],
 [data-suite="kayal"] [data-mood="day"],
 [data-suite="temple-pond"][data-mood="day"],
 [data-suite="onam-pookalam"][data-mood="day"],
@@ -2020,6 +2125,7 @@
 [data-suite="urli-pookal"][data-mood="day"],
 [data-suite="kettuvallam-raat"][data-mood="day"],
 [data-suite="vallam-kali"][data-mood="day"],
+[data-suite="toran-mala"][data-mood="day"],
 [data-suite="kayal"][data-mood="day"],
 [data-suite="jazz-lounge"] [data-mood="day"],
 [data-suite="launch-stage"] [data-mood="day"],
@@ -2064,6 +2170,7 @@
 [data-suite="kanjivaram-pattu"] [data-mood="day"],
 [data-suite="malli-mazhai"] [data-mood="day"],
 [data-suite="pongal-paanai"] [data-mood="day"],
+[data-suite="olai-chuvadi"] [data-mood="day"],
 [data-suite="tanjore"] [data-mood="day"],
 [data-suite="pongal-kolam"][data-mood="day"],
 [data-suite="kalyana-vazhai"][data-mood="day"],
@@ -2072,6 +2179,7 @@
 [data-suite="kanjivaram-pattu"][data-mood="day"],
 [data-suite="malli-mazhai"][data-mood="day"],
 [data-suite="pongal-paanai"][data-mood="day"],
+[data-suite="olai-chuvadi"][data-mood="day"],
 [data-suite="tanjore"][data-mood="day"],
 [data-suite="kashi-ghat"] [data-mood="day"],
 [data-suite="rishikesh-ganga"] [data-mood="day"],
@@ -2112,6 +2220,8 @@
 [data-suite="aurora-igloo"] [data-mood="day"],
 [data-suite="sharad-poonam"] [data-mood="day"],
 [data-suite="holly-ribbon"] [data-mood="day"],
+[data-suite="naksha-pangong"] [data-mood="day"],
+[data-suite="barf-khidki"] [data-mood="day"],
 [data-suite="himani"] [data-mood="day"],
 [data-suite="kailash-kamal"][data-mood="day"],
 [data-suite="rhododendron-himalaya"][data-mood="day"],
@@ -2120,6 +2230,8 @@
 [data-suite="aurora-igloo"][data-mood="day"],
 [data-suite="sharad-poonam"][data-mood="day"],
 [data-suite="holly-ribbon"][data-mood="day"],
+[data-suite="naksha-pangong"][data-mood="day"],
+[data-suite="barf-khidki"][data-mood="day"],
 [data-suite="himani"][data-mood="day"],
 [data-suite="fairy-forest"] [data-mood="day"],
 [data-suite="vat-vriksha"] [data-mood="day"],
@@ -2165,13 +2277,17 @@
 [data-suite="mysuru"][data-mood="day"],
 [data-suite="arati-mandap"] [data-mood="day"],
 [data-suite="tholu-bommalata"] [data-mood="day"],
+[data-suite="ikat-dhaaga"] [data-mood="day"],
 [data-suite="kalamkari"] [data-mood="day"],
 [data-suite="arati-mandap"][data-mood="day"],
 [data-suite="tholu-bommalata"][data-mood="day"],
+[data-suite="ikat-dhaaga"][data-mood="day"],
 [data-suite="kalamkari"][data-mood="day"],
 [data-suite="pipli-chhata"] [data-mood="day"],
+[data-suite="konark-chakra"] [data-mood="day"],
 [data-suite="pattachitra"] [data-mood="day"],
 [data-suite="pipli-chhata"][data-mood="day"],
+[data-suite="konark-chakra"][data-mood="day"],
 [data-suite="pattachitra"][data-mood="day"],
 [data-suite="chinar-dal"] [data-mood="day"],
 [data-suite="tulip-kashmir"] [data-mood="day"],
@@ -2193,7 +2309,9 @@
 [data-suite="bihu-utsav"][data-mood="day"],
 [data-suite="deodar-sanjh"][data-mood="day"],
 [data-suite="chai-bagan"][data-mood="day"],
+[data-suite="chik-baradari"] [data-mood="day"],
 [data-suite="sufi-raat"] [data-mood="day"],
+[data-suite="chik-baradari"][data-mood="day"],
 [data-suite="sufi-raat"][data-mood="day"],
 [data-suite="christening-lilies"] [data-mood="day"],
 [data-suite="stained-glass"] [data-mood="day"],
@@ -2215,6 +2333,7 @@
 [data-suite="nimbu-amalfi"] [data-mood="day"],
 [data-suite="sea-bubbles"] [data-mood="day"],
 [data-suite="konkan-kinara"] [data-mood="day"],
+[data-suite="lehar"] [data-mood="day"],
 [data-suite="sagar"] [data-mood="day"],
 [data-suite="bali-garden"][data-mood="day"],
 [data-suite="santorini-white"][data-mood="day"],
@@ -2224,6 +2343,7 @@
 [data-suite="nimbu-amalfi"][data-mood="day"],
 [data-suite="sea-bubbles"][data-mood="day"],
 [data-suite="konkan-kinara"][data-mood="day"],
+[data-suite="lehar"][data-mood="day"],
 [data-suite="sagar"][data-mood="day"],
 [data-suite="space-voyage"] [data-mood="day"],
 [data-suite="gold-gala"] [data-mood="day"],
@@ -2239,6 +2359,7 @@
 [data-suite="polaroid-lights"] [data-mood="day"],
 [data-suite="shamiana-raat"] [data-mood="day"],
 [data-suite="ghungroo-raat"] [data-mood="day"],
+[data-suite="jhilmil"] [data-mood="day"],
 [data-suite="rooftop"] [data-mood="day"],
 [data-suite="space-voyage"][data-mood="day"],
 [data-suite="gold-gala"][data-mood="day"],
@@ -2254,6 +2375,7 @@
 [data-suite="polaroid-lights"][data-mood="day"],
 [data-suite="shamiana-raat"][data-mood="day"],
 [data-suite="ghungroo-raat"][data-mood="day"],
+[data-suite="jhilmil"][data-mood="day"],
 [data-suite="rooftop"][data-mood="day"],
 [data-suite="zamindar-bari"] [data-mood="day"],
 [data-suite="durga-pujo"] [data-mood="day"],
@@ -2263,6 +2385,7 @@
 [data-suite="aipan-kumaon"] [data-mood="day"],
 [data-suite="bishnupur-terracotta"] [data-mood="day"],
 [data-suite="shiuli-bhor"] [data-mood="day"],
+[data-suite="howrah-tareekh"] [data-mood="day"],
 [data-suite="rajbari"] [data-mood="day"],
 [data-suite="zamindar-bari"][data-mood="day"],
 [data-suite="durga-pujo"][data-mood="day"],
@@ -2272,6 +2395,7 @@
 [data-suite="aipan-kumaon"][data-mood="day"],
 [data-suite="bishnupur-terracotta"][data-mood="day"],
 [data-suite="shiuli-bhor"][data-mood="day"],
+[data-suite="howrah-tareekh"][data-mood="day"],
 [data-suite="rajbari"][data-mood="day"] {
   --suite-sky-top: #8cc9d8;
   --suite-sky-bottom: #e8f4ea;
@@ -2290,6 +2414,7 @@
 [data-suite="urli-pookal"] [data-mood="dusk"],
 [data-suite="kettuvallam-raat"] [data-mood="dusk"],
 [data-suite="vallam-kali"] [data-mood="dusk"],
+[data-suite="toran-mala"] [data-mood="dusk"],
 [data-suite="kayal"] [data-mood="dusk"],
 [data-suite="temple-pond"][data-mood="dusk"],
 [data-suite="onam-pookalam"][data-mood="dusk"],
@@ -2299,6 +2424,7 @@
 [data-suite="urli-pookal"][data-mood="dusk"],
 [data-suite="kettuvallam-raat"][data-mood="dusk"],
 [data-suite="vallam-kali"][data-mood="dusk"],
+[data-suite="toran-mala"][data-mood="dusk"],
 [data-suite="kayal"][data-mood="dusk"],
 [data-suite="jazz-lounge"] [data-mood="dusk"],
 [data-suite="launch-stage"] [data-mood="dusk"],
@@ -2343,6 +2469,7 @@
 [data-suite="kanjivaram-pattu"] [data-mood="dusk"],
 [data-suite="malli-mazhai"] [data-mood="dusk"],
 [data-suite="pongal-paanai"] [data-mood="dusk"],
+[data-suite="olai-chuvadi"] [data-mood="dusk"],
 [data-suite="tanjore"] [data-mood="dusk"],
 [data-suite="pongal-kolam"][data-mood="dusk"],
 [data-suite="kalyana-vazhai"][data-mood="dusk"],
@@ -2351,6 +2478,7 @@
 [data-suite="kanjivaram-pattu"][data-mood="dusk"],
 [data-suite="malli-mazhai"][data-mood="dusk"],
 [data-suite="pongal-paanai"][data-mood="dusk"],
+[data-suite="olai-chuvadi"][data-mood="dusk"],
 [data-suite="tanjore"][data-mood="dusk"],
 [data-suite="kashi-ghat"] [data-mood="dusk"],
 [data-suite="rishikesh-ganga"] [data-mood="dusk"],
@@ -2391,6 +2519,8 @@
 [data-suite="aurora-igloo"] [data-mood="dusk"],
 [data-suite="sharad-poonam"] [data-mood="dusk"],
 [data-suite="holly-ribbon"] [data-mood="dusk"],
+[data-suite="naksha-pangong"] [data-mood="dusk"],
+[data-suite="barf-khidki"] [data-mood="dusk"],
 [data-suite="himani"] [data-mood="dusk"],
 [data-suite="kailash-kamal"][data-mood="dusk"],
 [data-suite="rhododendron-himalaya"][data-mood="dusk"],
@@ -2399,6 +2529,8 @@
 [data-suite="aurora-igloo"][data-mood="dusk"],
 [data-suite="sharad-poonam"][data-mood="dusk"],
 [data-suite="holly-ribbon"][data-mood="dusk"],
+[data-suite="naksha-pangong"][data-mood="dusk"],
+[data-suite="barf-khidki"][data-mood="dusk"],
 [data-suite="himani"][data-mood="dusk"],
 [data-suite="fairy-forest"] [data-mood="dusk"],
 [data-suite="vat-vriksha"] [data-mood="dusk"],
@@ -2444,13 +2576,17 @@
 [data-suite="mysuru"][data-mood="dusk"],
 [data-suite="arati-mandap"] [data-mood="dusk"],
 [data-suite="tholu-bommalata"] [data-mood="dusk"],
+[data-suite="ikat-dhaaga"] [data-mood="dusk"],
 [data-suite="kalamkari"] [data-mood="dusk"],
 [data-suite="arati-mandap"][data-mood="dusk"],
 [data-suite="tholu-bommalata"][data-mood="dusk"],
+[data-suite="ikat-dhaaga"][data-mood="dusk"],
 [data-suite="kalamkari"][data-mood="dusk"],
 [data-suite="pipli-chhata"] [data-mood="dusk"],
+[data-suite="konark-chakra"] [data-mood="dusk"],
 [data-suite="pattachitra"] [data-mood="dusk"],
 [data-suite="pipli-chhata"][data-mood="dusk"],
+[data-suite="konark-chakra"][data-mood="dusk"],
 [data-suite="pattachitra"][data-mood="dusk"],
 [data-suite="chinar-dal"] [data-mood="dusk"],
 [data-suite="tulip-kashmir"] [data-mood="dusk"],
@@ -2472,7 +2608,9 @@
 [data-suite="bihu-utsav"][data-mood="dusk"],
 [data-suite="deodar-sanjh"][data-mood="dusk"],
 [data-suite="chai-bagan"][data-mood="dusk"],
+[data-suite="chik-baradari"] [data-mood="dusk"],
 [data-suite="sufi-raat"] [data-mood="dusk"],
+[data-suite="chik-baradari"][data-mood="dusk"],
 [data-suite="sufi-raat"][data-mood="dusk"],
 [data-suite="christening-lilies"] [data-mood="dusk"],
 [data-suite="stained-glass"] [data-mood="dusk"],
@@ -2494,6 +2632,7 @@
 [data-suite="nimbu-amalfi"] [data-mood="dusk"],
 [data-suite="sea-bubbles"] [data-mood="dusk"],
 [data-suite="konkan-kinara"] [data-mood="dusk"],
+[data-suite="lehar"] [data-mood="dusk"],
 [data-suite="sagar"] [data-mood="dusk"],
 [data-suite="bali-garden"][data-mood="dusk"],
 [data-suite="santorini-white"][data-mood="dusk"],
@@ -2503,6 +2642,7 @@
 [data-suite="nimbu-amalfi"][data-mood="dusk"],
 [data-suite="sea-bubbles"][data-mood="dusk"],
 [data-suite="konkan-kinara"][data-mood="dusk"],
+[data-suite="lehar"][data-mood="dusk"],
 [data-suite="sagar"][data-mood="dusk"],
 [data-suite="space-voyage"] [data-mood="dusk"],
 [data-suite="gold-gala"] [data-mood="dusk"],
@@ -2518,6 +2658,7 @@
 [data-suite="polaroid-lights"] [data-mood="dusk"],
 [data-suite="shamiana-raat"] [data-mood="dusk"],
 [data-suite="ghungroo-raat"] [data-mood="dusk"],
+[data-suite="jhilmil"] [data-mood="dusk"],
 [data-suite="rooftop"] [data-mood="dusk"],
 [data-suite="space-voyage"][data-mood="dusk"],
 [data-suite="gold-gala"][data-mood="dusk"],
@@ -2533,6 +2674,7 @@
 [data-suite="polaroid-lights"][data-mood="dusk"],
 [data-suite="shamiana-raat"][data-mood="dusk"],
 [data-suite="ghungroo-raat"][data-mood="dusk"],
+[data-suite="jhilmil"][data-mood="dusk"],
 [data-suite="rooftop"][data-mood="dusk"],
 [data-suite="zamindar-bari"] [data-mood="dusk"],
 [data-suite="durga-pujo"] [data-mood="dusk"],
@@ -2542,6 +2684,7 @@
 [data-suite="aipan-kumaon"] [data-mood="dusk"],
 [data-suite="bishnupur-terracotta"] [data-mood="dusk"],
 [data-suite="shiuli-bhor"] [data-mood="dusk"],
+[data-suite="howrah-tareekh"] [data-mood="dusk"],
 [data-suite="rajbari"] [data-mood="dusk"],
 [data-suite="zamindar-bari"][data-mood="dusk"],
 [data-suite="durga-pujo"][data-mood="dusk"],
@@ -2551,6 +2694,7 @@
 [data-suite="aipan-kumaon"][data-mood="dusk"],
 [data-suite="bishnupur-terracotta"][data-mood="dusk"],
 [data-suite="shiuli-bhor"][data-mood="dusk"],
+[data-suite="howrah-tareekh"][data-mood="dusk"],
 [data-suite="rajbari"][data-mood="dusk"] {
   --suite-sky-top: #5a3a6e;
   --suite-sky-bottom: #f2a064;
@@ -2569,6 +2713,7 @@
 [data-suite="urli-pookal"] [data-mood="night"],
 [data-suite="kettuvallam-raat"] [data-mood="night"],
 [data-suite="vallam-kali"] [data-mood="night"],
+[data-suite="toran-mala"] [data-mood="night"],
 [data-suite="kayal"] [data-mood="night"],
 [data-suite="temple-pond"][data-mood="night"],
 [data-suite="onam-pookalam"][data-mood="night"],
@@ -2578,6 +2723,7 @@
 [data-suite="urli-pookal"][data-mood="night"],
 [data-suite="kettuvallam-raat"][data-mood="night"],
 [data-suite="vallam-kali"][data-mood="night"],
+[data-suite="toran-mala"][data-mood="night"],
 [data-suite="kayal"][data-mood="night"],
 [data-suite="jazz-lounge"] [data-mood="night"],
 [data-suite="launch-stage"] [data-mood="night"],
@@ -2622,6 +2768,7 @@
 [data-suite="kanjivaram-pattu"] [data-mood="night"],
 [data-suite="malli-mazhai"] [data-mood="night"],
 [data-suite="pongal-paanai"] [data-mood="night"],
+[data-suite="olai-chuvadi"] [data-mood="night"],
 [data-suite="tanjore"] [data-mood="night"],
 [data-suite="pongal-kolam"][data-mood="night"],
 [data-suite="kalyana-vazhai"][data-mood="night"],
@@ -2630,6 +2777,7 @@
 [data-suite="kanjivaram-pattu"][data-mood="night"],
 [data-suite="malli-mazhai"][data-mood="night"],
 [data-suite="pongal-paanai"][data-mood="night"],
+[data-suite="olai-chuvadi"][data-mood="night"],
 [data-suite="tanjore"][data-mood="night"],
 [data-suite="kashi-ghat"] [data-mood="night"],
 [data-suite="rishikesh-ganga"] [data-mood="night"],
@@ -2670,6 +2818,8 @@
 [data-suite="aurora-igloo"] [data-mood="night"],
 [data-suite="sharad-poonam"] [data-mood="night"],
 [data-suite="holly-ribbon"] [data-mood="night"],
+[data-suite="naksha-pangong"] [data-mood="night"],
+[data-suite="barf-khidki"] [data-mood="night"],
 [data-suite="himani"] [data-mood="night"],
 [data-suite="kailash-kamal"][data-mood="night"],
 [data-suite="rhododendron-himalaya"][data-mood="night"],
@@ -2678,6 +2828,8 @@
 [data-suite="aurora-igloo"][data-mood="night"],
 [data-suite="sharad-poonam"][data-mood="night"],
 [data-suite="holly-ribbon"][data-mood="night"],
+[data-suite="naksha-pangong"][data-mood="night"],
+[data-suite="barf-khidki"][data-mood="night"],
 [data-suite="himani"][data-mood="night"],
 [data-suite="fairy-forest"] [data-mood="night"],
 [data-suite="vat-vriksha"] [data-mood="night"],
@@ -2723,13 +2875,17 @@
 [data-suite="mysuru"][data-mood="night"],
 [data-suite="arati-mandap"] [data-mood="night"],
 [data-suite="tholu-bommalata"] [data-mood="night"],
+[data-suite="ikat-dhaaga"] [data-mood="night"],
 [data-suite="kalamkari"] [data-mood="night"],
 [data-suite="arati-mandap"][data-mood="night"],
 [data-suite="tholu-bommalata"][data-mood="night"],
+[data-suite="ikat-dhaaga"][data-mood="night"],
 [data-suite="kalamkari"][data-mood="night"],
 [data-suite="pipli-chhata"] [data-mood="night"],
+[data-suite="konark-chakra"] [data-mood="night"],
 [data-suite="pattachitra"] [data-mood="night"],
 [data-suite="pipli-chhata"][data-mood="night"],
+[data-suite="konark-chakra"][data-mood="night"],
 [data-suite="pattachitra"][data-mood="night"],
 [data-suite="chinar-dal"] [data-mood="night"],
 [data-suite="tulip-kashmir"] [data-mood="night"],
@@ -2751,7 +2907,9 @@
 [data-suite="bihu-utsav"][data-mood="night"],
 [data-suite="deodar-sanjh"][data-mood="night"],
 [data-suite="chai-bagan"][data-mood="night"],
+[data-suite="chik-baradari"] [data-mood="night"],
 [data-suite="sufi-raat"] [data-mood="night"],
+[data-suite="chik-baradari"][data-mood="night"],
 [data-suite="sufi-raat"][data-mood="night"],
 [data-suite="christening-lilies"] [data-mood="night"],
 [data-suite="stained-glass"] [data-mood="night"],
@@ -2773,6 +2931,7 @@
 [data-suite="nimbu-amalfi"] [data-mood="night"],
 [data-suite="sea-bubbles"] [data-mood="night"],
 [data-suite="konkan-kinara"] [data-mood="night"],
+[data-suite="lehar"] [data-mood="night"],
 [data-suite="sagar"] [data-mood="night"],
 [data-suite="bali-garden"][data-mood="night"],
 [data-suite="santorini-white"][data-mood="night"],
@@ -2782,6 +2941,7 @@
 [data-suite="nimbu-amalfi"][data-mood="night"],
 [data-suite="sea-bubbles"][data-mood="night"],
 [data-suite="konkan-kinara"][data-mood="night"],
+[data-suite="lehar"][data-mood="night"],
 [data-suite="sagar"][data-mood="night"],
 [data-suite="space-voyage"] [data-mood="night"],
 [data-suite="gold-gala"] [data-mood="night"],
@@ -2797,6 +2957,7 @@
 [data-suite="polaroid-lights"] [data-mood="night"],
 [data-suite="shamiana-raat"] [data-mood="night"],
 [data-suite="ghungroo-raat"] [data-mood="night"],
+[data-suite="jhilmil"] [data-mood="night"],
 [data-suite="rooftop"] [data-mood="night"],
 [data-suite="space-voyage"][data-mood="night"],
 [data-suite="gold-gala"][data-mood="night"],
@@ -2812,6 +2973,7 @@
 [data-suite="polaroid-lights"][data-mood="night"],
 [data-suite="shamiana-raat"][data-mood="night"],
 [data-suite="ghungroo-raat"][data-mood="night"],
+[data-suite="jhilmil"][data-mood="night"],
 [data-suite="rooftop"][data-mood="night"],
 [data-suite="zamindar-bari"] [data-mood="night"],
 [data-suite="durga-pujo"] [data-mood="night"],
@@ -2821,6 +2983,7 @@
 [data-suite="aipan-kumaon"] [data-mood="night"],
 [data-suite="bishnupur-terracotta"] [data-mood="night"],
 [data-suite="shiuli-bhor"] [data-mood="night"],
+[data-suite="howrah-tareekh"] [data-mood="night"],
 [data-suite="rajbari"] [data-mood="night"],
 [data-suite="zamindar-bari"][data-mood="night"],
 [data-suite="durga-pujo"][data-mood="night"],
@@ -2830,6 +2993,7 @@
 [data-suite="aipan-kumaon"][data-mood="night"],
 [data-suite="bishnupur-terracotta"][data-mood="night"],
 [data-suite="shiuli-bhor"][data-mood="night"],
+[data-suite="howrah-tareekh"][data-mood="night"],
 [data-suite="rajbari"][data-mood="night"] {
   --suite-sky-top: #081a26;
   --suite-sky-bottom: #173848;
@@ -2850,6 +3014,7 @@
 [data-suite="chand-raat"],
 [data-suite="fawwara-bagh"],
 [data-suite="anar-bagh"],
+[data-suite="pachchikari"],
 [data-suite="noor-bagh"] {
   --suite-plate: #f7f6ef;
   --suite-ink: #0f3b36;
@@ -2889,6 +3054,7 @@
 [data-suite="aipan-kumaon"],
 [data-suite="bishnupur-terracotta"],
 [data-suite="shiuli-bhor"],
+[data-suite="howrah-tareekh"],
 [data-suite="rajbari"] {
   --suite-plate: #fbf5ea;
   --suite-ink: #3a0f10;
@@ -2935,6 +3101,7 @@
 [data-suite="moti-bharat"],
 [data-suite="navratri-garbi"],
 [data-suite="choodi-jhalar"],
+[data-suite="mandvi-dhow"],
 [data-suite="kutch-toran"] {
   --suite-plate: #fdf6ea;
   --suite-ink: #3a1410;
@@ -2966,6 +3133,7 @@
 [data-suite="teddy-picnic"],
 [data-suite="kulfi-thela"],
 [data-suite="meetha-bakery"],
+[data-suite="channapatna"],
 [data-suite="gubbara"] {
   --suite-plate: #fff6f8;
   --suite-ink: #3d1830;
@@ -2988,6 +3156,7 @@
 [data-suite="retirement-naav"],
 [data-suite="locket-jodi"],
 [data-suite="cycle-basket"],
+[data-suite="irani-carrom"],
 [data-suite="saath"] {
   --suite-plate: #fdf4ee;
   --suite-ink: #3b0f16;
@@ -3014,6 +3183,7 @@
 [data-suite="polaroid-lights"],
 [data-suite="shamiana-raat"],
 [data-suite="ghungroo-raat"],
+[data-suite="jhilmil"],
 [data-suite="rooftop"] {
   --suite-plate: #f8f1ff;
   --suite-ink: #24123d;
@@ -3071,6 +3241,7 @@
 [data-suite="tota-bagh"],
 [data-suite="gajra-ghera"],
 [data-suite="baganbilas"],
+[data-suite="pondy-gali"],
 [data-suite="gulaab"] {
   --suite-plate: #fffaf7;
   --suite-ink: #3d1f26;
@@ -3188,6 +3359,7 @@
 [data-suite="kanjivaram-pattu"],
 [data-suite="malli-mazhai"],
 [data-suite="pongal-paanai"],
+[data-suite="olai-chuvadi"],
 [data-suite="tanjore"] {
   --suite-plate: #fdf5e6;
   --suite-ink: #3a0a0a;
@@ -3239,6 +3411,7 @@
 }
 [data-suite="arati-mandap"],
 [data-suite="tholu-bommalata"],
+[data-suite="ikat-dhaaga"],
 [data-suite="kalamkari"] {
   --suite-plate: #fbf3e2;
   --suite-ink: #1c2340;
@@ -3252,6 +3425,7 @@
   --suite-stone: #efe2c6;
 }
 [data-suite="pipli-chhata"],
+[data-suite="konark-chakra"],
 [data-suite="pattachitra"] {
   --suite-plate: #fdf4e0;
   --suite-ink: #2a1208;
@@ -3296,6 +3470,7 @@
   --suite-light: #ffe7a8;
   --suite-stone: #eef0dc;
 }
+[data-suite="chik-baradari"],
 [data-suite="sufi-raat"] {
   --suite-plate: #fbf6ea;
   --suite-ink: #0f2a2e;
@@ -3362,6 +3537,8 @@
 [data-suite="aurora-igloo"],
 [data-suite="sharad-poonam"],
 [data-suite="holly-ribbon"],
+[data-suite="naksha-pangong"],
+[data-suite="barf-khidki"],
 [data-suite="himani"] {
   --suite-plate: #f6f8fb;
   --suite-ink: #1a2433;
@@ -3415,6 +3592,7 @@
 [data-suite="naya-mehmaan"],
 [data-suite="badal-sapne"],
 [data-suite="chidiya-ghonsla"],
+[data-suite="jhalar-palna"],
 [data-suite="palna"] {
   --suite-plate: #fdf9f6;
   --suite-ink: #3a2a3a;
@@ -3450,6 +3628,7 @@
 [data-suite="nimbu-amalfi"],
 [data-suite="sea-bubbles"],
 [data-suite="konkan-kinara"],
+[data-suite="lehar"],
 [data-suite="sagar"] {
   --suite-plate: #f7fcfc;
   --suite-ink: #0f3340;
@@ -3467,6 +3646,7 @@
 [data-suite="cricket-stadium"],
 [data-suite="khazana-dweep"],
 [data-suite="khargosh-bagicha"],
+[data-suite="ped-ghar"],
 [data-suite="jungle-party"] {
   --suite-plate: #fbfdf2;
   --suite-ink: #1f3a1a;
@@ -4521,6 +4701,7 @@
 .guest-themed[data-suite="fort-night"],
 .guest-themed[data-suite="siya-ram-mala"],
 .guest-themed[data-suite="mor-bagh"],
+.guest-themed[data-suite="jaali-vriksh"],
 .guest-themed[data-suite="rajwada-bagh"] {
   --guest-deep: var(--tpl-emerald-paper);
   --guest-jewel: var(--tpl-emerald-ruby);
@@ -4531,6 +4712,7 @@
 .guest-themed[data-suite="vazhai-mandap"],
 .guest-themed[data-suite="kasavu-sona"],
 .guest-themed[data-suite="urli-pookal"],
+.guest-themed[data-suite="toran-mala"],
 .guest-themed[data-suite="kayal"] {
   --guest-deep: var(--tpl-kasavu-back);
   --guest-jewel: var(--tpl-kasavu-kumkum);
@@ -4546,6 +4728,7 @@
 .guest-themed[data-suite="dino-jungle"],
 .guest-themed[data-suite="little-racer"],
 .guest-themed[data-suite="cricket-stadium"],
+.guest-themed[data-suite="ped-ghar"],
 .guest-themed[data-suite="jungle-party"] {
   --guest-jewel: var(--flower-leaf-deep);
 }
@@ -4557,6 +4740,7 @@
 .guest-themed[data-suite="oh-baby"],
 .guest-themed[data-suite="annaprashan"],
 .guest-themed[data-suite="naya-mehmaan"],
+.guest-themed[data-suite="jhalar-palna"],
 .guest-themed[data-suite="palna"] {
   --guest-jewel: var(--suite-accent-text);
 }
@@ -7242,6 +7426,368 @@
     opacity: 0;
     transform: translate(2cqw, -14cqh);
   }
+}
+
+/* Themed openings: each theme's own opening painting over its scene (opening-themed.tsx) */
+@property --themed-reveal {
+  syntax: "<percentage>";
+  inherits: true;
+  initial-value: 0%;
+}
+.themed-canvas {
+  width: max(100cqw, calc(100cqh * 9 / 16));
+  aspect-ratio: 9 / 16;
+  translate: -50% -50%;
+  perspective: 160cqw;
+}
+/* The place waits a little closer, then settles as the painting goes */
+.themed-beyond {
+  scale: 1.06;
+  filter: brightness(0.85);
+  transition:
+    scale 2600ms cubic-bezier(0.3, 0, 0.2, 1) 300ms,
+    filter 1400ms ease 500ms;
+}
+.opening-stage[data-open="true"] .themed-beyond {
+  scale: 1;
+  filter: none;
+}
+.themed-cover {
+  animation: gate-breathe 9s ease-in-out infinite alternate;
+  transform-style: preserve-3d;
+  transition: opacity 400ms ease 2300ms;
+}
+.opening-stage[data-open="true"] .themed-cover {
+  animation-play-state: paused;
+  /* Whatever is left goes at the end; in still mode it goes at once */
+  opacity: 0;
+}
+.themed-part {
+  background: var(--cover) center / 100% 100% no-repeat;
+  backface-visibility: hidden;
+  transition: transform 1600ms cubic-bezier(0.55, 0, 0.35, 1);
+}
+
+/* Fly through it: the jaali, the stepwell's steps */
+.opening-stage[data-open="true"] [data-move="zoom"] .themed-part {
+  transform: scale(3.4);
+  opacity: 0;
+  transition:
+    transform 2200ms cubic-bezier(0.5, 0, 0.3, 1) 150ms,
+    opacity 900ms ease 1300ms;
+}
+[data-move="zoom"] .themed-part {
+  transform-origin: 50% 44% !important;
+}
+
+/* The marble sinks away */
+.opening-stage[data-open="true"] [data-move="sink"] .themed-part {
+  transform: translateY(104%);
+  transition: transform 1900ms cubic-bezier(0.6, 0, 0.4, 1) 300ms;
+}
+
+/* Threads slip down from the middle outward */
+.opening-stage[data-open="true"] [data-move="threads"] .themed-part {
+  transform: translateY(112%) rotate(calc(var(--j) * 6deg));
+  transition: transform 1100ms cubic-bezier(0.55, 0, 0.75, 0.4) calc(var(--mid) * 120ms + 100ms);
+}
+
+/* Palm-leaf pages dealt away to either side, top first */
+.opening-stage[data-open="true"] [data-move="deal"] .themed-part {
+  transform: translateX(calc(var(--side) * 112%)) rotate(calc(var(--side) * 5deg));
+  transition: transform 900ms cubic-bezier(0.55, 0, 0.6, 0.6) calc(var(--row) * 150ms);
+}
+
+/* Torans swing loose at one end, bottom row first, then drop */
+.opening-stage[data-open="true"] [data-move="rows"] .themed-part {
+  animation: themed-toran 1300ms cubic-bezier(0.5, 0, 0.7, 0.5) calc(var(--up) * 190ms) both;
+}
+@keyframes themed-toran {
+  40% {
+    transform: rotate(calc(var(--side) * 14deg));
+  }
+  100% {
+    transform: translateY(115%) rotate(calc(var(--side) * 22deg));
+  }
+}
+
+/* The blind rolls up from the bottom, the roll riding its edge */
+[data-move="roll"] .themed-part {
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1700ms cubic-bezier(0.55, 0, 0.35, 1) 200ms;
+}
+.opening-stage[data-open="true"] [data-move="roll"] .themed-part {
+  clip-path: inset(0 0 100% 0);
+}
+.themed-roll {
+  top: 100%;
+  height: 4.5%;
+  translate: 0 -100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--card-gold) 55%, var(--night)),
+    var(--card-gold) 35%,
+    color-mix(in oklab, var(--card-gold) 60%, var(--card-ivory)) 55%,
+    color-mix(in oklab, var(--card-gold) 50%, var(--night))
+  );
+  box-shadow: 0 0.6cqh 1.2cqh color-mix(in oklab, var(--night) 45%, transparent);
+  transition:
+    top 1700ms cubic-bezier(0.55, 0, 0.35, 1) 200ms,
+    height 1700ms ease 200ms,
+    opacity 400ms ease 1900ms;
+}
+.opening-stage[data-open="true"] .themed-roll {
+  top: 0%;
+  height: 7%;
+  translate: 0 0;
+  opacity: 0;
+}
+
+/* The sail billows toward the guest, then drops in folds */
+[data-move="drop"] .themed-part {
+  transform-origin: 50% 100% !important;
+}
+.opening-stage[data-open="true"] [data-move="drop"] .themed-part {
+  animation: themed-sail 1700ms cubic-bezier(0.5, 0, 0.6, 1) 150ms both;
+}
+@keyframes themed-sail {
+  25% {
+    transform: scale(1.05) skewX(-1deg);
+  }
+  100% {
+    transform: scale(1.02, 0) skewX(8deg);
+  }
+}
+
+/* The wheel spins and rolls away; the beach under it goes with the light */
+[data-move="wheel"] .themed-part:not(.themed-ground) {
+  clip-path: ellipse(49% 27.6% at 50% 48.5%);
+  transform-origin: 50% 48.5% !important;
+}
+.opening-stage[data-open="true"] [data-move="wheel"] .themed-part:not(.themed-ground) {
+  transform: translateX(125%) rotate(300deg);
+  transition: transform 2000ms cubic-bezier(0.45, 0, 0.6, 1) 150ms;
+}
+.opening-stage[data-open="true"] [data-move="wheel"] .themed-ground {
+  opacity: 0;
+  transition: opacity 1200ms ease 600ms;
+}
+
+/* The map folds in half, then in half again, and flies off */
+[data-move="fold"] .themed-part:nth-of-type(2) {
+  transform-origin: 0% 50% !important;
+}
+.opening-stage[data-open="true"] [data-move="fold"] .themed-part:nth-of-type(2) {
+  transform: rotateY(-180deg);
+  transition: transform 900ms cubic-bezier(0.5, 0, 0.4, 1) 100ms;
+}
+.opening-stage[data-open="true"] [data-move="fold"] .themed-part:nth-of-type(1) {
+  animation: themed-map 1300ms cubic-bezier(0.5, 0, 0.6, 1) 950ms both;
+}
+@keyframes themed-map {
+  40% {
+    transform: scale(1, 0.5);
+  }
+  100% {
+    transform: translate(10%, -60%) scale(0.12, 0.06) rotate(-25deg);
+    opacity: 0;
+  }
+}
+
+/* Calendar pages flip up one after another, faster and faster */
+[data-move="flip"] .themed-part {
+  transform-origin: 50% 0% !important;
+}
+.opening-stage[data-open="true"] [data-move="flip"] .themed-part {
+  transform: rotateX(110deg);
+  transition: transform 650ms cubic-bezier(0.5, 0, 0.6, 1) calc((4 - var(--i)) * 260ms);
+}
+
+/* Puzzle tiles lift out, each its own way */
+.opening-stage[data-open="true"] [data-move="puzzle"] .themed-part {
+  transform: translate(calc(var(--j) * 120%), calc(var(--j) * -40% - 70%))
+    rotate(calc(var(--j) * 40deg)) scale(0.6);
+  opacity: 0;
+  transition:
+    transform 1100ms cubic-bezier(0.5, 0, 0.6, 1) calc(var(--i) * 70ms),
+    opacity 600ms ease calc(var(--i) * 70ms + 500ms);
+}
+
+/* The toy blocks tumble, bottom rows first */
+.opening-stage[data-open="true"] [data-move="tumble"] .themed-part {
+  transform: translate(calc(var(--j) * 30%), 115%) rotate(calc(var(--j) * 140deg));
+  transition: transform 1100ms cubic-bezier(0.6, 0, 0.8, 0.5)
+    calc(var(--up) * 110ms + (var(--j) + 0.5) * 120ms);
+}
+
+/* The carrom board tips back and slides down */
+.opening-stage[data-open="true"] [data-move="slide"] .themed-part {
+  animation: themed-board 1700ms cubic-bezier(0.5, 0, 0.6, 1) 150ms both;
+}
+@keyframes themed-board {
+  35% {
+    transform: rotateX(24deg) scale(0.94);
+  }
+  100% {
+    transform: rotateX(30deg) translateY(120%) scale(0.9);
+  }
+}
+
+/* The canopy is drawn up into its ring, like a pouch */
+[data-move="gather"] .themed-part {
+  transform-origin: 50% 0% !important;
+}
+.opening-stage[data-open="true"] [data-move="gather"] .themed-part {
+  animation: themed-pouch 1800ms cubic-bezier(0.55, 0, 0.4, 1) 150ms both;
+}
+@keyframes themed-pouch {
+  55% {
+    transform: scale(0.3, 0.55);
+  }
+  80% {
+    transform: scale(0.06, 0.12);
+  }
+  90% {
+    transform: scale(0.08, 0.14);
+  }
+  100% {
+    transform: scale(0.02, 0.04);
+    opacity: 0;
+  }
+}
+
+/* A wave runs up over the sand and, going back, takes the sand with it: clear water, so the
+   sand shows through it as it goes and the lagoon behind it as it comes */
+.themed-wave {
+  top: 100%;
+  height: 120%;
+  background:
+    radial-gradient(circle at 50% 0, var(--card-ivory) 0 2.2%, transparent 2.6%) 0 0 / 12% 4%
+      repeat-x,
+    linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklab, var(--card-ivory) 85%, transparent) 1.4%,
+      color-mix(in oklab, var(--card-ivory) 50%, transparent) 4%,
+      color-mix(in oklab, var(--tpl-rangmahal-turquoise) 55%, transparent) 10%,
+      color-mix(in oklab, var(--tpl-rangmahal-turquoise) 30%, transparent) 45%,
+      transparent
+    );
+}
+.opening-stage[data-open="true"] .themed-wave {
+  animation: themed-wave 2300ms cubic-bezier(0.45, 0, 0.4, 1) 100ms both;
+}
+@keyframes themed-wave {
+  48% {
+    top: 4%;
+  }
+  60% {
+    top: 4%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+.opening-stage[data-open="true"] [data-move="wave"] .themed-cover {
+  opacity: 0;
+  transition: opacity 800ms ease 500ms;
+}
+
+/* Wiped away: gold rubbed off, frost wiped clear, the hall lit spot by spot, colour sweeping in */
+[data-move="scratch"] .themed-cover,
+[data-move="frost"] .themed-cover,
+[data-move="spots"] .themed-cover,
+[data-move="colour"] .themed-cover {
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  transition:
+    --themed-reveal 2000ms cubic-bezier(0.4, 0, 0.3, 1) 150ms,
+    opacity 400ms ease 2200ms;
+}
+.opening-stage[data-open="true"] [data-move] .themed-cover {
+  --themed-reveal: 100%;
+}
+[data-move="scratch"] .themed-cover {
+  mask-image:
+    radial-gradient(
+      circle at 50% 44%,
+      transparent calc(var(--themed-reveal) * 0.9),
+      black calc(var(--themed-reveal) * 0.9 + 1%)
+    ),
+    radial-gradient(
+      circle at 24% 26%,
+      transparent calc(var(--themed-reveal) * 0.9 - 14%),
+      black calc(var(--themed-reveal) * 0.9 - 13%)
+    ),
+    radial-gradient(
+      circle at 78% 30%,
+      transparent calc(var(--themed-reveal) * 0.9 - 22%),
+      black calc(var(--themed-reveal) * 0.9 - 21%)
+    ),
+    radial-gradient(
+      circle at 30% 74%,
+      transparent calc(var(--themed-reveal) * 0.9 - 30%),
+      black calc(var(--themed-reveal) * 0.9 - 29%)
+    ),
+    radial-gradient(
+      circle at 74% 78%,
+      transparent calc(var(--themed-reveal) * 0.9 - 38%),
+      black calc(var(--themed-reveal) * 0.9 - 37%)
+    );
+}
+[data-move="frost"] .themed-cover {
+  mask-image:
+    radial-gradient(
+      ellipse 130% 22% at 50% 30%,
+      transparent calc(var(--themed-reveal) * 1.3 - 5%),
+      black calc(var(--themed-reveal) * 1.3 + 3%)
+    ),
+    radial-gradient(
+      ellipse 130% 22% at 45% 52%,
+      transparent calc(var(--themed-reveal) * 1.3 - 30%),
+      black calc(var(--themed-reveal) * 1.3 - 22%)
+    ),
+    radial-gradient(
+      ellipse 130% 22% at 55% 74%,
+      transparent calc(var(--themed-reveal) * 1.3 - 55%),
+      black calc(var(--themed-reveal) * 1.3 - 47%)
+    );
+}
+[data-move="spots"] .themed-cover {
+  mask-image:
+    radial-gradient(
+      circle at 50% 40%,
+      transparent calc(var(--themed-reveal) * 0.95 - 5%),
+      black calc(var(--themed-reveal) * 0.95 + 3%)
+    ),
+    radial-gradient(
+      circle at 18% 22%,
+      transparent calc(var(--themed-reveal) * 0.95 - 15%),
+      black calc(var(--themed-reveal) * 0.95 - 7%)
+    ),
+    radial-gradient(
+      circle at 84% 58%,
+      transparent calc(var(--themed-reveal) * 0.95 - 22%),
+      black calc(var(--themed-reveal) * 0.95 - 14%)
+    ),
+    radial-gradient(
+      circle at 24% 80%,
+      transparent calc(var(--themed-reveal) * 0.95 - 30%),
+      black calc(var(--themed-reveal) * 0.95 - 22%)
+    ),
+    radial-gradient(
+      circle at 80% 16%,
+      transparent calc(var(--themed-reveal) * 0.95 - 36%),
+      black calc(var(--themed-reveal) * 0.95 - 28%)
+    );
+}
+[data-move="colour"] .themed-cover {
+  mask-image: linear-gradient(
+    150deg,
+    transparent calc(var(--themed-reveal) * 1.4 - 20%),
+    black calc(var(--themed-reveal) * 1.4 - 4%)
+  );
 }
 
 /* Still mode: no drifting or swaying, and each move lands at once */

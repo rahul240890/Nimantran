@@ -14,6 +14,7 @@ import type { StoryBeat } from "@/lib/engine/story";
 import {
   isFreshOpening,
   isPaintedGate,
+  isThemedOpening,
   type OpeningGod,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
@@ -30,7 +31,10 @@ import { freshBackdrop } from "./opening-fresh";
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
-/** A painted gate or fresh opening takes longer: its own movement, then the place beyond. */
+/**
+ * A painted gate takes longer: the doors open, then the guest walks through the arch. A
+ * fresh or themed opening takes as long, its painting going its own way.
+ */
 const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 3200;
@@ -331,6 +335,7 @@ export function Opening({
   const painted = style === "doors" && Boolean(cover);
   const gate = isPaintedGate(style);
   const fresh = isFreshOpening(style);
+  const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
@@ -365,10 +370,10 @@ export function Opening({
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
       () => (still ? goInLatest.current() : setWelcome(true)),
-      still ? 0 : gate || fresh ? GATE_OPEN_MS : OPEN_MS,
+      still ? 0 : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate, fresh]);
+  }, [open, pages, welcome, still, gate, fresh, themed]);
   useEffect(() => {
     if (!welcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -482,7 +487,7 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || fresh || cover ? (
+        {gate || fresh || themed || cover ? (
           <Image
             // A painted opening's own place beyond, so the wide screen matches it
             src={
@@ -490,7 +495,9 @@ export function Opening({
                 ? `/openings/gates/${style}/beyond.webp`
                 : fresh
                   ? freshBackdrop(style)
-                  : (cover as string)
+                  : themed
+                    ? `/suites/${style}/scene.webp`
+                    : (cover as string)
             }
             alt=""
             fill

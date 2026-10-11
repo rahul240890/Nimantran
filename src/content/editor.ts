@@ -1187,6 +1187,26 @@ export const suiteCopy = {
     "aurora-igloo": "Aurora Igloo",
     "teddy-picnic": "Teddy Picnic",
     "dukaan-mahurat": "Dukaan Mahurat",
+    "jaali-vriksh": "Jaali Vriksh",
+    pachchikari: "Pachchikari",
+    "chik-baradari": "Chik Baradari",
+    "baori-deep": "Baori Deep",
+    "ikat-dhaaga": "Ikat Dhaaga",
+    "olai-chuvadi": "Olai Chuvadi",
+    "konark-chakra": "Konark Chakra",
+    "mandvi-dhow": "Mandvi Dhow",
+    shekhawati: "Shekhawati",
+    lehar: "Lehar",
+    "naksha-pangong": "Naksha Pangong",
+    "toran-mala": "Toran Mala",
+    jhilmil: "Jhilmil",
+    "howrah-tareekh": "Howrah Tareekh",
+    "barf-khidki": "Barf Khidki",
+    "pondy-gali": "Pondy Gali",
+    "irani-carrom": "Irani Carrom",
+    channapatna: "Channapatna",
+    "ped-ghar": "Ped Ghar",
+    "jhalar-palna": "Jhalar Palna",
     "mameru-bandhani": "Mameru Bandhani",
     "sindhi-ajrak": "Sindhi Ajrak",
     "hampi-ruins": "Hampi Ruins",
@@ -1600,6 +1620,31 @@ export const suiteCopy = {
     "teddy-picnic":
       "A teddy bears' picnic: balloons float up, bubbles drift and the bunting flutters.",
     "dukaan-mahurat": "A shop's first morning: the toran sways, petals fall and balloons float up.",
+    "jaali-vriksh":
+      "Opens by flying through a carved tree-of-life jaali into a palace garden at sunset.",
+    pachchikari:
+      "Stone flowers lift out of white marble and the slab sinks onto the ship palace by moonlight.",
+    "chik-baradari": "A cane blind rolls up on a twelve-arched pavilion over a moonlit lake.",
+    "baori-deep":
+      "Dive down a stepwell lit with a thousand diyas to the lamp-lit pool at its bottom.",
+    "ikat-dhaaga": "Woven ikat silk comes undone thread by thread over a sunny weavers' courtyard.",
+    "olai-chuvadi":
+      "Palm-leaf pages are dealt away to show a river mandapam on the Kaveri at dawn.",
+    "konark-chakra": "A carved Konark wheel rolls away across the sand of a golden Odisha beach.",
+    "mandvi-dhow": "A patched sail drops to show the Mandvi shipyard at sunset.",
+    shekhawati: "Gold foil scratches away to show a painted Shekhawati haveli courtyard.",
+    lehar: "A wave washes the sand away to show an Andaman lagoon with a pavilion on the water.",
+    "naksha-pangong": "An old map folds away and lands on Pangong lake at dusk.",
+    "toran-mala":
+      "Rows of mango-leaf torans fall away into a sunny Kerala courtyard for the haldi.",
+    jhilmil: "A mirror ball lights up an old theatre, spot by spot, for the sangeet.",
+    "howrah-tareekh": "Calendar pages fly off to show Howrah Bridge at dusk: a save the date.",
+    "barf-khidki": "Frost wipes from the window onto a snowy hill-station street at dusk.",
+    "pondy-gali": "A sliding puzzle comes apart to show a bougainvillea lane in Pondicherry.",
+    "irani-carrom": "A carrom board slides away into a sunlit old Irani cafe.",
+    channapatna: "A wall of wooden toy blocks tumbles down onto a toy town.",
+    "ped-ghar": "A pencil drawing colours itself in: a treehouse in a big mango tree.",
+    "jhalar-palna": "A lace cradle canopy is drawn up onto a dawn garden with a cradle.",
     "mameru-bandhani": "Bandhani silks, brass and gifts for the mameru.",
     "sindhi-ajrak": "Indigo and madder ajrak, roses and tassels for a Sindhi wedding.",
     "hampi-ruins": "Stone steps, brass lamps and jasmine among the old temples.",
@@ -1784,6 +1829,86 @@ export const openingCopy = {
   intro:
     "The first thing guests see, full screen, with your names and a countdown. Tap a style to watch it open.",
   styles: {
+    "jaali-vriksh": {
+      name: "Tree-of-life jaali",
+      description: "Fly through a carved sandstone jaali into a palace garden.",
+    },
+    pachchikari: {
+      name: "Stone flowers",
+      description: "Inlaid stone flowers lift out and the marble sinks away.",
+    },
+    "chik-baradari": {
+      name: "Cane blind",
+      description: "A woven cane blind rolls up onto a moonlit pavilion.",
+    },
+    "baori-deep": {
+      name: "Stepwell of lamps",
+      description: "Dive down a stepwell lit with diyas.",
+    },
+    "ikat-dhaaga": {
+      name: "Ikat threads",
+      description: "Ikat silk comes undone thread by thread.",
+    },
+    "olai-chuvadi": {
+      name: "Palm-leaf pages",
+      description: "Palm-leaf pages are dealt away to either side.",
+    },
+    "konark-chakra": {
+      name: "Konark wheel",
+      description: "A carved stone wheel rolls away across the sand.",
+    },
+    "mandvi-dhow": {
+      name: "Dropping sail",
+      description: "A patched sail drops in folds onto the shipyard.",
+    },
+    shekhawati: {
+      name: "Gold scratch",
+      description: "Gold foil scratches away onto a painted haveli.",
+    },
+    lehar: {
+      name: "Wave on the sand",
+      description: "A wave washes the sand away onto a lagoon.",
+    },
+    "naksha-pangong": {
+      name: "Folding map",
+      description: "An old map folds away onto a mountain lake.",
+    },
+    "toran-mala": {
+      name: "Falling torans",
+      description: "Rows of mango-leaf torans fall away one by one.",
+    },
+    jhilmil: {
+      name: "Mirror ball",
+      description: "A mirror ball lights up the hall, spot by spot.",
+    },
+    "howrah-tareekh": {
+      name: "Calendar pages",
+      description: "Calendar pages flip away to the day.",
+    },
+    "barf-khidki": {
+      name: "Frosted window",
+      description: "The frost wipes off the glass and melts away.",
+    },
+    "pondy-gali": {
+      name: "Sliding puzzle",
+      description: "Puzzle tiles lift out to show a bougainvillea lane.",
+    },
+    "irani-carrom": {
+      name: "Carrom board",
+      description: "The carrom board tips back and slides away.",
+    },
+    channapatna: {
+      name: "Toy blocks",
+      description: "A wall of wooden toy blocks tumbles down.",
+    },
+    "ped-ghar": {
+      name: "Colouring in",
+      description: "A pencil drawing fills with colour.",
+    },
+    "jhalar-palna": {
+      name: "Cradle canopy",
+      description: "A lace canopy is drawn up like a pouch.",
+    },
     "rajwada-pol": {
       name: "Rajasthani palace gate",
       description:
@@ -2011,6 +2136,7 @@ export const openingCopy = {
     skies: "Skies and nature",
     crafts: "Crafts and colour",
     play: "Fun and playful",
+    themed: "Its own opening",
     painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",
