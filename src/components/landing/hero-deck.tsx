@@ -148,6 +148,8 @@ export function HeroDeck() {
       {/*
         Seven 44px dots do not fit one row on a phone, so phones step through the themes
         with the arrows and the dots only show where you are; wider screens can tap a dot.
+        Phone dots stay 24px wide so they pass the target-size check even before the page
+        hydrates and takes them out of the tab order.
         With more themes than dots, the row slides and the end dots shrink to say so.
       */}
       <div className="flex max-w-full items-center justify-center gap-1">
@@ -169,7 +171,7 @@ export function HeroDeck() {
                   aria-pressed={index === current}
                   aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
                   onClick={() => setCurrent(index)}
-                  className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-auto max-sm:px-[3px] sm:w-11"
+                  className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-6 sm:w-11"
                   tabIndex={phone ? -1 : undefined}
                 >
                   <span
