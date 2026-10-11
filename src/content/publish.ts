@@ -38,7 +38,7 @@ export const shareCopy = {
   whatsapp: "Share on WhatsApp",
   moreWays: "More ways to share",
   open: "Open invitation",
-  guestView: "See what guests see when they tap it",
+  guestView: "See what guests see",
   edit: "Edit invite",
   messageLabel: "Message",
   messageHint: "Sent with the link. Change it however you like.",

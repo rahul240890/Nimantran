@@ -39,7 +39,7 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   whatsapp: "WhatsApp पर भेजें",
   moreWays: "भेजने के और तरीक़े",
   open: "निमंत्रण खोलें",
-  guestView: "देखें, टैप करने पर मेहमान क्या देखेंगे",
+  guestView: "मेहमान क्या देखेंगे",
   edit: "निमंत्रण बदलें",
   messageLabel: "संदेश",
   messageHint: "लिंक के साथ जाता है। जैसे चाहें बदलें।",
