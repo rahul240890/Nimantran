@@ -4,16 +4,25 @@ import { Check, ChevronDown } from "lucide-react";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
-import { includedFunctions, type EditorStep, type InviteDraft } from "@/lib/editor/draft";
+import {
+  COUPLE_SLOTS,
+  NAME_SLOTS,
+  draftQuestions,
+  includedFunctions,
+  type EditorStep,
+  type InviteDraft,
+} from "@/lib/editor/draft";
+import { defaultType } from "@/lib/editor/type";
+import { WORDING_IDS } from "@/lib/traditions/schema";
 import { stepErrors } from "@/lib/editor/draft-checks";
 
 /**
- * The details page (the middle of three stages): the names, the functions, and the photos
- * and music, as three parts of one page. One part is open at a time; the others fold to a
+ * The details page (the middle of three stages): names, family, functions, photos, card
+ * words, and music and replies, as six parts of one page. One part is open at a time; the others fold to a
  * single line that says what's in them, so the host always sees how far along they are and
  * can open any part without stepping through the rest.
  */
-export const DETAIL_STEPS = ["couple", "functions", "extras"] as const;
+export const DETAIL_STEPS = ["couple", "family", "functions", "photos", "words", "music"] as const;
 export type DetailStep = (typeof DETAIL_STEPS)[number];
 
 export const isDetailStep = (step: EditorStep): step is DetailStep =>
@@ -40,8 +49,21 @@ function useSummary(draft: InviteDraft) {
     if (part === "functions") {
       return editor.sections.functions(includedFunctions(draft).map((id) => functionCopy[id].name));
     }
-    const music = draft.music.clip !== null || draft.music.playOnOpen;
-    return editor.sections.extras(draft.photos.length, music);
+    if (part === "family") {
+      const { family } = draft;
+      const filled =
+        Boolean(family.first.parents || family.second.parents || family.memory) ||
+        WORDING_IDS.some((id) => draft.tradition.wording[id]?.trim());
+      return editor.sections.family(filled);
+    }
+    if (part === "photos") return editor.sections.photos(draft.photos.length);
+    if (part === "words") {
+      const own =
+        COUPLE_SLOTS.some((id) => !NAME_SLOTS.includes(id) && draft.content[id] !== undefined) ||
+        JSON.stringify(draft.type) !== JSON.stringify(defaultType);
+      return editor.sections.words(own);
+    }
+    return editor.sections.music(draft.music.clip !== null, draftQuestions(draft).length);
   };
 }
 

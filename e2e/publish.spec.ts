@@ -5,6 +5,7 @@ import {
   next,
   noOverflow,
   numberFor,
+  openPublish,
   publish,
   signIn,
   writeInvite,
@@ -46,8 +47,8 @@ test.describe("publish and share", () => {
   }, info) => {
     await writeInvite(page, numberFor(info), ["Aarav", "Meera"]);
 
-    await page.getByRole("button", { name: "Publish" }).click();
-    const dialog = page.getByRole("dialog", { name: "Choose your link" });
+    // The packages come first; until payments are on, the invite publishes free
+    const dialog = await openPublish(page);
     await expect(dialog.getByRole("textbox", { name: /Invitation link/ })).toHaveValue(
       /^aarav-weds-meera/,
     );
@@ -227,6 +228,8 @@ test.describe("publish and share", () => {
     page,
     browser,
   }, info) => {
+    // Every step, a second language and the packages before publishing
+    test.slow();
     await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
     await page.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1&region=GJ")}`);
     await signIn(page, numberFor(info));
@@ -236,21 +239,12 @@ test.describe("publish and share", () => {
     await next(page);
     await next(page);
 
-    // The language step: Gujarati, with English beside it for guests to switch to
+    // The names, in Gujarati: the tradition's own language
     await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked();
-    await page
-      .getByRole("radiogroup", { name: "Add a second language?" })
-      .getByRole("radio", { name: "English" })
-      .click();
-    await next(page);
     await page.locator('[data-slot="first"]').fill("આરવ");
     await page.locator('[data-slot="second"]').fill("મીરા");
-    const english = page.getByRole("region", { name: "The card in English" });
-    await english.locator('[data-translation="first"]').fill("Aarav");
-    await english.locator('[data-translation="second"]').fill("Meera");
-    expect(await noOverflow(page)).toBe(true);
-    expect((await axe(page).analyze()).violations).toEqual([]);
     await next(page);
+    await next(page); // family
 
     const wedding = page
       .getByRole("listitem")
@@ -268,7 +262,17 @@ test.describe("publish and share", () => {
     await next(page);
     await addDesignPhotos(page);
     await next(page);
+    await next(page); // card words
+    await next(page); // music and replies
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
+
+    // After the preview: English beside it, for guests to switch to
+    const english = page.getByRole("region", { name: "Add a second language?" });
+    await english.getByRole("radio", { name: "English" }).click();
+    await english.locator('[data-translation="first"]').fill("Aarav");
+    await english.locator('[data-translation="second"]').fill("Meera");
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
     const path = await publish(page, "aarav-meera-gu");
 
     const guestContext = await browser.newContext({

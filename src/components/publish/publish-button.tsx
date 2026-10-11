@@ -4,7 +4,7 @@ import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send, Sparkles } from "
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
-import { inviteEdition } from "@/actions/checkout";
+import { needsPackage } from "@/actions/checkout";
 import { checkSlug, publishInvite, type PublishOutcome, type SlugCheck } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -23,8 +23,8 @@ import { editionsText } from "@/i18n/copy/editions";
 type SlugState = { slug: string; result: SlugCheck } | null;
 
 /**
- * The last step's main action: publish the invite, or share it once it's live. While
- * payments are on, a free invite goes to its packages first and comes back here to publish.
+ * The last step's main action: publish the invite, or share it once it's live. An invite
+ * without a package goes to the three packages first and comes back here to publish.
  */
 export function PublishButton({
   draft,
@@ -44,15 +44,15 @@ export function PublishButton({
   const [open, setOpen] = useState(autoOpen && signedIn && draftProblems(draft).length === 0);
   const [gating, setGating] = useState(false);
 
-  // Packages before publishing: a free invite chooses one (or carries on free) first
+  // Packages before publishing: an invite with none sees the three first, every time
   const start = async () => {
     if (draftProblems(draft).length > 0) return onNotReady();
     setGating(true);
     const synced = await syncDraft();
     const remoteId = remoteIdNow();
-    const packages =
-      synced === "synced" && remoteId ? await inviteEdition(remoteId).catch(() => null) : null;
-    if (remoteId && packages?.edition.plan === "free") {
+    const choose =
+      synced === "synced" && remoteId ? await needsPackage(remoteId).catch(() => false) : false;
+    if (remoteId && choose) {
       router.push(`/invites/${remoteId}/edition?publish=1`);
       return;
     }

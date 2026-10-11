@@ -21,6 +21,7 @@ import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
 import { usePhotoUrls } from "../use-photo-urls";
+import { SecondLanguageSection } from "./second-language";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
@@ -62,6 +63,7 @@ function Section({
 
 export function PreviewStep({
   draft,
+  update,
   goTo,
   onReset,
   signedIn = false,
@@ -124,6 +126,9 @@ export function PreviewStep({
 
       {signedIn && draft.remoteId && problems.length === 0 && <SeeAsGuest />}
 
+      {/* After seeing it once: guests can also read it in a second language */}
+      <SecondLanguageSection draft={draft} update={update} />
+
       {signedIn && draft.remoteId && <EditionNotice draft={draft} inviteId={draft.remoteId} />}
 
       <Section title={previewCopy.occasionHeading} step="occasion" goTo={goTo}>
@@ -178,7 +183,7 @@ export function PreviewStep({
         </ol>
       </Section>
 
-      <Section title={previewCopy.photosHeading} step="extras" goTo={goTo}>
+      <Section title={previewCopy.photosHeading} step="photos" goTo={goTo}>
         {draft.photos.length === 0 ? (
           <p className="text-sm text-ink-muted">{previewCopy.noPhotos}</p>
         ) : (
@@ -202,7 +207,7 @@ export function PreviewStep({
         )}
       </Section>
 
-      <Section title={previewCopy.musicHeading} step="extras" goTo={goTo}>
+      <Section title={previewCopy.musicHeading} step="music" goTo={goTo}>
         <p className="text-sm">
           {draft.music.clip ? draft.music.clip.name : extrasCopy.ragaNames[raga]}
           {draft.music.playOnOpen ? ` · ${previewCopy.playsOnOpen}` : ""}

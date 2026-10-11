@@ -111,3 +111,15 @@ export async function inviteEdition(inviteId: unknown): Promise<InviteEdition> {
   const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
   return { edition, prices: pricesFor(edition, design, coupons, null, new Date(), pricing) };
 }
+
+/**
+ * Whether publishing should pass through the packages first: always, until the invite has
+ * a package, whether or not payments are switched on yet. The packages page says which.
+ */
+export async function needsPackage(inviteId: unknown): Promise<boolean> {
+  const id = z.uuid().safeParse(inviteId);
+  const account = await getAccount();
+  if (!id.success || !account) return false;
+  const edition = await invitePlan(account, id.data);
+  return edition?.plan === "free";
+}

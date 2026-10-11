@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Page, type TestInfo } from "@playwright/test";
+import { expect, test, type Page, type TestInfo } from "@playwright/test";
 
 /* Shared steps for the publish and RSVP tests. */
 
@@ -44,6 +44,8 @@ export async function addDesignPhotos(page: Page) {
 
 /** Signs in and writes a complete wedding invite with one photo, ending on the preview step. */
 export async function writeInvite(page: Page, number: string, names: [string, string]) {
+  // Ten steps, then the packages before publishing: more time than a plain test
+  test.info().setTimeout(test.info().timeout + 45_000);
   // A known "today" for the calendar; time still moves, so every edit saves
   await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
   await page.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1")}`);
@@ -52,10 +54,10 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await next(page);
   await next(page);
   await next(page);
-  await next(page); // language
   await page.getByRole("textbox", { name: /First name/ }).fill(names[0]);
   await page.getByRole("textbox", { name: /Second name/ }).fill(names[1]);
   await next(page);
+  await next(page); // family
   await page.getByRole("checkbox", { name: /Haldi/ }).click();
   const item = (name: string) =>
     page
@@ -80,18 +82,41 @@ export async function writeInvite(page: Page, number: string, names: [string, st
   await next(page);
   await addDesignPhotos(page);
   await next(page);
+  await next(page); // card words
+  await next(page); // music and replies
   await expect(page.getByText("Your invitation is ready")).toBeVisible();
+}
+
+/**
+ * Opens the link dialog from the editor. Publishing passes through the packages first; until
+ * payments are on, they publish free. A click that lands before the page has hydrated does
+ * nothing, so try again.
+ */
+export async function openPublish(page: Page) {
+  const dialog = page.getByRole("dialog", { name: "Choose your link" });
+  await expect(async () => {
+    if (!(await dialog.isVisible())) {
+      if (/\/edition/.test(page.url())) {
+        await page.getByRole("link", { name: "Publish your invite" }).click();
+      } else {
+        await page.getByRole("button", { name: "Publish" }).click();
+      }
+    }
+    await expect(dialog).toBeVisible({ timeout: 5_000 });
+  }).toPass({ timeout: 60_000 });
+  // Back from the packages, the editor reopens the invite and then the dialog, once
+  await expect(page).not.toHaveURL(/[?&]invite=/);
+  await expect(dialog).toBeVisible();
+  return dialog;
 }
 
 /** Publishes the invite open in the editor under a unique link; ends on the share page. */
 export async function publish(page: Page, base: string): Promise<string> {
-  const dialog = page.getByRole("dialog", { name: "Choose your link" });
-  // A click that lands before the editor has hydrated opens nothing, so try again
-  await expect(async () => {
-    if (!(await dialog.isVisible())) await page.getByRole("button", { name: "Publish" }).click();
-    await expect(dialog).toBeVisible({ timeout: 3_000 });
-  }).toPass({ timeout: 30_000 });
-  await dialog.getByRole("textbox", { name: /Invitation link/ }).fill(`${base}-${Date.now()}`);
+  const dialog = await openPublish(page);
+  const link = dialog.getByRole("textbox", { name: /Invitation link/ });
+  const wanted = `${base}-${Date.now()}`;
+  await link.fill(wanted);
+  await expect(link).toHaveValue(wanted);
   await expect(dialog.getByText("This link is free.")).toBeVisible();
   await dialog.getByRole("button", { name: "Publish invitation" }).click();
   await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);

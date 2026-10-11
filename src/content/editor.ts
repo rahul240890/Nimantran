@@ -21,7 +21,7 @@ export const editor = {
   stages: { design: "Design", details: "Your details", preview: "Preview & share" },
   /** The details page: its sections, each folded to one line with what's filled in. */
   sections: {
-    label: "Your details, in three parts",
+    label: "Your details, in six parts",
     open: (part: string, summary: string, state: "done" | "todo" | "check") =>
       `${part}: ${summary}${state === "done" ? ", done" : state === "check" ? ", needs a look" : ""}. Open`,
     done: "Done",
@@ -34,8 +34,13 @@ export const editor = {
         : names.length <= 3
           ? names.join(", ")
           : `${names.slice(0, 2).join(", ")} and ${names.length - 2} more`,
-    extras: (photos: number, music: boolean) =>
-      `${photos === 0 ? "No photos yet" : photos === 1 ? "1 photo" : `${photos} photos`} · ${music ? "music on" : "no music"}`,
+    family: (filled: boolean) =>
+      filled ? "Family added" : "Optional: parents, blessings and who invites",
+    photos: (photos: number) =>
+      photos === 0 ? "No photos yet" : photos === 1 ? "1 photo" : `${photos} photos`,
+    words: (own: boolean) => (own ? "Your own words" : "Written for your occasion"),
+    music: (own: boolean, questions: number) =>
+      `${own ? "Your own music" : "The design's music"} · ${questions === 0 ? "no extra questions" : questions === 1 ? "1 question" : `${questions} questions`}`,
   },
   back: "Back",
   next: "Continue",
@@ -100,19 +105,18 @@ export const stepCopy: Record<
     intro:
       "Each design has its own painting, opening and raga. Switch at any time: every word you've typed stays.",
   },
-  language: {
-    label: "Language",
-    eyebrow: "Card language",
-    title: "Which language is your card in?",
-    intro:
-      "Everything on the card follows it: the names, the wording, the function names and the dates. The ideas we offer for each line come in this language too.",
-  },
   couple: {
-    label: "Couple",
-    eyebrow: "The couple",
-    title: "Who is the couple?",
+    label: "Names",
+    eyebrow: "Names",
+    title: "Who's getting married?",
+    intro: "Choose the card's language, then type the names. They appear large on every design.",
+  },
+  family: {
+    label: "Family",
+    eyebrow: "Family",
+    title: "Who's inviting your guests?",
     intro:
-      "Names appear large on the card. The other lines start with wording for your occasion; change them to sound like your family.",
+      "Parents, blessings and who invites. All optional: what you fill in appears on the family page.",
   },
   functions: {
     label: "Functions",
@@ -121,12 +125,25 @@ export const stepCopy: Record<
     intro:
       "Choose the functions you're inviting guests to. The card shows the main function's date and venue; guests see every function when they open it.",
   },
-  extras: {
-    label: "Photos & music",
-    eyebrow: "Photos and music",
-    title: "Make it yours",
+  photos: {
+    label: "Photos",
+    eyebrow: "Photos",
+    title: "Add your photos",
+    intro: "Add the photos your design shows in its frames, and more for guests to scroll through.",
+  },
+  words: {
+    label: "Card words",
+    eyebrow: "Card words",
+    title: "Read the card's words",
     intro:
-      "Add the photos your design shows, choose the raga that plays as the card opens, and pick what the RSVP asks.",
+      "Every line is already written for your occasion. Change any of them to sound like your family, or leave them as they are.",
+  },
+  music: {
+    label: "Music & replies",
+    eyebrow: "Music and replies",
+    title: "Music and replies",
+    intro:
+      "Choose the music that plays as the card opens, what the reply asks, and whom guests can call.",
   },
   preview: {
     label: "Preview",
@@ -424,7 +441,6 @@ export const functionFields = {
 
 export const coupleCopy = {
   namesHeading: "Names",
-  wordingHeading: "Wording",
   example: (sample: string) => `e.g. ${sample}`,
   joinerHint: "The word between the names, like &, weds or संग.",
   doorsHint: "Two short words painted on the gates.",
@@ -436,26 +452,21 @@ export const coupleCopy = {
   languagesHeading: "Card language",
   languagesHint: "With two languages, guests switch between them on the invitation.",
   bothLanguages: (main: string, second: string) => `${main} and ${second}`,
-  secondHeading: (language: string) => `The card in ${language}`,
   secondHint: (main: string) => `Leave a line empty to repeat the ${main} card's words.`,
   ideas: "Ideas",
   ideasLabel: (field: string) => `Ideas for ${field}`,
   useIdea: (text: string) => `Use “${text}”`,
-  moreWording: "More card words",
-  moreWordingHint: "Gate words and the family line. Each starts with wording for your occasion.",
-  cardIn: "Card language:",
-  changeLanguage: "Change language",
 } as const;
 
 /** The language step: the card's language, asked before anything is written. */
 export const languageCopy = {
   mainHeading: "Card language",
-  traditionMatch: "Your tradition's",
+  mainHint: "The names, wording, function names and dates all follow it.",
+  traditionMatch: "your tradition's",
   secondHeading: "Add a second language?",
   secondHint:
-    "Guests switch between the two on the invitation. A second language comes with the Celebration and Grand packages.",
+    "Guests switch between the two on the invitation. Optional, and it comes with the Celebration and Grand packages.",
   secondNone: "Only one language",
-  secondLabel: "Second language",
 } as const;
 
 /**
@@ -1671,10 +1682,6 @@ export const studioCopy = {
 
 /** The family section of the names step (Step 12s): parents, blessings and whom to call. */
 export const familyCopy = {
-  heading: "Family",
-  intro:
-    "Parents, blessings and whom guests can call. All optional: what you fill in appears on the family page.",
-  open: "Add family details",
   sideHeading: (name: string) => `${name}'s family`,
   sideFallback: { first: "First family", second: "Second family" },
   relation: "Printed as",

@@ -158,10 +158,10 @@ test.describe("accounts", () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto("/create?quality=2d&category=engagement");
     await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByRole("button", { name: "Continue" }).click(); // language
     await page.getByRole("textbox", { name: /First name/ }).fill("Aditya");
     await page.getByRole("textbox", { name: /Second name/ }).fill("Priya");
     await page.getByRole("button", { name: "Continue" }).click();
+    await page.getByRole("button", { name: "Continue" }).click(); // family
 
     await page.goto("/sign-in?next=/invites");
     await signInWithPhone(page, numberFor(info));
@@ -193,7 +193,7 @@ test.describe("accounts", () => {
     await signInWithPhone(phone, number);
     await expect(phone).toHaveURL(/\/create/);
     await phone.getByRole("radio", { name: /Roka/ }).click();
-    for (let i = 0; i < 4; i++) await phone.getByRole("button", { name: "Continue" }).click();
+    for (let i = 0; i < 3; i++) await phone.getByRole("button", { name: "Continue" }).click();
     await phone.getByRole("textbox", { name: /First name/ }).fill("Kabir");
     await phone.getByRole("textbox", { name: /Second name/ }).fill("Ananya");
     await expect(phone.getByText("Saved to your account")).toHaveCount(1);
@@ -210,7 +210,7 @@ test.describe("accounts", () => {
     await expect(card.getByText("Roka")).toBeVisible();
     await card.getByRole("link", { name: "Continue" }).click();
     await expect(laptop).toHaveURL(/\/create$/);
-    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
+    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
     await expect(laptop.getByRole("textbox", { name: /First name/ })).toHaveValue("Kabir");
     await laptop.getByRole("textbox", { name: /First name/ }).fill("Kabir Singh");
     await expect(laptop.getByText("Saved to your account")).toHaveCount(1);

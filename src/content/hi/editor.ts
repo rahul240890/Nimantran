@@ -15,7 +15,7 @@ export const editor: Translation<typeof en.editor> = {
   changeDesign: "डिज़ाइन बदलें",
   stages: { design: "डिज़ाइन", details: "आपकी जानकारी", preview: "झलक और भेजें" },
   sections: {
-    label: "आपकी जानकारी, तीन हिस्सों में",
+    label: "आपकी जानकारी, छह हिस्सों में",
     open: (part, summary, state) =>
       `${part}: ${summary}${state === "done" ? ", पूरा" : state === "check" ? ", एक बार देखें" : ""}। खोलें`,
     done: "पूरा",
@@ -28,8 +28,12 @@ export const editor: Translation<typeof en.editor> = {
         : names.length <= 3
           ? names.join(", ")
           : `${names.slice(0, 2).join(", ")} और ${names.length - 2} और`,
-    extras: (photos, music) =>
-      `${photos === 0 ? "अभी कोई तस्वीर नहीं" : `${photos} तस्वीर${photos === 1 ? "" : "ें"}`} · ${music ? "संगीत चालू" : "संगीत बंद"}`,
+    family: (filled) => (filled ? "परिवार जोड़ा गया" : "वैकल्पिक: माता-पिता, आशीर्वाद और निमंत्रक"),
+    photos: (photos) =>
+      photos === 0 ? "अभी कोई तस्वीर नहीं" : `${photos} तस्वीर${photos === 1 ? "" : "ें"}`,
+    words: (own) => (own ? "आपके अपने शब्द" : "आपके अवसर के लिए लिखे हुए"),
+    music: (own, questions) =>
+      `${own ? "आपका अपना संगीत" : "डिज़ाइन का संगीत"} · ${questions === 0 ? "कोई और सवाल नहीं" : `${questions} सवाल`}`,
   },
   back: "पीछे",
   next: "आगे बढ़ें",
@@ -89,19 +93,18 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     intro:
       "हर डिज़ाइन की अपनी पेंटिंग, अपना खुलना और अपना राग है। कभी भी बदलें, आपके लिखे सारे शब्द बने रहेंगे।",
   },
-  language: {
-    label: "भाषा",
-    eyebrow: "कार्ड की भाषा",
-    title: "आपका कार्ड किस भाषा में हो?",
-    intro:
-      "कार्ड पर सब कुछ इसी भाषा में आएगा: नाम, शब्द, रस्मों के नाम और तारीख़ें। हर पंक्ति के लिए दिए गए सुझाव भी इसी भाषा में होंगे।",
-  },
   couple: {
-    label: "जोड़ा",
-    eyebrow: "जोड़ा",
-    title: "जोड़ा कौन है?",
+    label: "नाम",
+    eyebrow: "नाम",
+    title: "किसकी शादी है?",
+    intro: "कार्ड की भाषा चुनें, फिर नाम लिखें। नाम हर डिज़ाइन पर बड़े अक्षरों में आते हैं।",
+  },
+  family: {
+    label: "परिवार",
+    eyebrow: "परिवार",
+    title: "मेहमानों को कौन बुला रहा है?",
     intro:
-      "नाम कार्ड पर बड़े अक्षरों में आते हैं। बाक़ी पंक्तियाँ आपके अवसर के शब्दों से शुरू होती हैं; इन्हें अपने परिवार के अंदाज़ में बदल लीजिए।",
+      "माता-पिता, आशीर्वाद और निमंत्रक। सब वैकल्पिक है: जो भरेंगे वह परिवार वाले पन्ने पर आएगा।",
   },
   functions: {
     label: "रस्में",
@@ -110,12 +113,26 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     intro:
       "वे रस्में चुनें जिनमें मेहमानों को बुला रहे हैं। कार्ड पर मुख्य रस्म की तारीख़ और जगह आती है; खोलने पर मेहमान हर रस्म देखते हैं।",
   },
-  extras: {
-    label: "तस्वीरें और संगीत",
-    eyebrow: "तस्वीरें और संगीत",
-    title: "इसे अपना बनाइए",
+  photos: {
+    label: "तस्वीरें",
+    eyebrow: "तस्वीरें",
+    title: "अपनी तस्वीरें जोड़ें",
     intro:
-      "आपका डिज़ाइन जो तस्वीरें दिखाता है वे जोड़ें, कार्ड खुलते समय बजने वाला राग चुनें, और तय करें कि जवाब में क्या पूछना है।",
+      "आपका डिज़ाइन अपने फ़्रेम में जो तस्वीरें दिखाता है वे जोड़ें, और मेहमानों के देखने के लिए और भी।",
+  },
+  words: {
+    label: "कार्ड के शब्द",
+    eyebrow: "कार्ड के शब्द",
+    title: "कार्ड के शब्द पढ़ लीजिए",
+    intro:
+      "हर पंक्ति आपके अवसर के लिए पहले से लिखी है। चाहें तो अपने परिवार के अंदाज़ में बदलें, या जैसी है वैसी रहने दें।",
+  },
+  music: {
+    label: "संगीत और जवाब",
+    eyebrow: "संगीत और जवाब",
+    title: "संगीत और जवाब",
+    intro:
+      "कार्ड खुलते समय बजने वाला संगीत, जवाब में क्या पूछना है, और मेहमान किसे फ़ोन कर सकते हैं।",
   },
   preview: {
     label: "झलक",
@@ -408,7 +425,6 @@ export const functionFields: Translation<typeof en.functionFields> = {
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
   namesHeading: "नाम",
-  wordingHeading: "शब्द",
   example: (sample) => `जैसे ${sample}`,
   joinerHint: "नामों के बीच का शब्द, जैसे &, संग या weds।",
   doorsHint: "द्वारों पर लिखे दो छोटे शब्द।",
@@ -420,25 +436,20 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
   languagesHeading: "कार्ड की भाषा",
   languagesHint: "दो भाषाएँ चुनने पर मेहमान निमंत्रण पर उनके बीच बदल सकते हैं।",
   bothLanguages: (main, second) => `${main} और ${second}`,
-  secondHeading: (language) => `${language} में कार्ड`,
   secondHint: (main) => `कोई पंक्ति ख़ाली छोड़ें तो ${main} कार्ड वाले शब्द ही आएँगे।`,
   ideas: "सुझाव",
   ideasLabel: (field) => `${field} के सुझाव`,
   useIdea: (text) => `“${text}” लिखें`,
-  moreWording: "कार्ड के और शब्द",
-  moreWordingHint: "द्वार के शब्द और परिवार की पंक्ति। हर एक आपके अवसर के शब्दों से शुरू होता है।",
-  cardIn: "कार्ड की भाषा:",
-  changeLanguage: "भाषा बदलें",
 };
 
 export const languageCopy: Translation<typeof en.languageCopy> = {
   mainHeading: "कार्ड की भाषा",
+  mainHint: "नाम, शब्द, रस्मों के नाम और तारीख़ें सब इसी भाषा में आएँगे।",
   traditionMatch: "आपकी परंपरा की",
   secondHeading: "दूसरी भाषा भी जोड़ें?",
   secondHint:
-    "मेहमान निमंत्रण पर दोनों भाषाओं के बीच बदल सकेंगे। दूसरी भाषा सेलिब्रेशन और ग्रैंड पैकेज में मिलती है।",
+    "मेहमान निमंत्रण पर दोनों भाषाओं के बीच बदल सकेंगे। यह वैकल्पिक है, और सेलिब्रेशन और ग्रैंड पैकेज में मिलती है।",
   secondNone: "सिर्फ़ एक भाषा",
-  secondLabel: "दूसरी भाषा",
 };
 
 export const namesCopy: Translation<typeof en.namesCopy> = {
@@ -1645,10 +1656,6 @@ export const studioCopy: Translation<typeof en.studioCopy> = {
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
-  heading: "परिवार",
-  intro:
-    "माता-पिता, आशीर्वाद और मेहमान किसे फ़ोन करें। सब वैकल्पिक है: जो भरेंगे वह परिवार वाले पन्ने पर दिखेगा।",
-  open: "परिवार की जानकारी जोड़ें",
   sideHeading: (name) => `${name} का परिवार`,
   sideFallback: { first: "पहला परिवार", second: "दूसरा परिवार" },
   relation: "कार्ड पर ऐसे छपेगा",

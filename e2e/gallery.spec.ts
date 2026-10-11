@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { axe, next, noOverflow } from "./invite-helpers";
+import { axe, noOverflow } from "./invite-helpers";
 
 /* The gallery (Step 12g): occasions, a wedding's kinds, their designs, search and Use this design. */
 
@@ -75,13 +75,9 @@ test.describe("finding a design", () => {
     await expect(preview.getByText("Page 2 of 9")).toBeVisible();
     await preview.getByRole("link", { name: "Use this design" }).click();
     await expect(page).toHaveURL(/\/create$/);
-    // The card's language is asked first; a Gujarati wedding suggests Gujarati
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Which language is your card in?",
-    );
+    // The names come first, in the card's language: a Gujarati wedding suggests Gujarati
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
     await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked();
-    await next(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who is the couple?");
   });
 
   test("a birthday has its own theme and one name on the cover", async ({ page }) => {
@@ -96,7 +92,6 @@ test.describe("finding a design", () => {
     await expect(preview.getByText("Page 1 of 4")).toBeVisible();
     await preview.getByRole("link", { name: "Use this design" }).click();
     await expect(page).toHaveURL(/\/create$/);
-    await next(page); // language
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Whose birthday is it?");
     await expect(page.getByLabel(/^Second name/)).toHaveCount(0);
     await page.getByLabel(/^Birthday name/).fill("Aarav");
