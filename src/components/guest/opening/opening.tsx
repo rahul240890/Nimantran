@@ -11,7 +11,12 @@ import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
-import { isPaintedGate, type OpeningGod, type OpeningStyle } from "@/lib/opening/catalog";
+import {
+  isFreshOpening,
+  isPaintedGate,
+  type OpeningGod,
+  type OpeningStyle,
+} from "@/lib/opening/catalog";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
@@ -21,10 +26,11 @@ import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
+import { freshBackdrop } from "./opening-fresh";
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
-/** A painted gate takes longer: the doors open, then the guest walks through the arch. */
+/** A painted gate or fresh opening takes longer: its own movement, then the place beyond. */
 const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 3200;
@@ -162,6 +168,7 @@ function OpeningWelcome({
   names,
   script,
   skip,
+  over,
   onSkip,
 }: {
   copy: CardCopy;
@@ -170,6 +177,8 @@ function OpeningWelcome({
   names: CSSProperties;
   script: CSSProperties;
   skip: string;
+  /** Over a painting the guest should still see round the names (the fresh openings). */
+  over: boolean;
   onSkip: () => void;
 }) {
   const words = CARD_GREETING_WORDS[lang];
@@ -180,6 +189,7 @@ function OpeningWelcome({
     <div
       lang={lang}
       data-testid="opening-welcome"
+      data-over={over ? "art" : undefined}
       onClick={onSkip}
       className="opening-welcome absolute inset-0 z-40 flex flex-col items-center justify-center gap-[2.4cqh] px-[8cqw] text-center"
     >
@@ -320,6 +330,7 @@ export function Opening({
   const cover = theme.images.cover;
   const painted = style === "doors" && Boolean(cover);
   const gate = isPaintedGate(style);
+  const fresh = isFreshOpening(style);
   const layout = OPENING_LAYOUT[style];
   // The names in the theme's own lettering, as on the pages inside; the host's face wins
   const voice = theme.voice ?? "regal";
@@ -354,10 +365,10 @@ export function Opening({
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
       () => (still ? goInLatest.current() : setWelcome(true)),
-      still ? 0 : gate ? GATE_OPEN_MS : OPEN_MS,
+      still ? 0 : gate || fresh ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate]);
+  }, [open, pages, welcome, still, gate, fresh]);
   useEffect(() => {
     if (!welcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -399,8 +410,8 @@ export function Opening({
           "isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
           painted
             ? "story-print w-full px-[3cqw]"
-            : gate
-              ? // Smaller on a painted gate, so the doors themselves show round it
+            : gate || fresh
+              ? // Smaller on a painted gate or fresh opening, so the painting shows round it
                 "opening-plate w-auto max-w-[min(68cqw,24rem)] px-[5cqw] py-[1.6cqh]"
               : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
         )}
@@ -471,10 +482,16 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || cover ? (
+        {gate || fresh || cover ? (
           <Image
-            // A painted gate's own place beyond, so the wide screen matches the gate
-            src={gate ? `/openings/gates/${style}/beyond.webp` : (cover as string)}
+            // A painted opening's own place beyond, so the wide screen matches it
+            src={
+              gate
+                ? `/openings/gates/${style}/beyond.webp`
+                : fresh
+                  ? freshBackdrop(style)
+                  : (cover as string)
+            }
             alt=""
             fill
             sizes="100vw"
@@ -579,6 +596,7 @@ export function Opening({
             names={face("names", type.names)}
             script={face("script", type.words)}
             skip={guestCopy.doorway.skip}
+            over={fresh}
             onSkip={goIn}
           />
         )}

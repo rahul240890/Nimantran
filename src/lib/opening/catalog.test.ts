@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  FRESH_OPENINGS,
   OPENING_GROUPS,
   OPENING_STYLES,
   PAINTED_GATES,
+  isFreshOpening,
   isPaintedGate,
   noOpening,
   offersGods,
@@ -50,6 +52,23 @@ describe("openings", () => {
       expect(isPaintedGate(gate)).toBe(true);
     }
     expect(isPaintedGate("palace")).toBe(false);
+  });
+
+  it("offers every fresh opening on any theme, for pages and Scenes alike", () => {
+    expect(FRESH_OPENINGS).toHaveLength(25);
+    for (const id of FRESH_OPENINGS) {
+      expect(openingStyles("classic", false)).toContain(id);
+      expect(openingStyles("rajwada-bagh", true)).toContain(id);
+      expect(isFreshOpening(id)).toBe(true);
+      expect(isPaintedGate(id)).toBe(false);
+    }
+    expect(isFreshOpening("rajwada-pol")).toBe(false);
+  });
+
+  it("opens some occasions on a fresh opening of their own", () => {
+    expect(openingStyle(noOpening, "classic", false, "holi")).toBe("gulaal-bindu");
+    expect(openingStyle(noOpening, "classic", false, "mehendi")).toBe("choodi-chakra");
+    expect(openingStyle(noOpening, "classic", false, "christmas")).toBe("kaanch-ka-gola");
   });
 
   it("keeps gods off party occasions", () => {

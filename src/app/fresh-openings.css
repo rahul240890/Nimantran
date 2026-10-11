@@ -1,0 +1,1346 @@
+/*
+ * Fresh openings: the owner's paintings in four or five layers (opening-fresh.tsx).
+ * Waiting, each moves gently; opened (.opening-stage[data-open="true"]) each plays its own
+ * movement in about 2.5 seconds, then the welcome comes up. Still mode (globals.css, end)
+ * stops every animation and transition, so each lands at once.
+ */
+
+@property --fo-fold {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 82deg;
+}
+
+.fo-canvas {
+  width: max(100cqw, calc(100cqh * 768 / 1365));
+  aspect-ratio: 768 / 1365;
+  translate: -50% -50%;
+}
+
+/* The place beyond waits in the dark round whatever opens, then lights up and settles */
+.fo-beyond {
+  filter: brightness(0.42) saturate(0.8) blur(0.3cqw);
+  scale: 1.08;
+  transition:
+    filter 1300ms ease 700ms,
+    scale 2600ms cubic-bezier(0.3, 0, 0.2, 1) 300ms;
+}
+.opening-stage[data-open="true"] .fo-beyond {
+  filter: none;
+  scale: 1;
+}
+
+/* Edge pieces: sway a little, then pass by as if the guest walks through */
+.fo-front {
+  transform-origin: 50% 40%;
+  transition:
+    scale 1600ms cubic-bezier(0.55, 0, 0.3, 1) 700ms,
+    opacity 800ms ease 1300ms;
+}
+.opening-stage[data-open="true"] .fo-front {
+  scale: 1.35;
+  opacity: 0;
+}
+.fo-front-half {
+  clip-path: inset(0 50% 0 0);
+  transition:
+    translate 1500ms cubic-bezier(0.55, 0, 0.3, 1) 300ms,
+    opacity 700ms ease 1100ms;
+}
+.fo-front-half.fo-right {
+  clip-path: inset(0 0 0 50%);
+}
+.opening-stage[data-open="true"] .fo-front-half {
+  translate: calc(var(--side) * 45%) 0;
+  opacity: 0;
+}
+.fo-front-sink {
+  transition:
+    translate 1500ms cubic-bezier(0.55, 0, 0.3, 1) 200ms,
+    opacity 900ms ease 800ms;
+}
+.opening-stage[data-open="true"] .fo-front-sink {
+  translate: 0 30%;
+  opacity: 0;
+}
+.fo-front-blow {
+  transition:
+    translate 1600ms cubic-bezier(0.5, 0, 0.6, 1) 200ms,
+    opacity 900ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-front-blow {
+  translate: 40% 0;
+  opacity: 0;
+}
+
+/* A painting split in two with soft overlapping middles (clouds, the forest) */
+.fo-soft-l {
+  mask-image: linear-gradient(90deg, #000 86%, transparent);
+}
+.fo-soft-r {
+  mask-image: linear-gradient(270deg, #000 86%, transparent);
+}
+
+/* Loose pieces */
+.fo-float {
+  opacity: 0;
+  will-change: transform;
+}
+.fo-fall {
+  animation: fo-fall var(--t) linear var(--d) infinite;
+}
+.fo-rise {
+  animation: fo-rise var(--t) ease-in-out var(--d) infinite;
+}
+.fo-bob {
+  opacity: 1;
+  animation: fo-bob var(--t) ease-in-out var(--d) infinite alternate;
+}
+.fo-cross {
+  animation: fo-cross var(--t) linear var(--d) infinite;
+}
+.opening-stage[data-open="true"] :is(.fo-fall, .fo-rise, .fo-bob, .fo-cross) {
+  opacity: 0;
+  transition: opacity 500ms ease;
+  animation-play-state: paused;
+}
+.opening-stage[data-open="true"] .fo-burst {
+  animation: fo-burst 1900ms cubic-bezier(0.2, 0.6, 0.3, 1) var(--d) both;
+}
+.opening-stage[data-open="true"] .fo-after {
+  animation: fo-cross var(--t) ease-in-out var(--d) both;
+}
+@keyframes fo-fall {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0);
+  }
+  10%,
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6cqw, 120cqh) rotate(var(--spin));
+  }
+}
+@keyframes fo-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  20%,
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(3cqw, -55cqh);
+  }
+}
+@keyframes fo-bob {
+  from {
+    transform: translate(0, -0.8cqh) rotate(-4deg);
+  }
+  to {
+    transform: translate(0.8cqw, 0.8cqh) rotate(4deg);
+  }
+}
+@keyframes fo-cross {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  8%,
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(125cqw, -4cqh);
+  }
+}
+@keyframes fo-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3) rotate(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--bx), calc(var(--by) + 14cqh)) scale(1) rotate(var(--spin));
+  }
+}
+@keyframes fo-rock {
+  from {
+    rotate: -0.8deg;
+  }
+  to {
+    rotate: 0.8deg;
+  }
+}
+@keyframes fo-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+@keyframes fo-twinkle {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fo-sweep {
+  from {
+    background-position: 140% 0;
+  }
+  to {
+    background-position: -40% 0;
+  }
+}
+
+/* A slow band of light across mirrors and glossy tiles */
+.fo-glint {
+  background: linear-gradient(
+      105deg,
+      transparent 40%,
+      color-mix(in oklab, var(--open-light) 38%, transparent) 50%,
+      transparent 60%
+    )
+    0 0 / 300% 100% no-repeat;
+  mix-blend-mode: screen;
+  animation: fo-sweep 6s ease-in-out infinite;
+  transition: opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .fo-glint {
+  opacity: 0;
+}
+
+/* pankhi: the fan rocks from its rivet, then folds shut blade by blade and drops */
+.fo-fan {
+  transform-origin: 50% 63%;
+  mask-image:
+    conic-gradient(
+      from 0deg at 50% 63%,
+      #000 0 var(--fo-fold),
+      transparent var(--fo-fold) calc(360deg - var(--fo-fold)),
+      #000 calc(360deg - var(--fo-fold))
+    ),
+    linear-gradient(transparent 63%, #000 63%);
+  animation: fo-rock 5s ease-in-out infinite alternate;
+  transition:
+    --fo-fold 1050ms cubic-bezier(0.6, 0, 0.3, 1) 150ms,
+    translate 900ms cubic-bezier(0.6, 0, 1, 1) 1150ms,
+    opacity 500ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-fan {
+  --fo-fold: 1deg;
+  translate: 0 75%;
+  opacity: 0;
+}
+
+/* sheesh-mahal: the mirror wall turns like louvres, from the middle outward */
+.fo-strip {
+  backface-visibility: hidden;
+  transition:
+    transform 950ms cubic-bezier(0.6, 0, 0.3, 1) calc(200ms + var(--i) * 120ms),
+    filter 950ms ease calc(200ms + var(--i) * 120ms),
+    opacity 300ms ease calc(900ms + var(--i) * 120ms);
+}
+.opening-stage[data-open="true"] .fo-strip {
+  transform: rotateY(86deg);
+  filter: brightness(1.6);
+  opacity: 0;
+}
+
+/* popup-mahal: the paper layers stand up as the guest arrives, then the camera goes in */
+.fo-pop-far,
+.fo-pop-near {
+  backface-visibility: hidden;
+  animation: fo-popup 900ms cubic-bezier(0.3, 1.45, 0.5, 1) 300ms both;
+}
+.fo-pop-far {
+  transform-origin: 50% 71%;
+  transition: scale 2200ms cubic-bezier(0.5, 0, 0.3, 1) 200ms;
+}
+.fo-pop-near {
+  transform-origin: 50% 100%;
+  animation-delay: 750ms;
+  transition:
+    scale 1600ms cubic-bezier(0.55, 0, 0.3, 1) 150ms,
+    opacity 700ms ease 900ms;
+}
+.fo-pop-sky {
+  transition: scale 2600ms cubic-bezier(0.5, 0, 0.3, 1);
+}
+.opening-stage[data-open="true"] .fo-pop-near {
+  scale: 2.3;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-pop-far {
+  scale: 1.3;
+}
+.opening-stage[data-open="true"] .fo-pop-sky {
+  scale: 1.1;
+}
+@keyframes fo-popup {
+  from {
+    transform: rotateX(84deg);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* odhni: the veil ripples in the breeze, then lifts from its foot and flies up */
+.fo-veil {
+  transform-origin: 50% 0;
+  animation: fo-cloth 5s ease-in-out infinite alternate;
+  transition:
+    translate 1600ms cubic-bezier(0.5, 0, 0.35, 1) 200ms,
+    scale 1600ms cubic-bezier(0.5, 0, 0.35, 1) 200ms,
+    rotate 1600ms ease 200ms,
+    opacity 500ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-veil {
+  translate: 6% -108%;
+  scale: 1.2 0.7;
+  rotate: x 38deg;
+  opacity: 0;
+}
+.fo-veil-shade {
+  background: linear-gradient(
+      90deg,
+      transparent 20%,
+      color-mix(in oklab, var(--open-shadow) 40%, transparent) 35%,
+      transparent 50%,
+      color-mix(in oklab, var(--open-light) 18%, transparent) 65%,
+      transparent 80%
+    )
+    0 0 / 220% 100%;
+  mix-blend-mode: multiply;
+  animation: fo-sweep 7s ease-in-out infinite alternate;
+}
+@keyframes fo-cloth {
+  from {
+    transform: skewX(-0.5deg) scaleY(1);
+  }
+  to {
+    transform: skewX(0.5deg) scaleY(1.01);
+  }
+}
+
+/* kavad-peti: the outer panels swing open, then the four inside fold back in a ripple */
+.fo-panel {
+  backface-visibility: hidden;
+  transform-origin: calc(50% + var(--side) * 50%) 50%;
+}
+.fo-kavad-outer {
+  transition: transform 1100ms cubic-bezier(0.6, 0, 0.25, 1) 150ms;
+}
+.fo-kavad-inner {
+  /* The two by the middle go first, the outer two a beat later */
+  transition: transform 900ms cubic-bezier(0.6, 0, 0.25, 1) calc(1100ms + var(--o) * 180ms);
+}
+.opening-stage[data-open="true"] .fo-panel {
+  transform: rotateY(calc(var(--side) * -100deg));
+}
+.fo-panel-shade {
+  background: linear-gradient(
+    calc(90deg + var(--side) * 90deg),
+    transparent 30%,
+    var(--open-shadow)
+  );
+  opacity: 0;
+  transition: opacity 900ms ease 300ms;
+}
+.opening-stage[data-open="true"] .fo-panel-shade {
+  opacity: 1;
+}
+
+/* chhatri-utsav: the parasol turns overhead, then spins up and lifts into the sky */
+.fo-chhatri {
+  transform-origin: 50% 44.6%;
+  scale: 2.1;
+  transition:
+    scale 1700ms cubic-bezier(0.6, 0, 0.3, 1) 250ms,
+    rotate 1900ms cubic-bezier(0.4, 0, 0.3, 1) 100ms,
+    translate 1100ms cubic-bezier(0.6, 0, 1, 1) 1000ms,
+    opacity 500ms ease 1700ms;
+}
+.opening-stage[data-open="true"] .fo-chhatri {
+  scale: 0.3;
+  rotate: 320deg;
+  translate: 0 -75%;
+  opacity: 0;
+}
+.fo-chhatri-spin {
+  transform-origin: 50% 44.6%;
+  animation: fo-spin 90s linear infinite;
+}
+
+/* jal-darpan: rings spread from the floating diya; opened, rings race out and the lake
+   gives way to the ghat */
+.fo-lake {
+  transition:
+    opacity 1100ms ease 900ms,
+    filter 1100ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-lake {
+  opacity: 0;
+  filter: blur(0.8cqw);
+}
+.fo-ripple {
+  position: absolute;
+  width: 14cqw;
+  aspect-ratio: 1;
+  border: 0.35cqw solid color-mix(in oklab, var(--card-ivory) 55%, transparent);
+  border-radius: 50%;
+  translate: -50% -50%;
+  scale: 1 0.32;
+  opacity: 0;
+  animation: fo-ripple 5s ease-out calc(var(--i) * -1.25s) infinite;
+}
+.fo-ripple-big {
+  animation: none;
+}
+.opening-stage[data-open="true"] .fo-ripple {
+  animation: none;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-ripple-big {
+  animation: fo-ripple-big 1700ms ease-out calc(100ms + var(--i) * 140ms) both;
+}
+@keyframes fo-ripple {
+  0% {
+    opacity: 0.8;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+@keyframes fo-ripple-big {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.3);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(16);
+  }
+}
+
+/* pushp-varsha: the petal wall breathes, then comes apart in a whirl of petals */
+.fo-wall {
+  animation: fo-breathe 6s ease-in-out infinite alternate;
+  transition:
+    scale 1400ms cubic-bezier(0.5, 0, 0.3, 1) 150ms,
+    rotate 1400ms cubic-bezier(0.5, 0, 0.3, 1) 150ms,
+    opacity 900ms ease 500ms,
+    filter 1000ms ease 300ms;
+}
+.opening-stage[data-open="true"] .fo-wall {
+  scale: 1.6;
+  rotate: 35deg;
+  opacity: 0;
+  filter: blur(0.6cqw);
+}
+@keyframes fo-breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.015);
+  }
+}
+
+/* moti-seep: light pulses from the shell's seam; opened, the lid tilts back on its hinge
+   and the pearl's light floods the screen */
+.fo-shell-top {
+  transform-origin: 50% 54%;
+  transition:
+    transform 1300ms cubic-bezier(0.55, 0, 0.3, 1) 200ms,
+    opacity 600ms ease 1300ms;
+}
+.opening-stage[data-open="true"] .fo-shell-top {
+  transform: rotateX(72deg) translateY(-6%);
+  opacity: 0;
+}
+.fo-shell-base {
+  transition:
+    opacity 800ms ease 1400ms,
+    translate 1200ms ease 1200ms;
+}
+.opening-stage[data-open="true"] .fo-shell-base {
+  opacity: 0;
+  translate: 0 12%;
+}
+.fo-pearl {
+  width: 60cqw;
+  aspect-ratio: 2.4;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--open-light) 85%, transparent),
+    transparent
+  );
+  mix-blend-mode: screen;
+  animation: fo-twinkle 2.4s ease-in-out infinite alternate;
+}
+.fo-flood {
+  background: radial-gradient(
+    circle at 50% 56%,
+    var(--card-ivory),
+    color-mix(in oklab, var(--open-light) 70%, transparent) 40%,
+    transparent 75%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-flood {
+  animation: fo-flood 1900ms ease 600ms both;
+}
+@keyframes fo-flood {
+  0% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* badal-raag: rain and far lightning; opened, the clouds part at two depths, sun rays
+   break through and a rainbow draws itself */
+.fo-cloud-back {
+  transition: translate 2100ms cubic-bezier(0.5, 0, 0.25, 1) 300ms;
+}
+.opening-stage[data-open="true"] .fo-cloud-back.fo-soft-l {
+  translate: -80% 0;
+}
+.opening-stage[data-open="true"] .fo-cloud-back.fo-soft-r {
+  translate: 80% 0;
+}
+.fo-rain {
+  background: repeating-linear-gradient(
+    104deg,
+    transparent 0 1.6cqw,
+    color-mix(in oklab, var(--card-ivory) 30%, transparent) 1.6cqw 1.75cqw
+  );
+  background-size: 100% 18cqh;
+  opacity: 0.55;
+  animation: fo-rain 600ms linear infinite;
+  transition: opacity 500ms ease;
+}
+.opening-stage[data-open="true"] .fo-rain {
+  opacity: 0;
+}
+@keyframes fo-rain {
+  to {
+    background-position: -4cqw 18cqh;
+  }
+}
+.fo-lightning {
+  background: color-mix(in oklab, var(--card-ivory) 50%, transparent);
+  mix-blend-mode: soft-light;
+  opacity: 0;
+  animation: fo-lightning 8s linear infinite;
+}
+.opening-stage[data-open="true"] .fo-lightning {
+  animation: none;
+}
+@keyframes fo-lightning {
+  0%,
+  61%,
+  64%,
+  66%,
+  100% {
+    opacity: 0;
+  }
+  62%,
+  65% {
+    opacity: 0.9;
+  }
+}
+.fo-rays {
+  left: 50%;
+  top: 30%;
+  width: 260%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: repeating-conic-gradient(
+    color-mix(in oklab, var(--open-light) 32%, transparent) 0 4deg,
+    transparent 4deg 14deg
+  );
+  mask-image: radial-gradient(closest-side, #000, transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition:
+    opacity 1200ms ease 900ms,
+    rotate 6s linear 900ms;
+}
+.opening-stage[data-open="true"] .fo-rays {
+  opacity: 0.8;
+  rotate: 25deg;
+}
+.fo-rainbow {
+  left: -8%;
+  top: 14%;
+  width: 116%;
+  fill: none;
+  stroke-width: 1.7;
+  mix-blend-mode: screen;
+  opacity: 0.75;
+}
+.fo-rainbow path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1500ms cubic-bezier(0.4, 0, 0.2, 1) calc(1100ms + var(--i) * 60ms);
+}
+.fo-rainbow path:nth-child(1) {
+  stroke: oklch(0.7 0.19 25);
+}
+.fo-rainbow path:nth-child(2) {
+  stroke: oklch(0.78 0.16 60);
+}
+.fo-rainbow path:nth-child(3) {
+  stroke: oklch(0.9 0.16 100);
+}
+.fo-rainbow path:nth-child(4) {
+  stroke: oklch(0.78 0.17 145);
+}
+.fo-rainbow path:nth-child(5) {
+  stroke: oklch(0.7 0.13 230);
+}
+.fo-rainbow path:nth-child(6) {
+  stroke: oklch(0.6 0.16 290);
+}
+.opening-stage[data-open="true"] .fo-rainbow path {
+  stroke-dashoffset: 0;
+}
+
+/* jugnu-van: fireflies wander round the name; opened, they rush in and burst, and the
+   forest parts */
+.fo-forest {
+  transition:
+    translate 1700ms cubic-bezier(0.55, 0, 0.3, 1) 450ms,
+    opacity 900ms ease 1300ms;
+}
+.opening-stage[data-open="true"] .fo-forest.fo-soft-l {
+  translate: -70% 0;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-forest.fo-soft-r {
+  translate: 70% 0;
+  opacity: 0;
+}
+.fo-firefly {
+  width: 1cqw;
+  aspect-ratio: 1;
+  background: var(--open-light);
+  box-shadow:
+    0 0 1.4cqw 0.4cqw color-mix(in oklab, var(--marigold) 70%, transparent),
+    0 0 4cqw 1cqw color-mix(in oklab, var(--open-light) 30%, transparent);
+  animation:
+    fo-wander 7s ease-in-out calc(var(--i) * -0.9s) infinite alternate,
+    fo-twinkle 1.6s ease-in-out calc(var(--i) * -0.37s) infinite alternate;
+  transition:
+    translate 700ms cubic-bezier(0.6, 0, 0.4, 1) calc(var(--i) * 15ms),
+    scale 400ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-firefly {
+  translate: var(--tx) var(--ty);
+  scale: 0;
+}
+@keyframes fo-wander {
+  from {
+    transform: translate(-1.5cqw, 1cqh);
+  }
+  to {
+    transform: translate(1.5cqw, -1.2cqh);
+  }
+}
+.fo-firefly-burst {
+  left: 50%;
+  top: 44%;
+  width: 40cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    var(--card-ivory),
+    color-mix(in oklab, var(--marigold) 60%, transparent) 40%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  scale: 0.2;
+}
+.opening-stage[data-open="true"] .fo-firefly-burst {
+  animation: fo-glow-burst 1400ms ease-out 650ms both;
+}
+@keyframes fo-glow-burst {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 4;
+  }
+}
+
+/* uday-surya: a first glow behind the hills; opened, the sun rises and the hills sink */
+.fo-sun {
+  left: 50%;
+  top: 72%;
+  width: 26cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(
+    closest-side,
+    var(--card-ivory),
+    var(--open-light) 45%,
+    color-mix(in oklab, var(--marigold) 55%, transparent) 70%,
+    transparent
+  );
+  box-shadow: 0 0 18cqw 8cqw color-mix(in oklab, var(--marigold) 35%, transparent);
+  mix-blend-mode: screen;
+  animation: fo-twinkle 3s ease-in-out infinite alternate;
+  transition: top 1500ms cubic-bezier(0.3, 0, 0.2, 1) 100ms;
+}
+.opening-stage[data-open="true"] .fo-sun {
+  top: 46%;
+}
+.fo-dawn-far {
+  transition:
+    translate 1500ms cubic-bezier(0.6, 0, 0.3, 1) 900ms,
+    opacity 900ms ease 1000ms;
+}
+.fo-dawn-near {
+  transition: translate 1300ms cubic-bezier(0.6, 0, 0.3, 1) 700ms;
+}
+.opening-stage[data-open="true"] .fo-dawn-far {
+  translate: 0 18%;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-dawn-near {
+  translate: 0 60%;
+}
+.fo-dawn-light {
+  background: linear-gradient(
+    0deg,
+    color-mix(in oklab, var(--marigold) 45%, transparent),
+    color-mix(in oklab, var(--open-light) 35%, transparent) 50%,
+    transparent
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-dawn-light {
+  animation: fo-flood 2200ms ease 300ms both;
+}
+
+/* taaramandal: stars join in gold round the name; opened, the guest flies through them */
+.fo-warp {
+  transition:
+    scale 1900ms cubic-bezier(0.6, 0, 0.4, 1) 200ms,
+    opacity 800ms ease 1300ms,
+    filter 1500ms ease 300ms;
+}
+.opening-stage[data-open="true"] .fo-warp {
+  scale: 2.6;
+  opacity: 0;
+  filter: blur(0.5cqw) brightness(1.4);
+}
+.fo-constellation {
+  fill: var(--open-light);
+  stroke: color-mix(in oklab, var(--open-gilt) 80%, transparent);
+  stroke-width: 0.18;
+  transition:
+    scale 1300ms cubic-bezier(0.6, 0, 0.4, 1),
+    opacity 700ms ease 500ms;
+  transform-origin: 50% 44%;
+}
+.fo-constellation path {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: fo-draw 6s ease-in-out 800ms forwards;
+}
+.fo-constellation circle {
+  animation: fo-twinkle 1.8s ease-in-out calc(var(--i) * -0.3s) infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-constellation {
+  scale: 3;
+  opacity: 0;
+}
+@keyframes fo-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.fo-streak {
+  left: 50%;
+  top: 44%;
+  width: 40cqw;
+  height: 0.25cqw;
+  transform-origin: 0 50%;
+  rotate: var(--a);
+  background: linear-gradient(90deg, transparent, var(--card-ivory));
+  opacity: 0;
+  scale: 0 1;
+}
+.opening-stage[data-open="true"] .fo-streak {
+  animation: fo-streak 1100ms cubic-bezier(0.5, 0, 0.8, 1) calc(300ms + var(--i) * 30ms) both;
+}
+@keyframes fo-streak {
+  0% {
+    opacity: 0;
+    scale: 0 1;
+    translate: 2cqw 0;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.4 1;
+    translate: 60cqw 0;
+  }
+}
+
+/* thar-ki-ret: sand drifts off the crests; opened, a wind sweeps the dunes away */
+.fo-dunes {
+  mask-image: linear-gradient(90deg, transparent 33%, #000 66%);
+  mask-size: 300% 100%;
+  mask-position: 100% 0;
+  transition: mask-position 1900ms cubic-bezier(0.5, 0, 0.4, 1) 200ms;
+}
+.opening-stage[data-open="true"] .fo-dunes {
+  mask-position: 0% 0;
+}
+.fo-grain {
+  width: 0.5cqw;
+  aspect-ratio: 1;
+  background: color-mix(in oklab, var(--open-light) 80%, var(--marigold));
+  opacity: 0;
+  animation: fo-grain 4s linear calc(var(--i) * -0.27s) infinite;
+}
+.opening-stage[data-open="true"] .fo-grain {
+  animation-duration: 900ms;
+}
+@keyframes fo-grain {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(22cqw, -3cqh);
+  }
+}
+
+/* sheher-ki-raat: windows wake one by one; opened, the whole city lights up and sinks */
+.fo-city {
+  transition:
+    translate 1400ms cubic-bezier(0.6, 0, 0.35, 1) 950ms,
+    opacity 800ms ease 1350ms;
+}
+.opening-stage[data-open="true"] .fo-city {
+  translate: 0 45%;
+  opacity: 0;
+}
+.fo-city-lit {
+  opacity: 0;
+  transition: opacity 700ms ease 100ms;
+}
+.opening-stage[data-open="true"] .fo-city-lit {
+  opacity: 1;
+}
+.fo-window {
+  width: 0.7cqw;
+  aspect-ratio: 0.7;
+  border-radius: 0.1cqw;
+  background: var(--open-light);
+  box-shadow: 0 0 1.2cqw color-mix(in oklab, var(--marigold) 70%, transparent);
+  opacity: 0;
+  animation: fo-window 9s ease-in-out calc(var(--i) * -0.7s) infinite;
+}
+@keyframes fo-window {
+  0%,
+  30% {
+    opacity: 0;
+  }
+  40%,
+  90% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* choodi-chakra: the bangle rings turn, each its own way; opened, they spread like ripples */
+.fo-band {
+  mask-image: radial-gradient(
+    closest-side,
+    transparent calc(var(--r0) - 0.4%),
+    #000 var(--r0),
+    #000 calc(var(--r1) - 0.4%),
+    transparent var(--r1)
+  );
+  animation: fo-spin calc(40s + var(--i) * 14s) linear infinite;
+  animation-direction: normal;
+  transition:
+    scale 1500ms cubic-bezier(0.4, 0, 0.3, 1) calc(150ms + var(--i) * 90ms),
+    opacity 800ms ease calc(800ms + var(--i) * 90ms);
+}
+.fo-band.fo-reverse {
+  animation-direction: reverse;
+}
+/* The outer two rings run past the painting's sides, so they only rock */
+.fo-band.fo-rocking {
+  animation: fo-rock 4s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-band {
+  scale: calc(1.6 + var(--i) * 0.3);
+  opacity: 0;
+}
+
+/* sanjhi-roshni: a lamp behind the paper breathes; opened, it flares and the sheet turns
+   away like a page */
+.fo-lamp {
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    color-mix(in oklab, var(--marigold) 55%, transparent),
+    transparent 68%
+  );
+  mix-blend-mode: screen;
+  animation: fo-lamp 3.5s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-lamp {
+  animation: fo-flare 700ms ease forwards;
+}
+@keyframes fo-lamp {
+  from {
+    opacity: 0.25;
+  }
+  to {
+    opacity: 0.7;
+  }
+}
+@keyframes fo-flare {
+  to {
+    opacity: 1;
+    filter: brightness(1.6);
+  }
+}
+.fo-page {
+  transform-origin: 0 50%;
+  backface-visibility: hidden;
+  transition:
+    transform 1400ms cubic-bezier(0.5, 0, 0.3, 1) 650ms,
+    opacity 400ms ease 1750ms;
+}
+.opening-stage[data-open="true"] .fo-page {
+  transform: rotateY(-112deg);
+  opacity: 0;
+}
+.fo-page-shade {
+  background: linear-gradient(90deg, transparent 40%, var(--open-shadow));
+  opacity: 0;
+  transition: opacity 1200ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-page-shade {
+  opacity: 1;
+}
+
+/* chhaya-parda: shadows sway on the lit screen; opened, the screen rolls up */
+.fo-screen {
+  transform-origin: 50% 0;
+  transition:
+    scale 1300ms cubic-bezier(0.6, 0, 0.3, 1) 450ms,
+    opacity 400ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-screen {
+  scale: 1 0.02;
+  opacity: 0;
+}
+.fo-screen-glow {
+  animation: fo-flicker 2.2s ease-in-out infinite alternate;
+}
+@keyframes fo-flicker {
+  0% {
+    filter: brightness(0.92);
+  }
+  40% {
+    filter: brightness(1.05);
+  }
+  60% {
+    filter: brightness(0.97);
+  }
+  100% {
+    filter: brightness(1.08);
+  }
+}
+.fo-shadow {
+  filter: brightness(0) blur(0.3cqw);
+  opacity: 0.42;
+  animation: fo-puppet calc(9s + var(--i) * 2s) ease-in-out calc(var(--i) * -3s) infinite alternate;
+  transition:
+    scale 500ms ease,
+    opacity 400ms ease;
+}
+.opening-stage[data-open="true"] .fo-shadow {
+  scale: 1.4;
+  opacity: 0;
+}
+@keyframes fo-puppet {
+  from {
+    transform: translate(-6cqw, 0) rotate(-5deg);
+  }
+  to {
+    transform: translate(6cqw, -1.5cqh) rotate(5deg);
+  }
+}
+
+/* athangudi-tiles: a shine runs over the glossy tiles; opened, they turn over in a wave
+   from the middle */
+.fo-tile {
+  background: color-mix(in oklab, var(--night) 85%, var(--marigold));
+  backface-visibility: hidden;
+  transition:
+    transform 700ms cubic-bezier(0.5, 0, 0.3, 1) calc(150ms + var(--d) * 150ms),
+    opacity 200ms ease calc(450ms + var(--d) * 150ms);
+}
+.opening-stage[data-open="true"] .fo-tile {
+  transform: rotateY(180deg);
+  opacity: 0;
+}
+
+/* gulaal-bindu: colour drops breathe at the corners; opened, they bloom over everything */
+.fo-bloom {
+  translate: -10% -10%;
+  scale: 0;
+  transition:
+    scale 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(var(--i) * 70ms),
+    opacity 300ms ease;
+}
+.fo-bloom-idle {
+  scale: 0.55;
+  animation: fo-bloom 5s ease-in-out calc(var(--i) * -1.3s) infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-bloom {
+  animation: none;
+  scale: 3.4;
+}
+.fo-paper {
+  transition: opacity 800ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-paper {
+  opacity: 0;
+}
+@keyframes fo-bloom {
+  from {
+    transform: scale(0.85);
+  }
+  to {
+    transform: scale(1.12);
+  }
+}
+
+/* bioscope: a kaleidoscope turns in the lens; opened, the lens opens round the guest */
+.fo-scope {
+  transform-origin: 49.8% 36.4%;
+  transition:
+    scale 1600ms cubic-bezier(0.6, 0, 0.3, 1) 450ms,
+    opacity 500ms ease 1700ms;
+}
+.opening-stage[data-open="true"] .fo-scope {
+  scale: 5.5;
+  opacity: 0;
+}
+.fo-kaleido {
+  background: var(--night);
+  transition: opacity 500ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-kaleido {
+  opacity: 0;
+}
+.fo-kaleido-glass {
+  background: repeating-conic-gradient(
+    color-mix(in oklab, var(--marigold) 35%, var(--night)) 0 15deg,
+    color-mix(in oklab, var(--open-gilt) 25%, var(--night)) 15deg 30deg
+  );
+  animation: fo-spin 30s linear infinite;
+}
+.fo-kaleido-band {
+  animation: fo-spin 18s linear infinite;
+  transition: rotate 1700ms cubic-bezier(0.4, 0, 0.2, 1) 100ms;
+}
+.fo-kaleido-band.fo-reverse {
+  animation-direction: reverse;
+  animation-duration: 24s;
+}
+.opening-stage[data-open="true"] .fo-kaleido-band {
+  rotate: calc(var(--turn) * 540deg);
+}
+
+/* kaanch-ka-gola: snow falls inside the globe; opened, it shakes and the guest falls in */
+.fo-globe {
+  transform-origin: 50% 39.4%;
+  transition:
+    scale 1500ms cubic-bezier(0.7, 0, 0.3, 1) 500ms,
+    opacity 500ms ease 1650ms;
+}
+.opening-stage[data-open="true"] .fo-globe {
+  scale: 7;
+  opacity: 0;
+}
+.fo-globe-shake {
+  transform-origin: 50% 85%;
+  animation: fo-rock 4s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-globe-shake {
+  animation: fo-shake 450ms ease-in-out;
+}
+@keyframes fo-shake {
+  25% {
+    rotate: -3deg;
+  }
+  50% {
+    rotate: 3deg;
+  }
+  75% {
+    rotate: -2deg;
+  }
+}
+.fo-flake {
+  width: 1cqw;
+  aspect-ratio: 1;
+  background: var(--card-ivory);
+  opacity: 0.85;
+  animation: fo-snow calc(6s + var(--i) * 0.2s) linear calc(var(--i) * -0.6s) infinite;
+}
+.opening-stage[data-open="true"] .fo-flake {
+  animation: fo-swirl 900ms ease-in-out calc(var(--i) * -0.05s) infinite;
+}
+@keyframes fo-snow {
+  from {
+    transform: translate(0, -50cqh);
+  }
+  to {
+    transform: translate(2cqw, 50cqh);
+  }
+}
+@keyframes fo-swirl {
+  0% {
+    transform: rotate(0) translate(6cqw) rotate(0);
+  }
+  100% {
+    transform: rotate(1turn) translate(6cqw) rotate(-1turn);
+  }
+}
+
+/* phirki: the paper square folds open, flap by flap, like a fortune-teller */
+.fo-flap {
+  backface-visibility: hidden;
+  transition:
+    transform 900ms cubic-bezier(0.55, 0, 0.3, 1) calc(150ms + var(--i) * 140ms),
+    opacity 200ms ease calc(550ms + var(--i) * 140ms);
+}
+.fo-flap-top {
+  transform-origin: 50% 0;
+}
+.fo-flap-right {
+  transform-origin: 100% 50%;
+}
+.fo-flap-bottom {
+  transform-origin: 50% 100%;
+}
+.fo-flap-left {
+  transform-origin: 0 50%;
+}
+.opening-stage[data-open="true"] .fo-flap {
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-flap-top {
+  transform: rotateX(-170deg);
+}
+.opening-stage[data-open="true"] .fo-flap-right {
+  transform: rotateY(-170deg);
+}
+.opening-stage[data-open="true"] .fo-flap-bottom {
+  transform: rotateX(170deg);
+}
+.opening-stage[data-open="true"] .fo-flap-left {
+  transform: rotateY(170deg);
+}
+
+/* bulbule: a big soap bubble wobbles round the name and small ones rise; opened, they pop */
+.fo-garden {
+  transition: opacity 900ms ease 700ms;
+}
+.opening-stage[data-open="true"] .fo-garden {
+  opacity: 0;
+}
+.fo-bubble {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 0.25cqw color-mix(in oklab, var(--card-ivory) 55%, transparent);
+  background:
+    radial-gradient(
+      circle at 32% 28%,
+      color-mix(in oklab, var(--card-ivory) 90%, transparent) 0 5%,
+      transparent 6%
+    ),
+    radial-gradient(
+      circle,
+      transparent 52%,
+      color-mix(in oklab, oklch(0.88 0.1 320) 40%, transparent) 70%,
+      color-mix(in oklab, oklch(0.9 0.11 200) 60%, transparent) 88%,
+      color-mix(in oklab, var(--card-ivory) 85%, transparent) 100%
+    );
+}
+.fo-bubble-big {
+  left: 50%;
+  top: 44%;
+  width: 96%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  animation: fo-wobble 4s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .fo-bubble-big {
+  animation: fo-pop 450ms ease-out both;
+}
+.fo-bubble-rise {
+  top: 100%;
+  animation: fo-bubble calc(11s + var(--i) * 1.3s) ease-in-out calc(var(--i) * -1.9s) infinite;
+  transition: opacity 200ms ease calc(150ms + var(--i) * 90ms);
+}
+.opening-stage[data-open="true"] .fo-bubble-rise {
+  opacity: 0;
+}
+@keyframes fo-wobble {
+  from {
+    transform: scale(1.02, 0.98);
+  }
+  to {
+    transform: scale(0.98, 1.02);
+  }
+}
+@keyframes fo-pop {
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+@keyframes fo-bubble {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(4cqw, -55cqh);
+  }
+  100% {
+    transform: translate(-2cqw, -115cqh);
+  }
+}
+
+/* chhuk-chhuk: the toy train puffs along its track; opened, it races off in a cloud of
+   steam that clears onto the station */
+.fo-train {
+  translate: 0 11%;
+  transition: transform 1000ms cubic-bezier(0.6, 0, 1, 1) 100ms;
+}
+.opening-stage[data-open="true"] .fo-train {
+  transform: translateX(-130%);
+}
+.fo-train-loop {
+  animation: fo-train 18s linear infinite;
+}
+@keyframes fo-train {
+  from {
+    transform: translateX(105%);
+  }
+  to {
+    transform: translateX(-105%);
+  }
+}
+.fo-puff {
+  opacity: 0;
+  animation: fo-puff 2.4s ease-out calc(var(--i) * -0.8s) infinite;
+}
+@keyframes fo-puff {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6cqw, -10cqh) scale(1.5);
+  }
+}
+.fo-steam {
+  opacity: 0;
+  scale: 0.2;
+}
+.opening-stage[data-open="true"] .fo-steam {
+  animation: fo-steam 1500ms ease-out calc(300ms + var(--i) * 70ms) both;
+}
+@keyframes fo-steam {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    scale: 2.6;
+  }
+}
+.fo-hills {
+  transition: opacity 800ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-hills {
+  opacity: 0;
+}
+
+/* The welcome over a fresh opening lets the place revealed show round the names */
+.opening-welcome[data-over="art"] {
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 46%,
+    color-mix(in oklab, var(--open-plate) 94%, transparent),
+    color-mix(in oklab, var(--open-plate) 82%, transparent) 55%,
+    color-mix(in oklab, var(--open-plate) 30%, transparent) 100%
+  );
+}
