@@ -1,9 +1,9 @@
 import { expect, test } from "@playwright/test";
 import { axe, noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
 
-/* The story as an MP4 for WhatsApp Status and Reels (Step 17c), made in the browser. */
+/* The invitation video (Step 17c), an MP4 made in the browser: the opening, the welcome, the pages. */
 
-test.describe("video for Status and Reels", () => {
+test.describe("invitation video", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("a host makes the video from the share page", async ({ page }, info) => {
@@ -12,10 +12,8 @@ test.describe("video for Status and Reels", () => {
     await writeInvite(page, numberFor(info), ["Arjun", "Diya"]);
     await publish(page, "arjun-video");
     const card = page.locator("[data-video-card]");
-    await expect(
-      card.getByRole("heading", { name: "Video for WhatsApp Status and Reels" }),
-    ).toBeVisible();
-    await expect(card.getByRole("img", { name: "The video's first page" })).toBeVisible();
+    await expect(card.getByRole("heading", { name: "Invitation video" })).toBeVisible();
+    await expect(card.getByRole("img", { name: "The video's first moment" })).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
@@ -47,13 +45,21 @@ test.describe("video for Status and Reels", () => {
     expect(facts.type).toBe("video/mp4");
     expect(facts.width).toBe(1080);
     expect(facts.height).toBe(1920);
-    expect(facts.duration).toBeGreaterThanOrEqual(29.5);
-    expect(facts.duration).toBeLessThanOrEqual(45.5);
+    // The pages' 30 to 45 seconds, after seven or eight of opening and welcome
+    expect(facts.duration).toBeGreaterThanOrEqual(36);
+    expect(facts.duration).toBeLessThanOrEqual(54);
     expect(facts.size).toBeGreaterThan(100_000);
     await expect(card.getByRole("link", { name: "Download MP4" })).toHaveAttribute(
       "download",
       /arjun-video-\d+-invitation\.mp4$/,
     );
     expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Away to another screen and back: the video is still there, not made again
+    const share = page.url();
+    await page.goto("/templates");
+    await page.goto(share);
+    await expect(page.locator("[data-video-card]").getByText("Your video is ready")).toBeVisible();
+    await expect(page.locator("[data-video-card] video")).toBeVisible();
   });
 });

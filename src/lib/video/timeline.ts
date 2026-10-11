@@ -59,14 +59,19 @@ export type VideoTimeline = {
  * pages need more than that at a comfortable pace (five functions or so), the video grows
  * towards a minute instead. A function's page keeps more time than the cover or family's.
  * With `fixed` (the host set a time for every page) each page keeps it, so the video and its
- * music run exactly as long as the pages need, squeezed only past a minute.
+ * music run exactly as long as the pages need, squeezed only past a minute. `lead` is how
+ * long the opening plays before the pages, which the minute includes.
  */
 export function videoTimeline(
   story: readonly StoryBeat[],
-  { fixed = false }: { fixed?: boolean } = {},
+  { fixed = false, lead = 0 }: { fixed?: boolean; lead?: number } = {},
 ): VideoTimeline {
-  const room = (fixed ? VIDEO_FIXED_MAX_SECONDS : VIDEO_MAX_SECONDS) - END_SECONDS;
-  const longest = VIDEO_LONGEST_SECONDS - END_SECONDS;
+  // The opening before the pages (`lead` seconds) counts towards the minute
+  const longest = VIDEO_LONGEST_SECONDS - END_SECONDS - lead;
+  const room = Math.min(
+    (fixed ? VIDEO_FIXED_MAX_SECONDS : VIDEO_MAX_SECONDS) - END_SECONDS,
+    longest,
+  );
   const natural = story.reduce((sum, beat) => sum + beat.seconds, 0);
   const functions = story.map((beat) => isFunctionBeat(beat));
   const floors = (fn: number, page: number) =>

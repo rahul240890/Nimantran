@@ -176,7 +176,7 @@ export const refunds: LegalDoc = {
       id: "what-you-buy",
       heading: "What you buy",
       body: [
-        "A package (Basic, Celebration or Grand) unlocks more for one invitation: a paid design without the watermark, more invites, a second card language and the video for WhatsApp Status and Reels. Our pricing page lists what each includes.",
+        "A package (Basic, Celebration or Grand) unlocks more for one invitation: a paid design without the watermark, more invites, a second card language and the invitation video. Our pricing page lists what each includes.",
         "Each package is a one-time payment for one invitation. There is no subscription, and nothing is charged again.",
       ],
     },

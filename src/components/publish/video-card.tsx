@@ -34,8 +34,20 @@ import { SCENE_FLY, sceneTimeline } from "@/lib/video/scene-timeline";
 import { scenePage, withBlessing } from "@/lib/suites/scene";
 import { SUITES } from "@/lib/suites/catalog";
 import { voiceFaces } from "@/lib/suites/lettering";
-import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/look";
+import { loadFonts, loadImages, openingPalette, paletteReader, readFonts } from "@/lib/video/look";
+import { withPrelude } from "@/lib/video/film";
+import {
+  fingerprint,
+  keptVideo,
+  loadKept,
+  makeKept,
+  stopKept,
+  subscribeVideos,
+} from "@/lib/video/keep";
+import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
+import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
+import { openingGod, openingStyle, welcomeKind } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import "@/components/invitation/type/fonts.css";
 
@@ -60,20 +72,18 @@ type VideoCardProps = {
 /** A video ready to make, and the moment its poster shows. */
 type Ready = { film: VideoFilm; poster: number };
 
-type State =
-  | { step: "idle" }
-  | { step: "making"; done: number }
-  | { step: "ready"; blob: Blob; href: string }
-  | { step: "unsupported" };
+/** What this browser can do, checked once on the page. */
+type Support = "checking" | "ok" | "silent" | "unsupported";
 
 const noSubscribe = () => () => {};
 const ALL = "all";
 const TEST_CODECS = { video: "vp9", audio: "opus" } as const;
 
 /**
- * The story as an MP4 for WhatsApp Status and Instagram Reels (Step 17c), made in the
- * host's browser: a poster of the first page, then a progress bar, then the video to
- * watch, share or download.
+ * The invitation video (Step 17c), an MP4 to share anywhere, made in the host's browser:
+ * the opening as guests see it, the welcome, then the pages. A poster of the closed opening,
+ * then a progress bar, then the video to watch, share or download. It keeps going when the
+ * host moves to another screen, and stays saved in this browser for when they come back.
  */
 export function VideoCard(props: VideoCardProps) {
   const { videoCopy } = useText(publishText);
@@ -91,10 +101,17 @@ export function VideoCard(props: VideoCardProps) {
   const clipUrl = props.clipUrl ?? null;
   const codecs = testCodecs ? TEST_CODECS : undefined;
   const [music, setMusic] = useState(true);
-  const [state, setState] = useState<State>({ step: "idle" });
-  const [silent, setSilent] = useState(false);
+  const [support, setSupport] = useState<Support>("checking");
+  const silent = support === "silent";
   const poster = useRef<HTMLCanvasElement>(null);
-  const stopper = useRef<AbortController | null>(null);
+  // The video for this invitation and choice, kept while making and saved once made
+  const key = `${slug}:${perFunction ? only : ALL}`;
+  const kept = useSyncExternalStore(
+    subscribeVideos,
+    () => keptVideo(key),
+    () => null,
+  );
+  useEffect(() => void loadKept(key), [key]);
   const canShareFiles = useSyncExternalStore(
     noSubscribe,
     () => typeof navigator !== "undefined" && typeof navigator.canShare === "function",
@@ -102,6 +119,11 @@ export function VideoCard(props: VideoCardProps) {
   );
 
   const { template, prepare, look } = useVideoFilm(draft, functions, photos, url);
+  // What this video is made from: when it changes, a kept video is out of date
+  const made = useMemo(
+    () => fingerprint({ draft, functions, photos, url, clipUrl, music: music && !silent }),
+    [draft, functions, photos, url, clipUrl, music, silent],
+  );
 
   // The poster: the cover page once its words have risen in
   useEffect(() => {
@@ -123,50 +145,44 @@ export function VideoCard(props: VideoCardProps) {
   useEffect(() => {
     let live = true;
     void import("@/lib/video/encode").then(async ({ videoSupport }) => {
-      const support = await videoSupport(codecs);
+      const can = await videoSupport(codecs);
       if (!live) return;
-      if (support === "no-video") setState({ step: "unsupported" });
-      setSilent(support === "no-audio");
+      setSupport(can === "no-video" ? "unsupported" : can === "no-audio" ? "silent" : "ok");
     });
     return () => {
       live = false;
     };
   }, [codecs]);
 
-  // Let go of the finished file when leaving the page
-  const href = state.step === "ready" ? state.href : null;
-  useEffect(() => () => void (href && URL.revokeObjectURL(href)), [href]);
-
   const make = async () => {
-    const controller = new AbortController();
-    stopper.current = controller;
-    setState({ step: "making", done: 0 });
+    const withMusic = music && !silent ? withClip(template, clipUrl).music : null;
     try {
-      const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
-      const blob = await makeVideo(
-        ready.film,
-        music && !silent ? withClip(template, clipUrl).music : null,
-        (done) => setState({ step: "making", done }),
-        controller.signal,
-        codecs,
-      );
-      setState({ step: "ready", blob, href: URL.createObjectURL(blob) });
+      await makeKept(key, made, async (onProgress, signal) => {
+        const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
+        return makeVideo(ready.film, withMusic, onProgress, signal, codecs);
+      });
     } catch (error) {
-      setState({ step: "idle" });
       if (error instanceof DOMException && error.name === "AbortError") {
         toast({ title: videoCopy.stopped });
       } else {
         toast({ title: videoCopy.failed, tone: "error" });
       }
-    } finally {
-      stopper.current = null;
     }
   };
 
-  const file =
-    state.step === "ready"
-      ? new File([state.blob], videoCopy.fileName(slug), { type: "video/mp4" })
-      : null;
+  const state =
+    support === "unsupported"
+      ? { step: "unsupported" as const }
+      : (kept ?? { step: "idle" as const });
+  const stale = state.step === "ready" && state.look !== made;
+  const file = useMemo(
+    () =>
+      state.step === "ready"
+        ? new File([state.blob], videoCopy.fileName(slug), { type: "video/mp4" })
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.step === "ready" ? state.blob : null, slug, videoCopy],
+  );
   const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
 
   const share = async () => {
@@ -218,6 +234,19 @@ export function VideoCard(props: VideoCardProps) {
         </div>
 
         <div className="flex w-full min-w-0 flex-col gap-4">
+          {/* Each choice keeps its own video, so the choice stays while one is ready */}
+          {allowed && perFunction && state.step !== "making" && state.step !== "unsupported" && (
+            <Field label={videoCopy.which} className="max-w-xs">
+              <Select
+                value={only}
+                onValueChange={setOnly}
+                options={[
+                  { value: ALL, label: videoCopy.whole },
+                  ...props.functions.map((fn) => ({ value: fn.kind, label: fn.name })),
+                ]}
+              />
+            </Field>
+          )}
           {!allowed ? (
             <>
               <p className="text-sm font-semibold">{videoCopy.locked}</p>
@@ -255,7 +284,7 @@ export function VideoCard(props: VideoCardProps) {
                 size="sm"
                 className="self-start"
                 leadingIcon={<Square aria-hidden />}
-                onClick={() => stopper.current?.abort()}
+                onClick={() => stopKept(key)}
               >
                 {videoCopy.stop}
               </Button>
@@ -265,6 +294,7 @@ export function VideoCard(props: VideoCardProps) {
               <p role="status" className="font-semibold">
                 {videoCopy.ready}
               </p>
+              {stale && <p className="text-sm text-ink-muted">{videoCopy.changed}</p>}
               <div className="flex flex-wrap gap-3">
                 {sharable && (
                   <Button leadingIcon={<Share2 aria-hidden />} onClick={() => void share()}>
@@ -278,7 +308,7 @@ export function VideoCard(props: VideoCardProps) {
                   </a>
                 </Button>
                 <Button
-                  variant="ghost"
+                  variant={stale ? "secondary" : "ghost"}
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={() => void make()}
                 >
@@ -288,18 +318,6 @@ export function VideoCard(props: VideoCardProps) {
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              {perFunction && (
-                <Field label={videoCopy.which} className="max-w-xs">
-                  <Select
-                    value={only}
-                    onValueChange={setOnly}
-                    options={[
-                      { value: ALL, label: videoCopy.whole },
-                      ...props.functions.map((fn) => ({ value: fn.kind, label: fn.name })),
-                    ]}
-                  />
-                </Field>
-              )}
               {silent ? (
                 <p className="text-sm text-ink-muted">{videoCopy.noSound}</p>
               ) : (
@@ -334,6 +352,28 @@ export function useVideoFilm(
   const { videoCopy } = useText(publishText);
   const language = cardLanguages(draft)[0];
   const template = draftTemplate(draft);
+  // The guest's opening plays first, as on the link: closed with the names, opening, the welcome
+  const opening = useMemo(() => {
+    const suite = draftSuite(draft);
+    const scenePhotos = couplePagePhotos(
+      sceneCouple(draftCouple(draft)),
+      photos.map((photo) => photo.id),
+      (id) => photos.find((photo) => photo.id === id)?.url,
+      draftCopy(draft, language),
+      (id) => photoAspect(photos, id),
+    );
+    const isScene = draftShowsScene(draft) && Boolean(scenePage(suite, scenePhotos.length));
+    const style = openingStyle(draft.opening, suite, isScene, draft.categoryId);
+    const timeline = preludeTimeline(style);
+    if (!timeline) return null;
+    return {
+      style,
+      god: openingGod(draft.opening, draft.categoryId),
+      kind: welcomeKind(style),
+      timeline,
+    };
+  }, [draft, photos, language]);
+  const lead = opening?.timeline.pages ?? 0;
   const scene = useMemo(() => {
     const copy = draftCopy(draft, language);
     const suite = draftSuite(draft);
@@ -357,10 +397,10 @@ export function useVideoFilm(
     return {
       copy,
       suite,
-      timeline: videoTimeline(beats, { fixed: draft.pageSeconds !== null }),
+      timeline: videoTimeline(beats, { fixed: draft.pageSeconds !== null, lead }),
       type: pageType(draft.type, [language]),
     };
-  }, [draft, functions, photos, language]);
+  }, [draft, functions, photos, language, lead]);
 
   // A Scene invite's video is the scene itself: its painting, photo and flying cards
   const oneScene = useMemo(() => {
@@ -399,10 +439,10 @@ export function useVideoFilm(
       page,
       items,
       photos: scenePhotos,
-      timeline: sceneTimeline(items.length),
+      timeline: sceneTimeline(items.length, lead),
       type: pageType(draft.type, [language]),
     };
-  }, [draft, functions, photos, language]);
+  }, [draft, functions, photos, language, lead]);
 
   // Everything the frames need: colours, fonts, paintings and photos
   const prepare = async (): Promise<Ready> => {
@@ -417,7 +457,16 @@ export function useVideoFilm(
             : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue].join(" "),
         )
       : scene.timeline.beats.flatMap(({ beat }) => beat.lines.map((line) => line.text));
-    const sample = `${words.join(" ")} ${copy.first} ${copy.second}`;
+    const sample = [
+      ...words,
+      copy.first,
+      copy.second,
+      copy.joiner,
+      copy.blessing,
+      copy.line,
+      copy.date,
+      copy.venue,
+    ].join(" ");
     const families = [fonts.display, fonts.sans, fonts.label, type.names, type.words];
     await loadFonts(
       families.filter((family): family is string => Boolean(family)),
@@ -435,15 +484,41 @@ export function useVideoFilm(
       open: videoCopy.ending.open,
       link: url.replace(/^https?:\/\//, ""),
     };
+    // The opening's paintings load with the pages', and its colours are read from the theme
+    const prelude = opening
+      ? loadImages(preludeImages(opening.style, suite, opening.god)).then((images) => ({
+          ...opening,
+          suite,
+          copy,
+          lang: language,
+          type,
+          fonts,
+          colours: openingPalette(suite, template, opening.style),
+          images,
+        }))
+      : null;
+    // The video opens closed, the names on the opening, then plays on into the pages
+    const open = async (pages: Ready): Promise<Ready> => {
+      const film = await prelude;
+      if (!film) return pages;
+      return {
+        film: withPrelude(
+          { total: film.timeline.total, draw: (ctx, at) => drawPrelude(ctx, film, at) },
+          film.timeline.pages,
+          pages.film,
+        ),
+        poster: PRELUDE_IDLE - 0.4,
+      };
+    };
     if (oneScene) {
       const images = await loadImages(sceneVideoImages(oneScene));
       const film = { ...oneScene, lang: language, fonts, palette, images, ending };
       const first = oneScene.timeline.shots[0];
-      return {
+      return open({
         film: { total: film.timeline.total, draw: (ctx, at) => drawSceneFrame(ctx, film, at) },
         // The first card has landed and the names are in
         poster: first ? first.start + SCENE_FLY + 0.6 : 2,
-      };
+      });
     }
     const images = await loadImages(videoImages(scene.timeline, scene.suite));
     const story = {
@@ -456,12 +531,12 @@ export function useVideoFilm(
       ending,
     };
     const cover = scene.timeline.beats[0];
-    return {
+    return open({
       film: { total: story.timeline.total, draw: (ctx, at) => drawFrame(ctx, story, at) },
       poster: cover ? Math.min(cover.seconds - 0.2, 3.2) : 0,
-    };
+    });
   };
 
-  const look = useMemo(() => ({ scene, oneScene }), [scene, oneScene]);
+  const look = useMemo(() => ({ scene, oneScene, opening }), [scene, oneScene, opening]);
   return { template, prepare, look };
 }
