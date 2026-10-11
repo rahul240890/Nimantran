@@ -11,6 +11,10 @@ import { ROLES, lettering, type TypeRole, type Voice } from "./lettering";
  */
 
 export type SceneRole =
+  /** The blessing over the names: ॥ श्री गणेशाय नमः ॥. */
+  | "blessing"
+  /** The blessing opening the slot, on a painting with no line for it over the names. */
+  | "blessing-card"
   /** The couple's names under the photos. */
   | "names"
   /** The "&" between them. */
@@ -37,6 +41,8 @@ type SceneSize = {
 };
 
 export const SCENE_SIZES: Record<SceneRole, SceneSize> = {
+  blessing: { role: "script", min: 0.8, fluid: 4.6, max: 1.4 },
+  "blessing-card": { role: "script", min: 1, fluid: 5.8, max: 1.8 },
   names: { role: "names", min: 1.25, fluid: 9.6, max: 3.4 },
   joiner: { role: "joiner", min: 0.8, fluid: 5.6, max: 2 },
   line: { role: "body", min: 0.72, fluid: 3.9, max: 1.3 },

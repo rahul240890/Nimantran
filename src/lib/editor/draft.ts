@@ -11,6 +11,7 @@ import {
 } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy, type CardCopy } from "@/lib/templates/content";
+import { cardSuggestions } from "@/lib/templates/card-suggestions";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
@@ -415,7 +416,12 @@ export function draftCopy(
   for (const id of COUPLE_SLOTS) {
     // The tradition's wording in the second language beats the main card's typed words
     const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
-    const value = own ?? tradition[id] ?? words[id] ?? samples[id];
+    const value =
+      own ??
+      tradition[id] ??
+      words[id] ??
+      samples[id] ??
+      localBlessing(draft, template, id, language);
     if (value !== undefined) content[id] = value;
   }
   if (language !== "en") {
@@ -444,6 +450,22 @@ export function draftCopy(
   if (blessing !== undefined) copy.blessing = blessing.trim();
   copy.symbol = draftSymbol(draft);
   return copy;
+}
+
+/**
+ * A design's sample blessing is English ("Shri Ganeshaya Namah"), so a card in another
+ * language starts with the occasion's own blessing in its script instead (॥ श्री गणेशाय
+ * नमः ॥, जय श्री कृष्ण), and a design without one keeps none.
+ */
+function localBlessing(
+  draft: InviteDraft,
+  template: Template,
+  id: SlotId,
+  language: CardLanguage,
+): string | undefined {
+  if (id !== "blessing" || language === "en") return undefined;
+  if (!sampleOf(template, "blessing").trim()) return "";
+  return cardSuggestions(draft.categoryId, language, "blessing")[0] ?? "";
 }
 
 /** The wording a slot starts with: the occasion's, else the design's sample. */
