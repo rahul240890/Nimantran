@@ -1,3 +1,4 @@
+import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { MOTIFS } from "@/components/invitation/art/motifs";
 import { templates, type TemplateId } from "@/content/landing";
@@ -198,10 +199,11 @@ function MinimalMonogram({ w }: { w: Words }) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-monogram-paper text-center text-tpl-monogram-ink">
       <span className="absolute inset-[7%] border border-tpl-monogram-ornament" />
-      <span className="relative flex items-center gap-[4cqw] font-display text-[22cqw] leading-none">
-        {s.first.charAt(0)}
-        <span className="h-[22cqw] w-px bg-tpl-monogram-ornament" />
-        {s.second.charAt(0)}
+      {/* A gilt flower between fine rules, never the couple's initials */}
+      <span className="relative flex items-center gap-[4cqw] text-tpl-monogram-accent">
+        <span className="h-px w-[14cqw] bg-tpl-monogram-ornament" />
+        <FlowerMark className="w-[18cqw]" strokeWidth={1.1} />
+        <span className="h-px w-[14cqw] bg-tpl-monogram-ornament" />
       </span>
       <span className="relative mt-[10%] font-label text-[4.2cqw] tracking-[0.34em]">
         {`${s.first} ${w.and} ${s.second}`.toUpperCase()}

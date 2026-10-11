@@ -9,6 +9,7 @@
  * text engine, so every Indian script shapes correctly with the page's fonts.
  */
 
+import { drawFlower } from "../art/flower";
 import { seededRandom } from "@/lib/engine/particles";
 import type { CardCopy } from "@/lib/templates/content";
 import type { StockRole, Template } from "@/lib/templates/schema";
@@ -246,32 +247,27 @@ export function paintInside(
       );
     }
     if (layout.monogram) {
-      // The couple's initials, large, either side of a fine rule
+      // A gilt flower, large, between two fine rules: the couple's initials are never set
       const unit = p.w / units;
-      const { top, size, initials, x } = layout.monogram;
-      const px = size * unit;
-      ctx.font = `${Math.round(px)}px ${FONTS.display}`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const [a, b] = initials.map((letter) => ctx.measureText(letter).width) as [number, number];
-      const gap = px * 0.24;
-      const start = x * unit - (a + gap + b) / 2;
+      const { top, size, x } = layout.monogram;
       const middle = (top + size / 2) * unit;
-      ctx.fillStyle = p.paint("ink", stock.ink);
-      ctx.fillText(initials[0], start + a / 2, middle);
-      ctx.fillText(initials[1], start + a + gap + b / 2, middle);
+      const centre = x * unit;
+      const across = size * 0.8 * unit;
       ctx.strokeStyle = p.paint("foil", stock.gold);
       ctx.lineWidth = Math.max(1, unit * 0.12);
-      ctx.beginPath();
-      ctx.moveTo(start + a + gap / 2, (top + size * 0.08) * unit);
-      ctx.lineTo(start + a + gap / 2, (top + size * 0.92) * unit);
-      ctx.stroke();
+      for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(centre + side * across * 0.65, middle);
+        ctx.lineTo(centre + side * across * 1.6, middle);
+        ctx.stroke();
+      }
+      drawFlower(ctx, centre, middle, across, p.paint("foil", stock.gold));
     }
     for (const run of layout.runs) drawRun(p, stock, run, units);
   });
 }
 
-/** The front of one door: the template's door art, its word and an initial. */
+/** The front of one door: the template's door art, its word and a small gilt flower. */
 export function paintDoorFront(
   side: DoorSide,
   copy: CardCopy,
@@ -285,9 +281,16 @@ export function paintDoorFront(
     const { ctx, w } = p;
     paper(p, stock.paper, stock.ink, side === "left" ? 23 : 29);
     drawLayers(p, stock, motif.door(side), FACE.door.width);
-    const { label, initial } = layoutDoor(copy, template, motif, side);
+    const { label, flower } = layoutDoor(copy, template, motif, side);
     if (label) drawRun(p, stock, label, FACE.door.width);
-    drawRun(p, stock, initial, FACE.door.width);
+    const unit = p.w / FACE.door.width;
+    drawFlower(
+      ctx,
+      flower.x * unit,
+      flower.y * unit,
+      flower.size * unit,
+      p.paint("foil", stock.gold),
+    );
 
     // The seam edge darkens a little, as paper does where it folds
     if (p.pass === "colour") {

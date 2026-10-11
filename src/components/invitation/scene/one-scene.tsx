@@ -1,5 +1,6 @@
 "use client";
 
+import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import {
   ChevronDown,
   ChevronLeft,
@@ -396,22 +397,7 @@ export function OneScene({
                   className="absolute flex items-center justify-center bg-card-ivory text-card-gold-text"
                   style={style}
                 >
-                  <svg viewBox="-20 -20 40 40" className="w-[38%] max-w-[12cqw] opacity-70">
-                    {Array.from({ length: 8 }, (_, petal) => (
-                      <ellipse
-                        key={petal}
-                        cx="0"
-                        cy="-9"
-                        rx="3.6"
-                        ry="7.4"
-                        transform={`rotate(${petal * 45})`}
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.4"
-                      />
-                    ))}
-                    <circle r="3.4" fill="currentColor" />
-                  </svg>
+                  <FlowerMark className="w-[38%] max-w-[12cqw] opacity-70" />
                 </div>
               );
             })}

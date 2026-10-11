@@ -7,6 +7,7 @@
  * Browser only.
  */
 
+import { drawFlower } from "@/components/invitation/art/flower";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
 import { SUITES, type Mood } from "@/lib/suites/catalog";
@@ -148,40 +149,12 @@ function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Pal
     }
     ctx.fillStyle = colours.paper;
     ctx.fillRect(box.x, box.y, box.w, box.h);
-    drawFlower(
-      ctx,
-      box.x + box.w / 2,
-      box.y + box.h / 2,
-      Math.min(box.w, box.h, 12 * CQW) * 0.19,
-      colours.goldText,
-    );
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    const across = Math.min(box.w, box.h, 12 * CQW) * 0.38;
+    drawFlower(ctx, box.x + box.w / 2, box.y + box.h / 2, across, colours.goldText);
+    ctx.restore();
   });
-}
-
-/** Eight petals round a dot, as the live scene draws an empty frame. */
-function drawFlower(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number,
-  colour: string,
-) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.globalAlpha = 0.7;
-  ctx.strokeStyle = colour;
-  ctx.fillStyle = colour;
-  ctx.lineWidth = r * 0.07;
-  for (let petal = 0; petal < 8; petal++) {
-    ctx.beginPath();
-    ctx.ellipse(0, -r * 0.45, r * 0.18, r * 0.37, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.rotate(Math.PI / 4);
-  }
-  ctx.beginPath();
-  ctx.arc(0, 0, r * 0.17, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
 }
 
 /** The hour's light over the painting: a gold morning, a dusk, a lamplit night. */

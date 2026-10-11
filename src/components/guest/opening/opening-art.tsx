@@ -1,3 +1,4 @@
+import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
@@ -345,28 +346,6 @@ function Curtain() {
   );
 }
 
-/** A pressed flower for the wax seal: the seal carries no letters, only the flower. */
-function SealFlower() {
-  return (
-    <svg aria-hidden viewBox="-20 -20 40 40" className="size-[62%] text-(--open-seal-ink)">
-      {range(8).map((i) => (
-        <ellipse
-          key={i}
-          cx="0"
-          cy="-9"
-          rx="3.6"
-          ry="7.4"
-          transform={`rotate(${i * 45})`}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.6"
-        />
-      ))}
-      <circle r="3.6" fill="currentColor" />
-    </svg>
-  );
-}
-
 /** A royal envelope: the flap lifts, the wax seal breaks and the card rises. */
 function Envelope() {
   return (
@@ -413,7 +392,7 @@ function Envelope() {
             )}
           >
             <span className="grid size-[76%] place-items-center rounded-full border-[0.5cqw] border-(--open-seal-ring)">
-              <SealFlower />
+              <FlowerMark className="size-[62%] text-(--open-seal-ink)" strokeWidth={1.6} />
             </span>
           </span>
         ))}
