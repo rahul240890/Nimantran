@@ -1,5 +1,6 @@
 "use client";
 
+import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import {
   ChevronDown,
   ChevronLeft,
@@ -391,14 +392,14 @@ export function OneScene({
                   style={style}
                 />
               ) : (
+                // A frame waiting for a photo shows a small gilt flower, never initials
                 <div
                   key={i}
                   aria-hidden
-                  className="absolute flex items-center justify-center bg-card-ivory font-display text-[9cqw] text-card-gold-text"
+                  className="absolute flex items-center justify-center bg-card-ivory text-card-gold-text"
                   style={style}
                 >
-                  {(names[page.frames.length > 1 ? i : 0] ?? "").slice(0, 1)}
-                  {page.frames.length === 1 && names[1] ? ` ${joiner} ${names[1].slice(0, 1)}` : ""}
+                  <FlowerMark className="w-[38%] max-w-[12cqw] opacity-70" />
                 </div>
               );
             })}

@@ -10,6 +10,7 @@ import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
+import { FamilyWords, type FamilyBlock } from "@/components/guest/family-words";
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { WatermarkLayer } from "@/components/guest/watermark";
@@ -429,13 +430,7 @@ export function GuestView({
 }
 
 /** The family's labelled wording (blessings, parents, hosts, whom to call), when written. */
-function FamilyWording({
-  family,
-  lang,
-}: {
-  family: readonly { id: string; title: string; text: string }[];
-  lang: string;
-}) {
+function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang: string }) {
   const { guestCopy } = useGuestText();
   if (family.length === 0) return null;
   return (
@@ -448,7 +443,7 @@ function FamilyWording({
           {family.map((block) => (
             <div key={block.id} className="flex flex-col gap-1">
               <dt className="text-sm text-accent-text">{block.title}</dt>
-              <dd className="text-lg break-words">{block.text}</dd>
+              <FamilyWords block={block} className="text-lg" soft="text-ink-muted" />
             </div>
           ))}
         </dl>

@@ -2068,7 +2068,7 @@ export const openingCopy = {
     },
     envelope: {
       name: "Royal envelope",
-      description: "A wax seal with your initials breaks and the card rises out.",
+      description: "A wax seal pressed with a flower breaks and the card rises out.",
     },
     lotus: {
       name: "Lotus bloom",

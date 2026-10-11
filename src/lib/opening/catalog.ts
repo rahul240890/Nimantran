@@ -318,3 +318,92 @@ export function openingStyle(
 export function openingGod(choice: OpeningChoice, category: CategoryId): OpeningGod | null {
   return choice.god && offersGods(category) ? choice.god : null;
 }
+
+/**
+ * The moment between the opening and the pages takes the opening's own feeling: a toran
+ * and turning sun rays after a palace door, a lotus opening after flowers, lamps lit one by
+ * one, a moon rising, confetti for a party, or a letter unfolding.
+ */
+export const WELCOME_KINDS = ["royal", "bloom", "lamps", "night", "party", "letter"] as const;
+export type WelcomeKind = (typeof WELCOME_KINDS)[number];
+
+const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
+  pankhi: "royal",
+  "sheesh-mahal": "royal",
+  "popup-mahal": "royal",
+  "uday-surya": "royal",
+  "athangudi-tiles": "royal",
+  pachchikari: "royal",
+  "chik-baradari": "royal",
+  "konark-chakra": "royal",
+  shekhawati: "royal",
+  "toran-mala": "royal",
+  odhni: "bloom",
+  "jal-darpan": "bloom",
+  "pushp-varsha": "bloom",
+  "moti-seep": "bloom",
+  "jaali-vriksh": "bloom",
+  lehar: "bloom",
+  "ped-ghar": "bloom",
+  "jhalar-palna": "bloom",
+  "jugnu-van": "lamps",
+  "sanjhi-roshni": "lamps",
+  "chhaya-parda": "lamps",
+  "baori-deep": "lamps",
+  jhilmil: "lamps",
+  "badal-raag": "night",
+  taaramandal: "night",
+  "thar-ki-ret": "night",
+  "sheher-ki-raat": "night",
+  "mandvi-dhow": "night",
+  "barf-khidki": "night",
+  "chhatri-utsav": "party",
+  "choodi-chakra": "party",
+  "gulaal-bindu": "party",
+  "kaanch-ka-gola": "party",
+  phirki: "party",
+  bulbule: "party",
+  "chhuk-chhuk": "party",
+  "irani-carrom": "party",
+  channapatna: "party",
+  "kavad-peti": "letter",
+  bioscope: "letter",
+  "ikat-dhaaga": "letter",
+  "olai-chuvadi": "letter",
+  "naksha-pangong": "letter",
+  "howrah-tareekh": "letter",
+  "pondy-gali": "letter",
+  "rajwada-pol": "royal",
+  "gopuram-kadhavu": "royal",
+  "haveli-kiwad": "royal",
+  "shahi-parda": "royal",
+  doors: "royal",
+  palace: "royal",
+  temple: "royal",
+  curtain: "royal",
+  mandap: "royal",
+  jharokha: "royal",
+  "phoolon-ki-deewar": "bloom",
+  "bagiya-gate": "bloom",
+  lotus: "bloom",
+  phool: "bloom",
+  peacock: "bloom",
+  diyas: "lamps",
+  lanterns: "lamps",
+  rangoli: "lamps",
+  "noor-darwaza": "night",
+  moonlit: "night",
+  "deco-gates": "party",
+  "mela-tamboo": "party",
+  fireworks: "party",
+  balloons: "party",
+  gift: "party",
+  envelope: "letter",
+  scroll: "letter",
+  storybook: "letter",
+  none: "letter",
+};
+
+export function welcomeKind(style: OpeningStyle): WelcomeKind {
+  return WELCOME_KIND[style];
+}

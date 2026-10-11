@@ -1,3 +1,4 @@
+import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import type { CSSProperties } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { FACE, type Layer } from "@/components/invitation/art/decor";
@@ -71,7 +72,7 @@ function Door({
   motif: Motif;
 }) {
   const isLeft = side === "left";
-  const { label, initial } = layoutDoor(copy, template, motif, side);
+  const { label, flower } = layoutDoor(copy, template, motif, side);
   const { width, height } = FACE.door;
 
   return (
@@ -99,7 +100,17 @@ function Door({
           className="absolute inset-0 size-full"
         />
         {label && <Run run={label} />}
-        <Run run={initial} />
+        <span
+          className="absolute text-card-gold-text"
+          style={{
+            left: `${flower.x}cqw`,
+            top: `${flower.y}cqw`,
+            width: `${flower.size}cqw`,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          <FlowerMark className="block w-full" />
+        </span>
         {/* The door darkens as it turns away from the light */}
         <span
           className="absolute inset-0 bg-card-ink"
@@ -200,21 +211,27 @@ export function GateCard({
           </span>
         )}
         {inside.monogram && (
+          // A gilt flower between fine rules, never the couple's initials
           <span
-            className="absolute flex items-center font-display leading-none text-card-ink"
+            className="absolute flex items-center text-card-gold-text"
             style={{
               top: `${inside.monogram.top}cqw`,
               left: `${inside.monogram.x}cqw`,
               height: `${inside.monogram.size}cqw`,
-              fontSize: `${inside.monogram.size}cqw`,
-              gap: `${inside.monogram.size * 0.24}cqw`,
+              gap: `${inside.monogram.size * 0.2}cqw`,
               transform: `translateX(-50%) translateY(${reveal(order(inside.monogram.top)).lift})`,
               opacity: reveal(order(inside.monogram.top)).opacity,
             }}
           >
-            <span>{inside.monogram.initials[0]}</span>
-            <span className="h-[85%] w-px bg-card-gold" />
-            <span>{inside.monogram.initials[1]}</span>
+            <span
+              className="h-px bg-card-gold"
+              style={{ width: `${inside.monogram.size * 0.8}cqw` }}
+            />
+            <FlowerMark className="h-[80%] w-auto" />
+            <span
+              className="h-px bg-card-gold"
+              style={{ width: `${inside.monogram.size * 0.8}cqw` }}
+            />
           </span>
         )}
         {inside.runs.map((run, i) => (

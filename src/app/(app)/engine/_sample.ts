@@ -44,6 +44,21 @@ export function sampleDraft(suite: SuiteId, hindi: boolean): InviteDraft {
         requesters: "Shri and Smt. Gupta, Shri and Smt. Sharma",
       },
     },
+    // Long, real-looking family lines, so the pages show how parents' names wrap
+    family: {
+      first: {
+        relation: "son",
+        parents: "Smt. Sunita Devi & Shri Ramesh Chandra Gupta",
+        town: "Jodhpur",
+      },
+      second: {
+        relation: "daughter",
+        parents: "Smt. Meenakshi & Shri Rajendra Prasad Sharma",
+        town: "Udaipur",
+      },
+      memory: "Late Shri Hari Narayan Gupta",
+      contacts: [],
+    },
     content: {
       first: "Arjun",
       second: "Sia",
@@ -79,6 +94,10 @@ function occasionDraft(suite: SuiteId, occasion: CategoryId, hindi: boolean): In
     ...draft,
     suite,
     languages: hindi ? ["hi"] : draft.languages,
+    family: {
+      ...draft.family,
+      first: { relation: "son", parents: "Smt. Neha & Shri Vikram Malhotra", town: "Jodhpur" },
+    },
     content: {
       first: one ? "Aarav" : "Arjun",
       second: one ? "" : "Sia",

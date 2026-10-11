@@ -167,7 +167,7 @@ export const TEMPLATES: Record<TemplateId, Template> = {
   monogram: {
     id: "monogram",
     name: "Minimal Monogram",
-    description: "Quiet stone-white stock, your initials in large type, and Raag Bhupali.",
+    description: "Quiet stone-white stock, one gilt flower between fine rules, and Raag Bhupali.",
     occasion: "wedding",
     scene: {
       format: "gate-fold",

@@ -15,6 +15,7 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  welcomeKind,
   type OpeningGod,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
@@ -28,6 +29,7 @@ import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templ
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 import { freshBackdrop } from "./opening-fresh";
+import { OpeningWelcome } from "./opening-welcome";
 
 /** How long the opening takes to open before the pages come in. */
 export const OPEN_MS = 1500;
@@ -37,7 +39,7 @@ export const OPEN_MS = 1500;
  */
 const GATE_OPEN_MS = 2500;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
-export const WELCOME_MS = 3200;
+export const WELCOME_MS = 4400;
 
 const noSubscribe = () => () => {};
 
@@ -148,136 +150,6 @@ function GuestGreeting({ name, lang }: { name: string; lang: CardLanguage }) {
       </span>
       <span className="text-sm text-card-ivory/85">{words.invited}</span>
     </p>
-  );
-}
-
-/** The first letters of the names, for the envelope's wax seal. */
-function initials(copy: CardCopy): string {
-  const first = Array.from(copy.first.trim())[0] ?? "";
-  const second = Array.from(copy.second.trim())[0] ?? "";
-  return second ? `${first}${second}` : first;
-}
-
-const SPARKS = Array.from({ length: 18 }, (_, i) => i);
-
-/**
- * The moment between the opening and the invitation (Step 12y): the theme's light fills
- * the frame, a ring draws itself round the initials, and the names rise large with the
- * guest's welcome and the date. It moves on by itself; a tap moves on sooner.
- */
-function OpeningWelcome({
-  copy,
-  lang,
-  guest,
-  names,
-  script,
-  skip,
-  over,
-  onSkip,
-}: {
-  copy: CardCopy;
-  lang: CardLanguage;
-  guest: string | null;
-  names: CSSProperties;
-  script: CSSProperties;
-  skip: string;
-  /** Over a painting the guest should still see round the names (the fresh openings). */
-  over: boolean;
-  onSkip: () => void;
-}) {
-  const words = CARD_GREETING_WORDS[lang];
-  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
-  const button = useRef<HTMLButtonElement>(null);
-  useEffect(() => button.current?.focus({ preventScroll: true }), []);
-  return (
-    <div
-      lang={lang}
-      data-testid="opening-welcome"
-      data-over={over ? "art" : undefined}
-      onClick={onSkip}
-      className="opening-welcome absolute inset-0 z-40 flex flex-col items-center justify-center gap-[2.4cqh] px-[8cqw] text-center"
-    >
-      <div aria-hidden className="absolute inset-0 overflow-hidden">
-        {SPARKS.map((i) => (
-          <span
-            key={i}
-            className="opening-welcome-spark absolute rounded-full"
-            style={
-              {
-                left: `${((i * 37 + 11) % 92) + 4}%`,
-                top: `${((i * 53 + 7) % 86) + 6}%`,
-                "--i": i,
-              } as CSSProperties
-            }
-          />
-        ))}
-      </div>
-      <svg
-        aria-hidden
-        viewBox="0 0 120 120"
-        className="opening-welcome-ring relative w-[30cqw] max-w-[9rem]"
-      >
-        <circle cx="60" cy="60" r="54" pathLength={1} />
-        <circle cx="60" cy="60" r="46" pathLength={1} />
-        <text x="60" y="60" dominantBaseline="central" textAnchor="middle" style={names}>
-          {initials(copy)}
-        </text>
-      </svg>
-      {(guest || copy.blessing) && (
-        <p
-          className="opening-welcome-rise relative text-[clamp(0.95rem,4.6cqw,1.5rem)] text-card-accent-text"
-          style={{ ...script, "--d": "500ms" } as CSSProperties}
-        >
-          {guest ? `${words.dear} ${guest}` : copy.blessing}
-        </p>
-      )}
-      <p
-        className="opening-welcome-rise opening-welcome-names relative flex flex-col items-center break-words text-card-ink"
-        style={{ ...names, "--d": "750ms" } as CSSProperties}
-      >
-        <span className="text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]">{copy.first}</span>
-        {joiner && (
-          <>
-            <span className="text-[clamp(1.2rem,min(7cqw,4.5cqh),2.4rem)] text-card-accent-text">
-              {joiner}
-            </span>
-            <span className="text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]">{copy.second}</span>
-          </>
-        )}
-      </p>
-      <span
-        aria-hidden
-        className="opening-welcome-rule opening-welcome-rise relative"
-        style={{ "--d": "1000ms" } as CSSProperties}
-      />
-      {(guest ? words.invited : copy.line) && (
-        <p
-          className="opening-welcome-rise relative max-w-[30ch] text-[clamp(0.85rem,3.8cqw,1.15rem)] text-card-ink-muted"
-          style={{ "--d": "1150ms" } as CSSProperties}
-        >
-          {guest ? words.invited : copy.line}
-        </p>
-      )}
-      {copy.date && (
-        <p
-          className="opening-welcome-rise relative font-label text-[clamp(0.75rem,3.2cqw,1rem)] tracking-[0.2em] text-card-ink uppercase [font-variant-numeric:lining-nums]"
-          style={{ "--d": "1300ms" } as CSSProperties}
-        >
-          {copy.date}
-        </p>
-      )}
-      <button
-        ref={button}
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation();
-          onSkip();
-        }}
-        className="absolute end-3 bottom-[max(0.75rem,env(safe-area-inset-bottom))] inline-flex min-h-11 items-center rounded-full px-4 font-label text-xs tracking-[0.2em] text-card-ink-muted uppercase focus-visible:outline-2 focus-visible:outline-ring"
-      >
-        {skip}
-      </button>
-    </div>
   );
 }
 
@@ -512,7 +384,7 @@ export function Opening({
         data-open={open}
         className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
-        <OpeningArt style={style} cover={cover} seal={initials(copy)} />
+        <OpeningArt style={style} cover={cover} />
         {open && !still && <OpeningPetals />}
 
         <div className="absolute inset-0 z-30 flex flex-col">
@@ -597,6 +469,8 @@ export function Opening({
         </div>
         {welcome && (
           <OpeningWelcome
+            kind={welcomeKind(style)}
+            seconds={WELCOME_MS / 1000}
             copy={copy}
             lang={lang}
             guest={guest}
@@ -644,13 +518,11 @@ export function OpeningSample({
   style,
   god,
   open,
-  seal,
 }: {
   suite: SuiteId;
   style: OpeningStyle;
   god: OpeningGod | null;
   open: boolean;
-  seal: string;
 }) {
   const layout = OPENING_LAYOUT[style];
   return (
@@ -660,7 +532,7 @@ export function OpeningSample({
       className="opening-page relative aspect-[9/16] w-full overflow-hidden rounded-lg"
     >
       <div data-open={open} className="opening-stage [container-type:size] absolute inset-0">
-        <OpeningArt style={style} cover={SUITES[suite].images.cover} seal={seal} sample />
+        <OpeningArt style={style} cover={SUITES[suite].images.cover} sample />
         <div className="absolute inset-0 z-30 flex flex-col">
           <div
             className="opening-crest flex flex-none items-end justify-center px-[10cqw] pt-[5cqh] pb-[1.5cqh]"

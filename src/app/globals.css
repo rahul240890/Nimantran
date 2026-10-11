@@ -7112,50 +7112,111 @@
   }
 }
 
-/* Step 12y: the welcome between the opening and the invitation */
+/*
+ * Step 12y, redrawn: the welcome between the opening and the pages. The words alone, with
+ * the opening's own feeling moving round them (opening-welcome.tsx). Card stock carries ink;
+ * the dark skies (lamps, night, party) carry ivory. Still mode never shows it, and every
+ * move here stops there too, in case the setting changes while it is up.
+ */
 .opening-welcome {
+  --welcome-ink: var(--card-ink);
+  --welcome-soft: var(--card-ink-muted);
+  --welcome-accent: var(--card-accent-text);
   cursor: pointer;
+  color: var(--welcome-ink);
   background: radial-gradient(
     circle at 50% 42%,
     color-mix(in oklab, var(--open-light) 70%, var(--open-plate)),
     var(--open-plate) 46%,
     color-mix(in oklab, var(--open-plate) 78%, var(--open-gilt)) 100%
   );
-  animation: opening-welcome-in 700ms ease both;
+  animation: welcome-in 700ms ease both;
 }
-.opening-welcome-ring circle {
-  fill: none;
-  stroke: var(--open-gilt);
-  stroke-width: 1.6;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transform: rotate(-90deg);
-  transform-origin: center;
-  animation: opening-draw-ring 1400ms cubic-bezier(0.6, 0, 0.2, 1) 150ms forwards;
+.opening-welcome[data-tone="dark"] {
+  --welcome-ink: var(--card-ivory);
+  --welcome-soft: color-mix(in oklab, var(--card-ivory) 82%, transparent);
+  --welcome-accent: var(--open-gilt-bright);
+  background: radial-gradient(
+    ellipse at 50% 40%,
+    color-mix(in oklab, var(--open-jewel) 62%, var(--open-deep)),
+    var(--open-deep) 72%
+  );
 }
-.opening-welcome-ring circle + circle {
-  stroke-width: 0.8;
-  stroke-dasharray: 0.02 0.02;
-  animation-delay: 450ms;
+.opening-welcome[data-welcome="night"] {
+  background:
+    radial-gradient(
+      circle at 78% 14%,
+      color-mix(in oklab, var(--open-gilt) 22%, transparent),
+      transparent 34%
+    ),
+    linear-gradient(
+      180deg,
+      var(--open-deep),
+      color-mix(in oklab, var(--open-jewel) 48%, var(--open-deep))
+    );
 }
-.opening-welcome-ring text {
-  fill: var(--card-gold-text);
-  font-size: 2.6rem;
+.opening-welcome[data-welcome="bloom"] {
+  background: radial-gradient(
+    circle at 50% 46%,
+    var(--open-plate) 30%,
+    color-mix(in oklab, var(--open-plate) 72%, var(--open-petal-fall)) 100%
+  );
+}
+.opening-welcome[data-welcome="letter"] {
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    color-mix(in oklab, var(--open-jewel) 70%, var(--open-deep)),
+    var(--open-deep)
+  );
+}
+/* The letter's own button sits off the sheet, on the dark round it */
+.opening-welcome[data-welcome="letter"] > button {
+  color: color-mix(in oklab, var(--card-ivory) 85%, transparent);
+}
+/* Over a fresh opening the place revealed still shows round the names (fresh-openings.css) */
+.opening-welcome.opening-welcome[data-over="art"] {
+  background: radial-gradient(
+    ellipse 75% 55% at 50% 46%,
+    color-mix(in oklab, var(--open-plate) 94%, transparent),
+    color-mix(in oklab, var(--open-plate) 82%, transparent) 55%,
+    color-mix(in oklab, var(--open-plate) 30%, transparent) 100%
+  );
+}
+.welcome-accent {
+  color: var(--welcome-accent);
+}
+.welcome-soft {
+  color: var(--welcome-soft);
+}
+
+/* The words: each rises softly from a blur, one after another */
+.welcome-rise,
+.welcome-name,
+.welcome-joiner {
   opacity: 0;
-  animation: opening-welcome-fade 900ms ease 700ms forwards;
+  animation: welcome-rise 1000ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) forwards;
 }
-.opening-welcome-rise {
-  opacity: 0;
-  translate: 0 1.4rem;
-  animation: opening-welcome-rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0ms) forwards;
-}
-.opening-welcome-names {
+.welcome-names {
   line-height: 1.05;
-  text-shadow: 0 0.06em 0.3em color-mix(in oklab, var(--open-gilt) 45%, transparent);
 }
-.opening-welcome-rule {
-  width: min(42cqw, 12rem);
+.welcome-name {
+  display: block;
+  max-width: 100%;
+  text-wrap: balance;
+  text-shadow: 0 0.06em 0.35em color-mix(in oklab, var(--open-gilt) 40%, transparent);
+  animation-name: welcome-name;
+  animation-duration: 1300ms;
+}
+.welcome-joiner {
+  display: block;
+  margin-block: 0.05em;
+  animation-name: welcome-pop;
+  animation-duration: 800ms;
+}
+.welcome-rule {
+  width: min(46cqw, 13rem);
   height: 0.75rem;
+  scale: 0 1;
   background:
     radial-gradient(circle, var(--open-gilt) 0 0.22rem, transparent 0.24rem) center / 0.75rem
       0.75rem no-repeat,
@@ -7169,47 +7230,354 @@
         transparent
       )
       center / 100% 1px no-repeat;
+  animation: welcome-draw 900ms cubic-bezier(0.6, 0, 0.2, 1) var(--d, 0ms) forwards;
 }
-.opening-welcome-spark {
-  width: 0.5rem;
+.welcome-date {
+  color: var(--welcome-ink);
+  background: color-mix(in oklab, var(--open-gilt) 16%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--open-gilt) 60%, transparent);
+}
+.welcome-progress {
+  background: linear-gradient(90deg, var(--open-gilt), var(--open-gilt-bright));
+  scale: 0 1;
+  animation: welcome-draw var(--welcome-ms, 4s) linear forwards;
+}
+
+/* Royal: slow sun rays behind the names, a toran swinging in from the top */
+.welcome-rays {
+  translate: -50% -50%;
+  background: repeating-conic-gradient(
+    from 0deg,
+    color-mix(in oklab, var(--open-gilt) 20%, transparent) 0deg 4deg,
+    transparent 4deg 15deg
+  );
+  mask-image: radial-gradient(circle, black 8%, transparent 52%);
+  opacity: 0;
+  animation:
+    welcome-fade 1200ms ease 200ms forwards,
+    welcome-turn 60s linear infinite;
+}
+.welcome-toran {
+  translate: 0 -110%;
+  animation: welcome-drop 1100ms cubic-bezier(0.3, 1.4, 0.5, 1) 150ms forwards;
+}
+.welcome-petal {
+  opacity: 0;
+  animation: welcome-fall 5.5s linear calc(var(--i) * 260ms) infinite;
+}
+
+/* Bloom: three rings of a lotus open outward from the centre, then turn gently */
+.welcome-lotus {
+  opacity: 0.4;
+  animation: welcome-turn 80s linear infinite;
+}
+.welcome-lotus-petal {
+  rotate: var(--a);
+  scale: 0;
+  animation: welcome-bloom 1200ms cubic-bezier(0.3, 1.3, 0.5, 1) calc(200ms + var(--r) * 280ms)
+    forwards;
+}
+
+/* Lamps: each diya lights in turn, and warm motes rise from the row */
+.welcome-diya {
+  filter: drop-shadow(0 0 0.6rem color-mix(in oklab, var(--marigold) 60%, transparent));
+}
+.welcome-diya .welcome-flame {
+  scale: 0;
+  transform-origin: 50% 100%;
+  transform-box: fill-box;
+  animation:
+    welcome-light 500ms ease-out calc(300ms + var(--i) * 180ms) forwards,
+    flicker 1.3s ease-in-out calc(900ms + var(--i) * 180ms) infinite alternate;
+}
+.welcome-mote {
+  width: 0.4rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--marigold), transparent 70%);
+  opacity: 0;
+  animation: welcome-float 4.2s ease-in calc(600ms + var(--i) * 330ms) infinite;
+}
+
+/* Night: stars twinkle, the moon rises, lanterns lower on their strings and sway */
+.welcome-star {
+  width: 0.3rem;
   aspect-ratio: 1;
   background: radial-gradient(circle, var(--open-gilt-bright), transparent 70%);
-  opacity: 0;
-  animation: opening-welcome-spark 2.2s ease-in-out calc(var(--i) * 140ms) infinite;
+  animation: welcome-twinkle 2.6s ease-in-out calc(var(--i) * 170ms) infinite;
 }
-@keyframes opening-welcome-in {
+.welcome-moon {
+  filter: drop-shadow(0 0 1.4rem color-mix(in oklab, var(--open-gilt-bright) 60%, transparent));
+  opacity: 0;
+  translate: 0 30%;
+  animation: welcome-rise-moon 1600ms cubic-bezier(0.2, 0.7, 0.2, 1) 200ms forwards;
+}
+.welcome-fanoos {
+  transform-origin: top center;
+  animation: opening-sway 3.6s ease-in-out calc(var(--i) * -900ms) infinite alternate;
+}
+.welcome-fanoos-string {
+  height: 0;
+  background: var(--open-gilt);
+  animation: welcome-lower 1200ms ease-out calc(300ms + var(--i) * 200ms) forwards;
+}
+.welcome-fanoos .welcome-flame {
+  transform-origin: 50% 100%;
+  transform-box: fill-box;
+  animation: flicker 1.3s ease-in-out infinite alternate;
+}
+
+/* Party: confetti bursts from behind the names, rings of light open, streamers fall */
+.welcome-confetti {
+  width: 1.6cqw;
+  height: 2.6cqw;
+  border-radius: 1px;
+  opacity: 0;
+  animation: welcome-confetti 2.4s cubic-bezier(0.1, 0.8, 0.3, 1) calc(150ms + var(--i) * 12ms)
+    forwards;
+}
+.welcome-burst {
+  translate: -50% -50%;
+  scale: 0;
+  border: 2px dotted color-mix(in oklab, var(--open-gilt-bright) 70%, transparent);
+  animation: welcome-burst 1600ms ease-out calc(100ms + var(--i) * 450ms) forwards;
+}
+.welcome-streamer {
+  height: 14cqh;
+  border-radius: 1cqw;
+  opacity: 0;
+  animation: welcome-streamer 4.8s linear calc(400ms + var(--i) * 420ms) infinite;
+}
+
+/* Letter: the sheet unfolds from its crease and its gilt corners draw themselves */
+.welcome-sheet {
+  background:
+    radial-gradient(
+      ellipse at 50% 30%,
+      color-mix(in oklab, var(--open-light) 40%, transparent),
+      transparent 70%
+    ),
+    var(--open-plate);
+  border-radius: 0.6rem;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--open-gilt) 70%, transparent),
+    0 1.5rem 3rem var(--open-shadow);
+  transform-origin: 50% 50%;
+  animation: welcome-unfold 900ms cubic-bezier(0.3, 1.1, 0.4, 1) both;
+}
+.welcome-corner {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: welcome-stroke 1200ms ease 600ms forwards;
+}
+.welcome-dust {
+  width: 0.35rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--open-gilt), transparent 70%);
+  opacity: 0;
+  animation: welcome-twinkle 2.4s ease-in-out calc(900ms + var(--i) * 210ms) infinite;
+}
+
+@keyframes welcome-in {
   from {
     opacity: 0;
-    scale: 1.06;
+    scale: 1.05;
   }
 }
-@keyframes opening-draw-ring {
+@keyframes welcome-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.2rem;
+    filter: blur(6px);
+  }
   to {
-    stroke-dashoffset: 0;
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
   }
 }
-@keyframes opening-welcome-fade {
+@keyframes welcome-name {
+  from {
+    opacity: 0;
+    letter-spacing: 0.12em;
+    filter: blur(10px);
+    translate: 0 0.4em;
+  }
+  to {
+    opacity: 1;
+    letter-spacing: normal;
+    filter: blur(0);
+    translate: 0 0;
+  }
+}
+@keyframes welcome-pop {
+  from {
+    opacity: 0;
+    scale: 0.4;
+    rotate: -12deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+@keyframes welcome-draw {
+  to {
+    scale: 1 1;
+  }
+}
+@keyframes welcome-fade {
   to {
     opacity: 1;
   }
 }
-@keyframes opening-welcome-rise {
+@keyframes welcome-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes welcome-drop {
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes welcome-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-5cqh) rotate(0deg);
+  }
+  10% {
+    opacity: 0.9;
+  }
+  85% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(6cqw, 105cqh) rotate(320deg);
+  }
+}
+@keyframes welcome-bloom {
+  to {
+    scale: 1;
+  }
+}
+@keyframes welcome-light {
+  to {
+    scale: 1;
+  }
+}
+@keyframes welcome-float {
+  0% {
+    opacity: 0;
+    transform: translateY(0) scale(0.6);
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60cqh) scale(1.4);
+  }
+}
+@keyframes welcome-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    scale: 0.6;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.3;
+  }
+}
+@keyframes welcome-rise-moon {
   to {
     opacity: 1;
     translate: 0 0;
   }
 }
-@keyframes opening-welcome-spark {
-  0%,
-  100% {
-    opacity: 0;
-    scale: 0.4;
-  }
-  50% {
-    opacity: 0.9;
-    scale: 1.3;
+@keyframes welcome-lower {
+  to {
+    height: var(--drop);
   }
 }
+@keyframes welcome-confetti {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  45% {
+    opacity: 1;
+    transform: translate(calc(var(--x) - 50%), calc(var(--y) - 50%)) rotate(var(--spin));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x) * 1.1 - 50%), calc(var(--y) + 30cqh))
+      rotate(calc(var(--spin) * 3));
+  }
+}
+@keyframes welcome-burst {
+  0% {
+    scale: 0;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+    opacity: 0;
+  }
+}
+@keyframes welcome-streamer {
+  0% {
+    opacity: 0;
+    transform: translateY(-16cqh) rotate(8deg);
+  }
+  10% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0.6;
+    transform: translateY(110cqh) rotate(-14deg);
+  }
+}
+@keyframes welcome-unfold {
+  from {
+    opacity: 0;
+    transform: perspective(60rem) rotateX(80deg) scaleY(0.2);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes welcome-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opening-welcome,
+  .opening-welcome *,
+  .opening-welcome *::before {
+    animation: none !important;
+  }
+  .opening-welcome :is(.welcome-rise, .welcome-name, .welcome-joiner, .welcome-moon) {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .opening-welcome :is(.welcome-rule, .welcome-toran, .welcome-lotus-petal, .welcome-flame) {
+    scale: 1;
+    translate: 0 0;
+  }
+  .welcome-petal,
+  .welcome-confetti,
+  .welcome-streamer,
+  .welcome-mote,
+  .welcome-progress {
+    display: none;
+  }
+}
+
 /* The names on the opening itself: a soft gilt glow so they read from across a room */
 .opening-names {
   text-shadow:

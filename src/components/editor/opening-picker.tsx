@@ -8,7 +8,7 @@ import { OpeningSample } from "@/components/guest/opening/opening";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
-import { draftCopy, type InviteDraft } from "@/lib/editor/draft";
+import type { InviteDraft } from "@/lib/editor/draft";
 import {
   GOD_PAINTINGS,
   OPENING_GODS,
@@ -60,8 +60,6 @@ export function OpeningPicker({
   const style = openingStyle(draft.opening, suite, scene, draft.categoryId);
   const god = openingGod(draft.opening, draft.categoryId);
   const beat = useBeat(!still);
-  const copy = draftCopy(draft, draft.languages[0]);
-  const seal = `${Array.from(copy.first.trim())[0] ?? ""}${Array.from(copy.second.trim())[0] ?? ""}`;
   const offered = openingStyles(suite, scene);
   const setOpening = (change: Partial<InviteDraft["opening"]>) =>
     update((current) => ({ ...current, opening: { ...current.opening, ...change } }));
@@ -119,7 +117,6 @@ export function OpeningPicker({
                           style={id}
                           god={god}
                           open={id === style && beat}
-                          seal={seal}
                         />
                       )}
                       <span className="flex flex-col gap-0.5 px-1 pb-1">

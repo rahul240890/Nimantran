@@ -802,7 +802,7 @@ export const designCopy: Translation<typeof en.designCopy> = {
   },
   monogram: {
     name: "सादा मोनोग्राम",
-    description: "शांत पत्थर-सफ़ेद कार्ड, बड़े अक्षरों में आपके नाम के पहले अक्षर और राग भूपाली।",
+    description: "शांत पत्थर-सफ़ेद कार्ड, महीन रेखाओं के बीच एक सुनहरा फूल और राग भूपाली।",
   },
   kasavu: {
     name: "केरल कसवु",
@@ -2034,7 +2034,7 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     },
     envelope: {
       name: "शाही लिफ़ाफ़ा",
-      description: "आपके नाम के अक्षरों वाली मोहर टूटती है और कार्ड बाहर आता है।",
+      description: "फूल की छाप वाली मोहर टूटती है और कार्ड बाहर आता है।",
     },
     lotus: {
       name: "खिलता कमल",

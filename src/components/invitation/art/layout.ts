@@ -1,5 +1,4 @@
 import type { CardCopy } from "@/lib/templates/content";
-import { initialOf } from "@/lib/templates/content";
 import type { FontRole, StockRole, Template, TypeStyle } from "@/lib/templates/schema";
 import type { DoorSide, Motif } from "./motifs";
 import type { Layer } from "./decor";
@@ -37,8 +36,8 @@ export type InsideLayout = {
   runs: TextRun[];
   /** The divider's centre line, when there is one. */
   divider: number | null;
-  /** The couple's initials with a fine rule between them (monogram layout). */
-  monogram: { top: number; size: number; initials: [string, string]; x: number } | null;
+  /** A gilt flower between two fine rules, large, above the names (monogram layout). */
+  monogram: { top: number; size: number; x: number } | null;
   /** A drawn sacred symbol, top-centre above every word (a lettered one is a run). */
   symbol: { top: number; size: number; x: number } | null;
   /** How much everything was scaled down to fit the motif's text box. */
@@ -287,7 +286,6 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
       monogram = {
         top: y,
         size: MONOGRAM_SIZE * scale,
-        initials: [initialOf(copy.first), initialOf(copy.second)],
         x,
       };
     }
@@ -305,7 +303,10 @@ export function symbolLayers(copy: CardCopy, layout: InsideLayout): Layer[] | nu
   return [{ items: [{ at: [x, top + size / 2], scale: size / 2, shapes: sacred.shapes }] }];
 }
 
-export type DoorLayout = { label: TextRun | null; initial: TextRun };
+/** A small flower drawn in place of an initial: its centre and width, in face units. */
+export type FlowerMark = { x: number; y: number; size: number };
+
+export type DoorLayout = { label: TextRun | null; flower: FlowerMark };
 
 export function layoutDoor(
   copy: CardCopy,
@@ -313,7 +314,7 @@ export function layoutDoor(
   motif: Motif,
   side: DoorSide,
 ): DoorLayout {
-  const { labels, names } = template.fonts;
+  const { labels } = template.fonts;
   const { doorText } = motif;
   const word = side === "left" ? copy.doors[0] : copy.doors[1];
   let label: TextRun | null = null;
@@ -334,25 +335,7 @@ export function layoutDoor(
     );
     label.top = doorText.label - label.lineHeight / 2;
   }
-  const initial = run(
-    {
-      key: "initial",
-      text: initialOf(side === "left" ? copy.first : copy.second),
-      style: {
-        font: "display",
-        italic: names.font === "display" && names.italic,
-        uppercase: false,
-        tracking: 0,
-        scale: 1,
-      },
-      size: doorText.initial.size,
-      ink: doorText.initial.ink ?? "accentText",
-      lines: 1,
-      gap: 0,
-    },
-    40,
-    25,
-  );
-  initial.top = doorText.initial.y - initial.lineHeight / 2;
-  return { label, initial };
+  // Each door carries a small gilt flower where an initial once sat; never the names' letters
+  const flower = { x: 25, y: doorText.initial.y, size: doorText.initial.size * 0.95 };
+  return { label, flower };
 }

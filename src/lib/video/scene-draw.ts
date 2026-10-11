@@ -7,6 +7,7 @@
  * Browser only.
  */
 
+import { drawFlower } from "@/components/invitation/art/flower";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
 import { SUITES, type Mood } from "@/lib/suites/catalog";
@@ -134,10 +135,8 @@ const px = ([x, y, w, h]: FrameBox) => ({
   h: (h / 100) * PAGE_H,
 });
 
-/** The photos under the painting, or the names' initials when there are none. */
+/** The photos under the painting, or a small gilt flower in a frame still waiting for one. */
 function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Palette) {
-  const names = [film.copy.first, film.copy.second].filter((name) => name.trim());
-  const joiner = film.copy.joiner && film.copy.joiner !== "&" ? film.copy.joiner : "&";
   film.page.frames.forEach((frame, i) => {
     const [x, y, w, h] = frame;
     // A touch larger than the opening, as the live scene does, so no edge shows
@@ -151,15 +150,11 @@ function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Pal
     }
     ctx.fillStyle = colours.paper;
     ctx.fillRect(box.x, box.y, box.w, box.h);
-    const initials =
-      film.page.frames.length === 1
-        ? [names[0]?.slice(0, 1), names[1]?.slice(0, 1)].filter(Boolean).join(` ${joiner} `)
-        : (names[i] ?? "").slice(0, 1);
-    ctx.fillStyle = colours.goldText;
-    ctx.font = `${9 * CQW}px ${film.fonts.display}`;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(initials, box.x + box.w / 2, box.y + box.h / 2);
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    const across = Math.min(box.w, box.h, 12 * CQW) * 0.38;
+    drawFlower(ctx, box.x + box.w / 2, box.y + box.h / 2, across, colours.goldText);
+    ctx.restore();
   });
 }
 

@@ -2,7 +2,6 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { draftCopy, draftTemplate } from "@/lib/editor/draft";
-import { initialOf } from "@/lib/templates/content";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
 import { firstReadable, readableOn } from "@/lib/og/contrast";
@@ -61,7 +60,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
   const detail = firstReadable(back, 3, gold, accentText, text);
   const when = inviteWhen(draft);
   const where = inviteWhere(draft);
-  const monogram = [copy.first, copy.second].filter(Boolean).map(initialOf).join(" · ");
   // A painted theme shows its own cover painting, the first thing guests will open
   const painting = await paintedCover(draftSuite(draft));
 
@@ -156,12 +154,25 @@ export default async function Image({ params }: { params: Promise<{ slug: string
                 justifyContent: "center",
                 borderRadius: 999,
                 border: `3px solid ${gold}`,
-                fontFamily: "Rozha One",
-                fontSize: monogram.length > 5 ? 44 : 60,
-                color: accentText,
               }}
             >
-              {monogram}
+              {/* A gilt flower in the ring: the preview never shows the names' initials */}
+              <svg width="92" height="92" viewBox="-20 -20 40 40">
+                {Array.from({ length: 8 }, (_, petal) => (
+                  <ellipse
+                    key={petal}
+                    cx="0"
+                    cy="-9"
+                    rx="3.6"
+                    ry="7.4"
+                    transform={`rotate(${petal * 45})`}
+                    fill="none"
+                    stroke={accentText}
+                    strokeWidth="1.4"
+                  />
+                ))}
+                <circle r="3.4" fill={accentText} />
+              </svg>
             </div>
             <div style={{ fontFamily: "Tenor Sans", fontSize: 18, letterSpacing: 4, color: gold }}>
               {site.name.toUpperCase()}

@@ -63,12 +63,13 @@ describe.each(TEMPLATE_IDS)("the %s layout", (id) => {
     expect(layout.scale).toBeGreaterThan(0.55);
   });
 
-  it("puts each door's initial on its door", () => {
+  it("puts a flower on each door, never an initial", () => {
     const copy = toCardCopy(template);
     const left = layoutDoor(copy, template, motif, "left");
     const right = layoutDoor(copy, template, motif, "right");
-    expect(left.initial.rows).toEqual([copy.first.charAt(0).toUpperCase()]);
-    expect(right.initial.rows).toEqual([copy.second.charAt(0).toUpperCase()]);
+    expect(left.flower).toEqual(right.flower);
+    expect(left.flower.size).toBeGreaterThan(0);
+    expect(JSON.stringify(left)).not.toContain(`"${copy.first.charAt(0).toUpperCase()}"`);
     expect(Boolean(left.label)).toBe(motif.doorText.label !== null);
   });
 });
