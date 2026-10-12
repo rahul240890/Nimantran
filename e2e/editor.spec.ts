@@ -69,7 +69,7 @@ for (const colorScheme of ["light", "dark"] as const) {
         "Whose tradition should the card follow?",
       );
       await page.getByRole("radio", { name: /Marathi/ }).click();
-      await expect(page.getByRole("heading", { name: "Ceremony names" })).toBeVisible();
+      await expect(page.getByText(/symbol and the blessing.*in Card words/)).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
 
@@ -236,6 +236,32 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
   });
 
+  test("a design picked in the gallery opens on the names, with no other step flashing first", async ({
+    page,
+  }) => {
+    // Every main heading the page ever shows, from the first paint
+    await page.addInitScript(() => {
+      const seen: string[] = [];
+      (window as unknown as { headings: string[] }).headings = seen;
+      new MutationObserver(() => {
+        const text = document.querySelector("main h1")?.textContent;
+        if (text && seen.at(-1) !== text) seen.push(text);
+      }).observe(document, { childList: true, subtree: true, characterData: true });
+    });
+    // A draft already part way through the design steps
+    await next(page);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Whose tradition should the card follow?",
+    );
+    await page.goto(
+      "/create?quality=2d&category=wedding&tradition=marathi&suite=kayal&template=gopuram",
+    );
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
+    expect(
+      await page.evaluate(() => (window as unknown as { headings: string[] }).headings),
+    ).toEqual(["Who's getting married?"]);
+  });
+
   test("a design chosen on the landing page starts the invite", async ({ page }) => {
     await page.goto("/create?quality=2d&template=kasavu");
     await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).toBeChecked();
@@ -287,7 +313,7 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
   });
 
-  test("a tradition sets the symbol, invocation, ceremony names and family wording", async ({
+  test("a tradition sets the designs, and its symbol and invocation wait in the card words", async ({
     page,
   }) => {
     await page.goto("/create?quality=2d&region=TN");
@@ -296,20 +322,9 @@ test.describe("invite editor", () => {
     const traditions = page.getByRole("radiogroup", { name: "Traditions" }).getByRole("radio");
     await expect(traditions.first()).toHaveAccessibleName(/Tamil Hindu/);
     await traditions.first().click();
-    await expect(page.getByRole("radio", { name: "Pillaiyar suzhi", exact: true })).toBeChecked();
-    await expect(page.getByRole("radio", { name: /In its script/ })).toBeChecked();
-    await expect(page.getByText("திருமணம்")).toBeVisible();
-
-    const wide = page.viewportSize()!.width >= 1024;
-    const card = page.getByRole("img", { name: /, as guests see it$/ });
-    if (wide) await expect(card).toContainText("ஸ்ரீ விநாயகர் துணை");
-    await page.getByRole("radio", { name: /In English letters/ }).click();
-    if (wide) await expect(card).toContainText("Sri Vinayagar Thunai");
-    await page.getByRole("radio", { name: /Leave it off/ }).click();
-    if (wide) await expect(card).not.toContainText("Sri Vinayagar Thunai");
-
-    await page.reload();
-    await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
+    // The tradition step only picks the tradition; the top of the card is set in the details
+    await expect(page.getByRole("radio", { name: /In its script/ })).toHaveCount(0);
+    await expect(page.getByText(/symbol and the blessing.*in Card words/)).toBeVisible();
 
     // The tradition's designs lead the list
     await next(page);
@@ -319,6 +334,36 @@ test.describe("invite editor", () => {
       .getByRole("radiogroup", { name: "Card paper and colours" })
       .getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
+
+    await next(page);
+    await page
+      .getByRole("radiogroup", { name: "Card language" })
+      .getByRole("radio", { name: /^English/ })
+      .click();
+    const parts = page.getByRole("group", { name: "Your details, in six parts" });
+    await parts.getByRole("button", { name: /^Card words: / }).click();
+    await expect(page.getByRole("heading", { name: "Symbol and blessing" })).toBeVisible();
+    await expect(page.getByRole("radio", { name: "Pillaiyar suzhi", exact: true })).toBeChecked();
+    await expect(page.getByRole("radio", { name: /In its script/ })).toBeChecked();
+    const blessing = page.getByRole("textbox", { name: /^Blessing/ });
+
+    const wide = page.viewportSize()!.width >= 1024;
+    const card = page.getByRole("img", { name: /, as guests see it$/ });
+    await page.getByRole("radio", { name: /In English letters/ }).click();
+    await expect(blessing).toHaveValue("Sri Vinayagar Thunai");
+    if (wide) await expect(card).toContainText("Sri Vinayagar Thunai");
+    // A typed blessing wins until an invocation is picked again
+    await blessing.fill("Om Shanti");
+    await expect(page.getByRole("radio", { name: /In English letters/ })).toBeChecked();
+    await page.getByRole("radio", { name: /Leave it off/ }).click();
+    await expect(blessing).toHaveValue("");
+    if (wide) await expect(card).not.toContainText("Sri Vinayagar Thunai");
+    await page.getByRole("radio", { name: "No symbol" }).click();
+
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Read the card's words");
+    await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
+    await expect(page.getByRole("radio", { name: "No symbol" })).toBeChecked();
   });
 
   test("the family section keeps parents, the tradition's hosts line and whom to call", async ({

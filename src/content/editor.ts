@@ -12,6 +12,7 @@ export const editor = {
   metaDescription:
     "Choose a 3D design, add your names and functions, then preview your invitation.",
   headerLabel: "Invite editor",
+  opening: "Opening your invite…",
   progressLabel: "Invite progress",
   progress: (step: number, total: number) => `Step ${step} of ${total}`,
   done: "done",
@@ -95,7 +96,7 @@ export const stepCopy: Record<
     eyebrow: "Choose a tradition",
     title: "Whose tradition should the card follow?",
     intro:
-      "A tradition sets the sacred symbol, the invocation, local ceremony names and the family wording. Everything stays editable, and you can skip this step.",
+      "A tradition sets the sacred symbol, the blessing at the top, local ceremony names and the family wording. Everything stays editable, and you can skip this step.",
   },
   design: {
     label: "Design",
@@ -135,7 +136,7 @@ export const stepCopy: Record<
     eyebrow: "Card words",
     title: "Read the card's words",
     intro:
-      "Every line is already written for your occasion. Change any of them to sound like your family, or leave them as they are.",
+      "Every line is already written for your occasion, from the blessing at the top down. Change any of them to sound like your family, or leave them as they are.",
   },
   music: {
     label: "Music & replies",
@@ -796,7 +797,11 @@ export const traditionCopy = {
     tamil: "The Pillaiyar suzhi, Nichayathartham and Varaverpu",
     modern: "No religious symbols, for any couple or an interfaith wedding",
   },
-  elements: "Religious elements",
+  elements: "Symbol and blessing",
+  elementsIntro: (tradition: string) =>
+    `The top of the card, set by your ${tradition} tradition. Change either or leave it off.`,
+  elementsLater:
+    "You'll choose the symbol and the blessing, such as Shri Ganeshaya Namah, in Card words.",
   symbol: "Symbol at the top of the card",
   symbolNames: {
     om: "Om",
@@ -823,8 +828,6 @@ export const traditionCopy = {
     welcome: "Waiting to welcome you",
     children: "The children's line",
   },
-  ceremonies: "Ceremony names",
-  ceremoniesIntro: "Functions take their local names on the guest page.",
 };
 
 /** Each design's name and one line about it, as the design step shows them. */
