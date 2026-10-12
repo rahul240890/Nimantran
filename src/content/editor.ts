@@ -963,6 +963,16 @@ export const suiteCopy = {
     navrang: "Navrang",
     "nadi-safar": "Nadi Safar",
     "ek-rekha": "Ek Rekha",
+    meghdoot: "Meghdoot",
+    "aath-pehar": "Aath Pehar",
+    "beej-se-bagh": "Beej se Bagh",
+    "kissa-kitaab": "Kissa Kitaab",
+    "itr-daan": "Itr Daan",
+    "pakshi-kosh": "Pakshi Kosh",
+    "gudiya-ghar": "Gudiya Ghar",
+    "jantar-mantar": "Jantar Mantar",
+    rangrez: "Rangrez",
+    "phool-mandi": "Phool Mandi",
     "udaipur-lake": "Udaipur Lake",
     "space-voyage": "Space Voyage",
     "rainbow-unicorn": "Rainbow Unicorn",
@@ -1305,6 +1315,24 @@ export const suiteCopy = {
     "nadi-safar":
       "A leaf boat carrying a marigold from a glacier spring, past the ghats, to the sea.",
     "ek-rekha": "One golden line on ivory paper that draws the whole world, page by page.",
+    meghdoot:
+      "One small white cloud carries your invitation from the snowy mountains, past lakes and monsoon rain, to your door.",
+    "aath-pehar":
+      "One marble pavilion on a lotus pool, painted through the eight watches of a single day.",
+    "beej-se-bagh":
+      "A tiny sprout grows page by page into a flowering tree with a swing, glowing with lanterns at night.",
+    "kissa-kitaab": "Paper pop-up scenes rise out of an open storybook, a new one on every page.",
+    "itr-daan":
+      "An attar maker's chest of cut-glass bottles, a different fragrance rising as soft mist on every page.",
+    "pakshi-kosh":
+      "An old naturalist's album of Indian birds, a pair on every page, painted in the Company School style.",
+    "gudiya-ghar":
+      "A hand-painted toy haveli opened up, a different room lit for every celebration.",
+    "jantar-mantar":
+      "Jaipur's great stone observatory from dawn to the stars, with wide open skies.",
+    rangrez: "A dyer's courtyard where long cloths dry in the breeze, a new colour on every page.",
+    "phool-mandi":
+      "A day at an old flower market, from the first baskets at dawn to the last garlands at night.",
     "udaipur-lake": "Lake Pichola at dusk, with a white marble jharokha for each celebration.",
     "space-voyage": "A porthole among the planets, with a starship plaque for each celebration.",
     "rainbow-unicorn": "Candy clouds and a rainbow, with a unicorn keeping watch.",
@@ -2015,6 +2043,46 @@ export const openingCopy = {
     "rekha-dwar": {
       name: "Doors drawn in one line",
       description: "Ivory paper doors drawn in one gold line open onto a sunrise over lotuses.",
+    },
+    "megh-parda": {
+      name: "Monsoon clouds",
+      description: "Two banks of monsoon cloud slide apart onto a lotus lake below the mountains.",
+    },
+    "pehar-jaali": {
+      name: "Marble screens",
+      description: "Carved marble jaali screens slide apart onto a pavilion on a lotus pool.",
+    },
+    "lata-phatak": {
+      name: "Garden gate",
+      description: "A vine-covered garden gate swings open onto a garden at dawn.",
+    },
+    "kitaab-jild": {
+      name: "Storybook cover",
+      description: "A storybook's ribboned cover opens onto a paper pop-up palace.",
+    },
+    "itr-almari": {
+      name: "Attar cabinet",
+      description: "The glass doors of an attar cabinet open, and rose mist rolls out.",
+    },
+    "kosh-jild": {
+      name: "Bird album",
+      description: "Lacquered album covers open onto sarus cranes by a lotus pond.",
+    },
+    "gudiya-pat": {
+      name: "Dollhouse front",
+      description: "The painted front of a toy haveli swings open onto its lit rooms.",
+    },
+    "yantra-pat": {
+      name: "Astrolabe plate",
+      description: "A brass astrolabe plate splits open onto the observatory at sunset.",
+    },
+    "rang-parda": {
+      name: "Dyed cloths",
+      description: "Two long bandhani cloths gather aside onto a dyer's courtyard.",
+    },
+    "genda-ladi": {
+      name: "Marigold curtain",
+      description: "A curtain of marigold strings gathers aside onto the flower market.",
     },
     pankhi: {
       name: "Painted fan",

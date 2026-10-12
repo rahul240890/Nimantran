@@ -71,6 +71,46 @@ export const PAINTED_GATES = {
     move: "swing",
     hole: { left: 9.1, top: 11.6, width: 81.7, height: 88.4 },
   },
+  "megh-parda": {
+    move: "slide",
+    hole: { left: 12.6, top: 13.3, width: 74.7, height: 86.7 },
+  },
+  "pehar-jaali": {
+    move: "slide",
+    hole: { left: 10.8, top: 9.4, width: 78.3, height: 90.6 },
+  },
+  "lata-phatak": {
+    move: "swing",
+    hole: { left: 13.5, top: 10.2, width: 73.0, height: 89.8 },
+  },
+  "kitaab-jild": {
+    move: "swing",
+    hole: { left: 8.4, top: 10.0, width: 83.2, height: 90.0 },
+  },
+  "itr-almari": {
+    move: "swing",
+    hole: { left: 13.0, top: 7.5, width: 74.1, height: 92.5 },
+  },
+  "kosh-jild": {
+    move: "swing",
+    hole: { left: 8.9, top: 8.4, width: 82.1, height: 91.6 },
+  },
+  "gudiya-pat": {
+    move: "swing",
+    hole: { left: 15.4, top: 16.6, width: 69.2, height: 83.4 },
+  },
+  "yantra-pat": {
+    move: "swing",
+    hole: { left: 14.5, top: 12.3, width: 71.1, height: 87.7 },
+  },
+  "rang-parda": {
+    move: "gather",
+    hole: { left: 10.2, top: 7.8, width: 79.6, height: 92.2 },
+  },
+  "genda-ladi": {
+    move: "gather",
+    hole: { left: 8.6, top: 6.6, width: 82.8, height: 93.4 },
+  },
 } as const satisfies Record<
   string,
   {
@@ -351,6 +391,16 @@ const STORY_GATE: Record<StoryId, PaintedGate> = {
   navrang: "navrang-dwar",
   "nadi-safar": "ghat-dwar",
   "ek-rekha": "rekha-dwar",
+  meghdoot: "megh-parda",
+  "aath-pehar": "pehar-jaali",
+  "beej-se-bagh": "lata-phatak",
+  "kissa-kitaab": "kitaab-jild",
+  "itr-daan": "itr-almari",
+  "pakshi-kosh": "kosh-jild",
+  "gudiya-ghar": "gudiya-pat",
+  "jantar-mantar": "yantra-pat",
+  rangrez: "rang-parda",
+  "phool-mandi": "genda-ladi",
 };
 
 /** The style the guest sees: the host's pick when it fits, else the design's own. */
@@ -461,6 +511,16 @@ const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   "navrang-dwar": "bloom",
   "ghat-dwar": "lamps",
   "rekha-dwar": "letter",
+  "megh-parda": "bloom",
+  "pehar-jaali": "royal",
+  "lata-phatak": "bloom",
+  "kitaab-jild": "letter",
+  "itr-almari": "royal",
+  "kosh-jild": "letter",
+  "gudiya-pat": "party",
+  "yantra-pat": "night",
+  "rang-parda": "party",
+  "genda-ladi": "bloom",
   fireworks: "party",
   balloons: "party",
   gift: "party",
