@@ -247,7 +247,8 @@ function Welcome({
     <section
       aria-labelledby="guest-welcome"
       data-mood="dawn"
-      className="guest-sky relative isolate pb-28 sm:pb-36"
+      data-tour="8"
+      className="guest-sky relative isolate flex min-h-svh flex-col pb-28 sm:pb-36"
     >
       <Garland
         flower={look.flower}
@@ -264,8 +265,8 @@ function Welcome({
       )}
       <Ground look={look} className="absolute inset-x-0 bottom-0 -z-10 h-24 w-full sm:h-32" />
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
-        <Reveal className="flex flex-col items-center gap-5 text-center lg:items-start lg:text-start">
+      <div className="mx-auto my-auto grid w-full max-w-6xl items-center gap-8 px-4 pt-4 sm:gap-12 sm:px-6 sm:pt-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
+        <Reveal className="guest-stagger flex flex-col items-center gap-4 text-center sm:gap-5 lg:items-start lg:text-start">
           <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
             {cardWords.invitedTo}
           </p>
@@ -304,7 +305,7 @@ function Welcome({
         </Reveal>
 
         {photo && (
-          <Reveal className="mx-auto w-[min(72vw,22rem)] lg:me-8">
+          <Reveal className="mx-auto w-[min(64vw,22rem,calc(40svh*0.8))] lg:me-8">
             <Framed look={look}>
               <FramedPhoto
                 photo={{ src: photo.url, alt: "", fit: photo.fit }}
@@ -337,7 +338,8 @@ function SaveTheDate({
     <section
       aria-labelledby="guest-save-date"
       data-mood="day"
-      className="guest-sky relative isolate px-4 py-16 sm:px-6 sm:py-20"
+      data-tour="8"
+      className="guest-sky relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
     >
       {look.style === "garden" && (
         <Houseboat className="guest-boat absolute bottom-6 -z-10 w-40 sm:w-56" />
@@ -351,7 +353,7 @@ function SaveTheDate({
       <div
         ref={ref}
         data-reveal={mounted ? (seen ? "in" : "wait") : undefined}
-        className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem)] place-items-center"
+        className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem,56svh)] place-items-center"
       >
         <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
         <div className="guest-date-disc relative grid aspect-square w-[48%] place-content-center rounded-full text-center">
@@ -392,13 +394,44 @@ function Celebrations({
   const images = SUITES[suite].images;
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
-      <div data-mood="day" className="guest-sky guest-sky-flat px-4 pt-4 pb-10 sm:px-6">
+      <div
+        data-mood="day"
+        data-tour={functions.length > 1 ? "6" : undefined}
+        className={cn(
+          "guest-sky guest-sky-flat px-4 pt-4 pb-10 sm:px-6",
+          // With more than one celebration, the day's plan fills a screen of its own first
+          functions.length > 1 && "flex min-h-svh flex-col justify-center py-16",
+        )}
+      >
         <Heading
           id="guest-functions"
           lang={lang}
           label={cardWords.eventsLabel}
           title={cardWords.celebrations}
         />
+        {functions.length > 1 && (
+          <Reveal className="mx-auto mt-8 w-full max-w-md">
+            <ol lang={lang} className="guest-stagger flex flex-col gap-3">
+              {functions.map((fn) => (
+                <li key={fn.kind}>
+                  <a
+                    href={`#fn-${fn.kind}`}
+                    className="guest-card flex min-h-14 flex-col items-center gap-0.5 px-5 py-3 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0"
+                  >
+                    <span className="max-w-full font-display text-xl leading-tight break-words text-ink">
+                      {fn.name}
+                    </span>
+                    {(fn.date || fn.time) && (
+                      <span className="text-sm text-ink-muted">
+                        {[fn.date, fn.time].filter(Boolean).join(" · ")}
+                      </span>
+                    )}
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        )}
         {allIcsUrl && (
           <div className="mt-6 flex justify-center">
             <Button asChild variant="secondary" className="rounded-full">
@@ -419,12 +452,16 @@ function Celebrations({
             <li
               key={fn.kind}
               data-mood={mood}
-              className="guest-sky guest-hour relative isolate px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
+              data-tour="8"
+              className="guest-sky guest-hour relative isolate flex min-h-svh flex-col justify-center px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
             >
               <Divider look={look} />
-              <Reveal className="guest-hour-body mx-auto grid w-full max-w-5xl items-center gap-10 pt-12 md:grid-cols-2 md:gap-14 md:pt-16">
+              <Reveal className="guest-hour-body mx-auto grid w-full max-w-5xl items-center gap-6 pt-12 sm:gap-10 md:grid-cols-2 md:gap-14 md:pt-16">
                 {image && (
-                  <Framed look={look} className="guest-hour-art mx-auto w-[min(68vw,20rem)]">
+                  <Framed
+                    look={look}
+                    className="guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]"
+                  >
                     <Image
                       src={image}
                       alt=""
@@ -484,7 +521,11 @@ function Dusk({
       <Divider look={look} />
       <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
       {photos.length > 0 && (
-        <section aria-labelledby="guest-photos" className="relative pt-20 pb-6">
+        <section
+          aria-labelledby="guest-photos"
+          data-tour="9"
+          className="relative flex min-h-svh flex-col justify-center pt-20 pb-6"
+        >
           <div className="px-4 sm:px-6">
             <Heading
               id="guest-photos"
@@ -519,7 +560,11 @@ function Dusk({
         </section>
       )}
       {family.length > 0 && (
-        <section aria-labelledby="guest-family" className="relative px-4 pt-10 sm:px-6">
+        <section
+          aria-labelledby="guest-family"
+          data-tour="9"
+          className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+        >
           <Heading
             id="guest-family"
             lang={lang}
@@ -527,7 +572,7 @@ function Dusk({
             title={cardWords.family}
           />
           <Reveal className="mx-auto mt-10 w-full max-w-4xl">
-            <dl lang={familyLang} className="flex flex-wrap justify-center gap-6">
+            <dl lang={familyLang} className="guest-stagger flex flex-wrap justify-center gap-6">
               {family.map((block) => (
                 <div
                   key={block.id}
@@ -578,8 +623,12 @@ function Night({
       className="guest-sky guest-night relative isolate pb-10"
     >
       <Festoon className="guest-festoon h-12 w-full sm:h-16" />
-      <section aria-label={words.lampsLabel} className="relative px-4 pt-10 pb-6 sm:px-6">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+      <section
+        aria-label={words.lampsLabel}
+        data-tour="7"
+        className="relative flex min-h-svh flex-col justify-center px-4 pt-10 pb-6 sm:px-6"
+      >
+        <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
             {cardWords.blessingLabel}
           </p>
@@ -603,13 +652,14 @@ function Night({
           <p aria-live="polite" className="min-h-6 text-sm text-ink-muted">
             {lit ? words.lit : ""}
           </p>
-        </div>
+        </Reveal>
       </section>
       {reply && (
         <section
           id="rsvp"
           aria-labelledby="guest-rsvp"
-          className="relative scroll-mt-4 px-4 pt-6 pb-12 sm:px-6 sm:pb-16"
+          data-tour="end"
+          className="relative flex min-h-svh scroll-mt-4 flex-col justify-center px-4 pt-6 pb-12 sm:px-6 sm:pb-16"
         >
           <Reveal className="guest-card mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-9 sm:px-10">
             <Heading

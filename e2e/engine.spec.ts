@@ -195,7 +195,7 @@ test.describe("event pages", () => {
         "fn-reception",
         "reply",
       ]);
-      await expect(story.getByText("Will you join us?")).toBeVisible();
+      await expect(story.getByText("You are most welcome")).toBeVisible();
       for (const name of ["Previous page", "See the card"]) {
         const button = (await page.getByRole("button", { name }).boundingBox())!;
         expect(button.height).toBeGreaterThanOrEqual(44);

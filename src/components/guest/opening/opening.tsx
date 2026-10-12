@@ -171,6 +171,11 @@ export type OpeningProps = {
   musicOnOpen: boolean;
   /** The guest's name when they came by their own link: the opening greets them first. */
   guest: string | null;
+  /**
+   * The pages flow on into the details below once they end: the opening closes behind them
+   * and this takes the guest down the page. Without it the last page waits for the guest.
+   */
+  onCarryOn?: () => void;
   /** What comes once it opens: the event pages, or (for One Scene) the page behind it. */
   after:
     | { kind: "pages"; template: Template; beats: readonly StoryBeat[]; textBox: boolean }
@@ -214,6 +219,7 @@ export function Opening({
   music,
   musicOnOpen,
   guest,
+  onCarryOn,
   after,
 }: OpeningProps) {
   const { guestCopy, invitation } = useGuestText();
@@ -297,6 +303,17 @@ export function Opening({
     setPages(false);
     setAsked(false);
   };
+  // The pages are done: they close without taking focus back to the top, and the page
+  // below carries on with the music still playing
+  const carryOn = onCarryOn
+    ? () => {
+        returnFocus.current = false;
+        setWelcome(false);
+        setPages(false);
+        setAsked(false);
+        onCarryOn();
+      }
+    : undefined;
 
   const plate = (half?: "left" | "right") => {
     const Names = half ? "p" : "h1";
@@ -537,6 +554,7 @@ export function Opening({
           }}
           onDone={leave}
           onFinished={music.rest}
+          onCarryOn={carryOn}
         />
       )}
     </section>

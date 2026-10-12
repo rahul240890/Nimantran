@@ -672,6 +672,8 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   removeClip: "हटाएँ",
   listenClip: "सुनें",
   clipMeta: (n) => `आपका संगीत · ${n} सेकंड`,
+  repeatNote: (clip, live, times) =>
+    `आपके निमंत्रण के पन्ने लगभग ${live} सेकंड चलते हैं, और मेहमानों के जवाब तक नीचे स्क्रॉल करते समय भी संगीत चलता रहता है। यह ${clip} सेकंड की क्लिप लगभग ${times} बार दोहराई जाएगी, इसलिए ऐसा हिस्सा चुनें जो दोहराने पर अच्छा लगे, या लंबी क्लिप रखें।`,
   listen: (raga) => `${raga} सुनें`,
   stopListening: "सुनना बंद करें",
   designsOwn: "डिज़ाइन का अपना",

@@ -2,11 +2,12 @@
 
 import { CalendarPlus, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
+import { GuestTour } from "@/components/guest/guest-tour";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
@@ -240,6 +241,9 @@ export function GuestView({
   const opening = openingStyle(draft.opening, suite, Boolean(scene), draft.categoryId);
   const god = openingGod(draft.opening, draft.categoryId);
   const [entered, setEntered] = useState(false);
+  // Each time the pages end, the page below carries on by itself, section by section
+  const [tour, setTour] = useState(0);
+  const tourRoot = useRef<HTMLDivElement>(null);
   const showOpening = !entered && opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
@@ -316,6 +320,7 @@ export function GuestView({
                 music={music}
                 musicOnOpen={draft.music.playOnOpen}
                 guest={guestName}
+                onCarryOn={() => setTour((was) => was + 1)}
                 after={
                   scene
                     ? { kind: "enter", onEnter: () => setEntered(true) }
@@ -324,111 +329,128 @@ export function GuestView({
               />
             )}
 
-            {look ? (
-              <ThemedDetails
-                suite={suite}
-                look={look}
-                copy={copy}
-                lang={language}
-                functions={details}
-                main={
-                  mainKind && mainDate
-                    ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
-                    : null
-                }
-                photo={placed.welcome}
-                photos={placed.rest}
-                family={family}
-                familyLang={language}
-                allIcsUrl={allIcsUrl}
-                music={music}
-                reply={rsvp}
-              />
-            ) : (
-              <>
-                <FamilyWording family={family} lang={language} />
+            <div ref={tourRoot} className="contents">
+              {look ? (
+                <ThemedDetails
+                  suite={suite}
+                  look={look}
+                  copy={copy}
+                  lang={language}
+                  functions={details}
+                  main={
+                    mainKind && mainDate
+                      ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
+                      : null
+                  }
+                  photo={placed.welcome}
+                  photos={placed.rest}
+                  family={family}
+                  familyLang={language}
+                  allIcsUrl={allIcsUrl}
+                  music={music}
+                  reply={rsvp}
+                />
+              ) : (
+                <>
+                  <FamilyWording family={family} lang={language} />
 
-                <section
-                  aria-labelledby="guest-functions"
-                  className="border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
-                >
-                  <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                    <div className="flex flex-wrap items-end justify-between gap-4">
-                      <h2
-                        id="guest-functions"
-                        className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                      >
-                        {guestCopy.functions}
-                      </h2>
-                      {allIcsUrl && (
-                        <Button asChild variant="secondary">
-                          <a href={allIcsUrl} download>
-                            <CalendarPlus aria-hidden />
-                            {guestCopy.addAll}
-                          </a>
-                        </Button>
-                      )}
-                    </div>
-                    <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-                      {details.map((fn) => (
-                        <li key={fn.kind}>
-                          <FunctionCard fn={fn} />
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                </section>
-
-                {placed.all.length > 0 && (
-                  <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
-                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                      <h2
-                        id="guest-photos"
-                        className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                      >
-                        {guestCopy.photos}
-                      </h2>
-                      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                        {placed.all.map((photo, index) => (
-                          <li
-                            key={photo.id}
-                            className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
-                          >
-                            <FramedPhoto
-                              photo={{ src: photo.url, alt: "", fit: photo.fit }}
-                              alt={guestCopy.photoAlt(index + 1)}
-                              frameAspect={GALLERY_ASPECT}
-                              lazy
-                              className="aspect-[4/5] w-full"
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </section>
-                )}
-                {rsvpFunctions.length > 0 && (
                   <section
-                    id="rsvp"
-                    aria-labelledby="guest-rsvp"
-                    className="scroll-mt-4 border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                    aria-labelledby="guest-functions"
+                    data-tour
+                    className="flex min-h-svh flex-col justify-center border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
                   >
-                    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
-                      <div className="flex flex-col gap-2">
+                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                      <div className="flex flex-wrap items-end justify-between gap-4">
                         <h2
-                          id="guest-rsvp"
+                          id="guest-functions"
                           className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
                         >
-                          {rsvpCopy.heading}
+                          {guestCopy.functions}
                         </h2>
-                        <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                        {allIcsUrl && (
+                          <Button asChild variant="secondary">
+                            <a href={allIcsUrl} download>
+                              <CalendarPlus aria-hidden />
+                              {guestCopy.addAll}
+                            </a>
+                          </Button>
+                        )}
                       </div>
-                      {rsvp}
+                      <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
+                        {details.map((fn) => (
+                          <li key={fn.kind}>
+                            <FunctionCard fn={fn} />
+                          </li>
+                        ))}
+                      </ol>
                     </div>
                   </section>
-                )}
-              </>
-            )}
+
+                  {placed.all.length > 0 && (
+                    <section
+                      aria-labelledby="guest-photos"
+                      data-tour
+                      className="flex min-h-svh flex-col justify-center px-4 py-12 sm:px-6 sm:py-16"
+                    >
+                      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                        <h2
+                          id="guest-photos"
+                          className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                        >
+                          {guestCopy.photos}
+                        </h2>
+                        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
+                          {placed.all.map((photo, index) => (
+                            <li
+                              key={photo.id}
+                              className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
+                            >
+                              <FramedPhoto
+                                photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                                alt={guestCopy.photoAlt(index + 1)}
+                                frameAspect={GALLERY_ASPECT}
+                                lazy
+                                className="aspect-[4/5] w-full"
+                              />
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </section>
+                  )}
+                  {rsvpFunctions.length > 0 && (
+                    <section
+                      id="rsvp"
+                      aria-labelledby="guest-rsvp"
+                      data-tour="end"
+                      className="flex min-h-svh scroll-mt-4 flex-col justify-center border-t border-line px-4 py-12 sm:px-6 sm:py-16"
+                    >
+                      <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                          <h2
+                            id="guest-rsvp"
+                            className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                          >
+                            {rsvpCopy.heading}
+                          </h2>
+                          <p className="text-ink-muted">{rsvpCopy.intro}</p>
+                        </div>
+                        {rsvp}
+                      </div>
+                    </section>
+                  )}
+                </>
+              )}
+            </div>
+            <GuestTour
+              root={tourRoot}
+              run={tour}
+              music={music}
+              labels={invitation.tour}
+              musicLabels={
+                look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
+              }
+            />
             {!preview && <PhotoWall slug={slug} />}
           </main>
 
@@ -458,7 +480,11 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
   const { guestCopy } = useGuestText();
   if (family.length === 0) return null;
   return (
-    <section aria-labelledby="guest-family" className="px-4 pb-12 sm:px-6">
+    <section
+      aria-labelledby="guest-family"
+      data-tour
+      className="flex min-h-svh flex-col justify-center px-4 py-12 sm:px-6"
+    >
       <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl border border-line bg-surface px-5 py-8 text-center shadow-raised sm:px-10">
         <h2 id="guest-family" className="font-display text-2xl leading-tight">
           {guestCopy.family}

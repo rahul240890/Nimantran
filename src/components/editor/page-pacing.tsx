@@ -17,22 +17,13 @@ import { videoTimeline } from "@/lib/video/timeline";
 const AUTO = "auto";
 
 /**
- * How long each page stays (Step 12y): Auto times every page by its words, or the host fixes
- * one time for them all. The live music and the reel follow the pages, so the summary says
- * how long both will run with this many functions.
+ * How many pages the invitation has, how long they play live (the music runs with them)
+ * and how long the reel is.
  */
-export function PagePacing({
-  draft,
-  update,
-}: {
-  draft: InviteDraft;
-  update: (change: (draft: InviteDraft) => InviteDraft) => void;
-}) {
-  const { extrasCopy } = useText(editorText);
-  const words = extrasCopy.pacing;
+export function useStoryTimes(draft: InviteDraft): { pages: number; live: number; reel: number } {
   const locale = useLocale();
   const language = cardLanguages(draft)[0];
-  const { pages, live, reel } = useMemo(() => {
+  return useMemo(() => {
     const copy = draftCopy(draft, language);
     // Only the number of pages matters here, so any address stands in for a photo's
     const written = storyBeats({
@@ -58,6 +49,23 @@ export function PagePacing({
       reel: Math.round(timeline.total),
     };
   }, [draft, language, locale]);
+}
+
+/**
+ * How long each page stays (Step 12y): Auto times every page by its words, or the host fixes
+ * one time for them all. The live music and the reel follow the pages, so the summary says
+ * how long both will run with this many functions.
+ */
+export function PagePacing({
+  draft,
+  update,
+}: {
+  draft: InviteDraft;
+  update: (change: (draft: InviteDraft) => InviteDraft) => void;
+}) {
+  const { extrasCopy } = useText(editorText);
+  const words = extrasCopy.pacing;
+  const { pages, live, reel } = useStoryTimes(draft);
 
   return (
     <div className="flex flex-col gap-3">

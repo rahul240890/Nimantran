@@ -55,8 +55,11 @@ export type StoryBeat = {
   symbol: boolean;
   /** Seconds the beat stays before the next one begins. */
   seconds: number;
-  /** A function page's Directions and Add to calendar links. */
-  links?: { maps: string | null; calendar: string | null };
+  /**
+   * A function page's Directions and Add to calendar links. The calendar has both forms, so
+   * the guest's phone can open its own calendar straight away (calendar-link.ts).
+   */
+  links?: { maps: string | null; ics: string | null; google: string | null };
   /** The couple's photos on their photo page: one of them together, or one each. */
   photos?: readonly StoryPhoto[];
   /** Where the host placed the words on this page (Step 12s); left out, the theme's own. */
@@ -82,7 +85,7 @@ export type StoryPhoto = {
 export type StoryInput = {
   copy: CardCopy;
   functions: readonly StoryFunction[];
-  /** Whether the invite takes replies, so the last beat asks for one. */
+  /** Whether the invite takes replies. The last page welcomes the guest either way. */
   replies: boolean;
   words: StoryWords;
   /** The tradition's family wording (blessings from, hosts), as the family wrote it. */
@@ -113,6 +116,8 @@ export type FamilyParts = { lead: string; names: string; tail: string; place: st
 export type StoryWords = {
   saveTheDate: string;
   joinUs: string;
+  /** The last page's welcome, in place of a question ("You are most welcome"). */
+  welcome: string;
   withLove: string;
   and: string;
 };
@@ -210,7 +215,6 @@ function beat(id: string, scene: StorySceneId, lines: StoryLine[], symbol = fals
 export function storyBeats({
   copy,
   functions,
-  replies,
   words: w,
   family = [],
   couple = [],
@@ -313,12 +317,14 @@ export function storyBeats({
       ]),
     );
     const maps = fn.mapsUrl ?? null;
-    const calendar = fn.icsUrl ?? fn.googleCalendarUrl ?? null;
-    if (maps || calendar) beats[beats.length - 1]!.links = { maps, calendar };
+    const ics = fn.icsUrl ?? null;
+    const google = fn.googleCalendarUrl ?? null;
+    if (maps || ics || google) beats[beats.length - 1]!.links = { maps, ics, google };
   }
 
+  // The last page welcomes the guest warmly rather than asking; the host can reword it.
   // One function's venue is on its own page; a single card venue closes the story instead
-  const closing = [...line(replies ? w.joinUs : w.withLove, "display")];
+  const closing = [...line(w.welcome, "display"), ...line(w.withLove, "script")];
   if (functions.length === 0) closing.push(...line(copy.venue, "venue"));
   beats.push(beat("reply", "reply", closing));
 

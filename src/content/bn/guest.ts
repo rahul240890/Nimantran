@@ -199,6 +199,13 @@ export const guestText: GuestText = {
       directions: "পথ দেখুন",
       calendar: "ক্যালেন্ডারে যোগ করুন",
       textBox: "লেখার পেছনে বাক্স",
+      more: "বিস্তারিত দেখুন",
+      calendarShort: "ক্যালেন্ডার",
+    },
+    tour: {
+      label: "আমন্ত্রণ নিজে থেকেই এগোচ্ছে",
+      pause: "এখানে থামুন",
+      play: "এগিয়ে চলুন",
     },
   },
   theme: { group: "রঙের থিম", system: "ডিভাইসের মতো", light: "হালকা", dark: "গাঢ়" },

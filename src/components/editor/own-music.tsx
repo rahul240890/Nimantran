@@ -1,6 +1,6 @@
 "use client";
 
-import { Music, Pause, Play, Upload } from "lucide-react";
+import { Music, Pause, Play, Repeat, Upload } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -80,15 +80,33 @@ function usePartPlayer() {
   return { playing, play, stop };
 }
 
+/**
+ * A short clip loops: the pages, and the guest page below them, run longer than it, so
+ * the host hears how often it will come round again before they choose.
+ */
+function RepeatNote({ clip, live }: { clip: number; live: number | null }) {
+  const { extrasCopy } = useText(editorText);
+  if (!live || clip <= 0 || clip >= live) return null;
+  const times = Math.ceil(live / clip);
+  return (
+    <p className="flex items-start gap-2 rounded-md bg-marigold/10 px-3 py-2 text-sm text-ink">
+      <Repeat aria-hidden className="mt-0.5 size-4 shrink-0 text-marigold-strong" />
+      {extrasCopy.repeatNote(Math.round(clip), live, times)}
+    </p>
+  );
+}
+
 /** The clip as kept: listen to it, change it or take it out. */
 function KeptClip({
   clip,
   url,
+  live,
   onChange,
   onRemove,
 }: {
   clip: MusicClip;
   url: string | null;
+  live: number | null;
   onChange: () => void;
   onRemove: () => void;
 }) {
@@ -113,46 +131,49 @@ function KeptClip({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-lg border border-line-strong bg-surface p-4 shadow-raised sm:flex-row sm:items-center">
-      <span
-        aria-hidden
-        className="grid size-11 shrink-0 place-items-center rounded-full bg-marigold/15 text-marigold-strong"
-      >
-        <Music className="size-5" />
-      </span>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <p className="truncate font-semibold text-ink">{clip.name}</p>
-        <p className="text-sm text-ink-muted">{extrasCopy.clipMeta(Math.round(clip.seconds))}</p>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          disabled={!url}
-          aria-pressed={listening}
-          leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
-          onClick={() => void listen()}
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 rounded-lg border border-line-strong bg-surface p-4 shadow-raised sm:flex-row sm:items-center">
+        <span
+          aria-hidden
+          className="grid size-11 shrink-0 place-items-center rounded-full bg-marigold/15 text-marigold-strong"
         >
-          {listening ? extrasCopy.stopPart : extrasCopy.listenClip}
-        </Button>
-        <Button type="button" variant="secondary" size="sm" onClick={onChange}>
-          {extrasCopy.changeClip}
-        </Button>
-        <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
-          {extrasCopy.removeClip}
-        </Button>
+          <Music className="size-5" />
+        </span>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <p className="truncate font-semibold text-ink">{clip.name}</p>
+          <p className="text-sm text-ink-muted">{extrasCopy.clipMeta(Math.round(clip.seconds))}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={!url}
+            aria-pressed={listening}
+            leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
+            onClick={() => void listen()}
+          >
+            {listening ? extrasCopy.stopPart : extrasCopy.listenClip}
+          </Button>
+          <Button type="button" variant="secondary" size="sm" onClick={onChange}>
+            {extrasCopy.changeClip}
+          </Button>
+          <Button type="button" variant="ghost" size="sm" onClick={onRemove}>
+            {extrasCopy.removeClip}
+          </Button>
+        </div>
+        {url && (
+          <audio
+            ref={audio}
+            src={url}
+            preload="none"
+            onPlay={() => setListening(true)}
+            onPause={() => setListening(false)}
+            onEnded={() => setListening(false)}
+          />
+        )}
       </div>
-      {url && (
-        <audio
-          ref={audio}
-          src={url}
-          preload="none"
-          onPlay={() => setListening(true)}
-          onPause={() => setListening(false)}
-          onEnded={() => setListening(false)}
-        />
-      )}
+      <RepeatNote clip={clip.seconds} live={live} />
     </div>
   );
 }
@@ -160,10 +181,12 @@ function KeptClip({
 /** Choosing the part of a picked song to keep. */
 function Trimmer({
   song,
+  live,
   onUse,
   onCancel,
 }: {
   song: Song;
+  live: number | null;
   onUse: (clip: MusicClip, blob: Blob) => void;
   onCancel: () => void;
 }) {
@@ -294,6 +317,8 @@ function Trimmer({
         </div>
       )}
 
+      <RepeatNote clip={cut.seconds} live={live} />
+
       <Button
         type="button"
         variant="secondary"
@@ -331,10 +356,13 @@ function Trimmer({
 export function OwnMusic({
   clip,
   url,
+  live = null,
   onClip,
 }: {
   clip: MusicClip | null;
   url: string | null;
+  /** How long the invitation's pages play, in seconds, so a short clip can say it repeats. */
+  live?: number | null;
   /** The new clip (already kept on this device), or null to take it out. */
   onClip: (clip: MusicClip | null) => void;
 }) {
@@ -401,6 +429,7 @@ export function OwnMusic({
       {song ? (
         <Trimmer
           song={song}
+          live={live}
           onUse={(next, blob) => void use(next, blob)}
           onCancel={() => setSong(null)}
         />
@@ -408,6 +437,7 @@ export function OwnMusic({
         <KeptClip
           clip={clip}
           url={url}
+          live={live}
           onChange={() => input.current?.click()}
           onRemove={() => {
             discard(clip);
