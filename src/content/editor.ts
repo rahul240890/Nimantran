@@ -973,6 +973,16 @@ export const suiteCopy = {
     "jantar-mantar": "Jantar Mantar",
     rangrez: "Rangrez",
     "phool-mandi": "Phool Mandi",
+    "udan-khatola": "Udan Khatola",
+    "rang-raste": "Rang Raste",
+    "kaanch-gumbad": "Kaanch Gumbad",
+    "chalk-pati": "Chalk Pati",
+    "jadon-ka-pul": "Jadon ka Pul",
+    "gol-matol": "Gol Matol",
+    "bhool-bhulaiya": "Bhool Bhulaiya",
+    "deco-yatra": "Deco Yatra",
+    "gehra-neela": "Gehra Neela",
+    "shatranj-baazi": "Shatranj Baazi",
     "udaipur-lake": "Udaipur Lake",
     "space-voyage": "Space Voyage",
     "rainbow-unicorn": "Rainbow Unicorn",
@@ -1333,6 +1343,17 @@ export const suiteCopy = {
     rangrez: "A dyer's courtyard where long cloths dry in the breeze, a new colour on every page.",
     "phool-mandi":
       "A day at an old flower market, from the first baskets at dawn to the last garlands at night.",
+    "udan-khatola": "A flying carpet carries the invitation over a city of blue domes and gardens.",
+    "rang-raste": "A painted truck drives the invitation along hills, fields and the sea.",
+    "kaanch-gumbad": "A tiny world under a glass dome, a different one on every page.",
+    "chalk-pati":
+      "Coloured chalk drawings on a school blackboard, from a village lane to the fair.",
+    "jadon-ka-pul": "Living root bridges over a misty green river, lit by lanterns at night.",
+    "gol-matol": "A clay village of round cottages, soft and bright as a toy.",
+    "bhool-bhulaiya": "A rose garden maze, one more turning on every page.",
+    "deco-yatra": "A journey across India painted like old railway posters in sunburst colours.",
+    "gehra-neela": "Sunlit water under the sea, coral and pearls on every page.",
+    "shatranj-baazi": "An ivory and rosewood chess game set in a palace hall.",
     "udaipur-lake": "Lake Pichola at dusk, with a white marble jharokha for each celebration.",
     "space-voyage": "A porthole among the planets, with a starship plaque for each celebration.",
     "rainbow-unicorn": "Candy clouds and a rainbow, with a unicorn keeping watch.",
@@ -2083,6 +2104,47 @@ export const openingCopy = {
     "genda-ladi": {
       name: "Marigold curtain",
       description: "A curtain of marigold strings gathers aside onto the flower market.",
+    },
+    "kaleen-parda": {
+      name: "Carpet curtain",
+      description: "A woven carpet slides aside onto a city of blue domes at dawn.",
+    },
+    "truck-darwaza": {
+      name: "Truck doors",
+      description:
+        "Painted truck doors with peacocks and lotuses swing open onto the road at sunset.",
+    },
+    "kaanch-dhakkan": {
+      name: "Velvet cover",
+      description: "A velvet cloth gathers aside to show a little world under glass.",
+    },
+    "pati-pat": {
+      name: "Classroom doors",
+      description: "Wooden classroom doors with chalk flowers open onto a path to the village.",
+    },
+    "jad-jhalar": {
+      name: "Vine curtain",
+      description: "A curtain of hanging roots and vines gathers aside onto the river bridges.",
+    },
+    "gol-darwaza": {
+      name: "Cottage door",
+      description: "A round pink clay door swings open onto a cottage garden.",
+    },
+    "jhaadi-deewar": {
+      name: "Hedge gates",
+      description: "Two clipped hedge walls slide apart onto a rose arch path.",
+    },
+    "deco-dibba": {
+      name: "Lift doors",
+      description: "Art deco lift doors slide apart onto a train crossing a viaduct.",
+    },
+    "samundar-parda": {
+      name: "Kelp curtain",
+      description: "Kelp parts under the water to show a coral arch and white sand.",
+    },
+    "shatranj-sandook": {
+      name: "Chessboard doors",
+      description: "Inlaid chessboard doors swing open onto a palace terrace with a chess game.",
     },
     pankhi: {
       name: "Painted fan",
