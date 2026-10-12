@@ -4503,9 +4503,36 @@
   }
 }
 
+@keyframes story-dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem) scale(0.8);
+  }
+}
+@keyframes story-nudge {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(0.2rem);
+  }
+}
+
 @layer components {
   .story-line {
     animation: story-line-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) var(--story-delay, 0s) both;
+  }
+  /* A function page's Directions and Calendar pop in one after the other once the words are up */
+  .story-dock > * {
+    animation: story-dock-in 0.7s cubic-bezier(0.34, 1.4, 0.64, 1) 1.4s both;
+  }
+  .story-dock > * + * {
+    animation-delay: 1.55s;
+  }
+  .story-nudge {
+    animation: story-nudge 1.8s ease-in-out 1.5s infinite;
   }
   .story-draw {
     stroke-dasharray: 1;
@@ -5400,6 +5427,30 @@
     }
     .guest-float-music[data-playing] {
       animation: guest-glow 2.4s ease-in-out infinite;
+    }
+
+    /* A section's pieces arrive one after another once it is in view */
+    :is(.guest-stagger[data-reveal="in"], [data-reveal="in"] .guest-stagger) > * {
+      animation: guest-rise 800ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+      animation-delay: calc(var(--n, 0) * 110ms + 200ms);
+    }
+    .guest-stagger > :nth-child(2) {
+      --n: 1;
+    }
+    .guest-stagger > :nth-child(3) {
+      --n: 2;
+    }
+    .guest-stagger > :nth-child(4) {
+      --n: 3;
+    }
+    .guest-stagger > :nth-child(5) {
+      --n: 4;
+    }
+    .guest-stagger > :nth-child(6) {
+      --n: 5;
+    }
+    .guest-stagger > :nth-child(n + 7) {
+      --n: 6;
     }
   }
 }

@@ -2,6 +2,7 @@
 
 import {
   CalendarPlus,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   MailCheck,
@@ -22,6 +23,7 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
+  type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
@@ -29,6 +31,7 @@ import { SYMBOLS } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
+import { useCalendarLink } from "@/lib/publish/calendar-link";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
@@ -69,7 +72,11 @@ export type StoryLabels = {
   done: string;
   directions: string;
   calendar: string;
+  /** "Calendar", under its icon on a function's page. */
+  calendarShort: string;
   textBox: string;
+  /** The last page's way on to the details below, when the page carries on there. */
+  more: string;
 };
 
 type StoryPlayerProps = {
@@ -96,6 +103,12 @@ type StoryPlayerProps = {
   onDone: (hadFocus: boolean) => void;
   /** The last page's time is up (the guest has seen every page at its pace). */
   onFinished?: () => void;
+  /**
+   * The pages flow on into the details below: once the last page's time is up (or the
+   * guest taps on from it) this is called instead of resting on the last page, and the
+   * last page offers it in place of the reply button.
+   */
+  onCarryOn?: () => void;
 };
 
 /* Each kind of line's ink; sizes, faces and spacing come from the lettering spec */
@@ -151,6 +164,7 @@ export function StoryPlayer({
   music,
   onDone: onDoneProp,
   onFinished,
+  onCarryOn,
 }: StoryPlayerProps) {
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
@@ -187,9 +201,9 @@ export function StoryPlayer({
     [beats.length, still],
   );
   const next = useCallback(() => {
-    if (last) onDone();
+    if (last) (onCarryOn ?? onDone)();
     else go(index + 1);
-  }, [last, onDone, go, index]);
+  }, [last, onDone, onCarryOn, go, index]);
   const previous = useCallback(() => go(index - 1), [go, index]);
 
   // The page underneath goes once the new one has turned over it
@@ -206,19 +220,21 @@ export function StoryPlayer({
     if (!running) return;
     const already = spent.current.index === index ? spent.current.ms : 0;
     const start = performance.now();
-    // The last page stays until the guest acts, so the reply button can be pressed; once
-    // its time is up the music, timed to the pages, comes to rest
+    // The last page carries on into the details once its time is up; without them it stays
+    // until the guest acts, so the reply button can be pressed, and the music comes to rest
     const left = Math.max(0, seconds * 1000 - already);
     const timer = !last
       ? window.setTimeout(next, left)
-      : onFinished
-        ? window.setTimeout(onFinished, left)
-        : null;
+      : onCarryOn
+        ? window.setTimeout(onCarryOn, left)
+        : onFinished
+          ? window.setTimeout(onFinished, left)
+          : null;
     return () => {
       if (timer !== null) window.clearTimeout(timer);
       spent.current = { index, ms: already + performance.now() - start };
     };
-  }, [running, index, seconds, last, next, onFinished]);
+  }, [running, index, seconds, last, next, onFinished, onCarryOn]);
 
   // Fetch the next page's painting ahead, so it is ready when the page turns
   const upcoming = beats[index + 1];
@@ -373,7 +389,8 @@ export function StoryPlayer({
               textBox={textBox}
               type={type}
               still={still}
-              reply={last && current ? reply : null}
+              reply={last && current && !onCarryOn ? reply : null}
+              carryOn={last && current ? onCarryOn : undefined}
               labels={labels}
               onReply={onDone}
               inert={!current}
@@ -627,6 +644,7 @@ export function StoryPage({
   type,
   still,
   reply,
+  carryOn,
   labels,
   onReply,
   inert,
@@ -641,6 +659,8 @@ export function StoryPage({
   type?: PageType;
   still: boolean;
   reply: { href: string; label: string } | null | undefined;
+  /** The last page's way on to the details below, in place of the reply button. */
+  carryOn?: () => void;
   labels: StoryLabels;
   onReply: () => void;
   inert: boolean;
@@ -704,7 +724,7 @@ export function StoryPage({
     type,
     printed,
     reply?.label,
-    Boolean(beat.links),
+    Boolean(carryOn),
     suiteId,
     lang,
   ]);
@@ -805,13 +825,14 @@ export function StoryPage({
               ? "[container-type:size]"
               : "inset-x-[5%] top-[calc(max(0.75rem,env(safe-area-inset-top))+4.25rem)] bottom-[max(4%,env(safe-area-inset-bottom))]",
         )}
-        style={
+        style={clearDock(
           frames
             ? areaStyle(frames.area, true)
             : painted && !arches
               ? areaStyle(textArea(suiteId, look.art), whole, lifted)
-              : undefined
-        }
+              : undefined,
+          Boolean(beat.links),
+        )}
       >
         {/* Centred words sit a little above the middle, where the eye takes the centre to be */}
         {middle && <span aria-hidden className="min-h-0 grow-[0.8]" />}
@@ -915,29 +936,6 @@ export function StoryPage({
               </Fragment>
             );
           })}
-          {beat.links && (
-            <span
-              className="story-line mt-[1.5cqmin] flex flex-wrap justify-center gap-2"
-              style={delay(after)}
-            >
-              {beat.links.maps && (
-                <Button asChild variant="secondary" size="sm">
-                  <a href={beat.links.maps} target="_blank" rel="noopener noreferrer">
-                    <Navigation aria-hidden />
-                    {labels.directions}
-                  </a>
-                </Button>
-              )}
-              {beat.links.calendar && (
-                <Button asChild variant="secondary" size="sm">
-                  <a href={beat.links.calendar} download>
-                    <CalendarPlus aria-hidden />
-                    {labels.calendar}
-                  </a>
-                </Button>
-              )}
-            </span>
-          )}
           {reply && (
             <span className="story-line mt-[2cqmin]" style={delay(after)}>
               <Button asChild size="lg">
@@ -948,9 +946,115 @@ export function StoryPage({
               </Button>
             </span>
           )}
+          {carryOn && (
+            <span className="story-line mt-[2.5cqmin]" style={delay(after)}>
+              <Button
+                size="lg"
+                className="rounded-full"
+                trailingIcon={<ChevronDown aria-hidden className="story-nudge" />}
+                onClick={carryOn}
+              >
+                {labels.more}
+              </Button>
+            </span>
+          )}
         </div>
         {middle && <span aria-hidden className="min-h-0 grow-[1.2]" />}
       </div>
+      {beat.links && <PageDock links={beat.links} labels={labels} still={still} />}
     </div>
+  );
+}
+
+/** The room a function page's dock takes at the foot of the page, kept clear of the words. */
+const DOCK_CLEAR = "calc(env(safe-area-inset-bottom) + 6.25rem)";
+
+/** Keeps the words' area above the dock on a page that has one. */
+function clearDock(style: CSSProperties | undefined, dock: boolean): CSSProperties | undefined {
+  if (!dock) return style;
+  const bottom = style?.bottom;
+  return {
+    ...style,
+    bottom: bottom ? `max(${bottom}, ${DOCK_CLEAR})` : DOCK_CLEAR,
+  };
+}
+
+/**
+ * Directions and the calendar on a function's page: two round glass icons at the foot of
+ * the page, apart from the words like a reel's own buttons. The calendar opens the guest's
+ * own calendar in one tap (calendar-link.ts).
+ */
+function PageDock({
+  links,
+  labels,
+  still,
+}: {
+  links: NonNullable<StoryBeat["links"]>;
+  labels: StoryLabels;
+  still: boolean;
+}) {
+  const calendar = useCalendarLink(links.ics, links.google);
+  if (!links.maps && !calendar) return null;
+  return (
+    <div
+      className={cn(
+        "absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 flex justify-center gap-8",
+        !still && "story-dock",
+      )}
+    >
+      {links.maps && (
+        <DockLink
+          href={links.maps}
+          external
+          label={labels.directions}
+          icon={<Navigation aria-hidden className="size-5" />}
+        >
+          {labels.directions}
+        </DockLink>
+      )}
+      {calendar && (
+        <DockLink
+          href={calendar.href}
+          external={calendar.external}
+          label={labels.calendar}
+          icon={<CalendarPlus aria-hidden className="size-5" />}
+        >
+          {labels.calendarShort}
+        </DockLink>
+      )}
+    </div>
+  );
+}
+
+function DockLink({
+  href,
+  external,
+  label,
+  icon,
+  children,
+}: {
+  href: string;
+  external: boolean;
+  label: string;
+  icon: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+      className="group flex min-w-16 flex-col items-center gap-1.5 rounded-2xl p-1 text-card-ivory outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
+      <span className="grid size-12 place-items-center rounded-full border border-card-ivory/45 bg-night/45 shadow-overlay backdrop-blur-md transition-[transform,background-color] duration-200 group-hover:bg-night/65 group-active:scale-90 motion-still:transition-none">
+        {icon}
+      </span>
+      <span
+        aria-hidden
+        className="rounded-full bg-night/45 px-2.5 py-0.5 text-xs font-semibold tracking-wide whitespace-nowrap backdrop-blur-sm"
+      >
+        {children}
+      </span>
+    </a>
   );
 }

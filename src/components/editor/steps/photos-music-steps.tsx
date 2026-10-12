@@ -45,7 +45,7 @@ import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
 import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
-import { PagePacing } from "../page-pacing";
+import { PagePacing, useStoryTimes } from "../page-pacing";
 import { ContactsSection } from "./family-section";
 import { draftShowsScene } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
@@ -491,6 +491,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
   const clip = draft.music.clip;
   const clipUrl = useClipUrl(draft);
+  const { live } = useStoryTimes(draft);
   // "Your own music" stays chosen while the host picks a song, before any clip exists
   const [ownChosen, setOwnChosen] = useState(clip !== null);
   const source = clip || ownChosen ? "own" : "raga";
@@ -568,6 +569,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
         <OwnMusic
           clip={clip}
           url={clipUrl}
+          live={draftShowsScene(draft) ? null : live}
           onClip={(next) => {
             setAside.current = null;
             setClip(next);

@@ -209,6 +209,13 @@ export const guestText: GuestText = {
       directions: "வழி பார்க்கவும்",
       calendar: "நாள்காட்டியில் சேர்க்கவும்",
       textBox: "எழுத்துகளுக்குப் பின் பெட்டி",
+      more: "விவரங்களைப் பார்க்க",
+      calendarShort: "நாள்காட்டி",
+    },
+    tour: {
+      label: "அழைப்பிதழ் தானாக நகர்கிறது",
+      pause: "இங்கே நிறுத்து",
+      play: "தொடர்ந்து செல்",
     },
   },
   theme: { group: "வண்ணத் தீம்", system: "சாதனத்தைப் போல", light: "வெளிர்", dark: "இருண்ட" },

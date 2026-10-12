@@ -198,6 +198,13 @@ export const guestText: GuestText = {
       directions: "રસ્તો જુઓ",
       calendar: "કૅલેન્ડરમાં ઉમેરો",
       textBox: "શબ્દો પાછળ ચોકઠું",
+      more: "વિગતો જુઓ",
+      calendarShort: "કૅલેન્ડર",
+    },
+    tour: {
+      label: "આમંત્રણ આપમેળે આગળ વધે છે",
+      pause: "અહીં રોકો",
+      play: "આગળ ચલાવો",
     },
   },
   theme: { group: "રંગ થીમ", system: "ડિવાઇસ પ્રમાણે", light: "આછી", dark: "ઘેરી" },

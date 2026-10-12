@@ -103,7 +103,7 @@ describe("event pages", () => {
       "reply",
     ]);
     expect(beats[0]!.symbol).toBe(true);
-    expect(beats.at(-1)!.lines[0]!.text).toBe(words.joinUs);
+    expect(beats.at(-1)!.lines.map((l) => l.text)).toEqual([words.welcome, words.withLove]);
     // Every beat has a unique id, for keys and tests
     expect(new Set(beats.map((b) => b.id)).size).toBe(beats.length);
   });
@@ -149,7 +149,7 @@ describe("event pages", () => {
     for (const beat of beats) for (const line of beat.lines) expect(line.text).not.toBe("");
     const mehendi = beats.find((b) => b.scene === "mehendi")!;
     expect(mehendi.lines.map((l) => l.text)).toEqual(["Mehendi", "Friday, 12 February 2027"]);
-    expect(beats.at(-1)!.lines[0]!.text).toBe(words.withLove);
+    expect(beats.at(-1)!.lines[0]!.text).toBe(words.welcome);
   });
 
   it("keeps a single function's date on its own page, not the family's", () => {
@@ -191,7 +191,8 @@ describe("event pages", () => {
     });
     expect(beats.find((b) => b.scene === "haldi")!.links).toEqual({
       maps: "https://maps.example/x",
-      calendar: "/ics/haldi",
+      ics: "/ics/haldi",
+      google: null,
     });
     expect(beats.find((b) => b.scene === "sangeet")!.links).toBeUndefined();
   });

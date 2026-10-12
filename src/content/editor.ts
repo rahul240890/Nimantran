@@ -716,6 +716,8 @@ export const extrasCopy = {
   removeClip: "Remove",
   listenClip: "Listen",
   clipMeta: (n: number) => `Your music · ${n} seconds`,
+  repeatNote: (clip: number, live: number, times: number) =>
+    `Your invitation pages play for about ${live} seconds, and the music carries on while guests scroll down to reply. This ${clip} second clip will repeat about ${times} times, so pick a part that loops smoothly, or keep a longer one.`,
   listen: (raga: string) => `Listen to ${raga}`,
   stopListening: "Stop listening",
   designsOwn: "Design's own",

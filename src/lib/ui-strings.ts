@@ -26,12 +26,20 @@ export const uiStrings = {
       directions: "Directions",
       calendar: "Add to calendar",
       textBox: "Box behind the words",
+      more: "See the details",
+      calendarShort: "Calendar",
+    },
+    tour: {
+      label: "The invitation, moving on by itself",
+      pause: "Hold here",
+      play: "Play on",
     },
   },
   /** Words the story adds between the host's own (Step 12d). */
   storyWords: {
     saveTheDate: "Save the date",
     joinUs: "Will you join us?",
+    welcome: "You are most welcome",
     withLove: "With love, we await you",
     and: "and",
   },
