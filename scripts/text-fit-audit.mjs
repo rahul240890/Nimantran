@@ -24,7 +24,8 @@ const STORY_THEMES = (
   "rajwada-bagh,shahi-savari,kayal,noor-bagh,phulkari-haveli,rajbari,peshwai-wada,kutch-toran," +
   "gubbara,saath,rooftop,ivory-arch,gulaab,deco-noir,taara,kaagaz,mitti,neel,pichwai,tanjore," +
   "kashi,sagar,mysuru,kalamkari,pattachitra,chinar,chai-bagan,sufi-raat,chapel,sakura,vigna," +
-  "himani,van,riad,palna,deepotsav,jungle-party,classic"
+  "himani,van,riad,palna,deepotsav,jungle-party,chaand-kalayein,ritu-chakra,raagmala," +
+  "panchatantra,patang-udaan,diya-ki-kahani,resham-katha,navrang,nadi-safar,ek-rekha,classic"
 ).split(",");
 
 const browser = await chromium.launch(

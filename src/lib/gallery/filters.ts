@@ -1,5 +1,5 @@
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
-import { suiteSuits } from "@/lib/suites/catalog";
+import { isStoryId, suiteSuits } from "@/lib/suites/catalog";
 import { isMoving } from "@/lib/suites/moving";
 import {
   WEDDING_KINDS,
@@ -20,7 +20,7 @@ import { normalize } from "./search";
  */
 
 /** "moving" is a Scene painted in layers that move like a short film (moving.ts). */
-export const DESIGN_FORMATS = ["moving", "scene", "story", "card"] as const;
+export const DESIGN_FORMATS = ["moving", "storybook", "scene", "story", "card"] as const;
 export type DesignFormat = (typeof DESIGN_FORMATS)[number];
 
 /**
@@ -72,6 +72,7 @@ export function hasFilters(filters: DesignFilters): boolean {
 
 export function formatOf(design: GalleryDesign): DesignFormat {
   if (isMoving(design.suite)) return "moving";
+  if (isStoryId(design.suite)) return "storybook";
   return design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
 }
 

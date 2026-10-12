@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { THEMED_IDS } from "@/lib/suites/catalog";
+import { STORY_IDS, THEMED_IDS } from "@/lib/suites/catalog";
 import {
   FRESH_OPENINGS,
   OPENING_GROUPS,
@@ -25,6 +25,21 @@ describe("openings", () => {
     expect(openingStyle(noOpening, "classic", false)).toBe("rajwada-pol");
     expect(openingStyle(noOpening, "rajwada-bagh", true)).toBe("rajwada-pol");
     expect(openingStyle({ style: "lotus", god: null }, "classic", false)).toBe("lotus");
+  });
+
+  it("opens each story theme at its own gate, which any card can also pick", () => {
+    for (const story of STORY_IDS) {
+      const gate = openingStyle(noOpening, story, false);
+      expect(isPaintedGate(gate), story).toBe(true);
+      expect(existsSync(join(process.cwd(), "public/openings/gates", gate, "hole.webp"))).toBe(
+        true,
+      );
+    }
+    expect(openingStyle(noOpening, "navrang", false)).toBe("navrang-dwar");
+    expect(openingStyle({ style: "lotus", god: null }, "navrang", false)).toBe("lotus");
+    expect(new Set(STORY_IDS.map((id) => openingStyle(noOpening, id, false))).size).toBe(
+      STORY_IDS.length,
+    );
   });
 
   it("opens each themed design with its own painting, which any card can also pick", () => {

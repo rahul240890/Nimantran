@@ -15,6 +15,8 @@ describe("design tiers", () => {
     expect(defaultTier("pichwai")).toBe("royal");
     expect(defaultTier("rajwada-bagh")).toBe("royal");
     expect(defaultTier("deepotsav")).toBe("royal");
+    // The storybook themes with their own gates are Stories too, at ₹799
+    expect(defaultTier("chaand-kalayein")).toBe("royal");
     expect(tierPricePaise(DEFAULT_PRICING, "premium")).toBe(49_900);
     expect(tierPricePaise(DEFAULT_PRICING, "royal")).toBe(79_900);
   });

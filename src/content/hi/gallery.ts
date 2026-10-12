@@ -34,6 +34,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     label: "निमंत्रण का प्रकार",
     all: "सभी",
     moving: "चलते दृश्य",
+    storybook: "कहानी की किताब",
     scene: "दृश्य",
     story: "कहानी",
     card: "3D कार्ड",
@@ -241,6 +242,10 @@ export const shelfCopy: Translation<typeof en.shelfCopy> = {
       title: "चलते दृश्य",
       intro:
         "छोटी फ़िल्म की तरह चलते चित्र: पंखुड़ियाँ गिरती हैं, कंदील उड़ते हैं, पानी लहराता है। फ़ोटो की ज़रूरत नहीं।",
+    },
+    storybook: {
+      title: "कहानी की किताबें",
+      intro: "नौ चित्रित पन्नों में कही एक कहानी, जो अपने ही दरवाज़े से खुलती है।",
     },
     story: { title: "स्टोरी", intro: "हर रस्म का अपना पूरा चित्रित पन्ना।" },
     scene: {

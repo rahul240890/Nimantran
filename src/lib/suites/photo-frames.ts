@@ -414,6 +414,86 @@ const FRAMES: Partial<Record<SuiteId, Entry>> = {
     ],
     image: "photo",
   },
+  "chaand-kalayein": {
+    one: [[20.4, 16.6, 59.1, 32.9]],
+    words: [
+      [52, 12],
+      [52, 12],
+    ],
+    image: "photo",
+  },
+  "ritu-chakra": {
+    one: [[20.4, 20.1, 59.0, 33.2]],
+    words: [
+      [56, 12],
+      [56, 12],
+    ],
+    image: "photo",
+  },
+  raagmala: {
+    one: [[24.0, 14.3, 52.1, 36.8]],
+    words: [
+      [54, 12],
+      [54, 12],
+    ],
+    image: "photo",
+  },
+  panchatantra: {
+    one: [[19.1, 13.3, 59.9, 32.7]],
+    words: [
+      [49, 12],
+      [49, 12],
+    ],
+    image: "photo",
+  },
+  "patang-udaan": {
+    one: [[22.9, 17.8, 54.3, 29.5]],
+    words: [
+      [50, 12],
+      [50, 12],
+    ],
+    image: "photo",
+  },
+  "diya-ki-kahani": {
+    one: [[20.7, 17.4, 58.5, 32.3]],
+    words: [
+      [53, 12],
+      [53, 12],
+    ],
+    image: "photo",
+  },
+  "resham-katha": {
+    one: [[28.9, 11.7, 44.0, 36.7]],
+    words: [
+      [51, 12],
+      [51, 12],
+    ],
+    image: "photo",
+  },
+  navrang: {
+    one: [[23.2, 10.5, 53.5, 40.7]],
+    words: [
+      [54, 12],
+      [54, 12],
+    ],
+    image: "photo",
+  },
+  "nadi-safar": {
+    one: [[20.6, 15.4, 58.9, 33.0]],
+    words: [
+      [51, 12],
+      [51, 12],
+    ],
+    image: "photo",
+  },
+  "ek-rekha": {
+    one: [[15.4, 13.0, 69.1, 38.3]],
+    words: [
+      [54, 12],
+      [54, 12],
+    ],
+    image: "photo",
+  },
 };
 
 /** The painting and frames for a theme's photo page with this many photos, if it has one. */

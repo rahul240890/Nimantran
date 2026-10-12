@@ -56,6 +56,17 @@ const PAINTED_MUSIC: Record<Exclude<SuiteId, SceneThemeId | "classic">, ThemeMus
   "jungle-party": { raga: "pilu", lead: "santoor", taal: "keherwa", tempo: 90 },
   rooftop: { raga: "kafi", lead: "santoor", taal: "keherwa", tempo: 92 },
   deepotsav: { raga: "yaman", lead: "sitar", taal: "keherwa", tempo: 76 },
+  // The story themes, each on its own raga and pace
+  "chaand-kalayein": { raga: "yaman", lead: "sitar", taal: null, tempo: 58 },
+  "ritu-chakra": { raga: "bhupali", lead: "santoor", taal: "dadra", tempo: 66 },
+  raagmala: { raga: "bihag", lead: "veena", taal: null, tempo: 60 },
+  panchatantra: { raga: "pilu", lead: "bansuri", taal: "keherwa", tempo: 80 },
+  "patang-udaan": { raga: "kafi", lead: "santoor", taal: "keherwa", tempo: 96 },
+  "diya-ki-kahani": { raga: "yaman", lead: "sitar", taal: "keherwa", tempo: 70 },
+  "resham-katha": { raga: "hamsadhwani", lead: "veena", taal: "dadra", tempo: 66 },
+  navrang: { raga: "khamaj", lead: "santoor", taal: null, tempo: 70 },
+  "nadi-safar": { raga: "madhyamavati", lead: "bansuri", taal: "dadra", tempo: 64 },
+  "ek-rekha": { raga: "desh", lead: "santoor", taal: null, tempo: 60 },
 };
 
 /** Scene themes whose occasion asks for something their kin doesn't play. */

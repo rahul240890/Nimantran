@@ -1,6 +1,6 @@
 import type { CategoryId } from "@/lib/categories/catalog";
-import type { SuiteId, ThemedId } from "@/lib/suites/catalog";
-import { SUITES, THEMED_IDS } from "@/lib/suites/catalog";
+import type { StoryId, SuiteId, ThemedId } from "@/lib/suites/catalog";
+import { isStoryId, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
@@ -31,6 +31,46 @@ export const PAINTED_GATES = {
   "deco-gates": { move: "swing", hole: { left: 19.8, top: 0.8, width: 60.4, height: 99.2 } },
   "bagiya-gate": { move: "swing", hole: { left: 22.8, top: 6.3, width: 54.6, height: 93.7 } },
   "mela-tamboo": { move: "lift", hole: { left: 9.8, top: 6.2, width: 80.3, height: 93.8 } },
+  "chaand-dwar": {
+    move: "swing",
+    hole: { left: 13.5, top: 11.6, width: 73.0, height: 88.4 },
+  },
+  "ritu-dwar": {
+    move: "swing",
+    hole: { left: 11.6, top: 14.8, width: 77.0, height: 85.2 },
+  },
+  "raag-dwar": {
+    move: "swing",
+    hole: { left: 8.8, top: 13.9, width: 82.4, height: 86.1 },
+  },
+  "van-dwar": {
+    move: "swing",
+    hole: { left: 8.7, top: 12.1, width: 82.6, height: 87.9 },
+  },
+  "patang-dwar": {
+    move: "swing",
+    hole: { left: 14.6, top: 22.3, width: 70.9, height: 77.7 },
+  },
+  "kumhar-dwar": {
+    move: "swing",
+    hole: { left: 20.1, top: 17.0, width: 59.8, height: 83.0 },
+  },
+  "karghaa-dwar": {
+    move: "swing",
+    hole: { left: 14.5, top: 15.8, width: 71.1, height: 84.2 },
+  },
+  "navrang-dwar": {
+    move: "swing",
+    hole: { left: 17.7, top: 18.4, width: 64.5, height: 81.6 },
+  },
+  "ghat-dwar": {
+    move: "swing",
+    hole: { left: 13.3, top: 22.5, width: 73.3, height: 77.5 },
+  },
+  "rekha-dwar": {
+    move: "swing",
+    hole: { left: 9.1, top: 11.6, width: 81.7, height: 88.4 },
+  },
 } as const satisfies Record<
   string,
   {
@@ -299,6 +339,20 @@ export function openingStyles(suite: SuiteId, scene: boolean): readonly OpeningS
   );
 }
 
+/** Each story theme's own gate, painted with its pages. */
+const STORY_GATE: Record<StoryId, PaintedGate> = {
+  "chaand-kalayein": "chaand-dwar",
+  "ritu-chakra": "ritu-dwar",
+  raagmala: "raag-dwar",
+  panchatantra: "van-dwar",
+  "patang-udaan": "patang-dwar",
+  "diya-ki-kahani": "kumhar-dwar",
+  "resham-katha": "karghaa-dwar",
+  navrang: "navrang-dwar",
+  "nadi-safar": "ghat-dwar",
+  "ek-rekha": "rekha-dwar",
+};
+
 /** The style the guest sees: the host's pick when it fits, else the design's own. */
 export function openingStyle(
   choice: OpeningChoice,
@@ -310,6 +364,8 @@ export function openingStyle(
   if (choice.style && offered.includes(choice.style)) return choice.style;
   // A themed opening's own theme opens with it
   if (isThemedOpening(suite)) return suite;
+  // A story theme opens with its own gate
+  if (isStoryId(suite)) return STORY_GATE[suite];
   if (hasCoverDoors(suite) && !scene) return "doors";
   return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }
@@ -395,6 +451,16 @@ const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   moonlit: "night",
   "deco-gates": "party",
   "mela-tamboo": "party",
+  "chaand-dwar": "night",
+  "ritu-dwar": "bloom",
+  "raag-dwar": "royal",
+  "van-dwar": "bloom",
+  "patang-dwar": "party",
+  "kumhar-dwar": "lamps",
+  "karghaa-dwar": "royal",
+  "navrang-dwar": "bloom",
+  "ghat-dwar": "lamps",
+  "rekha-dwar": "letter",
   fireworks: "party",
   balloons: "party",
   gift: "party",

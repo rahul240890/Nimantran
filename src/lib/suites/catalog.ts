@@ -352,6 +352,29 @@ export const SCENE_THEME_IDS = [
 ] as const;
 export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
 
+/**
+ * The story themes (owner's paintings, 2026-10-12): nine pages that tell one story from the
+ * cover to the reply (a moon waxing, a tree through six seasons, a kite's flight), each with
+ * a gate of its own and a page for photos. Painted to suit every occasion, not only weddings.
+ */
+export const STORY_IDS = [
+  "chaand-kalayein",
+  "ritu-chakra",
+  "raagmala",
+  "panchatantra",
+  "patang-udaan",
+  "diya-ki-kahani",
+  "resham-katha",
+  "navrang",
+  "nadi-safar",
+  "ek-rekha",
+] as const;
+export type StoryId = (typeof STORY_IDS)[number];
+
+export function isStoryId(value: unknown): value is StoryId {
+  return typeof value === "string" && (STORY_IDS as readonly string[]).includes(value);
+}
+
 export const SUITE_IDS = [
   "rajwada-bagh",
   "shahi-savari",
@@ -390,6 +413,7 @@ export const SUITE_IDS = [
   "palna",
   "deepotsav",
   "jungle-party",
+  ...STORY_IDS,
   ...SCENE_THEME_IDS,
   "classic",
 ] as const;
@@ -465,6 +489,11 @@ export type Suite = {
    * theme has four pages (cover, family, the party itself as its reception, the reply).
    */
   occasions?: readonly CategoryId[];
+  /**
+   * A story theme told without a wedding in it, so it suits every occasion (but a prayer
+   * meet) as well as the wedding journey; the reception's painting holds the party itself.
+   */
+  everyOccasion?: true;
   /**
    * The guest page below the painted pages (guest-look.ts): a style, and any touch picked
    * differently from it. Missing keeps the plain details page.
@@ -1451,6 +1480,297 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     },
     occasions: ["birthday"],
   },
+  // The moon from a thin crescent to full, over a marble terrace garden
+  "chaand-kalayein": {
+    id: "chaand-kalayein",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "emerald",
+    traditions: [],
+    guest: {
+      style: "palace",
+      flower: "jasmine",
+      secondFlower: "rose",
+      lamp: "lanterns",
+      pattern: "jaali",
+    },
+    voice: "romantic",
+    images: {
+      cover: "/suites/chaand-kalayein/cover.webp",
+      family: "/suites/chaand-kalayein/family.webp",
+      haldi: "/suites/chaand-kalayein/haldi.webp",
+      mehendi: "/suites/chaand-kalayein/mehendi.webp",
+      sangeet: "/suites/chaand-kalayein/sangeet.webp",
+      baraat: "/suites/chaand-kalayein/baraat.webp",
+      wedding: "/suites/chaand-kalayein/wedding.webp",
+      reception: "/suites/chaand-kalayein/reception.webp",
+      reply: "/suites/chaand-kalayein/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // One courtyard tree through India's six seasons
+  "ritu-chakra": {
+    id: "ritu-chakra",
+    art: "bagh",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "rose",
+      secondFlower: "marigold",
+      lamp: "diyas",
+      pattern: "rangoli",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/ritu-chakra/cover.webp",
+      family: "/suites/ritu-chakra/family.webp",
+      haldi: "/suites/ritu-chakra/haldi.webp",
+      mehendi: "/suites/ritu-chakra/mehendi.webp",
+      sangeet: "/suites/ritu-chakra/sangeet.webp",
+      baraat: "/suites/ritu-chakra/baraat.webp",
+      wedding: "/suites/ritu-chakra/wedding.webp",
+      reception: "/suites/ritu-chakra/reception.webp",
+      reply: "/suites/ritu-chakra/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // A garland of ragas, a veena resting on every page
+  raagmala: {
+    id: "raagmala",
+    art: "bagh",
+    turn: "arch",
+    faiths: ["all"],
+    template: "rangmahal",
+    traditions: [],
+    guest: {
+      style: "palace",
+      flower: "marigold",
+      secondFlower: "rose",
+      lamp: "diyas",
+      pattern: "jaali",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/raagmala/cover.webp",
+      family: "/suites/raagmala/family.webp",
+      haldi: "/suites/raagmala/haldi.webp",
+      mehendi: "/suites/raagmala/mehendi.webp",
+      sangeet: "/suites/raagmala/sangeet.webp",
+      baraat: "/suites/raagmala/baraat.webp",
+      wedding: "/suites/raagmala/wedding.webp",
+      reception: "/suites/raagmala/reception.webp",
+      reply: "/suites/raagmala/reply.webp",
+    },
+    tones: { mehendi: "dark", baraat: "dark" },
+    everyOccasion: true,
+  },
+  // The fable forest, its animals gathering page by page
+  panchatantra: {
+    id: "panchatantra",
+    art: "kayal",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "emerald",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "marigold",
+      secondFlower: "lotus",
+      lamp: "lanterns",
+      pattern: "pookalam",
+    },
+    voice: "playful",
+    images: {
+      cover: "/suites/panchatantra/cover.webp",
+      family: "/suites/panchatantra/family.webp",
+      haldi: "/suites/panchatantra/haldi.webp",
+      mehendi: "/suites/panchatantra/mehendi.webp",
+      sangeet: "/suites/panchatantra/sangeet.webp",
+      baraat: "/suites/panchatantra/baraat.webp",
+      wedding: "/suites/panchatantra/wedding.webp",
+      reception: "/suites/panchatantra/reception.webp",
+      reply: "/suites/panchatantra/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // One kite flying from the rooftops to the stars
+  "patang-udaan": {
+    id: "patang-udaan",
+    art: "savari",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "bandhani",
+    traditions: [],
+    guest: {
+      style: "party",
+      flower: "marigold",
+      secondFlower: "rose",
+      lamp: "fairy",
+      pattern: "burst",
+    },
+    voice: "playful",
+    images: {
+      cover: "/suites/patang-udaan/cover.webp",
+      family: "/suites/patang-udaan/family.webp",
+      haldi: "/suites/patang-udaan/haldi.webp",
+      mehendi: "/suites/patang-udaan/mehendi.webp",
+      sangeet: "/suites/patang-udaan/sangeet.webp",
+      baraat: "/suites/patang-udaan/baraat.webp",
+      wedding: "/suites/patang-udaan/wedding.webp",
+      reception: "/suites/patang-udaan/reception.webp",
+      reply: "/suites/patang-udaan/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // River clay becoming a lit lamp
+  "diya-ki-kahani": {
+    id: "diya-ki-kahani",
+    art: "savari",
+    turn: "fade",
+    faiths: ["all"],
+    template: "marigold",
+    traditions: [],
+    guest: {
+      style: "palace",
+      flower: "marigold",
+      secondFlower: "jasmine",
+      lamp: "diyas",
+      pattern: "rangoli",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/diya-ki-kahani/cover.webp",
+      family: "/suites/diya-ki-kahani/family.webp",
+      haldi: "/suites/diya-ki-kahani/haldi.webp",
+      mehendi: "/suites/diya-ki-kahani/mehendi.webp",
+      sangeet: "/suites/diya-ki-kahani/sangeet.webp",
+      baraat: "/suites/diya-ki-kahani/baraat.webp",
+      wedding: "/suites/diya-ki-kahani/wedding.webp",
+      reception: "/suites/diya-ki-kahani/reception.webp",
+      reply: "/suites/diya-ki-kahani/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // Silk from the mulberry leaf to a woven sari
+  "resham-katha": {
+    id: "resham-katha",
+    art: "kayal",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "paithani",
+    traditions: [],
+    guest: {
+      style: "procession",
+      flower: "jasmine",
+      secondFlower: "marigold",
+      lamp: "nilavilakku",
+      pattern: "kolam",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/resham-katha/cover.webp",
+      family: "/suites/resham-katha/family.webp",
+      haldi: "/suites/resham-katha/haldi.webp",
+      mehendi: "/suites/resham-katha/mehendi.webp",
+      sangeet: "/suites/resham-katha/sangeet.webp",
+      baraat: "/suites/resham-katha/baraat.webp",
+      wedding: "/suites/resham-katha/wedding.webp",
+      reception: "/suites/resham-katha/reception.webp",
+      reply: "/suites/resham-katha/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // One flower pavilion in nine colours
+  navrang: {
+    id: "navrang",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "fairy",
+      pattern: "jaali",
+    },
+    voice: "romantic",
+    images: {
+      cover: "/suites/navrang/cover.webp",
+      family: "/suites/navrang/family.webp",
+      haldi: "/suites/navrang/haldi.webp",
+      mehendi: "/suites/navrang/mehendi.webp",
+      sangeet: "/suites/navrang/sangeet.webp",
+      baraat: "/suites/navrang/baraat.webp",
+      wedding: "/suites/navrang/wedding.webp",
+      reception: "/suites/navrang/reception.webp",
+      reply: "/suites/navrang/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // A leaf boat with a marigold, from a glacier spring to the sea
+  "nadi-safar": {
+    id: "nadi-safar",
+    art: "kayal",
+    turn: "ripple",
+    faiths: ["all"],
+    template: "kasavu",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "lotus",
+      secondFlower: "marigold",
+      lamp: "diyas",
+      pattern: "alpona",
+    },
+    voice: "romantic",
+    images: {
+      cover: "/suites/nadi-safar/cover.webp",
+      family: "/suites/nadi-safar/family.webp",
+      haldi: "/suites/nadi-safar/haldi.webp",
+      mehendi: "/suites/nadi-safar/mehendi.webp",
+      sangeet: "/suites/nadi-safar/sangeet.webp",
+      baraat: "/suites/nadi-safar/baraat.webp",
+      wedding: "/suites/nadi-safar/wedding.webp",
+      reception: "/suites/nadi-safar/reception.webp",
+      reply: "/suites/nadi-safar/reply.webp",
+    },
+    everyOccasion: true,
+  },
+  // One golden line that draws the whole world
+  "ek-rekha": {
+    id: "ek-rekha",
+    art: "bagh",
+    turn: "fade",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "lotus",
+      secondFlower: "rose",
+      lamp: "fairy",
+      pattern: "jaali",
+    },
+    voice: "modern",
+    images: {
+      cover: "/suites/ek-rekha/cover.webp",
+      family: "/suites/ek-rekha/family.webp",
+      haldi: "/suites/ek-rekha/haldi.webp",
+      mehendi: "/suites/ek-rekha/mehendi.webp",
+      sangeet: "/suites/ek-rekha/sangeet.webp",
+      baraat: "/suites/ek-rekha/baraat.webp",
+      wedding: "/suites/ek-rekha/wedding.webp",
+      reception: "/suites/ek-rekha/reception.webp",
+      reply: "/suites/ek-rekha/reply.webp",
+    },
+    everyOccasion: true,
+  },
   classic: {
     id: "classic",
     art: "card",
@@ -2061,10 +2381,12 @@ export function weddingFit(suite: SuiteId): readonly JourneyId[] {
 
 /**
  * Whether a theme is painted for an occasion: wedding themes for the steps of the wedding
- * journey they suit, every other theme for its own occasions only.
+ * journey they suit, story themes for every occasion but a prayer meet, every other theme for
+ * its own occasions only.
  */
 export function suiteSuits(suite: SuiteId, category: CategoryId): boolean {
   if (isWeddingJourney(category)) return weddingFit(suite).includes(category);
+  if (SUITES[suite].everyOccasion) return category !== "prayer-meet";
   return Boolean(SUITES[suite].occasions?.includes(category));
 }
 

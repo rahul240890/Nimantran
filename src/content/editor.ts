@@ -953,6 +953,16 @@ export const suiteCopy = {
     palna: "Palna",
     deepotsav: "Deepotsav",
     "jungle-party": "Jungle Party",
+    "chaand-kalayein": "Chaand Kalayein",
+    "ritu-chakra": "Ritu Chakra",
+    raagmala: "Raagmala",
+    panchatantra: "Panchatantra",
+    "patang-udaan": "Patang Udaan",
+    "diya-ki-kahani": "Diya ki Kahani",
+    "resham-katha": "Resham Katha",
+    navrang: "Navrang",
+    "nadi-safar": "Nadi Safar",
+    "ek-rekha": "Ek Rekha",
     "udaipur-lake": "Udaipur Lake",
     "space-voyage": "Space Voyage",
     "rainbow-unicorn": "Rainbow Unicorn",
@@ -1279,6 +1289,22 @@ export const suiteCopy = {
     palna: "A flower swing cradle among soft pastel clouds.",
     deepotsav: "A Diwali night of diyas, rangoli and fireworks, opening with Lakshmi and Ganesha.",
     "jungle-party": "A storybook jungle of friendly animals, balloons and big leaves.",
+    "chaand-kalayein":
+      "The moon grows from a thin crescent to full over a marble garden, one phase on every page.",
+    "ritu-chakra":
+      "One courtyard tree through India's six seasons, from spring blossom to winter lamps.",
+    raagmala: "A garland of ragas painted like miniatures, with a veena resting on every page.",
+    panchatantra: "The fable forest, its friendly animals gathering a little more on every page.",
+    "patang-udaan":
+      "One kite's flight from the dawn rooftops, through the festival sky, to the stars.",
+    "diya-ki-kahani":
+      "River clay shaped on the potter's wheel, fired and painted into a glowing lamp.",
+    "resham-katha":
+      "Silk from the mulberry leaf to the loom to a woven sari in temple red and gold.",
+    navrang: "One flower pavilion painted in nine colours, a new colour on every page.",
+    "nadi-safar":
+      "A leaf boat carrying a marigold from a glacier spring, past the ghats, to the sea.",
+    "ek-rekha": "One golden line on ivory paper that draws the whole world, page by page.",
     "udaipur-lake": "Lake Pichola at dusk, with a white marble jharokha for each celebration.",
     "space-voyage": "A porthole among the planets, with a starship plaque for each celebration.",
     "rainbow-unicorn": "Candy clouds and a rainbow, with a unicorn keeping watch.",
@@ -1947,6 +1973,48 @@ export const openingCopy = {
     "mela-tamboo": {
       name: "Fair tent",
       description: "Striped tent flaps lift onto balloons, a carousel and a big cake.",
+    },
+    "chaand-dwar": {
+      name: "Moonlit garden doors",
+      description: "Mother-of-pearl doors of crescents and stars open onto a moonlit pool garden.",
+    },
+    "ritu-dwar": {
+      name: "Courtyard doors",
+      description:
+        "Old terracotta and green doors, carved with a leaf for each season, open onto a blossoming tree.",
+    },
+    "raag-dwar": {
+      name: "Music-room doors",
+      description: "Lapis and gold painted doors open onto a palace terrace with a veena at dawn.",
+    },
+    "van-dwar": {
+      name: "Forest door",
+      description:
+        "Doors of woven branches and leaves open onto a mossy path into the fable forest.",
+    },
+    "patang-dwar": {
+      name: "Rooftop doors",
+      description: "Bright turquoise doors painted with kites open onto the dawn rooftops.",
+    },
+    "kumhar-dwar": {
+      name: "Potters' lane doors",
+      description: "Indigo doors with terracotta tiles open onto a lane lit by hundreds of diyas.",
+    },
+    "karghaa-dwar": {
+      name: "Weavers' house doors",
+      description: "Doors wrapped in red silk and gold zari open onto a weavers' courtyard.",
+    },
+    "navrang-dwar": {
+      name: "Doors of nine colours",
+      description: "White doors set with nine bands of coloured glass open onto a rose pavilion.",
+    },
+    "ghat-dwar": {
+      name: "Riverside ghat doors",
+      description: "Teal doors carved with waves and fish open onto a glacier spring at dawn.",
+    },
+    "rekha-dwar": {
+      name: "Doors drawn in one line",
+      description: "Ivory paper doors drawn in one gold line open onto a sunrise over lotuses.",
     },
     pankhi: {
       name: "Painted fan",
