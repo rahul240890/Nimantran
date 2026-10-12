@@ -39,8 +39,8 @@ export const uiStrings: Translation<typeof en> = {
   storyWords: {
     saveTheDate: "तारीख़ याद रखें",
     joinUs: "क्या आप हमारे साथ होंगे?",
-    welcome: "आपका हार्दिक स्वागत है",
-    withLove: "सप्रेम, आपकी प्रतीक्षा में",
+    welcome: "आपका आगमन, हमारा सौभाग्य",
+    withLove: "हाथ जोड़कर, पलकें बिछाए आपकी राह देख रहे हैं",
     and: "और",
   },
   error: {

@@ -6,7 +6,7 @@ import type { CardLanguage } from "./card-languages";
 import type { SlotId } from "./ids";
 
 /*
- * The few words the event pages add of their own ("Save the date", "You are most welcome"),
+ * The few words the event pages add of their own ("Save the date", "Your presence, our blessing"),
  * in the card's language rather than the site's, so a Gujarati card reads Gujarati on every
  * page. English and Hindi share the site's own strings. Drafts for a native proofreader.
  */
@@ -16,29 +16,29 @@ export const CARD_STORY_WORDS: Record<CardLanguage, StoryWords> = {
   mr: {
     saveTheDate: "तारीख लक्षात ठेवा",
     joinUs: "आपण नक्की याल ना?",
-    welcome: "आपले सहर्ष स्वागत आहे",
-    withLove: "सप्रेम, आपली वाट पाहत आहोत",
+    welcome: "आपले आगमन, आमचे भाग्य",
+    withLove: "हात जोडून, आतुरतेने आपली वाट पाहत आहोत",
     and: "आणि",
   },
   gu: {
     saveTheDate: "તારીખ યાદ રાખજો",
     joinUs: "આપ જરૂર પધારશો ને?",
-    welcome: "આપને ભાવભર્યું આમંત્રણ છે",
-    withLove: "સપ્રેમ, આપની રાહ જોઈએ છીએ",
+    welcome: "આપનું આગમન, અમારું સૌભાગ્ય",
+    withLove: "ભાવભર્યું આમંત્રણ, હાથ જોડી આપની રાહ જોઈએ છીએ",
     and: "અને",
   },
   bn: {
     saveTheDate: "তারিখটি মনে রাখবেন",
     joinUs: "আপনি আসবেন তো?",
-    welcome: "আপনাকে সাদর আমন্ত্রণ",
-    withLove: "সাদরে, আপনার অপেক্ষায়",
+    welcome: "আপনার আগমন, আমাদের সৌভাগ্য",
+    withLove: "করজোড়ে, সাদরে আপনার অপেক্ষায় রইলাম",
     and: "ও",
   },
   ta: {
     saveTheDate: "தேதியை நினைவில் கொள்ளுங்கள்",
     joinUs: "நீங்கள் வருவீர்களா?",
-    welcome: "தங்களை அன்புடன் வரவேற்கிறோம்",
-    withLove: "அன்புடன், உங்கள் வருகைக்காகக் காத்திருக்கிறோம்",
+    welcome: "தங்கள் வருகை, எங்கள் பாக்கியம்",
+    withLove: "கரம் கூப்பி, அன்புடன் தங்களை வரவேற்கக் காத்திருக்கிறோம்",
     and: "மற்றும்",
   },
 };

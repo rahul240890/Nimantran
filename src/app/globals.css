@@ -4599,6 +4599,31 @@
     transform: translateY(1.25rem) scale(0.8);
   }
 }
+/* The music's bars (music-bars.tsx), each at its own pace, shortened in still mode */
+.music-bar {
+  transform-origin: bottom;
+  scale: 1 0.55;
+  animation: music-bar 1.1s ease-in-out infinite alternate;
+}
+.music-bar:nth-child(2) {
+  scale: 1 0.9;
+  animation-duration: 0.8s;
+  animation-delay: -0.4s;
+}
+.music-bar:nth-child(3) {
+  scale: 1 0.4;
+  animation-duration: 1.3s;
+  animation-delay: -0.9s;
+}
+@keyframes music-bar {
+  from {
+    scale: 1 0.35;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
 @keyframes story-nudge {
   0%,
   60%,
@@ -5547,6 +5572,19 @@
   }
 }
 
+/*
+ * The guest page turns a section at a time: each scroll or swipe settles on the next
+ * full-screen section, up or down, as the pages above it do. A section taller than the
+ * screen still scrolls through before the next one takes over.
+ */
+html:has(.guest-snap) {
+  scroll-snap-type: y mandatory;
+}
+.guest-snap :is([data-tour], [data-snap]) {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 @keyframes guest-rise {
   from {
     opacity: 0;
@@ -6357,6 +6395,15 @@
     var(--open-light),
     color-mix(in oklab, var(--marigold) 75%, var(--open-jewel)) 55%,
     var(--open-wood-dark)
+  );
+}
+/* Through the cover's own doors, which fill the screen: morning light, not a dark room */
+.opening-beyond.opening-beyond-dawn {
+  background: radial-gradient(
+    closest-side at 50% 45%,
+    var(--open-light),
+    color-mix(in oklab, var(--open-light) 55%, var(--marigold)) 60%,
+    color-mix(in oklab, var(--marigold) 70%, var(--open-jewel))
   );
 }
 .opening-rays {

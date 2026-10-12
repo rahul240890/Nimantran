@@ -191,6 +191,7 @@ export function PhotoWall({ slug }: { slug: string }) {
     <section
       id="photo-wall"
       aria-labelledby={headingId}
+      data-snap
       className="scroll-mt-4 border-t border-line bg-surface-2/40 px-4 py-12 sm:px-6 sm:py-16"
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">

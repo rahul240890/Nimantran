@@ -10,8 +10,6 @@ import {
   Pause,
   Play,
   RectangleHorizontal,
-  Volume2,
-  VolumeX,
   X,
 } from "lucide-react";
 import {
@@ -26,6 +24,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { MusicBars } from "@/components/invitation/music-bars";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { SYMBOLS } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
@@ -453,7 +452,7 @@ export function StoryPlayer({
           {music && (
             <IconButton
               label={music.playing ? music.pause : music.play}
-              icon={music.playing ? <Volume2 /> : <VolumeX />}
+              icon={<MusicBars playing={music.playing} className="size-5" />}
               size="sm"
               onClick={music.toggle}
               className={GLASS}
@@ -563,7 +562,7 @@ function PageArrow({
 }
 
 /** The painting behind a page: the couple's framed one on their photo page. */
-function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
+export function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
   const frames = beat.photos?.length ? photoPage(suiteId, beat.photos.length) : null;
   return frames?.image ?? SUITES[suiteId].images[pageLook(beat.scene).art];
 }

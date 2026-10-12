@@ -1,7 +1,8 @@
 "use client";
 
-import { Pause, Play, Volume2, VolumeX } from "lucide-react";
+import { Pause, Play } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { MusicBars } from "@/components/invitation/music-bars";
 import type { RagaMusic } from "@/components/invitation/use-raga-music";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -213,11 +214,7 @@ export function GuestTour({
           onClick={music.toggle}
           className="grid size-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          {music.playing ? (
-            <Volume2 aria-hidden className="size-5" />
-          ) : (
-            <VolumeX aria-hidden className="size-5" />
-          )}
+          <MusicBars playing={music.playing} className="size-5" />
         </button>
       )}
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, Flower2, Music, Pause } from "lucide-react";
+import { CalendarPlus, Flower2 } from "lucide-react";
 import Image from "next/image";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { FunctionFacts } from "@/components/guest/function-facts";
@@ -11,6 +11,7 @@ import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import { FamilyWords, pairedSide, type FamilyBlock } from "@/components/guest/family-words";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
+import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
@@ -95,7 +96,7 @@ export function ThemedDetails({
       ref={top}
       data-suite={suite}
       data-guest={look.style}
-      className="guest-themed relative isolate overflow-hidden"
+      className="guest-themed relative isolate overflow-clip"
     >
       <FlowerDefs />
       <Welcome
@@ -675,7 +676,8 @@ function Night({
       )}
       <p
         lang={lang}
-        className="relative px-6 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
+        data-snap
+        className="relative px-6 pt-10 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
       >
         {cardWords.closing}
       </p>
@@ -697,11 +699,7 @@ function FloatingMusic({ music }: { music: Music }) {
       data-playing={music.playing || undefined}
       className="guest-float-music fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-20 grid size-14 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
     >
-      {music.playing ? (
-        <Pause aria-hidden className="size-6" />
-      ) : (
-        <Music aria-hidden className="size-6" />
-      )}
+      <MusicBars playing={music.playing} className="size-6" />
     </button>
   );
 }
