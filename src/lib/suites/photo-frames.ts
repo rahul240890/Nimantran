@@ -574,6 +574,86 @@ const FRAMES: Partial<Record<SuiteId, Entry>> = {
     ],
     image: "photo",
   },
+  "udan-khatola": {
+    one: [[32.3, 17.2, 35.3, 19.0]],
+    words: [
+      [39, 12],
+      [39, 12],
+    ],
+    image: "photo",
+  },
+  "rang-raste": {
+    one: [[27.9, 19.4, 44.3, 24.5]],
+    words: [
+      [47, 12],
+      [47, 12],
+    ],
+    image: "photo",
+  },
+  "kaanch-gumbad": {
+    one: [[32.7, 18.6, 35.0, 28.6]],
+    words: [
+      [50, 12],
+      [50, 12],
+    ],
+    image: "photo",
+  },
+  "chalk-pati": {
+    one: [[19.0, 12.5, 62.0, 38.2]],
+    words: [
+      [54, 12],
+      [54, 12],
+    ],
+    image: "photo",
+  },
+  "jadon-ka-pul": {
+    one: [[28.4, 20.8, 42.2, 23.0]],
+    words: [
+      [47, 12],
+      [47, 12],
+    ],
+    image: "photo",
+  },
+  "gol-matol": {
+    one: [[24.0, 14.7, 53.5, 29.6]],
+    words: [
+      [47, 12],
+      [47, 12],
+    ],
+    image: "photo",
+  },
+  "bhool-bhulaiya": {
+    one: [[21.1, 14.1, 57.7, 31.3]],
+    words: [
+      [48, 12],
+      [48, 12],
+    ],
+    image: "photo",
+  },
+  "deco-yatra": {
+    one: [[21.0, 11.9, 58.3, 37.5]],
+    words: [
+      [52, 12],
+      [52, 12],
+    ],
+    image: "photo",
+  },
+  "gehra-neela": {
+    one: [[23.2, 15.8, 53.8, 29.4]],
+    words: [
+      [48, 12],
+      [48, 12],
+    ],
+    image: "photo",
+  },
+  "shatranj-baazi": {
+    one: [[28.3, 18.9, 44.9, 25.7]],
+    words: [
+      [48, 12],
+      [48, 12],
+    ],
+    image: "photo",
+  },
 };
 
 /** The painting and frames for a theme's photo page with this many photos, if it has one. */

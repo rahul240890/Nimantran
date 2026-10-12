@@ -57,7 +57,7 @@ import { FunctionsStep } from "./steps/functions-step";
 import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
 import { TraditionStep } from "./steps/tradition-step";
-import { forgetPhotoUrl } from "./use-photo-urls";
+import { forgetPhotoUrl, useDropLostPhotos } from "./use-photo-urls";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
@@ -253,6 +253,7 @@ export function Editor({
     ),
   );
   const ready = hydrated && !arriving;
+  useDropLostPhotos(draft, update, ready);
 
   const step = draft.step;
   const index = EDITOR_STEPS.indexOf(step);
