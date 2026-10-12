@@ -82,19 +82,15 @@ describe("invite draft", () => {
   });
 
   it("lists the steps still to finish", () => {
-    // The wedding's own theme paints a photo frame, so it asks for its photo too
+    // Photos are optional, even on a theme that paints a photo frame
     expect(draftProblems(newDraft()).map((problem) => problem.step)).toEqual([
       "couple",
       "functions",
-      "photos",
     ]);
-    expect(draftProblems(complete()).map((problem) => problem.step)).toEqual(["photos"]);
-    const photo = { id: "p1", width: 800, height: 1000 };
-    expect(draftProblems({ ...complete(), photos: [photo] })).toEqual([]);
-    // Once the frames have their own fields, another photo never stands in for one
-    const strict = { ...complete(), photos: [photo] };
+    expect(draftProblems(complete())).toEqual([]);
+    const strict = complete();
     strict.couplePhotos = { layout: "one", ids: [""], strict: true };
-    expect(draftProblems(strict).map((problem) => problem.step)).toEqual(["photos"]);
+    expect(draftProblems(strict)).toEqual([]);
   });
 
   it("plays the theme's own music, or the chosen raga its own way", () => {

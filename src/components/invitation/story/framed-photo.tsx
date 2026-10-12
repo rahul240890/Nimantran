@@ -43,21 +43,26 @@ export function FramedPhoto({
   photo,
   frameAspect,
   alt = photo.alt,
+  lazy = false,
   className,
   style,
 }: {
   photo: StoryPhoto;
   frameAspect: number;
   alt?: string;
+  /** Loads only as it nears the screen, for photos further down a page. */
+  lazy?: boolean;
   className?: string;
   style?: CSSProperties;
 }) {
+  const loading = lazy ? "lazy" : undefined;
   if (!photo.fit) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- the family's own photo, sized by its frame
       <img
         src={photo.src}
         alt={alt}
+        loading={loading}
         decoding="async"
         draggable={false}
         className={cn("object-cover select-none", className)}
@@ -79,6 +84,7 @@ export function FramedPhoto({
         <img
           src={photo.src}
           alt=""
+          loading={loading}
           decoding="async"
           draggable={false}
           className="select-none"

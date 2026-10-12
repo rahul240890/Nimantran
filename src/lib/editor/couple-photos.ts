@@ -1,5 +1,5 @@
 import type { StoryPhoto } from "@/lib/engine/story";
-import type { PhotoCrop } from "./photo-fit";
+import type { PhotoCrop, PhotoFit } from "./photo-fit";
 
 /*
  * The couple's photo page (Step 12l): no page, one photo of the couple together, or one
@@ -81,6 +81,16 @@ export function sceneCouple(couple: CouplePhotos): CouplePhotos {
   return { ...couple, layout: couple.layout === "one" ? "one" : "two" };
 }
 
+/** The ids of the photos the photo page shows: a card with one name has one photo. */
+export function couplePageIds(
+  couple: CouplePhotos,
+  photoIds: readonly string[],
+  second: string,
+): string[] {
+  // A birthday's one name has one photo, whatever layout a couple's invite left behind
+  return coupleFrameIds(couple, photoIds).slice(0, second.trim() ? 2 : 1);
+}
+
 /**
  * The photo page's photos for the story, with the names each one shows and, for a photo the
  * host adjusted, how it sits in its frame (`aspectOf` gives the photo file's width over height).
@@ -92,18 +102,29 @@ export function couplePagePhotos(
   names: { first: string; second: string; joiner: string },
   aspectOf?: (id: string) => number | undefined,
 ): StoryPhoto[] {
-  // A birthday's one name has one photo, whatever layout a couple's invite left behind
-  const ids = coupleFrameIds(couple, photoIds).slice(0, names.second.trim() ? 2 : 1);
+  const ids = couplePageIds(couple, photoIds, names.second);
   const together = [names.first, names.second].filter(Boolean).join(` ${names.joiner || "&"} `);
   const alts = ids.length > 1 ? [names.first, names.second] : [together];
   return ids.flatMap((id, i) => {
     const src = urlFor(id);
     if (!src) return [];
-    const crop = couple.crops?.[id];
-    const aspect = aspectOf?.(id);
     const alt = alts[i] || together;
-    return [crop && aspect ? { src, alt, fit: { ...crop, aspect } } : { src, alt }];
+    const fit = photoFit(couple, id, aspectOf?.(id));
+    return [fit ? { src, alt, fit } : { src, alt }];
   });
+}
+
+/**
+ * How the host placed a photo, with its own shape, so every page that shows it (the guest
+ * page's welcome and gallery too) turns and crops it the same way; none if never adjusted.
+ */
+export function photoFit(
+  couple: CouplePhotos,
+  id: string,
+  aspect: number | undefined,
+): PhotoFit | undefined {
+  const crop = couple.crops?.[id];
+  return crop && aspect ? { ...crop, aspect } : undefined;
 }
 
 /** A photo's width over its height, from the invite's photos, if it is one of them. */

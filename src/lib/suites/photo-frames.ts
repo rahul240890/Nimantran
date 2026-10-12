@@ -32,6 +32,21 @@ export function photoBox([x, y, width, height]: FrameBox): FrameBox {
   return [x - 0.8, y - 0.5, width + 1.6, height + 1];
 }
 
+/**
+ * Where photos show on a painting with these frames. Each frame has its own photo, but a
+ * single photo on a painting with two frames lies behind both, so it shows through the
+ * two openings as one picture rather than leaving the second frame empty.
+ */
+export function photoWindows(frames: readonly FrameBox[], photos: number): readonly FrameBox[] {
+  if (frames.length !== 2 || photos !== 1) return frames;
+  const [a, b] = frames as readonly [FrameBox, FrameBox];
+  const left = Math.min(a[0], b[0]);
+  const top = Math.min(a[1], b[1]);
+  const right = Math.max(a[0] + a[2], b[0] + b[2]);
+  const bottom = Math.max(a[1] + a[3], b[1] + b[3]);
+  return [[left, top, right - left, bottom - top]];
+}
+
 type Entry = {
   one: readonly [FrameBox];
   /** Missing on a theme for one person (a birthday): two photos share the one frame. */

@@ -112,9 +112,9 @@ for (const colorScheme of ["light", "dark"] as const) {
       await fillWedding(page);
       await next(page);
       await expect(page.getByRole("heading", { level: 1 })).toHaveText("Add your photos");
-      // The design's photo frames are asked for, apart from any other photos
-      await next(page);
-      await expect(page.getByText(/things? needs? your attention/)).toBeVisible();
+      // The design's photo frames have their own fields, apart from any other photos, and
+      // each one is optional
+      await expect(page.getByText("Optional", { exact: true }).first()).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
       await addDesignPhotos(page);

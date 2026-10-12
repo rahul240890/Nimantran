@@ -32,7 +32,7 @@ import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { fitScale } from "@/lib/suites/fit";
 import { keepDate, type Voice } from "@/lib/suites/lettering";
 import { sceneLine } from "@/lib/suites/scene-type";
-import { PAINTING_ASPECT, photoBox, type FrameBox } from "@/lib/suites/photo-frames";
+import { PAINTING_ASPECT, photoBox, photoWindows, type FrameBox } from "@/lib/suites/photo-frames";
 import { frameAspectOf } from "@/lib/editor/photo-fit";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import {
@@ -351,6 +351,7 @@ export function OneScene({
   const voice = SUITES[suite].voice ?? "regal";
   // The theme's own way of bringing in the photos and the names (reveal.ts)
   const reveal = revealFor(suite);
+  const windows = photoWindows(page.frames, photos.length);
   const wait = after ? AFTER_MS : 0;
   const [firstAt, joinerAt, secondAt] = nameTimings(
     reveal.names,
@@ -440,16 +441,17 @@ export function OneScene({
             aspectRatio: String(PAINTING_ASPECT),
           }}
         >
-          {/* The photos lie under the painting and show through its frames; on a card that
-              comes together from its sides, they appear once its frames are in place */}
+          {/* The photos lie under the painting and show through its frames (one photo on a
+              two-frame painting shows through both); on a card that comes together from its
+              sides, they appear once its frames are in place */}
           <div data-after={after} className="absolute inset-0">
-            {page.frames.map((frame, i) => {
+            {windows.map((frame, i) => {
               const photo = photos[i];
               const style = box(photoBox(frame));
               const arrive = photoReveal(
                 reveal.photo,
                 i,
-                Math.min(page.frames.length, photos.length),
+                Math.min(windows.length, photos.length),
                 wait + PHOTOS_AT_MS,
               );
               return photo ? (
