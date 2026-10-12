@@ -5,6 +5,7 @@ import {
   CameraOff,
   ChevronLeft,
   ChevronRight,
+  BookOpen,
   Clapperboard,
   Crown,
   Eye,
@@ -79,6 +80,7 @@ const TIER_ICONS = { free: Gift, premium: Sparkles, royal: Crown, signature: Cla
 
 const FORMAT_NAMES: Record<DesignFormat, string> = {
   moving: "Moving scene",
+  storybook: "Storybook",
   scene: "Scene",
   story: "Story",
   card: "3D card",
@@ -86,6 +88,7 @@ const FORMAT_NAMES: Record<DesignFormat, string> = {
 const FORMAT_ICONS = {
   all: LayoutGrid,
   moving: Clapperboard,
+  storybook: BookOpen,
   scene: ImageIcon,
   story: Layers,
   card: Rotate3d,

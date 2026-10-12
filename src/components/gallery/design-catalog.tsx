@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookOpen,
   Clapperboard,
   ArrowLeft,
   ArrowRight,
@@ -61,6 +62,7 @@ const CHIP_OCCASIONS = [
 const FORMAT_ICONS = {
   all: LayoutGrid,
   moving: Clapperboard,
+  storybook: BookOpen,
   scene: ImageIcon,
   story: Layers,
   card: Rotate3d,
@@ -331,9 +333,9 @@ function Results({
           onValueChange={(value) =>
             set({ format: value === "all" ? null : (value as DesignFormat) })
           }
-          className="w-full max-w-xl"
+          className="w-full max-w-2xl"
         >
-          {(["all", "moving", "scene", "story", "card"] as const).map((choice) => {
+          {(["all", "moving", "storybook", "scene", "story", "card"] as const).map((choice) => {
             const Icon = FORMAT_ICONS[choice];
             return (
               <RadioItem

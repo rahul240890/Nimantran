@@ -12,6 +12,9 @@ describe("design tiers", () => {
     expect(defaultTier("minimal-white-scene")).toBe("free");
     expect(defaultTier("space-voyage-scene")).toBe("free");
     expect(defaultTier("kayal-scene")).toBe("premium");
+    // The story themes with their own gates are Signature (₹799)
+    expect(defaultTier("chaand-kalayein")).toBe("signature");
+    expect(defaultTier("ek-rekha")).toBe("signature");
     expect(defaultTier("pichwai")).toBe("royal");
     expect(defaultTier("rajwada-bagh")).toBe("premium");
     // Diwali's Story has a god page too, but a festival invite stays Premium

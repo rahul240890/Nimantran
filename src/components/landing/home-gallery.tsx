@@ -1,5 +1,6 @@
 import {
   ArrowRight,
+  BookOpen,
   Clapperboard,
   Image as ImageIcon,
   Layers,
@@ -188,6 +189,7 @@ function covers(locale: UiLocale) {
 
 const KIND_ICONS = {
   moving: Clapperboard,
+  storybook: BookOpen,
   story: Layers,
   scene: ImageIcon,
   card: Rotate3d,

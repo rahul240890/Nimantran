@@ -29,7 +29,9 @@ describe("couple photo paintings", () => {
   });
 
   it("gives every wedding theme a frame for each of the couple", () => {
-    for (const suite of PHOTO_PAGE_SUITES.filter((id) => !SUITES[id].occasions)) {
+    for (const suite of PHOTO_PAGE_SUITES.filter(
+      (id) => !SUITES[id].occasions && !SUITES[id].everyOccasion,
+    )) {
       expect(photoPage(suite, 2)!.frames, suite).toHaveLength(2);
     }
     expect(photoPage("jungle-party", 1)!.image).toBe("/suites/jungle-party/photo.webp");

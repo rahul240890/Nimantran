@@ -5,6 +5,7 @@ import {
   SUITE_IDS,
   hasBlessingPage,
   isSceneTheme,
+  isStoryId,
   suiteFor,
   type SuiteId,
 } from "@/lib/suites/catalog";
@@ -56,8 +57,8 @@ const FREE_SCENES: ReadonlySet<string> = new Set([
 
 /**
  * A design's tier before the admin changes it: 3D cards and illustrated cards are free, the grandest wedding
- * Stories (the ones that open with a painted god) are Royal, the moving scenes Signature,
- * and the rest are Premium.
+ * Stories (the ones that open with a painted god) are Royal, the moving scenes and the story
+ * themes with their own gates Signature, and the rest are Premium.
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
@@ -68,6 +69,8 @@ export function defaultTier(designId: string): DesignTier {
     return FREE_SCENES.has(suite) || isIllustrated(suite as SuiteId) ? "free" : "premium";
   }
   const suite = designId as SuiteId;
+  // The story themes (₹799, 2026-10-12): nine pages of one story, a gate and a photo page
+  if (isStoryId(suite)) return "signature";
   const wedding = suite in SUITES && !SUITES[suite].occasions?.length;
   return wedding && hasBlessingPage(suite) ? "royal" : "premium";
 }

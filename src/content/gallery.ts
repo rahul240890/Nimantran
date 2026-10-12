@@ -38,6 +38,7 @@ export const galleryCopy = {
     label: "Kind of invitation",
     all: "All",
     moving: "Moving",
+    storybook: "Storybook",
     scene: "Scene",
     story: "Story",
     card: "3D card",
@@ -252,6 +253,10 @@ export const shelfCopy = {
       title: "Moving scenes",
       intro:
         "Painted scenes that move like a short film: petals fall, lanterns rise, water ripples. No photo needed.",
+    },
+    storybook: {
+      title: "Storybooks",
+      intro: "One story told across nine painted pages, opening on its own gate.",
     },
     story: { title: "Stories", intro: "A full-screen painted page for every function." },
     scene: {

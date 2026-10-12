@@ -43,13 +43,13 @@ export const SHELVES: readonly Shelf[] = [
     kind: "photos" as const,
     value,
   })),
-  ...(["moving", "story", "scene", "card"] as const satisfies readonly DesignFormat[]).map(
-    (value) => ({
-      id: `format-${value}` as const,
-      kind: "format" as const,
-      value,
-    }),
-  ),
+  ...(
+    ["moving", "storybook", "story", "scene", "card"] as const satisfies readonly DesignFormat[]
+  ).map((value) => ({
+    id: `format-${value}` as const,
+    kind: "format" as const,
+    value,
+  })),
   ...SHELF_OCCASIONS.map((value) => ({
     id: `occasion-${value}` as const,
     kind: "occasion" as const,

@@ -117,7 +117,7 @@ export function siteMenu(locale: UiLocale): SiteMenu {
         },
         {
           title: menuCopy.kinds,
-          links: (["story", "scene", "card"] as const).map((format) =>
+          links: (["storybook", "story", "scene", "card"] as const).map((format) =>
             view({ format }, shelfCopy.format[format].title),
           ),
         },

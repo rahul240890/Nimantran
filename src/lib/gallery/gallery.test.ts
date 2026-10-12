@@ -69,9 +69,13 @@ describe("gallery catalog", () => {
           continue;
         }
         expect(suiteSuits(design.suite, category), `${design.id} for ${category}`).toBe(true);
-        // A wedding's theme never shows for a party, a puja or a festival
-        if (!wedding) expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
+        // A wedding's theme never shows for a party, a puja or a festival; a story theme,
+        // told without a wedding in it, shows for every occasion
+        if (!wedding && !SUITES[design.suite].everyOccasion)
+          expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
       }
+      // A story theme suits every occasion but a prayer meet
+      expect(suiteSuits("navrang", category)).toBe(category !== "prayer-meet");
       // Every occasion has at least one painted design of its own
       expect(occasionDesigns(category).some((design) => design.suite !== "classic")).toBe(true);
     }
