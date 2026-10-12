@@ -288,7 +288,11 @@ export const collectionCopy = {
 
 /** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */
 export const shelfCopy = {
-  trending: { group: "Trending", title: "Trending now", intro: "The designs hosts are choosing most right now." },
+  trending: {
+    group: "Trending",
+    title: "Trending now",
+    intro: "The designs hosts are choosing most right now.",
+  },
   groups: {
     moving: "New: moving scenes",
     photos: "Illustrated or with your photos",
