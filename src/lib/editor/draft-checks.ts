@@ -1,4 +1,3 @@
-import { draftFrameSlots } from "@/lib/publish/frames";
 import { INVITE_FORMATS } from "./formats";
 import { OPENING_GODS, OPENING_STYLES, noOpening } from "@/lib/opening/catalog";
 import { z } from "zod";
@@ -249,7 +248,7 @@ export function parseDraft(value: unknown): InviteDraft | null {
   return result.success ? result.data : null;
 }
 
-export type StepErrors = Record<string, "required" | "too-long" | "no-functions" | "photo-needed">;
+export type StepErrors = Record<string, "required" | "too-long" | "no-functions">;
 
 /** What stops the host moving past a step. Keys are field ids (slot ids or "haldi.date"). */
 export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
@@ -279,12 +278,7 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
       }
     }
   }
-  if (step === "photos") {
-    // A design that shows photos in its frames needs each one
-    draftFrameSlots(draft).forEach((id, frame) => {
-      if (!id) errors[`frame-${frame}`] = "photo-needed";
-    });
-  }
+  // Photos are optional on every design: an empty frame holds a flower, or the page is left out
   if (step === "functions") {
     const ids = includedFunctions(draft);
     if (ids.length === 0) errors.functions = "no-functions";

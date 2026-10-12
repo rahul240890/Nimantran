@@ -9,8 +9,9 @@ import type { GuestFunction } from "@/components/guest/guest-view";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
-import { FamilyWords, type FamilyBlock } from "@/components/guest/family-words";
-import type { PublicPhoto } from "@/lib/invites/public";
+import { FamilyWords, pairedSide, type FamilyBlock } from "@/components/guest/family-words";
+import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
+import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import type { CardLanguage } from "@/lib/templates/card-languages";
@@ -56,6 +57,7 @@ export function ThemedDetails({
   lang,
   functions,
   main,
+  photo,
   photos,
   family,
   familyLang,
@@ -72,7 +74,10 @@ export function ThemedDetails({
   functions: readonly GuestFunction[];
   /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
   main: { date: string; venue: string } | null;
-  photos: readonly PublicPhoto[];
+  /** The photo the welcome shows: the couple's, from the design's own frame. */
+  photo: GuestPhoto | undefined;
+  /** The other photos, for the gallery at dusk: each photo shows once on the page. */
+  photos: readonly GuestPhoto[];
   family: readonly FamilyBlock[];
   familyLang: string | undefined;
   allIcsUrl: string | null;
@@ -97,7 +102,7 @@ export function ThemedDetails({
         copy={copy}
         lang={lang}
         look={look}
-        photo={photos[0]}
+        photo={photo}
         onShower={() => setBurst((was) => was + 1)}
         showered={burst > 0}
       />
@@ -110,7 +115,14 @@ export function ThemedDetails({
         allIcsUrl={allIcsUrl}
       />
       {(photos.length > 0 || family.length > 0) && (
-        <Dusk photos={photos} family={family} familyLang={familyLang} look={look} lang={lang} />
+        <Dusk
+          first={Boolean(photo)}
+          photos={photos}
+          family={family}
+          familyLang={familyLang}
+          look={look}
+          lang={lang}
+        />
       )}
       <Night copy={copy} lang={lang} look={look} reply={reply} />
       {onScreen && <FloatingMusic music={music} />}
@@ -220,7 +232,7 @@ function Welcome({
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
-  photo: PublicPhoto | undefined;
+  photo: GuestPhoto | undefined;
   onShower: () => void;
   showered: boolean;
 }) {
@@ -294,14 +306,11 @@ function Welcome({
         {photo && (
           <Reveal className="mx-auto w-[min(72vw,22rem)] lg:me-8">
             <Framed look={look}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
-              <img
-                src={photo.url}
-                alt=""
-                width={photo.width}
-                height={photo.height}
-                decoding="async"
-                className="h-full w-full object-cover"
+              <FramedPhoto
+                photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                alt={guestCopy.photoAlt(1)}
+                frameAspect={GALLERY_ASPECT}
+                className="size-full"
               />
             </Framed>
           </Reveal>
@@ -453,13 +462,16 @@ function Celebrations({
 
 /** Photos and family at dusk, under hanging lamps in a palace or over the water. */
 function Dusk({
+  first,
   photos,
   family,
   familyLang,
   look,
   lang,
 }: {
-  photos: readonly PublicPhoto[];
+  /** Whether the welcome already shows the first photo, so these count on from the second. */
+  first: boolean;
+  photos: readonly GuestPhoto[];
   family: readonly FamilyBlock[];
   familyLang: string | undefined;
   look: GuestLook;
@@ -492,15 +504,12 @@ function Dusk({
               {photos.map((photo, index) => (
                 <li key={photo.id} className="guest-photo w-[min(62vw,15rem)] shrink-0 snap-center">
                   <Framed look={look}>
-                    {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
-                    <img
-                      src={photo.url}
-                      alt={guestCopy.photoAlt(index + 1)}
-                      width={photo.width}
-                      height={photo.height}
-                      loading="lazy"
-                      decoding="async"
-                      className="h-full w-full object-cover"
+                    <FramedPhoto
+                      photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                      alt={guestCopy.photoAlt(index + (first ? 2 : 1))}
+                      frameAspect={GALLERY_ASPECT}
+                      lazy
+                      className="size-full"
                     />
                   </Framed>
                 </li>
@@ -522,7 +531,11 @@ function Dusk({
               {family.map((block) => (
                 <div
                   key={block.id}
-                  className="guest-card guest-family flex w-full flex-col items-center gap-2 px-6 py-8 text-center sm:w-[calc(50%-0.75rem)]"
+                  className={cn(
+                    "guest-card guest-family flex w-full flex-col items-center gap-2 px-6 py-8 text-center",
+                    // Both sides' parents side by side; the blessings and hosts each a full row
+                    pairedSide(family, block) && "sm:w-[calc(50%-0.75rem)]",
+                  )}
                 >
                   <dt className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
                     {block.title}

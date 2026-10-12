@@ -29,9 +29,10 @@ export const metadata: Metadata = {
  * ?opening=palace (or any style in lib/opening/catalog.ts) and ?god=ganesha choose the
  * first screen (Step 12x).
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
+ * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
-  const { suite: asked, lang, format, photos: count, now, opening, god } = await searchParams;
+  const { suite: asked, lang, format, photos: count, now, opening, god, turn } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
       ? Date.parse(`${now}:00+05:30`)
@@ -46,8 +47,18 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     ...sample,
     languages: language === "en" ? sample.languages : [language],
   };
+  const shown = scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS;
+  const turns = Number(turn);
+  const placed = scene ? sceneDraft(base, sceneCount) : base;
   const draft: InviteDraft = {
-    ...(scene ? sceneDraft(base, sceneCount) : base),
+    ...placed,
+    couplePhotos:
+      shown[0] && [1, 2, 3].includes(turns)
+        ? {
+            ...placed.couplePhotos,
+            crops: { [shown[0].id]: { x: 0.5, y: 0.5, zoom: 1, turn: turns, tilt: 0 } },
+          }
+        : placed.couplePhotos,
     opening: {
       style: OPENING_STYLES.includes(opening as OpeningStyle) ? (opening as OpeningStyle) : null,
       god: OPENING_GODS.includes(god as OpeningGod) ? (god as OpeningGod) : null,
@@ -73,7 +84,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       slug="sample"
       draft={draft}
       functions={functions}
-      photos={scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS}
+      photos={shown}
       allIcsUrl={null}
       rsvpFunctions={rsvpFunctions}
       questions={[]}

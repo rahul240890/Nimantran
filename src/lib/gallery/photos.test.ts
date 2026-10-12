@@ -5,7 +5,7 @@ import { designPhotos, mixDesigns } from "./photos";
 describe("design photos", () => {
   it("says what photos each kind of design takes", () => {
     expect(designPhotos(sceneDesign("mor-kamal"))).toBe("none");
-    expect(designPhotos(sceneDesign("gulmohar"))).toBe("two");
+    expect(designPhotos(sceneDesign("gulmohar"))).toBe("either");
     expect(designPhotos(sceneDesign("udaipur-lake"))).toBe("couple");
     expect(designPhotos(sceneDesign("kayal"))).toBe("either");
     expect(designPhotos(paintedDesign("rajwada-bagh"))).toBe("either");
@@ -14,7 +14,7 @@ describe("design photos", () => {
 
   it("asks one guest of honour for one photo, unless the painting has two frames", () => {
     expect(designPhotos(sceneDesign("kayal"), "birthday")).toBe("one");
-    expect(designPhotos(sceneDesign("gulmohar"), "birthday")).toBe("two");
+    expect(designPhotos(sceneDesign("gulmohar"), "birthday")).toBe("either");
   });
 });
 

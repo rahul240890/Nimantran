@@ -13,6 +13,7 @@ import {
   PAINTING_ASPECT,
   photoBox,
   photoPage,
+  photoWindows,
   type FrameBox,
 } from "@/lib/suites/photo-frames";
 import { designLayouts } from "@/lib/suites/photo-layouts";
@@ -42,21 +43,31 @@ export function coupleLayouts(draft: InviteDraft): CoupleLayout[] {
   return designLayouts(draftSuite(draft), draftShowsScene(draft), draftPeople(draft) === "one");
 }
 
-/** Whether the design paints its own photo frames, which then must be filled. */
+/**
+ * Whether the design paints its own photo frames. Their photos are optional: an empty
+ * frame on a Scene holds a small gilt flower, and a Story with no photo skips its photo page.
+ */
 export function framedDesign(draft: InviteDraft): boolean {
   return !coupleLayouts(draft).includes("none");
 }
 
+/** Whether the design is a Scene painted with two frames, the bride's and the groom's. */
+function pairedScene(draft: InviteDraft): boolean {
+  const suite = draftSuite(draft);
+  return draftShowsScene(draft) && isSceneTheme(suite) && sceneFrames(suite) === 2;
+}
+
 /**
  * The couple's photos as the invite shows them: the host's layout where the design offers
- * it. A framed design never goes without its photos: a Scene shows its fullest painting, as
- * it always has, and a Story's photo page starts with one photo.
+ * it. A framed design keeps its frames: a Scene painted with two frames starts with one
+ * photo each, as it always has, and any other starts with one photo.
  */
 export function draftCouple(draft: InviteDraft): CouplePhotos {
   const layouts = coupleLayouts(draft);
   const own = draft.couplePhotos.layout;
-  // A painting with the bride's and the groom's frames offers only "two"; one with none, "none"
-  const layout = layouts.includes(own) ? own : layouts.includes("one") ? "one" : layouts[0]!;
+  // An illustrated card, with its couple painted, offers only "none"
+  const start = pairedScene(draft) ? "two" : "one";
+  const layout = layouts.includes(own) ? own : layouts.includes(start) ? start : layouts[0]!;
   return layout === own ? draft.couplePhotos : { ...draft.couplePhotos, layout };
 }
 
@@ -73,14 +84,16 @@ export function draftFrames(draft: InviteDraft): FrameSpot[] {
   const couple = draftCouple(draft);
   const suite = draftSuite(draft);
   // One guest of honour has one photo, as the pages show it, unless the painting has two frames
-  const pair = scene && isSceneTheme(suite) && sceneFrames(suite) === 2;
+  const pair = pairedScene(draft);
   const one = draftPeople(draft) === "one" && !pair;
   const chosen = coupleFrameIds(couple, ids).slice(0, one ? 1 : 2);
   if (chosen.length === 0) return [];
   const page = scene ? scenePage(suite, chosen.length) : photoPage(suite, chosen.length);
   if (!page) return chosen.map((id) => ({ id, image: null, box: null, aspect: ARCH_ASPECT }));
-  return chosen.slice(0, page.frames.length).map((id, i) => {
-    const box = photoBox(page.frames[i]!);
+  // One photo on a two-frame painting lies behind both frames, as the guest sees it
+  const windows = photoWindows(page.frames, chosen.length);
+  return chosen.slice(0, windows.length).map((id, i) => {
+    const box = photoBox(windows[i]!);
     return { id, image: page.image, box, aspect: frameAspectOf(box, PAINTING_ASPECT) };
   });
 }

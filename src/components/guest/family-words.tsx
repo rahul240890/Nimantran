@@ -12,6 +12,14 @@ export type FamilyBlock = {
 };
 
 /**
+ * Whether a block is one of the two sides' parents, which a wide page sets side by side so
+ * the son's family and the daughter's read together; every other block takes a full row.
+ */
+export function pairedSide(family: readonly FamilyBlock[], block: FamilyBlock): boolean {
+  return Boolean(block.parts) && family.filter((b) => b.parts).length === 2;
+}
+
+/**
  * A family block's words under its heading. A side's parents are set as a name of their
  * own: "Son of" small above, each parent kept whole on a line (breaking at the "&"), and
  * the home town small beneath, so a long pair of names never wraps mid-name.

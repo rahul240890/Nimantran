@@ -60,7 +60,6 @@ export const editor = {
     required: "Please fill this in",
     "too-long": "This is too long for the card",
     "no-functions": "Choose at least one function",
-    "photo-needed": "Add this photo. Your design shows it in its frame.",
   },
   save: {
     idle: "Drafts save on this device",
@@ -650,8 +649,8 @@ export const extrasCopy = {
   designPhotosHeading: "Photos for your design",
   designPhotosHint: (frames: number) =>
     frames === 1
-      ? "Your design has a photo frame. Add the photo that goes in it."
-      : "Your design has two photo frames. Add a photo for each.",
+      ? "Optional. Your photo shows in the design's own frame. Without one, the design still looks complete."
+      : "Optional. Add a photo for each frame, or choose one photo of you both above.",
   framePhotos: {
     together: "Photo of you both",
     one: "Your photo",
@@ -662,7 +661,7 @@ export const extrasCopy = {
   addFramePhoto: (frame: string) => `Add: ${frame}`,
   changeFramePhoto: (frame: string) => `Change: ${frame}`,
   framePhotoAdded: "Added",
-  framePhotoNeeded: "Needed",
+  framePhotoOptional: "Optional",
   changePhoto: "Change photo",
   galleryHeading: "More photos",
   galleryHint: (max: number) =>

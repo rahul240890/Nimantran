@@ -52,7 +52,6 @@ export const editor: Translation<typeof en.editor> = {
     required: "कृपया इसे भरें",
     "too-long": "यह कार्ड के लिए बहुत लंबा है",
     "no-functions": "कम से कम एक रस्म चुनें",
-    "photo-needed": "यह तस्वीर जोड़ें। आपका डिज़ाइन इसे अपने फ़्रेम में दिखाता है।",
   },
   save: {
     idle: "ड्राफ़्ट इसी डिवाइस पर सहेजे जाते हैं",
@@ -605,8 +604,8 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   designPhotosHeading: "आपके डिज़ाइन की तस्वीरें",
   designPhotosHint: (frames) =>
     frames === 1
-      ? "आपके डिज़ाइन में एक फ़्रेम है। उसमें लगने वाली तस्वीर जोड़ें।"
-      : "आपके डिज़ाइन में दो फ़्रेम हैं। दोनों के लिए एक-एक तस्वीर जोड़ें।",
+      ? "वैकल्पिक। आपकी तस्वीर डिज़ाइन के अपने फ़्रेम में दिखेगी। तस्वीर के बिना भी डिज़ाइन पूरा दिखता है।"
+      : "वैकल्पिक। हर फ़्रेम के लिए एक तस्वीर जोड़ें, या ऊपर आप दोनों की एक तस्वीर चुनें।",
   framePhotos: {
     together: "आप दोनों की तस्वीर",
     one: "आपकी तस्वीर",
@@ -617,7 +616,7 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   addFramePhoto: (frame) => `जोड़ें: ${frame}`,
   changeFramePhoto: (frame) => `बदलें: ${frame}`,
   framePhotoAdded: "जुड़ गई",
-  framePhotoNeeded: "ज़रूरी",
+  framePhotoOptional: "वैकल्पिक",
   changePhoto: "तस्वीर बदलें",
   galleryHeading: "और तस्वीरें",
   galleryHint: (max) => `वैकल्पिक। मेहमान इन्हें निमंत्रण पर देख सकेंगे। कुल ${max} तस्वीरें तक।`,
