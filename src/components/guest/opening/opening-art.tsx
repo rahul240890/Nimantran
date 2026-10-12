@@ -76,6 +76,16 @@ export const OPENING_LAYOUT: Record<OpeningStyle, { crest: number; gap: number }
   "yantra-pat": { crest: 22, gap: 0 },
   "rang-parda": { crest: 22, gap: 0 },
   "genda-ladi": { crest: 22, gap: 0 },
+  "kaleen-parda": { crest: 22, gap: 0 },
+  "truck-darwaza": { crest: 22, gap: 0 },
+  "kaanch-dhakkan": { crest: 22, gap: 0 },
+  "pati-pat": { crest: 22, gap: 0 },
+  "jad-jhalar": { crest: 22, gap: 0 },
+  "gol-darwaza": { crest: 22, gap: 0 },
+  "jhaadi-deewar": { crest: 22, gap: 0 },
+  "deco-dibba": { crest: 22, gap: 0 },
+  "samundar-parda": { crest: 22, gap: 0 },
+  "shatranj-sandook": { crest: 22, gap: 0 },
   ...(Object.fromEntries(FRESH_OPENINGS.map((id) => [id, { crest: 22, gap: 0 }])) as Record<
     FreshOpening,
     { crest: number; gap: number }
