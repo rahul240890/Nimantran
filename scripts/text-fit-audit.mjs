@@ -25,7 +25,8 @@ const STORY_THEMES = (
   "gubbara,saath,rooftop,ivory-arch,gulaab,deco-noir,taara,kaagaz,mitti,neel,pichwai,tanjore," +
   "kashi,sagar,mysuru,kalamkari,pattachitra,chinar,chai-bagan,sufi-raat,chapel,sakura,vigna," +
   "himani,van,riad,palna,deepotsav,jungle-party,chaand-kalayein,ritu-chakra,raagmala," +
-  "panchatantra,patang-udaan,diya-ki-kahani,resham-katha,navrang,nadi-safar,ek-rekha,classic"
+  "panchatantra,patang-udaan,diya-ki-kahani,resham-katha,navrang,nadi-safar,ek-rekha," +
+  "meghdoot,aath-pehar,beej-se-bagh,kissa-kitaab,itr-daan,pakshi-kosh,gudiya-ghar,jantar-mantar,rangrez,phool-mandi,classic"
 ).split(",");
 
 const browser = await chromium.launch(

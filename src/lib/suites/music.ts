@@ -67,6 +67,16 @@ const PAINTED_MUSIC: Record<Exclude<SuiteId, SceneThemeId | "classic">, ThemeMus
   navrang: { raga: "khamaj", lead: "santoor", taal: null, tempo: 70 },
   "nadi-safar": { raga: "madhyamavati", lead: "bansuri", taal: "dadra", tempo: 64 },
   "ek-rekha": { raga: "desh", lead: "santoor", taal: null, tempo: 60 },
+  meghdoot: { raga: "desh", lead: "bansuri", taal: "dadra", tempo: 62 },
+  "aath-pehar": { raga: "bhairavi", lead: "sitar", taal: null, tempo: 56 },
+  "beej-se-bagh": { raga: "bhupali", lead: "bansuri", taal: "keherwa", tempo: 76 },
+  "kissa-kitaab": { raga: "pilu", lead: "santoor", taal: "keherwa", tempo: 86 },
+  "itr-daan": { raga: "yaman", lead: "sitar", taal: "dadra", tempo: 62 },
+  "pakshi-kosh": { raga: "hamsadhwani", lead: "bansuri", taal: null, tempo: 62 },
+  "gudiya-ghar": { raga: "khamaj", lead: "santoor", taal: "keherwa", tempo: 84 },
+  "jantar-mantar": { raga: "madhyamavati", lead: "sitar", taal: null, tempo: 60 },
+  rangrez: { raga: "kafi", lead: "shehnai", taal: "keherwa", tempo: 88 },
+  "phool-mandi": { raga: "bhimpalasi", lead: "bansuri", taal: "dadra", tempo: 70 },
 };
 
 /** Scene themes whose occasion asks for something their kin doesn't play. */

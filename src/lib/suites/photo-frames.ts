@@ -494,6 +494,86 @@ const FRAMES: Partial<Record<SuiteId, Entry>> = {
     ],
     image: "photo",
   },
+  meghdoot: {
+    one: [[21.4, 18.6, 57.0, 31.6]],
+    words: [
+      [53, 12],
+      [53, 12],
+    ],
+    image: "photo",
+  },
+  "aath-pehar": {
+    one: [[29.6, 9.3, 40.9, 39.0]],
+    words: [
+      [51, 12],
+      [51, 12],
+    ],
+    image: "photo",
+  },
+  "beej-se-bagh": {
+    one: [[22.7, 21.8, 57.9, 32.4]],
+    words: [
+      [57, 12],
+      [57, 12],
+    ],
+    image: "photo",
+  },
+  "kissa-kitaab": {
+    one: [[25.8, 12.5, 48.4, 39.8]],
+    words: [
+      [55, 12],
+      [55, 12],
+    ],
+    image: "photo",
+  },
+  "itr-daan": {
+    one: [[23.7, 21.6, 52.6, 30.8]],
+    words: [
+      [55, 12],
+      [55, 12],
+    ],
+    image: "photo",
+  },
+  "pakshi-kosh": {
+    one: [[19.4, 8.3, 61.3, 46.2]],
+    words: [
+      [58, 12],
+      [58, 12],
+    ],
+    image: "photo",
+  },
+  "gudiya-ghar": {
+    one: [[34.0, 22.4, 32.7, 22.4]],
+    words: [
+      [48, 12],
+      [48, 12],
+    ],
+    image: "photo",
+  },
+  "jantar-mantar": {
+    one: [[20.3, 12.4, 59.5, 32.9]],
+    words: [
+      [48, 12],
+      [48, 12],
+    ],
+    image: "photo",
+  },
+  rangrez: {
+    one: [[30.7, 12.3, 38.7, 29.2]],
+    words: [
+      [44, 12],
+      [44, 12],
+    ],
+    image: "photo",
+  },
+  "phool-mandi": {
+    one: [[26.7, 15.8, 45.8, 27.0]],
+    words: [
+      [46, 12],
+      [46, 12],
+    ],
+    image: "photo",
+  },
 };
 
 /** The painting and frames for a theme's photo page with this many photos, if it has one. */
