@@ -374,9 +374,8 @@ export function DesignTierList({
         </CardTitle>
         <CardDescription>
           Open any design to play its demo and step through every page, then set its tier there or
-          on its tile. New designs start as Premium Scenes or Stories and free 3D cards until you
-          change them. The grandest wedding Stories, which open with a painted god, start as Royal,
-          and the moving scenes start as Signature.
+          on its tile. Until you change them, 3D cards are free, Scenes and moving scenes start as
+          Premium and Stories start as Royal.
         </CardDescription>
       </CardHeader>
       <CardBody className="flex flex-col gap-5">

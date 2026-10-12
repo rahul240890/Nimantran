@@ -11,8 +11,9 @@ import { z } from "zod";
  */
 
 /**
- * Signature is the moving scenes' tier (owner, 2026-10-09): painted in layers that move
- * like a short film, priced above Royal.
+ * Signature began as the moving scenes' tier (owner, 2026-10-09). Since 2026-10-12 the
+ * scenes start as Premium (₹499) and the Stories as Royal (₹799); Signature stays for the
+ * admin to give any design, no cheaper than Royal.
  */
 export const DESIGN_TIERS = ["free", "premium", "royal", "signature"] as const;
 export type DesignTier = (typeof DESIGN_TIERS)[number];
@@ -49,7 +50,7 @@ export type Pricing = {
 };
 
 export const DEFAULT_PRICING: Pricing = {
-  designs: { premium: 49_900, royal: 59_900, signature: 79_900 },
+  designs: { premium: 49_900, royal: 79_900, signature: 79_900 },
   packages: { celebration: 50_000, grand: 1_50_000 },
   invites: { basic: 50, celebration: 500 },
   tiers: {},

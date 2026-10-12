@@ -1,75 +1,17 @@
 import type { InviteDraft } from "@/lib/editor/draft";
 import { allDesigns } from "@/lib/gallery/catalog";
-import {
-  SUITES,
-  SUITE_IDS,
-  hasBlessingPage,
-  isSceneTheme,
-  suiteFor,
-  type SuiteId,
-} from "@/lib/suites/catalog";
-import { isMoving } from "@/lib/suites/moving";
-import { hasScene, isIllustrated } from "@/lib/suites/scene";
+import { SUITE_IDS, isSceneTheme, suiteFor } from "@/lib/suites/catalog";
+import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
 
-/*
- * Free by default: every 3D card, every illustrated card (no photos needed), plus a few
- * Scenes and two-photo cards so each kind of celebration has a painted design at no cost. A prayer meet's
- * Scene is always free to start with.
- */
-const FREE_SCENES: ReadonlySet<string> = new Set([
-  "minimal-white",
-  "love-letter",
-  "glass-house",
-  "temple-pond",
-  "space-voyage",
-  "rainbow-unicorn",
-  "silver-jubilee",
-  "oh-baby",
-  "kitty-tea",
-  "new-year-eve",
-  "new-home-modern",
-  "shraddhanjali",
-  // Two-photo cards in folk art and modern looks; the jewelled and silk ones are Premium
-  "phad-gatha",
-  "mandana-lal",
-  "pithora-ghoda",
-  "sohrai-khovar",
-  "aipan-kumaon",
-  "pipli-chhata",
-  "kasavu-sona",
-  "urli-pookal",
-  "patola-bandh",
-  "moti-bharat",
-  "polaroid-lights",
-  "dak-tikat",
-  "kadhai-hoop",
-  "syahi-bamboo",
-  "lace-ivory",
-  "origami-saaras",
-  "nimbu-amalfi",
-  "rakhi-dor",
-  "judwa-taare",
-  "naya-mehmaan",
-]);
-
 /**
- * A design's tier before the admin changes it: 3D cards and illustrated cards are free, the grandest wedding
- * Stories (the ones that open with a painted god) are Royal, the moving scenes Signature,
- * and the rest are Premium.
+ * A design's tier before the admin changes it (owner, 2026-10-12): 3D cards are free, every
+ * Scene and moving scene is Premium (₹499) and every Story is Royal (₹799).
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
-  if (designId.endsWith("-scene")) {
-    const suite = designId.slice(0, -"-scene".length);
-    // The moving scenes are the dearest: painted in layers that move like a short film
-    if (isMoving(suite as SuiteId)) return "signature";
-    return FREE_SCENES.has(suite) || isIllustrated(suite as SuiteId) ? "free" : "premium";
-  }
-  const suite = designId as SuiteId;
-  const wedding = suite in SUITES && !SUITES[suite].occasions?.length;
-  return wedding && hasBlessingPage(suite) ? "royal" : "premium";
+  return designId.endsWith("-scene") ? "premium" : "royal";
 }
 
 export function designTier(pricing: Pricing, designId: string): DesignTier {
