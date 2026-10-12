@@ -1,4 +1,5 @@
 import type { OccasionSection, WeddingKind } from "@/lib/gallery/catalog";
+import type { CollectionId } from "@/lib/gallery/collections";
 
 /*
  * English copy for the gallery (Step 12g): the occasion sections, a line per occasion and
@@ -223,6 +224,65 @@ export const catalogCopy = {
   allPhotos: "Any",
   photoGroups: { none: "Illustrated", one: "Couple photo", two: "Bride and groom photos" },
   allDesigns: "All designs",
+};
+
+/** Collections (src/lib/gallery/collections.ts): the designs grouped by look and feeling. */
+export const collectionCopy = {
+  heading: "Shop by collection",
+  intro: "Every design sits in one collection, grouped by its look and feeling.",
+  label: "Collection",
+  all: "All collections",
+  groups: { wedding: "Wedding collections", celebration: "Every celebration" },
+  /** The Designs page's rows of collections. */
+  rowsHeading: "Collections",
+  name: (name: string) => `${name} Collection`,
+  names: {
+    "royal-wedding": {
+      name: "Royal Wedding",
+      intro: "Palaces, forts and havelis, lit for a grand celebration.",
+    },
+    nawabi: { name: "Nawabi Nikah", intro: "Mughal gardens, Awadhi arches and Sufi nights." },
+    divine: {
+      name: "Divine Blessings",
+      intro: "Temples, ghats and sacred art for a blessed beginning.",
+    },
+    "folk-art": {
+      name: "Folk Art",
+      intro: "Madhubani, Warli, Gond, Pichwai and more, painted by hand.",
+    },
+    "silk-thread": {
+      name: "Silk and Thread",
+      intro: "Patola, bandhani, phulkari, kanjivaram silk and kundan.",
+    },
+    garden: { name: "Garden Blossoms", intro: "Gulmohar, roses, jasmine and peonies in bloom." },
+    destination: {
+      name: "Destination and Nature",
+      intro: "Beaches, backwaters, mountains and lakes.",
+    },
+    modern: { name: "Modern Minimal", intro: "Clean lines, soft colours and calm space." },
+    "love-story": {
+      name: "Love Story",
+      intro: "Save the dates and engagements with a playful, romantic touch.",
+    },
+    functions: {
+      name: "Haldi, Mehendi and Sangeet",
+      intro: "Every wedding function, from roka to vidaai.",
+    },
+    storybook: { name: "Storybook", intro: "One story told across nine painted pages." },
+    "little-wonders": { name: "Little Wonders", intro: "Birthday parties children will love." },
+    baby: { name: "Baby Blessings", intro: "Baby showers, naming ceremonies and first rice." },
+    milestones: {
+      name: "Family Milestones",
+      intro: "Anniversaries, big birthdays, griha pravesh and retirement.",
+    },
+    festivals: {
+      name: "Festivals",
+      intro: "Diwali, Eid, Holi, Navratri, Onam, Christmas and more.",
+    },
+    parties: { name: "Party Nights", intro: "Rooftops, reunions, kitty parties and farewells." },
+    business: { name: "Business and Launch", intro: "Shop openings, mahurats and launches." },
+    "cards-3d": { name: "Classic 3D Cards", intro: "Cards that open in 3D in your guest's hand." },
+  } satisfies Record<CollectionId, { name: string; intro: string }>,
 };
 
 /** The Designs page's rows (src/lib/gallery/shelves.ts): a few designs each, and View all. */

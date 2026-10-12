@@ -8,6 +8,7 @@ import {
   type GalleryDesign,
   type WeddingKind,
 } from "@/lib/gallery/catalog";
+import { collectionOf } from "@/lib/gallery/collections";
 import type { SearchWords } from "@/lib/gallery/search";
 
 /** A design's name and description in the page's language. */
@@ -36,7 +37,8 @@ export function searchWords(): SearchWords {
         galleryText[l].weddingKindCopy[id].name,
         galleryText[l].weddingKindCopy[id].description,
       ]),
-    // A design is found by the kinds of wedding it is made for too ("gujarati" finds Bandhani)
+    // A design is found by the kinds of wedding it is made for ("gujarati" finds Bandhani)
+    // and by its collection ("royal" finds Jal Mahal)
     design: (design) => {
       const kinds = WEDDING_KINDS.filter((kind) => {
         const entry = WEDDING_KIND_ENTRIES[kind];
@@ -50,6 +52,7 @@ export function searchWords(): SearchWords {
           words.name,
           words.description,
           ...kinds.map((kind) => galleryText[l].weddingKindCopy[kind].name),
+          galleryText[l].collectionCopy.names[collectionOf(design.suite)].name,
         ];
       });
     },

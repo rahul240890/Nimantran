@@ -10,6 +10,7 @@ import {
   occasionTile,
   suiteImage,
 } from "@/lib/gallery/catalog";
+import { COLLECTIONS, COLLECTION_IDS, type CollectionGroup } from "@/lib/gallery/collections";
 import { NO_FILTERS, designCatalog, filterCatalog, filtersToParams } from "@/lib/gallery/filters";
 import type { DesignFilters } from "@/lib/gallery/filters";
 import { normalize } from "@/lib/gallery/search";
@@ -18,8 +19,9 @@ import { searchWords } from "@/components/gallery/design-words";
 
 /*
  * The header's menus, worked out on the server so the header ships only these words and
- * links, not the catalogue: Designs (by photos, by kind, popular lists), Weddings (by
- * tradition and by function) and Occasions (by section). Each link lands on a list:
+ * links, not the catalogue: Designs (by photos, by kind, popular lists), Collections (for
+ * weddings and every celebration), Weddings (by tradition and by function) and Occasions
+ * (by section). Each link lands on a list:
  * a View all of the Designs page, or a gallery page.
  */
 
@@ -38,9 +40,9 @@ export type MenuPanel = {
   feature: { title: string; text: string; image: string; href: string };
 };
 
-export type SiteMenu = Record<"designs" | "weddings" | "occasions", MenuPanel>;
+export type SiteMenu = Record<"designs" | "collections" | "weddings" | "occasions", MenuPanel>;
 
-export const MENU_IDS = ["designs", "weddings", "occasions"] as const;
+export const MENU_IDS = ["designs", "collections", "weddings", "occasions"] as const;
 
 export function isMenuId(id: string): id is keyof SiteMenu {
   return (MENU_IDS as readonly string[]).includes(id);
@@ -75,7 +77,8 @@ const COMMUNITIES = ["punjabi", "muslim", "modern"] as const;
 
 export function siteMenu(locale: UiLocale): SiteMenu {
   const { menuCopy } = landingText[locale];
-  const { shelfCopy, weddingKindCopy, catalogCopy, sectionNames } = galleryText[locale];
+  const { shelfCopy, weddingKindCopy, catalogCopy, sectionNames, collectionCopy } =
+    galleryText[locale];
   const designs = pagePath({ kind: "designs" }, locale);
   const entries = designCatalog();
   const words = searchWords();
@@ -142,6 +145,23 @@ export function siteMenu(locale: UiLocale): SiteMenu {
         ...menuCopy.designsFeature,
         image: suiteImage("kutch-toran", "cover") ?? occasionTile("wedding")!,
         href: designs,
+      },
+    },
+    collections: {
+      groups: (["wedding", "celebration"] as const satisfies readonly CollectionGroup[]).map(
+        (group) => ({
+          title: collectionCopy.groups[group],
+          links: COLLECTION_IDS.filter((id) => COLLECTIONS[id].group === group).map((collection) =>
+            view({ collection }, collectionCopy.names[collection].name),
+          ),
+        }),
+      ),
+      all: { label: collectionCopy.all, href: `${designs}#collections` },
+      feature: {
+        title: collectionCopy.name(collectionCopy.names["royal-wedding"].name),
+        text: collectionCopy.names["royal-wedding"].intro,
+        image: suiteImage("jal-mahal", "cover")!,
+        href: `${designs}${filtersToParams({ ...NO_FILTERS, collection: "royal-wedding" })}`,
       },
     },
     weddings: {

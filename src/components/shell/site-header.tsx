@@ -205,6 +205,9 @@ const navItem =
 
 const wide = (group: MenuPanel["groups"][number]) => group.links.length > 8;
 
+/** Links the wide bar leaves to the phone menu and the footer, so the bar fits on one line. */
+const BAR_HIDDEN = new Set(["how-it-works"]);
+
 /** An open menu on a wide screen: its groups in columns, a painted card, and its All link. */
 function DesktopPanel({ panel }: { panel: MenuPanel }) {
   return (
@@ -333,53 +336,55 @@ export function SiteHeader({ menu }: { menu: SiteMenu }) {
           className="ms-4 hidden min-w-0 xl:block"
         >
           <NavigationMenu.List className="flex items-center">
-            {nav.map((item) => {
-              const current =
-                active === item.id ||
-                (isPageLink(item.id) && pathname === navHref(item.id, locale));
-              const underline = (
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute inset-x-3 bottom-1.5 h-0.5 origin-center rounded-full bg-marigold transition-transform duration-300 ease-out-expo",
-                    current ? "scale-x-100" : "scale-x-0",
-                  )}
-                />
-              );
-              return (
-                <NavigationMenu.Item key={item.id} value={item.id}>
-                  {isMenuId(item.id) ? (
-                    <>
-                      <NavigationMenu.Trigger
-                        data-current={current || undefined}
-                        className={cn(navItem, "group gap-1 data-[state=open]:text-ink")}
-                      >
-                        {item.label}
-                        <ChevronDown
-                          aria-hidden
-                          className="size-4 transition-transform duration-300 group-data-[state=open]:rotate-180"
-                        />
-                        {underline}
-                      </NavigationMenu.Trigger>
-                      <NavigationMenu.Content className="data-[motion^=from-]:animate-fade-in data-[motion^=to-]:animate-fade-out">
-                        <DesktopPanel panel={menu[item.id]} />
-                      </NavigationMenu.Content>
-                    </>
-                  ) : (
-                    <NavigationMenu.Link asChild active={current}>
-                      <Link
-                        href={navHref(item.id, locale)}
-                        aria-current={current ? "true" : undefined}
-                        className={navItem}
-                      >
-                        {item.label}
-                        {underline}
-                      </Link>
-                    </NavigationMenu.Link>
-                  )}
-                </NavigationMenu.Item>
-              );
-            })}
+            {nav
+              .filter((item) => !BAR_HIDDEN.has(item.id))
+              .map((item) => {
+                const current =
+                  active === item.id ||
+                  (isPageLink(item.id) && pathname === navHref(item.id, locale));
+                const underline = (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute inset-x-3 bottom-1.5 h-0.5 origin-center rounded-full bg-marigold transition-transform duration-300 ease-out-expo",
+                      current ? "scale-x-100" : "scale-x-0",
+                    )}
+                  />
+                );
+                return (
+                  <NavigationMenu.Item key={item.id} value={item.id}>
+                    {isMenuId(item.id) ? (
+                      <>
+                        <NavigationMenu.Trigger
+                          data-current={current || undefined}
+                          className={cn(navItem, "group gap-1 data-[state=open]:text-ink")}
+                        >
+                          {item.label}
+                          <ChevronDown
+                            aria-hidden
+                            className="size-4 transition-transform duration-300 group-data-[state=open]:rotate-180"
+                          />
+                          {underline}
+                        </NavigationMenu.Trigger>
+                        <NavigationMenu.Content className="data-[motion^=from-]:animate-fade-in data-[motion^=to-]:animate-fade-out">
+                          <DesktopPanel panel={menu[item.id]} />
+                        </NavigationMenu.Content>
+                      </>
+                    ) : (
+                      <NavigationMenu.Link asChild active={current}>
+                        <Link
+                          href={navHref(item.id, locale)}
+                          aria-current={current ? "true" : undefined}
+                          className={navItem}
+                        >
+                          {item.label}
+                          {underline}
+                        </Link>
+                      </NavigationMenu.Link>
+                    )}
+                  </NavigationMenu.Item>
+                );
+              })}
           </NavigationMenu.List>
           {/* The open menu spans the page under the bar (the header is its positioned parent) */}
           <div className="absolute inset-x-0 top-full flex justify-center px-4 sm:px-6 lg:px-8">

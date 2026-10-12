@@ -111,23 +111,36 @@ test.describe("the Designs page", () => {
 
   test("rows show a few designs each, and View all opens the whole list", async ({ page }) => {
     await page.goto("/designs");
-    const noPhoto = page.locator('[data-shelf="photos-none"]');
-    await expect(noPhoto.locator("[data-design]")).toHaveCount(10);
-    await noPhoto
-      .getByRole("link", { name: /^View all \d+ designs: Illustrated invitations$/ })
+    const folkArt = page.locator('[data-shelf="collection-folk-art"]');
+    await expect(folkArt.locator("[data-design]")).toHaveCount(10);
+    await folkArt
+      .getByRole("link", { name: /^View all \d+ designs: Folk Art Collection$/ })
       .first()
       .click();
-    await expect(page).toHaveURL(/photos=none/);
+    await expect(page).toHaveURL(/collection=folk-art/);
     await expect(
-      page.getByRole("heading", { name: /^Illustrated invitations · \d+ designs$/ }),
+      page.getByRole("heading", { name: /^Folk Art Collection · \d+ designs$/ }),
     ).toBeVisible();
     await expect(page.locator("[data-shelf]")).toHaveCount(0);
     expect(await page.locator("[data-design]").count()).toBeGreaterThan(10);
 
     // Back returns to the rows
     await page.goBack();
-    await expect(noPhoto).toBeVisible();
-    await expect(page).not.toHaveURL(/photos=/);
+    await expect(folkArt).toBeVisible();
+    await expect(page).not.toHaveURL(/collection=/);
+  });
+
+  test("collections open as tiles and rows, each listing its own themes", async ({ page }) => {
+    await page.goto("/designs");
+    await expect(page.locator("[data-collection]")).toHaveCount(18);
+    await expect(page.locator('[data-shelf="collection-storybook"]')).toBeVisible();
+    await page.locator('[data-collection="royal-wedding"]').getByRole("link").click();
+    await expect(page).toHaveURL(/collection=royal-wedding/);
+    await expect(
+      page.getByRole("heading", { name: /^Royal Wedding Collection · \d+ designs$/ }),
+    ).toBeVisible();
+    await expect(page.locator("[data-design]").first()).toHaveAttribute("data-design", /jal-mahal/);
+    await expect(page.locator('[data-design="gubbara"]')).toHaveCount(0);
   });
 
   test("filters narrow every design, follow the address and open the editor set up", async ({
@@ -155,12 +168,11 @@ test.describe("the Designs page", () => {
 
     // Clearing every filter goes back to the rows
     await page.getByRole("button", { name: "Clear filters" }).click();
-    await expect(page.locator('[data-shelf="photos-none"]')).toBeVisible();
+    await expect(page.locator('[data-shelf="collection-garden"]')).toBeVisible();
 
     await page
-      .locator('[data-shelf="occasion-birthday"]')
-      .getByRole("link", { name: /^View all/ })
-      .first()
+      .locator('section[aria-labelledby="occasions-heading"]')
+      .getByRole("link", { name: "Birthday", exact: true })
       .click();
     await expect(page).toHaveURL(/occasion=birthday/);
     await expect(page.locator('[data-design="gubbara"]')).toBeVisible();

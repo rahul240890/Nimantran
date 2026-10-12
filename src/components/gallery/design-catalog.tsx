@@ -36,7 +36,15 @@ import {
   type PhotoGroup,
 } from "@/lib/gallery/filters";
 import { normalize } from "@/lib/gallery/search";
-import { SHELVES, shelfEntries, shelfHref, type Shelf } from "@/lib/gallery/shelves";
+import { COLLECTION_IDS, type CollectionId } from "@/lib/gallery/collections";
+import {
+  COLLECTION_SHELVES,
+  SHELVES,
+  shelfEntries,
+  shelfHref,
+  type Shelf,
+} from "@/lib/gallery/shelves";
+import { CollectionTiles } from "./collection-tiles";
 import { pagePath } from "@/lib/seo/paths";
 import { searchWords } from "./design-words";
 import { CatalogCard, ShelfRow, TraditionTiles, type Covers } from "./shelf-row";
@@ -169,7 +177,10 @@ function SearchBox({ value, onChange }: { value: string; onChange: (value: strin
   );
 }
 
-/** The page with nothing chosen: tradition tiles, occasions, then rows of designs by kind. */
+/**
+ * The page with nothing chosen: tradition tiles, occasions, the collections as tiles, then
+ * the moving scenes and a row per collection.
+ */
 function Browse({
   entries,
   covers,
@@ -180,17 +191,19 @@ function Browse({
   designsPath: string;
 }) {
   const locale = useLocale();
-  const { shelfCopy, catalogCopy, weddingKindCopy, occasionTaglines } = useText(galleryText);
+  const { shelfCopy, catalogCopy, weddingKindCopy, occasionTaglines, collectionCopy } =
+    useText(galleryText);
   const occasionsPath = pagePath({ kind: "gallery" }, locale);
   const kindTitle = (kind: WeddingKind) => shelfCopy.tradition(weddingKindCopy[kind].name);
-  // The moving scenes head the page in a group of their own
-  const featured = (shelf: Shelf) => shelf.kind === "format" && shelf.value === "moving";
-  const groups = (["moving", "photos", "format", "occasion"] as const).map((group) => ({
-    group,
-    shelves: SHELVES.filter((shelf) =>
-      group === "moving" ? featured(shelf) : shelf.kind === group && !featured(shelf),
-    ),
-  }));
+  // The moving scenes head the rows in a group of their own, then a row per collection
+  const groups = [
+    {
+      group: "moving",
+      title: shelfCopy.groups.moving,
+      shelves: SHELVES.filter((shelf) => shelf.kind === "format" && shelf.value === "moving"),
+    },
+    { group: "collections", title: collectionCopy.rowsHeading, shelves: COLLECTION_SHELVES },
+  ] as const;
   const words = (shelf: Shelf) => {
     switch (shelf.kind) {
       case "photos":
@@ -206,6 +219,11 @@ function Browse({
         return {
           title: CATEGORIES[shelf.value].names[locale],
           intro: occasionTaglines[shelf.value] ?? "",
+        };
+      case "collection":
+        return {
+          title: collectionCopy.name(collectionCopy.names[shelf.value].name),
+          intro: collectionCopy.names[shelf.value].intro,
         };
     }
   };
@@ -241,7 +259,9 @@ function Browse({
         </ul>
       </section>
 
-      {groups.map(({ group, shelves }, groupIndex) => (
+      <CollectionTiles entries={entries} covers={covers} designsPath={designsPath} />
+
+      {groups.map(({ group, title, shelves }, groupIndex) => (
         <section
           key={group}
           aria-labelledby={`group-${group}`}
@@ -252,7 +272,7 @@ function Browse({
             className="flex items-center gap-3 font-label text-xs tracking-[0.24em] text-accent-text uppercase"
           >
             <span aria-hidden className="h-px w-6 bg-marigold" />
-            {shelfCopy.groups[group]}
+            {title}
           </h2>
           {shelves.map((shelf, index) => {
             const { shown, total } = shelfEntries(entries, shelf);
@@ -292,7 +312,8 @@ function Results({
   onChange: (next: DesignFilters) => void;
 }) {
   const locale = useLocale();
-  const { galleryCopy, catalogCopy, shelfCopy, weddingKindCopy } = useText(galleryText);
+  const { galleryCopy, catalogCopy, shelfCopy, weddingKindCopy, collectionCopy } =
+    useText(galleryText);
   const text = useSearchText(entries);
   const deferred = useDeferredValue(filters);
   const shown = useMemo(
@@ -302,18 +323,22 @@ function Results({
   const set = (change: Partial<DesignFilters>) => onChange({ ...filters, ...change });
   const showKinds = !filters.occasion || filters.occasion === "wedding";
   // A View all names its row: "Illustrated invitations · 89 designs"
-  const { query, kind, photos, format, occasion } = filters;
+  const { query, kind, photos, format, occasion, collection } = filters;
   const only = (chosen: unknown) =>
-    !query.trim() && [kind ?? occasion, photos, format].filter(Boolean).length === 1 && !!chosen;
-  const title = only(kind)
-    ? shelfCopy.tradition(weddingKindCopy[kind!].name)
-    : only(occasion)
-      ? CATEGORIES[occasion!].names[locale]
-      : only(photos)
-        ? shelfCopy.photos[photos!].title
-        : only(format)
-          ? shelfCopy.format[format!].title
-          : null;
+    !query.trim() &&
+    [kind ?? occasion, photos, format, collection].filter(Boolean).length === 1 &&
+    !!chosen;
+  const title = only(collection)
+    ? collectionCopy.name(collectionCopy.names[collection!].name)
+    : only(kind)
+      ? shelfCopy.tradition(weddingKindCopy[kind!].name)
+      : only(occasion)
+        ? CATEGORIES[occasion!].names[locale]
+        : only(photos)
+          ? shelfCopy.photos[photos!].title
+          : only(format)
+            ? shelfCopy.format[format!].title
+            : null;
 
   return (
     <>
@@ -347,6 +372,14 @@ function Results({
             );
           })}
         </RadioGroup>
+
+        <ChipRow<CollectionId>
+          label={collectionCopy.label}
+          allLabel={collectionCopy.all}
+          value={filters.collection}
+          options={COLLECTION_IDS.map((id) => ({ id, label: collectionCopy.names[id].name }))}
+          onChange={(collection) => set({ collection })}
+        />
 
         <ChipRow<PhotoGroup>
           label={catalogCopy.photosLabel}

@@ -1,5 +1,6 @@
 import type { CategoryId } from "@/lib/categories/catalog";
 import type { WeddingKind } from "./catalog";
+import { COLLECTION_IDS, type CollectionId } from "./collections";
 import {
   NO_FILTERS,
   PHOTO_GROUPS,
@@ -22,7 +23,8 @@ export type Shelf =
   | { id: `photos-${PhotoGroup}`; kind: "photos"; value: PhotoGroup }
   | { id: `format-${DesignFormat}`; kind: "format"; value: DesignFormat }
   | { id: `tradition-${WeddingKind}`; kind: "tradition"; value: WeddingKind }
-  | { id: `occasion-${CategoryId}`; kind: "occasion"; value: CategoryId };
+  | { id: `occasion-${CategoryId}`; kind: "occasion"; value: CategoryId }
+  | { id: `collection-${CollectionId}`; kind: "collection"; value: CollectionId };
 
 /** Occasions beyond the wedding that get a row of their own. */
 export const SHELF_OCCASIONS = [
@@ -57,6 +59,13 @@ export const SHELVES: readonly Shelf[] = [
   })),
 ];
 
+/** A row per collection, which the Designs page shows after its moving scenes. */
+export const COLLECTION_SHELVES: readonly Shelf[] = COLLECTION_IDS.map((value) => ({
+  id: `collection-${value}` as const,
+  kind: "collection" as const,
+  value,
+}));
+
 /** The filters a row stands for, which View all chooses. */
 export function shelfFilters(shelf: Shelf): DesignFilters {
   switch (shelf.kind) {
@@ -68,6 +77,8 @@ export function shelfFilters(shelf: Shelf): DesignFilters {
       return { ...NO_FILTERS, kind: shelf.value };
     case "occasion":
       return { ...NO_FILTERS, occasion: shelf.value };
+    case "collection":
+      return { ...NO_FILTERS, collection: shelf.value };
   }
 }
 

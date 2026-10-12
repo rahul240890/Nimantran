@@ -15,6 +15,7 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 
 export const nav: Translation<typeof en.nav> = [
   { id: "designs", label: "डिज़ाइन" },
+  { id: "collections", label: "संग्रह" },
   { id: "weddings", label: "शादी" },
   { id: "occasions", label: "अवसर" },
   { id: "how-it-works", label: "कैसे काम करता है" },
