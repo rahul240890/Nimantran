@@ -18,8 +18,8 @@ describe("packages", () => {
     expect(formatRupees(packagePrice("basic", "premium"))).toBe("₹499");
     expect(formatRupees(packagePrice("celebration", "premium"))).toBe("₹999");
     expect(formatRupees(packagePrice("grand", "premium"))).toBe("₹1,999");
-    expect(formatRupees(packagePrice("basic", "royal"))).toBe("₹599");
-    expect(formatRupees(packagePrice("grand", "royal"))).toBe("₹2,099");
+    expect(formatRupees(packagePrice("basic", "royal"))).toBe("₹799");
+    expect(formatRupees(packagePrice("grand", "royal"))).toBe("₹2,299");
     expect(packagePrice("basic", "free")).toBe(0);
     expect(formatRupees(packagePrice("celebration", "free"))).toBe("₹500");
   });
@@ -44,7 +44,7 @@ describe("packages", () => {
     expect(upgradePricePaise(free, "basic", "premium")).toBe(49_900);
     expect(upgradePricePaise(free, "celebration", "free")).toBe(50_000);
     expect(upgradePricePaise(basic, "celebration", "premium")).toBe(50_000);
-    expect(upgradePricePaise(basic, "grand", "royal")).toBe(1_60_000);
+    expect(upgradePricePaise(basic, "grand", "royal")).toBe(1_80_000);
     expect(upgradePricePaise({ plan: "grand", tier: "royal" }, "basic", "premium")).toBeNull();
   });
 
@@ -55,7 +55,7 @@ describe("packages", () => {
   });
 
   it("charge the design's difference when a paid invite moves to a dearer design", () => {
-    expect(upgradePricePaise({ plan: "basic", tier: "premium" }, "basic", "royal")).toBe(10_000);
+    expect(upgradePricePaise({ plan: "basic", tier: "premium" }, "basic", "royal")).toBe(30_000);
   });
 
   it("ask a paid design for its package, and a second language for Celebration", () => {

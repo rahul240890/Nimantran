@@ -7,18 +7,19 @@ import { DEFAULT_PRICING, parsePricing, pricesInOrder, tierPricePaise } from "./
 import { priceFor } from "./offers";
 
 describe("design tiers", () => {
-  it("start with free cards, free starter Scenes and a few Royal wedding Stories", () => {
+  it("start with free 3D cards, Premium Scenes and moving scenes, and Royal Stories", () => {
     expect(defaultTier("card-marigold")).toBe("free");
-    expect(defaultTier("minimal-white-scene")).toBe("free");
-    expect(defaultTier("space-voyage-scene")).toBe("free");
+    expect(defaultTier("minimal-white-scene")).toBe("premium");
     expect(defaultTier("kayal-scene")).toBe("premium");
+    expect(defaultTier("jal-mahal-scene")).toBe("premium");
     expect(defaultTier("pichwai")).toBe("royal");
-    expect(defaultTier("rajwada-bagh")).toBe("premium");
-    // Diwali's Story has a god page too, but a festival invite stays Premium
-    expect(defaultTier("deepotsav")).toBe("premium");
+    expect(defaultTier("rajwada-bagh")).toBe("royal");
+    expect(defaultTier("deepotsav")).toBe("royal");
+    expect(tierPricePaise(DEFAULT_PRICING, "premium")).toBe(49_900);
+    expect(tierPricePaise(DEFAULT_PRICING, "royal")).toBe(79_900);
   });
 
-  it("include some designs of each tier", () => {
+  it("include some designs of each default tier", () => {
     const tiers = allDesigns().map((design) => defaultTier(design.id));
     for (const tier of ["free", "premium", "royal"] as const) expect(tiers).toContain(tier);
   });
@@ -55,8 +56,7 @@ describe("design tiers", () => {
     expect(old.tiers).toEqual({ "card-marigold": "royal" });
   });
 
-  it("price the moving scenes as Signature, at ₹799 unless the admin changes it", () => {
-    expect(defaultTier("jal-mahal-scene")).toBe("signature");
+  it("price Signature at ₹799 unless the admin changes it", () => {
     expect(tierPricePaise(DEFAULT_PRICING, "signature")).toBe(79_900);
     // Settings saved before Signature existed keep their prices and gain Signature's default
     const saved = parsePricing({

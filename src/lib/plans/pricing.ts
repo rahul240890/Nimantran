@@ -32,8 +32,9 @@ const stored = unstable_cache(
     if (error) throw error;
     return parsePricing(data?.value);
   },
-  // The key names the stored shape, so a deploy never reads an older shape from the cache
-  ["pricing", "packages"],
+  // The key names the stored shape, so a deploy never reads an older shape from the cache.
+  // Its date is the last pricing change made in the database by hand, which a deploy then reads.
+  ["pricing", "packages", "2026-10-12"],
   { tags: [PRICING_TAG], revalidate: 3600 },
 );
 
