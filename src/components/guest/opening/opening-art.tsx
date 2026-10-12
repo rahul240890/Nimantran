@@ -492,7 +492,8 @@ export function LotusBloom() {
 function CoverDoors({ cover }: { cover: string }) {
   return (
     <div className="absolute inset-0 [perspective:1600px]">
-      <Beyond className="inset-0" />
+      {/* The whole screen opens onto it, so it is warm light rather than a dark room */}
+      <Beyond className="opening-beyond-dawn inset-0" />
       {(["left", "right"] as const).map((side) => (
         <div
           key={side}

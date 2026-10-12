@@ -4,7 +4,8 @@ import { ChevronDown, DoorOpen, LoaderCircle, MailCheck } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
-import { StoryPlayer } from "@/components/invitation/story/story-player";
+import { pageImage, StoryPlayer } from "@/components/invitation/story/story-player";
+import { MusicBars } from "@/components/invitation/music-bars";
 import { musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
@@ -41,6 +42,8 @@ export const OPEN_MS = 1500 * OPENING_PACE;
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
+/** The longest the opening waits for the screen to settle after going full screen. */
+const SETTLE_CAP_MS = 1000;
 
 const noSubscribe = () => () => {};
 
@@ -188,10 +191,12 @@ export type OpeningProps = {
  * inside another (the host's phone preview) leaves its frame alone. Phones that can't
  * (an iPhone's Safari) simply carry on as they were.
  */
-function fillScreen() {
+function fillScreen(): Promise<void> | null {
   const root = document.documentElement;
-  if (window.self !== window.top || document.fullscreenElement || !root.requestFullscreen) return;
-  root.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
+  if (window.self !== window.top || document.fullscreenElement || !root.requestFullscreen) {
+    return null;
+  }
+  return root.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
 }
 
 /** Closing the invitation again gives the browser its bars back. */
@@ -226,10 +231,13 @@ export function Opening({
   const still = useReducedMotion();
   const [asked, setAsked] = useState(false);
   const [pages, setPages] = useState(false);
+  // Going full screen blanks a phone's screen for a moment while it resizes; the move waits
+  // until the screen is back, so the guest sees the whole of it
+  const [settled, setSettled] = useState(true);
   const stage = useRef<HTMLDivElement>(null);
   // The move waits for its paintings, so it never plays over empty space; still mode needn't
   const ready = useOpeningReady(stage, `${suite}/${style}`);
-  const open = asked && (ready || still);
+  const open = asked && settled && (ready || still);
   const waiting = asked && !open;
   useOpeningPace(stage, open, still);
   const theme = SUITES[suite];
@@ -293,7 +301,31 @@ export function Opening({
 
   const enter = () => {
     setAsked(true);
-    fillScreen();
+    const filling = fillScreen();
+    if (filling) {
+      setSettled(false);
+      let done = false;
+      const settle = () => {
+        if (done) return;
+        done = true;
+        // A frame for the resized page to be drawn before the move begins
+        requestAnimationFrame(() => requestAnimationFrame(() => setSettled(true)));
+      };
+      void filling.then(settle);
+      window.setTimeout(settle, SETTLE_CAP_MS);
+    }
+    // The first pages' paintings load while the opening plays, so no page comes in empty
+    const next = latest.current;
+    if (next.kind === "pages") {
+      for (const beat of next.beats.slice(0, 2)) {
+        const src = pageImage(suite, beat);
+        if (!src) continue;
+        const image = new window.Image();
+        image.decoding = "async";
+        image.src = src;
+      }
+    }
+    // The music swells in with the opening (it fades up over its first seconds)
     if (musicOnOpen && !music.playing && !musicMuted()) void music.play();
   };
   const leave = (hadFocus: boolean) => {
@@ -532,6 +564,18 @@ export function Opening({
             over={fresh}
             onSkip={goIn}
           />
+        )}
+        {/* The music's button comes in with the welcome, in the corner it keeps on the pages */}
+        {welcome && (
+          <button
+            type="button"
+            aria-pressed={music.playing}
+            aria-label={music.playing ? invitation.pauseMusic : invitation.playMusic}
+            onClick={music.toggle}
+            className="absolute end-2 top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-50 grid size-11 animate-fade-in place-items-center rounded-full bg-night/35 text-card-ivory backdrop-blur-sm hover:bg-night/55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:animate-none"
+          >
+            <MusicBars playing={music.playing} className="size-5" />
+          </button>
         )}
       </div>
 

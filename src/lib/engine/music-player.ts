@@ -13,6 +13,8 @@ export type { MusicChoice } from "./music";
 const LOOKAHEAD_S = 0.6;
 const TICK_MS = 150;
 const VOLUME = 0.55;
+/** How long the music takes to swell to its full volume. */
+const FADE_IN_S = 2.5;
 
 export class MusicPlayer {
   private ctx: AudioContext | null = null;
@@ -62,8 +64,19 @@ export class MusicPlayer {
         clip.src = this.music.clip;
         this.clip = clip;
       }
-      await this.clip.play();
+      // The host's song swells in as the raga does (where the phone lets a page set volume)
+      const clip = this.clip;
+      clip.volume = 0;
+      await clip.play();
       this.playing = true;
+      const start = performance.now();
+      const rise = () => {
+        if (!this.playing || this.clip !== clip) return;
+        const share = Math.min(1, (performance.now() - start) / (FADE_IN_S * 1000));
+        clip.volume = share;
+        if (share < 1) requestAnimationFrame(rise);
+      };
+      requestAnimationFrame(rise);
       return;
     }
     const AudioContextClass =
@@ -103,7 +116,7 @@ export class MusicPlayer {
     const now = ctx.currentTime;
     this.master!.gain.cancelScheduledValues(now);
     this.master!.gain.setValueAtTime(this.master!.gain.value, now);
-    this.master!.gain.linearRampToValueAtTime(VOLUME, now + 2.5);
+    this.master!.gain.linearRampToValueAtTime(VOLUME, now + FADE_IN_S);
     if (!this.score) this.begin(now);
     this.schedule();
     this.timer = window.setInterval(() => this.schedule(), TICK_MS);

@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarPlus, Volume2, VolumeX } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
@@ -18,6 +18,7 @@ import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo"
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
+import { MusicBars } from "@/components/invitation/music-bars";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
@@ -311,7 +312,7 @@ export function GuestView({
                     pressed={music.playing}
                     onClick={music.toggle}
                   >
-                    {music.playing ? <Volume2 aria-hidden /> : <VolumeX aria-hidden />}
+                    <MusicBars playing={music.playing} className="size-5" />
                   </SceneButton>
                 }
               />
