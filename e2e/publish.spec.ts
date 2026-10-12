@@ -320,12 +320,12 @@ test.describe("publish and share", () => {
     // The card's time is Gujarati too, never "AM" in English letters
     await expect(story.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
     await guest.keyboard.press("ArrowRight");
-    const reply = story.getByRole("link", { name: "આમંત્રણનો જવાબ આપો" });
-    await expect(reply).toHaveAttribute("href", "#rsvp");
+    // The last page welcomes the guest and carries on down the page, in Gujarati
+    await expect(story.getByText("આપને ભાવભર્યું આમંત્રણ છે")).toBeVisible();
+    const more = story.getByRole("button", { name: "વિગતો જુઓ" });
     expect((await axe(guest).analyze()).violations).toEqual([]);
-    await reply.click();
+    await more.click();
     await expect(story).toHaveCount(0);
-    await expect(guest).toHaveURL(/#rsvp$/);
 
     const article = guest.getByRole("article", { name: "હસ્તમેળાપ" });
     await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
