@@ -13,6 +13,7 @@ export const homeMeta = {
 
 export const nav = [
   { id: "designs", label: "Designs" },
+  { id: "collections", label: "Collections" },
   { id: "weddings", label: "Weddings" },
   { id: "occasions", label: "Occasions" },
   { id: "how-it-works", label: "How it works" },

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Flame,
   Clapperboard,
   ArrowRight,
   Camera,
@@ -28,6 +29,7 @@ import type { GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
 import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
 import { ScenePoster, SceneSample } from "./scene-poster";
+import { useTrending } from "./use-trending";
 import { StorySample } from "./story-sample";
 
 type DesignCardProps = {
@@ -72,6 +74,7 @@ export function DesignCard({
   const moving = isMoving(design.suite);
   const painted = pages.length > 0;
   const [open, setOpen] = useState(false);
+  const trending = useTrending().includes(design.id);
 
   return (
     <article
@@ -146,6 +149,15 @@ export function DesignCard({
                 ? galleryCopy.storyBadge(pages.length)
                 : galleryCopy.card}
         </span>
+        {trending && (
+          <span
+            data-trending
+            className="absolute start-3 top-10 inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-on-marigold uppercase shadow-raised"
+          >
+            <Flame aria-hidden className="size-3.5" />
+            {galleryCopy.trendingBadge}
+          </span>
+        )}
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />
         </span>

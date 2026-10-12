@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { ShelfRow, TraditionTiles, type Covers } from "@/components/gallery/shelf-row";
+import { TrendingRow } from "@/components/gallery/trending-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES } from "@/lib/categories/catalog";
@@ -60,6 +61,7 @@ export function HomeShelves({
           level={3}
         />
       )}
+      {group === "wedding" && <TrendingRow id="home-trending" covers={covers} entries={entries} />}
       {rows.map(({ shelf, title, intro }) => {
         const { shown, total } = shelfEntries(entries, shelf);
         return (

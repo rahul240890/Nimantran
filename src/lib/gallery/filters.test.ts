@@ -64,9 +64,12 @@ describe("design filters", () => {
       kind: null,
       format: "story",
       photos: "none",
+      collection: "garden",
     } as const;
     expect(filtersFromParams(new URLSearchParams(filtersToParams(filters)))).toEqual(filters);
-    expect(filtersFromParams(new URLSearchParams("occasion=moon&format=x"))).toEqual(NO_FILTERS);
+    expect(
+      filtersFromParams(new URLSearchParams("occasion=moon&format=x&collection=moon")),
+    ).toEqual(NO_FILTERS);
   });
 });
 
@@ -95,5 +98,14 @@ describe("photo filters", () => {
     expect(hasFilters(NO_FILTERS)).toBe(false);
     expect(hasFilters(filters)).toBe(true);
     expect(hasFilters({ ...NO_FILTERS, query: "  " })).toBe(false);
+  });
+
+  it("a collection lists its own themes, its best first", () => {
+    const royal = filterCatalog(entries, { ...NO_FILTERS, collection: "royal-wedding" }, () => "");
+    expect(royal.every((entry) => entry.collection === "royal-wedding")).toBe(true);
+    expect(royal[0]!.design.suite).toBe("jal-mahal");
+    const cards = filterCatalog(entries, { ...NO_FILTERS, collection: "cards-3d" }, () => "");
+    expect(cards.every((entry) => entry.format === "card")).toBe(true);
+    expect(hasFilters({ ...NO_FILTERS, collection: "baby" })).toBe(true);
   });
 });

@@ -10,6 +10,7 @@ import {
   type GalleryDesign,
   type WeddingKind,
 } from "./catalog";
+import { COLLECTION_IDS, collectionOf, collectionRank, type CollectionId } from "./collections";
 import { designPhotos, type PhotoNeed } from "./photos";
 import { normalize } from "./search";
 
@@ -43,6 +44,7 @@ export type CatalogEntry = {
   photos: PhotoNeed;
   occasions: readonly CategoryId[];
   kinds: readonly WeddingKind[];
+  collection: CollectionId;
 };
 
 export type DesignFilters = {
@@ -52,6 +54,8 @@ export type DesignFilters = {
   kind: WeddingKind | null;
   format: DesignFormat | null;
   photos: PhotoGroup | null;
+  /** A collection, such as Royal Wedding (collections.ts). */
+  collection: CollectionId | null;
 };
 
 export const NO_FILTERS: DesignFilters = {
@@ -60,13 +64,14 @@ export const NO_FILTERS: DesignFilters = {
   kind: null,
   format: null,
   photos: null,
+  collection: null,
 };
 
 /** Whether any filter is chosen: if not, the Designs page shows its rows instead of a grid. */
 export function hasFilters(filters: DesignFilters): boolean {
   return (
     filters.query.trim() !== "" ||
-    !!(filters.occasion || filters.kind || filters.format || filters.photos)
+    !!(filters.occasion || filters.kind || filters.format || filters.photos || filters.collection)
   );
 }
 
@@ -101,6 +106,7 @@ export function catalogEntry(design: GalleryDesign): CatalogEntry {
     photos: designPhotos(design),
     occasions: occasionsOf(design),
     kinds: kindsOf(design),
+    collection: collectionOf(design.suite),
   };
 }
 
@@ -120,14 +126,19 @@ export function filterCatalog(
 ): CatalogEntry[] {
   const terms = normalize(filters.query).split(" ").filter(Boolean);
   const occasion = filters.kind ? "wedding" : filters.occasion;
-  return entries.filter(
+  const shown = entries.filter(
     (entry) =>
       (!filters.format || entry.format === filters.format) &&
       (!occasion || entry.occasions.includes(occasion)) &&
       (!filters.kind || entry.kinds.includes(filters.kind)) &&
+      (!filters.collection || entry.collection === filters.collection) &&
       (!filters.photos || PHOTO_GROUP_NEEDS[filters.photos].includes(entry.photos)) &&
       (terms.length === 0 || terms.every((term) => words(entry.design).includes(term))),
   );
+  // A collection lists its best themes first
+  return filters.collection
+    ? shown.sort((a, b) => collectionRank(a.design.suite) - collectionRank(b.design.suite))
+    : shown;
 }
 
 /** The occasion a design opens for: the one the host filtered by, else its own. */
@@ -153,6 +164,7 @@ export function filtersFromParams(params: URLSearchParams): DesignFilters {
   const kind = params.get("tradition");
   const format = params.get("format");
   const photos = params.get("photos");
+  const collection = params.get("collection");
   return {
     query: params.get("q") ?? "",
     occasion: (CATEGORY_IDS as readonly string[]).includes(occasion ?? "")
@@ -165,12 +177,16 @@ export function filtersFromParams(params: URLSearchParams): DesignFilters {
     photos: (PHOTO_GROUPS as readonly string[]).includes(photos ?? "")
       ? (photos as PhotoGroup)
       : null,
+    collection: (COLLECTION_IDS as readonly string[]).includes(collection ?? "")
+      ? (collection as CollectionId)
+      : null,
   };
 }
 
 export function filtersToParams(filters: DesignFilters): string {
   const params = new URLSearchParams();
   if (filters.query.trim()) params.set("q", filters.query.trim());
+  if (filters.collection) params.set("collection", filters.collection);
   if (filters.occasion) params.set("occasion", filters.occasion);
   if (filters.kind) params.set("tradition", filters.kind);
   if (filters.format) params.set("format", filters.format);

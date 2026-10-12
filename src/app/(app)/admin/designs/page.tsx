@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { AdminHeading } from "@/components/admin/admin-shell";
 import { DesignPricingForm, type DesignRow } from "@/components/admin/design-pricing";
+import { TrendingPicker } from "@/components/admin/trending-picker";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { designWords } from "@/components/gallery/design-words";
 import { requireAdmin } from "@/lib/admin/access";
 import { cardDesign, paintedDesign, sceneDesign, type GalleryDesign } from "@/lib/gallery/catalog";
-import { catalogEntry } from "@/lib/gallery/filters";
+import { catalogEntry, designCatalog } from "@/lib/gallery/filters";
+import { getTrending } from "@/lib/gallery/trending-store";
 import { allDesignIds, defaultTier, designTier } from "@/lib/plans/design-defaults";
 import { getPricing } from "@/lib/plans/pricing";
 import { isSuiteId } from "@/lib/suites/catalog";
@@ -28,7 +30,19 @@ function galleryDesign(id: string): GalleryDesign | null {
 /** Which designs are Free, Premium, Royal or Signature, and what each package costs. */
 export default async function DesignsPage() {
   await requireAdmin("/admin/designs");
-  const pricing = await getPricing();
+  const [pricing, { pinned, trending }] = await Promise.all([getPricing(), getTrending()]);
+  const kinds = {
+    moving: "Moving",
+    storybook: "Storybook",
+    scene: "Scene",
+    story: "Story",
+    card: "3D card",
+  };
+  const trendingOptions = designCatalog().map((entry) => ({
+    id: entry.design.id,
+    name: designWords(entry.design, "en").name,
+    kind: kinds[entry.format],
+  }));
   const rows: DesignRow[] = allDesignIds().flatMap((id) => {
     const design = galleryDesign(id);
     if (!design) return [];
@@ -50,6 +64,9 @@ export default async function DesignsPage() {
         title="Designs and prices"
         intro="Every host can open and try every design. A Premium, Royal or Signature design shows its price on its tile, and publishing it asks for a package: Basic at the design's price, or Celebration and Grand on top. Prices include GST and apply once checkout is switched on."
       />
+      <div className="mb-6">
+        <TrendingPicker options={trendingOptions} pinned={pinned} trending={trending} />
+      </div>
       <DesignPricingForm
         rows={rows}
         amounts={pricing}
