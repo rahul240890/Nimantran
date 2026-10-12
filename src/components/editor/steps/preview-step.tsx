@@ -1,7 +1,16 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CircleAlert, Clock, Eye, MapPin, PartyPopper, Pencil, Shirt } from "lucide-react";
+import {
+  CircleAlert,
+  Clock,
+  Eye,
+  ImageIcon,
+  MapPin,
+  PartyPopper,
+  Pencil,
+  Shirt,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +29,7 @@ import { inviteNames } from "@/lib/publish/describe";
 import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
-import { usePhotoUrls } from "../use-photo-urls";
+import { photoFailed, usePhotoUrls } from "../use-photo-urls";
 import { SecondLanguageSection } from "./second-language";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
@@ -193,13 +202,22 @@ export function PreviewStep({
                 key={photo.id}
                 className="aspect-square overflow-hidden rounded-sm border border-line bg-surface-2"
               >
-                {urls[photo.id] && (
+                {urls[photo.id] ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
+                    key={urls[photo.id]}
                     src={urls[photo.id]}
                     alt={extrasCopy.photo(index + 1)}
+                    // An account link that ran out is asked for again; a lost photo leaves
+                    onError={() => photoFailed(photo.id)}
                     className="size-full object-cover"
                   />
+                ) : (
+                  // Still coming from the account
+                  <span className="grid size-full place-items-center text-ink-faint">
+                    <ImageIcon aria-hidden className="size-6" />
+                    <span className="sr-only">{extrasCopy.photo(index + 1)}</span>
+                  </span>
                 )}
               </li>
             ))}

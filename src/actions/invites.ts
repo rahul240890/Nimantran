@@ -55,12 +55,15 @@ export async function deleteInvite(inviteId: string): Promise<boolean> {
   return store.remove(account, inviteId);
 }
 
-/** Short-lived links to an invite's photos in the account, for devices that don't have them. */
-export async function invitePhotoUrls(inviteId: string): Promise<Record<string, string>> {
+/**
+ * Short-lived links to an invite's photos in the account, for devices that don't have them;
+ * null when the account couldn't say, so no photo is taken for lost.
+ */
+export async function invitePhotoUrls(inviteId: string): Promise<Record<string, string> | null> {
   const store = inviteStore();
   const account = await getAccount();
-  if (!store || !account || !id.safeParse(inviteId).success) return {};
-  return store.photoUrls(account, inviteId);
+  if (!store || !account || !id.safeParse(inviteId).success) return null;
+  return store.photoUrls(account, inviteId).catch(() => null);
 }
 
 export type SlugCheck = { available: boolean; suggestions: string[] };

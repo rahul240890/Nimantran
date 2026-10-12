@@ -41,7 +41,7 @@ export default async function InvitePreviewPage({
   if (!store || !draft) notFound();
 
   const [urls, active, edition, locale, { hostPreviewCopy }] = await Promise.all([
-    store.photoUrls(account, id),
+    store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
     editionsActive(),
     invitePlan(account, id),
     getLocale(),
