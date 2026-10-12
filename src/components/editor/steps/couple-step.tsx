@@ -33,6 +33,7 @@ import { Lettering } from "../lettering";
 import { CardLanguagePicker } from "./language-step";
 import { Fold } from "./fold";
 import { Ideas } from "./ideas";
+import { SacredElements } from "./sacred-elements";
 import { cn } from "@/lib/cn";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
@@ -291,8 +292,9 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
 }
 
 /**
- * The card words section: every line the design shows besides the names, each starting
- * with wording for the occasion, then how the letters look.
+ * The card words section: the tradition's symbol and invocation at the top of the card,
+ * every line the design shows besides the names, each starting with wording for the
+ * occasion, then how the letters look.
  */
 export function WordsStep({ draft, update, errors }: StepProps) {
   const { studioCopy } = useText(editorText);
@@ -305,6 +307,7 @@ export function WordsStep({ draft, update, errors }: StepProps) {
 
   return (
     <div className="flex flex-col gap-8">
+      <SacredElements draft={draft} update={update} />
       {wording.length > 0 && (
         <div className="grid gap-5 sm:grid-cols-2">
           {wording.map((id) => {
