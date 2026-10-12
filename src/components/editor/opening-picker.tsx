@@ -5,6 +5,7 @@ import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useState } from "react";
 import { SymbolMark } from "@/components/guest/opening/opening-art";
 import { OpeningSample } from "@/components/guest/opening/opening";
+import { OPENING_PACE } from "@/components/guest/opening/opening-pace";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
@@ -30,7 +31,7 @@ function useBeat(on: boolean): boolean {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!on) return;
-    const timer = window.setInterval(() => setOpen((value) => !value), 2600);
+    const timer = window.setInterval(() => setOpen((value) => !value), 2600 * OPENING_PACE);
     return () => {
       window.clearInterval(timer);
       setOpen(false);
