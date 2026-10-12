@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, DoorOpen, MailCheck } from "lucide-react";
+import { ChevronDown, DoorOpen, LoaderCircle, MailCheck } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
@@ -29,15 +29,16 @@ import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templ
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 import { freshBackdrop } from "./opening-fresh";
+import { OPENING_PACE, useOpeningPace, useOpeningReady } from "./opening-pace";
 import { OpeningWelcome } from "./opening-welcome";
 
-/** How long the opening takes to open before the pages come in. */
-export const OPEN_MS = 1500;
+/** How long the opening takes to open before the pages come in, at the opening's pace. */
+export const OPEN_MS = 1500 * OPENING_PACE;
 /**
  * A painted gate takes longer: the doors open, then the guest walks through the arch. A
  * fresh or themed opening takes as long, its painting going its own way.
  */
-const GATE_OPEN_MS = 2500;
+const GATE_OPEN_MS = 2500 * OPENING_PACE;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
 
@@ -217,8 +218,14 @@ export function Opening({
 }: OpeningProps) {
   const { guestCopy, invitation } = useGuestText();
   const still = useReducedMotion();
-  const [open, setOpen] = useState(false);
+  const [asked, setAsked] = useState(false);
   const [pages, setPages] = useState(false);
+  const stage = useRef<HTMLDivElement>(null);
+  // The move waits for its paintings, so it never plays over empty space; still mode needn't
+  const ready = useOpeningReady(stage, `${suite}/${style}`);
+  const open = asked && (ready || still);
+  const waiting = asked && !open;
+  useOpeningPace(stage, open, still);
   const theme = SUITES[suite];
   const cover = theme.images.cover;
   const painted = style === "doors" && Boolean(cover);
@@ -279,7 +286,7 @@ export function Opening({
   }, [open]);
 
   const enter = () => {
-    setOpen(true);
+    setAsked(true);
     fillScreen();
     if (musicOnOpen && !music.playing && !musicMuted()) void music.play();
   };
@@ -288,7 +295,7 @@ export function Opening({
     leaveFullScreen();
     setWelcome(false);
     setPages(false);
-    setOpen(false);
+    setAsked(false);
   };
 
   const plate = (half?: "left" | "right") => {
@@ -400,6 +407,7 @@ export function Opening({
       </div>
 
       <div
+        ref={stage}
         data-open={open}
         className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
@@ -463,9 +471,16 @@ export function Opening({
             <Button
               ref={button}
               size="lg"
-              leadingIcon={<DoorOpen aria-hidden />}
+              leadingIcon={
+                waiting ? (
+                  <LoaderCircle aria-hidden className="animate-spin motion-still:animate-none" />
+                ) : (
+                  <DoorOpen aria-hidden />
+                )
+              }
               onClick={enter}
               aria-expanded={open}
+              aria-busy={waiting || undefined}
               disabled={open}
               className="min-w-[min(16rem,80cqw)]"
             >
@@ -544,13 +559,19 @@ export function OpeningSample({
   open: boolean;
 }) {
   const layout = OPENING_LAYOUT[style];
+  const stage = useRef<HTMLDivElement>(null);
+  useOpeningPace(stage, open, useReducedMotion());
   return (
     <div
       data-suite={suite}
       data-opening={style}
       className="opening-page relative aspect-[9/16] w-full overflow-hidden rounded-lg"
     >
-      <div data-open={open} className="opening-stage [container-type:size] absolute inset-0">
+      <div
+        ref={stage}
+        data-open={open}
+        className="opening-stage [container-type:size] absolute inset-0"
+      >
         <OpeningArt style={style} cover={SUITES[suite].images.cover} sample />
         <div className="absolute inset-0 z-30 flex flex-col">
           <div

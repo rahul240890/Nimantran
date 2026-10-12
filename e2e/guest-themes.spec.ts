@@ -204,7 +204,9 @@ test("the welcome before the pages", async ({ page }) => {
   await page.clock.pauseAt(new Date("2026-10-01T10:00:05+05:30"));
   await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
   await page.getByRole("button", { name: "Open the invitation" }).click();
-  await page.clock.runFor(1600);
+  // It opens once its paintings have loaded, at the opening's calmer pace
+  await expect(page.locator("[data-doorway]")).toHaveAttribute("data-doorway", "open");
+  await page.clock.runFor(2500);
   const welcome = page.getByTestId("opening-welcome");
   await expect(welcome).toBeVisible();
   await expect(welcome).toContainText("Arjun");
