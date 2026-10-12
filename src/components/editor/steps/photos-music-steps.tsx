@@ -43,7 +43,13 @@ import type { MusicPlayer } from "@/lib/engine/music-player";
 import { arrangement } from "@/lib/engine/music";
 import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
-import { forgetPhotoUrl, rememberPhotoUrl, useClipUrl, usePhotoUrls } from "../use-photo-urls";
+import {
+  forgetPhotoUrl,
+  photoFailed,
+  rememberPhotoUrl,
+  useClipUrl,
+  usePhotoUrls,
+} from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
 import { PagePacing } from "../page-pacing";
 import { ContactsSection } from "./family-section";
@@ -281,7 +287,12 @@ function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
                   ) : id && url ? (
                     // Local object URLs: next/image can't optimise these
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={url} alt="" className="h-44 w-full object-cover" />
+                    <img
+                      src={url}
+                      alt=""
+                      onError={() => photoFailed(id)}
+                      className="h-44 w-full object-cover"
+                    />
                   ) : (
                     <span className="flex flex-col items-center gap-2 px-4 py-6 text-center text-ink-muted">
                       {adding === frame ? (
@@ -456,6 +467,7 @@ function MorePhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
                   <img
                     src={url}
                     alt={extrasCopy.photo(index + 1)}
+                    onError={() => photoFailed(photo.id)}
                     className="size-full object-cover"
                   />
                 ) : (

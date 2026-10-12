@@ -77,6 +77,16 @@ const PAINTED_MUSIC: Record<Exclude<SuiteId, SceneThemeId | "classic">, ThemeMus
   "jantar-mantar": { raga: "madhyamavati", lead: "sitar", taal: null, tempo: 60 },
   rangrez: { raga: "kafi", lead: "shehnai", taal: "keherwa", tempo: 88 },
   "phool-mandi": { raga: "bhimpalasi", lead: "bansuri", taal: "dadra", tempo: 70 },
+  "udan-khatola": { raga: "bihag", lead: "santoor", taal: "dadra", tempo: 68 },
+  "rang-raste": { raga: "kafi", lead: "shehnai", taal: "bhangra", tempo: 94 },
+  "kaanch-gumbad": { raga: "yaman", lead: "santoor", taal: "dadra", tempo: 60 },
+  "chalk-pati": { raga: "pilu", lead: "bansuri", taal: "keherwa", tempo: 82 },
+  "jadon-ka-pul": { raga: "desh", lead: "santoor", taal: null, tempo: 58 },
+  "gol-matol": { raga: "khamaj", lead: "bansuri", taal: "keherwa", tempo: 90 },
+  "bhool-bhulaiya": { raga: "bihag", lead: "sitar", taal: "dadra", tempo: 64 },
+  "deco-yatra": { raga: "hamsadhwani", lead: "santoor", taal: "keherwa", tempo: 78 },
+  "gehra-neela": { raga: "madhyamavati", lead: "bansuri", taal: null, tempo: 54 },
+  "shatranj-baazi": { raga: "mand", lead: "sitar", taal: null, tempo: 52 },
 };
 
 /** Scene themes whose occasion asks for something their kin doesn't play. */

@@ -111,6 +111,46 @@ export const PAINTED_GATES = {
     move: "gather",
     hole: { left: 8.6, top: 6.6, width: 82.8, height: 93.4 },
   },
+  "kaleen-parda": {
+    move: "slide",
+    hole: { left: 9.2, top: 13.8, width: 81.5, height: 86.2 },
+  },
+  "truck-darwaza": {
+    move: "swing",
+    hole: { left: 14.2, top: 20.2, width: 71.4, height: 79.8 },
+  },
+  "kaanch-dhakkan": {
+    move: "gather",
+    hole: { left: 15.5, top: 8.4, width: 69.0, height: 91.6 },
+  },
+  "pati-pat": {
+    move: "swing",
+    hole: { left: 16.6, top: 10.8, width: 66.8, height: 89.2 },
+  },
+  "jad-jhalar": {
+    move: "gather",
+    hole: { left: 9.2, top: 12.6, width: 81.6, height: 87.4 },
+  },
+  "gol-darwaza": {
+    move: "swing",
+    hole: { left: 19.9, top: 16.7, width: 60.4, height: 83.3 },
+  },
+  "jhaadi-deewar": {
+    move: "slide",
+    hole: { left: 13.8, top: 14.8, width: 71.4, height: 85.2 },
+  },
+  "deco-dibba": {
+    move: "slide",
+    hole: { left: 19.0, top: 14.5, width: 62.0, height: 85.5 },
+  },
+  "samundar-parda": {
+    move: "slide",
+    hole: { left: 15.0, top: 14.2, width: 70.0, height: 85.8 },
+  },
+  "shatranj-sandook": {
+    move: "swing",
+    hole: { left: 15.6, top: 10.6, width: 68.8, height: 89.4 },
+  },
 } as const satisfies Record<
   string,
   {
@@ -401,6 +441,16 @@ const STORY_GATE: Record<StoryId, PaintedGate> = {
   "jantar-mantar": "yantra-pat",
   rangrez: "rang-parda",
   "phool-mandi": "genda-ladi",
+  "udan-khatola": "kaleen-parda",
+  "rang-raste": "truck-darwaza",
+  "kaanch-gumbad": "kaanch-dhakkan",
+  "chalk-pati": "pati-pat",
+  "jadon-ka-pul": "jad-jhalar",
+  "gol-matol": "gol-darwaza",
+  "bhool-bhulaiya": "jhaadi-deewar",
+  "deco-yatra": "deco-dibba",
+  "gehra-neela": "samundar-parda",
+  "shatranj-baazi": "shatranj-sandook",
 };
 
 /** The style the guest sees: the host's pick when it fits, else the design's own. */
@@ -521,6 +571,16 @@ const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   "yantra-pat": "night",
   "rang-parda": "party",
   "genda-ladi": "bloom",
+  "kaleen-parda": "royal",
+  "truck-darwaza": "party",
+  "kaanch-dhakkan": "bloom",
+  "pati-pat": "letter",
+  "jad-jhalar": "bloom",
+  "gol-darwaza": "party",
+  "jhaadi-deewar": "bloom",
+  "deco-dibba": "royal",
+  "samundar-parda": "night",
+  "shatranj-sandook": "royal",
   fireworks: "party",
   balloons: "party",
   gift: "party",

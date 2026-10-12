@@ -309,16 +309,19 @@ const supabaseStore: InviteStore = {
   async photoUrls(_account, id) {
     const supabase = await supabaseServer();
     if (!supabase) return {};
-    const { data: media } = await supabase
+    const { data: media, error } = await supabase
       .from("media")
       .select("id, storage_path")
       .eq("event_id", id)
       .in("kind", ["photo", "audio"]);
+    // An error isn't an empty invite: the editor would take its photos for lost
+    if (error) throw error;
     if (!media?.length) return {};
-    const { data } = await supabase.storage.from(BUCKET).createSignedUrls(
+    const { data, error: linkError } = await supabase.storage.from(BUCKET).createSignedUrls(
       media.map((row) => row.storage_path as string),
       PHOTO_LINK_SECONDS,
     );
+    if (linkError) throw linkError;
     const byPath = new Map((data ?? []).map((link) => [link.path, link.signedUrl]));
     return Object.fromEntries(
       media.flatMap((row) => {
