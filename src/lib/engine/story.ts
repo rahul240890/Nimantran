@@ -174,17 +174,24 @@ export function keepPeople(names: string): string {
     .join(" ");
 }
 
-/** Where a family's blocks (given as line counts) break onto a second page, if they do. */
-export function familySplit(counts: readonly number[]): number {
+/**
+ * Where a family's blocks (given as line counts) break onto a second page, if they do: where
+ * the two pages hold the most even share, but never between the two sides' parents (`sides`
+ * marks their blocks), so the son's family and the daughter's always read together. On a
+ * tie the break comes just after them, leaving the hosts to the second page.
+ */
+export function familySplit(counts: readonly number[], sides: readonly boolean[] = []): number {
   const total = counts.reduce((sum, n) => sum + n, 0);
   if (total <= FAMILY_LINES_PER_PAGE || counts.length < 2) return counts.length;
-  let best = 1;
+  const afterSides = sides.lastIndexOf(true) + 1;
+  let best = counts.length;
   let bestMax = Infinity;
   let first = 0;
   for (let i = 1; i < counts.length; i++) {
     first += counts[i - 1]!;
+    if (sides[i - 1] && sides[i]) continue;
     const most = Math.max(first, total - first);
-    if (most < bestMax) {
+    if (most < bestMax || (most === bestMax && i === afterSides)) {
       bestMax = most;
       best = i;
     }
@@ -267,8 +274,11 @@ export function storyBeats({
   ];
   const lines = (blocks: readonly FamilyLine[]) => blocks.flatMap(blockLines);
   // A long family (blessings, both sides' parents, hosts…) shares two pages, split where
-  // the two hold the most even number of lines
-  const half = familySplit(family.map((block) => blockLines(block).length));
+  // the two hold the most even number of lines, with both sides' parents on one page
+  const half = familySplit(
+    family.map((block) => blockLines(block).length),
+    family.map((block) => Boolean(block.parts)),
+  );
   const blessings = [...line(copy.families, "small"), ...lines(family.slice(0, half))];
   const more = lines(family.slice(half));
   const invite = [

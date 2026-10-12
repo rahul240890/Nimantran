@@ -157,6 +157,16 @@ describe("the family page", () => {
     expect(familySplit([4, 4, 2])).toBe(1);
   });
 
+  it("keeps both sides' parents on one page, with the hosts after them", () => {
+    // Blessings, the son's side, the daughter's side, the hosts
+    const sides = [false, true, true, false];
+    expect(familySplit([2, 4, 4, 2], sides)).toBe(3);
+    // Long blessings go on their own page, and the sides still read together
+    expect(familySplit([5, 4, 4, 2], sides)).toBe(1);
+    // Both sides alone stay on one page however long
+    expect(familySplit([5, 5], [true, true])).toBe(2);
+  });
+
   it("keeps each parent's name whole, breaking before the &", () => {
     expect(keepPeople("Smt. Asha & Shri Vijay Shah")).toBe(
       "Smt.\u00a0Asha &\u00a0Shri\u00a0Vijay\u00a0Shah",

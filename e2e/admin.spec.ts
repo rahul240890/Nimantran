@@ -62,7 +62,8 @@ test.describe("designs and prices", () => {
     test.setTimeout(90_000);
     const [id, word, name] = ["kayal-scene", "kayal", "Kayal"];
     await page.goto(`/designs?q=${word}`);
-    const tile = page.locator(`[data-design="${id}"]`);
+    // The search's own result, first on the page: the shelves below can show it too
+    const tile = page.locator(`[data-design="${id}"]`).first();
     await expect(tile.locator("[data-tier]")).toHaveAttribute("data-tier", "premium");
     // A phone's narrow tile shows the price alone
     const phone = info.project.name.startsWith("phone");

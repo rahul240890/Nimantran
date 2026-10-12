@@ -14,7 +14,7 @@ import { SUITES, type Mood } from "@/lib/suites/catalog";
 import { keepDate, type Voice } from "@/lib/suites/lettering";
 import { sceneLight, type Entrance, type ScenePage } from "@/lib/suites/scene";
 import { headingFit, sceneFont, type SceneFont, type SceneRole } from "@/lib/suites/scene-type";
-import type { FrameBox } from "@/lib/suites/photo-frames";
+import { photoWindows, type FrameBox } from "@/lib/suites/photo-frames";
 import {
   PAGE_H,
   PAGE_W,
@@ -137,7 +137,8 @@ const px = ([x, y, w, h]: FrameBox) => ({
 
 /** The photos under the painting, or a small gilt flower in a frame still waiting for one. */
 function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Palette) {
-  film.page.frames.forEach((frame, i) => {
+  // One photo on a two-frame painting shows through both frames, as the live scene shows it
+  photoWindows(film.page.frames, film.photos.length).forEach((frame, i) => {
     const [x, y, w, h] = frame;
     // A touch larger than the opening, as the live scene does, so no edge shows
     const box = px([x - 0.8, y - 0.5, w + 1.6, h + 1]);

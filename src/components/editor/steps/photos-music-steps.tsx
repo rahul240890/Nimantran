@@ -125,11 +125,11 @@ const LAYOUT_ICONS: Record<CoupleLayout, typeof ImageIcon> = {
 
 /**
  * The photos the design itself shows, each in its own upload field (Step 12l's photo page,
- * or a Scene's frame). A design with painted frames always asks for them: one, or one each
- * where it has a two-frame painting. Only a design without painted frames can do without.
+ * or a Scene's frame): one, or one each where it has a two-frame painting. Every one is
+ * optional; a design without painted frames can also leave its photo page out.
  */
-function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
-  const { extrasCopy, editor } = useText(editorText);
+function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
+  const { extrasCopy } = useText(editorText);
   const ids = draft.photos.map((photo) => photo.id);
   const urls = usePhotoUrls(ids, draft.remoteId);
   const one = draftPeople(draft) === "one";
@@ -240,15 +240,12 @@ function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
             const spot = id ? spots.find((s) => s.id === id) : undefined;
             const aspect = id ? photoAspect(draft.photos, id) : undefined;
             const crop = id ? draft.couplePhotos.crops?.[id] : undefined;
-            const error = errors[`frame-${frame}`];
-            const errorId = `frame-${frame}-error`;
             return (
               <li
                 key={frame}
                 className={cn(
                   "flex flex-col gap-3 rounded-lg border-2 bg-surface p-3 shadow-raised transition-colors duration-200",
                   id ? "border-line" : "border-dashed border-line-strong",
-                  error && "border-danger",
                 )}
               >
                 <span className="flex items-center justify-between gap-2">
@@ -259,8 +256,8 @@ function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
                       {extrasCopy.framePhotoAdded}
                     </Badge>
                   ) : (
-                    <span className="text-xs font-semibold text-accent-text">
-                      {extrasCopy.framePhotoNeeded}
+                    <span className="text-xs font-semibold text-ink-muted">
+                      {extrasCopy.framePhotoOptional}
                     </span>
                   )}
                 </span>
@@ -269,8 +266,6 @@ function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
                   aria-label={
                     id ? extrasCopy.changeFramePhoto(name) : extrasCopy.addFramePhoto(name)
                   }
-                  aria-describedby={error ? errorId : undefined}
-                  data-invalid={error ? true : undefined}
                   disabled={busy}
                   onClick={() => inputs.current[frame]?.click()}
                   className="group/frame relative grid min-h-40 cursor-pointer place-items-center overflow-hidden rounded-md bg-surface-2 transition-transform duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-wait motion-safe:active:scale-[0.98]"
@@ -325,11 +320,6 @@ function DesignPhotos({ draft, update, errors }: Omit<StepProps, "goTo">) {
                       />
                     )}
                   </span>
-                )}
-                {error && (
-                  <p id={errorId} role="alert" className="text-sm font-medium text-danger">
-                    {editor.errors[error as keyof typeof editor.errors]}
-                  </p>
                 )}
                 <input
                   ref={(node) => {
@@ -690,12 +680,12 @@ const sections =
   "flex flex-col gap-8 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0";
 
 /** The photos section: the design's own frames, then more photos for guests to scroll. */
-export function PhotosStep({ draft, update, errors }: StepProps) {
+export function PhotosStep({ draft, update }: StepProps) {
   return (
     <div className={sections}>
       {/* An illustrated card paints its couple, so it has no photos to ask for */}
       {coupleLayouts(draft).some((layout) => layout !== "none") && (
-        <DesignPhotos draft={draft} update={update} errors={errors} />
+        <DesignPhotos draft={draft} update={update} />
       )}
       <MorePhotos draft={draft} update={update} />
     </div>

@@ -4,15 +4,18 @@ import { CalendarPlus, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
+import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
-import { FamilyWords, type FamilyBlock } from "@/components/guest/family-words";
+import { FamilyWords, pairedSide, type FamilyBlock } from "@/components/guest/family-words";
 import { PhotoWall } from "@/components/guest/photo-wall";
+import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
+import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { useRagaMusic } from "@/components/invitation/use-raga-music";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
@@ -51,7 +54,13 @@ import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import type { EventWindow } from "@/lib/publish/event-day";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
-import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
+import {
+  couplePageIds,
+  couplePagePhotos,
+  photoAspect,
+  photoFit,
+  sceneCouple,
+} from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
 import { openingGod, openingStyle } from "@/lib/opening/catalog";
 import { withClip } from "@/lib/editor/music-clip";
@@ -210,6 +219,23 @@ export function GuestView({
     [draft, photos, copy],
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
+  // Photos as the host placed them (turned and cropped) wherever the page shows them. A
+  // painted theme's welcome shows the design's own couple photo, and its gallery the rest
+  const placed = useMemo(() => {
+    const couple = draftCouple(draft);
+    const ids = photos.map((photo) => photo.id);
+    const framed = couplePageIds(
+      draftShowsScene(draft) ? sceneCouple(couple) : couple,
+      ids,
+      copy.second,
+    );
+    const all: GuestPhoto[] = photos.map((photo) => ({
+      ...photo,
+      fit: photoFit(couple, photo.id, photoAspect(photos, photo.id)),
+    }));
+    const welcome = all.find((photo) => photo.id === framed[0]) ?? all[0];
+    return { all, welcome, rest: all.filter((photo) => photo !== welcome) };
+  }, [draft, photos, copy.second]);
   // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
   const opening = openingStyle(draft.opening, suite, Boolean(scene), draft.categoryId);
   const god = openingGod(draft.opening, draft.categoryId);
@@ -310,7 +336,8 @@ export function GuestView({
                     ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
                     : null
                 }
-                photos={photos}
+                photo={placed.welcome}
+                photos={placed.rest}
                 family={family}
                 familyLang={language}
                 allIcsUrl={allIcsUrl}
@@ -352,7 +379,7 @@ export function GuestView({
                   </div>
                 </section>
 
-                {photos.length > 0 && (
+                {placed.all.length > 0 && (
                   <section aria-labelledby="guest-photos" className="px-4 py-12 sm:px-6 sm:py-16">
                     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
                       <h2
@@ -362,20 +389,17 @@ export function GuestView({
                         {guestCopy.photos}
                       </h2>
                       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-                        {photos.map((photo, index) => (
+                        {placed.all.map((photo, index) => (
                           <li
                             key={photo.id}
                             className="overflow-hidden rounded-lg border border-line bg-surface-2 shadow-raised"
                           >
-                            {/* eslint-disable-next-line @next/next/no-img-element -- short-lived signed links */}
-                            <img
-                              src={photo.url}
+                            <FramedPhoto
+                              photo={{ src: photo.url, alt: "", fit: photo.fit }}
                               alt={guestCopy.photoAlt(index + 1)}
-                              width={photo.width}
-                              height={photo.height}
-                              loading="lazy"
-                              decoding="async"
-                              className="aspect-[4/5] h-full w-full object-cover"
+                              frameAspect={GALLERY_ASPECT}
+                              lazy
+                              className="aspect-[4/5] w-full"
                             />
                           </li>
                         ))}
@@ -439,9 +463,13 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
         <h2 id="guest-family" className="font-display text-2xl leading-tight">
           {guestCopy.family}
         </h2>
+        {/* Both sides' parents side by side, the blessings above and the hosts below them */}
         <dl lang={lang} className="grid w-full gap-5 sm:grid-cols-2">
           {family.map((block) => (
-            <div key={block.id} className="flex flex-col gap-1">
+            <div
+              key={block.id}
+              className={cn("flex flex-col gap-1", !pairedSide(family, block) && "sm:col-span-2")}
+            >
               <dt className="text-sm text-accent-text">{block.title}</dt>
               <FamilyWords block={block} className="text-lg" soft="text-ink-muted" />
             </div>
