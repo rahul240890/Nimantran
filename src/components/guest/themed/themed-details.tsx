@@ -95,7 +95,7 @@ export function ThemedDetails({
       ref={top}
       data-suite={suite}
       data-guest={look.style}
-      className="guest-themed relative isolate overflow-hidden"
+      className="guest-themed relative isolate overflow-clip"
     >
       <FlowerDefs />
       <Welcome
@@ -675,7 +675,8 @@ function Night({
       )}
       <p
         lang={lang}
-        className="relative px-6 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
+        data-snap
+        className="relative px-6 pt-10 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
       >
         {cardWords.closing}
       </p>

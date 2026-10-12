@@ -321,7 +321,7 @@ test.describe("publish and share", () => {
     await expect(story.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
     await guest.keyboard.press("ArrowRight");
     // The last page welcomes the guest and carries on down the page, in Gujarati
-    await expect(story.getByText("આપને ભાવભર્યું આમંત્રણ છે")).toBeVisible();
+    await expect(story.getByText("આપનું આગમન, અમારું સૌભાગ્ય")).toBeVisible();
     const more = story.getByRole("button", { name: "વિગતો જુઓ" });
     expect((await axe(guest).analyze()).violations).toEqual([]);
     await more.click();

@@ -393,6 +393,7 @@ export function Opening({
   return (
     <section
       aria-labelledby="guest-names"
+      data-snap
       data-suite={suite}
       data-mood="dusk"
       data-doorway={open ? "open" : "closed"}

@@ -220,6 +220,13 @@ export function GuestView({
     [draft, photos, copy],
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
+  // One Scene ends on the same welcome as the last of the pages, in the host's words if
+  // they changed it
+  const closing = useMemo(() => {
+    const last = story.beats.find((beat) => beat.id === "reply");
+    const [title, ...rest] = last?.lines.map((line) => line.text) ?? [];
+    return title ? { title, text: rest.join(" ") } : null;
+  }, [story.beats]);
   // Photos as the host placed them (turned and cropped) wherever the page shows them. A
   // painted theme's welcome shows the design's own couple photo, and its gallery the rest
   const placed = useMemo(() => {
@@ -256,7 +263,8 @@ export function GuestView({
 
   return (
     <GuestLanguage language={language}>
-      <div lang={language} className="flex min-h-dvh flex-col">
+      {/* The page turns a whole screen at a time, like the pages above it (globals.css) */}
+      <div lang={language} className="guest-snap flex min-h-dvh flex-col">
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
           {watermark && <WatermarkLayer />}
@@ -270,6 +278,8 @@ export function GuestView({
                 functions={told}
                 photos={scenePhotos}
                 reply={story.reply ?? null}
+                closing={closing}
+                onEnd={() => setTour((was) => was + 1)}
                 type={story.type}
                 detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
                 header={
@@ -454,7 +464,10 @@ export function GuestView({
             {!preview && <PhotoWall slug={slug} />}
           </main>
 
-          <footer className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6">
+          <footer
+            data-snap
+            className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6"
+          >
             <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
               <p className="flex items-center gap-2 text-sm text-ink-muted">
                 <BrandMark className="size-6 text-accent-text" />

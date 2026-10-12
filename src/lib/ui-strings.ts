@@ -39,8 +39,8 @@ export const uiStrings = {
   storyWords: {
     saveTheDate: "Save the date",
     joinUs: "Will you join us?",
-    welcome: "You are most welcome",
-    withLove: "With love, we await you",
+    welcome: "Your presence, our blessing",
+    withLove: "With folded hands and open hearts, we await you",
     and: "and",
   },
   error: {

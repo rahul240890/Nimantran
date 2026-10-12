@@ -5547,6 +5547,19 @@
   }
 }
 
+/*
+ * The guest page turns a section at a time: each scroll or swipe settles on the next
+ * full-screen section, up or down, as the pages above it do. A section taller than the
+ * screen still scrolls through before the next one takes over.
+ */
+html:has(.guest-snap) {
+  scroll-snap-type: y mandatory;
+}
+.guest-snap :is([data-tour], [data-snap]) {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 @keyframes guest-rise {
   from {
     opacity: 0;

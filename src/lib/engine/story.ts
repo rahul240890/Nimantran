@@ -116,7 +116,7 @@ export type FamilyParts = { lead: string; names: string; tail: string; place: st
 export type StoryWords = {
   saveTheDate: string;
   joinUs: string;
-  /** The last page's welcome, in place of a question ("You are most welcome"). */
+  /** The last page's welcome, in place of a question ("Your presence, our blessing"). */
   welcome: string;
   withLove: string;
   and: string;

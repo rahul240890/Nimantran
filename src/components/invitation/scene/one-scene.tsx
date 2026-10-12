@@ -69,7 +69,9 @@ import "@/components/invitation/type/fonts.css";
 
 /** The slot's opening card (the blessing, the line, or both) or one function. */
 type SceneItem =
-  { kind: "line"; text: string; blessing: string } | { kind: "function"; fn: StoryFunction };
+  | { kind: "line"; text: string; blessing: string }
+  | { kind: "function"; fn: StoryFunction }
+  | { kind: "closing"; title: string; text: string };
 
 /** The function in the slot, the side it came from, and which turn brought it. */
 type Shown = { index: number; from: Entrance; turn: number };
@@ -197,6 +199,13 @@ export type OneSceneProps = {
   /** Beside the pause button over the scene: the music button. */
   extra?: ReactNode;
   reply: { href: string; label: string } | null;
+  /**
+   * The last card in the slot, after every function: a warm welcome to the guest. With
+   * `onEnd`, the scene stops on it instead of starting the functions again.
+   */
+  closing?: { title: string; text: string } | null;
+  /** The scene has played every card once and rests on the welcome (the guest page carries on). */
+  onEnd?: () => void;
   /** Where "All the details" scrolls to; left out, there is no link. */
   detailsHref?: string;
   /** Inside the editor's phone: fills its box instead of the whole screen. */
@@ -232,6 +241,8 @@ export function OneScene({
   header,
   extra,
   reply,
+  closing = null,
+  onEnd,
   detailsHref,
   framed = false,
   miniature = false,
@@ -275,6 +286,7 @@ export function OneScene({
       ? [{ kind: "line" as const, text: slotLine, blessing: slotBlessing }]
       : []),
     ...functions.map((fn) => ({ kind: "function" as const, fn })),
+    ...(closing ? [{ kind: "closing" as const, ...closing }] : []),
   ];
   const count = items.length;
 
@@ -303,7 +315,18 @@ export function OneScene({
       setShown({ index: focused, from: entranceFor(turn), turn });
     }
   }
-  const playing = !held && !reduced && count > 1;
+  // Once it has rested on the welcome, the scene plays on only when the guest asks
+  const [ended, setEnded] = useState(false);
+  const playing = !held && !ended && !reduced && count > 1;
+  // Holding the scene, or playing it on again from the welcome
+  const toggle = () => {
+    setEnded(false);
+    setHeld(playing);
+  };
+  const latestEnd = useRef(onEnd);
+  useEffect(() => {
+    latestEnd.current = onEnd;
+  });
 
   const go = useCallback(
     (to: number) => {
@@ -323,6 +346,12 @@ export function OneScene({
     if (!playing) return;
     const timer = window.setTimeout(() => {
       if (index + 1 >= count) setRounded(true);
+      // On the guest page the scene ends on its welcome, and the page below carries on
+      if (index + 1 >= count && latestEnd.current) {
+        setEnded(true);
+        latestEnd.current();
+        return;
+      }
       go(index + 1);
     }, SCENE_HOLD_MS);
     return () => window.clearTimeout(timer);
@@ -384,6 +413,7 @@ export function OneScene({
 
   return (
     <section
+      data-snap
       data-suite={suite}
       data-mood={light.mood}
       data-scene-mood={light.mood}
@@ -604,7 +634,7 @@ export function OneScene({
                 key={`in-${shown.turn}`}
                 interactive={!still}
                 label={playing ? words.pause : words.play}
-                onClick={() => setHeld((h) => !h)}
+                onClick={toggle}
               >
                 <SlotCard
                   item={current}
@@ -680,7 +710,7 @@ export function OneScene({
                     <SceneButton
                       label={playing ? words.pause : words.play}
                       pressed={!playing}
-                      onClick={() => setHeld((h) => !h)}
+                      onClick={toggle}
                     >
                       {playing ? <Pause aria-hidden /> : <Play aria-hidden />}
                     </SceneButton>
@@ -962,7 +992,9 @@ function SlotCard({
   const key =
     item.kind === "line"
       ? `${item.blessing}|${item.text}`
-      : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
+      : item.kind === "closing"
+        ? `${item.title}|${item.text}`
+        : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
   // A painted card's words fit its writing area; a drawn card's, the card inside its padding
   // A painted card's writing area is fixed by its painting, so its words may set a little smaller
   useFit(painted ? face : card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, {
@@ -975,7 +1007,13 @@ function SlotCard({
   // Arriving, the words write themselves in once the card has landed: the name a letter at a
   // time, then each line below it. Once they have, they are plain words again, so a detail
   // typed in the editor simply appears.
-  const title = fn ? fn.name : item.kind === "line" ? item.blessing || item.text : "";
+  const title = fn
+    ? fn.name
+    : item.kind === "line"
+      ? item.blessing || item.text
+      : item.kind === "closing"
+        ? item.title
+        : "";
   const units = Math.max(1, revealUnits(title));
   const step = Math.min(LETTER_MS, LETTERS_MS / units);
   const after = REVEAL_AT_MS + units * step + 120;
@@ -1074,6 +1112,36 @@ function SlotCard({
                 >
                   {item.blessing ? item.text : write(item.text)}
                 </p>
+              )}
+            </>
+          ) : item.kind === "closing" ? (
+            <>
+              {/* The last card: the welcome large, a rule, then the family's few warm words */}
+              <p
+                lang={lang}
+                className="max-w-full text-balance"
+                style={sceneLine(voice, "function", lang, type)}
+              >
+                {write(item.title)}
+              </p>
+              {item.text && (
+                <>
+                  <span
+                    aria-hidden
+                    className={cn("story-rule scene-rule", rise(next(0))[0])}
+                    style={rise(next(0))[1]}
+                  />
+                  <p
+                    lang={lang}
+                    className={cn(
+                      "max-w-full text-balance text-card-accent-text",
+                      rise(next(1))[0],
+                    )}
+                    style={rise(next(1), sceneLine(voice, "line", lang, type))[1]}
+                  >
+                    {item.text}
+                  </p>
+                </>
               )}
             </>
           ) : (
