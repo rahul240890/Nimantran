@@ -122,6 +122,8 @@ const miniStore = (() => {
 
 const SYNC_DELAY = 1200;
 
+const noSubscribe = () => () => {};
+
 /** The page the phone shows as each step opens: the one that step fills in. */
 function stepPage(draft: InviteDraft, step: EditorStep): string {
   if (step === "functions") {
@@ -232,6 +234,26 @@ export function Editor({
   const wide = useMediaQuery(WIDE);
   const still = useReducedMotion();
 
+  // The steps wait for this device's draft, and for a design or invite named in the address
+  // to be applied, so the step it replaces never flashes past first
+  const hydrated = useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
+  const [arriving, setArriving] = useState(() =>
+    Boolean(
+      initialSuite ||
+      initialInvite ||
+      fresh ||
+      missing ||
+      initialTemplate ||
+      initialCategory ||
+      initialTradition,
+    ),
+  );
+  const ready = hydrated && !arriving;
+
   const step = draft.step;
   const index = EDITOR_STEPS.indexOf(step);
   const last = index === EDITOR_STEPS.length - 1;
@@ -257,6 +279,13 @@ export function Editor({
     if (started.current) return;
     started.current = true;
     void (async () => {
+      try {
+        await arrive();
+      } finally {
+        setArriving(false);
+      }
+    })();
+    async function arrive() {
       if (missing) toast({ title: syncCopy.missing, tone: "error" });
       if (initialInvite || fresh) {
         const switched = await switchDraft(initialInvite, { signedIn });
@@ -301,7 +330,7 @@ export function Editor({
         if (initialTradition) next = withTradition(next, initialTradition);
         return next;
       });
-    })();
+    }
   }, [
     initialInvite,
     fresh,
@@ -494,209 +523,225 @@ export function Editor({
       </header>
 
       <main className="mx-auto flex w-full max-w-[90rem] flex-1 flex-col gap-6 px-4 pt-6 sm:px-6 sm:pt-8 lg:px-8">
-        {/* On phones the floating preview sits beside the progress and the chosen design */}
-        <div className={cn(miniShown && "max-lg:pe-[6.5rem]")}>
-          <Stepper
-            steps={STAGES.map((id) => ({ id, label: editor.stages[id] }))}
-            current={stageOf(step)}
-            label={editor.progressLabel}
-            progressText={editor.progress(stageOf(step) + 1, STAGES.length)}
-            doneLabel={editor.done}
-          />
-        </div>
-
-        <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
-          <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
-            {/* Past the design: what was chosen, with the way back to change it */}
-            {!PICKING.has(step) && (
-              <DesignBar
-                draft={draft}
-                onChange={() => goTo("design")}
-                className={cn("mb-5", miniShown && "max-lg:pe-[6.5rem]")}
+        {ready ? (
+          <>
+            {/* On phones the floating preview sits beside the progress and the chosen design */}
+            <div className={cn(miniShown && "max-lg:pe-[6.5rem]")}>
+              <Stepper
+                steps={STAGES.map((id) => ({ id, label: editor.stages[id] }))}
+                current={stageOf(step)}
+                label={editor.progressLabel}
+                progressText={editor.progress(stageOf(step) + 1, STAGES.length)}
+                doneLabel={editor.done}
               />
-            )}
-            <form
-              ref={form}
-              noValidate
-              // Filling in a function brings its page up in the phone, the names the cover
-              onFocusCapture={(event) => {
-                const target = (event.target as HTMLElement).closest<HTMLElement>(
-                  "[data-page-target]",
-                );
-                if (target?.dataset.pageTarget) setPage(target.dataset.pageTarget);
-              }}
-              onSubmit={(event) => {
-                event.preventDefault();
-                advance();
-              }}
-              className="flex flex-1 flex-col"
-            >
-              {isDetailStep(step) ? (
-                // The details: six parts of one page, the open one in full, the others
-                // folded to a line that says what's in them
-                <div
-                  role="group"
-                  aria-label={editor.sections.label}
-                  className="flex flex-1 flex-col gap-3 pb-8"
-                >
-                  {DETAIL_STEPS.map((part, at) =>
-                    part === step ? (
-                      <div
-                        key={part}
-                        aria-current="step"
-                        className="flex flex-col border-y border-line bg-surface/70 px-4 pt-5 max-sm:-mx-4 sm:rounded-xl sm:border sm:p-6 sm:shadow-raised lg:p-8"
-                      >
-                        {intro(at + 1)}
-                        {content}
-                      </div>
-                    ) : (
-                      <div key={part}>
-                        <SectionRow
-                          draft={draft}
-                          part={part}
-                          current={step}
-                          label={stepCopy[part].label}
-                          onOpen={() => goTo(part)}
-                        />
-                      </div>
-                    ),
-                  )}
-                </div>
-              ) : (
-                <>
-                  {intro(null)}
-                  {/* Phones and tablets see the card inline on the last step */}
-                  {!wide && last && (
-                    <section aria-label={editor.preview} className="mb-8">
-                      {preview("h-[min(78svh,40rem)] min-h-[28rem]")}
-                    </section>
-                  )}
-                  {content}
-                </>
-              )}
+            </div>
 
-              {errorCount > 0 && (
-                <p
-                  role="alert"
-                  className="mb-3 rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+            <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
+              <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
+                {/* Past the design: what was chosen, with the way back to change it */}
+                {!PICKING.has(step) && (
+                  <DesignBar
+                    draft={draft}
+                    onChange={() => goTo("design")}
+                    className={cn("mb-5", miniShown && "max-lg:pe-[6.5rem]")}
+                  />
+                )}
+                <form
+                  ref={form}
+                  noValidate
+                  // Filling in a function brings its page up in the phone, the names the cover
+                  onFocusCapture={(event) => {
+                    const target = (event.target as HTMLElement).closest<HTMLElement>(
+                      "[data-page-target]",
+                    );
+                    if (target?.dataset.pageTarget) setPage(target.dataset.pageTarget);
+                  }}
+                  onSubmit={(event) => {
+                    event.preventDefault();
+                    advance();
+                  }}
+                  className="flex flex-1 flex-col"
                 >
-                  {editor.fixErrors(errorCount)}
-                </p>
-              )}
-
-              {/* Back and Continue stay in reach on phones */}
-              <div className="sticky bottom-0 z-30 -mx-4 mt-auto flex items-center gap-3 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-t-lg lg:border-x lg:px-4">
-                {index > 0 ? (
-                  <Button
-                    variant="secondary"
-                    leadingIcon={<ArrowLeft aria-hidden className="rtl:rotate-180" />}
-                    onClick={() => goTo(EDITOR_STEPS[index - 1] ?? "design")}
-                    className="max-[359px]:px-3.5"
-                  >
-                    {editor.back}
-                  </Button>
-                ) : null}
-                <div className="ms-auto flex min-w-0 items-center gap-2 sm:gap-3">
-                  {!wide && !last && (
-                    <Sheet open={sheet} onOpenChange={setSheet}>
-                      <SheetTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          leadingIcon={<Eye aria-hidden />}
-                          className={index > 0 ? "max-[479px]:px-3" : "max-[359px]:px-3"}
-                        >
-                          {/* With Back beside it, only the eye fits on narrow phones */}
-                          <span
-                            className={index > 0 ? "max-[479px]:sr-only" : "max-[359px]:sr-only"}
-                          >
-                            {editor.showPreview}
-                          </span>
-                        </Button>
-                      </SheetTrigger>
-                      <SheetContent title={editor.previewTitle} closeLabel={editor.close}>
-                        {preview("h-[min(70dvh,34rem)] min-h-[24rem]")}
-                      </SheetContent>
-                    </Sheet>
-                  )}
-                  {last && (
-                    <PublishButton
-                      key={autoPublish ? "back" : "first"}
-                      autoOpen={autoPublish}
-                      draft={draft}
-                      signedIn={signedIn}
-                      onNotReady={() => toast({ title: publishCopy.finishFirst, tone: "error" })}
-                    />
-                  )}
-                  {!last && (
-                    <Button
-                      type="submit"
-                      trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
-                      className="max-[359px]:px-4"
+                  {isDetailStep(step) ? (
+                    // The details: six parts of one page, the open one in full, the others
+                    // folded to a line that says what's in them
+                    <div
+                      role="group"
+                      aria-label={editor.sections.label}
+                      className="flex flex-1 flex-col gap-3 pb-8"
                     >
-                      {index === EDITOR_STEPS.length - 2 ? (
-                        <>
-                          <span className="sm:hidden">{editor.next}</span>
-                          <span className="max-sm:hidden">{editor.toPreview}</span>
-                        </>
-                      ) : (
-                        editor.next
+                      {DETAIL_STEPS.map((part, at) =>
+                        part === step ? (
+                          <div
+                            key={part}
+                            aria-current="step"
+                            className="flex flex-col border-y border-line bg-surface/70 px-4 pt-5 max-sm:-mx-4 sm:rounded-xl sm:border sm:p-6 sm:shadow-raised lg:p-8"
+                          >
+                            {intro(at + 1)}
+                            {content}
+                          </div>
+                        ) : (
+                          <div key={part}>
+                            <SectionRow
+                              draft={draft}
+                              part={part}
+                              current={step}
+                              label={stepCopy[part].label}
+                              onOpen={() => goTo(part)}
+                            />
+                          </div>
+                        ),
                       )}
-                    </Button>
+                    </div>
+                  ) : (
+                    <>
+                      {intro(null)}
+                      {/* Phones and tablets see the card inline on the last step */}
+                      {!wide && last && (
+                        <section aria-label={editor.preview} className="mb-8">
+                          {preview("h-[min(78svh,40rem)] min-h-[28rem]")}
+                        </section>
+                      )}
+                      {content}
+                    </>
                   )}
-                </div>
-              </div>
-            </form>
-          </div>
 
-          {/*
+                  {errorCount > 0 && (
+                    <p
+                      role="alert"
+                      className="mb-3 rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+                    >
+                      {editor.fixErrors(errorCount)}
+                    </p>
+                  )}
+
+                  {/* Back and Continue stay in reach on phones */}
+                  <div className="sticky bottom-0 z-30 -mx-4 mt-auto flex items-center gap-3 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-t-lg lg:border-x lg:px-4">
+                    {index > 0 ? (
+                      <Button
+                        variant="secondary"
+                        leadingIcon={<ArrowLeft aria-hidden className="rtl:rotate-180" />}
+                        onClick={() => goTo(EDITOR_STEPS[index - 1] ?? "design")}
+                        className="max-[359px]:px-3.5"
+                      >
+                        {editor.back}
+                      </Button>
+                    ) : null}
+                    <div className="ms-auto flex min-w-0 items-center gap-2 sm:gap-3">
+                      {!wide && !last && (
+                        <Sheet open={sheet} onOpenChange={setSheet}>
+                          <SheetTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              leadingIcon={<Eye aria-hidden />}
+                              className={index > 0 ? "max-[479px]:px-3" : "max-[359px]:px-3"}
+                            >
+                              {/* With Back beside it, only the eye fits on narrow phones */}
+                              <span
+                                className={
+                                  index > 0 ? "max-[479px]:sr-only" : "max-[359px]:sr-only"
+                                }
+                              >
+                                {editor.showPreview}
+                              </span>
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent title={editor.previewTitle} closeLabel={editor.close}>
+                            {preview("h-[min(70dvh,34rem)] min-h-[24rem]")}
+                          </SheetContent>
+                        </Sheet>
+                      )}
+                      {last && (
+                        <PublishButton
+                          key={autoPublish ? "back" : "first"}
+                          autoOpen={autoPublish}
+                          draft={draft}
+                          signedIn={signedIn}
+                          onNotReady={() =>
+                            toast({ title: publishCopy.finishFirst, tone: "error" })
+                          }
+                        />
+                      )}
+                      {!last && (
+                        <Button
+                          type="submit"
+                          trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
+                          className="max-[359px]:px-4"
+                        >
+                          {index === EDITOR_STEPS.length - 2 ? (
+                            <>
+                              <span className="sm:hidden">{editor.next}</span>
+                              <span className="max-sm:hidden">{editor.toPreview}</span>
+                            </>
+                          ) : (
+                            editor.next
+                          )}
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </form>
+              </div>
+
+              {/*
             Phones: while the words are being typed, a small live phone floats at the top
             corner showing the page being edited; tapping it opens the preview large
           */}
-          {mini && (
-            <div className="fixed end-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-30 animate-fade-in lg:hidden">
-              {miniHidden ? (
-                <button
-                  type="button"
-                  aria-label={editor.showLivePreview}
-                  onClick={() => miniStore.set(false)}
-                  className="grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                >
-                  <Smartphone aria-hidden className="size-5" />
-                </button>
-              ) : (
-                <div className="relative">
-                  <button
-                    type="button"
-                    aria-label={editor.livePreview}
-                    onClick={() => setSheet(true)}
-                    className="block h-[11.4rem] w-[5.4rem] cursor-pointer overflow-hidden rounded-[1rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                  >
-                    {/* A guest-sized phone, shrunk, so the words wrap as they will for guests */}
-                    <span className="block h-[25.35rem] w-48 origin-top-left scale-[0.45]">
-                      {preview("h-full", true)}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={editor.hideLivePreview}
-                    onClick={() => miniStore.set(true)}
-                    className="absolute -start-2.5 -top-2.5 grid size-7 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised before:absolute before:-inset-2 before:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                  >
-                    <X aria-hidden className="size-3.5" />
-                  </button>
+              {mini && (
+                <div className="fixed end-3 top-[calc(env(safe-area-inset-top)+4.5rem)] z-30 animate-fade-in lg:hidden">
+                  {miniHidden ? (
+                    <button
+                      type="button"
+                      aria-label={editor.showLivePreview}
+                      onClick={() => miniStore.set(false)}
+                      className="grid size-11 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      <Smartphone aria-hidden className="size-5" />
+                    </button>
+                  ) : (
+                    <div className="relative">
+                      <button
+                        type="button"
+                        aria-label={editor.livePreview}
+                        onClick={() => setSheet(true)}
+                        className="block h-[11.4rem] w-[5.4rem] cursor-pointer overflow-hidden rounded-[1rem] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      >
+                        {/* A guest-sized phone, shrunk, so the words wrap as they will for guests */}
+                        <span className="block h-[25.35rem] w-48 origin-top-left scale-[0.45]">
+                          {preview("h-full", true)}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={editor.hideLivePreview}
+                        onClick={() => miniStore.set(true)}
+                        className="absolute -start-2.5 -top-2.5 grid size-7 cursor-pointer place-items-center rounded-full border border-line bg-surface text-ink shadow-raised before:absolute before:-inset-2 before:content-[''] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                      >
+                        <X aria-hidden className="size-3.5" />
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
-            </div>
-          )}
 
-          {/* Desktop: the card stays beside the form, live */}
-          <aside
-            aria-label={editor.preview}
-            className="hidden lg:sticky lg:top-24 lg:mb-8 lg:flex lg:h-[min(calc(100dvh-8rem),48rem)] lg:min-h-[32rem] lg:flex-col"
+              {/* Desktop: the card stays beside the form, live */}
+              <aside
+                aria-label={editor.preview}
+                className="hidden lg:sticky lg:top-24 lg:mb-8 lg:flex lg:h-[min(calc(100dvh-8rem),48rem)] lg:min-h-[32rem] lg:flex-col"
+              >
+                {wide && preview("h-full")}
+              </aside>
+            </div>
+          </>
+        ) : (
+          <div
+            role="status"
+            className="flex flex-1 animate-fade-in flex-col items-center justify-center gap-3 pb-24 text-ink-muted"
           >
-            {wide && preview("h-full")}
-          </aside>
-        </div>
+            <LoaderCircle aria-hidden className="size-6 animate-spin motion-still:animate-none" />
+            <span className="text-sm">{editor.opening}</span>
+          </div>
+        )}
       </main>
     </div>
   );

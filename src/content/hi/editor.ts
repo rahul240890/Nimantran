@@ -8,6 +8,7 @@ export const editor: Translation<typeof en.editor> = {
   metaTitle: "अपना निमंत्रण बनाएँ",
   metaDescription: "3D डिज़ाइन चुनें, नाम और रस्में जोड़ें, फिर अपना निमंत्रण देखें।",
   headerLabel: "निमंत्रण एडिटर",
+  opening: "आपका निमंत्रण खुल रहा है…",
   progressLabel: "निमंत्रण की प्रगति",
   progress: (step, total) => `${total} में से चरण ${step}`,
   done: "पूरा",
@@ -84,7 +85,7 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     eyebrow: "परंपरा चुनें",
     title: "कार्ड किसकी परंपरा से बने?",
     intro:
-      "परंपरा से कार्ड का शुभ चिह्न, मंगलाचरण, रस्मों के स्थानीय नाम और परिवार की शब्दावली तय होती है। सब कुछ बदला जा सकता है, और यह चरण छोड़ भी सकते हैं।",
+      "परंपरा से कार्ड का शुभ चिह्न, सबसे ऊपर का मंगलाचरण, रस्मों के स्थानीय नाम और परिवार की शब्दावली तय होती है। सब कुछ बदला जा सकता है, और यह चरण छोड़ भी सकते हैं।",
   },
   design: {
     label: "डिज़ाइन",
@@ -125,7 +126,7 @@ export const stepCopy: Translation<typeof en.stepCopy> = {
     eyebrow: "कार्ड के शब्द",
     title: "कार्ड के शब्द पढ़ लीजिए",
     intro:
-      "हर पंक्ति आपके अवसर के लिए पहले से लिखी है। चाहें तो अपने परिवार के अंदाज़ में बदलें, या जैसी है वैसी रहने दें।",
+      "ऊपर के मंगलाचरण से लेकर हर पंक्ति आपके अवसर के लिए पहले से लिखी है। चाहें तो अपने परिवार के अंदाज़ में बदलें, या जैसी है वैसी रहने दें।",
   },
   music: {
     label: "संगीत और जवाब",
@@ -752,7 +753,10 @@ export const traditionCopy: Translation<typeof en.traditionCopy> = {
     tamil: "पिल्लैयार सुऴि, निच्चयतार्थम और वरवेर्पु",
     modern: "कोई धार्मिक चिह्न नहीं, किसी भी जोड़े या अंतर-धार्मिक शादी के लिए",
   },
-  elements: "धार्मिक तत्व",
+  elements: "शुभ चिह्न और मंगलाचरण",
+  elementsIntro: (tradition: string) =>
+    `कार्ड का सबसे ऊपरी हिस्सा, आपकी ${tradition} परंपरा से। चाहें तो बदलें या हटा दें।`,
+  elementsLater: "शुभ चिह्न और मंगलाचरण, जैसे श्री गणेशाय नमः, आप कार्ड के शब्द में चुनेंगे।",
   symbol: "कार्ड के ऊपर शुभ चिह्न",
   symbolNames: {
     om: "ॐ",
@@ -779,8 +783,6 @@ export const traditionCopy: Translation<typeof en.traditionCopy> = {
     welcome: "स्वागतोत्सुक",
     children: "बच्चों की मनुहार",
   },
-  ceremonies: "रस्मों के नाम",
-  ceremoniesIntro: "मेहमानों के पेज पर रस्में अपने स्थानीय नाम से दिखेंगी।",
 };
 
 export const designCopy: Translation<typeof en.designCopy> = {
