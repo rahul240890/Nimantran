@@ -47,6 +47,8 @@ import {
 import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
+import { revealFor } from "@/lib/suites/reveal";
+import { RevealName, nameTimings } from "@/components/invitation/reveal/reveal";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
@@ -675,6 +677,21 @@ export function StoryPage({
   const voice = suite.voice ?? "regal";
   // A function's page sets a fine rule between its name and its day, as a printed card does
   const rule = ruleAt(beat);
+  // The theme's own way of bringing in the photos and the names (reveal.ts)
+  const reveal = still ? null : revealFor(suiteId);
+  const nameLines = beat.lines.flatMap((line, i) =>
+    roleOf(beat, line.style) === "names" || (line.style === "joiner" && beat.scene === "cover")
+      ? [i]
+      : [],
+  );
+  const nameStart = (nameLines.length ? lineDelay(nameLines[0]! + offset) + 0.3 : 0) * 1000;
+  const nameAt = reveal
+    ? nameTimings(
+        reveal.names,
+        nameLines.map((i) => beat.lines[i]!.text),
+        nameStart,
+      )
+    : [];
   const middle = layout?.place !== "top" && layout?.place !== "bottom";
   const overflowed = useRef(onOverflow);
   useEffect(() => {
@@ -760,13 +777,17 @@ export function StoryPage({
           className="absolute inset-0 overflow-hidden"
           contain={whole || lifted}
           lifted={lifted}
-          under={frames ? <PhotoWindows frames={frames.frames} photos={photos} /> : undefined}
+          under={
+            frames ? (
+              <PhotoWindows frames={frames.frames} photos={photos} reveal={reveal?.photo} />
+            ) : undefined
+          }
         />
       )}
       {painted && !still && <PageEffects art={look.art} />}
       {/* A painting brings its own garlands and ground, so the drawn scene stays for vector pages */}
       {!painted && <StoryScene scene={beat.scene} themed={themed} />}
-      {arches && <PhotoArches photos={photos} />}
+      {arches && <PhotoArches photos={photos} reveal={reveal?.photo} />}
 
       <div
         ref={fitArea}
@@ -855,6 +876,8 @@ export function StoryPage({
                   lang={line.lang}
                   className={cn(
                     "story-line text-balance",
+                    // The names arrive in the theme's way instead of rising in with the rest
+                    reveal && nameLines.includes(i) && "reveal-line",
                     // Names may run the full width; reading lines keep clear of the art's edges
                     ROLES[role].face === "names" && role !== "date" ? "max-w-full" : "max-w-[88%]",
                     LINE_COLOUR[role],
@@ -870,7 +893,24 @@ export function StoryPage({
                     ),
                   }}
                 >
-                  {role === "date" ? keepDate(line.text) : line.text}
+                  {reveal && nameLines.includes(i) ? (
+                    <RevealName
+                      kind={reveal.names}
+                      text={line.text}
+                      {...nameAt[nameLines.indexOf(i)]!}
+                      part={
+                        role === "joiner"
+                          ? "joiner"
+                          : nameLines.indexOf(i) === 0
+                            ? "first"
+                            : "second"
+                      }
+                    />
+                  ) : role === "date" ? (
+                    keepDate(line.text)
+                  ) : (
+                    line.text
+                  )}
                 </p>
               </Fragment>
             );

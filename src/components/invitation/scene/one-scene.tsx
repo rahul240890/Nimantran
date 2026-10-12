@@ -11,6 +11,7 @@ import {
   Play,
 } from "lucide-react";
 import {
+  Fragment,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -34,6 +35,14 @@ import { sceneLine } from "@/lib/suites/scene-type";
 import { PAINTING_ASPECT, photoBox, type FrameBox } from "@/lib/suites/photo-frames";
 import { frameAspectOf } from "@/lib/editor/photo-fit";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import {
+  RevealName,
+  SPLITS_BY_LETTER,
+  letters,
+  nameTimings,
+  photoReveal,
+} from "@/components/invitation/reveal/reveal";
+import { revealFor } from "@/lib/suites/reveal";
 import { MovingLayers } from "./moving-layers";
 import {
   SCENE_HOLD_MS,
@@ -154,6 +163,14 @@ type FitOptions = {
 
 /** How long an illustrated card takes to come together, its words appearing at the end. */
 const OPEN_MS = 1500;
+
+/**
+ * When the photos and then the names start arriving: at once on a plain painting, or once
+ * an illustrated card has come together or a moving scene's layers have landed.
+ */
+const PHOTOS_AT_MS = 200;
+const NAMES_AT_MS = 500;
+const AFTER_MS = 1050;
 
 /** A blessing up to this long (॥ श्री गणेशाय नमः ॥) is kept on one line. */
 const SHORT_BLESSING = 28;
@@ -332,6 +349,14 @@ export function OneScene({
   // In the editor's phone the page already has its own heading
   const Names = framed ? "p" : "h1";
   const voice = SUITES[suite].voice ?? "regal";
+  // The theme's own way of bringing in the photos and the names (reveal.ts)
+  const reveal = revealFor(suite);
+  const wait = after ? AFTER_MS : 0;
+  const [firstAt, joinerAt, secondAt] = nameTimings(
+    reveal.names,
+    names[1] ? [names[0]!, joiner, names[1]] : names,
+    wait + NAMES_AT_MS,
+  );
   const namesLine = sceneLine(voice, "names", lang, type);
   const namesStrut = { fontSize: namesLine.fontSize, lineHeight: namesLine.lineHeight };
   const namesBox = useRef<HTMLHeadingElement>(null);
@@ -421,14 +446,23 @@ export function OneScene({
             {page.frames.map((frame, i) => {
               const photo = photos[i];
               const style = box(photoBox(frame));
+              const arrive = photoReveal(
+                reveal.photo,
+                i,
+                Math.min(page.frames.length, photos.length),
+                wait + PHOTOS_AT_MS,
+              );
               return photo ? (
-                <FramedPhoto
-                  key={i}
-                  photo={photo}
-                  frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
-                  className="absolute bg-card-ivory"
-                  style={style}
-                />
+                <Fragment key={i}>
+                  {/* Card stock in the frame until the photo has arrived */}
+                  <div aria-hidden className="absolute bg-card-ivory" style={style} />
+                  <FramedPhoto
+                    photo={photo}
+                    frameAspect={frameAspectOf(photoBox(frame), PAINTING_ASPECT)}
+                    className={cn("absolute bg-card-ivory", arrive.className)}
+                    style={{ ...style, ...arrive.style }}
+                  />
+                </Fragment>
               ) : (
                 // A frame waiting for a photo shows a small gilt flower, never initials
                 <div
@@ -499,7 +533,11 @@ export function OneScene({
           >
             {/* Sized as the names, so its own line and the spaces shrink with them */}
             <span ref={namesWords} className="block max-w-full text-balance" style={namesStrut}>
-              <span style={namesLine}>{names[0]}</span>
+              <span style={namesLine}>
+                {names[0] && (
+                  <RevealName kind={reveal.names} text={names[0]} {...firstAt!} part="first" />
+                )}
+              </span>
               {names[1] && (
                 <>
                   {" "}
@@ -507,9 +545,11 @@ export function OneScene({
                     className="text-card-accent-text"
                     style={sceneLine(voice, "joiner", lang, type)}
                   >
-                    {joiner}
+                    <RevealName kind={reveal.names} text={joiner} {...joinerAt!} part="joiner" />
                   </span>{" "}
-                  <span style={namesLine}>{names[1]}</span>
+                  <span style={namesLine}>
+                    <RevealName kind={reveal.names} text={names[1]} {...secondAt!} part="second" />
+                  </span>
                 </>
               )}
             </span>
@@ -833,16 +873,6 @@ const LETTERS_MS = 950;
 const LINE_MS = 160;
 /** How long one letter or line takes to settle. */
 const SETTLE_MS = 650;
-
-// Letters split cleanly only in scripts that don't join them; the others come in a word at a time
-const SPLITS_BY_LETTER = /^[\p{Script=Latin}\p{Script=Common}\p{M}\s]*$/u;
-const letters =
-  typeof Intl !== "undefined" && "Segmenter" in Intl
-    ? (word: string) =>
-        [...new Intl.Segmenter(undefined, { granularity: "grapheme" }).segment(word)].map(
-          (part) => part.segment,
-        )
-    : (word: string) => Array.from(word);
 
 /**
  * Words that write themselves in: each letter (or, in a script whose letters join, each

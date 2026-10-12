@@ -98,6 +98,10 @@ The Rang templates (TRADITIONS.md, section 6) use the fullest motion: busier amb
 - Vector first, so the same art serves 2D, 3D, video export and print.
 - Each pack's art credits its artist in the collection line.
 
+## 9a. Photo and name reveals
+
+Every theme brings in the couple's photos and names in its own way (owner, 2026-10-11): `src/lib/suites/reveal.ts` gives each theme one of 12 photo reveals (iris, develop, curtain, bloom, swing, wash, blinds, rise, glow, flip, sweep, focus) and one of 11 name reveals (rise, ink, glow, drop, type, wave, unfold, flicker, focus, meet, trace). Themes with a fitting idea are picked by hand (the Polaroid card develops, the locket flips open, the ink painting writes the names in a stroke); the rest step through the styles in catalogue order so neighbours never share a pair. Two photos arrive one after the other from their own sides. Names in a script whose letters join (Devanagari, Bengali, Gujarati, Tamil) move a word at a time. The movement is in `src/app/reveals.css`, and Still mode shows everything in place at once.
+
 ## 10. Quality gate for motion
 
 - [ ] Full, Light and Still versions all complete and reviewed
