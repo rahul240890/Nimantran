@@ -26,13 +26,12 @@ Principles:
 
 ## 2. Personal: packages per invite (decided 2026-10-09)
 
-Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹599) or Signature (default ₹799, for the moving scenes, whose painting plays in layers like a short film). Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
+Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹799) or Signature (default ₹799). Until the admin changes a design, 3D cards are Free, every Scene and moving scene is Premium (₹499) and every Story is Royal (₹799) (owner, 2026-10-12). Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
 
 |                                       | Free                    | Basic                      | Celebration (most chosen) | Grand               |
 | ------------------------------------- | ----------------------- | -------------------------- | ------------------------- | ------------------- |
 | **Price (India, incl. GST)**          | ₹0, free designs only   | **The design's price**     | **Design + ₹500**         | **Design + ₹1,500** |
 | On a ₹499 design                      | —                       | ₹499                       | ₹999                      | ₹1,999              |
-| On a ₹599 design                      | —                       | ₹599                       | ₹1,099                    | ₹2,099              |
 | On a ₹799 design                      | —                       | ₹799                       | ₹1,299                    | ₹2,299              |
 | On a free design                      | ₹0                      | ₹0 (same as Free, no mark) | ₹500                      | ₹1,500              |
 | Watermark                             | Small “Made with Shubh” | No                         | No                        | No                  |

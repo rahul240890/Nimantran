@@ -132,7 +132,7 @@ test.describe("packages", () => {
     const basic = page.getByRole("article", { name: "Basic" });
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
-    await basic.getByRole("button", { name: "Pay ₹499" }).click();
+    await basic.getByRole("button", { name: "Pay ₹799" }).click();
     const pay = page.getByRole("dialog", { name: "Test payment" });
     await pay.getByRole("button", { name: "Pay (test)" }).click();
     await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
@@ -244,7 +244,7 @@ test.describe("coupons, invoices and refunds", () => {
     await page.getByRole("button", { name: "Apply" }).click();
     await expect(page.getByText(`Coupon ${code} applied`).first()).toBeVisible();
     const basic = page.getByRole("article", { name: "Basic" });
-    await basic.getByRole("button", { name: "Pay ₹399" }).click();
+    await basic.getByRole("button", { name: "Pay ₹639" }).click();
     await page
       .getByRole("dialog", { name: "Test payment" })
       .getByRole("button", { name: "Pay (test)" })
@@ -261,11 +261,11 @@ test.describe("coupons, invoices and refunds", () => {
     // Back to the admin: the order, its coupon and a refund
     await admin.goto("/admin/orders");
     const row = admin.getByRole("row").filter({ hasText: code });
-    await expect(row.getByText("₹399")).toBeVisible();
+    await expect(row.getByText("₹639")).toBeVisible();
     await row.getByRole("button", { name: "Refund" }).click();
-    const confirm = admin.getByRole("dialog", { name: "Refund ₹399?" });
-    await confirm.getByRole("button", { name: "Refund ₹399" }).click();
-    await expect(admin.getByText("₹399 refunded").first()).toBeVisible();
+    const confirm = admin.getByRole("dialog", { name: "Refund ₹639?" });
+    await confirm.getByRole("button", { name: "Refund ₹639" }).click();
+    await expect(admin.getByText("₹639 refunded").first()).toBeVisible();
     await expect(row.getByText("Refunded")).toBeVisible();
     await expect(row.getByRole("button", { name: "Refund" })).toHaveCount(0);
 
