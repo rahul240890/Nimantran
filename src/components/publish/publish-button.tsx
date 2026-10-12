@@ -44,15 +44,20 @@ export function PublishButton({
   const [open, setOpen] = useState(autoOpen && signedIn && draftProblems(draft).length === 0);
   const [gating, setGating] = useState(false);
 
-  // Packages before publishing: an invite with none sees the three first, every time
+  // Packages before publishing: an invite with none sees the three first, every time.
+  // Publishing needs the invite saved, so a save that fails stops here instead of skipping
+  // the packages; and when the package can't be checked, the packages page says.
   const start = async () => {
     if (draftProblems(draft).length > 0) return onNotReady();
     setGating(true);
     const synced = await syncDraft();
     const remoteId = remoteIdNow();
-    const choose =
-      synced === "synced" && remoteId ? await needsPackage(remoteId).catch(() => false) : false;
-    if (remoteId && choose) {
+    if (synced !== "synced" || !remoteId) {
+      setGating(false);
+      toast({ title: publishCopy.failed, tone: "error" });
+      return;
+    }
+    if (await packageCheck(remoteId)) {
       router.push(`/invites/${remoteId}/edition?publish=1`);
       return;
     }
@@ -93,6 +98,19 @@ export function PublishButton({
 }
 
 const remoteIdNow = () => inviteDraft.get().draft.remoteId;
+
+/** Whether the invite still needs a package: yes when no answer comes, as the page shows. */
+async function packageCheck(remoteId: string): Promise<boolean> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const answer = await Promise.race([
+    needsPackage(remoteId).catch(() => true),
+    new Promise<boolean>((resolve) => {
+      timer = setTimeout(() => resolve(true), 8_000);
+    }),
+  ]);
+  clearTimeout(timer);
+  return answer;
+}
 
 function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => void }) {
   const { publishCopy } = useText(publishText);

@@ -13,7 +13,13 @@ const SECURITY_HEADERS = [
     key: "Content-Security-Policy",
     value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'",
   },
-  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+  // Razorpay's checkout window pays with UPI apps and Google Pay through the Payment
+  // Request API, which a blanket payment=() switches off inside its frame
+  {
+    key: "Permissions-Policy",
+    value:
+      'camera=(), microphone=(), geolocation=(), payment=(self "https://api.razorpay.com" "https://checkout.razorpay.com")',
+  },
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
 ];
 
