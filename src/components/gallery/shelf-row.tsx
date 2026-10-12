@@ -74,7 +74,8 @@ export function ShelfRow({
   id: string;
   title: string;
   intro: string;
-  href: string;
+  /** View all; a row without one (Trending) shows only its own designs. */
+  href?: string;
   entries: readonly CatalogEntry[];
   total: number;
   covers: Covers;
@@ -119,14 +120,16 @@ export function ShelfRow({
             onClick={() => scroll(1)}
             className="hidden md:inline-flex"
           />
-          <Link
-            href={href}
-            aria-label={label}
-            className="inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-surface px-4 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            {shelfCopy.viewAll}
-            <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
-          </Link>
+          {href && (
+            <Link
+              href={href}
+              aria-label={label}
+              className="inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-surface px-4 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {shelfCopy.viewAll}
+              <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
+            </Link>
+          )}
         </div>
       </div>
       <ul
@@ -147,7 +150,7 @@ export function ShelfRow({
             />
           </li>
         ))}
-        {total > entries.length && (
+        {href && total > entries.length && (
           <li className="w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4rem)/4.3)] xl:w-[calc((100%-5rem)/5.25)]">
             <Link
               href={href}

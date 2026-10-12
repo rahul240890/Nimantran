@@ -22,6 +22,7 @@ import { pricesInOrder, pricingSchema } from "@/lib/plans/design-tiers";
 import { COUPON_CODE, cleanCouponCode } from "@/lib/plans/offers";
 import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";
+import { TRENDING_TAG, saveTrendingPins } from "@/lib/gallery/trending-store";
 
 /*
  * The master admin's changes. Every call checks the admin again on the server; the
@@ -181,4 +182,16 @@ export async function saveDesignPricing(input: unknown): Promise<PricingSaveResu
   revalidateTag(PRICING_TAG, { expire: 0 });
   revalidatePath("/admin/designs");
   return "saved";
+}
+
+/** The designs the admin pins to the head of the Trending row (Admin, Designs). */
+export async function saveTrending(input: unknown): Promise<boolean | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const parsed = z.array(z.string().max(80)).max(40).safeParse(input);
+  if (!parsed.success) return false;
+  if (!(await saveTrendingPins(parsed.data, admin.account))) return false;
+  revalidateTag(TRENDING_TAG, { expire: 0 });
+  revalidatePath("/admin/designs");
+  return true;
 }

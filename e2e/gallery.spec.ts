@@ -134,6 +134,10 @@ test.describe("the Designs page", () => {
     await page.goto("/designs");
     await expect(page.locator("[data-collection]")).toHaveCount(18);
     await expect(page.locator('[data-shelf="collection-storybook"]')).toBeVisible();
+    // Trending leads the rows, its designs badged wherever they show
+    const trending = page.locator('[data-shelf="trending"]');
+    await expect(trending.locator("[data-design]").first()).toBeVisible();
+    await expect(trending.locator("[data-trending]").first()).toBeVisible();
     await page.locator('[data-collection="royal-wedding"]').getByRole("link").click();
     await expect(page).toHaveURL(/collection=royal-wedding/);
     await expect(

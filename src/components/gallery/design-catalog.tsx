@@ -45,6 +45,7 @@ import {
   type Shelf,
 } from "@/lib/gallery/shelves";
 import { CollectionTiles } from "./collection-tiles";
+import { TrendingRow } from "./trending-row";
 import { pagePath } from "@/lib/seo/paths";
 import { searchWords } from "./design-words";
 import { CatalogCard, ShelfRow, TraditionTiles, type Covers } from "./shelf-row";
@@ -260,6 +261,20 @@ function Browse({
       </section>
 
       <CollectionTiles entries={entries} covers={covers} designsPath={designsPath} />
+
+      <section
+        aria-labelledby="group-trending"
+        className="flex flex-col gap-8 border-t border-line pt-8"
+      >
+        <h2
+          id="group-trending"
+          className="flex items-center gap-3 font-label text-xs tracking-[0.24em] text-accent-text uppercase"
+        >
+          <span aria-hidden className="h-px w-6 bg-marigold" />
+          {shelfCopy.trending.group}
+        </h2>
+        <TrendingRow id="trending" covers={covers} entries={entries} />
+      </section>
 
       {groups.map(({ group, title, shelves }, groupIndex) => (
         <section

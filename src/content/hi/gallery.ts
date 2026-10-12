@@ -52,6 +52,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     optional: "फ़ोटो चाहें तो",
   },
   sceneBadge: "दृश्य · 1 पन्ना",
+  trendingBadge: "ट्रेंडिंग",
   movingBadge: "चलचित्र",
   storyBadge: (count) => `कहानी · ${count} पन्ने`,
   sceneNote:
@@ -253,6 +254,7 @@ export const collectionCopy: Translation<typeof en.collectionCopy> = {
 };
 
 export const shelfCopy: Translation<typeof en.shelfCopy> = {
+  trending: { group: "ट्रेंडिंग", title: "अभी ट्रेंडिंग", intro: "जो डिज़ाइन मेज़बान अभी सबसे ज़्यादा चुन रहे हैं।" },
   groups: {
     moving: "नया: चलते दृश्य",
     photos: "चित्रित या आपकी फ़ोटो के साथ",
