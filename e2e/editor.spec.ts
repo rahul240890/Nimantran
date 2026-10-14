@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { AI_SHOWN } from "../src/lib/ai/shown";
 
 const noOverflow = (page: Page) =>
   page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
@@ -445,8 +446,13 @@ test.describe("invite editor", () => {
     await expect(again.locator(".story-line", { hasText: "Together forever" })).toHaveCount(0);
     await again.getByRole("button", { name: "Done" }).click();
 
-    // AI writes only for an invite saved to an account
-    await page.getByRole("button", { name: "Write with AI" }).click();
+    // AI is hidden for now (src/lib/ai/shown.ts); when shown, it writes only for a saved invite
+    const write = page.getByRole("button", { name: "Write with AI" });
+    if (!AI_SHOWN) {
+      await expect(write).toHaveCount(0);
+      return;
+    }
+    await write.click();
     const ai = page.getByRole("dialog", { name: "Write the words with AI" });
     await expect(ai.getByRole("radio", { name: "Traditional" })).toBeChecked();
     expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
