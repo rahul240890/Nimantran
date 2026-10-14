@@ -687,11 +687,11 @@ export const extrasCopy = {
   cancelPhoto: "Cancel",
   closePhoto: "Close",
   musicHeading: "Music",
-  musicHint: "A raga composed live as the card opens, or a short clip of your own music.",
+  musicHint: "A raga composed live as the card opens, or your own song.",
   musicSource: { raga: "A raga", own: "Your own music" },
   ragaHint: "Composed live, so it costs your guests no data.",
   ownHint:
-    "Pick a song or a recording from your phone and keep the part you love, up to 30 seconds. Guests hear it when the card opens, and it plays in your video too.",
+    "Pick a song or a recording from your phone and choose where it starts and ends. Guests hear it from their first tap, once through with no repeats, and it fades out at the end. It plays in your video too.",
   chooseSong: "Choose a song",
   songTypes: "MP3, M4A, WAV or AAC",
   readingSong: "Reading your song…",
@@ -701,10 +701,21 @@ export const extrasCopy = {
   trimHeading: "Keep the part you love",
   waveformLabel: (name: string) => `The shape of ${name}, with the part you keep lit`,
   startAt: "Starts at",
-  clipLength: "Length",
-  seconds: (n: number) => `${n} seconds`,
-  secondsShort: (n: number) => `${n}s`,
-  playPart: "Play this part",
+  endAt: "Ends at",
+  keeping: (length: string) => `Keeping ${length}`,
+  needNote: (need: string, pages: number) =>
+    `Your invitation plays for about ${need}: the opening and ${pages === 1 ? "1 page" : `${pages} pages`}. Keep at least ${need} so the song never stops early or repeats.`,
+  sceneNeedNote: (need: string) =>
+    `Your invitation plays for about ${need}: the opening and the scene. Keep at least ${need} so the song never stops early or repeats.`,
+  fullNote: (full: string) =>
+    `Keep about ${full} and the song also plays on softly while the page moves down to the reply form.`,
+  fitInvitation: (length: string) => `The invitation, ${length}`,
+  fitAll: (length: string) => `With the page below, ${length}`,
+  tooShort: (song: string, need: string) =>
+    `This song is ${song} long, and your invitation plays for about ${need}. Choose a longer song, so the music lasts to the end without repeating.`,
+  chooseLonger: "Choose another song",
+  playPart: "Play from the start",
+  playEnd: "Hear the ending",
   stopPart: "Stop",
   rights: "I have the right to use this music",
   rightsHint:
@@ -715,9 +726,9 @@ export const extrasCopy = {
   changeClip: "Change",
   removeClip: "Remove",
   listenClip: "Listen",
-  clipMeta: (n: number) => `Your music · ${n} seconds`,
-  repeatNote: (clip: number, live: number, times: number) =>
-    `Your invitation pages play for about ${live} seconds, and the music carries on while guests scroll down to reply. This ${clip} second clip will repeat about ${times} times, so pick a part that loops smoothly, or keep a longer one.`,
+  clipMeta: (length: string) => `Your music · ${length}`,
+  shortNote: (clip: string, need: string) =>
+    `Your invitation now plays for about ${need}, longer than this ${clip} part, so the music would stop early. Choose the part again with Change.`,
   listen: (raga: string) => `Listen to ${raga}`,
   stopListening: "Stop listening",
   designsOwn: "Design's own",

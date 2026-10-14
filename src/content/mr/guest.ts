@@ -208,6 +208,7 @@ export const guestText: GuestText = {
       label: "निमंत्रण आपोआप पुढे जात आहे",
       pause: "इथेच थांबा",
       play: "पुढे चला",
+      again: "निमंत्रण पुन्हा पाहा",
     },
   },
   theme: { group: "रंगसंगती", system: "डिव्हाइसप्रमाणे", light: "फिकट", dark: "गडद" },

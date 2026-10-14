@@ -185,15 +185,24 @@ test.describe("publish and share", () => {
     await page.locator('input[accept^="audio"]').setInputFiles({
       name: "Shehnai at dawn.wav",
       mimeType: "audio/wav",
-      buffer: toneWav(6),
+      buffer: toneWav(4),
+    });
+    // Shorter than the invitation plays: the host is asked for a longer song
+    await expect(page.getByText(/Choose a longer song/)).toBeVisible();
+    await page.locator('input[accept^="audio"]').setInputFiles({
+      name: "Shehnai at dawn.wav",
+      mimeType: "audio/wav",
+      buffer: toneWav(150),
     });
     await expect(page.getByText("Keep the part you love")).toBeVisible();
+    await expect(page.getByText(/Your invitation plays for about/)).toBeVisible();
+    await expect(page.getByRole("slider", { name: "Ends at" })).toBeVisible();
     await expect(page.getByRole("img", { name: /The shape of Shehnai at dawn/ })).toBeVisible();
     const use = page.getByRole("button", { name: "Use this music" });
     await expect(use).toBeDisabled();
     await page.getByRole("checkbox", { name: "I have the right to use this music" }).click();
     await use.click();
-    await expect(page.getByText("Your music · 6 seconds")).toBeVisible();
+    await expect(page.getByText(/Your music · [12]:\d\d/)).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await next(page);

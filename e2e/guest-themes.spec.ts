@@ -220,3 +220,52 @@ test("the welcome before the pages", async ({ page }) => {
   await expect(welcome).toHaveCount(0);
   await expect(page.locator("[data-story-beat]").first()).toBeVisible();
 });
+
+// The guest's first tap starts the music and keeps the screen on; once the invitation has
+// played to the reply form, it offers to play again, from the top, music and all
+test("the music starts on the first tap, and the invitation opens again at the end", async ({
+  page,
+}) => {
+  test.slow();
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.addInitScript(() => {
+    const counts = { locks: 0 };
+    (window as unknown as { __awake: typeof counts }).__awake = counts;
+    Object.defineProperty(navigator, "wakeLock", {
+      configurable: true,
+      value: {
+        request: async () => {
+          counts.locks += 1;
+          return { released: false, release: async () => {} };
+        },
+      },
+    });
+  });
+  await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
+  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
+  const open = page.getByRole("button", { name: "Open the invitation", exact: true });
+  await expect(open).toBeVisible();
+  // A tap anywhere before the gate is enough to start the music
+  await page.mouse.click(5, 5);
+  await open.click();
+  await page.clock.runFor(8000);
+  await expect(page.getByRole("button", { name: "Pause music" }).first()).toBeVisible();
+  expect(
+    await page.evaluate(() => (window as unknown as { __awake: { locks: number } }).__awake.locks),
+  ).toBeGreaterThan(0);
+
+  // Every page, then the page below moving on by itself to the reply form
+  const again = page.locator("[data-tour-controls]").getByRole("button", {
+    name: "Watch the invitation again",
+  });
+  for (let i = 0; i < 60 && !(await again.isVisible()); i++) await page.clock.runFor(5000);
+  await expect(again).toBeVisible();
+  await again.click();
+  await page.clock.runFor(1500);
+  await expect(page.locator("[data-doorway]")).toHaveAttribute("data-doorway", "open");
+  await expect(again).toHaveCount(0);
+  // The page's footer offers it too, for a guest who scrolled there themselves
+  await expect(
+    page.locator("footer").getByRole("button", { name: "Watch the invitation again" }),
+  ).toBeAttached();
+});

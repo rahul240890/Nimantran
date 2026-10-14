@@ -179,6 +179,11 @@ export type OpeningProps = {
    * and this takes the guest down the page. Without it the last page waits for the guest.
    */
   onCarryOn?: () => void;
+  /**
+   * Goes up by one each time the guest asks to open the invitation again (from the page
+   * below): the opening plays again from the start, as if they had tapped it.
+   */
+  replay?: number;
   /** What comes once it opens: the event pages, or (for One Scene) the page behind it. */
   after:
     | { kind: "pages"; template: Template; beats: readonly StoryBeat[]; textBox: boolean }
@@ -225,6 +230,7 @@ export function Opening({
   musicOnOpen,
   guest,
   onCarryOn,
+  replay = 0,
   after,
 }: OpeningProps) {
   const { guestCopy, invitation } = useGuestText();
@@ -340,12 +346,24 @@ export function Opening({
   const carryOn = onCarryOn
     ? () => {
         returnFocus.current = false;
+        // The music plays on under the page below, softer
+        music.soften();
         setWelcome(false);
         setPages(false);
         setAsked(false);
         onCarryOn();
       }
     : undefined;
+
+  // Opening it again from the page below: the guest's tap there has just brought them back
+  // up here, so the opening plays as if tapped (the music was started from that tap)
+  const enterLatest = useRef(enter);
+  useEffect(() => {
+    enterLatest.current = enter;
+  });
+  useEffect(() => {
+    if (replay > 0) enterLatest.current();
+  }, [replay]);
 
   const plate = (half?: "left" | "right") => {
     const Names = half ? "p" : "h1";
