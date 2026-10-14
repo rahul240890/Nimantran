@@ -7,14 +7,21 @@ import { clipName, clipPath, clipSchema, clipWindow, waveformPeaks, withClip } f
 const clip = { id: "c1", type: "audio/mp4", seconds: 20, name: "Din Shagna Da", rights: true };
 
 describe("music clips", () => {
-  it("keeps the asked length, never running past the end of the song", () => {
-    expect(clipWindow(180, 42, 20)).toEqual({ start: 42, seconds: 20 });
-    expect(clipWindow(180, 175, 20)).toEqual({ start: 160, seconds: 20 });
-    expect(clipWindow(180, -5, 30)).toEqual({ start: 0, seconds: 30 });
+  it("keeps from the start to the end the host chose, never past the end of the song", () => {
+    expect(clipWindow(180, 42, 120)).toEqual({ start: 42, seconds: 78 });
+    expect(clipWindow(180, 175, 195)).toEqual({ start: 160, seconds: 20 });
+    expect(clipWindow(180, -5, 30)).toEqual({ start: 0, seconds: 35 });
   });
 
-  it("keeps the whole song when it is shorter than the length", () => {
+  it("keeps at least as long as the invitation plays", () => {
+    expect(clipWindow(240, 30, 60, 95)).toEqual({ start: 30, seconds: 95 });
+    // Too near the end for that: the start moves back
+    expect(clipWindow(240, 200, 210, 95)).toEqual({ start: 145, seconds: 95 });
+  });
+
+  it("keeps the whole song when it is shorter, and five minutes at most", () => {
     expect(clipWindow(12, 4, 20)).toEqual({ start: 0, seconds: 12 });
+    expect(clipWindow(600, 10, 500)).toEqual({ start: 10, seconds: 300 });
   });
 
   it("draws a song's shape, its loudest slice full height", () => {
@@ -48,7 +55,8 @@ describe("music clips", () => {
   it("needs the host's word that they may use the music", () => {
     expect(clipSchema.safeParse(clip).success).toBe(true);
     expect(clipSchema.safeParse({ ...clip, rights: false }).success).toBe(false);
-    expect(clipSchema.safeParse({ ...clip, seconds: 45 }).success).toBe(false);
+    expect(clipSchema.safeParse({ ...clip, seconds: 180 }).success).toBe(true);
+    expect(clipSchema.safeParse({ ...clip, seconds: 400 }).success).toBe(false);
   });
 
   it("reads drafts saved before clips as playing the raga", () => {

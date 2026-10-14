@@ -34,6 +34,7 @@ export const uiStrings: Translation<typeof en> = {
       label: "निमंत्रण अपने आप आगे बढ़ रहा है",
       pause: "यहीं रुकें",
       play: "आगे चलें",
+      again: "निमंत्रण फिर से देखें",
     },
   },
   storyWords: {

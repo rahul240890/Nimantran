@@ -2,21 +2,25 @@ import { z } from "zod";
 import type { Template } from "@/lib/templates/schema";
 
 /*
- * The host's own music: a short clip they upload and trim, played instead of the raga.
- * The editor cuts and re-encodes it in the browser (clip-encode.ts), so every clip is a
- * small AAC file (or a WAV where the browser can't write AAC). It is kept on the device
- * beside the photos and uploads to the event's folder in the event-media bucket.
+ * The host's own music: the part of a song they choose, played instead of the raga. It runs
+ * at least as long as the invitation plays (song-length.ts), so it never stops early or
+ * starts again; it plays once and fades out at its end. The editor cuts and re-encodes it
+ * in the browser (clip-encode.ts), so every clip is an AAC file (or a WAV where the browser
+ * can't write AAC) small enough to upload. It is kept on the device beside the photos and
+ * uploads to the event's folder in the event-media bucket.
  */
 
 export const CLIP_TYPES = ["audio/mp4", "audio/wav"] as const;
 export type ClipType = (typeof CLIP_TYPES)[number];
 
-/** Clip lengths the host can pick, in seconds. */
-export const CLIP_LENGTHS = [15, 20, 30] as const;
 export const MIN_CLIP_SECONDS = 3;
-export const MAX_CLIP_SECONDS = 30;
-/** The largest file a clip may be: 30 seconds of WAV fits well inside. */
-export const MAX_CLIP_BYTES = 3 * 1024 * 1024;
+/** The longest part of a song a clip keeps: five minutes covers the longest invitation. */
+export const MAX_CLIP_SECONDS = 300;
+/**
+ * The largest file a clip may be, under the upload limit of a server function (4.5 MB).
+ * The encoder lowers the quality of a long clip until it fits (clip-encode.ts).
+ */
+export const MAX_CLIP_BYTES = 4 * 1024 * 1024;
 /** What the file picker offers. */
 export const CLIP_ACCEPT = "audio/*,.mp3,.m4a,.aac,.wav,.ogg,.opus";
 
@@ -48,16 +52,20 @@ export function clipName(fileName: string): string {
 }
 
 /**
- * The part of a song a clip keeps: as long as asked (or the whole song when it is
- * shorter), starting where the host chose but never running past the end.
+ * The part of a song a clip keeps, from where the host starts it to where they end it: at
+ * least `need` seconds (the invitation's own length) where the song is that long, at most
+ * MAX_CLIP_SECONDS, and never past the end of the song.
  */
 export function clipWindow(
   duration: number,
   start: number,
-  length: number,
+  end: number,
+  need = MIN_CLIP_SECONDS,
 ): { start: number; seconds: number } {
-  const seconds = Math.min(length, MAX_CLIP_SECONDS, Math.max(0, duration));
-  const latest = Math.max(0, duration - seconds);
+  const song = Math.max(0, duration);
+  const longest = Math.min(MAX_CLIP_SECONDS, song);
+  const seconds = Math.min(longest, Math.max(need, MIN_CLIP_SECONDS, end - start));
+  const latest = Math.max(0, song - seconds);
   return { start: Math.min(Math.max(0, start), latest), seconds };
 }
 

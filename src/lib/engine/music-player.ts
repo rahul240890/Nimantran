@@ -1,7 +1,9 @@
 /*
  * Plays the invitation's music with the Web Audio API: the score (music.ts) written a
  * little ahead of the clock, each strike drawn by its instrument (instruments.ts). A host's
- * own clip plays through an audio element instead, looping. Browser only.
+ * own clip plays through an audio element instead, once through: it lasts as long as the
+ * invitation and fades out at its end (clip-encode.ts), and it never starts again by
+ * itself. Browser only.
  */
 
 import { Score, type MusicChoice, type Strike } from "./music";
@@ -13,8 +15,10 @@ export type { MusicChoice } from "./music";
 const LOOKAHEAD_S = 0.6;
 const TICK_MS = 150;
 const VOLUME = 0.55;
-/** How long the music takes to swell to its full volume. */
+/** How long the raga takes to swell to its full volume. */
 const FADE_IN_S = 2.5;
+/** The host's song is heard at once: it already starts softly (clip-encode.ts). */
+const CLIP_FADE_IN_S = 0.8;
 
 export class MusicPlayer {
   private ctx: AudioContext | null = null;
@@ -32,6 +36,16 @@ export class MusicPlayer {
   private music: MusicChoice;
   /** The host's own clip, while one is the track. */
   private clip: HTMLAudioElement | null = null;
+  /** Counts the clip's volume moves, so only the latest one carries on. */
+  private ramps = 0;
+  /** Counts the clip's fades, so a fade from before the latest play doesn't stop it. */
+  private fades = 0;
+  /** A play under way, so a second tap while it starts doesn't start it twice. */
+  private starting: Promise<void> | null = null;
+  /** How loud, from 0 to 1 of full: softer once the pages are over. */
+  private level = 1;
+  /** Told when the music stops by itself (the song has reached its end). */
+  onEnded: (() => void) | null = null;
 
   constructor(music: MusicChoice) {
     this.music = music;
@@ -39,6 +53,41 @@ export class MusicPlayer {
 
   get isPlaying() {
     return this.playing;
+  }
+
+  /**
+   * Fetches the host's song ahead, so the guest's tap starts it at once rather than after
+   * it downloads.
+   */
+  preload() {
+    if (this.music.clip) this.clipElement();
+  }
+
+  /**
+   * The song from its beginning: at once while it plays (swelling in again), or at the next
+   * play. The raga needs nothing: each play begins a fresh phrase.
+   */
+  rewind() {
+    const clip = this.clip;
+    if (!clip) return;
+    if (this.playing) clip.volume = 0;
+    clip.currentTime = 0;
+    if (this.playing) this.rampClip(clip, 0, this.level, CLIP_FADE_IN_S);
+  }
+
+  /** Turns the music to `level` of its full volume over `fade` seconds, playing on. */
+  setLevel(level: number, fade = 1.5) {
+    this.level = Math.min(1, Math.max(0, level));
+    if (!this.playing) return;
+    if (this.clip) {
+      this.rampClip(this.clip, this.clip.volume, this.level, fade);
+      return;
+    }
+    if (!this.ctx || !this.master) return;
+    const now = this.ctx.currentTime;
+    this.master.gain.cancelScheduledValues(now);
+    this.master.gain.setValueAtTime(this.master.gain.value, now);
+    this.master.gain.linearRampToValueAtTime(VOLUME * this.level, now + fade);
   }
 
   setTrack(music: MusicChoice) {
@@ -56,27 +105,52 @@ export class MusicPlayer {
   /** Starts or resumes the music. Must be called from a tap or key press. */
   async play() {
     if (this.playing) return;
+    if (this.starting) return this.starting;
+    this.starting = this.start().finally(() => {
+      this.starting = null;
+    });
+    return this.starting;
+  }
+
+  private clipElement(): HTMLAudioElement {
+    if (!this.clip) {
+      const clip = new Audio();
+      clip.preload = "auto";
+      clip.src = this.music.clip!;
+      clip.addEventListener("ended", () => {
+        if (this.clip !== clip) return;
+        this.playing = false;
+        // Heard to its end: the next play starts it again from the beginning
+        clip.currentTime = 0;
+        this.onEnded?.();
+      });
+      this.clip = clip;
+    }
+    return this.clip;
+  }
+
+  /** Moves the clip's volume (where the phone lets a page set it) from one level to another. */
+  private rampClip(clip: HTMLAudioElement, from: number, to: number, fade: number) {
+    const start = performance.now();
+    const token = ++this.ramps;
+    const step = () => {
+      if (!this.playing || this.clip !== clip || this.ramps !== token) return;
+      const share = fade <= 0 ? 1 : Math.min(1, (performance.now() - start) / (fade * 1000));
+      clip.volume = from + (to - from) * share;
+      if (share < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+
+  private async start() {
     if (this.music.clip) {
-      if (!this.clip) {
-        const clip = new Audio();
-        clip.loop = true;
-        clip.preload = "auto";
-        clip.src = this.music.clip;
-        this.clip = clip;
-      }
-      // The host's song swells in as the raga does (where the phone lets a page set volume)
-      const clip = this.clip;
+      const clip = this.clipElement();
+      this.fades++;
       clip.volume = 0;
+      // Called straight from the tap, before any wait, so the phone lets it play
       await clip.play();
       this.playing = true;
-      const start = performance.now();
-      const rise = () => {
-        if (!this.playing || this.clip !== clip) return;
-        const share = Math.min(1, (performance.now() - start) / (FADE_IN_S * 1000));
-        clip.volume = share;
-        if (share < 1) requestAnimationFrame(rise);
-      };
-      requestAnimationFrame(rise);
+      this.rampClip(clip, 0, this.level, CLIP_FADE_IN_S);
       return;
     }
     const AudioContextClass =
@@ -116,7 +190,7 @@ export class MusicPlayer {
     const now = ctx.currentTime;
     this.master!.gain.cancelScheduledValues(now);
     this.master!.gain.setValueAtTime(this.master!.gain.value, now);
-    this.master!.gain.linearRampToValueAtTime(VOLUME, now + FADE_IN_S);
+    this.master!.gain.linearRampToValueAtTime(VOLUME * this.level, now + FADE_IN_S);
     if (!this.score) this.begin(now);
     this.schedule();
     this.timer = window.setInterval(() => this.schedule(), TICK_MS);
@@ -127,7 +201,26 @@ export class MusicPlayer {
     if (!this.playing) return;
     if (this.clip) {
       this.playing = false;
-      this.clip.pause();
+      const clip = this.clip;
+      const token = ++this.fades;
+      const from = clip.volume;
+      const start = performance.now();
+      const stop = () => {
+        if (this.fades === token && !this.playing) clip.pause();
+      };
+      const step = () => {
+        if (this.fades !== token || this.playing) return;
+        const share = fade <= 0 ? 1 : Math.min(1, (performance.now() - start) / (fade * 1000));
+        clip.volume = from * (1 - share);
+        if (share < 1) requestAnimationFrame(step);
+        else stop();
+      };
+      if (fade <= 0) stop();
+      else {
+        requestAnimationFrame(step);
+        // A hidden tab draws no frames: the song still stops once the fade's time is up
+        window.setTimeout(stop, fade * 1000 + 50);
+      }
       return;
     }
     if (!this.ctx || !this.master) return;

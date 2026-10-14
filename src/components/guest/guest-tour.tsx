@@ -1,6 +1,6 @@
 "use client";
 
-import { Pause, Play } from "lucide-react";
+import { Pause, Play, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
 import { MusicBars } from "@/components/invitation/music-bars";
 import type { RagaMusic } from "@/components/invitation/use-raga-music";
@@ -16,7 +16,8 @@ const IDLE_MS = 7000;
 /** A section counts as the one showing once its top is above this share of the screen. */
 const SHOWING_AT = 0.35;
 
-type TourState = "off" | "on" | "idle" | "paused";
+/** "done": it has reached the end, and offers to open the invitation again. */
+type TourState = "off" | "on" | "idle" | "paused" | "done";
 
 /** The full-screen sections below the pages, top to bottom (each marked `data-tour`). */
 function tourStops(root: HTMLElement): HTMLElement[] {
@@ -44,22 +45,34 @@ function showing(stops: readonly HTMLElement[]): number {
  * reply form, while the music plays on until the reply comes into view. The guest can
  * scroll freely at any time (the page waits, then carries on from where they are), or hold
  * it with the button at the foot of the screen. Still mode only takes the guest to the
- * first section and lets them scroll.
+ * first section and lets them scroll. At the end the button offers to open the invitation
+ * again, until the guest takes over (the page's footer offers it too).
  */
 export function GuestTour({
   root,
   run,
+  stop = 0,
   music,
   labels,
   musicLabels,
+  onEnd,
+  onAgain,
+  againLabel,
 }: {
   root: RefObject<HTMLElement | null>;
   /** Goes up by one each time the pages end, which starts the tour from the top. */
   run: number;
+  /** Goes up by one each time the invitation is opened again, which stops the tour. */
+  stop?: number;
   music: RagaMusic;
   labels: { label: string; pause: string; play: string };
   /** A music button beside the hold button, on pages without a music button of their own. */
   musicLabels?: { play: string; pause: string } | null;
+  /** The tour is over (it reached the end, or the guest opened the invitation again). */
+  onEnd?: () => void;
+  /** Opens the invitation again from the top; called from the guest's tap. */
+  onAgain?: () => void;
+  againLabel?: string;
 }) {
   const still = useReducedMotion();
   const [state, setState] = useState<TourState>("off");
@@ -67,9 +80,25 @@ export function GuestTour({
   const [step, setStep] = useState(0);
   const [dwell, setDwell] = useState(DWELL_SECONDS);
   const latestMusic = useRef(music);
+  const latestEnd = useRef(onEnd);
   useEffect(() => {
     latestMusic.current = music;
+    latestEnd.current = onEnd;
   });
+  // Moving on stops at the end; the screen may sleep again from here
+  const ended = state === "off" || state === "done";
+  const wasEnded = useRef(true);
+  useEffect(() => {
+    if (ended && !wasEnded.current) latestEnd.current?.();
+    wasEnded.current = ended;
+  }, [ended]);
+
+  // Opened again from the top: the page below waits until the pages end again
+  const [stopped, setStopped] = useState(stop);
+  if (stopped !== stop) {
+    setStopped(stop);
+    setState("off");
+  }
 
   // The pages have ended: down to the first section
   useEffect(() => {
@@ -126,19 +155,41 @@ export function GuestTour({
       } else {
         const next = stops[at + 1];
         if (!next || current.dataset.tour === "end") {
-          // The end of the page: the tour stops, and the music with it
+          // The end of the page: the tour stops, and the raga with it
           if (latestMusic.current.playing) latestMusic.current.rest();
-          return setState("off");
+          return setState("done");
         }
         scrollToStop(next, false);
         // The reply form is where the guest takes over
-        if (next.dataset.tour === "end") return setState("off");
+        if (next.dataset.tour === "end") return setState("done");
         setDwell(Number(next.dataset.tour) || DWELL_SECONDS);
       }
       setStep((was) => was + 1);
     }, dwell * 1000);
     return () => window.clearTimeout(timer);
   }, [state, step, dwell, root]);
+
+  // At the end, the offer to open it again gives way as soon as the guest takes over
+  useEffect(() => {
+    if (state !== "done") return;
+    const away = (event: Event) => {
+      if ((event.target as Element | null)?.closest?.("[data-tour-controls]")) return;
+      setState("off");
+    };
+    const options = { passive: true, capture: true } as const;
+    // The scroll that brought the reply form in is still settling; wait for the guest
+    const timer = window.setTimeout(() => {
+      window.addEventListener("wheel", away, options);
+      window.addEventListener("pointerdown", away, options);
+      window.addEventListener("keydown", away, options);
+    }, 1200);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("wheel", away, options);
+      window.removeEventListener("pointerdown", away, options);
+      window.removeEventListener("keydown", away, options);
+    };
+  }, [state]);
 
   // The guest's own scrolling or tapping holds the tour; it carries on once they stop
   useEffect(() => {
@@ -167,7 +218,27 @@ export function GuestTour({
     };
   }, [state]);
 
-  if (state === "off") return null;
+  if (state === "off" || (state === "done" && !onAgain)) return null;
+  if (state === "done") {
+    return (
+      <div
+        data-tour-controls
+        className="fixed start-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 animate-[pop-in_500ms_ease-out_both] rounded-full bg-night/70 p-1 text-card-ivory shadow-overlay backdrop-blur-md motion-still:animate-none"
+      >
+        <button
+          type="button"
+          onClick={() => {
+            setState("off");
+            onAgain?.();
+          }}
+          className="flex min-h-11 items-center gap-2 rounded-full ps-3 pe-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <RotateCcw aria-hidden className="size-4" />
+          {againLabel}
+        </button>
+      </div>
+    );
+  }
   const moving = state === "on";
   const held = state === "paused";
   return (
