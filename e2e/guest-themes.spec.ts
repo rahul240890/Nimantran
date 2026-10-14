@@ -78,7 +78,8 @@ for (const suite of THEMES) {
         await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
 
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
-        await expect(page.getByRole("button", { name: /Play the music/ }).last()).toBeVisible();
+        // The guest's first tap (the flowers) started the music
+        await expect(page.getByRole("button", { name: /Pause the music/ }).last()).toBeVisible();
 
         expect(await noOverflow(page)).toBe(true);
         expect((await axe(page).analyze()).violations).toEqual([]);
