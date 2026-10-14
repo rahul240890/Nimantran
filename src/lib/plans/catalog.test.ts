@@ -72,15 +72,13 @@ describe("packages", () => {
     expect(planNeeded(two, "premium")).toBe("celebration");
   });
 
-  it("put the host's own song in Celebration", () => {
+  it("let every package play the host's own song", () => {
     const draft = newDraft();
     draft.music = {
       ...draft.music,
       clip: { id: "c1", name: "Song", type: "audio/mp4", seconds: 30 },
     } as InviteDraft["music"];
-    expect(planShortfalls(draft, { plan: "basic", tier: "free" }, "free")).toEqual([
-      { limit: "ownSong", used: 1 },
-    ]);
-    expect(planNeeded(draft, "free")).toBe("celebration");
+    expect(planShortfalls(draft, { plan: "free", tier: "free" }, "free")).toEqual([]);
+    expect(planNeeded(draft, "free")).toBe("free");
   });
 });

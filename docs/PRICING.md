@@ -38,7 +38,7 @@ Every design has a price the master admin sets (**Admin, Designs**): Free, Premi
 | Invites by link (guests + open link)  | 50                      | 50                         | 500                       | Unlimited           |
 | Functions, RSVP, guest list, own link | Every function          | Every function             | Every function            | Every function      |
 | Card languages                        | 1                       | 1                          | 2                         | 2                   |
-| Own song                              | —                       | —                          | Yes                       | Yes                 |
+| Own song                              | Yes                     | Yes                        | Yes                       | Yes                 |
 | WhatsApp Status and Reels video       | —                       | —                          | One video                 | One per function    |
 | Guest photo wall                      | —                       | —                          | 30 days                   | 1 year              |
 | Co-hosts                              | 1                       | 1                          | 3                         | Unlimited           |
@@ -48,6 +48,8 @@ Rules:
 - **Full preview, then pay, then publish.** The editor's last step shows the invite as guests will see it (`/invites/<id>/preview`). Publishing a Free invite while checkout is on opens the packages first; a free design can continue free from the Basic card.
 - **Upgrades pay the difference** between packages, and between designs when a paid invite moves to a dearer one.
 - An invite remembers the design tier it was bought on (`event_plans.design_tier`), so its package price stays fair if the admin later changes the design's tier.
+- **Own song in every package** (owner, 2026-10-14): Free and Basic play the host's own clip too, so nobody has to remove a song they chose to publish.
+- **Video preview for everyone** (owner, 2026-10-14): any host makes the invitation video and watches it free, from the editor's last step (`/invites/<id>/video`) or the share page. Without Celebration or Grand it carries a "Made with Shubh" mark across the middle and can't be downloaded or shared; with them it downloads clean once the invite is live, since its last card carries the link.
 - Not in any package yet, because they are not built: save-the-date and thank-you cards, PDF and printable QR. Add them to Grand when they exist.
 
 ## 3. Personal: Family Plus (yearly)

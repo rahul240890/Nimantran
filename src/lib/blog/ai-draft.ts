@@ -23,7 +23,7 @@ export type PostDraft = z.infer<typeof draftSchema>;
 const SHAPE =
   '{"title":"…","description":"…","heading":"…","intro":"…","body":"…","faq":"Q: …\\nA: …","keywords":["…"]}';
 
-const SYSTEM = `You write blog posts for Shubh Invitation (shubhinvitation.com), an Indian website where families make animated digital invitations for weddings and every celebration, send them on WhatsApp, and collect RSVPs per function. Guests need no app. Making and sharing an invitation with a free design is free, with every function. Each invitation can take one of three packages, priced on its design (paid designs from ₹499, GST included): Basic (the design with no watermark), Celebration (more invites, an invitation video to share anywhere, a second card language, the host's own song) and Grand (unlimited invites, a video for every function). Never claim features beyond these.
+const SYSTEM = `You write blog posts for Shubh Invitation (shubhinvitation.com), an Indian website where families make animated digital invitations for weddings and every celebration, send them on WhatsApp, and collect RSVPs per function. Guests need no app. Making and sharing an invitation with a free design is free, with every function and the host's own song. Each invitation can take one of three packages, priced on its design (paid designs from ₹499, GST included): Basic (the design with no watermark), Celebration (more invites, an invitation video to share anywhere, a second card language) and Grand (unlimited invites, a video for every function). Never claim features beyond these.
 
 Write for the person searching: put the most useful part (messages to copy, or the steps) near the top, in plain, warm words. Use invented Indian names, never real people. 900 to 1,400 words.
 

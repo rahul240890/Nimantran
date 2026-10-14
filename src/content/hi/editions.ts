@@ -22,6 +22,7 @@ export const planCopy: Translation<typeof en.planCopy> = {
       "हर कार्यक्रम, जवाब और मेहमानों की सूची के साथ",
       "आपका अपना लिंक और QR कोड",
       "कार्यक्रम तक कभी भी बदलाव करें",
+      "आपका अपना गाना",
       "कार्ड की 1 भाषा",
     ],
   },
@@ -32,7 +33,6 @@ export const planCopy: Translation<typeof en.planCopy> = {
       "बेसिक की हर सुविधा",
       "कहीं भी भेजने के लिए निमंत्रण वीडियो",
       "कार्ड की 2 भाषाएँ",
-      "आपका अपना गाना",
       "मेहमानों की फ़ोटो वॉल 30 दिन",
       "3 सह-मेज़बान",
     ],
@@ -96,6 +96,8 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   paymentId: "भुगतान",
   back: "निमंत्रण पर वापस",
   backToEditor: "अपने निमंत्रण पर वापस",
+  videoFirst: "चुनने से पहले अपना निमंत्रण वीडियो मुफ़्त बनाकर देखें।",
+  videoFirstLink: "अपना वीडियो देखें",
   secure: "Razorpay से सुरक्षित भुगतान: UPI, कार्ड और नेटबैंकिंग।",
   previewCheckout: {
     title: "टेस्ट भुगतान",
@@ -130,7 +132,6 @@ export const limitCopy: Translation<typeof en.limitCopy> = {
   body: (plan) => `इसे ऐसे ही प्रकाशित करने के लिए ${plan} चुनें।`,
   used: {
     languages: (count) => `कार्ड की ${count} भाषाएँ`,
-    ownSong: () => "आपका अपना गाना",
     design: (rank) => `${TIER_NAMES[rank] ?? "प्रीमियम"} डिज़ाइन`,
   },
   choose: "पैकेज चुनें",

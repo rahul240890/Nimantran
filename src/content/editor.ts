@@ -863,6 +863,7 @@ export const previewCopy = {
   readyBodyAccount:
     "It's saved to your account, photos included. See it as your guests will, then publish it to get your link.",
   seeAsGuest: "See it as your guests will",
+  watchVideo: "Watch it as a video",
   seeAsGuestBody:
     "The whole invitation, full screen: the opening, the music, every page and the reply form.",
   notReady: "A few details are missing",
