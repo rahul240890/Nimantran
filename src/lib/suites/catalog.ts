@@ -447,8 +447,14 @@ export function isSuiteId(value: unknown): value is SuiteId {
 export const MOODS = ["dawn", "day", "dusk", "night"] as const;
 export type Mood = (typeof MOODS)[number];
 
-/** How one page gives way to the next. */
-export type PageTurn = "fade" | "arch" | "sweep" | "ripple";
+/**
+ * How one page gives way to the next. "push" is the reel's own turn, and the rest suit a
+ * theme's world: palace "doors" part, a "book" leaf turns over, "petals" fall, a diya's
+ * "glow" opens from the tap, pages "fly" in from a different side each time, an "arch"
+ * rises and water "ripple"s. Those with a direction play the other way on Back.
+ */
+export type PageTurn =
+  "fade" | "arch" | "sweep" | "ripple" | "push" | "fly" | "doors" | "book" | "petals" | "glow";
 
 /**
  * The paintings a theme can have, one per kind of page. Functions without their own
@@ -527,7 +533,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "rajwada-bagh": {
     id: "rajwada-bagh",
     art: "bagh",
-    turn: "arch",
+    turn: "doors",
     faiths: ["all"],
     template: "emerald",
     traditions: ["north-hindu"],
@@ -547,7 +553,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "shahi-savari": {
     id: "shahi-savari",
     art: "savari",
-    turn: "sweep",
+    turn: "doors",
     faiths: ["all"],
     template: "rangmahal",
     traditions: ["rajasthani"],
@@ -588,7 +594,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "noor-bagh": {
     id: "noor-bagh",
     art: "bagh",
-    turn: "arch",
+    turn: "petals",
     faiths: ["muslim", "all"],
     template: "emerald",
     traditions: [],
@@ -615,7 +621,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "phulkari-haveli": {
     id: "phulkari-haveli",
     art: "savari",
-    turn: "sweep",
+    turn: "doors",
     faiths: ["sikh", "all"],
     template: "phulkari",
     traditions: [],
@@ -641,7 +647,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   rajbari: {
     id: "rajbari",
     art: "kayal",
-    turn: "ripple",
+    turn: "doors",
     faiths: ["all"],
     template: "alpona",
     traditions: ["bengali"],
@@ -667,7 +673,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "peshwai-wada": {
     id: "peshwai-wada",
     art: "bagh",
-    turn: "arch",
+    turn: "doors",
     faiths: ["all"],
     template: "paithani",
     traditions: ["marathi"],
@@ -688,7 +694,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "kutch-toran": {
     id: "kutch-toran",
     art: "savari",
-    turn: "sweep",
+    turn: "doors",
     faiths: ["all"],
     template: "bandhani",
     traditions: ["gujarati"],
@@ -711,7 +717,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "playful",
     id: "gubbara",
     art: "bagh",
-    turn: "fade",
+    turn: "fly",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -753,7 +759,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "modern",
     id: "rooftop",
     art: "kayal",
-    turn: "sweep",
+    turn: "push",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -801,7 +807,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "gulaab",
     art: "bagh",
-    turn: "fade",
+    turn: "petals",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -830,7 +836,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "modern",
     id: "deco-noir",
     art: "kayal",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -866,7 +872,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "modern",
     id: "taara",
     art: "kayal",
-    turn: "fade",
+    turn: "glow",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -895,7 +901,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "modern",
     id: "kaagaz",
     art: "bagh",
-    turn: "arch",
+    turn: "book",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -923,7 +929,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "mitti",
     art: "savari",
-    turn: "sweep",
+    turn: "push",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -979,7 +985,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   pichwai: {
     id: "pichwai",
     art: "kayal",
-    turn: "ripple",
+    turn: "book",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -1039,7 +1045,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   kashi: {
     id: "kashi",
     art: "kayal",
-    turn: "ripple",
+    turn: "glow",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -1098,7 +1104,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   mysuru: {
     id: "mysuru",
     art: "kayal",
-    turn: "arch",
+    turn: "doors",
     faiths: ["all"],
     template: "gopuram",
     traditions: [],
@@ -1127,7 +1133,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   kalamkari: {
     id: "kalamkari",
     art: "kayal",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "gopuram",
     traditions: [],
@@ -1157,7 +1163,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   pattachitra: {
     id: "pattachitra",
     art: "kayal",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "alpona",
     traditions: [],
@@ -1187,7 +1193,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   chinar: {
     id: "chinar",
     art: "kayal",
-    turn: "ripple",
+    turn: "petals",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1214,7 +1220,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "chai-bagan": {
     id: "chai-bagan",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "alpona",
     traditions: [],
@@ -1241,7 +1247,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "sufi-raat": {
     id: "sufi-raat",
     art: "kayal",
-    turn: "arch",
+    turn: "glow",
     faiths: ["muslim", "all"],
     template: "emerald",
     traditions: [],
@@ -1270,7 +1276,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "chapel",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["christian", "all"],
     template: "monogram",
     traditions: [],
@@ -1300,7 +1306,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "sakura",
     art: "kayal",
-    turn: "fade",
+    turn: "petals",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1328,7 +1334,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "vigna",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1357,7 +1363,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "himani",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -1386,7 +1392,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "romantic",
     id: "van",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1414,7 +1420,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   riad: {
     id: "riad",
     art: "kayal",
-    turn: "arch",
+    turn: "doors",
     faiths: ["muslim", "all"],
     template: "emerald",
     traditions: [],
@@ -1443,7 +1449,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "playful",
     id: "palna",
     art: "bagh",
-    turn: "fade",
+    turn: "fly",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1461,7 +1467,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   deepotsav: {
     id: "deepotsav",
     art: "kayal",
-    turn: "fade",
+    turn: "glow",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -1487,7 +1493,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     voice: "playful",
     id: "jungle-party",
     art: "bagh",
-    turn: "fade",
+    turn: "fly",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1504,7 +1510,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "chaand-kalayein": {
     id: "chaand-kalayein",
     art: "bagh",
-    turn: "fade",
+    turn: "glow",
     faiths: ["all"],
     template: "emerald",
     traditions: [],
@@ -1562,7 +1568,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   raagmala: {
     id: "raagmala",
     art: "bagh",
-    turn: "arch",
+    turn: "book",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -1592,7 +1598,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   panchatantra: {
     id: "panchatantra",
     art: "kayal",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "emerald",
     traditions: [],
@@ -1621,7 +1627,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "patang-udaan": {
     id: "patang-udaan",
     art: "savari",
-    turn: "sweep",
+    turn: "fly",
     faiths: ["all"],
     template: "bandhani",
     traditions: [],
@@ -1650,7 +1656,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "diya-ki-kahani": {
     id: "diya-ki-kahani",
     art: "savari",
-    turn: "fade",
+    turn: "glow",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -1679,7 +1685,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "resham-katha": {
     id: "resham-katha",
     art: "kayal",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "paithani",
     traditions: [],
@@ -1708,7 +1714,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   navrang: {
     id: "navrang",
     art: "bagh",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1766,7 +1772,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "ek-rekha": {
     id: "ek-rekha",
     art: "bagh",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -1795,7 +1801,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   meghdoot: {
     id: "meghdoot",
     art: "bagh",
-    turn: "sweep",
+    turn: "fly",
     faiths: ["all"],
     template: "emerald",
     traditions: [],
@@ -1824,7 +1830,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "aath-pehar": {
     id: "aath-pehar",
     art: "kayal",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -1853,7 +1859,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "beej-se-bagh": {
     id: "beej-se-bagh",
     art: "bagh",
-    turn: "ripple",
+    turn: "petals",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -1882,7 +1888,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "kissa-kitaab": {
     id: "kissa-kitaab",
     art: "bagh",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "bandhani",
     traditions: [],
@@ -1911,7 +1917,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "itr-daan": {
     id: "itr-daan",
     art: "savari",
-    turn: "fade",
+    turn: "petals",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -1941,7 +1947,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "pakshi-kosh": {
     id: "pakshi-kosh",
     art: "bagh",
-    turn: "fade",
+    turn: "fly",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -1970,7 +1976,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "gudiya-ghar": {
     id: "gudiya-ghar",
     art: "savari",
-    turn: "sweep",
+    turn: "push",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -2000,7 +2006,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "jantar-mantar": {
     id: "jantar-mantar",
     art: "savari",
-    turn: "fade",
+    turn: "glow",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -2029,7 +2035,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   rangrez: {
     id: "rangrez",
     art: "savari",
-    turn: "sweep",
+    turn: "push",
     faiths: ["all"],
     template: "bandhani",
     traditions: [],
@@ -2059,7 +2065,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "phool-mandi": {
     id: "phool-mandi",
     art: "kayal",
-    turn: "arch",
+    turn: "petals",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -2088,7 +2094,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "udan-khatola": {
     id: "udan-khatola",
     art: "savari",
-    turn: "sweep",
+    turn: "fly",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -2117,7 +2123,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "rang-raste": {
     id: "rang-raste",
     art: "savari",
-    turn: "sweep",
+    turn: "push",
     faiths: ["all"],
     template: "bandhani",
     traditions: [],
@@ -2146,7 +2152,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "kaanch-gumbad": {
     id: "kaanch-gumbad",
     art: "bagh",
-    turn: "fade",
+    turn: "doors",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -2175,7 +2181,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "chalk-pati": {
     id: "chalk-pati",
     art: "bagh",
-    turn: "ripple",
+    turn: "book",
     faiths: ["all"],
     template: "marigold",
     traditions: [],
@@ -2212,7 +2218,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "jadon-ka-pul": {
     id: "jadon-ka-pul",
     art: "bagh",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "emerald",
     traditions: [],
@@ -2241,7 +2247,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "gol-matol": {
     id: "gol-matol",
     art: "bagh",
-    turn: "ripple",
+    turn: "fly",
     faiths: ["all"],
     template: "rose",
     traditions: [],
@@ -2270,7 +2276,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "bhool-bhulaiya": {
     id: "bhool-bhulaiya",
     art: "bagh",
-    turn: "sweep",
+    turn: "doors",
     faiths: ["all"],
     template: "emerald",
     traditions: [],
@@ -2299,7 +2305,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "deco-yatra": {
     id: "deco-yatra",
     art: "savari",
-    turn: "sweep",
+    turn: "book",
     faiths: ["all"],
     template: "monogram",
     traditions: [],
@@ -2357,7 +2363,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   "shatranj-baazi": {
     id: "shatranj-baazi",
     art: "savari",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: "rangmahal",
     traditions: [],
@@ -2385,7 +2391,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
   classic: {
     id: "classic",
     art: "card",
-    turn: "fade",
+    turn: "push",
     faiths: ["all"],
     template: null,
     traditions: ["modern"],

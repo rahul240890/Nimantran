@@ -4752,7 +4752,104 @@
 @keyframes suite-turn-sweep {
   from {
     opacity: 0;
-    transform: translateX(10%);
+    transform: translateX(calc(var(--turn-dir, 1) * 10%));
+  }
+}
+/* --turn-dir is 1 going on and -1 going back, so the turns with a direction reverse on Back */
+@keyframes suite-turn-push {
+  from {
+    transform: translateX(calc(var(--turn-dir, 1) * 100%));
+  }
+}
+@keyframes suite-leave-push {
+  to {
+    transform: translateX(calc(var(--turn-dir, 1) * -28%)) scale(0.94);
+    filter: brightness(0.55);
+  }
+}
+@keyframes suite-turn-fly {
+  from {
+    opacity: 0.3;
+    transform: translate(var(--fly-x), var(--fly-y)) rotate(var(--fly-r)) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+  }
+}
+@keyframes suite-leave-fly {
+  to {
+    transform: scale(0.88);
+    filter: brightness(0.5);
+  }
+}
+@keyframes suite-turn-doors {
+  from {
+    transform: scale(1.06);
+    filter: brightness(0.7);
+  }
+}
+/* The page going out parts down its middle, each half drawing back to its own edge */
+@keyframes suite-leave-doors {
+  from {
+    clip-path: polygon(0 0, 50% 0, 50% 100%, 50% 100%, 50% 0, 100% 0, 100% 100%, 0 100%);
+  }
+  to {
+    clip-path: polygon(0 0, 0 0, 0 100%, 100% 100%, 100% 0, 100% 0, 100% 100%, 0 100%);
+  }
+}
+@keyframes suite-turn-book {
+  from {
+    filter: brightness(0.6);
+  }
+}
+@keyframes suite-leave-book {
+  from {
+    transform: perspective(160cqw) rotateY(0deg);
+  }
+  to {
+    transform: perspective(160cqw) rotateY(calc(var(--turn-dir, 1) * -180deg));
+    filter: brightness(0.4);
+  }
+}
+@keyframes suite-turn-petals {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes suite-petal {
+  to {
+    opacity: 0;
+    transform: translateY(115cqh) rotate(var(--petal-spin, 180deg));
+  }
+}
+@keyframes suite-turn-glow {
+  from {
+    clip-path: circle(0% at var(--turn-x, 50%) var(--turn-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--turn-x, 50%) var(--turn-y, 50%));
+  }
+}
+@keyframes suite-leave-glow {
+  to {
+    filter: brightness(0.4) sepia(0.5);
+  }
+}
+@keyframes suite-glow-light {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.4);
+  }
+  40% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(5);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(30);
   }
 }
 @keyframes suite-turn-ripple {
@@ -4832,6 +4929,66 @@
   }
   .suite-turn-ripple {
     animation: suite-turn-ripple 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  .suite-turn-push {
+    animation: suite-turn-push 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .suite-leave-push {
+    animation: suite-leave-push 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .suite-turn-fly {
+    animation: suite-turn-fly 1s cubic-bezier(0.2, 0.9, 0.25, 1.08) both;
+  }
+  .suite-leave-fly {
+    animation: suite-leave-fly 1s ease-in both;
+  }
+  .suite-turn-doors {
+    animation: suite-turn-doors 1.2s ease-out both;
+  }
+  .suite-leave-doors {
+    animation: suite-leave-doors 1.2s cubic-bezier(0.6, 0, 0.3, 1) both;
+  }
+  .suite-turn-book {
+    animation: suite-turn-book 1.1s ease-out both;
+  }
+  .suite-leave-book {
+    transform-origin: var(--book-hinge, left) center;
+    backface-visibility: hidden;
+    animation: suite-leave-book 1.1s cubic-bezier(0.55, 0.05, 0.35, 1) both;
+  }
+  .suite-turn-petals {
+    animation: suite-turn-petals 1.2s cubic-bezier(0.45, 0, 0.2, 1) both;
+  }
+  .suite-petal {
+    border-radius: 80% 0;
+    opacity: 0.95;
+    animation: suite-petal 1.3s cubic-bezier(0.45, 0, 0.2, 1) both;
+  }
+  .suite-turn-glow {
+    animation: suite-turn-glow 1.1s cubic-bezier(0.5, 0, 0.2, 1) both;
+  }
+  .suite-leave-glow {
+    animation: suite-leave-glow 1.1s ease-in both;
+  }
+  .suite-turn-glow-light {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 9999px;
+    background: radial-gradient(circle, var(--card-ivory), var(--card-gold) 45%, transparent 70%);
+    animation: suite-glow-light 1.1s ease-out both;
+  }
+  /* Still mode never turns a page, but should one start, it only fades */
+  @media (prefers-reduced-motion: reduce) {
+    [class*="suite-turn-"] {
+      animation: suite-turn-fade 0.4s ease-out both;
+    }
+    [class*="suite-leave-"] {
+      animation: none;
+    }
+    .suite-petal,
+    .suite-turn-glow-light {
+      display: none;
+    }
   }
   .suite-drift {
     animation: suite-drift var(--suite-duration, 8s) ease-out both;
