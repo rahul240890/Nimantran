@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
+import { ScrollRow } from "@/components/ui/scroll-row";
 import { cn } from "@/lib/cn";
 import { suiteImage } from "@/lib/gallery/catalog";
 import { COLLECTIONS, COLLECTION_IDS, type CollectionGroup } from "@/lib/gallery/collections";
@@ -52,9 +53,9 @@ export function CollectionTiles({
             <h3 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
               {collectionCopy.groups[group]}
             </h3>
-            <ul
+            <ScrollRow
               className={cn(
-                "relative -mx-4 flex snap-x scroll-px-4 [scrollbar-width:thin] gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:gap-4 lg:overflow-visible lg:px-0",
+                "relative -mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:gap-4 lg:overflow-visible lg:px-0",
                 ids.length > 8 ? "lg:grid-cols-5" : "lg:grid-cols-4",
               )}
             >
@@ -114,7 +115,7 @@ export function CollectionTiles({
                   </li>
                 );
               })}
-            </ul>
+            </ScrollRow>
           </div>
         );
       })}

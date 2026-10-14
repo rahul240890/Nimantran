@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, type ReactNode } from "react";
-import { IconButton } from "@/components/ui/icon-button";
+import type { ReactNode } from "react";
+import { ScrollRow } from "@/components/ui/scroll-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { WEDDING_KINDS, WEDDING_KIND_ENTRIES, suiteImage } from "@/lib/gallery/catalog";
@@ -18,7 +18,6 @@ import {
 import { designPhotos } from "@/lib/gallery/photos";
 import { shelfHref, traditionShelf } from "@/lib/gallery/shelves";
 import type { TemplateId } from "@/lib/templates/ids";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { DesignCard } from "./design-card";
 import { designWords } from "./design-words";
 
@@ -59,7 +58,7 @@ export function CatalogCard({
 /**
  * A row of a few designs that scrolls sideways, with View all for the rest: the way large
  * shops show a big catalogue. The next design peeks in at the edge, so the row reads as
- * one to swipe; on a wider screen arrows scroll it too.
+ * one to swipe; on a wider screen round arrows over its edges scroll it too.
  */
 export function ShelfRow({
   id,
@@ -82,14 +81,6 @@ export function ShelfRow({
   priority: boolean;
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
-  const list = useRef<HTMLUListElement>(null);
-  const still = useReducedMotion();
-  const scroll = (way: 1 | -1) => {
-    const row = list.current;
-    if (!row) return;
-    const rtl = getComputedStyle(row).direction === "rtl" ? -1 : 1;
-    row.scrollBy({ left: way * rtl * row.clientWidth * 0.85, behavior: still ? "auto" : "smooth" });
-  };
   const label = shelfCopy.viewAllLabel(title, total);
 
   return (
@@ -104,22 +95,6 @@ export function ShelfRow({
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">
-          <IconButton
-            label={shelfCopy.back}
-            icon={<ChevronLeft className="rtl:rotate-180" />}
-            size="sm"
-            variant="ghost"
-            onClick={() => scroll(-1)}
-            className="hidden md:inline-flex"
-          />
-          <IconButton
-            label={shelfCopy.next}
-            icon={<ChevronRight className="rtl:rotate-180" />}
-            size="sm"
-            variant="ghost"
-            onClick={() => scroll(1)}
-            className="hidden md:inline-flex"
-          />
           {href && (
             <Link
               href={href}
@@ -132,10 +107,7 @@ export function ShelfRow({
           )}
         </div>
       </div>
-      <ul
-        ref={list}
-        className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 [scrollbar-width:thin] gap-3 overflow-x-auto overscroll-x-contain px-4 pb-3 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:px-0"
-      >
+      <ScrollRow className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:px-0">
         {entries.map((entry, index) => (
           <li
             key={entry.design.id}
@@ -167,7 +139,7 @@ export function ShelfRow({
             </Link>
           </li>
         )}
-      </ul>
+      </ScrollRow>
     </section>
   );
 }
@@ -194,7 +166,7 @@ export function TraditionTiles({
         {shelfCopy.traditionsHeading}
       </Heading>
       {/* A strip of round paintings, as shops head a catalogue with its main kinds */}
-      <ul className="relative -mx-4 flex snap-x scroll-px-4 [scrollbar-width:thin] gap-2 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0">
+      <ScrollRow className="relative -mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0">
         {WEDDING_KINDS.map((kind, index) => {
           const entry = WEDDING_KIND_ENTRIES[kind];
           return (
@@ -227,7 +199,7 @@ export function TraditionTiles({
             </li>
           );
         })}
-      </ul>
+      </ScrollRow>
     </section>
   );
 }

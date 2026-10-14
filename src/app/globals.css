@@ -4393,6 +4393,14 @@
   }
 }
 
+/* A row that scrolls sideways without a scrollbar: swiped on a phone, arrows on a wider screen */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /*
  * Content rises into place as it scrolls into view. Pure CSS (scroll-driven animations):
  * browsers without support, and still mode, simply show it in place.
