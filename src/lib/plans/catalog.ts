@@ -32,8 +32,6 @@ export type Plan = {
   watermark: boolean;
   /** Languages on the card. */
   languages: number;
-  /** The host's own song instead of the design's raga. */
-  ownSong: boolean;
   /** The invitation video, an MP4 to share anywhere (Step 17c). */
   video: VideoAllowance;
   /** Days the guest photo wall stays open after the last function (Step 24); 0 for none. */
@@ -47,7 +45,6 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "free",
     watermark: true,
     languages: 1,
-    ownSong: false,
     video: "none",
     albumDays: 0,
     cohosts: 1,
@@ -56,7 +53,6 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "basic",
     watermark: false,
     languages: 1,
-    ownSong: false,
     video: "none",
     albumDays: 0,
     cohosts: 1,
@@ -65,7 +61,6 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "celebration",
     watermark: false,
     languages: 2,
-    ownSong: true,
     video: "one",
     albumDays: 30,
     cohosts: 3,
@@ -74,7 +69,6 @@ export const PLANS: Record<PlanId, Plan> = {
     id: "grand",
     watermark: false,
     languages: 2,
-    ownSong: true,
     video: "every",
     albumDays: 365,
     cohosts: null,
@@ -160,10 +154,10 @@ export function formatRupees(paise: number): string {
 
 /**
  * Something an invite uses beyond its edition: its design, when it costs more than the
- * tier paid for (`used` is then the design's tier rank), a second card language, or the
- * host's own song.
+ * tier paid for (`used` is then the design's tier rank), or a second card language. The
+ * host's own song comes with every package, Free included (owner, 2026-10-14).
  */
-export type PlanNeed = { limit: "design" | "languages" | "ownSong"; used: number };
+export type PlanNeed = { limit: "design" | "languages"; used: number };
 
 /** What an invite uses that its edition doesn't cover; empty when it fits. */
 export function planShortfalls(
@@ -178,7 +172,6 @@ export function planShortfalls(
   }
   const languages = cardLanguages(draft).length;
   if (languages > plan.languages) needs.push({ limit: "languages", used: languages });
-  if (draft.music.clip && !plan.ownSong) needs.push({ limit: "ownSong", used: 1 });
   return needs;
 }
 

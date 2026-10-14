@@ -870,6 +870,7 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
   readyBodyAccount:
     "यह तस्वीरों समेत आपके खाते में सहेजा गया है। पहले इसे मेहमानों की नज़र से देखें, फिर लिंक पाने के लिए प्रकाशित करें।",
   seeAsGuest: "मेहमानों की नज़र से देखें",
+  watchVideo: "वीडियो में देखें",
   seeAsGuestBody: "पूरा निमंत्रण, पूरी स्क्रीन पर: खुलना, संगीत, हर पेज और जवाब का फ़ॉर्म।",
   notReady: "कुछ ब्योरा बाक़ी है",
   fix: (label) => `${label} पूरा करें`,

@@ -1,6 +1,6 @@
 "use client";
 
-import { Clapperboard, Download, Lock, RotateCcw, Share2, Sparkles, Square } from "lucide-react";
+import { Clapperboard, Download, Globe, RotateCcw, Share2, Sparkles, Square } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,7 @@ import {
 import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
+import { readWatermarkLook, withWatermark } from "@/lib/video/watermark";
 import { openingGod, openingStyle, welcomeKind } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import "@/components/invitation/type/fonts.css";
@@ -60,8 +61,17 @@ type VideoCardProps = {
   url: string;
   slug: string;
   names: string;
-  /** Whether the invite's package includes the video; else where to choose one. */
+  /**
+   * Whether the invite's package includes the video. Without it the host still makes and
+   * watches the whole video, with the mark across it, and `upgradeHref` gets the clean one.
+   */
   allowed: boolean;
+  /**
+   * Whether the invite is live. Before publishing the video is only watched here, since its
+   * last card carries the link; `publishHref` publishes it.
+   */
+  published?: boolean;
+  publishHref?: string;
   /** Whether the package also makes a video for each function on its own (Grand). */
   perFunction?: boolean;
   upgradeHref: string;
@@ -87,7 +97,11 @@ const TEST_CODECS = { video: "vp9", audio: "opus" } as const;
  */
 export function VideoCard(props: VideoCardProps) {
   const { videoCopy } = useText(publishText);
-  const { draft, photos, url, slug, names, allowed, upgradeHref, testCodecs } = props;
+  const { draft, photos, url, slug, names, allowed, testCodecs } = props;
+  const published = props.published ?? true;
+  // Downloaded and shared only clean and with the real link; otherwise watched here
+  const clean = allowed && published;
+  const marked = !allowed;
   // Grand makes a video of one function too: its own date, time and place
   const [only, setOnly] = useState<string>(ALL);
   const perFunction = Boolean(props.perFunction) && props.functions.length > 1;
@@ -105,7 +119,7 @@ export function VideoCard(props: VideoCardProps) {
   const silent = support === "silent";
   const poster = useRef<HTMLCanvasElement>(null);
   // The video for this invitation and choice, kept while making and saved once made
-  const key = `${slug}:${perFunction ? only : ALL}`;
+  const key = `${slug}:${perFunction ? only : ALL}${marked ? ":preview" : ""}`;
   const kept = useSyncExternalStore(
     subscribeVideos,
     () => keptVideo(key),
@@ -159,7 +173,10 @@ export function VideoCard(props: VideoCardProps) {
     try {
       await makeKept(key, made, async (onProgress, signal) => {
         const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
-        return makeVideo(ready.film, withMusic, onProgress, signal, codecs);
+        const film = marked
+          ? withWatermark(ready.film, videoCopy.mark, readWatermarkLook())
+          : ready.film;
+        return makeVideo(film, withMusic, onProgress, signal, codecs);
       });
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
@@ -177,11 +194,11 @@ export function VideoCard(props: VideoCardProps) {
   const stale = state.step === "ready" && state.look !== made;
   const file = useMemo(
     () =>
-      state.step === "ready"
+      state.step === "ready" && clean
         ? new File([state.blob], videoCopy.fileName(slug), { type: "video/mp4" })
         : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.step === "ready" ? state.blob : null, slug, videoCopy],
+    [state.step === "ready" ? state.blob : null, clean, slug, videoCopy],
   );
   const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
 
@@ -212,6 +229,8 @@ export function VideoCard(props: VideoCardProps) {
             <video
               src={state.href}
               controls
+              // A preview is watched here; the clean one downloads from the button
+              controlsList={clean ? undefined : "nodownload"}
               playsInline
               aria-label={videoCopy.player(names)}
               className="size-full object-cover"
@@ -226,9 +245,9 @@ export function VideoCard(props: VideoCardProps) {
               className="size-full"
             />
           )}
-          {!allowed && (
-            <span className="absolute inset-0 grid place-items-center bg-night/45">
-              <Lock aria-hidden className="size-8 text-card-ivory" />
+          {marked && (
+            <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-night/65 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.18em] text-card-ivory uppercase">
+              {videoCopy.preview}
             </span>
           )}
         </div>
@@ -247,17 +266,7 @@ export function VideoCard(props: VideoCardProps) {
               />
             </Field>
           )}
-          {!allowed ? (
-            <>
-              <p className="text-sm font-semibold">{videoCopy.locked}</p>
-              <Button asChild className="self-start">
-                <Link href={upgradeHref}>
-                  <Sparkles aria-hidden />
-                  {videoCopy.upgrade}
-                </Link>
-              </Button>
-            </>
-          ) : state.step === "unsupported" ? (
+          {state.step === "unsupported" ? (
             <p role="status" className="text-sm text-ink-muted">
               {videoCopy.unsupported}
             </p>
@@ -295,20 +304,23 @@ export function VideoCard(props: VideoCardProps) {
                 {videoCopy.ready}
               </p>
               {stale && <p className="text-sm text-ink-muted">{videoCopy.changed}</p>}
+              {!clean && <Unlock {...props} marked={marked} />}
               <div className="flex flex-wrap gap-3">
                 {sharable && (
                   <Button leadingIcon={<Share2 aria-hidden />} onClick={() => void share()}>
                     {videoCopy.share}
                   </Button>
                 )}
-                <Button asChild variant={sharable ? "secondary" : "primary"}>
-                  <a href={state.href} download={videoCopy.fileName(slug)}>
-                    <Download aria-hidden />
-                    {videoCopy.download}
-                  </a>
-                </Button>
+                {clean && (
+                  <Button asChild variant={sharable ? "secondary" : "primary"}>
+                    <a href={state.href} download={videoCopy.fileName(slug)}>
+                      <Download aria-hidden />
+                      {videoCopy.download}
+                    </a>
+                  </Button>
+                )}
                 <Button
-                  variant={stale ? "secondary" : "ghost"}
+                  variant={stale || !clean ? "secondary" : "ghost"}
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={() => void make()}
                 >
@@ -328,13 +340,42 @@ export function VideoCard(props: VideoCardProps) {
                 leadingIcon={<Clapperboard aria-hidden />}
                 onClick={() => void make()}
               >
-                {videoCopy.make}
+                {marked ? videoCopy.makePreview : videoCopy.make}
               </Button>
+              {!clean && <Unlock {...props} marked={marked} />}
             </div>
           )}
         </div>
       </div>
     </Card>
+  );
+}
+
+/**
+ * Why a video isn't to download yet, and the way to the clean one: a package for a preview
+ * with the mark, or publishing for an invite not yet live.
+ */
+function Unlock({
+  marked,
+  upgradeHref,
+  publishHref,
+}: Pick<VideoCardProps, "upgradeHref" | "publishHref"> & { marked: boolean }) {
+  const { videoCopy } = useText(publishText);
+  const href = marked ? upgradeHref : publishHref;
+  return (
+    <div className="flex flex-col gap-3 rounded-md border border-marigold/45 bg-marigold/10 p-4">
+      <p className="text-sm text-ink-muted">
+        {marked ? videoCopy.previewNote : videoCopy.draftNote}
+      </p>
+      {href && (
+        <Button asChild variant="secondary" size="sm" className="self-start">
+          <Link href={href}>
+            {marked ? <Sparkles aria-hidden /> : <Globe aria-hidden />}
+            {marked ? videoCopy.upgrade : videoCopy.publish}
+          </Link>
+        </Button>
+      )}
+    </div>
   );
 }
 

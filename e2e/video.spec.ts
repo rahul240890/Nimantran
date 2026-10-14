@@ -6,6 +6,27 @@ import { axe, noOverflow, numberFor, publish, writeInvite } from "./invite-helpe
 test.describe("invitation video", () => {
   test.use({ reducedMotion: "reduce" });
 
+  test("a host watches the video before publishing", async ({ page }, info) => {
+    await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
+    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
+    const card = page.locator("[data-video-card]");
+    await expect(card.getByRole("heading", { name: "Invitation video" })).toBeVisible();
+    await expect(card.getByRole("img", { name: "The video's first moment" })).toBeVisible();
+    // Not live yet: watched here, and downloaded once published with its link
+    await expect(card.getByText("Publish your invitation to download")).toBeVisible();
+    await expect(card.getByRole("link", { name: "Publish your invitation" })).toBeVisible();
+    await expect(card.getByRole("link", { name: "Download MP4" })).toHaveCount(0);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    const shots = process.env.VIDEO_SHOTS;
+    if (shots) {
+      await page.screenshot({ path: `${shots}/video-page-${info.project.name}-light.png` });
+      await page.emulateMedia({ colorScheme: "dark" });
+      await page.screenshot({ path: `${shots}/video-page-${info.project.name}-dark.png` });
+    }
+  });
+
   test("a host makes the video from the share page", async ({ page }, info) => {
     // Open-source Chromium encodes in software, far slower than a phone's hardware
     test.setTimeout(480_000);

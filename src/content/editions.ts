@@ -24,6 +24,7 @@ export const planCopy = {
       "Every function, with replies and the guest list",
       "Your own link and QR code",
       "Edit any time until the event",
+      "Your own song",
       "1 card language",
     ],
   },
@@ -34,7 +35,6 @@ export const planCopy = {
       "Everything in Basic",
       "An invitation video to share anywhere",
       "2 card languages",
-      "Your own song",
       "Guest photo wall for 30 days",
       "3 co-hosts",
     ],
@@ -99,6 +99,8 @@ export const upgradeCopy = {
   paymentId: "Payment",
   back: "Back to the invite",
   backToEditor: "Back to your invite",
+  videoFirst: "Make your invitation video for free and watch it before you choose.",
+  videoFirstLink: "Watch your video",
   secure: "Paid securely through Razorpay: UPI, cards and netbanking.",
   previewCheckout: {
     title: "Test payment",
@@ -133,7 +135,6 @@ export const limitCopy = {
   body: (plan: string) => `To publish it as it is, choose ${plan}.`,
   used: {
     languages: (count: number) => `${count} card languages`,
-    ownSong: () => "Your own song",
     /** The design's tier, by its place in the list (1 Premium, 2 Royal, 3 Signature). */
     design: (rank: number) => `A ${TIER_NAMES[rank] ?? "Premium"} design`,
   } satisfies Record<PlanNeed["limit"], (count: number) => string>,

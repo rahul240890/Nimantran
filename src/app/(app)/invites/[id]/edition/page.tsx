@@ -1,4 +1,12 @@
-import { ArrowLeft, FileText, Globe, PartyPopper, ReceiptText, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Clapperboard,
+  FileText,
+  Globe,
+  PartyPopper,
+  ReceiptText,
+  Users,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -13,7 +21,7 @@ import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { checkoutCoupons } from "@/lib/payments/coupons";
-import { formatRupees, isPlanId, planNeeded, planShortfalls } from "@/lib/plans/catalog";
+import { formatRupees, isPlanId, PLANS, planNeeded, planShortfalls } from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { pricesFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
@@ -123,6 +131,16 @@ export default async function EditionPage({
                   <Globe aria-hidden />
                   {upgradeCopy.publishNow}
                 </Link>
+              </Button>
+            </div>
+          )}
+          {/* Watching the video first is the best reason to choose a package with it */}
+          {active && !draft.slug && PLANS[current.plan].video === "none" && (
+            <div className="flex max-w-2xl flex-col gap-3 rounded-lg border border-line bg-surface-2 p-5 sm:flex-row sm:items-center">
+              <Clapperboard aria-hidden className="size-6 shrink-0 text-accent-text" />
+              <p className="flex-1 text-sm text-ink-muted">{upgradeCopy.videoFirst}</p>
+              <Button asChild variant="secondary" size="sm">
+                <Link href={`/invites/${id}/video`}>{upgradeCopy.videoFirstLink}</Link>
               </Button>
             </div>
           )}
