@@ -111,8 +111,8 @@ test.describe("pages for payments", () => {
     await page.goto("/pricing");
     for (const [name, price] of [
       ["Basic", "₹499"],
-      ["Celebration", "₹999"],
-      ["Grand", "₹1,999"],
+      ["Celebration", "₹899"],
+      ["Grand", "₹1,099"],
     ] as const) {
       const plan = page.getByRole("article", { name, exact: true });
       await expect(plan.getByText(price, { exact: true })).toBeVisible();

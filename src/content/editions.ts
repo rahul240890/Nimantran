@@ -33,7 +33,7 @@ export const planCopy = {
     bestFor: "Most weddings and big birthdays",
     highlights: [
       "Everything in Basic",
-      "An invitation video to share anywhere",
+      "WhatsApp video of your invitation, for Status and Reels",
       "2 card languages",
       "Guest photo wall for 30 days",
       "3 co-hosts",
@@ -44,7 +44,7 @@ export const planCopy = {
     bestFor: "Big multi-day weddings",
     highlights: [
       "Everything in Celebration",
-      "A video for every function",
+      "WhatsApp video of your invitation, and one for every function",
       "Guest photo wall for a year",
       "As many co-hosts as you like",
       "Priority help from our team",
@@ -55,6 +55,12 @@ export const planCopy = {
 /** The invites line on each package: guests by personal link or the open link. */
 export const invitesLine = (count: number | null) =>
   count === null ? "Unlimited invites" : `${count.toLocaleString("en-IN")} invites by link`;
+
+/** The invites count on each package card, large: the number, then what it counts. */
+export const invitesCount = (count: number | null) =>
+  count === null
+    ? { value: "Unlimited", label: "invites" }
+    : { value: count.toLocaleString("en-IN"), label: "invites by link" };
 
 export const upgradeCopy = {
   metaTitle: "Choose your package",
@@ -101,6 +107,14 @@ export const upgradeCopy = {
   backToEditor: "Back to your invite",
   videoFirst: "Make your invitation video for free and watch it before you choose.",
   videoFirstLink: "Watch your video",
+  video: {
+    title: "WhatsApp video included",
+    body: "Make a free preview of your invitation video right here, then watch it full screen.",
+    make: "Make video preview",
+    ready: "Your preview is ready",
+    fullScreen: "Watch the video full screen",
+    fullScreenShort: "Full screen",
+  },
   secure: "Paid securely through Razorpay: UPI, cards and netbanking.",
   previewCheckout: {
     title: "Test payment",

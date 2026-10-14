@@ -58,9 +58,9 @@ const FREE = { plan: "free", tier: "free" } as const;
 describe("prices", () => {
   it("are the plain package price without coupons", () => {
     expect(priceFor(FREE, "grand", "premium", [], null, now)).toEqual({
-      listPaise: 1_99_900,
+      listPaise: 1_09_900,
       discountPaise: 0,
-      amountPaise: 1_99_900,
+      amountPaise: 1_09_900,
       coupon: null,
     });
     expect(
@@ -84,7 +84,7 @@ describe("prices", () => {
     ];
     const price = priceFor(FREE, "grand", "premium", coupons, null, now)!;
     expect(price.coupon).toMatchObject({ code: "BIG", auto: true });
-    expect(price.amountPaise).toBe(1_59_900);
+    expect(price.amountPaise).toBe(87_900);
   });
 
   it("cover every package above the current one", () => {

@@ -1,10 +1,11 @@
 "use client";
 
-import { Check, Globe, LockOpen, ShieldCheck, Sparkles } from "lucide-react";
+import { Check, Globe, LockOpen, ShieldCheck, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { beginCheckout, finishCheckout, tryCoupon } from "@/actions/checkout";
+import { PackageVideo, type PackageVideoProps } from "@/components/publish/video-card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import type { Price } from "@/lib/plans/offers";
@@ -83,6 +84,8 @@ export type EditionPickerProps = {
   pricing: Pick<Pricing, "designs" | "packages" | "invites">;
   /** Back to the editor to publish, when the host came from its Publish button. */
   publishHref: string | null;
+  /** The invitation video to preview on the Celebration card, made right there. */
+  video?: PackageVideoProps | null;
 };
 
 type Pending = { plan: PaidPlanId; stage: "opening" | "checking" } | null;
@@ -100,8 +103,9 @@ export function EditionPicker({
   prices: offerPrices,
   pricing,
   publishHref,
+  video = null,
 }: EditionPickerProps) {
-  const { upgradeCopy, planCopy, invitesLine } = useText(editionsText);
+  const { upgradeCopy, planCopy, invitesCount } = useText(editionsText);
   const router = useRouter();
   const [coupon, setCoupon] = useState<{
     code: string;
@@ -210,7 +214,7 @@ export function EditionPicker({
           const highlighted = pointAt === id && price !== null;
           const popular = id === "celebration";
           const busy = pending?.plan === id;
-          const invites = inviteLimit(freeBasic ? "free" : id, pricing);
+          const invites = invitesCount(inviteLimit(freeBasic ? "free" : id, pricing));
           return (
             <li key={id} className="flex">
               <article
@@ -277,15 +281,35 @@ export function EditionPicker({
                     </p>
                   )}
                 </div>
+                {/* How many guests it invites: what sets the three packages apart */}
+                <p
+                  className={cn(
+                    "flex items-center gap-3 rounded-md border px-3 py-2",
+                    id === "basic"
+                      ? "border-line bg-surface-2"
+                      : "border-marigold-edge bg-marigold/10",
+                  )}
+                >
+                  <Users aria-hidden className="size-5 shrink-0 text-accent-text" />
+                  <span className="flex flex-wrap items-baseline gap-x-1.5">
+                    <span className="font-display text-2xl leading-none tabular-nums">
+                      {invites.value}
+                    </span>
+                    <span className="text-sm text-ink-muted">{invites.label}</span>
+                  </span>
+                </p>
+                {id === "celebration" && video && <PackageVideo {...video} />}
                 <ul className="flex flex-1 flex-col gap-2 text-sm">
-                  {[invitesLine(invites), ...copy.highlights].map((line, index) => (
+                  {copy.highlights.map((line, index) => (
                     <li key={line} className="flex items-start gap-2">
                       <Check
                         aria-hidden
                         className="mt-0.5 size-4 shrink-0 text-accent-text"
                         strokeWidth={2.5}
                       />
-                      <span className={cn(index === 0 && "font-semibold")}>{line}</span>
+                      <span className={cn(id !== "basic" && index === 1 && "font-semibold")}>
+                        {line}
+                      </span>
                     </li>
                   ))}
                 </ul>

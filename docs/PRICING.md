@@ -28,26 +28,27 @@ Principles:
 
 Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹799) or Signature (default ₹799). Until the admin changes a design, 3D cards are Free, every Scene and moving scene is Premium (₹499) and every Story is Royal (₹799) (owner, 2026-10-12). Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
 
-|                                       | Free                    | Basic                      | Celebration (most chosen) | Grand               |
-| ------------------------------------- | ----------------------- | -------------------------- | ------------------------- | ------------------- |
-| **Price (India, incl. GST)**          | ₹0, free designs only   | **The design's price**     | **Design + ₹500**         | **Design + ₹1,500** |
-| On a ₹499 design                      | —                       | ₹499                       | ₹999                      | ₹1,999              |
-| On a ₹799 design                      | —                       | ₹799                       | ₹1,299                    | ₹2,299              |
-| On a free design                      | ₹0                      | ₹0 (same as Free, no mark) | ₹500                      | ₹1,500              |
-| Watermark                             | Small “Made with Shubh” | No                         | No                        | No                  |
-| Invites by link (guests + open link)  | 50                      | 50                         | 500                       | Unlimited           |
-| Functions, RSVP, guest list, own link | Every function          | Every function             | Every function            | Every function      |
-| Card languages                        | 1                       | 1                          | 2                         | 2                   |
-| Own song                              | Yes                     | Yes                        | Yes                       | Yes                 |
-| WhatsApp Status and Reels video       | —                       | —                          | One video                 | One per function    |
-| Guest photo wall                      | —                       | —                          | 30 days                   | 1 year              |
-| Co-hosts                              | 1                       | 1                          | 3                         | Unlimited           |
+|                                       | Free                    | Basic                      | Celebration (most chosen) | Grand             |
+| ------------------------------------- | ----------------------- | -------------------------- | ------------------------- | ----------------- |
+| **Price (India, incl. GST)**          | ₹0, free designs only   | **The design's price**     | **Design + ₹400**         | **Design + ₹600** |
+| On a ₹499 design                      | —                       | ₹499                       | ₹899                      | ₹1,099            |
+| On a ₹799 design                      | —                       | ₹799                       | ₹1,199                    | ₹1,399            |
+| On a free design                      | ₹0                      | ₹0 (same as Free, no mark) | ₹400                      | ₹600              |
+| Watermark                             | Small “Made with Shubh” | No                         | No                        | No                |
+| Invites by link (guests + open link)  | 100                     | 100                        | 500                       | Unlimited         |
+| Functions, RSVP, guest list, own link | Every function          | Every function             | Every function            | Every function    |
+| Card languages                        | 1                       | 1                          | 2                         | 2                 |
+| Own song                              | Yes                     | Yes                        | Yes                       | Yes               |
+| WhatsApp Status and Reels video       | —                       | —                          | One video                 | One per function  |
+| Guest photo wall                      | —                       | —                          | 30 days                   | 1 year            |
+| Co-hosts                              | 1                       | 1                          | 3                         | Unlimited         |
 
 Rules:
 
 - **Full preview, then pay, then publish.** The editor's last step shows the invite as guests will see it (`/invites/<id>/preview`). Publishing a Free invite while checkout is on opens the packages first; a free design can continue free from the Basic card.
 - **Upgrades pay the difference** between packages, and between designs when a paid invite moves to a dearer one.
 - An invite remembers the design tier it was bought on (`event_plans.design_tier`), so its package price stays fair if the admin later changes the design's tier.
+- **Package prices and invites** (owner, 2026-10-14): Celebration adds ₹400 and Grand ₹600 (were ₹500 and ₹1,500), and Basic invites 100 guests (was 50). The WhatsApp video and the invite count are what sell Celebration and Grand, so each card shows its invite count large, and the Celebration card makes the video preview right there, with a full-screen button. Saved prices are updated with `supabase-update-package-prices.sql` in the project files.
 - **Own song in every package** (owner, 2026-10-14): Free and Basic play the host's own clip too, so nobody has to remove a song they chose to publish.
 - **Video preview for everyone** (owner, 2026-10-14): any host makes the invitation video and watches it free, from the editor's last step (`/invites/<id>/video`) or the share page. Without Celebration or Grand it carries a "Made with Shubh" mark across the middle and can't be downloaded or shared; with them it downloads clean once the invite is live, since its last card carries the link.
 - Not in any package yet, because they are not built: save-the-date and thank-you cards, PDF and printable QR. Add them to Grand when they exist.

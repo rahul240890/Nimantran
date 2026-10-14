@@ -27,6 +27,51 @@ test.describe("invitation video", () => {
     }
   });
 
+  test("the Celebration package makes the video preview right on its card", async ({
+    page,
+    context,
+  }, info) => {
+    await context.addCookies([
+      { name: "shubh-preview-checkout", value: "on", url: info.project.use.baseURL! },
+    ]);
+    await writeInvite(page, numberFor(info), ["Ishaan", "Riya"]);
+    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
+    const id = new URL(page.url()).pathname.split("/")[2];
+    await page.goto(`/invites/${id}/edition`);
+    const counts = [
+      ["Basic", "100"],
+      ["Celebration", "500"],
+      ["Grand", "Unlimited"],
+    ] as const;
+    for (const [name, count] of counts) {
+      const plan = page.getByRole("article", { name, exact: true });
+      await expect(plan.getByText(count, { exact: true })).toBeVisible();
+    }
+    const celebration = page.getByRole("article", { name: "Celebration", exact: true });
+    const video = celebration.getByRole("region", { name: "WhatsApp video included" });
+    await expect(video.getByRole("img", { name: "The video's first moment" })).toBeVisible();
+    const unsupported = video.getByText("This browser can't make videos.", { exact: false });
+    await expect(
+      video.getByRole("button", { name: "Make video preview" }).or(unsupported),
+    ).toBeVisible();
+    await expect(page.getByRole("article", { name: "Grand" }).getByRole("region")).toHaveCount(0);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    const shots = process.env.VIDEO_SHOTS;
+    if (shots) {
+      await page.screenshot({
+        path: `${shots}/packages-${info.project.name}-light.png`,
+        fullPage: true,
+      });
+      await page.emulateMedia({ colorScheme: "dark" });
+      await page.screenshot({
+        path: `${shots}/packages-${info.project.name}-dark.png`,
+        fullPage: true,
+      });
+    }
+  });
+
   test("a host makes the video from the share page", async ({ page }, info) => {
     // Open-source Chromium encodes in software, far slower than a phone's hardware
     test.setTimeout(480_000);
