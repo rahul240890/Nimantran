@@ -46,7 +46,14 @@ import {
   type TypeRole,
   type Voice,
 } from "@/lib/suites/lettering";
-import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import {
+  SUITES,
+  hasGodAtTop,
+  paintedTone,
+  pageLook,
+  type PageTurn,
+  type SuiteId,
+} from "@/lib/suites/catalog";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
 import { revealFor } from "@/lib/suites/reveal";
@@ -123,12 +130,35 @@ const LINE_COLOUR: Record<TypeRole, string> = {
   label: "text-card-gold-text",
 };
 
-const TURN_CLASS = {
+/* The page coming in, and (for turns that move it) the page going out */
+const TURN_CLASS: Record<PageTurn, string> = {
   fade: "suite-turn-fade",
   arch: "suite-turn-arch",
   sweep: "suite-turn-sweep",
   ripple: "suite-turn-ripple",
-} as const;
+  push: "suite-turn-push",
+  fly: "suite-turn-fly",
+  doors: "suite-turn-doors",
+  book: "suite-turn-book",
+  petals: "suite-turn-petals",
+  glow: "suite-turn-glow",
+};
+const LEAVE_CLASS: Partial<Record<PageTurn, string>> = {
+  push: "suite-leave-push",
+  fly: "suite-leave-fly",
+  doors: "suite-leave-doors",
+  book: "suite-leave-book",
+  glow: "suite-leave-glow",
+};
+/** The page going out stays over the new one while it opens (doors) or turns over (book). */
+const LEAVES_ON_TOP: readonly PageTurn[] = ["doors", "book"];
+/** Where each page flies in from, by its place in the story: right, below, left, above. */
+const FLY_FROM = [
+  ["70%", "10%", "8deg"],
+  ["0%", "80%", "-6deg"],
+  ["-70%", "-5%", "-9deg"],
+  ["5%", "-80%", "5deg"],
+] as const;
 /** How long the page underneath stays while the next one turns over it. */
 const TURN_MS = 1300;
 /** A press held this long pauses the pages, as in a reel; letting go carries on. */
@@ -178,10 +208,13 @@ export function StoryPlayer({
     [onDoneProp],
   );
 
-  const [turn, setTurn] = useState<{ index: number; from: number | null }>({
-    index: 0,
-    from: null,
-  });
+  // `forward` says which way the guest went, and `at` where they tapped (as % of the page)
+  const [turn, setTurn] = useState<{
+    index: number;
+    from: number | null;
+    forward: boolean;
+    at: { x: number; y: number } | null;
+  }>({ index: 0, from: null, forward: true, at: null });
   const index = turn.index;
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -191,19 +224,22 @@ export function StoryPlayer({
   const running = !still && !paused && !hidden && !held;
 
   const go = useCallback(
-    (to: number) =>
+    (to: number, at: { x: number; y: number } | null = null) =>
       setTurn((t) =>
         to === t.index || to < 0 || to >= beats.length
           ? t
-          : { index: to, from: still ? null : t.index },
+          : { index: to, from: still ? null : t.index, forward: to > t.index, at },
       ),
     [beats.length, still],
   );
-  const next = useCallback(() => {
-    if (last) (onCarryOn ?? onDone)();
-    else go(index + 1);
-  }, [last, onDone, onCarryOn, go, index]);
-  const previous = useCallback(() => go(index - 1), [go, index]);
+  const next = useCallback(
+    (at?: { x: number; y: number }) => {
+      if (last) (onCarryOn ?? onDone)();
+      else go(index + 1, at);
+    },
+    [last, onDone, onCarryOn, go, index],
+  );
+  const previous = useCallback((at?: { x: number; y: number }) => go(index - 1, at), [go, index]);
 
   // The page underneath goes once the new one has turned over it
   useEffect(() => {
@@ -282,6 +318,19 @@ export function StoryPlayer({
   const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
   const look = pageLook(beat.scene);
   const pages = turn.from !== null && beats[turn.from] ? [turn.from, index] : [index];
+  const turning = pages.length > 1;
+  // Which way the page moves on screen: on with the reading direction, or back against it
+  const dir = turn.forward !== rtl ? 1 : -1;
+  const [flyX, flyY, flyR] = FLY_FROM[index % FLY_FROM.length]!;
+  const turnStyle = {
+    "--turn-dir": dir,
+    "--turn-x": `${turn.at?.x ?? 50}%`,
+    "--turn-y": `${turn.at?.y ?? 50}%`,
+    "--book-hinge": dir > 0 ? "left" : "right",
+    "--fly-x": dir > 0 ? flyX : `calc(${flyX} * -1)`,
+    "--fly-y": flyY,
+    "--fly-r": flyR,
+  } as CSSProperties;
 
   return createPortal(
     <section
@@ -335,6 +384,7 @@ export function StoryPlayer({
 
       <div
         className="[container-type:size] relative h-full w-full overflow-hidden select-none [-webkit-touch-callout:none] md:max-w-[min(100%,calc(100dvh*768/1365))] md:shadow-overlay"
+        style={turnStyle}
         onPointerDown={(event) => {
           swipe.current = { x: event.clientX, y: event.clientY, swiped: false };
           if ((event.target as HTMLElement).closest("button, a") || still) return;
@@ -372,8 +422,12 @@ export function StoryPlayer({
           if ((event.target as HTMLElement).closest("button, a")) return;
           const box = event.currentTarget.getBoundingClientRect();
           const fromStart = rtl ? box.right - event.clientX : event.clientX - box.left;
-          if (fromStart < box.width / 3) previous();
-          else next();
+          const at = {
+            x: ((event.clientX - box.left) / box.width) * 100,
+            y: ((event.clientY - box.top) / box.height) * 100,
+          };
+          if (fromStart < box.width / 3) previous(at);
+          else next(at);
         }}
       >
         {pages.map((i) => {
@@ -395,12 +449,21 @@ export function StoryPlayer({
               inert={!current}
               lang={lang}
               className={cn(
-                current && pages.length > 1 && TURN_CLASS[suite.turn],
+                turning && (current ? TURN_CLASS[suite.turn] : LEAVE_CLASS[suite.turn]),
                 !current && "pointer-events-none",
+                !current && LEAVES_ON_TOP.includes(suite.turn) && "z-[2]",
               )}
             />
           );
         })}
+        {turning && suite.turn === "petals" && <PetalShower key={`petals-${index}`} />}
+        {turning && suite.turn === "glow" && (
+          <span
+            key={`glow-${index}`}
+            aria-hidden
+            className="suite-turn-glow-light pointer-events-none absolute top-(--turn-y) left-(--turn-x) z-[3]"
+          />
+        )}
 
         {/* One bar per page: done, showing, or still to come */}
         <div
@@ -480,7 +543,7 @@ export function StoryPlayer({
         <PageArrow
           side="start"
           label={labels.previous}
-          onClick={previous}
+          onClick={() => previous()}
           hidden={index === 0}
           shown={still}
           className="lg:hidden"
@@ -488,7 +551,7 @@ export function StoryPlayer({
         <PageArrow
           side="end"
           label={labels.next}
-          onClick={next}
+          onClick={() => next()}
           hidden={last}
           shown={still}
           className="lg:hidden"
@@ -500,15 +563,51 @@ export function StoryPlayer({
         <PageArrow
           side="start"
           label={labels.previous}
-          onClick={previous}
+          onClick={() => previous()}
           hidden={index === 0}
           shown
           outside
         />
-        <PageArrow side="end" label={labels.next} onClick={next} hidden={last} shown outside />
+        <PageArrow
+          side="end"
+          label={labels.next}
+          onClick={() => next()}
+          hidden={last}
+          shown
+          outside
+        />
       </div>
     </section>,
     document.body,
+  );
+}
+
+/* Petals scattered evenly across the page, each with its own drift, spin and start */
+const PETALS = Array.from({ length: 28 }, (_, i) => ({
+  left: (i * 37) % 100,
+  delay: ((i * 53) % 45) / 100,
+  spin: ((i * 97) % 540) - 270,
+  tone: ["bg-card-accent", "bg-card-gold", "bg-card-ivory"][i % 3]!,
+}));
+
+/** The petal turn: a shower falls over the page while the next one is revealed behind it. */
+function PetalShower() {
+  return (
+    <span aria-hidden className="pointer-events-none absolute inset-0 z-[3] overflow-hidden">
+      {PETALS.map((petal, i) => (
+        <span
+          key={i}
+          className={cn("suite-petal absolute -top-[6%] h-[1.6cqmin] w-[2.4cqmin]", petal.tone)}
+          style={
+            {
+              left: `${petal.left}%`,
+              animationDelay: `${petal.delay}s`,
+              "--petal-spin": `${petal.spin}deg`,
+            } as CSSProperties
+          }
+        />
+      ))}
+    </span>
   );
 }
 

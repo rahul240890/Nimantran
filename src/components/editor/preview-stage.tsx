@@ -29,6 +29,7 @@ import { OneScene } from "@/components/invitation/scene/one-scene";
 import { scenePage } from "@/lib/suites/scene";
 import { PagePreview } from "./page-preview";
 import { AiWording } from "./ai-wording";
+import { AI_SHOWN } from "@/lib/ai/shown";
 import { PageWords } from "./page-words";
 import type { FunctionId } from "@/lib/events/functions";
 import type { StepProps } from "./steps/types";
@@ -231,14 +232,16 @@ export function PreviewStage({
                 textBox={textBox}
                 type={type}
               />
-              <AiWording
-                draft={draft}
-                update={update}
-                beats={beats}
-                page={listed[shownIndex]!}
-                pageName={pageName(listed[shownIndex]!.id)}
-                language={language}
-              />
+              {AI_SHOWN && (
+                <AiWording
+                  draft={draft}
+                  update={update}
+                  beats={beats}
+                  page={listed[shownIndex]!}
+                  pageName={pageName(listed[shownIndex]!.id)}
+                  language={language}
+                />
+              )}
             </div>
           )}
         </PagePreview>

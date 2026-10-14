@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
+import { AI_SHOWN } from "@/lib/ai/shown";
 import type { CardLanguage, InviteDraft } from "@/lib/editor/draft";
 import {
   ALIGNS,
@@ -152,17 +153,21 @@ export function PageWords(props: PageWordsProps) {
                 <p role="status" className="text-sm text-ink">
                   {t.overflow}
                 </p>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  className="self-start"
-                  loading={wording.pending}
-                  onClick={() => wording.ask([shown], language, "traditional", "shorten")}
-                >
-                  <Sparkles aria-hidden />
-                  {aiCopy.shorten}
-                </Button>
-                <WordingStatus wording={wording} />
+                {AI_SHOWN && (
+                  <>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="self-start"
+                      loading={wording.pending}
+                      onClick={() => wording.ask([shown], language, "traditional", "shorten")}
+                    >
+                      <Sparkles aria-hidden />
+                      {aiCopy.shorten}
+                    </Button>
+                    <WordingStatus wording={wording} />
+                  </>
+                )}
               </div>
             )}
 
