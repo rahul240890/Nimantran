@@ -55,7 +55,13 @@ test.describe("invitation video", () => {
     await expect(
       video.getByRole("button", { name: "Make video preview" }).or(unsupported),
     ).toBeVisible();
-    await expect(page.getByRole("article", { name: "Grand" }).getByRole("region")).toHaveCount(0);
+    // Grand has the video too; Basic doesn't
+    await expect(
+      page.getByRole("article", { name: "Grand" }).getByRole("region", {
+        name: "WhatsApp video included",
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole("article", { name: "Basic" }).getByRole("region")).toHaveCount(0);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     const shots = process.env.VIDEO_SHOTS;

@@ -140,6 +140,13 @@ export function draftShowsScene(draft: InviteDraft): boolean {
   return (draft.format === "scene" || isSceneTheme(suite)) && hasScene(suite);
 }
 
+/** The theme a video is made in: "kayal", "kayal-scene" or "card-marigold". */
+export function videoDesign(draft: InviteDraft): string {
+  const suite = draftSuite(draft);
+  if (suite === "classic") return `card-${draft.templateId}`;
+  return draftShowsScene(draft) ? `${suite}-scene` : suite;
+}
+
 /** Whether the pages open with the theme's painted god: when it has one and the host keeps it. */
 export function draftBlessing(draft: InviteDraft): boolean {
   return draft.blessingPage && hasBlessingPage(draftSuite(draft));

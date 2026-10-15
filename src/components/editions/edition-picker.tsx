@@ -298,7 +298,8 @@ export function EditionPicker({
                     <span className="text-sm text-ink-muted">{invites.label}</span>
                   </span>
                 </p>
-                {id === "celebration" && video && <PackageVideo {...video} />}
+                {/* The video is what Celebration and Grand add: both show it, made right here */}
+                {id !== "basic" && video && <PackageVideo {...video} />}
                 <ul className="flex flex-1 flex-col gap-2 text-sm">
                   {copy.highlights.map((line, index) => (
                     <li key={line} className="flex items-start gap-2">
