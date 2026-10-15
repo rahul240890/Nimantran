@@ -20,6 +20,7 @@ import {
   PAGE_W,
   SCALE,
   drawEnding,
+  drawPlaceMark,
   drawMotes,
   drawFittedPhoto,
   fillWith,
@@ -214,7 +215,9 @@ type Row = {
   glow?: string;
 };
 type RuleRow = { kind: "rule"; width: number; gap: number; colour: string };
-type Block = Row | RuleRow;
+/** The small mark between a function's day and its place, `em` across as on the live page. */
+type MarkRow = { kind: "mark"; em: number; gap: number; colour: string };
+type Block = Row | RuleRow | MarkRow;
 
 function textRow(
   ctx: CanvasRenderingContext2D,
@@ -244,13 +247,13 @@ function textRow(
 }
 
 function heightOf(block: Block): number {
-  if (block.kind === "rule") return block.gap;
+  if (block.kind === "rule" || block.kind === "mark") return block.gap;
   return block.gap + block.lines.length * block.size * block.leading;
 }
 
 /** Whether every line fits the width it was wrapped to (a single long word may not). */
 function fitsWidth(ctx: CanvasRenderingContext2D, block: Block, width: number): boolean {
-  if (block.kind === "rule") return true;
+  if (block.kind === "rule" || block.kind === "mark") return true;
   ctx.font = block.font;
   ctx.letterSpacing = `${block.spacing}px`;
   return block.lines.every((line) => ctx.measureText(line).width <= width + 0.5);
@@ -269,6 +272,11 @@ function drawBlocks(
   for (const block of blocks) {
     if (block.kind === "rule") {
       drawRule(ctx, cx, y + block.gap / 2, block.width, block.colour, alpha);
+      y += block.gap;
+      continue;
+    }
+    if (block.kind === "mark") {
+      drawPlaceMark(ctx, cx, y + block.gap / 2, block.em, block.colour, alpha);
       y += block.gap;
       continue;
     }
@@ -676,17 +684,17 @@ function drawCardWords(
       );
     }
     if (fn.venue) {
+      // A small gold mark keeps the place apart from the day above it (.scene-place-mark)
+      const venue = font("venue");
+      if (when)
+        blocks.push({
+          kind: "mark",
+          em: venue.size * fit * 1.25,
+          gap: venue.size * fit * 1.3,
+          colour: colours.goldText,
+        });
       blocks.push(
-        textRow(
-          ctx,
-          fn.venue,
-          font("venue"),
-          fit,
-          box.w,
-          colours.ink,
-          lang,
-          when ? nameSize * 0.42 : nameSize * 0.4,
-        ),
+        textRow(ctx, fn.venue, venue, fit, box.w, colours.ink, lang, when ? 0 : nameSize * 0.4),
       );
     }
     return blocks;

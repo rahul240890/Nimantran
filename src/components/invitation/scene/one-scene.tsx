@@ -1217,14 +1217,18 @@ function SlotCard({
                     )}
                   </div>
                 )}
+                {/* A small gold mark keeps the place apart from the day above it */}
+                {when && fn.venue && (
+                  <span
+                    aria-hidden
+                    className={cn("place-mark scene-place-mark", rise(next(3))[0])}
+                    style={rise(next(3))[1]}
+                  />
+                )}
                 {fn.venue && (
                   <p
                     lang={lang}
-                    className={cn(
-                      "scene-venue max-w-full text-balance",
-                      when && "mt-[0.55em]",
-                      rise(next(3))[0],
-                    )}
+                    className={cn("scene-venue max-w-full text-balance", rise(next(3))[0])}
                     style={rise(next(3), sceneLine(voice, "venue", lang, type))[1]}
                   >
                     {fn.venue}

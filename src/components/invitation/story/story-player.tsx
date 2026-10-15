@@ -41,6 +41,7 @@ import {
   lettering,
   lineSpace,
   roleOf,
+  placeMarkAt,
   ruleAt,
   roleSizeCss,
   type TypeRole,
@@ -795,6 +796,7 @@ export function StoryPage({
   const voice = suite.voice ?? "regal";
   // A function's page sets a fine rule between its name and its day, as a printed card does
   const rule = ruleAt(beat);
+  const mark = placeMarkAt(beat);
   // The theme's own way of bringing in the photos and the names (reveal.ts)
   const reveal = still ? null : revealFor(suiteId);
   const nameLines = beat.lines.flatMap((line, i) =>
@@ -988,6 +990,13 @@ export function StoryPage({
                   <span
                     aria-hidden
                     className="story-line story-rule mt-[calc(2.2cqmin*var(--story-fit,1))]"
+                    style={delay(i + offset)}
+                  />
+                )}
+                {i === mark && (
+                  <span
+                    aria-hidden
+                    className="story-line story-place-mark place-mark mt-[calc(1.6cqmin*var(--story-fit,1))]"
                     style={delay(i + offset)}
                   />
                 )}

@@ -4088,6 +4088,35 @@
   rotate: 45deg;
   background: var(--card-gold-text);
 }
+/*
+ * The small mark between a function's day and its place: a gold diamond between two dots,
+ * quieter than the rule under the name. Sized in em, so it follows the words round it.
+ */
+.place-mark {
+  position: relative;
+  display: block;
+  width: 2.4em;
+  height: 0.5em;
+  flex-shrink: 0;
+  background:
+    radial-gradient(circle, var(--card-gold-text) 0.085em, transparent 0.115em) left center / 0.5em
+      0.5em no-repeat,
+    radial-gradient(circle, var(--card-gold-text) 0.085em, transparent 0.115em) right center / 0.5em
+      0.5em no-repeat;
+}
+.place-mark::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.3em;
+  height: 0.3em;
+  rotate: 45deg;
+  background: var(--card-gold-text);
+}
+.story-place-mark {
+  font-size: calc(clamp(1rem, 4cqmin, 1.35rem) * var(--story-fit, 1));
+}
 /* Words break only when a page is too full to fit them whole even at the smallest size */
 [data-overflow] > .story-line {
   overflow-wrap: anywhere;
@@ -6198,7 +6227,8 @@ html:has(.guest-snap) {
   animation: scene-line 650ms cubic-bezier(0.2, 0.8, 0.25, 1) both;
   animation-delay: var(--reveal-delay, 0ms);
 }
-.scene-rule.scene-reveal-line {
+.scene-rule.scene-reveal-line,
+.place-mark.scene-reveal-line {
   animation-name: scene-rule-draw;
 }
 @keyframes scene-letter {
@@ -6548,6 +6578,10 @@ html:has(.guest-snap) {
 .scene-rule::after {
   width: 0.4em;
   height: 0.4em;
+}
+.scene-place-mark {
+  font-size: 1.4em;
+  margin-block: 0.3em 0.25em;
 }
 /* The photo editor's sliders: a 44px tall hit area round a slim track and a marigold thumb */
 .photo-range {
