@@ -22,7 +22,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 
 ### 1. Choose and buy the domain
 
-1. Pick the address, for example `shubhinvitation.com` (the planned domain) or `shubhinvitation.in`. Check both at a registrar such as GoDaddy, Namecheap, Hostinger or Cloudflare.
+1. Done: the domain is `shubhinvitations.com` (live since 2026-10-15). In the steps below, `your-domain` means `shubhinvitations.com`.
 2. Buy it. Turn on auto-renew.
 
 ### 2. Point the domain at Vercel
