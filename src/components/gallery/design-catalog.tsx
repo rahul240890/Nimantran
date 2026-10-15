@@ -17,6 +17,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { ScrollRow } from "@/components/ui/scroll-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
@@ -105,7 +106,7 @@ function ChipRow<T extends string>({
       <div
         role="group"
         aria-label={label}
-        className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
+        className="relative -mx-4 scrollbar-none flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
       >
         <button
           type="button"
@@ -240,7 +241,7 @@ function Browse({
         >
           {shelfCopy.occasionsHeading}
         </h2>
-        <ul className="relative -mx-4 flex [scrollbar-width:thin] gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
+        <ScrollRow className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
           {CHIP_OCCASIONS.map((id) => (
             <li key={id} className="shrink-0">
               <Link
@@ -257,7 +258,7 @@ function Browse({
               <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
             </Link>
           </li>
-        </ul>
+        </ScrollRow>
       </section>
 
       <CollectionTiles entries={entries} covers={covers} designsPath={designsPath} />

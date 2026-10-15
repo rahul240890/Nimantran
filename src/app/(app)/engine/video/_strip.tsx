@@ -18,7 +18,7 @@ export function FilmStrip(props: {
     props.draft,
     props.functions,
     props.photos,
-    "https://shubhinvitation.com/i/sample",
+    "https://shubhinvitations.com/i/sample",
   );
   const [moments, setMoments] = useState<number[]>([]);
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);

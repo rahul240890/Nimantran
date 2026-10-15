@@ -3,6 +3,7 @@
 import { format, parseISO } from "date-fns";
 import {
   CircleAlert,
+  Clapperboard,
   Clock,
   Eye,
   ImageIcon,
@@ -133,7 +134,9 @@ export function PreviewStep({
         </Card>
       )}
 
-      {signedIn && draft.remoteId && problems.length === 0 && <SeeAsGuest />}
+      {signedIn && draft.remoteId && problems.length === 0 && (
+        <SeeAsGuest published={Boolean(draft.slug)} />
+      )}
 
       {/* After seeing it once: guests can also read it in a second language */}
       <SecondLanguageSection draft={draft} update={update} />
@@ -267,28 +270,44 @@ export function PreviewStep({
   );
 }
 
-/** Saves the invite, then opens it full screen exactly as a guest will see it. */
-function SeeAsGuest() {
+/**
+ * Saves the invite, then opens it full screen exactly as a guest will see it, or as the
+ * invitation video (free to watch, with the mark until a package includes it).
+ */
+function SeeAsGuest({ published }: { published: boolean }) {
   const { previewCopy } = useText(editorText);
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<"preview" | "video" | null>(null);
+  const open = async (page: "preview" | "video") => {
+    setBusy(page);
+    await syncDraft();
+    const id = inviteDraft.get().draft.remoteId;
+    // A live invite's video is on its share page, with the link it ends on
+    if (id) router.push(`/invites/${id}/${page === "video" && published ? "share" : page}`);
+    else setBusy(null);
+  };
   return (
     <Card elevation="flat" className="gap-3 border-marigold/45 bg-marigold/10 p-5">
       <p className="text-sm text-ink-muted">{previewCopy.seeAsGuestBody}</p>
-      <Button
-        className="self-start"
-        loading={busy}
-        leadingIcon={<Eye aria-hidden />}
-        onClick={async () => {
-          setBusy(true);
-          await syncDraft();
-          const id = inviteDraft.get().draft.remoteId;
-          if (id) router.push(`/invites/${id}/preview`);
-          else setBusy(false);
-        }}
-      >
-        {previewCopy.seeAsGuest}
-      </Button>
+      <div className="flex flex-wrap gap-3">
+        <Button
+          loading={busy === "preview"}
+          disabled={busy !== null}
+          leadingIcon={<Eye aria-hidden />}
+          onClick={() => void open("preview")}
+        >
+          {previewCopy.seeAsGuest}
+        </Button>
+        <Button
+          variant="secondary"
+          loading={busy === "video"}
+          disabled={busy !== null}
+          leadingIcon={<Clapperboard aria-hidden />}
+          onClick={() => void open("video")}
+        >
+          {previewCopy.watchVideo}
+        </Button>
+      </div>
     </Card>
   );
 }

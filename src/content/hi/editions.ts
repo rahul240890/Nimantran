@@ -22,6 +22,7 @@ export const planCopy: Translation<typeof en.planCopy> = {
       "हर कार्यक्रम, जवाब और मेहमानों की सूची के साथ",
       "आपका अपना लिंक और QR कोड",
       "कार्यक्रम तक कभी भी बदलाव करें",
+      "आपका अपना गाना",
       "कार्ड की 1 भाषा",
     ],
   },
@@ -30,9 +31,8 @@ export const planCopy: Translation<typeof en.planCopy> = {
     bestFor: "ज़्यादातर शादियाँ और बड़े जन्मदिन",
     highlights: [
       "बेसिक की हर सुविधा",
-      "कहीं भी भेजने के लिए निमंत्रण वीडियो",
+      "आपके निमंत्रण का WhatsApp वीडियो, स्टेटस और रील्स के लिए",
       "कार्ड की 2 भाषाएँ",
-      "आपका अपना गाना",
       "मेहमानों की फ़ोटो वॉल 30 दिन",
       "3 सह-मेज़बान",
     ],
@@ -42,7 +42,7 @@ export const planCopy: Translation<typeof en.planCopy> = {
     bestFor: "कई दिनों की बड़ी शादियाँ",
     highlights: [
       "सेलिब्रेशन की हर सुविधा",
-      "हर कार्यक्रम का अपना वीडियो",
+      "आपके निमंत्रण का WhatsApp वीडियो, और हर कार्यक्रम का अपना वीडियो",
       "मेहमानों की फ़ोटो वॉल 1 साल",
       "जितने चाहें उतने सह-मेज़बान",
       "हमारी टीम से पहले मदद",
@@ -52,6 +52,11 @@ export const planCopy: Translation<typeof en.planCopy> = {
 
 export const invitesLine: typeof en.invitesLine = (count) =>
   count === null ? "असीमित इनवाइट" : `लिंक से ${count.toLocaleString("en-IN")} इनवाइट`;
+
+export const invitesCount: typeof en.invitesCount = (count) =>
+  count === null
+    ? { value: "असीमित", label: "इनवाइट" }
+    : { value: count.toLocaleString("en-IN"), label: "इनवाइट, लिंक से" };
 
 export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   metaTitle: "अपना पैकेज चुनें",
@@ -96,6 +101,16 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   paymentId: "भुगतान",
   back: "निमंत्रण पर वापस",
   backToEditor: "अपने निमंत्रण पर वापस",
+  videoFirst: "चुनने से पहले अपना निमंत्रण वीडियो मुफ़्त बनाकर देखें।",
+  videoFirstLink: "अपना वीडियो देखें",
+  video: {
+    title: "WhatsApp वीडियो शामिल",
+    body: "अपने निमंत्रण वीडियो की मुफ़्त झलक यहीं बनाएँ, फिर उसे पूरी स्क्रीन पर देखें।",
+    make: "वीडियो की झलक बनाएँ",
+    ready: "आपकी झलक तैयार है",
+    fullScreen: "वीडियो पूरी स्क्रीन पर देखें",
+    fullScreenShort: "पूरी स्क्रीन",
+  },
   secure: "Razorpay से सुरक्षित भुगतान: UPI, कार्ड और नेटबैंकिंग।",
   previewCheckout: {
     title: "टेस्ट भुगतान",
@@ -130,7 +145,6 @@ export const limitCopy: Translation<typeof en.limitCopy> = {
   body: (plan) => `इसे ऐसे ही प्रकाशित करने के लिए ${plan} चुनें।`,
   used: {
     languages: (count) => `कार्ड की ${count} भाषाएँ`,
-    ownSong: () => "आपका अपना गाना",
     design: (rank) => `${TIER_NAMES[rank] ?? "प्रीमियम"} डिज़ाइन`,
   },
   choose: "पैकेज चुनें",

@@ -33,6 +33,7 @@ export const uiStrings = {
       label: "The invitation, moving on by itself",
       pause: "Hold here",
       play: "Play on",
+      again: "Watch the invitation again",
     },
   },
   /** Words the story adds between the host's own (Step 12d). */

@@ -26,6 +26,8 @@ const STORY_THEMES = (
   "kashi,sagar,mysuru,kalamkari,pattachitra,chinar,chai-bagan,sufi-raat,chapel,sakura,vigna," +
   "himani,van,riad,palna,deepotsav,jungle-party,chaand-kalayein,ritu-chakra,raagmala," +
   "panchatantra,patang-udaan,diya-ki-kahani,resham-katha,navrang,nadi-safar,ek-rekha," +
+  "kagzi-phool,nilofar,sona-gulaab,shabnam,surkh-gulaab," +
+  "khushboo,ruh-gulaab,oud-raat,gulabpash,shringaar-mez," +
   "meghdoot,aath-pehar,beej-se-bagh,kissa-kitaab,itr-daan,pakshi-kosh,gudiya-ghar,jantar-mantar,rangrez,phool-mandi," +
   "udan-khatola,rang-raste,kaanch-gumbad,chalk-pati,jadon-ka-pul,gol-matol,bhool-bhulaiya,deco-yatra,gehra-neela,shatranj-baazi,classic"
 ).split(",");

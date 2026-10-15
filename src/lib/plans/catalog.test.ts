@@ -14,14 +14,14 @@ import { DEFAULT_PRICING } from "./design-tiers";
 const bilingual = (): InviteDraft => ({ ...newDraft(), languages: ["en", "hi"] });
 
 describe("packages", () => {
-  it("cost the design, plus ₹500 for Celebration and ₹1,500 for Grand", () => {
+  it("cost the design, plus ₹400 for Celebration and ₹600 for Grand", () => {
     expect(formatRupees(packagePrice("basic", "premium"))).toBe("₹499");
-    expect(formatRupees(packagePrice("celebration", "premium"))).toBe("₹999");
-    expect(formatRupees(packagePrice("grand", "premium"))).toBe("₹1,999");
+    expect(formatRupees(packagePrice("celebration", "premium"))).toBe("₹899");
+    expect(formatRupees(packagePrice("grand", "premium"))).toBe("₹1,099");
     expect(formatRupees(packagePrice("basic", "royal"))).toBe("₹799");
-    expect(formatRupees(packagePrice("grand", "royal"))).toBe("₹2,299");
+    expect(formatRupees(packagePrice("grand", "royal"))).toBe("₹1,399");
     expect(packagePrice("basic", "free")).toBe(0);
-    expect(formatRupees(packagePrice("celebration", "free"))).toBe("₹500");
+    expect(formatRupees(packagePrice("celebration", "free"))).toBe("₹400");
   });
 
   it("mark only free invites", () => {
@@ -31,9 +31,9 @@ describe("packages", () => {
     expect(PLANS.grand.video).toBe("every");
   });
 
-  it("allow 50 invites, 500 with Celebration and no limit with Grand", () => {
-    expect(inviteLimit("free", DEFAULT_PRICING)).toBe(50);
-    expect(inviteLimit("basic", DEFAULT_PRICING)).toBe(50);
+  it("allow 100 invites, 500 with Celebration and no limit with Grand", () => {
+    expect(inviteLimit("free", DEFAULT_PRICING)).toBe(100);
+    expect(inviteLimit("basic", DEFAULT_PRICING)).toBe(100);
     expect(inviteLimit("celebration", DEFAULT_PRICING)).toBe(500);
     expect(inviteLimit("grand", DEFAULT_PRICING)).toBeNull();
   });
@@ -42,9 +42,9 @@ describe("packages", () => {
     const free = { plan: "free", tier: "free" } as const;
     const basic = { plan: "basic", tier: "premium" } as const;
     expect(upgradePricePaise(free, "basic", "premium")).toBe(49_900);
-    expect(upgradePricePaise(free, "celebration", "free")).toBe(50_000);
-    expect(upgradePricePaise(basic, "celebration", "premium")).toBe(50_000);
-    expect(upgradePricePaise(basic, "grand", "royal")).toBe(1_80_000);
+    expect(upgradePricePaise(free, "celebration", "free")).toBe(40_000);
+    expect(upgradePricePaise(basic, "celebration", "premium")).toBe(40_000);
+    expect(upgradePricePaise(basic, "grand", "royal")).toBe(90_000);
     expect(upgradePricePaise({ plan: "grand", tier: "royal" }, "basic", "premium")).toBeNull();
   });
 
@@ -72,15 +72,13 @@ describe("packages", () => {
     expect(planNeeded(two, "premium")).toBe("celebration");
   });
 
-  it("put the host's own song in Celebration", () => {
+  it("let every package play the host's own song", () => {
     const draft = newDraft();
     draft.music = {
       ...draft.music,
       clip: { id: "c1", name: "Song", type: "audio/mp4", seconds: 30 },
     } as InviteDraft["music"];
-    expect(planShortfalls(draft, { plan: "basic", tier: "free" }, "free")).toEqual([
-      { limit: "ownSong", used: 1 },
-    ]);
-    expect(planNeeded(draft, "free")).toBe("celebration");
+    expect(planShortfalls(draft, { plan: "free", tier: "free" }, "free")).toEqual([]);
+    expect(planNeeded(draft, "free")).toBe("free");
   });
 });

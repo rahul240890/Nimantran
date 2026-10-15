@@ -205,6 +205,7 @@ export const guestText: GuestText = {
       label: "આમંત્રણ આપમેળે આગળ વધે છે",
       pause: "અહીં રોકો",
       play: "આગળ ચલાવો",
+      again: "આમંત્રણ ફરી જુઓ",
     },
   },
   theme: { group: "રંગ થીમ", system: "ડિવાઇસ પ્રમાણે", light: "આછી", dark: "ઘેરી" },

@@ -213,6 +213,8 @@ export const repliesCopy = {
 } as const;
 
 export const videoCopy = {
+  metaTitle: "Your invitation video",
+  back: "Back to your invite",
   heading: "Invitation video",
   body: "Your invitation as a vertical video with its raga: the opening as guests see it, the welcome with your names, then every page. Share it on WhatsApp, Instagram or anywhere else. It's made on this phone or computer, so nothing is uploaded, and it stays here when you come back.",
   poster: "The video's first moment",
@@ -233,8 +235,15 @@ export const videoCopy = {
     "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",
   noSound:
     "This browser can't add music to videos, so the video will be silent. Chrome or Edge add the raga.",
-  locked: "The Celebration and Grand packages include this video.",
-  upgrade: "Choose a package",
+  mark: `Made with ${site.shortName}`,
+  makePreview: "Make a free preview",
+  preview: "Free preview",
+  previewNote:
+    "Watch your whole video here for free. This preview carries a “Made with Shubh” mark; the Celebration and Grand packages download and share it clean.",
+  upgrade: "Get the clean video",
+  draftNote:
+    "Publish your invitation to download and share this video. It ends with your invitation's link, which you get when you publish.",
+  publish: "Publish your invitation",
   which: "Which video",
   whole: "The whole invitation",
   ending: {

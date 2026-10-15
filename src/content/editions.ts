@@ -24,6 +24,7 @@ export const planCopy = {
       "Every function, with replies and the guest list",
       "Your own link and QR code",
       "Edit any time until the event",
+      "Your own song",
       "1 card language",
     ],
   },
@@ -32,9 +33,8 @@ export const planCopy = {
     bestFor: "Most weddings and big birthdays",
     highlights: [
       "Everything in Basic",
-      "An invitation video to share anywhere",
+      "WhatsApp video of your invitation, for Status and Reels",
       "2 card languages",
-      "Your own song",
       "Guest photo wall for 30 days",
       "3 co-hosts",
     ],
@@ -44,7 +44,7 @@ export const planCopy = {
     bestFor: "Big multi-day weddings",
     highlights: [
       "Everything in Celebration",
-      "A video for every function",
+      "WhatsApp video of your invitation, and one for every function",
       "Guest photo wall for a year",
       "As many co-hosts as you like",
       "Priority help from our team",
@@ -55,6 +55,12 @@ export const planCopy = {
 /** The invites line on each package: guests by personal link or the open link. */
 export const invitesLine = (count: number | null) =>
   count === null ? "Unlimited invites" : `${count.toLocaleString("en-IN")} invites by link`;
+
+/** The invites count on each package card, large: the number, then what it counts. */
+export const invitesCount = (count: number | null) =>
+  count === null
+    ? { value: "Unlimited", label: "invites" }
+    : { value: count.toLocaleString("en-IN"), label: "invites by link" };
 
 export const upgradeCopy = {
   metaTitle: "Choose your package",
@@ -99,6 +105,16 @@ export const upgradeCopy = {
   paymentId: "Payment",
   back: "Back to the invite",
   backToEditor: "Back to your invite",
+  videoFirst: "Make your invitation video for free and watch it before you choose.",
+  videoFirstLink: "Watch your video",
+  video: {
+    title: "WhatsApp video included",
+    body: "Make a free preview of your invitation video right here, then watch it full screen.",
+    make: "Make video preview",
+    ready: "Your preview is ready",
+    fullScreen: "Watch the video full screen",
+    fullScreenShort: "Full screen",
+  },
   secure: "Paid securely through Razorpay: UPI, cards and netbanking.",
   previewCheckout: {
     title: "Test payment",
@@ -133,7 +149,6 @@ export const limitCopy = {
   body: (plan: string) => `To publish it as it is, choose ${plan}.`,
   used: {
     languages: (count: number) => `${count} card languages`,
-    ownSong: () => "Your own song",
     /** The design's tier, by its place in the list (1 Premium, 2 Royal, 3 Signature). */
     design: (rank: number) => `A ${TIER_NAMES[rank] ?? "Premium"} design`,
   } satisfies Record<PlanNeed["limit"], (count: number) => string>,

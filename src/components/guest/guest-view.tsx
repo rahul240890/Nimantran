@@ -1,8 +1,8 @@
 "use client";
 
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
@@ -19,7 +19,8 @@ import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
-import { useRagaMusic } from "@/components/invitation/use-raga-music";
+import { musicMuted, useRagaMusic } from "@/components/invitation/use-raga-music";
+import { useStayAwake } from "@/components/guest/use-stay-awake";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
@@ -253,6 +254,39 @@ export function GuestView({
   const [tour, setTour] = useState(0);
   const tourRoot = useRef<HTMLDivElement>(null);
   const showOpening = !entered && opening !== "none";
+  // Each time the guest opens the invitation again from the page below
+  const [again, setAgain] = useState(0);
+  // The screen stays on from the guest's first tap until the page has moved on to its end
+  const [awake, setAwake] = useState(false);
+  useStayAwake(awake);
+  // The music starts with the guest's first tap anywhere, the gate's or any other: a phone
+  // plays no sound before one, and the song is then already playing as the gate opens
+  const playOnOpen = draft.music.playOnOpen;
+  const latestMusic = useRef(music);
+  useEffect(() => {
+    latestMusic.current = music;
+  });
+  useEffect(() => {
+    const events = ["pointerup", "touchend", "keydown"] as const;
+    const first = () => {
+      events.forEach((name) => window.removeEventListener(name, first, true));
+      setAwake(true);
+      if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
+        void latestMusic.current.play();
+      }
+    };
+    events.forEach((name) => window.addEventListener(name, first, true));
+    return () => events.forEach((name) => window.removeEventListener(name, first, true));
+  }, [playOnOpen]);
+  // From the page below, back to the top and the whole invitation again, music and all
+  const openAgain = () => {
+    if (playOnOpen) music.replay();
+    setAwake(true);
+    window.scrollTo({ top: 0, behavior: "auto" });
+    setEntered(false);
+    setAgain((was) => was + 1);
+  };
+  const replayable = Boolean(scene) || opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
   // The family's blocks in the language the guest is reading
@@ -272,6 +306,7 @@ export function GuestView({
           <main id="main" className="flex flex-1 flex-col">
             {scene && !showOpening ? (
               <OneScene
+                key={again}
                 suite={suite}
                 page={scene}
                 copy={copy}
@@ -280,7 +315,11 @@ export function GuestView({
                 photos={scenePhotos}
                 reply={story.reply ?? null}
                 closing={closing}
-                onEnd={() => setTour((was) => was + 1)}
+                onEnd={() => {
+                  // The music plays on under the page below, softer
+                  music.soften();
+                  setTour((was) => was + 1);
+                }}
                 type={story.type}
                 detailsHref={doorway && guestLook(suite) ? "#guest-welcome" : undefined}
                 header={
@@ -332,6 +371,7 @@ export function GuestView({
                 musicOnOpen={draft.music.playOnOpen}
                 guest={guestName}
                 onCarryOn={() => setTour((was) => was + 1)}
+                replay={again}
                 after={
                   scene
                     ? { kind: "enter", onEnter: () => setEntered(true) }
@@ -456,11 +496,15 @@ export function GuestView({
             <GuestTour
               root={tourRoot}
               run={tour}
+              stop={again}
               music={music}
               labels={invitation.tour}
               musicLabels={
                 look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
               }
+              onEnd={() => setAwake(false)}
+              onAgain={replayable ? openAgain : undefined}
+              againLabel={invitation.tour.again}
             />
             {!preview && <PhotoWall slug={slug} />}
           </main>
@@ -469,6 +513,18 @@ export function GuestView({
             data-snap
             className="border-t border-line px-4 py-8 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6"
           >
+            {replayable && (
+              <div className="mx-auto mb-6 flex w-full max-w-5xl justify-center">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  leadingIcon={<RotateCcw aria-hidden />}
+                  onClick={openAgain}
+                >
+                  {invitation.tour.again}
+                </Button>
+              </div>
+            )}
             <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
               <p className="flex items-center gap-2 text-sm text-ink-muted">
                 <BrandMark className="size-6 text-accent-text" />

@@ -1,4 +1,12 @@
-import { ArrowLeft, FileText, Globe, PartyPopper, ReceiptText, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Clapperboard,
+  FileText,
+  Globe,
+  PartyPopper,
+  ReceiptText,
+  Users,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -9,15 +17,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAdmin } from "@/lib/admin/access";
+import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
+import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { checkoutCoupons } from "@/lib/payments/coupons";
-import { formatRupees, isPlanId, planNeeded, planShortfalls } from "@/lib/plans/catalog";
+import { formatRupees, isPlanId, PLANS, planNeeded, planShortfalls } from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { pricesFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
+import { inviteUrl } from "@/lib/publish/links";
+import { storyFunctions } from "@/lib/publish/story";
+import { requestOrigin } from "@/lib/request-origin";
 import { editionsText } from "@/i18n/copy/editions";
 import { getLocale, getText } from "@/i18n/server";
 
@@ -39,23 +52,43 @@ export default async function EditionPage({
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/edition`)}`);
+  const store = inviteStore();
   const [draft, current, owner, admin] = await Promise.all([
-    inviteStore()?.get(account, id),
+    store?.get(account, id),
     invitePlan(account, id),
     ownsInvite(account, id),
     getAdmin(),
   ]);
-  if (!draft || !current) notFound();
-  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons, pricing] = await Promise.all(
-    [
+  if (!store || !draft || !current) notFound();
+  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons, pricing, urls, origin] =
+    await Promise.all([
       editionsActive(),
       inviteReceipts(account, id),
       getLocale(),
       getText(editionsText),
       checkoutCoupons().catch(() => []),
       getPricing(),
-    ],
-  );
+      store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
+      requestOrigin(),
+    ]);
+  // The video preview on the Celebration card, made as the video page makes it: with the
+  // mark until the package has the video, and ending on the site until the invite is live
+  const photos: PublicPhoto[] = draft.photos.flatMap((photo) => {
+    const url = urls[photo.id];
+    return url ? [{ id: photo.id, url, width: photo.width, height: photo.height }] : [];
+  });
+  const clip = draft.music.clip;
+  const video = {
+    draft,
+    functions: storyFunctions(draft, locale),
+    photos,
+    clipUrl: clip ? (urls[clip.id] ?? null) : null,
+    url: draft.slug ? inviteUrl(origin, draft.slug) : origin,
+    slug: draft.slug ?? `draft-${id.slice(0, 8)}`,
+    names: inviteNames(draft),
+    allowed: !active || PLANS[current.plan].video !== "none",
+    testCodecs: authMode() === "preview",
+  };
   const design = designTier(pricing, draftDesignId(draft));
   // Back to the editor to publish, once the package covers the invite. Until payments are
   // switched on every invite publishes with everything, so it's ready as it is.
@@ -126,6 +159,16 @@ export default async function EditionPage({
               </Button>
             </div>
           )}
+          {/* Watching the video first is the best reason to choose a package with it */}
+          {active && !draft.slug && PLANS[current.plan].video === "none" && (
+            <div className="flex max-w-2xl flex-col gap-3 rounded-lg border border-line bg-surface-2 p-5 sm:flex-row sm:items-center">
+              <Clapperboard aria-hidden className="size-6 shrink-0 text-accent-text" />
+              <p className="flex-1 text-sm text-ink-muted">{upgradeCopy.videoFirst}</p>
+              <Button asChild variant="secondary" size="sm">
+                <Link href={`/invites/${id}/video`}>{upgradeCopy.videoFirstLink}</Link>
+              </Button>
+            </div>
+          )}
           <EditionPicker
             inviteId={id}
             edition={current}
@@ -138,6 +181,7 @@ export default async function EditionPage({
             prices={pricesFor(current, design, coupons, null, new Date(), pricing)}
             pricing={pricing}
             publishHref={ready ? publishHref : null}
+            video={video}
           />
 
           {receipts.length > 0 && (

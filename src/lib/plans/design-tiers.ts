@@ -51,8 +51,8 @@ export type Pricing = {
 
 export const DEFAULT_PRICING: Pricing = {
   designs: { premium: 49_900, royal: 79_900, signature: 79_900 },
-  packages: { celebration: 50_000, grand: 1_50_000 },
-  invites: { basic: 50, celebration: 500 },
+  packages: { celebration: 40_000, grand: 60_000 },
+  invites: { basic: 100, celebration: 500 },
   tiers: {},
 };
 

@@ -140,7 +140,7 @@ test.describe("packages", () => {
     await expect(page.getByRole("heading", { name: "Receipts" })).toBeVisible();
     await expect(
       page.getByRole("article", { name: "Celebration" }).getByRole("button", {
-        name: "Upgrade for ₹500",
+        name: "Upgrade for ₹400",
       }),
     ).toBeVisible();
 

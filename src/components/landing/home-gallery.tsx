@@ -13,6 +13,7 @@ import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { ScenePoster } from "@/components/gallery/scene-poster";
 import { Button } from "@/components/ui/button";
+import { ScrollRow } from "@/components/ui/scroll-row";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
@@ -111,7 +112,7 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
             <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
           </Link>
         </div>
-        <ul className="grid snap-x scroll-px-3 [scrollbar-width:thin] auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-1 gap-y-2 overflow-x-auto px-3 pb-1 sm:auto-cols-[6.5rem] sm:px-4 lg:grid-flow-row lg:grid-cols-7 lg:grid-rows-none lg:overflow-visible">
+        <ScrollRow className="grid snap-x scroll-px-3 auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-1 gap-y-2 overflow-x-auto px-3 pb-1 sm:auto-cols-[6.5rem] sm:px-4 lg:grid-flow-row lg:grid-cols-7 lg:grid-rows-none lg:overflow-visible">
           {occasions.map(({ id, name, image }, index) => (
             <li key={id} data-occasion={id} className="snap-start">
               <Link href={pagePath({ kind: "occasion", id }, locale)} className={tile}>
@@ -144,7 +145,7 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
               </span>
             </Link>
           </li>
-        </ul>
+        </ScrollRow>
       </div>
     </section>
   );
