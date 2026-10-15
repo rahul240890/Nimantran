@@ -13,7 +13,7 @@ import {
   Shirt,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -135,7 +135,7 @@ export function PreviewStep({
       )}
 
       {signedIn && draft.remoteId && problems.length === 0 && (
-        <SeeAsGuest published={Boolean(draft.slug)} />
+        <SeeAsGuest remoteId={draft.remoteId} published={Boolean(draft.slug)} />
       )}
 
       {/* After seeing it once: guests can also read it in a second language */}
@@ -270,20 +270,30 @@ export function PreviewStep({
   );
 }
 
+/** Where each button goes: a live invite's video is on its share page, with the link it ends on. */
+function guestHref(id: string, page: "preview" | "video", published: boolean) {
+  return `/invites/${id}/${page === "video" && published ? "share" : page}`;
+}
+
 /**
  * Saves the invite, then opens it full screen exactly as a guest will see it, or as the
  * invitation video (free to watch, with the mark until a package includes it).
  */
-function SeeAsGuest({ published }: { published: boolean }) {
+function SeeAsGuest({ remoteId, published }: { remoteId: string | null; published: boolean }) {
   const { previewCopy } = useText(editorText);
   const router = useRouter();
   const [busy, setBusy] = useState<"preview" | "video" | null>(null);
+  // Fetch both pages' code and loading screens ahead, so a tap opens them straight away
+  useEffect(() => {
+    if (!remoteId) return;
+    router.prefetch(guestHref(remoteId, "preview", published));
+    router.prefetch(guestHref(remoteId, "video", published));
+  }, [remoteId, published, router]);
   const open = async (page: "preview" | "video") => {
     setBusy(page);
     await syncDraft();
     const id = inviteDraft.get().draft.remoteId;
-    // A live invite's video is on its share page, with the link it ends on
-    if (id) router.push(`/invites/${id}/${page === "video" && published ? "share" : page}`);
+    if (id) router.push(guestHref(id, page, published));
     else setBusy(null);
   };
   return (
