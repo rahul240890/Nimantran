@@ -52,6 +52,10 @@ database keeps every invite. Applied so far after the first setup:
   includes (`cohost_limit()`), and the new `event_host_list()` and `accept_host_invite()`.
   Co-hosts who joined earlier keep editing.
 
+- `20261015090000_emails.sql` — emails (docs/EMAILS.md): `email_log`, so each welcome,
+  receipt and reminder goes once, and `email_opt_outs` for people who stop reminders. Only
+  the server's service role reads or writes them.
+
 ## Setting up a project
 
 1. **Create the project** at supabase.com in the Mumbai region (ap-south-1).

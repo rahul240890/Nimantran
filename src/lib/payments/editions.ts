@@ -16,6 +16,7 @@ import {
   type PaidPlanId,
   type PlanId,
 } from "@/lib/plans/catalog";
+import { receiptAfterPayment } from "@/lib/email/notify";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { higherTier, isDesignTier, type DesignTier } from "@/lib/plans/design-tiers";
 import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
@@ -411,6 +412,8 @@ export async function fulfilOrder(
     const raised = await raisePlan(order.event_id, edition, "purchase", order.id);
     if (!raised) return null;
   }
+  // Once per order, however many times the checkout and the webhook both get here
+  receiptAfterPayment(order.id);
   return order.plan_id;
 }
 
