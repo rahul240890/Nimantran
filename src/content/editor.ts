@@ -977,6 +977,16 @@ export const suiteCopy = {
     navrang: "Navrang",
     "nadi-safar": "Nadi Safar",
     "ek-rekha": "Ek Rekha",
+    "kagzi-phool": "Kagzi Phool",
+    nilofar: "Nilofar",
+    "sona-gulaab": "Sona Gulaab",
+    shabnam: "Shabnam",
+    "surkh-gulaab": "Surkh Gulaab",
+    khushboo: "Khushboo",
+    "ruh-gulaab": "Ruh Gulaab",
+    "oud-raat": "Oud Raat",
+    gulabpash: "Gulabpash",
+    "shringaar-mez": "Shringaar Mez",
     meghdoot: "Meghdoot",
     "aath-pehar": "Aath Pehar",
     "beej-se-bagh": "Beej se Bagh",
@@ -1339,6 +1349,18 @@ export const suiteCopy = {
     "nadi-safar":
       "A leaf boat carrying a marigold from a glacier spring, past the ghats, to the sea.",
     "ek-rekha": "One golden line on ivory paper that draws the whole world, page by page.",
+    "kagzi-phool":
+      "Magenta and coral bougainvillea spilling over whitewashed walls, sunny and joyful.",
+    nilofar: "Blue water lilies on a still pond, in indigo and lilac watercolour.",
+    "sona-gulaab": "Yellow and peach roses with flakes of gold leaf on warm ivory paper.",
+    shabnam: "Only white flowers, with dew drops and sage leaves, quiet and elegant.",
+    "surkh-gulaab": "Deep red and burgundy roses on cream paper, rich and dramatic.",
+    khushboo: "A crystal perfume bottle on silk, with a new note of its scent on every page.",
+    "ruh-gulaab": "The rose attar of Kannauj, from the rose fields at dawn to the copper stills.",
+    "oud-raat": "A night of oud and incense in an old perfumer's house, in black, teal and gold.",
+    gulabpash: "A silver rosewater sprinkler welcomes the guests with a fine mist of rosewater.",
+    "shringaar-mez":
+      "A vintage dressing table with a perfume atomizer, in lilac and gold, at every hour.",
     meghdoot:
       "One small white cloud carries your invitation from the snowy mountains, past lakes and monsoon rain, to your door.",
     "aath-pehar":
@@ -2078,6 +2100,50 @@ export const openingCopy = {
     "rekha-dwar": {
       name: "Doors drawn in one line",
       description: "Ivory paper doors drawn in one gold line open onto a sunrise over lotuses.",
+    },
+    "bel-khidki": {
+      name: "Bougainvillea shutters",
+      description:
+        "Blue window shutters grown over with bougainvillea swing open onto a sunset arch.",
+    },
+    "pankhudi-pat": {
+      name: "Water-lily petals",
+      description: "Two great water-lily petals unfold aside onto a lily pond.",
+    },
+    "gulaab-lifafa": {
+      name: "Wax-sealed envelope",
+      description:
+        "A watercolour envelope with a wax rose seal lifts open onto an arch of golden roses.",
+    },
+    "os-parda": {
+      name: "Dew curtain",
+      description: "A sheer white voile sewn with tiny flowers gathers aside onto a white garden.",
+    },
+    "surkh-dwar": {
+      name: "Rose garden doors",
+      description: "Old garden doors grown over with red roses swing open onto a rose walk.",
+    },
+    "itr-dibbi": {
+      name: "Perfume box",
+      description: "The silk-lined doors of a perfume box swing open, and a blush haze rolls out.",
+    },
+    "gulaab-bhaap": {
+      name: "Rose steam",
+      description: "Two banks of rose-scented steam drift apart onto the rose fields of Kannauj.",
+    },
+    "oud-darwaza": {
+      name: "Studded doors",
+      description: "Heavy carved doors with brass studs swing open as incense smoke curls out.",
+    },
+    "tarkashi-jaali": {
+      name: "Silver filigree screens",
+      description:
+        "Two silver filigree screens slide apart onto a marble garden and its rosewater sprinkler.",
+    },
+    "aaina-pat": {
+      name: "Mirror wings",
+      description:
+        "The carved wings of a folding mirror swing open onto a dressing table in lilac light.",
     },
     "megh-parda": {
       name: "Monsoon clouds",
