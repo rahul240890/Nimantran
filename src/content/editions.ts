@@ -92,6 +92,10 @@ export const upgradeCopy = {
   paid: (plan: string) => `${plan} is on. Thank you!`,
   paidBody: "Everything in your package is unlocked.",
   cancelled: "Payment not completed. Nothing was charged.",
+  declined:
+    "The payment didn't go through. Nothing was charged. Try again, or choose another way to pay.",
+  testMode:
+    "Test payments are on, so no real money moves. UPI apps like Google Pay don't work in test mode: choose UPI ID and enter success@razorpay, or pay by card with 4111 1111 1111 1111, any future expiry and any CVV.",
   failed:
     "The payment couldn't be confirmed. If money left your account, it comes back within 5 to 7 days, or write to us.",
   off: "Payments open very soon. Everything is free until then.",

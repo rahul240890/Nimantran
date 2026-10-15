@@ -61,6 +61,19 @@ function loadCheckout(): Promise<boolean> {
   });
 }
 
+/**
+ * Razorpay hides its own window when it closes. Should a failed payment leave its dark
+ * backdrop behind, or the page unable to scroll, this lets the host back onto the page.
+ */
+function releasePage() {
+  window.setTimeout(() => {
+    for (const node of document.querySelectorAll<HTMLElement>(".razorpay-container")) {
+      node.style.display = "none";
+    }
+    if (document.body.style.overflow === "hidden") document.body.style.overflow = "";
+  }, 300);
+}
+
 /** The site's marigold for Razorpay's window, read from the design tokens. */
 const brandColour = () =>
   getComputedStyle(document.documentElement).getPropertyValue("--marigold").trim() || undefined;
@@ -78,6 +91,8 @@ export type EditionPickerProps = {
   active: boolean;
   /** Only the invite's owner pays; co-hosts see the packages and prices. */
   canPay?: boolean;
+  /** Razorpay's test keys: real UPI apps can't pay, so say what can. */
+  testMode?: boolean;
   prefill: { name: string; email: string | null; phone: string | null };
   /** What each package costs this invite now, with any festival offer running. */
   prices: Partial<Record<PaidPlanId, Price>>;
@@ -99,6 +114,7 @@ export function EditionPicker({
   focus,
   active,
   canPay = true,
+  testMode = false,
   prefill,
   prices: offerPrices,
   pricing,
@@ -163,7 +179,10 @@ export function EditionPicker({
       toast({ title: upgradeCopy.loadFailed, tone: "error" });
       return;
     }
-    const checkout = new window.Razorpay({
+    // A failed attempt keeps Razorpay's window open to try again; closing it after one
+    // says the payment failed rather than that it was cancelled
+    let declined = false;
+    const options = {
       key: started.keyId,
       order_id: started.orderId,
       amount: started.amountPaise,
@@ -181,11 +200,30 @@ export function EditionPicker({
       modal: {
         ondismiss: () => {
           setPending(null);
-          toast({ title: upgradeCopy.cancelled });
+          releasePage();
+          toast(
+            declined
+              ? {
+                  title: upgradeCopy.declined,
+                  description: testMode ? upgradeCopy.testMode : undefined,
+                  tone: "error",
+                }
+              : { title: upgradeCopy.cancelled },
+          );
         },
       },
-    });
-    checkout.open();
+    };
+    try {
+      const checkout = new window.Razorpay(options);
+      checkout.on("payment.failed", () => {
+        declined = true;
+      });
+      checkout.open();
+    } catch {
+      setPending(null);
+      releasePage();
+      toast({ title: upgradeCopy.loadFailed, tone: "error" });
+    }
   };
 
   const freeDesign = design === "free";
@@ -199,6 +237,14 @@ export function EditionPicker({
           className="rounded-md border border-line bg-surface-2 px-4 py-3 text-sm text-ink-muted"
         >
           {upgradeCopy.off}
+        </p>
+      )}
+      {active && canPay && testMode && (
+        <p
+          role="note"
+          className="rounded-md border border-line bg-surface-2 px-4 py-3 text-sm text-ink-muted"
+        >
+          {upgradeCopy.testMode}
         </p>
       )}
       <ul className="grid gap-4 lg:grid-cols-3">

@@ -22,6 +22,7 @@ import { getAccount } from "@/lib/auth/server";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
+import { razorpayKeys } from "@/lib/payments/razorpay";
 import { checkoutCoupons } from "@/lib/payments/coupons";
 import { formatRupees, isPlanId, PLANS, planNeeded, planShortfalls } from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
@@ -177,6 +178,7 @@ export default async function EditionPage({
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
             canPay={owner}
+            testMode={razorpayKeys()?.mode === "test"}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
             prices={pricesFor(current, design, coupons, null, new Date(), pricing)}
             pricing={pricing}
