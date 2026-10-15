@@ -20,6 +20,15 @@ function isPrivate(pathname: string) {
 export async function proxy(request: NextRequest) {
   const mode = authMode();
   const { pathname, search } = request.nextUrl;
+  // Supabase sends Google sign-ins to the Site URL when the callback address isn't on its
+  // Redirect URLs list, so a code arriving on the home page is finished at the callback
+  if (mode === "supabase" && pathname === "/" && request.nextUrl.searchParams.has("code")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/callback";
+    url.search = `?code=${encodeURIComponent(request.nextUrl.searchParams.get("code") ?? "")}&next=%2F`;
+    return NextResponse.redirect(url);
+  }
+
   let response = NextResponse.next({ request });
   let signedIn = false;
 
