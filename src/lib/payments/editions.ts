@@ -500,10 +500,9 @@ export async function fulfilOrder(
       .select(columns)
       .eq("provider_order_id", providerOrderId)
       .maybeSingle<FulfilRow>();
-  let { data: order, error: readError } = await readOrder(
-    "id, event_id, plan_id, design_tier, design_id, status, coupon_id",
-  );
-  if (missingColumn(readError)) {
+  const first = await readOrder("id, event_id, plan_id, design_tier, design_id, status, coupon_id");
+  let order = first.data;
+  if (missingColumn(first.error)) {
     ({ data: order } = await readOrder("id, event_id, plan_id, design_tier, status, coupon_id"));
   }
   if (!order || !isPaidPlanId(order.plan_id)) return null;
@@ -594,9 +593,9 @@ async function raisePlan(
   if (!service) return false;
   const read = (columns: string) =>
     service.from("event_plans").select(columns).eq("event_id", eventId).maybeSingle<PlanRow>();
-  let { data: existing, error: readError } = await read(PLAN_COLUMNS);
-  const before = missingColumn(readError);
-  if (before) ({ data: existing } = await read(PLAN_COLUMNS_BEFORE));
+  const first = await read(PLAN_COLUMNS);
+  const before = missingColumn(first.error);
+  const existing = before ? (await read(PLAN_COLUMNS_BEFORE)).data : first.data;
   const current = editionFromRow(existing);
   const raisedTo = raised(current, edition);
   // An admin's gift covers any design
@@ -838,7 +837,11 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
       if (order.fromPlanId === "free") preview.plans.delete(order.eventId);
       else {
         preview.plans.set(order.eventId, {
-          edition: { plan: order.fromPlanId, tier: order.fromDesignTier, design: order.fromDesignId },
+          edition: {
+            plan: order.fromPlanId,
+            tier: order.fromDesignTier,
+            design: order.fromDesignId,
+          },
           source: "purchase",
         });
       }

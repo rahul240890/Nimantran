@@ -86,17 +86,16 @@ export default async function EditionPage({
     pricing,
     urls,
     origin,
-  ] =
-    await Promise.all([
-      editionsActive(),
-      inviteReceipts(account, id),
-      getLocale(),
-      getText(editionsText),
-      checkoutCoupons().catch(() => []),
-      getPricing(),
-      store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
-      requestOrigin(),
-    ]);
+  ] = await Promise.all([
+    editionsActive(),
+    inviteReceipts(account, id),
+    getLocale(),
+    getText(editionsText),
+    checkoutCoupons().catch(() => []),
+    getPricing(),
+    store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
+    requestOrigin(),
+  ]);
   // The video preview on the Celebration card, made as the video page makes it: with the
   // mark until the package has the video, and ending on the site until the invite is live
   const photos: PublicPhoto[] = draft.photos.flatMap((photo) => {
