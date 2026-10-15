@@ -151,17 +151,22 @@ export default async function InvoicePage({ params }: PageProps<"/invoice/[order
                 value={`− ${formatRupees(order.discountPaise)}`}
               />
             )}
-            <Row label="Taxable value" value={formatRupees(gst.taxablePaise)} />
-            <Row label="CGST 9%" value={formatRupees(gst.cgstPaise)} />
-            <Row label="SGST 9%" value={formatRupees(gst.sgstPaise)} />
+            {/* GST appears only once the business is registered and its GSTIN is set */}
+            {taxInvoice && (
+              <>
+                <Row label="Taxable value" value={formatRupees(gst.taxablePaise)} />
+                <Row label="CGST 9%" value={formatRupees(gst.cgstPaise)} />
+                <Row label="SGST 9%" value={formatRupees(gst.sgstPaise)} />
+              </>
+            )}
             <Row label="Total paid" value={formatRupees(order.amountPaise)} strong />
           </dl>
 
           <footer className="flex flex-col gap-1 border-t border-line pt-5">
             <p>
               Paid online through Razorpay
-              {order.providerPaymentId ? `, payment ${order.providerPaymentId}` : ""}. Prices
-              include GST.
+              {order.providerPaymentId ? `, payment ${order.providerPaymentId}` : ""}.
+              {taxInvoice ? " Prices include GST." : ""}
             </p>
             {order.status === "refunded" && (
               <p className="font-semibold text-warning">
@@ -169,7 +174,6 @@ export default async function InvoicePage({ params }: PageProps<"/invoice/[order
                 {order.refundedAt ? ` on ${dated.format(new Date(order.refundedAt))}` : ""}.
               </p>
             )}
-            {!taxInvoice && <p>A tax invoice is issued once GST registration is complete.</p>}
           </footer>
         </main>
       </div>

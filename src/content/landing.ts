@@ -204,7 +204,7 @@ export const pricing = {
       "Grand: unlimited invites, and a video for every function",
     ],
   },
-  note: "One payment per invitation, GST included. Never a subscription. Every package covers every function.",
+  note: "One payment per invitation, all taxes included. Never a subscription. Every package covers every function.",
   cta: "Start your invite",
   compare: "Compare the packages",
 } as const;
