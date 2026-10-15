@@ -4521,6 +4521,58 @@
 }
 
 /*
+ * A sideways row's edges fade on a wider screen while there is more that way (ScrollRow sets
+ * data-more-back and data-more-next). Registered so the fade eases in and out.
+ */
+@property --row-fade-back {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --row-fade-next {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@utility row-fade {
+  @media (min-width: 48rem) {
+    --row-fade-back: 0px;
+    --row-fade-next: 0px;
+    transition:
+      --row-fade-back 300ms ease,
+      --row-fade-next 300ms ease;
+    /* Only while it scrolls: a mask clips the shadows of a row that fits */
+    &:is([data-more-back], [data-more-next]) {
+      mask-image: linear-gradient(
+        to right,
+        transparent,
+        black var(--row-fade-back),
+        black calc(100% - var(--row-fade-next)),
+        transparent
+      );
+    }
+    &:is([data-more-back], [data-more-next]):dir(rtl) {
+      mask-image: linear-gradient(
+        to left,
+        transparent,
+        black var(--row-fade-back),
+        black calc(100% - var(--row-fade-next)),
+        transparent
+      );
+    }
+    &[data-more-back] {
+      --row-fade-back: 3.5rem;
+    }
+    &[data-more-next] {
+      --row-fade-next: 3.5rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
  * Content rises into place as it scrolls into view. Pure CSS (scroll-driven animations):
  * browsers without support, and still mode, simply show it in place.
  */

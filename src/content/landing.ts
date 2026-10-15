@@ -62,7 +62,6 @@ export const shell = {
   primaryNav: "Main",
   openMenu: "Open menu",
   menuTitle: "Menu",
-  joinWaitlist: "Launch news",
   createInvite: "Start your invite",
   faq: "FAQ",
   createInviteShort: "Create invite",
@@ -134,6 +133,7 @@ export const howItWorks = {
   eyebrow: "How it works",
   title: "Ready in three steps",
   intro: "No design skills needed. Most families finish their invite over one cup of chai.",
+  stepLabel: (step: number) => `Step ${step}`,
   steps: [
     {
       title: "Pick a design",
@@ -227,7 +227,7 @@ export const faq = {
     },
     {
       q: "Can the card follow our family's traditions?",
-      a: "Yes. Pick your tradition, such as Marathi, Gujarati, Bengali or Tamil, and the card sets the sacred symbol, the invocation, local ceremony names and family wording like Darshanabhilashi, all still editable. People from each community are checking every tradition before launch.",
+      a: "Yes. Pick your tradition, such as Marathi, Gujarati, Bengali or Tamil, and the card sets the sacred symbol, the invocation, local ceremony names and family wording like Darshanabhilashi, all still editable.",
     },
     {
       q: "Can I change details after sending it?",
@@ -244,48 +244,12 @@ export const faq = {
   ],
 } as const;
 
-export const waitlist = {
-  eyebrow: "Launch news",
-  title: "Hear first when we launch",
-  intro:
-    "You can make and send invites today. Leave your details and we will write once when Shubh launches publicly, with your first-event offer.",
-  perks: [
-    "One email on launch day",
-    "Celebration free for your first event",
-    "A say in the designs we make next",
-  ],
-  form: {
-    name: "Your name",
-    email: "Email",
-    emailHint: "We only use it to tell you when we launch.",
-    phone: "WhatsApp number",
-    phoneHint: "Include the country code if you are outside India.",
-    optional: "Optional",
-    occasion: "What are you celebrating?",
-    occasionPlaceholder: "Choose one",
-    occasions: [
-      { value: "wedding", label: "A wedding" },
-      { value: "engagement", label: "An engagement" },
-      { value: "family", label: "Another family celebration" },
-      { value: "business", label: "I plan events for others" },
-    ],
-    submit: "Keep me posted",
-    sending: "Saving…",
-    privacy: "No spam. One email when we launch, and you can ask us to delete your details.",
-  },
-  errors: {
-    name: "Enter your name.",
-    nameLong: "Keep your name under 80 characters.",
-    email: "Enter an email like name@example.com.",
-    phone: "Enter a phone number with 10 to 15 digits.",
-    occasion: "Choose what you are celebrating.",
-    summary: "Check the highlighted fields.",
-    failed: "We couldn't add you just now. Your details are still here, so please try again.",
-    retry: "Try again",
-  },
-  success: {
-    title: (name: string) => `You're on the list, ${name}`,
-    body: "We will email you as soon as your spot opens. Until then, happy planning.",
-    again: "Add someone else",
-  },
+/** The home page's last word, before the footer: one more way in. */
+export const closing = {
+  eyebrow: "Start today",
+  title: "Your invitation, ready before the chai cools",
+  body: "Pick a painted design, add your names and dates, and send one link on WhatsApp. Free to start, and you pay only when you choose a package.",
+  primary: "Start your invite",
+  secondary: "Browse all designs",
+  proof: ["No app for guests", "Every function in one link", "Change details any time"],
 } as const;

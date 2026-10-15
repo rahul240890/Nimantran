@@ -261,66 +261,6 @@ test.describe("landing page", () => {
   }
 });
 
-test.describe("waitlist", () => {
-  test.use({ reducedMotion: "reduce" });
-
-  test("shows inline errors, focuses the first one, then clears them as they are fixed", async ({
-    page,
-  }) => {
-    await visit(page, "/#waitlist");
-    const form = page.locator("#waitlist form");
-    await form.getByRole("button", { name: "Keep me posted" }).click();
-
-    const name = form.getByRole("textbox", { name: /Your name/ });
-    await expect(name).toBeFocused();
-    await expect(name).toHaveAttribute("aria-invalid", "true");
-    await expect(form.getByText("Enter your name.")).toBeVisible();
-    await expect(form.getByText("Choose what you are celebrating.")).toBeVisible();
-
-    await name.fill("Meera Sharma");
-    await expect(form.getByText("Enter your name.")).toBeHidden();
-
-    await form.getByRole("textbox", { name: /Email/ }).fill("meera@");
-    await form.getByRole("textbox", { name: /WhatsApp/ }).fill("12345");
-    await form.getByRole("button", { name: "Keep me posted" }).click();
-    await expect(form.getByText("Enter an email like name@example.com.")).toBeVisible();
-    await expect(form.getByText("Enter a phone number with 10 to 15 digits.")).toBeVisible();
-  });
-
-  test("keeps what was typed across a reload", async ({ page }) => {
-    await visit(page, "/#waitlist");
-    const form = page.locator("#waitlist form");
-    await form.getByRole("textbox", { name: /Your name/ }).fill("Meera Sharma");
-    await form.getByRole("textbox", { name: /Email/ }).fill("meera@example.com");
-    await page.reload();
-    await expect(page.locator("[data-deck-live]")).toHaveAttribute("data-deck-live", "true");
-    await expect(form.getByRole("textbox", { name: /Your name/ })).toHaveValue("Meera Sharma");
-    await expect(form.getByRole("textbox", { name: /Email/ })).toHaveValue("meera@example.com");
-  });
-
-  test("joins with valid details and shows a thank-you", async ({ page }) => {
-    await visit(page, "/#waitlist");
-    const form = page.locator("#waitlist form");
-    await form.getByRole("textbox", { name: /Your name/ }).fill("Meera Sharma");
-    await form.getByRole("textbox", { name: /Email/ }).fill("meera@example.com");
-    await form.getByRole("textbox", { name: /WhatsApp/ }).fill("+91 98765 43210");
-    await form.getByRole("combobox", { name: /What are you celebrating/ }).click();
-    await page.getByRole("option", { name: "A wedding" }).click();
-    await form.getByRole("button", { name: "Keep me posted" }).click();
-
-    const thanks = page.getByRole("heading", { name: "You're on the list, Meera" });
-    await expect(thanks).toBeVisible();
-    await expect(thanks).toBeFocused();
-    expect((await axe(page).include("#waitlist").analyze()).violations).toEqual([]);
-
-    // The draft is cleared once someone has joined
-    await page.reload();
-    await expect(
-      page.locator("#waitlist form").getByRole("textbox", { name: /Your name/ }),
-    ).toHaveValue("");
-  });
-});
-
 test.describe("landing page motion", () => {
   test.use({ reducedMotion: "no-preference" });
 

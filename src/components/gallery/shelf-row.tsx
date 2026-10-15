@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ScrollRow } from "@/components/ui/scroll-row";
+import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { WEDDING_KINDS, WEDDING_KIND_ENTRIES, suiteImage } from "@/lib/gallery/catalog";
@@ -34,11 +34,14 @@ export function CatalogCard({
   filters,
   covers,
   priority,
+  compact,
 }: {
   entry: CatalogEntry;
   filters: DesignFilters;
   covers: Covers;
   priority: boolean;
+  /** In a sideways row (see DesignCard). */
+  compact?: boolean;
 }) {
   const locale = useLocale();
   const { name, description } = designWords(entry.design, locale);
@@ -51,6 +54,7 @@ export function CatalogCard({
       photos={designPhotos(entry.design, catalogCategory(entry, filters))}
       priority={priority}
       cover={entry.design.suite === "classic" ? covers[entry.design.template] : undefined}
+      compact={compact}
     />
   );
 }
@@ -58,7 +62,8 @@ export function CatalogCard({
 /**
  * A row of a few designs that scrolls sideways, with View all for the rest: the way large
  * shops show a big catalogue. The next design peeks in at the edge, so the row reads as
- * one to swipe; on a wider screen round arrows over its edges scroll it too.
+ * one to swipe; on a wider screen a pair of arrows beside View all scrolls it, its edges
+ * fade while there is more, and a thin gold line under it shows how far along it is.
  */
 export function ShelfRow({
   id,
@@ -82,60 +87,83 @@ export function ShelfRow({
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   const label = shelfCopy.viewAllLabel(title, total);
+  const row = useScrollRow();
+  const item =
+    "w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4.5rem)/4.4)] xl:w-[calc((100%-6rem)/5.3)]";
 
   return (
-    <section aria-labelledby={`${id}-heading`} data-shelf={id} className="flex flex-col gap-3">
+    <section aria-labelledby={`${id}-heading`} data-shelf={id} className="flex flex-col gap-4">
       <div className="flex items-end justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-0.5">
-          <h3 id={`${id}-heading`} className="font-display text-xl leading-tight sm:text-2xl">
+        <div className="flex min-w-0 flex-col gap-1">
+          <h3
+            id={`${id}-heading`}
+            className="font-display text-[1.35rem] leading-tight sm:text-[1.75rem]"
+          >
             {title}
           </h3>
-          <p className="text-sm text-ink-muted">
-            {intro} <span className="whitespace-nowrap">· {catalogCopy.count(total)}</span>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
+            <span className="min-w-0">{intro}</span>
+            <span className="inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-ink-muted ring-1 ring-line">
+              {catalogCopy.count(total)}
+            </span>
           </p>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-2">
           {href && (
             <Link
               href={href}
               aria-label={label}
-              className="inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-surface px-4 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:border-line-strong hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="group/all inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
               {shelfCopy.viewAll}
-              <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
+              <ArrowRight
+                aria-hidden
+                className="size-4 transition-transform duration-200 group-hover/all:translate-x-0.5 rtl:rotate-180 motion-still:transition-none"
+              />
             </Link>
           )}
+          <RowArrows row={row} />
         </div>
       </div>
-      <ScrollRow className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:px-0">
+      <ScrollRow
+        row={row}
+        track
+        className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:gap-5 lg:px-0"
+      >
         {entries.map((entry, index) => (
-          <li
-            key={entry.design.id}
-            data-format-item={entry.format}
-            className="w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4rem)/4.3)] xl:w-[calc((100%-5rem)/5.25)]"
-          >
+          <li key={entry.design.id} data-format-item={entry.format} className={item}>
             <CatalogCard
               entry={entry}
               filters={NO_FILTERS}
               covers={covers}
               priority={priority && index < 2}
+              compact
             />
           </li>
         ))}
         {href && total > entries.length && (
-          <li className="w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4rem)/4.3)] xl:w-[calc((100%-5rem)/5.25)]">
+          <li className={item}>
             <Link
               href={href}
               aria-label={label}
-              className="flex aspect-[3/4] h-auto w-full flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-line-strong bg-surface-2 p-4 text-center transition-colors hover:border-marigold hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              className="group/more relative isolate flex aspect-[3/4] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl bg-night p-4 text-center shadow-raised ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-float focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0"
             >
-              <span className="grid size-12 place-items-center rounded-full bg-marigold/15 text-accent-text">
-                <ArrowRight aria-hidden className="size-5 rtl:rotate-180" />
+              {/* A glow of marigold behind the words, like lamplight */}
+              <span
+                aria-hidden
+                className="absolute inset-0 -z-10 opacity-70"
+                style={{
+                  background:
+                    "radial-gradient(70% 55% at 50% 45%, color-mix(in srgb, var(--marigold) 32%, transparent), transparent)",
+                }}
+              />
+              <span className="grid size-14 place-items-center rounded-full bg-marigold text-on-marigold shadow-float transition-transform duration-300 group-hover/more:scale-110 motion-still:transition-none motion-still:group-hover/more:scale-100">
+                <ArrowRight aria-hidden className="size-6 rtl:rotate-180" />
               </span>
-              <span className="font-display text-lg leading-tight text-ink">
+              <span className="font-display text-xl leading-tight text-card-ivory">
                 {shelfCopy.viewAll}
               </span>
-              <span className="text-sm text-ink-muted">{catalogCopy.count(total)}</span>
+              <span className="text-sm text-card-ivory/80">{catalogCopy.count(total)}</span>
             </Link>
           </li>
         )}

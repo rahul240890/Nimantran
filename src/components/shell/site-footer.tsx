@@ -72,11 +72,6 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               </a>
             </li>
             <li>
-              <a href={`${home}#waitlist`} className={linkClass}>
-                {shell.joinWaitlist}
-              </a>
-            </li>
-            <li>
               <Link href={pagePath({ kind: "blog" }, locale)} className={linkClass}>
                 {pagesText[locale].blogCopy.crumb}
               </Link>

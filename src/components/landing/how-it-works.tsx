@@ -15,24 +15,31 @@ export function HowItWorks({ locale }: { locale: UiLocale }) {
       title={howItWorks.title}
       intro={howItWorks.intro}
     >
-      <ol className="relative grid gap-5 md:grid-cols-3 md:gap-6">
+      <ol className="relative grid gap-4 md:grid-cols-3 md:gap-6">
         {/* A gold thread joining the three steps on wide screens */}
         <span
           aria-hidden
-          className="absolute top-12 right-[16%] left-[16%] hidden h-px bg-linear-to-r from-transparent via-marigold to-transparent md:block"
+          className="absolute top-[3.25rem] right-[12%] left-[12%] hidden h-px bg-linear-to-r from-transparent via-marigold to-transparent md:block"
         />
         {howItWorks.steps.map((step, index) => {
           const Icon = icons[index]!;
           return (
             <li key={step.title} className="reveal-on-scroll">
-              <Card className="h-full items-start gap-4 p-6 sm:p-7 md:items-center md:text-center">
-                <span className="relative grid size-12 place-items-center rounded-full bg-surface text-accent-text shadow-float ring-1 ring-line">
-                  <Icon aria-hidden className="size-5" />
-                  <span className="absolute -end-1.5 -top-1.5 grid size-6 place-items-center rounded-full bg-marigold font-label text-xs text-on-marigold">
-                    {index + 1}
-                  </span>
+              <Card className="relative h-full items-start gap-4 overflow-hidden p-6 sm:p-7">
+                {/* The step's number, large and faint behind the words */}
+                <span
+                  aria-hidden
+                  className="pointer-events-none absolute -end-2 -top-6 font-display text-[7.5rem] leading-none text-marigold/15 select-none"
+                >
+                  {index + 1}
                 </span>
-                <h3 className="font-display text-2xl leading-tight">{step.title}</h3>
+                <span className="relative grid size-14 place-items-center rounded-2xl bg-marigold text-on-marigold shadow-float">
+                  <Icon aria-hidden className="size-6" />
+                </span>
+                <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
+                  {howItWorks.stepLabel(index + 1)}
+                </p>
+                <h3 className="-mt-2 font-display text-2xl leading-tight">{step.title}</h3>
                 <p className="text-ink-muted">{step.body}</p>
               </Card>
             </li>

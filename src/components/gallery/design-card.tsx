@@ -46,6 +46,11 @@ type DesignCardProps = {
    * differ between server and browser, so drawing it in both would not match.
    */
   cover?: ReactNode;
+  /**
+   * For a sideways row: the painting stands on its own with its price over it, and the words
+   * under it lead to the editor, without the card's box and its full-width button.
+   */
+  compact?: boolean;
 };
 
 /** The pages a design has paintings for, in the order guests see them. */
@@ -66,6 +71,7 @@ export function DesignCard({
   photos,
   priority,
   cover,
+  compact = false,
 }: DesignCardProps) {
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
@@ -80,13 +86,23 @@ export function DesignCard({
     <article
       data-design={design.id}
       data-format={scene ? "scene" : painted ? "story" : "card"}
-      className="group flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float"
+      className={cn(
+        "group flex h-full flex-col",
+        compact
+          ? "gap-3"
+          : "overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float",
+      )}
     >
       <button
         type="button"
         onClick={() => setOpen(true)}
         aria-label={galleryCopy.preview(name)}
-        className="@container/tile relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night outline-offset-[-3px] focus-visible:outline-2 focus-visible:outline-ring"
+        className={cn(
+          "@container/tile relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night focus-visible:outline-2 focus-visible:outline-ring",
+          compact
+            ? "rounded-2xl shadow-raised ring-1 ring-line outline-offset-3 transition-[transform,box-shadow] duration-500 ease-out-expo group-hover:-translate-y-1 group-hover:shadow-float motion-still:transition-none motion-still:group-hover:translate-y-0"
+            : "outline-offset-[-3px]",
+        )}
       >
         {scene ? (
           <>
@@ -158,41 +174,69 @@ export function DesignCard({
             {galleryCopy.trendingBadge}
           </span>
         )}
+        {compact && (
+          <TierBadge designId={design.id} className="absolute start-3 bottom-3 max-w-[60%]" />
+        )}
         <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
           <Eye aria-hidden className="size-5" />
         </span>
       </button>
-      {/* Named "tile" so a narrow card's price badge drops its tier name */}
-      <div className="@container/tile flex flex-1 flex-col gap-3 p-3 sm:p-4">
-        <div className="flex flex-col gap-1">
-          <h3 className="font-display text-xl leading-tight">{name}</h3>
-          <p className="line-clamp-2 text-sm text-ink-muted">{description}</p>
-        </div>
-        {/* What it costs and what photos it takes, the two things a host weighs first */}
-        <div className="flex flex-col items-start gap-2">
-          <TierBadge designId={design.id} variant="plain" className="max-w-full" />
-          <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
-            {photos === "none" ? (
-              <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
-            ) : (
-              <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
-            )}
-            {galleryCopy.photoNeeds[photos]}
-          </p>
-        </div>
-        {/* Two cards to a row on a phone leave little room: the arrow goes and the words
-            may wrap before they would ever touch the button's edge */}
-        <Button
-          asChild
-          size="sm"
-          className="mt-auto h-auto min-h-11 w-full px-3 py-2 text-center leading-tight whitespace-normal"
+      {compact ? (
+        <Link
+          href={href}
+          className="group/use flex flex-1 flex-col gap-1 rounded-lg px-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <Link href={href}>
+          <h3 className="truncate font-display text-lg leading-tight text-ink">{name}</h3>
+          <p className="line-clamp-1 text-sm text-ink-muted">{description}</p>
+          <p data-photos={photos} className="flex items-center gap-1.5 text-xs text-ink-muted">
+            {photos === "none" ? (
+              <CameraOff aria-hidden className="size-3.5 shrink-0" />
+            ) : (
+              <Camera aria-hidden className="size-3.5 shrink-0" />
+            )}
+            <span className="truncate">{galleryCopy.photoNeeds[photos]}</span>
+          </p>
+          <span className="mt-auto inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-text">
             {galleryCopy.useDesign}
-            <ArrowRight aria-hidden className="@max-[10.5rem]:hidden rtl:rotate-180" />
-          </Link>
-        </Button>
-      </div>
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform duration-200 group-hover/use:translate-x-1 rtl:rotate-180 motion-still:transition-none motion-still:group-hover/use:translate-x-0"
+            />
+          </span>
+        </Link>
+      ) : (
+        /* Named "tile" so a narrow card's price badge drops its tier name */
+        <div className="@container/tile flex flex-1 flex-col gap-3 p-3 sm:p-4">
+          <div className="flex flex-col gap-1">
+            <h3 className="font-display text-xl leading-tight">{name}</h3>
+            <p className="line-clamp-2 text-sm text-ink-muted">{description}</p>
+          </div>
+          {/* What it costs and what photos it takes, the two things a host weighs first */}
+          <div className="flex flex-col items-start gap-2">
+            <TierBadge designId={design.id} variant="plain" className="max-w-full" />
+            <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
+              {photos === "none" ? (
+                <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
+              ) : (
+                <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
+              )}
+              {galleryCopy.photoNeeds[photos]}
+            </p>
+          </div>
+          {/* Two cards to a row on a phone leave little room: the arrow goes and the words
+            may wrap before they would ever touch the button's edge */}
+          <Button
+            asChild
+            size="sm"
+            className="mt-auto h-auto min-h-11 w-full px-3 py-2 text-center leading-tight whitespace-normal"
+          >
+            <Link href={href}>
+              {galleryCopy.useDesign}
+              <ArrowRight aria-hidden className="@max-[10.5rem]:hidden rtl:rotate-180" />
+            </Link>
+          </Button>
+        </div>
+      )}
       <DesignPreview
         open={open}
         onOpenChange={setOpen}
