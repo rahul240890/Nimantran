@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
-import { cardFunctions, storyFunctions } from "./story";
+import { cardFunctions, storyFunctions, videoDesign } from "./story";
 
 /* The event pages speak only the card's language (Step 12g). */
 
@@ -55,5 +55,15 @@ describe("pages in the card's language", () => {
     for (const words of Object.values(CARD_STORY_WORDS)) {
       expect(Object.values(words).every((word) => word.trim().length > 0)).toBe(true);
     }
+  });
+});
+
+describe("the video's theme", () => {
+  it("differs for each theme, so each keeps its own video", () => {
+    const draft = newDraft();
+    const kayal: InviteDraft = { ...draft, suite: "kayal" };
+    const kashi: InviteDraft = { ...draft, suite: "kashi" };
+    expect(videoDesign(kayal)).not.toBe(videoDesign(kashi));
+    expect(videoDesign(kayal)).toMatch(/^kayal/);
   });
 });

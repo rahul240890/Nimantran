@@ -34,6 +34,7 @@ import {
   draftShowsScene,
   draftSuite,
   storyFamily,
+  videoDesign,
 } from "@/lib/publish/story";
 import { draftCouple } from "@/lib/publish/frames";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
@@ -332,8 +333,9 @@ function useInviteVideo({
   const [support, setSupport] = useState<Support>("checking");
   const silent = support === "silent";
   const poster = useRef<HTMLCanvasElement>(null);
-  // The video for this invitation and choice, kept while making and saved once made
-  const key = `${slug}:${choice}${marked ? ":preview" : ""}`;
+  // The video for this invitation, its theme and choice, kept while making and saved once
+  // made: each theme the host tries keeps its own video, and a new one starts unmade
+  const key = `${slug}:${videoDesign(draft)}:${choice}${marked ? ":preview" : ""}`;
   const kept = useSyncExternalStore(
     subscribeVideos,
     () => keptVideo(key),
