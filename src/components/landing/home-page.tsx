@@ -1,10 +1,10 @@
 import { PageTransition } from "@/components/motion/page-transition";
+import { Closing } from "./closing";
 import { Faq } from "./faq";
 import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
 import { HomeDesigns, HomeKinds, HomeMore, HomeOccasions } from "./home-gallery";
-import { Waitlist } from "./waitlist";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
 import { siteMenu } from "@/components/shell/site-menu";
@@ -30,7 +30,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
           <HowItWorks locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />
-          <Waitlist />
+          <Closing locale={locale} />
         </main>
         <SiteFooter locale={locale} />
         <JsonLd

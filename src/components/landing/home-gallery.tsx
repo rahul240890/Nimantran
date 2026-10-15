@@ -165,7 +165,7 @@ export function HomeDesigns({ locale }: { locale: UiLocale }) {
       aria-labelledby="templates-title"
       className="scroll-mt-16 outline-none"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 py-14 sm:px-6 sm:py-20 lg:gap-14 lg:px-8">
         <Heading
           id="templates-title"
           eyebrow={homeGallery.designsEyebrow}
@@ -221,7 +221,13 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
     {
       format: "card",
       picture: (
-        <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[8%]">
+        <span
+          className="absolute inset-0 flex justify-center bg-night px-[18%] pt-[6%] pb-[50%] sm:pt-[8%] sm:pb-[40%]"
+          style={{
+            backgroundImage:
+              "radial-gradient(60% 45% at 50% 32%, color-mix(in srgb, var(--marigold) 35%, transparent), transparent)",
+          }}
+        >
           <TemplateCover id="marigold" locale={locale} className="h-full w-auto max-w-full" />
         </span>
       ),
@@ -234,14 +240,14 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
       aria-labelledby="kinds-title"
       className="border-y border-line bg-surface-2/60"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <Heading
           id="kinds-title"
           eyebrow={homeGallery.kindsEyebrow}
           title={homeGallery.kindsTitle}
           intro={homeGallery.kindsIntro}
         />
-        <ul className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+        <ul className="grid gap-4 sm:grid-cols-3 lg:gap-6">
           {kinds.map(({ format, picture }) => {
             const Icon = KIND_ICONS[format];
             const { title, intro } = shelfCopy.format[format];
@@ -252,24 +258,31 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
                     { id: `format-${format}`, kind: "format", value: format },
                     designsPath,
                   )}
-                  className="group grid h-full grid-cols-[7rem_1fr] overflow-hidden rounded-xl border border-line bg-surface shadow-raised outline-offset-3 transition-[box-shadow,border-color] duration-300 hover:border-line-strong hover:shadow-float focus-visible:outline-2 focus-visible:outline-ring sm:grid-cols-1"
+                  className="group relative isolate flex aspect-[5/4] h-full flex-col justify-end overflow-hidden rounded-2xl bg-night shadow-raised ring-1 ring-line outline-offset-3 transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-float focus-visible:outline-2 focus-visible:outline-ring sm:aspect-[3/4] lg:aspect-[4/5] motion-still:transition-none motion-still:hover:translate-y-0"
                 >
-                  <span className="relative isolate block min-h-36 overflow-hidden bg-night sm:aspect-[4/3] sm:min-h-0">
+                  <span className="absolute inset-0 -z-10 transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100">
                     {picture}
                   </span>
-                  <span className="flex min-w-0 flex-col gap-1.5 p-4 sm:p-5">
-                    <span className="inline-flex items-center gap-2 font-display text-xl leading-tight text-ink sm:text-2xl">
-                      <Icon aria-hidden className="size-5 shrink-0 text-accent-text" />
+                  {/* Night rising from the foot keeps the words readable on any painting */}
+                  <span
+                    aria-hidden
+                    className="absolute inset-0 -z-10 bg-linear-to-t from-night via-night/60 to-transparent to-70%"
+                  />
+                  <span className="flex flex-col gap-1.5 p-5 text-card-ivory sm:p-6">
+                    <span className="grid size-10 place-items-center rounded-full bg-marigold text-on-marigold shadow-float">
+                      <Icon aria-hidden className="size-5" />
+                    </span>
+                    <span className="pt-1 font-display text-2xl leading-tight sm:text-[1.75rem]">
                       {title}
                     </span>
-                    <span className="text-sm leading-snug text-ink-muted sm:text-base">
+                    <span className="text-sm leading-snug text-card-ivory/80 sm:text-base">
                       {intro}
                     </span>
-                    <span className="mt-auto inline-flex items-center gap-1 pt-2 text-sm font-semibold text-accent-text">
+                    <span className="inline-flex items-center gap-1 pt-2 text-sm font-semibold text-marigold">
                       {shelfCopy.viewAll}
                       <ArrowRight
                         aria-hidden
-                        className="size-4 transition-transform group-hover:translate-x-0.5 rtl:rotate-180 motion-still:transition-none"
+                        className="size-4 transition-transform group-hover:translate-x-1 rtl:rotate-180 motion-still:transition-none"
                       />
                     </span>
                   </span>
@@ -289,7 +302,7 @@ export function HomeMore({ locale }: { locale: UiLocale }) {
   const designsPath = pagePath({ kind: "designs" }, locale);
   return (
     <section aria-labelledby="more-title">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-10 px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <Heading
           id="more-title"
           eyebrow={homeGallery.moreEyebrow}
@@ -297,7 +310,7 @@ export function HomeMore({ locale }: { locale: UiLocale }) {
           intro={homeGallery.moreIntro}
         />
         <HomeShelves designsPath={designsPath} group="occasion" covers={covers(locale)} />
-        <Button asChild className="self-center">
+        <Button asChild variant="secondary" className="self-center">
           <Link href={designsPath}>
             {homeGallery.allDesigns}
             <ArrowRight aria-hidden className="rtl:rotate-180" />

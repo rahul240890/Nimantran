@@ -30,8 +30,7 @@ export default defineConfig({
     command: `npm run start -- -p ${port}`,
     port,
     reuseExistingServer: !process.env.CI,
-    // Waitlist sign-ups are logged instead of sent anywhere, and sign-in runs in preview
-    // mode (any number, code 123456) instead of reaching Supabase
-    env: { WAITLIST_LOG_ONLY: "1", SHUBHDWAR_AUTH_PREVIEW: "1" },
+    // Sign-in runs in preview mode (any number, code 123456) instead of reaching Supabase
+    env: { SHUBHDWAR_AUTH_PREVIEW: "1" },
   },
 });

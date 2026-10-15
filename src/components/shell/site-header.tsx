@@ -183,16 +183,6 @@ function MobileMenu({ menu }: { menu: SiteMenu }) {
             <Button asChild fullWidth>
               <Link href={pagePath({ kind: "gallery" }, locale)}>{shell.createInvite}</Link>
             </Button>
-            <Button
-              fullWidth
-              variant="secondary"
-              onClick={() => {
-                pending.current = "waitlist";
-                setOpen(false);
-              }}
-            >
-              {shell.joinWaitlist}
-            </Button>
           </div>
         </div>
       </SheetContent>
