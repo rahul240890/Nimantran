@@ -286,9 +286,21 @@ export function ruleAt(beat: StoryBeat): number {
   return after < beat.lines.length ? after : -1;
 }
 
+/**
+ * Where a function's page sets its small mark between the day and the place: before the
+ * venue, when a day or an hour stands above it, or nowhere.
+ */
+export function placeMarkAt(beat: StoryBeat): number {
+  const rule = ruleAt(beat);
+  if (rule < 0) return -1;
+  const venue = beat.lines.findIndex((line) => line.style === "venue");
+  return venue > rule ? venue : -1;
+}
+
 /** The space above a line on its page, in cqmin, with the rule's own gap. */
 export function lineSpace(beat: StoryBeat, index: number, symbol: boolean): number {
   if (index === ruleAt(beat)) return 2.2;
+  if (index === placeMarkAt(beat)) return 1.6;
   const role = roleOf(beat, beat.lines[index]!.style);
   if (index === 0) return symbol ? spaceBefore(role, "display") : 0;
   const previous = roleOf(beat, beat.lines[index - 1]!.style);

@@ -8,6 +8,7 @@ import {
   keepDate,
   lettering,
   lineSpace,
+  placeMarkAt,
   roleOf,
   ruleAt,
   scriptOfLang,
@@ -146,5 +147,22 @@ describe("a function's day and place", () => {
         false,
       ),
     );
+  });
+
+  it("sets a small mark between the day and the place, only when both are there", () => {
+    const haldi = page("haldi", [
+      { text: "Haldi", style: "display" },
+      { text: "Sunday, 22 November 2026", style: "date" },
+      { text: "10:00 AM", style: "body" },
+      { text: "Sharma Niwas", style: "venue" },
+    ]);
+    expect(placeMarkAt(haldi)).toBe(3);
+    // A place alone under the name has the rule above it, not a second mark
+    const placeOnly = page("haldi", [
+      { text: "Haldi", style: "display" },
+      { text: "Sharma Niwas", style: "venue" },
+    ]);
+    expect(placeMarkAt(placeOnly)).toBe(-1);
+    expect(placeMarkAt(page("reply", [{ text: "Sharma Niwas", style: "venue" }]))).toBe(-1);
   });
 });

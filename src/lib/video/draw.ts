@@ -16,6 +16,7 @@ import {
   lettering,
   lineSpace,
   roleSize,
+  placeMarkAt,
   ruleAt,
   type TypeRole,
 } from "@/lib/suites/lettering";
@@ -296,9 +297,10 @@ type Placed = {
   colour: string;
   spacing: number;
   lineHeight: number;
-  /** Space above it, and whether a fine rule sits in that space (a function's page). */
+  /** Space above it, and whether a fine rule or the place's mark sits in that space. */
   space: number;
   rule?: boolean;
+  mark?: boolean;
 };
 
 function styleOf(
@@ -419,6 +421,7 @@ function drawWords(
       });
     }
     const rule = ruleAt(beat);
+    const mark = placeMarkAt(beat);
     for (const [index, line] of beat.lines.entries()) {
       const name = beat.scene === "cover" && line.style === "display";
       const lang = line.lang ?? scene.lang;
@@ -441,8 +444,13 @@ function drawWords(
         colour: style.colour,
         spacing: style.spacing * size,
         lineHeight: style.lineHeight,
-        space: (lineSpace(beat, index, Boolean(sacred)) + (index === rule ? 2.2 : 0)) * cq * fit,
+        space:
+          (lineSpace(beat, index, Boolean(sacred)) +
+            (index === rule ? 2.2 : index === mark ? 1.6 : 0)) *
+          cq *
+          fit,
         rule: index === rule,
+        mark: index === mark,
       });
     }
     height = placed.reduce((sum, item) => sum + item.space + item.height, 0) + padY * 2;
@@ -501,6 +509,11 @@ function drawWords(
     y += item.space;
     const p = lineProgress(entry, index, seconds);
     if (p > 0 && item.rule) drawRule(ctx, x, y - item.space / 2, cq * fit, colours, p);
+    if (p > 0 && item.mark) {
+      // Sized as the live page's mark: clamp(1rem, 4cqmin, 1.35rem)
+      const em = Math.min(1.35 * REM, Math.max(REM, 4 * cq)) * fit;
+      drawPlaceMark(ctx, x, y - item.space / 2, em, colours.goldText, 1 - (1 - p) ** 3);
+    }
     if (p > 0) {
       const eased = 1 - (1 - p) ** 3;
       ctx.save();
@@ -528,6 +541,37 @@ function drawWords(
     }
     y += item.height;
   });
+}
+
+/**
+ * The small mark between a function's day and its place (globals.css .place-mark): a gold
+ * diamond between two dots, `em` wide units as on the live page.
+ */
+export function drawPlaceMark(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  em: number,
+  colour: string,
+  alpha: number,
+) {
+  ctx.save();
+  ctx.globalAlpha *= alpha;
+  ctx.fillStyle = colour;
+  for (const side of [-1, 1]) {
+    ctx.beginPath();
+    ctx.arc(x + side * 0.95 * em, y, 0.085 * em, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  const d = 0.21 * em;
+  ctx.beginPath();
+  ctx.moveTo(x, y - d);
+  ctx.lineTo(x + d, y);
+  ctx.lineTo(x, y + d);
+  ctx.lineTo(x - d, y);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
 }
 
 /** The fine rule between a function's name and its day: a hairline with a small diamond. */
