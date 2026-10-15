@@ -67,11 +67,14 @@ async function push(): Promise<SyncState> {
   } else {
     // Record where it lives, keeping any edits made while it was saving
     inviteDraft.update((current) => ({ ...current, remoteId: result.id }), { touch: false });
-    const uploaded = result.missingPhotos.length
-      ? await uploadPhotos(result.id, draft.photos, result.missingPhotos)
-      : true;
-    // The music clip follows; until it's there guests hear the raga, so it never holds up a save
-    if (result.missingClip && draft.music.clip) await uploadClip(result.id, draft.music.clip);
+    // Photos and the music clip go up together. Until the clip is there guests hear the
+    // raga, so its upload never decides whether the save went through
+    const [uploaded] = await Promise.all([
+      result.missingPhotos.length
+        ? uploadPhotos(result.id, draft.photos, result.missingPhotos)
+        : true,
+      result.missingClip && draft.music.clip ? uploadClip(result.id, draft.music.clip) : null,
+    ]);
     if (uploaded) {
       markSynced({ ...draft, remoteId: result.id });
       set("synced");

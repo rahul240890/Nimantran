@@ -214,6 +214,7 @@ export const repliesCopy = {
 
 export const videoCopy = {
   metaTitle: "Your invitation video",
+  loading: "Getting your video ready",
   back: "Back to your invite",
   heading: "Invitation video",
   body: "Your invitation as a vertical video with its raga: the opening as guests see it, the welcome with your names, then every page. Share it on WhatsApp, Instagram or anywhere else. It's made on this phone or computer, so nothing is uploaded, and it stays here when you come back.",
@@ -264,4 +265,5 @@ export const hostPreviewCopy = {
   phone: "Your invitation on a phone",
   fullScreen: "See it full screen",
   menu: "Preview options",
+  opening: "Opening your invitation",
 } as const;

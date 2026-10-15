@@ -214,6 +214,7 @@ export const repliesCopy: Translation<typeof en.repliesCopy> = {
 
 export const videoCopy: Translation<typeof en.videoCopy> = {
   metaTitle: "आपका निमंत्रण वीडियो",
+  loading: "आपका वीडियो तैयार हो रहा है",
   back: "अपने निमंत्रण पर वापस",
   heading: "निमंत्रण वीडियो",
   body: "आपका निमंत्रण, उसके राग के साथ, खड़े वीडियो में: मेहमानों जैसा खुलता द्वार, आपके नामों के साथ स्वागत, फिर हर पन्ना। इसे WhatsApp, Instagram या कहीं भी भेजें। यह इसी फ़ोन या कंप्यूटर पर बनता है, कुछ भी अपलोड नहीं होता, और लौटने पर यहीं मिलता है।",
@@ -263,4 +264,5 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   phone: "फ़ोन पर आपका निमंत्रण",
   fullScreen: "पूरी स्क्रीन पर देखें",
   menu: "प्रीव्यू के विकल्प",
+  opening: "आपका निमंत्रण खुल रहा है",
 };
