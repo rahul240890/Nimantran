@@ -563,6 +563,36 @@ export async function inviteReceipts(account: Account, eventId: string): Promise
   return ((data ?? []) as unknown as OrderRow[]).map(orderFromRow);
 }
 
+/**
+ * Everything this person has paid for, on every invite, newest first: their payment
+ * history (Account, Payments). Orders stay when an invite is deleted, without its names.
+ */
+export async function accountOrders(account: Account): Promise<AdminOrder[]> {
+  if (isPreview()) {
+    return [...preview.orders.values()]
+      .filter((o) => o.userId === account.id && (o.status === "paid" || o.status === "refunded"))
+      .reverse()
+      .map((order) => {
+        const event = order.eventId ? previewDb.invites.get(order.eventId)?.event : undefined;
+        return { ...order, slug: event?.slug ?? null, names: namesOf(event?.content) };
+      });
+  }
+  const supabase = await supabaseServer();
+  if (!supabase) return [];
+  const { data } = await supabase
+    .from("orders")
+    .select(`${ORDER_COLUMNS}, events(slug, content)`)
+    .eq("user_id", account.id)
+    .in("status", ["paid", "refunded"])
+    .order("created_at", { ascending: false })
+    .limit(500);
+  return ((data ?? []) as unknown as OrderRow[]).map((row) => ({
+    ...orderFromRow(row),
+    slug: row.events?.slug ?? null,
+    names: namesOf(row.events?.content),
+  }));
+}
+
 /** Every order, newest first, for the admin (the page checks the admin first). */
 export async function adminOrders(limit = 100): Promise<AdminOrder[]> {
   if (isPreview()) {

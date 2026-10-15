@@ -10,6 +10,7 @@ export const accountMenu = {
   yourAccount: "Your account",
   invites: "My invites",
   profile: "Profile",
+  payments: "Payments",
   newInvite: "New invite",
   signOut: "Sign out",
   signedOut: "Signed out",
@@ -116,6 +117,76 @@ export const profileCopy = {
     required: "Please enter your name",
     "too-long": "Keep it under 60 characters",
     invalid: "Choose a language",
+  },
+} as const;
+
+/** The tabs between the account's pages. */
+export const accountTabs = {
+  label: "Your account",
+  profile: "Profile",
+  payments: "Payments",
+} as const;
+
+export const paymentsCopy = {
+  metaTitle: "Payments",
+  eyebrow: "Payments",
+  title: "Payment history",
+  intro: "Every package you've bought, with its receipt to print or save as a PDF.",
+  totalPaid: "Total paid",
+  count: (count: number) => (count === 1 ? "1 payment" : `${count} payments`),
+  refundedTotal: (amount: string) => `${amount} refunded`,
+  listLabel: "Your payments",
+  item: (plan: string) => `${plan} package`,
+  upgrade: (from: string) => `Upgrade from ${from}`,
+  forInvite: (occasion: string, names: string) => (names ? `${occasion} · ${names}` : occasion),
+  deletedInvite: "Invite deleted",
+  design: (name: string) => `Design: ${name}`,
+  tier: {
+    free: "Free design",
+    premium: "Premium design",
+    royal: "Royal design",
+    signature: "Signature design",
+  },
+  coupon: (code: string, amount: string) =>
+    code ? `Coupon ${code}, − ${amount}` : `Discount − ${amount}`,
+  paid: "Paid",
+  refunded: "Refunded",
+  refundedOn: (date: string) => `Refunded on ${date}`,
+  test: "Test payment",
+  receiptNo: (no: string) => `Receipt ${no}`,
+  paymentId: (id: string) => `Payment ${id}`,
+  view: "View receipt",
+  download: "Download PDF",
+  openInvite: "Open invite",
+  exportAll: "Download all as CSV",
+  help: {
+    question: "A question about a payment, or need a refund?",
+    contact: "Contact us",
+    refunds: "Refund policy",
+  },
+  empty: {
+    title: "No payments yet",
+    body: "When you buy a package for an invite, its receipt appears here. Free invites never need one.",
+    action: "Go to my invites",
+  },
+  csv: {
+    file: "shubh-payments",
+    headers: [
+      "Date",
+      "Time",
+      "Receipt no.",
+      "Package",
+      "Occasion",
+      "Names",
+      "Design",
+      "Design tier",
+      "List price (INR)",
+      "Discount (INR)",
+      "Coupon",
+      "Paid (INR)",
+      "Status",
+      "Razorpay payment ID",
+    ],
   },
 } as const;
 

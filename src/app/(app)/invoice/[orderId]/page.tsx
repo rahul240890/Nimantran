@@ -4,12 +4,14 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
 import { BrandMark } from "@/components/brand/brand-mark";
+import { AutoPrint } from "@/components/editions/auto-print";
 import { PrintButton } from "@/components/editions/print-button";
 import { planCopy } from "@/content/editions";
 import { getAdmin } from "@/lib/admin/access";
 import { getAccount } from "@/lib/auth/server";
 import { getBusiness } from "@/lib/payments/business";
 import { orderWithInvite } from "@/lib/payments/editions";
+import { paymentItems } from "@/lib/payments/history";
 import { gstSplit } from "@/lib/payments/invoice";
 import { formatRupees } from "@/lib/plans/catalog";
 import { site } from "@/lib/site";
@@ -17,6 +19,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = { title: "Invoice", robots: { index: false, follow: false } };
 
 const dated = new Intl.DateTimeFormat("en-IN", { dateStyle: "long", timeZone: "Asia/Kolkata" });
+const timed = new Intl.DateTimeFormat("en-IN", { timeStyle: "short", timeZone: "Asia/Kolkata" });
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
@@ -33,8 +36,12 @@ function Row({ label, value, strong }: { label: string; value: string; strong?: 
  * An order's invoice, to print or save as PDF. A tax invoice once the business's GSTIN is
  * set on Admin, Business details; a receipt until then. Only the buyer and admins see it.
  */
-export default async function InvoicePage({ params }: PageProps<"/invoice/[orderId]">) {
+export default async function InvoicePage({
+  params,
+  searchParams,
+}: PageProps<"/invoice/[orderId]">) {
   const { orderId } = await params;
+  const { from, download } = await searchParams;
   if (!z.uuid().safeParse(orderId).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invoice/${orderId}`)}`);
@@ -48,19 +55,28 @@ export default async function InvoicePage({ params }: PageProps<"/invoice/[order
   const paidAt = new Date(order.paidAt ?? order.createdAt);
   const buyer = account.id === order.userId ? account : null;
   const plan = planCopy[order.planId].name;
+  // The invite's design by name, for its buyer; invoices stay in English
+  const item = buyer ? (await paymentItems(buyer, [order], "en")).get(order.eventId ?? "") : null;
+  const back =
+    from === "payments"
+      ? "/account/payments"
+      : order.eventId
+        ? `/invites/${order.eventId}/edition`
+        : "/account/payments";
 
   return (
     <div className="min-h-dvh bg-paper px-4 py-8 sm:px-6 sm:py-12 print:bg-transparent print:p-0">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
           <Link
-            href={order.eventId ? `/invites/${order.eventId}/edition` : "/invites"}
+            href={back}
             className="-ms-2 inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
           >
             <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
             Back
           </Link>
           <PrintButton />
+          {download === "1" && <AutoPrint />}
         </div>
 
         <main
@@ -85,7 +101,9 @@ export default async function InvoicePage({ params }: PageProps<"/invoice/[order
                   {order.invoiceNo ?? order.id.slice(0, 8)}
                 </span>
               </p>
-              <p>Date {dated.format(paidAt)}</p>
+              <p>
+                Date {dated.format(paidAt)}, {timed.format(paidAt)}
+              </p>
             </div>
           </header>
 
@@ -129,9 +147,10 @@ export default async function InvoicePage({ params }: PageProps<"/invoice/[order
             <tbody>
               <tr className="border-b border-line align-top">
                 <td className="py-3 pe-4">
-                  <span className="font-semibold text-ink">{plan} edition</span>
+                  <span className="font-semibold text-ink">{plan} package</span>
                   <span className="block">
                     Digital invitation{order.names ? ` for ${order.names}` : ""}
+                    {item?.design ? `, ${item.design} design` : ""}
                     {order.fromPlanId !== "free"
                       ? `, upgrade from ${planCopy[order.fromPlanId].name}`
                       : ""}
