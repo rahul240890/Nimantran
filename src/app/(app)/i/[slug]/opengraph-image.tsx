@@ -5,6 +5,7 @@ import { draftCopy, draftTemplate } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
 import { firstReadable, readableOn } from "@/lib/og/contrast";
+import { asJpeg } from "@/lib/og/jpeg";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { draftSuite } from "@/lib/publish/story";
 import { suitePreview } from "@/lib/suites/catalog";
@@ -12,11 +13,15 @@ import { site } from "@/lib/site";
 
 export const alt = "The invitation's cover";
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+// JPEG keeps the file small enough for WhatsApp to show it (src/lib/og/jpeg.ts)
+export const contentType = "image/jpeg";
 
 /** The picture WhatsApp and other apps show under the link: the family's card, in its colours. */
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+  return asJpeg(await drawCover((await params).slug));
+}
+
+async function drawCover(slug: string): Promise<Response> {
   const [invite, tokens, fonts] = await Promise.all([
     findPublishedInvite(slug),
     lightTokens(),

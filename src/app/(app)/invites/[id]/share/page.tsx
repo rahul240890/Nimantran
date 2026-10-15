@@ -14,7 +14,7 @@ import { hostReplies } from "@/lib/invites/rsvp";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { PLANS } from "@/lib/plans/catalog";
 import { inviteStore } from "@/lib/invites/store";
-import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
+import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { storyFunctions } from "@/lib/publish/story";
 import { requestOrigin } from "@/lib/request-origin";
@@ -43,7 +43,7 @@ async function qrSvg(url: string): Promise<string> {
 }
 
 export default async function SharePage({ params }: PageProps<"/invites/[id]/share">) {
-  const { shareCopy } = await getText(publishText);
+  const { shareCopy, guestCopy } = await getText(publishText);
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
@@ -53,9 +53,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
   if (!draft.slug) redirect(`/create?invite=${id}`);
 
   const url = inviteUrl(await requestOrigin(), draft.slug);
-  const names = inviteNames(draft);
   const locale = await getLocale();
-  const occasion = occasionName(draft, locale);
   // The video comes with Celebration and Grand once payments are on (Step 17c)
   const [active, plan, published] = await Promise.all([
     editionsActive(),
@@ -63,6 +61,12 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
     findPublishedInvite(draft.slug),
   ]);
   const video = active ? PLANS[plan?.plan ?? "free"].video : "every";
+  // What guests get is the published invite, which is what WhatsApp's preview reads too
+  const live = published?.draft ?? draft;
+  const names = inviteNames(live);
+  const occasion = occasionName(live, locale);
+  const when = inviteWhen(live, locale);
+  const where = inviteWhere(live);
 
   return (
     <PageTransition>
@@ -72,15 +76,16 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           slug={draft.slug}
           url={url}
           names={names}
-          occasion={occasion}
-          when={inviteWhen(draft, locale)}
-          message={shareCopy.message(names, occasion, inviteWhen(draft, locale))}
+          // The same title and line the guest page gives WhatsApp (src/app/(app)/i/[slug]/page.tsx)
+          previewTitle={guestCopy.metaTitle(names, occasion)}
+          previewDescription={guestCopy.metaDescription(when, where)}
+          message={shareCopy.message({ names, occasion, when, where })}
           qr={await qrSvg(url)}
           replies={<RepliesCard inviteId={id} summary={await hostReplies(account, id)} />}
           video={
             <VideoCard
-              draft={published?.draft ?? draft}
-              functions={storyFunctions(published?.draft ?? draft, locale)}
+              draft={live}
+              functions={storyFunctions(live, locale)}
               photos={published?.photos ?? []}
               clipUrl={published?.clipUrl ?? null}
               url={url}

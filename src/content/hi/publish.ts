@@ -1,5 +1,6 @@
 import type * as en from "../publish";
 import type { Translation } from "@/i18n/text";
+import { chatLines, detailLines } from "@/lib/publish/message";
 
 /* हिन्दी: प्रकाशित करना, भेजना, मेहमान का पेज और जवाब। English: src/content/publish.ts. */
 
@@ -42,19 +43,21 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   guestView: "मेहमान क्या देखेंगे",
   edit: "निमंत्रण बदलें",
   messageLabel: "संदेश",
-  messageHint: "लिंक के साथ जाता है। जैसे चाहें बदलें।",
-  message: (names, occasion, when) =>
-    [
-      occasion
-        ? `${names} के ${occasion} में आपको सप्रेम आमंत्रित करते हैं।`
-        : `${names} की ओर से आपको सप्रेम आमंत्रण।`,
-      when,
-      "निमंत्रण खोलिए और बताइए कि आप आ पाएँगे:",
-    ]
-      .filter(Boolean)
-      .join("\n"),
+  messageHint:
+    "लिंक के साथ जाता है। जैसे चाहें बदलें: *तारों* के बीच के शब्द WhatsApp में मोटे दिखते हैं।",
+  message: ({ names, occasion, when, where }) =>
+    chatLines([
+      "✨ *सप्रेम आमंत्रण* ✨",
+      "",
+      occasion ? `*${names}* के ${occasion} में` : `*${names}* की ओर से`,
+      "आप सादर आमंत्रित हैं।",
+      ...detailLines(when, where),
+      "",
+      "निमंत्रण खोलिए और बताइए कि आप आ पाएँगे 🙏",
+    ]),
   previewHeading: "WhatsApp में यह ऐसा दिखेगा",
-  previewNote: "WhatsApp आपके संदेश के नीचे यह तस्वीर, शीर्षक और पंक्ति दिखाता है।",
+  previewNote:
+    "WhatsApp संदेश के ऊपर आपके निमंत्रण की तस्वीर, शीर्षक और तारीख़ दिखाता है। भेजते समय WhatsApp में तस्वीर आने तक एक पल रुकें, फिर भेजें।",
   qrHeading: "QR कोड",
   qrBody: "मेहमान फ़ोन के कैमरे से स्कैन करते हैं। इसे कार्ड, बैनर या स्वागत बोर्ड पर छापें।",
   qrAlt: (url) => `${url} का QR कोड`,

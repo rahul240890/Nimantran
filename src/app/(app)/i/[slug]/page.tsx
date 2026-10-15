@@ -19,6 +19,7 @@ import {
 import { guestGuide } from "@/lib/publish/event-day";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
+import { site } from "@/lib/site";
 import { storyFunctions } from "@/lib/publish/story";
 
 /*
@@ -41,7 +42,17 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
     title: { absolute: title },
     description,
     robots,
-    openGraph: { type: "website", title, description, url: `/i/${invite.slug}` },
+    // The preview picture's address on the very host WhatsApp fetched this page from. The site's
+    // own address can redirect (shubhinvitations.com to www), and WhatsApp drops a picture
+    // behind a redirect, sending the message with no preview.
+    metadataBase: new URL(await requestOrigin()),
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      title,
+      description,
+      url: `/i/${invite.slug}`,
+    },
     twitter: { card: "summary_large_image", title, description },
   };
 }

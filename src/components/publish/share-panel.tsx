@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { inviteDraft } from "@/lib/editor/store";
 import { whatsappShareUrl } from "@/lib/publish/links";
+import { chatSegments, withLink, type ChatSegment } from "@/lib/publish/message";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 
@@ -31,8 +32,9 @@ type SharePanelProps = {
   slug: string;
   url: string;
   names: string;
-  occasion: string;
-  when: string;
+  /** The title and line WhatsApp shows on the link's card, from the guest page's tags. */
+  previewTitle: string;
+  previewDescription: string;
   message: string;
   /** The QR code as an SVG string, drawn in currentColor. */
   qr: string;
@@ -59,8 +61,8 @@ export function SharePanel({
   slug,
   url,
   names,
-  occasion,
-  when,
+  previewTitle,
+  previewDescription,
   message: initialMessage,
   qr,
   replies,
@@ -69,7 +71,7 @@ export function SharePanel({
   const { shareCopy } = useText(publishText);
   const [message, setMessage] = useState(initialMessage);
   const nativeShare = useSyncExternalStore(noSubscribe, canShare, () => false);
-  const full = `${message.trim()}\n${url}`;
+  const full = withLink(message, url);
 
   const copy = async () => {
     const done = await copyText(url);
@@ -138,8 +140,8 @@ export function SharePanel({
               <Textarea
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                rows={4}
-                maxLength={600}
+                rows={11}
+                maxLength={800}
               />
             </Field>
 
@@ -185,25 +187,28 @@ export function SharePanel({
             <h2 id="share-preview" className="font-semibold">
               {shareCopy.previewHeading}
             </h2>
-            {/* A message bubble with the link preview WhatsApp builds from the page */}
+            {/* The sent message: WhatsApp's card for the link (built from the guest page's tags)
+                above the words, with WhatsApp's own bold and line spacing */}
             <div className="rounded-lg border border-line bg-surface-2/60 p-3 sm:p-4">
-              <div className="ms-auto max-w-sm overflow-hidden rounded-lg rounded-se-sm border border-success/25 bg-success/10 shadow-raised">
-                {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
-                <img
-                  src={`/i/${slug}/cover`}
-                  alt=""
-                  width={1200}
-                  height={630}
-                  className="aspect-[1200/630] w-full bg-surface-2 object-cover"
-                />
-                <div className="flex flex-col gap-0.5 bg-surface/70 px-3 py-2">
-                  <p className="text-sm font-semibold break-words">
-                    {names} · {occasion}
-                  </p>
-                  {when && <p className="text-xs text-ink-muted">{when}</p>}
-                  <p className="truncate text-xs text-ink-muted">{new URL(url).host}</p>
+              <div className="ms-auto max-w-sm overflow-hidden rounded-lg rounded-se-sm border border-success/25 bg-success/10 p-1 shadow-raised">
+                <div className="overflow-hidden rounded-md bg-surface/80">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
+                  <img
+                    src={`/i/${slug}/cover`}
+                    alt=""
+                    width={1200}
+                    height={630}
+                    className="aspect-[1200/630] w-full bg-surface-2 object-cover"
+                  />
+                  <div className="flex flex-col gap-0.5 px-3 py-2">
+                    <p className="line-clamp-2 text-sm font-semibold break-words">{previewTitle}</p>
+                    {previewDescription && (
+                      <p className="line-clamp-2 text-xs text-ink-muted">{previewDescription}</p>
+                    )}
+                    <p className="truncate text-xs text-ink-muted">{new URL(url).host}</p>
+                  </div>
                 </div>
-                <p className="px-3 py-2 text-sm break-words whitespace-pre-line">{full}</p>
+                <ChatText text={full} />
               </div>
             </div>
             <p className="text-sm text-ink-muted">{shareCopy.previewNote}</p>
@@ -242,6 +247,38 @@ export function SharePanel({
       </div>
 
       <StopSharing inviteId={inviteId} />
+    </div>
+  );
+}
+
+const SEGMENT_CLASS: Record<NonNullable<ChatSegment["style"]>, string> = {
+  bold: "font-bold",
+  italic: "italic",
+  strike: "line-through",
+  link: "break-all text-accent-text underline underline-offset-2",
+};
+
+/** The message as WhatsApp draws it: blank lines kept, *bold* bold, the link underlined. */
+function ChatText({ text }: { text: string }) {
+  return (
+    <div data-testid="chat-text" className="flex flex-col px-2.5 py-2 text-sm break-words">
+      {text.split("\n").map((line, index) =>
+        line.trim() ? (
+          <p key={index}>
+            {chatSegments(line).map((segment, part) =>
+              segment.style ? (
+                <span key={part} className={SEGMENT_CLASS[segment.style]}>
+                  {segment.text}
+                </span>
+              ) : (
+                segment.text
+              ),
+            )}
+          </p>
+        ) : (
+          <span key={index} aria-hidden className="h-[1lh]" />
+        ),
+      )}
     </div>
   );
 }

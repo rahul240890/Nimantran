@@ -51,6 +51,7 @@ import {
   type HostGuest,
 } from "@/lib/guests/list";
 import { personalUrl, whatsappToUrl } from "@/lib/publish/links";
+import { withLink } from "@/lib/publish/message";
 import { GuestFormDialog } from "./guest-form";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
@@ -84,11 +85,10 @@ export function guestMessage(
   kind: "invite" | "reminder",
   template?: string,
 ): string {
-  const link = view.url ? personalUrl(view.url, guest.token) : "";
   const body =
     template?.replaceAll("{name}", guest.name) ??
     messages[kind](guest.name, view.names, view.occasion, view.when);
-  return `${body.trim()}\n${link}`;
+  return view.url ? withLink(body, personalUrl(view.url, guest.token)) : body.trim();
 }
 
 function GuestRow({

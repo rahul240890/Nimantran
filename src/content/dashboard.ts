@@ -1,3 +1,4 @@
+import { chatLines } from "@/lib/publish/message";
 import { site } from "@/lib/site";
 
 /* The host dashboard and co-hosts (Step 11). English copy; Hindi in src/content/hi/dashboard.ts. */
@@ -214,20 +215,22 @@ export const dashboardCopy = {
 
   messages: {
     invite: (name: string, names: string, occasion: string, when: string) =>
-      [
+      chatLines([
         `Dear ${name},`,
-        `You're warmly invited to ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}${names}.`,
-        when,
-        "This is your personal invitation. Please open it and let us know if you can come:",
-      ]
-        .filter(Boolean)
-        .join("\n"),
+        "",
+        `✨ You're warmly invited to ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}*${names}* ✨`,
+        when && `🗓️ ${when}`,
+        "",
+        "This is your personal invitation. Please open it and let us know if you can come 🙏",
+      ]),
     reminder: (name: string, names: string, occasion: string, when: string) =>
-      [
+      chatLines([
         `Dear ${name},`,
-        `A gentle reminder about ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}${names}${when ? ` on ${when}` : ""}.`,
-        "We'd love to know if you can join us. It takes a moment to reply here:",
-      ].join("\n"),
+        "",
+        `A gentle reminder about ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}*${names}*${when ? ` on ${when}` : ""}.`,
+        "",
+        "We'd love to know if you can join us. It takes a moment to reply here 🙏",
+      ]),
   },
 
   reminders: {

@@ -69,7 +69,15 @@ test.describe("publish and share", () => {
     const whatsapp = page.getByRole("link", { name: "Share on WhatsApp" });
     const href = new URL((await whatsapp.getAttribute("href"))!);
     expect(href.origin).toBe("https://wa.me");
-    expect(href.searchParams.get("text")).toContain(link);
+    // Bold names, the venue, and the link on its own line where WhatsApp builds its preview
+    const text = href.searchParams.get("text")!;
+    expect(text).toContain("*Aarav & Meera*");
+    expect(text).toContain("📍 Taj Falaknuma, Hyderabad");
+    expect(text.endsWith(`\n\n${link}`)).toBe(true);
+    // The preview on this page shows the message as WhatsApp will: names in bold
+    await expect(
+      page.getByTestId("chat-text").locator(".font-bold", { hasText: "Aarav & Meera" }),
+    ).toBeVisible();
     await expect(page.getByRole("img", { name: /QR code for/ }).locator("svg")).toBeVisible();
     // The WhatsApp preview on this page loads the real picture
     const bubble = page.getByRole("region", { name: "How it looks in WhatsApp" }).locator("img");
@@ -101,11 +109,14 @@ test.describe("publish and share", () => {
       "content",
       /opengraph-image/,
     );
-    // The preview WhatsApp shows is a real image
+    // The preview WhatsApp shows is a real image, on the host the guest opened, and small enough
+    // for WhatsApp to show it at all (it drops pictures over about 300 KB)
     const image = await guest.locator('meta[property="og:image"]').getAttribute("content");
+    expect(new URL(image!).origin).toBe(new URL(link).origin);
     const preview = await page.request.get(new URL(image!).pathname);
     expect(preview.ok()).toBe(true);
-    expect(preview.headers()["content-type"]).toBe("image/png");
+    expect(preview.headers()["content-type"]).toBe("image/jpeg");
+    expect((await preview.body()).byteLength).toBeLessThan(300_000);
     const haldi = guest.getByRole("article", { name: "Haldi" });
     await expect(haldi.getByText("Wednesday, 14 October 2026")).toBeVisible();
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();
