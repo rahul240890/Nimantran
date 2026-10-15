@@ -2,13 +2,14 @@ import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import {
   SUITES,
   isSceneTheme,
+  isSuiteId,
   suiteHome,
   suiteSuits,
   type PageArt,
   type SuiteId,
 } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
-import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
+import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { WeddingKind } from "./ids";
@@ -362,6 +363,18 @@ function withScenes(designs: GalleryDesign[]): GalleryDesign[] {
 
 export function cardDesign(template: TemplateId): GalleryDesign {
   return { id: `card-${template}`, suite: "classic", template };
+}
+
+/** A design by its id, as Admin, Designs and receipts name it: a Scene, a Story or a 3D card. */
+export function designById(id: string): GalleryDesign | null {
+  if (id.startsWith("card-")) {
+    const template = id.slice("card-".length);
+    return isTemplateId(template) ? cardDesign(template) : null;
+  }
+  const scene = id.endsWith("-scene");
+  const suite = scene ? id.slice(0, -"-scene".length) : id;
+  if (!isSuiteId(suite)) return null;
+  return scene ? sceneDesign(suite) : paintedDesign(suite);
 }
 
 export type WeddingKindEntry = {

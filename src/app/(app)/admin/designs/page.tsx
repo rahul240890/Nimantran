@@ -5,27 +5,14 @@ import { TrendingPicker } from "@/components/admin/trending-picker";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { designWords } from "@/components/gallery/design-words";
 import { requireAdmin } from "@/lib/admin/access";
-import { cardDesign, paintedDesign, sceneDesign, type GalleryDesign } from "@/lib/gallery/catalog";
+import { designById } from "@/lib/gallery/catalog";
 import { catalogEntry, designCatalog } from "@/lib/gallery/filters";
 import { getTrending } from "@/lib/gallery/trending-store";
 import { allDesignIds, defaultTier, designTier } from "@/lib/plans/design-defaults";
 import { getPricing } from "@/lib/plans/pricing";
-import { isSuiteId } from "@/lib/suites/catalog";
-import { TEMPLATE_IDS, isTemplateId } from "@/lib/templates/ids";
+import { TEMPLATE_IDS } from "@/lib/templates/ids";
 
 export const metadata: Metadata = { title: "Designs and prices" };
-
-/** A design id as the gallery shows it: a Scene, a Story of pages or a 3D card. */
-function galleryDesign(id: string): GalleryDesign | null {
-  if (id.startsWith("card-")) {
-    const template = id.slice("card-".length);
-    return isTemplateId(template) ? cardDesign(template) : null;
-  }
-  const scene = id.endsWith("-scene");
-  const suite = scene ? id.slice(0, -"-scene".length) : id;
-  if (!isSuiteId(suite)) return null;
-  return scene ? sceneDesign(suite) : paintedDesign(suite);
-}
 
 /** Which designs are Free, Premium, Royal or Signature, and what each package costs. */
 export default async function DesignsPage() {
@@ -44,7 +31,7 @@ export default async function DesignsPage() {
     kind: kinds[entry.format],
   }));
   const rows: DesignRow[] = allDesignIds().flatMap((id) => {
-    const design = galleryDesign(id);
+    const design = designById(id);
     if (!design) return [];
     return [
       {

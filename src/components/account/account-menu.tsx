@@ -1,6 +1,6 @@
 "use client";
 
-import { FilePlus2, LayoutList, LogIn, LogOut, UserRound } from "lucide-react";
+import { FilePlus2, LayoutList, LogIn, LogOut, ReceiptText, UserRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTransition } from "react";
@@ -24,8 +24,8 @@ import { refreshAccountHint, useAccountHint } from "./use-account-hint";
 const iconClass = "absolute start-3 size-4.5 text-ink-muted";
 
 /**
- * "Sign in", or the signed-in person's picture opening a menu: My invites, Profile, a new
- * invite, Sign out. Works on static pages because it reads the account hint cookie.
+ * "Sign in", or the signed-in person's picture opening a menu: My invites, a new invite,
+ * Profile, Payments, Sign out. Works on static pages because it reads the account hint cookie.
  */
 export function AccountMenu({ className, compact }: { className?: string; compact?: boolean }) {
   const { accountMenu } = useText(accountText);
@@ -101,6 +101,12 @@ export function AccountMenu({ className, compact }: { className?: string; compac
           <Link href="/account">
             <UserRound aria-hidden className={iconClass} />
             {accountMenu.profile}
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/account/payments">
+            <ReceiptText aria-hidden className={iconClass} />
+            {accountMenu.payments}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

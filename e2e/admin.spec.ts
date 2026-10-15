@@ -144,12 +144,31 @@ test.describe("packages", () => {
       }),
     ).toBeVisible();
 
-    // Back to the editor with the link dialog open
     const id = new URL(page.url()).pathname.split("/")[2];
+
     await expect(page.getByRole("link", { name: "Publish your invite" })).toHaveAttribute(
       "href",
       `/create?invite=${id}&publish=1`,
     );
+
+    // The payment in the account's history, with its receipt and the spreadsheet
+    await page.goto("/account/payments");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Payment history");
+    const payment = page.getByRole("article", { name: "Basic package" });
+    await expect(payment.getByText("₹799").first()).toBeVisible();
+    await expect(payment.getByText(/Aarav & Meera/)).toBeVisible();
+    await expect(payment.getByText("Paid", { exact: true })).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    const csv = await page.request.get("/account/payments/export");
+    expect(csv.headers()["content-type"]).toContain("text/csv");
+    expect(await csv.text()).toContain("Basic");
+    await payment.getByRole("link", { name: "View receipt" }).click();
+    await expect(page.getByRole("heading", { name: /^(Receipt|Tax invoice)$/ })).toBeVisible();
+    await page.getByRole("link", { name: "Back" }).click();
+    await expect(page).toHaveURL(/\/account\/payments$/);
+
+    // Back to the editor with the link dialog open
     await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
     await expect(page.getByRole("dialog", { name: "Choose your link" })).toBeVisible({
       timeout: 30_000,
