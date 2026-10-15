@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { newDraft, type InviteDraft } from "@/lib/editor/draft";
 import {
+  FREE_EDITION,
   PLANS,
+  editionAfter,
+  editionFor,
   formatRupees,
   inviteLimit,
   packagePrice,
@@ -39,36 +42,42 @@ describe("packages", () => {
   });
 
   it("charge only the difference when moving up, and never for moving down", () => {
-    const free = { plan: "free", tier: "free" } as const;
-    const basic = { plan: "basic", tier: "premium" } as const;
+    const free = { plan: "free", tier: "free", design: null } as const;
+    const basic = { plan: "basic", tier: "premium", design: null } as const;
     expect(upgradePricePaise(free, "basic", "premium")).toBe(49_900);
     expect(upgradePricePaise(free, "celebration", "free")).toBe(40_000);
     expect(upgradePricePaise(basic, "celebration", "premium")).toBe(40_000);
     expect(upgradePricePaise(basic, "grand", "royal")).toBe(90_000);
-    expect(upgradePricePaise({ plan: "grand", tier: "royal" }, "basic", "premium")).toBeNull();
+    expect(
+      upgradePricePaise({ plan: "grand", tier: "royal", design: null }, "basic", "premium"),
+    ).toBeNull();
   });
 
   it("have nothing to buy for Basic on a free design, or a package already covering the design", () => {
-    const free = { plan: "free", tier: "free" } as const;
+    const free = { plan: "free", tier: "free", design: null } as const;
     expect(upgradePricePaise(free, "basic", "free")).toBeNull();
-    expect(upgradePricePaise({ plan: "basic", tier: "royal" }, "basic", "premium")).toBeNull();
+    expect(
+      upgradePricePaise({ plan: "basic", tier: "royal", design: null }, "basic", "premium"),
+    ).toBeNull();
   });
 
   it("charge the design's difference when a paid invite moves to a dearer design", () => {
-    expect(upgradePricePaise({ plan: "basic", tier: "premium" }, "basic", "royal")).toBe(30_000);
+    expect(
+      upgradePricePaise({ plan: "basic", tier: "premium", design: null }, "basic", "royal"),
+    ).toBe(30_000);
   });
 
   it("ask a paid design for its package, and a second language for Celebration", () => {
     const draft = newDraft();
-    const free = { plan: "free", tier: "free" } as const;
+    const free = { plan: "free", tier: "free", design: null } as const;
     expect(planShortfalls(draft, free, "free")).toEqual([]);
     expect(planShortfalls(draft, free, "premium")).toEqual([{ limit: "design", used: 1 }]);
     expect(planNeeded(draft, "free")).toBe("free");
     expect(planNeeded(draft, "royal")).toBe("basic");
     const two = bilingual();
-    expect(planShortfalls(two, { plan: "basic", tier: "premium" }, "premium")).toEqual([
-      { limit: "languages", used: 2 },
-    ]);
+    expect(
+      planShortfalls(two, { plan: "basic", tier: "premium", design: null }, "premium"),
+    ).toEqual([{ limit: "languages", used: 2 }]);
     expect(planNeeded(two, "premium")).toBe("celebration");
   });
 
@@ -78,7 +87,48 @@ describe("packages", () => {
       ...draft.music,
       clip: { id: "c1", name: "Song", type: "audio/mp4", seconds: 30 },
     } as InviteDraft["music"];
-    expect(planShortfalls(draft, { plan: "free", tier: "free" }, "free")).toEqual([]);
+    expect(planShortfalls(draft, { plan: "free", tier: "free", design: null }, "free")).toEqual([]);
     expect(planNeeded(draft, "free")).toBe("free");
+  });
+});
+
+describe("one payment, one design", () => {
+  const kayal = { plan: "basic", tier: "premium", design: "kayal-scene" } as const;
+
+  it("covers the design it was bought for, and nothing on another", () => {
+    expect(editionFor(kayal, "kayal-scene")).toBe(kayal);
+    expect(editionFor(kayal, "noor-bagh-scene")).toEqual(FREE_EDITION);
+    // A free invite and an admin's gift (no design) are the same on every design
+    expect(editionFor(FREE_EDITION, "noor-bagh")).toBe(FREE_EDITION);
+    const gift = { plan: "grand", tier: "royal", design: null } as const;
+    expect(editionFor(gift, "noor-bagh")).toBe(gift);
+  });
+
+  it("asks a new design for its own package, at its full price", () => {
+    const draft = newDraft();
+    const other = editionFor(kayal, "noor-bagh-scene");
+    expect(planShortfalls(draft, other, "premium")).toEqual([{ limit: "design", used: 1 }]);
+    expect(upgradePricePaise(other, "basic", "premium")).toBe(49_900);
+    expect(upgradePricePaise(other, "celebration", "premium")).toBe(89_900);
+  });
+
+  it("still upgrades the same design for the difference", () => {
+    const same = editionFor(kayal, "kayal-scene");
+    expect(planShortfalls(newDraft(), same, "premium")).toEqual([]);
+    expect(upgradePricePaise(same, "celebration", "premium")).toBe(40_000);
+    expect(upgradePricePaise(same, "basic", "premium")).toBeNull();
+  });
+
+  it("records the design a purchase is for", () => {
+    expect(editionAfter(FREE_EDITION, "basic", "royal", "rajwada-bagh")).toEqual({
+      plan: "basic",
+      tier: "royal",
+      design: "rajwada-bagh",
+    });
+    expect(editionAfter(kayal, "grand", "premium")).toEqual({
+      plan: "grand",
+      tier: "premium",
+      design: "kayal-scene",
+    });
   });
 });

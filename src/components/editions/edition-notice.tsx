@@ -20,18 +20,20 @@ import { draftDesignId } from "@/lib/plans/design-defaults";
 export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteId: string }) {
   const { limitCopy, planCopy } = useText(editionsText);
   const [edition, setEdition] = useState<InviteEdition>(null);
-  // A paid design asks for a package at its price (Admin, Designs)
-  const design = useDesignTier(draftDesignId(draft)).tier;
+  // A paid design asks for a package at its price (Admin, Designs), and a package bought
+  // for another design counts for nothing on this one
+  const designId = draftDesignId(draft);
+  const design = useDesignTier(designId).tier;
 
   useEffect(() => {
     let live = true;
-    inviteEdition(inviteId)
+    inviteEdition(inviteId, designId)
       .then((result) => live && setEdition(result))
       .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [inviteId]);
+  }, [inviteId, designId]);
 
   if (!edition) return null;
   const shortfalls = planShortfalls(draft, edition.edition, design);
@@ -63,7 +65,7 @@ export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteI
             {limitCopy.unlockBody(planCopy[needed].name, formatRupees(price.amountPaise))}
           </p>
           <Button asChild size="sm" className="self-start">
-            <Link href={`/invites/${inviteId}/edition?plan=${needed}`}>
+            <Link href={`/invites/${inviteId}/edition?plan=${needed}&design=${designId}`}>
               <Sparkles aria-hidden />
               {limitCopy.unlock(planCopy[needed].name)}
             </Link>

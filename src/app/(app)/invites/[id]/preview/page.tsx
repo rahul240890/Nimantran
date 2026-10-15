@@ -12,7 +12,8 @@ import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { PLANS } from "@/lib/plans/catalog";
+import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
+import { draftDesignId } from "@/lib/plans/design-defaults";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 
@@ -65,7 +66,9 @@ export default async function InvitePreviewPage({
     name: functionCopy[kind].name,
     date: draft.functions[kind].date,
   }));
-  const free = active && PLANS[edition?.plan ?? "free"].watermark;
+  // A package bought for another design leaves this one to choose its own
+  const free =
+    active && PLANS[editionFor(edition ?? FREE_EDITION, draftDesignId(draft)).plan].watermark;
   // A free invite chooses its package before publishing; a paid one goes straight back
   const next = draft.slug
     ? { href: `/invites/${id}/share`, label: hostPreviewCopy.share }

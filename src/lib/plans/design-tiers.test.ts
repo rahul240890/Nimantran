@@ -106,11 +106,15 @@ describe("design tiers", () => {
 
   it("make a Premium design need a package to publish", () => {
     const draft = newDraft();
-    expect(planShortfalls(draft, { plan: "free", tier: "free" }, "premium")).toContainEqual({
+    expect(
+      planShortfalls(draft, { plan: "free", tier: "free", design: null }, "premium"),
+    ).toContainEqual({
       limit: "design",
       used: 1,
     });
-    expect(planShortfalls(draft, { plan: "basic", tier: "premium" }, "premium")).toEqual([]);
+    expect(
+      planShortfalls(draft, { plan: "basic", tier: "premium", design: null }, "premium"),
+    ).toEqual([]);
     expect(planNeeded(draft, "royal")).toBe("basic");
   });
 
@@ -119,11 +123,16 @@ describe("design tiers", () => {
       designs: { premium: 59_900, royal: 79_900, signature: 99_900 },
       packages: { celebration: 60_000, grand: 2_00_000 },
     };
-    const free = { plan: "free", tier: "free" } as const;
+    const free = { plan: "free", tier: "free", design: null } as const;
     expect(upgradePricePaise(free, "basic", "premium", pricing)).toBe(59_900);
-    expect(upgradePricePaise({ plan: "basic", tier: "premium" }, "grand", "royal", pricing)).toBe(
-      2_20_000,
-    );
+    expect(
+      upgradePricePaise(
+        { plan: "basic", tier: "premium", design: null },
+        "grand",
+        "royal",
+        pricing,
+      ),
+    ).toBe(2_20_000);
     expect(priceFor(free, "celebration", "royal", [], null, new Date(), pricing)?.amountPaise).toBe(
       1_39_900,
     );

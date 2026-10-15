@@ -6,13 +6,13 @@ import { checkoutCoupons } from "@/lib/payments/coupons";
 import {
   confirmCheckout,
   editionsActive,
-  inviteDesignTier,
+  inviteDesign,
   invitePlan,
   startCheckout,
   type ConfirmResult,
   type StartedCheckout,
 } from "@/lib/payments/editions";
-import { PAID_PLAN_IDS, type Edition, type PaidPlanId } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, editionFor, type Edition, type PaidPlanId } from "@/lib/plans/catalog";
 import { getPricing } from "@/lib/plans/pricing";
 import {
   cleanCouponCode,
@@ -28,10 +28,18 @@ import {
  */
 
 const code = z.string().trim().max(30).nullable().optional();
+/** The design the host is buying for; the server checks it's a real one and prices it. */
+const designField = z
+  .string()
+  .max(80)
+  .regex(/^[a-z0-9-]+$/)
+  .nullable()
+  .optional();
 const startSchema = z.object({
   inviteId: z.uuid(),
   planId: z.enum(PAID_PLAN_IDS),
   code,
+  design: designField,
 });
 
 export async function beginCheckout(input: unknown): Promise<StartedCheckout> {
@@ -39,9 +47,13 @@ export async function beginCheckout(input: unknown): Promise<StartedCheckout> {
   const account = await getAccount();
   if (!parsed.success || !account) return { ok: false, reason: "not-found" };
   const { inviteId, planId } = parsed.data;
-  return startCheckout(account, inviteId, planId, parsed.data.code || null).catch(
-    () => ({ ok: false, reason: "failed" }) as const,
-  );
+  return startCheckout(
+    account,
+    inviteId,
+    planId,
+    parsed.data.code || null,
+    parsed.data.design ?? null,
+  ).catch(() => ({ ok: false, reason: "failed" }) as const);
 }
 
 const token = z
@@ -67,16 +79,20 @@ export type CouponCheck =
 
 /** Tries a coupon code on an invite: the new prices, or why it doesn't apply. */
 export async function tryCoupon(input: unknown): Promise<CouponCheck> {
-  const parsed = z.object({ inviteId: z.uuid(), code: z.string().max(30) }).safeParse(input);
+  const parsed = z
+    .object({ inviteId: z.uuid(), code: z.string().max(30), design: designField })
+    .safeParse(input);
   const account = await getAccount();
   if (!parsed.success || !account) return { ok: false, reason: "unknown" };
   const { inviteId } = parsed.data;
-  const [current, design] = await Promise.all([
+  const [had, chosen] = await Promise.all([
     invitePlan(account, inviteId).catch(() => null),
-    inviteDesignTier(account, inviteId).catch(() => null),
+    inviteDesign(account, inviteId, parsed.data.design ?? null).catch(() => null),
   ]);
   const typed = cleanCouponCode(parsed.data.code);
-  if (!current || !design || !typed) return { ok: false, reason: "unknown" };
+  if (!had || !chosen || !typed) return { ok: false, reason: "unknown" };
+  const current = editionFor(had, chosen.id);
+  const design = chosen.tier;
   const coupons = await checkoutCoupons().catch(() => []);
   const now = new Date();
   const problem = codeProblem(current, design, coupons, typed, now);
@@ -95,31 +111,44 @@ export type InviteEdition = {
 } | null;
 
 /**
- * An invite's package and the prices of the others while payments are on, for the
- * editor's notice. Priced on the design saved last, which the notice's own design matches
- * once the editor has saved.
+ * An invite's package as it stands on the design the editor shows, and the prices of the
+ * others while payments are on, for the editor's notice: a package bought for another
+ * design counts for nothing on this one.
  */
-export async function inviteEdition(inviteId: unknown): Promise<InviteEdition> {
+export async function inviteEdition(
+  inviteId: unknown,
+  designId: unknown = null,
+): Promise<InviteEdition> {
   const id = z.uuid().safeParse(inviteId);
+  const wanted = designField.safeParse(designId);
   const account = await getAccount();
   if (!id.success || !account || !(await editionsActive())) return null;
-  const [edition, design] = await Promise.all([
+  const [had, chosen] = await Promise.all([
     invitePlan(account, id.data),
-    inviteDesignTier(account, id.data),
+    inviteDesign(account, id.data, wanted.success ? (wanted.data ?? null) : null),
   ]);
-  if (!edition || !design) return null;
+  if (!had || !chosen) return null;
+  const edition = editionFor(had, chosen.id);
   const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
-  return { edition, prices: pricesFor(edition, design, coupons, null, new Date(), pricing) };
+  return {
+    edition,
+    prices: pricesFor(edition, chosen.tier, coupons, null, new Date(), pricing),
+  };
 }
 
 /**
  * Whether publishing should pass through the packages first: always, until the invite has
- * a package, whether or not payments are switched on yet. The packages page says which.
+ * a package for the design it's made with, whether or not payments are switched on yet.
+ * The packages page says which.
  */
 export async function needsPackage(inviteId: unknown): Promise<boolean> {
   const id = z.uuid().safeParse(inviteId);
   const account = await getAccount();
   if (!id.success || !account) return false;
-  const edition = await invitePlan(account, id.data);
-  return edition?.plan === "free";
+  const [edition, chosen] = await Promise.all([
+    invitePlan(account, id.data),
+    inviteDesign(account, id.data),
+  ]);
+  if (!edition || !chosen) return false;
+  return editionFor(edition, chosen.id).plan === "free";
 }

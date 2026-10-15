@@ -236,6 +236,19 @@ export const videoCopy = {
   share: "Share video",
   download: "Download MP4",
   again: "Make it again",
+  fullScreen: "Full screen",
+  watchFullScreen: "Watch the video full screen",
+  remove: "Delete video",
+  removeTitle: "Delete this video?",
+  removeBody:
+    "It's removed from this phone or computer. Your invitation stays as it is, and you can make the video again any time.",
+  removeConfirm: "Delete video",
+  keep: "Keep it",
+  removed: "Video deleted",
+  /** Download needs a package with the video, on a live invite (owner, 2026-10-16). */
+  downloadLocked: "Download MP4",
+  lockedPackage: "Downloading comes with Celebration and Grand.",
+  lockedPublish: "Download once your invitation is live: the video ends on its link.",
   failed: "Couldn't make the video. Try again, or try Chrome or Safari.",
   unsupported:
     "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",

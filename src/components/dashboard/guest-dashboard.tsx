@@ -1,4 +1,4 @@
-import { ArrowLeft, ExternalLink, Pencil, Send, Sparkles, Users } from "lucide-react";
+import { ArrowLeft, Clapperboard, ExternalLink, Pencil, Send, Sparkles, Users } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -102,6 +102,21 @@ export async function GuestDashboard({
                 <Link href={`/create?invite=${view.id}`}>
                   <Pencil aria-hidden />
                   {copy.edit}
+                </Link>
+              </Button>
+            )}
+            {/* A live invite's video is on its share page, which has the link it ends on */}
+            {view.canEdit && (
+              <Button asChild size="sm" variant="secondary">
+                <Link
+                  href={
+                    view.live
+                      ? `/invites/${view.id}/share#invitation-video`
+                      : `/invites/${view.id}/video`
+                  }
+                >
+                  <Clapperboard aria-hidden />
+                  {copy.video}
                 </Link>
               </Button>
             )}

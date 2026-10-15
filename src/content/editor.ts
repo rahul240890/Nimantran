@@ -76,6 +76,7 @@ export const syncCopy = {
   syncing: "Saving…",
   synced: "Saved to your account",
   offline: "Saved on this device, retrying",
+  "needs-plan": "Not live yet: needs a package",
   missing: "That invite isn't in your account. It may have been deleted.",
   switchFailed: "Couldn't save the invite that's open, so it stays open. Try again in a moment.",
 } as const;

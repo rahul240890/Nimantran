@@ -4,16 +4,19 @@ import {
   Clapperboard,
   Download,
   Globe,
+  Lock,
   Maximize,
   RotateCcw,
   Share2,
   Sparkles,
   Square,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -52,6 +55,7 @@ import {
   keptVideo,
   loadKept,
   makeKept,
+  removeKept,
   stopKept,
   subscribeVideos,
 } from "@/lib/video/keep";
@@ -149,6 +153,10 @@ export function VideoCard(props: VideoCardProps) {
     [state.step === "ready" ? state.blob : null, clean, slug, videoCopy],
   );
   const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
+  const player = useRef<FullScreenVideo>(null);
+  // Downloading needs a package with the video, and a live invite: the video ends on its link
+  const lockedHref = marked ? props.upgradeHref : props.publishHref;
+  const lockedReason = useId();
 
   const share = async () => {
     if (!file) return;
@@ -160,7 +168,7 @@ export function VideoCard(props: VideoCardProps) {
   };
 
   return (
-    <Card className="gap-4 p-5 sm:p-6" data-video-card>
+    <Card id="invitation-video" className="scroll-mt-24 gap-4 p-5 sm:p-6" data-video-card>
       <div className="flex flex-col gap-1">
         <h2 className="flex items-center gap-2 font-semibold">
           <Clapperboard aria-hidden className="size-5 shrink-0 text-accent-text" />
@@ -173,6 +181,7 @@ export function VideoCard(props: VideoCardProps) {
         <div className="relative aspect-[9/16] w-40 shrink-0 overflow-hidden rounded-lg border border-line bg-night shadow-raised">
           {state.step === "ready" ? (
             <video
+              ref={player}
               src={state.href}
               controls
               // A preview is watched here; the clean one downloads from the button
@@ -250,29 +259,56 @@ export function VideoCard(props: VideoCardProps) {
                 {videoCopy.ready}
               </p>
               {stale && <p className="text-sm text-ink-muted">{videoCopy.changed}</p>}
-              {!clean && <Unlock {...props} marked={marked} />}
+              {!clean && (
+                <p className="text-sm text-ink-muted">
+                  {marked ? videoCopy.previewNote : videoCopy.draftNote}
+                </p>
+              )}
               <div className="flex flex-wrap gap-3">
                 {sharable && (
                   <Button leadingIcon={<Share2 aria-hidden />} onClick={() => void share()}>
                     {videoCopy.share}
                   </Button>
                 )}
-                {clean && (
+                {clean ? (
                   <Button asChild variant={sharable ? "secondary" : "primary"}>
                     <a href={state.href} download={videoCopy.fileName(slug)}>
                       <Download aria-hidden />
                       {videoCopy.download}
                     </a>
                   </Button>
+                ) : (
+                  lockedHref && (
+                    // Download shows from the start, locked, and leads to what unlocks it
+                    <Button asChild>
+                      <Link href={lockedHref} aria-describedby={lockedReason}>
+                        <Lock aria-hidden />
+                        {videoCopy.downloadLocked}
+                      </Link>
+                    </Button>
+                  )
                 )}
                 <Button
-                  variant={stale || !clean ? "secondary" : "ghost"}
+                  variant="secondary"
+                  leadingIcon={<Maximize aria-hidden />}
+                  onClick={() => void playFullScreen(player.current)}
+                >
+                  {videoCopy.fullScreen}
+                </Button>
+                <Button
+                  variant={stale ? "secondary" : "ghost"}
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={() => void make()}
                 >
                   {videoCopy.again}
                 </Button>
+                <RemoveVideo videoKey={key} />
               </div>
+              {!clean && lockedHref && (
+                <p id={lockedReason} className="text-xs text-ink-muted">
+                  {marked ? videoCopy.lockedPackage : videoCopy.lockedPublish}
+                </p>
+              )}
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -418,10 +454,63 @@ export type PackageVideoProps = {
   names: string;
   /** Whether the invite's package already has the video: then the preview carries no mark. */
   allowed: boolean;
+  /** Whether the invite is live: only then does the clean video download, ending on its link. */
+  published?: boolean;
   testCodecs?: boolean;
 };
 
 type FullScreenVideo = HTMLVideoElement & { webkitEnterFullscreen?: () => void };
+
+/** Plays a video full screen from the start, sound and controls on. */
+async function playFullScreen(video: FullScreenVideo | null) {
+  if (!video) return;
+  video.controls = true;
+  video.muted = false;
+  video.currentTime = 0;
+  try {
+    if (video.requestFullscreen) await video.requestFullscreen();
+    else video.webkitEnterFullscreen?.();
+    await video.play();
+  } catch {
+    // iPhone Safari before 16.4, or full screen refused: the tile plays with its controls
+    video.webkitEnterFullscreen?.();
+  }
+}
+
+/** Deletes a made video from this device, after asking: the invitation itself stays. */
+function RemoveVideo({ videoKey, size }: { videoKey: string; size?: "sm" }) {
+  const { videoCopy } = useText(publishText);
+  const [open, setOpen] = useState(false);
+  const remove = async () => {
+    await removeKept(videoKey);
+    setOpen(false);
+    toast({ title: videoCopy.removed, tone: "success" });
+  };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size={size} leadingIcon={<Trash2 aria-hidden />}>
+          {videoCopy.remove}
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        title={videoCopy.removeTitle}
+        description={videoCopy.removeBody}
+        closeLabel={videoCopy.keep}
+        footer={
+          <>
+            <DialogClose asChild>
+              <Button variant="secondary">{videoCopy.keep}</Button>
+            </DialogClose>
+            <Button variant="danger" onClick={() => void remove()}>
+              {videoCopy.removeConfirm}
+            </Button>
+          </>
+        }
+      />
+    </Dialog>
+  );
+}
 
 /**
  * The invitation video inside the Celebration package (owner, 2026-10-14): the host makes
@@ -466,21 +555,8 @@ export function PackageVideo(props: PackageVideoProps) {
     };
   }, [state.step]);
 
-  const fullScreen = async () => {
-    const video = player.current;
-    if (!video) return;
-    video.controls = true;
-    video.muted = false;
-    video.currentTime = 0;
-    try {
-      if (video.requestFullscreen) await video.requestFullscreen();
-      else video.webkitEnterFullscreen?.();
-      await video.play();
-    } catch {
-      // iPhone Safari before 16.4, or full screen refused: the tile plays with its controls
-      video.webkitEnterFullscreen?.();
-    }
-  };
+  const fullScreen = () => playFullScreen(player.current);
+  const clean = props.allowed && Boolean(props.published);
 
   return (
     <section
@@ -553,9 +629,17 @@ export function PackageVideo(props: PackageVideoProps) {
               </p>
             </div>
           ) : state.step === "ready" ? (
-            <p role="status" className="text-xs font-semibold">
-              {upgradeCopy.video.ready}
-            </p>
+            <>
+              <p role="status" className="text-xs font-semibold">
+                {upgradeCopy.video.ready}
+              </p>
+              {!clean && (
+                <p className="flex items-start gap-1.5 text-xs text-ink-muted">
+                  <Lock aria-hidden className="mt-px size-3.5 shrink-0" />
+                  {props.allowed ? videoCopy.lockedPublish : videoCopy.lockedPackage}
+                </p>
+              )}
+            </>
           ) : null}
         </div>
       </div>
@@ -580,6 +664,14 @@ export function PackageVideo(props: PackageVideoProps) {
               >
                 {upgradeCopy.video.fullScreenShort}
               </Button>
+              {clean && (
+                <Button asChild size="sm" variant="secondary">
+                  <a href={state.href} download={videoCopy.fileName(props.slug)}>
+                    <Download aria-hidden />
+                    {videoCopy.download}
+                  </a>
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
@@ -588,6 +680,7 @@ export function PackageVideo(props: PackageVideoProps) {
               >
                 {videoCopy.again}
               </Button>
+              <RemoveVideo videoKey={key} size="sm" />
             </>
           ) : (
             <Button

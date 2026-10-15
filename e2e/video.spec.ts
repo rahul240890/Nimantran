@@ -133,5 +133,20 @@ test.describe("invitation video", () => {
     await page.goto(share);
     await expect(page.locator("[data-video-card]").getByText("Your video is ready")).toBeVisible();
     await expect(page.locator("[data-video-card] video")).toBeVisible();
+    await expect(card.getByRole("button", { name: "Full screen" })).toBeVisible();
+
+    // Deleted from this device after asking, and it stays deleted when the page comes back
+    await card.getByRole("button", { name: "Delete video" }).click();
+    const confirm = page.getByRole("dialog", { name: "Delete this video?" });
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await confirm.getByRole("button", { name: "Delete video" }).click();
+    await expect(page.getByText("Video deleted").first()).toBeVisible();
+    await expect(card.getByRole("button", { name: "Make video" })).toBeVisible();
+    await expect(card.locator("video")).toHaveCount(0);
+    await page.reload();
+    await expect(
+      page.locator("[data-video-card]").getByRole("button", { name: "Make video" }),
+    ).toBeVisible();
+    await expect(page.locator("[data-video-card] video")).toHaveCount(0);
   });
 });

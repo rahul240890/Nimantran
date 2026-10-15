@@ -9,7 +9,7 @@ import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/compon
 import { EmptyState } from "@/components/ui/empty-state";
 import { planCopy } from "@/content/editions";
 import { requireAdmin } from "@/lib/admin/access";
-import { adminOrders, type OrderStatus } from "@/lib/payments/editions";
+import { adminOrders, upgradedFrom, type OrderStatus } from "@/lib/payments/editions";
 import { formatRupees } from "@/lib/plans/catalog";
 
 export const metadata: Metadata = { title: "Orders" };
@@ -125,9 +125,9 @@ export default async function OrdersPage() {
                         </td>
                         <td className="px-3 py-3 whitespace-nowrap">
                           {planCopy[order.planId].name}
-                          {order.fromPlanId !== "free" && (
+                          {upgradedFrom(order) && (
                             <span className="block text-ink-muted">
-                              from {planCopy[order.fromPlanId].name}
+                              from {planCopy[upgradedFrom(order)!].name}
                             </span>
                           )}
                         </td>

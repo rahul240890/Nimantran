@@ -55,6 +55,9 @@ database keeps every invite. Applied so far after the first setup:
 - `20261015090000_emails.sql` — emails (docs/EMAILS.md): `email_log`, so each welcome,
   receipt and reminder goes once, and `email_opt_outs` for people who stop reminders. Only
   the server's service role reads or writes them.
+- `20261016090000_one_design_per_package.sql` — one payment, one design: `event_plans.design_id`
+  and `orders.design_id` / `from_design_id`. **Run it before the code that uses it goes live.**
+  Packages bought before it keep working: each is tied to its invite's design on first use.
 
 ## Setting up a project
 

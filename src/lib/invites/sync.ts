@@ -1,6 +1,6 @@
 "use client";
 
-import { saveInvite } from "@/actions/invites";
+import { saveInvite, type SyncResult } from "@/actions/invites";
 import { MAX_PHOTOS, newDraft, type InviteDraft } from "@/lib/editor/draft";
 import { shelvePhotos, shelvedPhotos } from "@/lib/editor/photo-refs";
 import { inviteDraft } from "@/lib/editor/store";
@@ -13,7 +13,10 @@ import { uploadClip, uploadPhotos } from "./photo-upload";
  * invite twice.
  */
 
-export type SyncState = "idle" | "syncing" | "synced" | "offline" | "signed-out";
+export type SyncState = "idle" | "syncing" | "synced" | "offline" | "signed-out" | "needs-plan";
+
+/** Why the account refused the last save of a live invite: what its package doesn't cover. */
+export type HeldBack = Extract<SyncResult, { status: "needs-plan" }>;
 
 /** The draft version last saved to the account, so a revisit doesn't save it again. */
 const SYNCED_KEY = "nimantran-invite-synced";
@@ -23,6 +26,7 @@ let state: SyncState = "idle";
 const listeners = new Set<() => void>();
 let queue: Promise<unknown> = Promise.resolve();
 let retry: ReturnType<typeof setTimeout> | null = null;
+let held: HeldBack | null = null;
 
 function set(next: SyncState) {
   if (state === next) return;
@@ -59,8 +63,12 @@ async function push(): Promise<SyncState> {
   }
   set("syncing");
   const result = await saveInvite(draft).catch(() => ({ status: "failed" }) as const);
+  held = result.status === "needs-plan" ? result : null;
   if (result.status === "signed-out") {
     set("signed-out");
+  } else if (result.status === "needs-plan") {
+    // No retry: the next edit, or a package bought for it, saves it
+    set("needs-plan");
   } else if (result.status === "failed") {
     set("offline");
     retry = setTimeout(() => void syncDraft(), RETRY_MS);
@@ -102,6 +110,8 @@ export const syncStore = {
   },
   get: () => state,
   getServer: (): SyncState => "idle",
+  /** What the last refused save of a live invite needed, while it stays refused. */
+  heldBack: (): HeldBack | null => (state === "needs-plan" ? held : null),
 };
 
 /**

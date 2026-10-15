@@ -77,6 +77,9 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   difference: "आप केवल अंतर का भुगतान करते हैं।",
   continueFree: "फ़्री में आगे बढ़ें",
   publishNow: "निमंत्रण प्रकाशित करें",
+  liveDesignReady: (design) =>
+    `अब आपके पैकेज में ${design} शामिल है। इसे मेहमानों के लिए लाइव करने के लिए एडिटर खोलें।`,
+  liveDesignLink: "लाइव करें",
   publishBody: "आपका पैकेज तैयार है। लिंक पाने के लिए निमंत्रण प्रकाशित करें।",
   publishFreeBody:
     "भुगतान जल्द शुरू होगा, इसलिए अभी आपका निमंत्रण सब कुछ के साथ मुफ़्त प्रकाशित होगा।",
@@ -157,4 +160,17 @@ export const limitCopy: Translation<typeof en.limitCopy> = {
   unlockBody: (plan, price) => `${plan} में इस निमंत्रण की हर चीज़ शामिल है, ${price} में।`,
   unlock: (plan) => `${plan} लें`,
   upgrade: "अपग्रेड करें",
+  oneDesign: "हर पैकेज एक डिज़ाइन के लिए है। दूसरे डिज़ाइन के लिए अलग पैकेज लेना होगा।",
+  paidFor: (design) => `आपका पैकेज ${design} के लिए है।`,
+};
+
+export const heldCopy: Translation<typeof en.heldCopy> = {
+  title: "आपके बदलाव अभी लाइव नहीं हुए",
+  body: "आपका निमंत्रण लाइव है, और इस बदलाव के लिए वह पैकेज चाहिए जो इसमें नहीं है। जब तक आप पैकेज नहीं चुनते, मेहमानों को पहले जैसा ही दिखेगा।",
+  design: (paid) =>
+    `आपका पैकेज ${paid} के लिए है। हर पैकेज एक डिज़ाइन के लिए है, इसलिए इस डिज़ाइन के लिए अलग पैकेज चाहिए।`,
+  choose: "पैकेज चुनें",
+  back: (paid) => `${paid} पर वापस जाएँ`,
+  backPlain: "जिस डिज़ाइन का भुगतान किया, उस पर वापस जाएँ",
+  backFailed: "आपका लाइव निमंत्रण नहीं खुल पाया। इंटरनेट देखें और फिर कोशिश करें।",
 };

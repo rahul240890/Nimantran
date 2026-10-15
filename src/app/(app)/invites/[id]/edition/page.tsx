@@ -24,8 +24,17 @@ import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
 import { razorpayKeys } from "@/lib/payments/razorpay";
 import { checkoutCoupons } from "@/lib/payments/coupons";
-import { formatRupees, isPlanId, PLANS, planNeeded, planShortfalls } from "@/lib/plans/catalog";
-import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { designWords } from "@/components/gallery/design-words";
+import { designById } from "@/lib/gallery/catalog";
+import {
+  editionFor,
+  formatRupees,
+  isPlanId,
+  PLANS,
+  planNeeded,
+  planShortfalls,
+} from "@/lib/plans/catalog";
+import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { pricesFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
@@ -49,19 +58,35 @@ export default async function EditionPage({
   searchParams,
 }: PageProps<"/invites/[id]/edition">) {
   const { id } = await params;
-  const { plan: focus, publish } = await searchParams;
+  const { plan: focus, publish, design: wanted } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/edition`)}`);
   const store = inviteStore();
-  const [draft, current, owner, admin] = await Promise.all([
+  const [draft, had, owner, admin] = await Promise.all([
     store?.get(account, id),
     invitePlan(account, id),
     ownsInvite(account, id),
     getAdmin(),
   ]);
-  if (!store || !draft || !current) notFound();
-  const [active, receipts, locale, { upgradeCopy, planCopy }, coupons, pricing, urls, origin] =
+  if (!store || !draft || !had) notFound();
+  // The design being bought for: the one the editor shows, which a live invite keeps off its
+  // live copy until it's paid for (?design=), else the saved one. One payment, one design:
+  // a package bought for another design counts for nothing here.
+  const designId =
+    typeof wanted === "string" && allDesignIds().includes(wanted) ? wanted : draftDesignId(draft);
+  const current = editionFor(had, designId);
+  const paidElsewhere = had.plan !== "free" && current.plan === "free" ? had.design : null;
+  const [
+    active,
+    receipts,
+    locale,
+    { upgradeCopy, planCopy, limitCopy },
+    coupons,
+    pricing,
+    urls,
+    origin,
+  ] =
     await Promise.all([
       editionsActive(),
       inviteReceipts(account, id),
@@ -88,9 +113,14 @@ export default async function EditionPage({
     slug: draft.slug ?? `draft-${id.slice(0, 8)}`,
     names: inviteNames(draft),
     allowed: !active || PLANS[current.plan].video !== "none",
+    published: Boolean(draft.slug),
     testCodecs: authMode() === "preview",
   };
-  const design = designTier(pricing, draftDesignId(draft));
+  const design = designTier(pricing, designId);
+  const paidName = (id: string | null) => {
+    const found = id ? designById(id) : null;
+    return found ? designWords(found, locale).name : null;
+  };
   // Back to the editor to publish, once the package covers the invite. Until payments are
   // switched on every invite publishes with everything, so it's ready as it is.
   const ready = !active || planShortfalls(draft, current, design).length === 0;
@@ -160,6 +190,32 @@ export default async function EditionPage({
               </Button>
             </div>
           )}
+          {/* A live invite's new design, bought here, goes live from the editor */}
+          {draft.slug && designId !== draftDesignId(draft) && ready && current.plan !== "free" && (
+            <div
+              role="status"
+              className="flex max-w-2xl flex-col gap-4 rounded-lg border border-success/40 bg-success/5 p-5 sm:flex-row sm:items-center"
+            >
+              <PartyPopper aria-hidden className="size-6 shrink-0 text-success" />
+              <p className="flex-1 font-semibold">
+                {upgradeCopy.liveDesignReady(paidName(designId) ?? "")}
+              </p>
+              <Button asChild>
+                <Link href={`/create?invite=${id}`}>
+                  <Globe aria-hidden />
+                  {upgradeCopy.liveDesignLink}
+                </Link>
+              </Button>
+            </div>
+          )}
+          {/* One payment is for one design (owner, 2026-10-16) */}
+          {active && (
+            <p role="note" className="max-w-2xl text-sm text-ink-muted">
+              {paidElsewhere && paidName(paidElsewhere)
+                ? `${limitCopy.paidFor(paidName(paidElsewhere)!)} ${limitCopy.oneDesign}`
+                : limitCopy.oneDesign}
+            </p>
+          )}
           {/* Watching the video first is the best reason to choose a package with it */}
           {active && !draft.slug && PLANS[current.plan].video === "none" && (
             <div className="flex max-w-2xl flex-col gap-3 rounded-lg border border-line bg-surface-2 p-5 sm:flex-row sm:items-center">
@@ -174,6 +230,7 @@ export default async function EditionPage({
             inviteId={id}
             edition={current}
             design={design}
+            designId={designId}
             needed={planNeeded(draft, design)}
             focus={typeof focus === "string" && isPlanId(focus) ? focus : null}
             active={active}
