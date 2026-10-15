@@ -67,7 +67,7 @@ export const upgradeCopy = {
   eyebrow: "Package",
   title: "Choose your package",
   intro: (names: string) =>
-    `One payment for ${names || "this invite"}, priced on its design. Prices include GST.`,
+    `One payment for ${names || "this invite"}, priced on its design. Prices include any taxes.`,
   current: "Your package",
   currentBadge: "Current",
   needed: "Fits your invite",
@@ -97,7 +97,7 @@ export const upgradeCopy = {
   off: "Payments open very soon. Everything is free until then.",
   ownerOnly: {
     title: "Only the invite's owner can buy a package",
-    body: "Co-hosts help run the invite, but the payment, receipt and GST invoice belong to the person who created it. Ask them to choose a package from their account.",
+    body: "Co-hosts help run the invite, but the payment, receipt and invoice belong to the person who created it. Ask them to choose a package from their account.",
   },
   loadFailed: "The payment window couldn't open. Check your connection and try again.",
   receipts: "Receipts",

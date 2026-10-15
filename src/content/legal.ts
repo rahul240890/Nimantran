@@ -184,7 +184,7 @@ export const refunds: LegalDoc = {
       id: "delivery",
       heading: "Delivery",
       body: [
-        "Nothing is shipped. The package is delivered online, on the invitation you paid for, usually within a minute of the payment being confirmed, and you get a receipt or GST invoice on screen.",
+        "Nothing is shipped. The package is delivered online, on the invitation you paid for, usually within a minute of the payment being confirmed, and you get a receipt on screen.",
         "If the package hasn't unlocked within an hour of paying, write to us with the payment ID and we will put it right or refund you in full.",
       ],
     },
@@ -288,7 +288,7 @@ export const terms: LegalDoc = {
       heading: "Money",
       body: [
         "Making and sharing an invitation is free. Paid packages (Basic, Celebration and Grand) unlock more for one invitation, such as paid designs, more invites, the video and no watermark. Our pricing page lists what each includes.",
-        "Prices are in Indian rupees and include GST. You pay once per invitation, through Razorpay, by UPI, card or netbanking; there is no subscription and nothing renews by itself. We never see or store your card details.",
+        "Prices are in Indian rupees and include any applicable taxes. You pay once per invitation, through Razorpay, by UPI, card or netbanking; there is no subscription and nothing renews by itself. We never see or store your card details.",
         "The package unlocks as soon as the payment is confirmed. Refunds follow our refund and cancellation policy: a full refund within 7 days if the invitation hasn't been sent to any guest.",
         "We may change prices for future purchases, never for a package you have already bought. Shubh Invitation never holds money sent between guests and families.",
       ],

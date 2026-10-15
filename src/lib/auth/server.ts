@@ -2,6 +2,7 @@ import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { LOCALES, type Locale } from "@/lib/categories/ids";
+import { welcomeAfterSignIn } from "@/lib/email/notify";
 import { supabaseServer } from "@/lib/supabase/server";
 import type { Account, AuthFailure, Profile } from "./account";
 import { ACCOUNT_HINT_COOKIE, encodeAccountHint } from "./hint";
@@ -172,6 +173,7 @@ export async function finishGoogleSignIn(params: URLSearchParams): Promise<Resul
   if (error || !data.user) return fail(error ? authFailure(error) : "unknown");
   const account = accountFromUser(data.user);
   await writeHint(account);
+  welcomeAfterSignIn(data.user);
   return ok(account);
 }
 

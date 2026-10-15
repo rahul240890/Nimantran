@@ -6,7 +6,7 @@
 export const pricingPageCopy = {
   title: "Pricing for digital invitations",
   description:
-    "Make and share an invitation free. Three packages per invitation, Basic, Celebration and Grand, priced on your design with GST included. No subscription.",
+    "Make and share an invitation free. Three packages per invitation, Basic, Celebration and Grand, priced on your design, taxes included. No subscription.",
   crumb: "Pricing",
   eyebrow: "Pricing",
   heading: "One price per invitation. No subscription.",
@@ -22,7 +22,7 @@ export const pricingPageCopy = {
   popular: "Most chosen",
   notesHeading: "Good to know",
   notes: [
-    "Prices are in rupees and include GST. You get a GST invoice.",
+    "Prices are in rupees and include any taxes. You get a receipt for every payment.",
     "Pay by UPI, card or netbanking, securely through Razorpay.",
     "Start free and move up later: you pay only the difference.",
     "Full refund within 7 days if your invitation hasn't been sent to any guest.",
