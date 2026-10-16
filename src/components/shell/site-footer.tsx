@@ -10,7 +10,7 @@ import { homePath, languages, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
-import { site } from "@/lib/site";
+import { siteNameIn } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { navHref } from "./nav-links";
 
@@ -133,7 +133,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
       <div className="border-t border-line">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
-            © 2026 {locale === "hi" ? site.nameDevanagari : site.name}. {shell.footer.rights}
+            © 2026 {siteNameIn(locale)}. {shell.footer.rights}
           </p>
           <div className="flex flex-wrap items-center gap-x-4">
             <nav aria-label={legalCopy.footer.heading} className="-ms-2 flex flex-wrap">

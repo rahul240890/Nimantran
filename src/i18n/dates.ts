@@ -1,9 +1,10 @@
 import { formatDistanceToNow, type Locale } from "date-fns";
-import { enIN, hi } from "date-fns/locale";
+import { bn, enIN, gu, hi, ta } from "date-fns/locale";
 import type { UiLocale } from "./locales";
+import { mr } from "./marathi-dates";
 
 /** date-fns words for each site language: month names, "3 days ago" and the like. */
-export const dateLocale: Record<UiLocale, Locale> = { en: enIN, hi };
+export const dateLocale: Record<UiLocale, Locale> = { en: enIN, hi, mr, gu, bn, ta };
 
 /**
  * "5 minutes ago" in the site language. A time stamped by the server can be a little

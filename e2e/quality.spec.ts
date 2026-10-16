@@ -1,8 +1,8 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
-import { UI_LOCALES } from "../src/i18n/locales";
-import { pagePath, publicPages } from "../src/lib/seo/paths";
+import { UI_LOCALES, type UiLocale } from "../src/i18n/locales";
+import { pagePath, publicPages, type PublicPage } from "../src/lib/seo/paths";
 import { POSTS } from "../src/content/blog";
 import { blogPostPath } from "../src/lib/blog/posts";
 
@@ -22,8 +22,27 @@ const strictAxe = (page: Page) =>
     "best-practice",
   ]);
 
+// English and Hindi page by page; each newer language through one page of every kind, which
+// share their layout with the rest (a full sweep of each would add ~20 minutes)
+const FULL: readonly UiLocale[] = ["en", "hi"];
+const SAMPLED: readonly PublicPage[] = [
+  { kind: "home" },
+  { kind: "designs" },
+  { kind: "design", id: "marigold" },
+  { kind: "gallery" },
+  { kind: "occasion", id: "wedding" },
+  { kind: "occasion", id: "haldi" },
+  { kind: "occasion", id: "birthday" },
+  { kind: "wedding-kind", id: "gujarati" },
+  { kind: "tradition", id: "bengali" },
+  { kind: "pricing" },
+  { kind: "contact" },
+  { kind: "privacy" },
+];
 const everyPublicPage = [
-  ...UI_LOCALES.flatMap((locale) => publicPages().map((page) => pagePath(page, locale))),
+  ...UI_LOCALES.flatMap((locale) =>
+    (FULL.includes(locale) ? publicPages() : SAMPLED).map((page) => pagePath(page, locale)),
+  ),
   ...POSTS.map((post) => blogPostPath(post.slug, post.locale)),
 ];
 const appPages = ["/sign-in", "/create?quality=2d", "/no-such-page"];

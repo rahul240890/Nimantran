@@ -32,6 +32,8 @@ export async function LegalPage({
   kind: "privacy" | "terms" | "refunds";
 }) {
   const { legalCopy, [kind]: doc } = legalText[locale];
+  // A language whose policies aren't translated yet shows the English ones, marked as such
+  const english = locale !== "en" && doc === legalText.en[kind];
   const { seoCopy } = seoText[locale];
   const email = await contactEmail();
   const updated = format(new Date(`${LEGAL_UPDATED}T00:00:00`), "d MMMM yyyy", {
@@ -47,8 +49,18 @@ export async function LegalPage({
     >
       <article
         aria-labelledby="page-title"
+        lang={english ? "en" : undefined}
         className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-4 pt-6 pb-20 sm:px-6 lg:px-8"
       >
+        {english && legalCopy.inEnglish && (
+          <p
+            role="note"
+            lang={locale}
+            className="rounded-lg border border-line bg-surface-2 px-4 py-3 text-sm text-ink-muted"
+          >
+            {legalCopy.inEnglish}
+          </p>
+        )}
         <header className="flex flex-col gap-4">
           <h1
             id="page-title"

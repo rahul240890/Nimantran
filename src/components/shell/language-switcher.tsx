@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLocale, useText } from "@/i18n/client";
 import { landingText } from "@/i18n/copy/landing";
-import { isUiLocale, languages } from "@/i18n/locales";
+import { isUiLocale, languages, type UiLocale } from "@/i18n/locales";
 import { switchLocalePath } from "@/lib/seo/paths";
 import { cn } from "@/lib/cn";
 
@@ -26,10 +26,21 @@ type LanguageSwitcherProps = {
   className?: string;
 };
 
+/** Each site language's own short mark, for the compact switcher. */
+const SHORT: Record<UiLocale, string> = {
+  en: "EN",
+  hi: "हि",
+  mr: "म",
+  gu: "ગુ",
+  bn: "বা",
+  ta: "த",
+};
+
 /**
- * Every launch language in its own script. English and Hindi switch the site; the rest
- * show as coming soon, with their scripts, so visitors know they're on the way.
+ * Every launch language in its own script. Six switch the site; the rest show as coming
+ * soon, with their scripts, so visitors know they're on the way.
  */
+
 export function LanguageSwitcher({ variant = "compact", className }: LanguageSwitcherProps) {
   const current = useLocale();
   const { shell } = useText(landingText);
@@ -66,7 +77,7 @@ export function LanguageSwitcher({ variant = "compact", className }: LanguageSwi
           {variant === "full" ? (
             <span lang={current}>{currentLanguage.native}</span>
           ) : (
-            <span lang={current}>{current === "hi" ? "हि" : current.toUpperCase()}</span>
+            <span lang={current}>{SHORT[current]}</span>
           )}
         </span>
         <ChevronDown aria-hidden className="text-ink-muted" />

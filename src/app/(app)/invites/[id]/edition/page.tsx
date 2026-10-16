@@ -43,6 +43,7 @@ import { storyFunctions } from "@/lib/publish/story";
 import { requestOrigin } from "@/lib/request-origin";
 import { editionsText } from "@/i18n/copy/editions";
 import { getLocale, getText } from "@/i18n/server";
+import { intlLocale } from "@/i18n/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { upgradeCopy } = await getText(editionsText);
@@ -261,7 +262,7 @@ export default async function EditionPage({
                       )}
                     </span>
                     <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-muted">
-                      {new Intl.DateTimeFormat(locale === "hi" ? "hi-IN" : "en-IN", {
+                      {new Intl.DateTimeFormat(intlLocale[locale], {
                         dateStyle: "medium",
                         timeZone: "Asia/Kolkata",
                       }).format(new Date(order.paidAt ?? order.createdAt))}

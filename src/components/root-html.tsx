@@ -9,8 +9,8 @@ import { Providers } from "@/components/providers";
 import { SiteAnalytics } from "@/components/shell/site-analytics";
 import { landingText } from "@/i18n/copy/landing";
 import type { Pricing } from "@/lib/plans/design-tiers";
-import type { UiLocale } from "@/i18n/locales";
-import { site } from "@/lib/site";
+import { ogLocale, type UiLocale } from "@/i18n/locales";
+import { site, siteNameIn } from "@/lib/site";
 import { themeInitScript } from "@/lib/theme";
 import "@/app/globals.css";
 
@@ -26,7 +26,7 @@ export function rootMetadata(locale: UiLocale): Metadata {
     metadataBase: new URL(site.url),
     title: {
       default: meta.title,
-      template: `%s · ${locale === "hi" ? site.nameDevanagari : site.name}`,
+      template: `%s · ${siteNameIn(locale)}`,
     },
     description: meta.description,
     applicationName: site.shortName,
@@ -53,7 +53,7 @@ export function rootMetadata(locale: UiLocale): Metadata {
       siteName: site.name,
       title: site.name,
       description: meta.description,
-      locale: locale === "hi" ? "hi_IN" : "en_IN",
+      locale: ogLocale(locale),
     },
     twitter: { card: "summary_large_image", title: site.name, description: meta.description },
   };

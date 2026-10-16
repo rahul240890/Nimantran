@@ -1,7 +1,7 @@
 /*
- * The languages Shubh Invitation speaks (Step 12). The site itself is in English and Hindi at
- * launch; the other eight arrive one at a time, each once a native speaker has proofread
- * it. Invitations themselves can be written in any of the ten (src/lib/categories).
+ * The languages Shubh Invitation speaks (Step 12). The site itself is in English, Hindi,
+ * Marathi, Gujarati, Bengali and Tamil; the other four arrive one at a time. Invitations
+ * themselves can be written in any of the ten (src/lib/categories).
  */
 
 export const languages = [
@@ -19,9 +19,30 @@ export const languages = [
 
 export type LanguageCode = (typeof languages)[number]["code"];
 
-/** Languages the site's own screens are translated into. */
-export const UI_LOCALES = ["en", "hi"] as const satisfies readonly LanguageCode[];
+/**
+ * Languages the site's own screens are translated into. Marathi, Gujarati, Bengali and
+ * Tamil are drafts awaiting a native proofreader (Step 12); their legal pages stay in
+ * English, the binding version, until a reviewed translation replaces them.
+ */
+export const UI_LOCALES = [
+  "en",
+  "hi",
+  "mr",
+  "gu",
+  "bn",
+  "ta",
+] as const satisfies readonly LanguageCode[];
 export type UiLocale = (typeof UI_LOCALES)[number];
+
+/** The languages whose pages live under their own prefix: /hi, /mr, /gu, /bn, /ta. */
+export type PrefixedLocale = Exclude<UiLocale, "en">;
+export const PREFIXED_LOCALES = UI_LOCALES.filter(
+  (locale): locale is PrefixedLocale => locale !== "en",
+);
+
+export function isPrefixedLocale(value: unknown): value is PrefixedLocale {
+  return typeof value === "string" && (PREFIXED_LOCALES as readonly string[]).includes(value);
+}
 
 export const DEFAULT_LOCALE: UiLocale = "en";
 
@@ -61,4 +82,14 @@ export function homePath(locale: UiLocale): string {
 }
 
 /** BCP 47 tags for Intl formatting, with the Indian region. */
-export const intlLocale: Record<UiLocale, string> = { en: "en-IN", hi: "hi-IN" };
+/** Open Graph's own spelling of a page's language: en_IN, hi_IN. */
+export const ogLocale = (locale: UiLocale) => `${locale}_IN`;
+
+export const intlLocale: Record<UiLocale, string> = {
+  en: "en-IN",
+  hi: "hi-IN",
+  mr: "mr-IN",
+  gu: "gu-IN",
+  bn: "bn-IN",
+  ta: "ta-IN",
+};

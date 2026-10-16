@@ -15,6 +15,7 @@ import type { Faith } from "@/lib/traditions/faith";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { WeddingKind } from "./ids";
 import { mixDesigns } from "./photos";
+import { UI_LOCALES, type UiLocale } from "@/i18n/locales";
 
 export { WEDDING_KINDS, isWeddingKind, type WeddingKind } from "./ids";
 
@@ -34,7 +35,8 @@ export type Occasion = {
   section: OccasionSection;
   /** The editor's category; null until the occasion's words and events exist. */
   category: CategoryId | null;
-  names: { en: string; hi: string };
+  /** Its name in each site language. */
+  names: Record<UiLocale, string>;
   /** A painting for its tile: a theme and one of its pages. */
   art: { suite: SuiteId; page: PageArt } | null;
   /** A painting made for the tile itself, in public/occasions, used before the theme's page. */
@@ -52,7 +54,9 @@ const live = (
   id,
   section,
   category: id,
-  names: { en: CATEGORIES[id].names.en, hi: CATEGORIES[id].names.hi },
+  names: Object.fromEntries(
+    UI_LOCALES.map((locale) => [locale, CATEGORIES[id].names[locale]]),
+  ) as Record<UiLocale, string>,
   art,
   tile: null,
   keywords: [...Object.values(CATEGORIES[id].names), ...keywords],
@@ -146,7 +150,12 @@ export const OCCASIONS: readonly Occasion[] = [
     ["barsa", "namkaran", "cradle ceremony", "naamkaran"],
     "family",
   ),
-  soon("mundan", "family", { en: "Mundan", hi: "मुंडन" }, ["chudakarana", "first haircut"]),
+  soon(
+    "mundan",
+    "family",
+    { en: "Mundan", hi: "मुंडन", mr: "जावळ", gu: "મુંડન", bn: "মুণ্ডন", ta: "முடி இறக்குதல்" },
+    ["chudakarana", "first haircut"],
+  ),
   live(
     "housewarming",
     { suite: "new-home-modern", page: "cover" },
@@ -172,11 +181,32 @@ export const OCCASIONS: readonly Occasion[] = [
     "family",
   ),
 
-  soon("fresher-party", "parties", { en: "Fresher party", hi: "फ्रेशर पार्टी" }, [
-    "college",
-    "freshers",
-  ]),
-  soon("welcome-party", "parties", { en: "Welcome party", hi: "वेलकम पार्टी" }, ["welcome"]),
+  soon(
+    "fresher-party",
+    "parties",
+    {
+      en: "Fresher party",
+      hi: "फ्रेशर पार्टी",
+      mr: "फ्रेशर पार्टी",
+      gu: "ફ્રેશર પાર્ટી",
+      bn: "ফ্রেশার পার্টি",
+      ta: "ஃப்ரெஷர் பார்ட்டி",
+    },
+    ["college", "freshers"],
+  ),
+  soon(
+    "welcome-party",
+    "parties",
+    {
+      en: "Welcome party",
+      hi: "वेलकम पार्टी",
+      mr: "वेलकम पार्टी",
+      gu: "વેલકમ પાર્ટી",
+      bn: "ওয়েলকাম পার্টি",
+      ta: "வெல்கம் பார்ட்டி",
+    },
+    ["welcome"],
+  ),
   live(
     "farewell-party",
     { suite: "farewell-night", page: "cover" },
@@ -189,7 +219,19 @@ export const OCCASIONS: readonly Occasion[] = [
     ["convocation", "graduation party", "degree", "passing out"],
     "parties",
   ),
-  soon("kitty-party", "parties", { en: "Kitty party", hi: "किटी पार्टी" }, ["kitty", "ladies"]),
+  soon(
+    "kitty-party",
+    "parties",
+    {
+      en: "Kitty party",
+      hi: "किटी पार्टी",
+      mr: "किटी पार्टी",
+      gu: "કિટી પાર્ટી",
+      bn: "কিটি পার্টি",
+      ta: "கிட்டி பார்ட்டி",
+    },
+    ["kitty", "ladies"],
+  ),
   live(
     "reunion",
     { suite: "reunion-yaarana", page: "cover" },
@@ -320,10 +362,19 @@ export const OCCASIONS: readonly Occasion[] = [
     ["product launch", "book launch", "office event", "conference"],
     "business",
   ),
-  soon("office-party", "business", { en: "Office party", hi: "ऑफ़िस पार्टी" }, [
-    "corporate",
-    "team",
-  ]),
+  soon(
+    "office-party",
+    "business",
+    {
+      en: "Office party",
+      hi: "ऑफ़िस पार्टी",
+      mr: "ऑफिस पार्टी",
+      gu: "ઑફિસ પાર્ટી",
+      bn: "অফিস পার্টি",
+      ta: "அலுவலக விருந்து",
+    },
+    ["corporate", "team"],
+  ),
 ].map(withTile);
 
 export function occasionById(id: string): Occasion | undefined {

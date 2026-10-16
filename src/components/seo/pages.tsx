@@ -9,7 +9,7 @@ import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
 import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
-import type { UiLocale } from "@/i18n/locales";
+import { ogLocale, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
 import { samplePath } from "@/lib/sample/paths";
@@ -87,7 +87,7 @@ export function publicMetadata(page: PublicPage, locale: UiLocale): Metadata {
       title,
       description,
       url,
-      locale: locale === "hi" ? "hi_IN" : "en_IN",
+      locale: ogLocale(locale),
     },
     twitter: { card: "summary_large_image", title, description },
   };

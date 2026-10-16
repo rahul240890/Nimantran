@@ -4,6 +4,7 @@ import type { Translation } from "@/i18n/text";
 /* हिन्दी: गोपनीयता नीति और शर्तें। English: src/content/legal.ts. खंडों की id अंग्रेज़ी जैसी ही रहें। */
 
 export const legalCopy: Translation<typeof en.legalCopy> = {
+  inEnglish: "",
   updated: "पिछला बदलाव",
   onThisPage: "इस पेज पर",
   contactHeading: "संपर्क",

@@ -190,8 +190,9 @@ function MobileMenu({ menu }: { menu: SiteMenu }) {
   );
 }
 
+// Tamil script sets wide, so its labels take a little less room to fit beside the buttons
 const navItem =
-  "relative inline-flex min-h-11 cursor-pointer items-center rounded-full px-3 text-[0.95rem] font-semibold whitespace-nowrap text-ink-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-[current=true]:text-ink data-current:text-ink";
+  "relative inline-flex min-h-11 cursor-pointer items-center rounded-full px-3 text-[0.95rem] font-semibold whitespace-nowrap text-ink-muted transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring aria-[current=true]:text-ink data-current:text-ink [&:lang(ta)]:px-2 [&:lang(ta)]:text-sm";
 
 const wide = (group: MenuPanel["groups"][number]) => group.links.length > 8;
 

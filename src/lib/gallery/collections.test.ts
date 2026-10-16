@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { galleryText } from "@/i18n/copy/gallery";
+import { UI_LOCALES } from "@/i18n/locales";
 import { SUITES, SUITE_IDS } from "@/lib/suites/catalog";
 import { COLLECTIONS, COLLECTION_IDS, collectionOf } from "./collections";
 import { designCatalog } from "./filters";
@@ -23,7 +24,7 @@ describe("collections", () => {
       ).toBe(true);
       if ("suite" in collection.cover)
         expect(SUITES[collection.cover.suite].images.cover).toBeTruthy();
-      for (const locale of ["en", "hi"] as const) {
+      for (const locale of UI_LOCALES) {
         const words = galleryText[locale].collectionCopy.names[id];
         expect(words.name, `${locale} ${id}`).not.toBe("");
         expect(words.intro, `${locale} ${id}`).not.toBe("");

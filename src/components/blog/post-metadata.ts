@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { BlogPost } from "@/content/blog/types";
 import { blogPostPath, translatedPost } from "@/lib/blog/posts";
-import { UI_LOCALES } from "@/i18n/locales";
+import { UI_LOCALES, ogLocale } from "@/i18n/locales";
 import { site } from "@/lib/site";
 
 /* A post's title, description, address and link preview; other languages only where written. */
@@ -23,7 +23,7 @@ export function postMetadata(post: BlogPost): Metadata {
       title: post.title,
       description: post.description,
       url: path,
-      locale: post.locale === "hi" ? "hi_IN" : "en_IN",
+      locale: ogLocale(post.locale),
       publishedTime: post.published,
       modifiedTime: post.updated,
       ...(post.cover ? { images: [{ url: post.cover.src, alt: post.cover.alt }] } : {}),
