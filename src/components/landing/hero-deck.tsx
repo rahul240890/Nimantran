@@ -89,6 +89,10 @@ export function HeroDeck() {
           if (offset < -total / 2) offset += total;
           const away = Math.abs(offset);
           const shown = away <= 2;
+          // Only the fan and the next card either side are drawn: the hundreds of themes behind
+          // them would fill the page with pictures nobody sees. The next card waits unseen, so
+          // it still slides in as the deck turns
+          if (away > 3) return null;
           return (
             <div
               key={suite}

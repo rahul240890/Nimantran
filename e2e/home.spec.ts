@@ -202,19 +202,18 @@ test.describe("landing page", () => {
     await expect(question).toHaveAttribute("aria-expanded", "false");
   });
 
-  test("the design rows preview a design and lead to View all", async ({ page }) => {
+  test("the trending designs preview a design, and See all designs leads on", async ({ page }) => {
     await visit(page);
-    const row = page.locator('[data-shelf="home-photos-none"]');
+    const row = page.locator("#templates");
     const first = row.locator("article").first();
     const name = (await first.locator("h3").first().textContent())!.trim();
     await first.getByRole("button", { name: `Preview ${name}` }).click();
     await expect(page.getByRole("dialog", { name })).toBeVisible();
     await page.keyboard.press("Escape");
-    await row
-      .getByRole("link", { name: /^View all \d+ designs: Illustrated invitations$/ })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/designs\?photos=none$/);
+    // The home page stays short: the photo rows and other occasions live on the Designs page
+    await expect(page.locator('[data-shelf="home-photos-none"]')).toHaveCount(0);
+    await row.getByRole("link", { name: "See all designs" }).click();
+    await expect(page).toHaveURL(/\/designs$/);
   });
 
   test("a tradition and a kind of invitation open their designs", async ({ page }) => {

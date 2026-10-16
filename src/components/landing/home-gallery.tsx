@@ -152,8 +152,8 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
 }
 
 /**
- * The wedding designs as the Designs page lays them out: the traditions as round paintings,
- * then a row each for illustrated, couple photo and bride and groom photo invitations.
+ * A taste of the designs: the wedding traditions as round paintings, the designs hosts are
+ * choosing most, and the way on to every design.
  */
 export function HomeDesigns({ locale }: { locale: UiLocale }) {
   const { homeGallery } = landingText[locale];
@@ -172,7 +172,13 @@ export function HomeDesigns({ locale }: { locale: UiLocale }) {
           title={homeGallery.designsTitle}
           intro={homeGallery.designsIntro}
         />
-        <HomeShelves designsPath={designsPath} group="wedding" covers={covers(locale)} />
+        <HomeShelves designsPath={designsPath} covers={covers(locale)} />
+        <Button asChild variant="secondary" className="self-center">
+          <Link href={designsPath}>
+            {homeGallery.allDesigns}
+            <ArrowRight aria-hidden className="rtl:rotate-180" />
+          </Link>
+        </Button>
       </div>
     </section>
   );
@@ -291,31 +297,6 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
             );
           })}
         </ul>
-      </div>
-    </section>
-  );
-}
-
-/** Rows for the other celebrations, then the way on to every design. */
-export function HomeMore({ locale }: { locale: UiLocale }) {
-  const { homeGallery } = landingText[locale];
-  const designsPath = pagePath({ kind: "designs" }, locale);
-  return (
-    <section aria-labelledby="more-title">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
-        <Heading
-          id="more-title"
-          eyebrow={homeGallery.moreEyebrow}
-          title={homeGallery.moreTitle}
-          intro={homeGallery.moreIntro}
-        />
-        <HomeShelves designsPath={designsPath} group="occasion" covers={covers(locale)} />
-        <Button asChild variant="secondary" className="self-center">
-          <Link href={designsPath}>
-            {homeGallery.allDesigns}
-            <ArrowRight aria-hidden className="rtl:rotate-180" />
-          </Link>
-        </Button>
       </div>
     </section>
   );
