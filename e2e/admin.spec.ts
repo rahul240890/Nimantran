@@ -344,10 +344,20 @@ test.describe("coupons, invoices and refunds", () => {
     await admin.getByRole("button", { name: "Save details" }).click();
     await expect(admin.getByText(/A GSTIN has 15 letters/)).toBeVisible();
     await admin.getByRole("textbox", { name: /GSTIN/ }).fill("24ABCDE1234F1Z5");
+    await admin.getByRole("textbox", { name: /^Phone/ }).fill("98765 43210");
     await admin.getByRole("button", { name: "Save details" }).click();
     await expect(admin.getByText("Business details saved").first()).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
     expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    // The contact page shows the business, and a chat on WhatsApp with its number
+    await admin.goto("/contact");
+    await expect(admin.getByText("Shubh Test Pvt Ltd")).toBeVisible();
+    await expect(admin.getByRole("link", { name: "Chat with us on WhatsApp" })).toHaveAttribute(
+      "href",
+      /^https:\/\/wa\.me\/919876543210\?text=/,
+    );
+    await admin.goto("/admin/business");
 
     await admin
       .getByRole("navigation", { name: "Admin" })

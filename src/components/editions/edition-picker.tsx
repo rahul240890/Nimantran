@@ -27,6 +27,7 @@ import {
 import type { DesignTier, Pricing } from "@/lib/plans/design-tiers";
 import { useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
+import { funnel } from "@/lib/funnel";
 
 /*
  * The three package cards for one invite, and paying for one. Razorpay's own checkout window takes
@@ -146,6 +147,7 @@ export function EditionPicker({
     }).catch(() => ({ ok: false }) as const);
     setPending(null);
     if (result.ok) {
+      funnel("Payment completed", { plan: result.planId, tier: design });
       toast({
         title: upgradeCopy.paid(planCopy[result.planId].name),
         description: upgradeCopy.paidBody,
@@ -175,6 +177,7 @@ export function EditionPicker({
       if (started.reason === "already") router.refresh();
       return;
     }
+    funnel("Checkout started", { plan, tier: design });
     if (started.provider === "preview") {
       setPending(null);
       setPreviewPay({ plan, orderId: started.orderId, amountPaise: started.amountPaise });

@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
+import { funnel } from "@/lib/funnel";
 import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
@@ -97,7 +98,10 @@ export function DesignCard({
     >
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          setOpen(true);
+          funnel("Design previewed", { design: design.id });
+        }}
         aria-label={galleryCopy.preview(name)}
         className={cn(
           "@container/tile relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night focus-visible:outline-2 focus-visible:outline-ring",

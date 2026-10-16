@@ -66,6 +66,10 @@ export const contactPageCopy: Translation<typeof en.contactPageCopy> = {
   emailNote: "हम 3 कामकाजी दिनों में जवाब देते हैं, और भुगतान के बारे में 1 कामकाजी दिन में।",
   emailPending:
     "हमारा ईमेल पता शुरुआत से पहले यहाँ दिखेगा। तब तक शुभ इन्विटेशन टीम के किसी भी संदेश का जवाब दें।",
+  whatsappHeading: "WhatsApp",
+  whatsappAction: "WhatsApp पर हमसे बात करें",
+  whatsappText: "नमस्ते Shubh Invitation, मेरे निमंत्रण के बारे में एक सवाल है।",
+  whatsappNote: "अपना सवाल भेजिए, और हो सके तो अपने निमंत्रण का लिंक भी। जवाब एक इंसान देता है।",
   businessHeading: "व्यवसाय की जानकारी",
   legalName: "व्यवसाय का नाम",
   address: "पता",
@@ -110,5 +114,6 @@ export const blogCopy: Translation<typeof en.blogCopy> = {
     "डिज़ाइन चुनें, अपने शब्द और कार्यक्रम जोड़ें, और WhatsApp पर भेजें। मेहमान एक टैप में जवाब देते हैं। शुरुआत मुफ़्त।",
   ctaCreate: "अपना निमंत्रण बनाएँ",
   ctaDesigns: (occasion) => `${occasion} के डिज़ाइन देखें`,
+  sampleDesigns: (occasion) => `${occasion} के डिज़ाइन, मेहमान की तरह खोलकर देखें`,
   morePosts: "और पढ़ें",
 };

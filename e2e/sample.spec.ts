@@ -75,6 +75,17 @@ test.describe("live samples", () => {
     await expect(page.getByRole("button", { name: "Open the invitation" })).toBeVisible();
   });
 
+  test("a blog post shows designs for its occasion, each opening as a guest", async ({ page }) => {
+    await page.goto("/blog/wedding-invitation-wording");
+    const designs = page.getByRole("region", { name: "Wedding designs to open as a guest" });
+    await expect(designs.locator("[data-sample-design]")).toHaveCount(4);
+    const first = designs.locator("[data-sample-design]").first();
+    const id = await first.getAttribute("data-sample-design");
+    await first.click();
+    await expect(page).toHaveURL(new RegExp(`/sample/${id}$`));
+    await expect(page.getByText("Sample invitation")).toBeVisible();
+  });
+
   test("an unknown design isn't found", async ({ request }) => {
     expect((await request.get("/sample/no-such-design")).status()).toBe(404);
   });

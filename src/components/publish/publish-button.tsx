@@ -19,6 +19,7 @@ import { cleanSlugInput, isSlug, suggestSlug } from "@/lib/publish/slug";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { editionsText } from "@/i18n/copy/editions";
+import { funnel } from "@/lib/funnel";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 
@@ -166,6 +167,7 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
     );
     setBusy(null);
     if (outcome.status === "published") {
+      funnel("Invite published");
       inviteDraft.update((current) => ({ ...current, slug: outcome.slug }), { touch: false });
       toast({ title: publishCopy.published, tone: "success" });
       onClose();

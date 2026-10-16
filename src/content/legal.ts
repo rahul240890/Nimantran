@@ -62,7 +62,7 @@ export const privacy: LegalDoc = {
         {
           list: [
             "Your email address and occasion if you join the waitlist.",
-            "Anonymous visit counts, such as which pages are viewed and from which kind of device. These never include the address of an invitation, so they cannot tell whose invitation you opened.",
+            "Anonymous visit counts, such as which pages are viewed and from which kind of device, and counts of steps such as opening a design, starting a payment or publishing. These never include the address of an invitation, a name or anything you type, so they cannot tell whose invitation you opened.",
             "Technical details when something breaks, such as the page, browser and error message, so we can fix it.",
           ],
         },

@@ -4,6 +4,7 @@ import { designWords } from "@/components/gallery/design-words";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { SampleBar } from "@/components/guest/sample-bar";
+import { FunnelMark } from "@/components/shell/funnel-mark";
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { getLocale } from "@/i18n/server";
@@ -59,6 +60,7 @@ export default async function SamplePage({ params }: PageProps<"/sample/[design]
 
   return (
     <>
+      <FunnelMark step="Sample opened" design={design.id} />
       <SampleBar
         label={galleryCopy.sampleLabel}
         note={galleryCopy.sampleNote}

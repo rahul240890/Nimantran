@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { inviteUrl, mapsUrl, personalUrl, whatsappShareUrl, whatsappToUrl } from "./links";
+import {
+  inviteUrl,
+  mapsUrl,
+  personalUrl,
+  supportWhatsAppUrl,
+  whatsappShareUrl,
+  whatsappToUrl,
+} from "./links";
 
 describe("links", () => {
   it("prefills WhatsApp with the whole message", () => {
@@ -26,5 +33,18 @@ describe("links", () => {
     expect(url.searchParams.get("text")).toBe("Hello");
     expect(new URL(whatsappToUrl(null, "Hi")).pathname).toBe("/");
     expect(personalUrl("https://x.in/i/a", "abc")).toBe("https://x.in/i/a?g=abc");
+  });
+});
+
+describe("support on WhatsApp", () => {
+  it("adds India's code to a ten-digit number and keeps one given in full", () => {
+    expect(supportWhatsAppUrl("98765 43210", "Hi")).toBe("https://wa.me/919876543210?text=Hi");
+    expect(supportWhatsAppUrl("+91 98765-43210", "Hi")).toBe("https://wa.me/919876543210?text=Hi");
+    expect(supportWhatsAppUrl("098765 43210", "Hi")).toBe("https://wa.me/919876543210?text=Hi");
+  });
+
+  it("gives nothing without a usable number", () => {
+    expect(supportWhatsAppUrl("", "Hi")).toBeNull();
+    expect(supportWhatsAppUrl("12345", "Hi")).toBeNull();
   });
 });

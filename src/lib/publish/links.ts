@@ -24,6 +24,16 @@ export function whatsappToUrl(phone: string | null, text: string): string {
     : whatsappShareUrl(text);
 }
 
+/**
+ * A chat with the business on WhatsApp, from the phone in Admin, Business details: an
+ * Indian number may be saved without +91. Null when there is no usable number.
+ */
+export function supportWhatsAppUrl(phone: string, text: string): string | null {
+  const digits = phone.replace(/\D/g, "").replace(/^0+/, "");
+  if (digits.length < 10) return null;
+  return whatsappToUrl(digits.length === 10 ? `91${digits}` : digits, text);
+}
+
 /** A guest's own link: replies from it are theirs, and opening it shows on the guest list. */
 export function personalUrl(inviteLink: string, token: string): string {
   return `${inviteLink}?g=${token}`;

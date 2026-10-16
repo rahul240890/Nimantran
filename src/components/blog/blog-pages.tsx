@@ -16,6 +16,7 @@ import { blogPosting, faqPage, itemList } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 import { Inline } from "./inline";
+import { SampleDesigns } from "./sample-designs";
 
 /*
  * The blog (docs/BLOG.md): its front page in each language, and each post. Every word is
@@ -309,6 +310,12 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
             </dl>
           </section>
         )}
+
+        <SampleDesigns
+          occasion={post.occasion}
+          locale={locale}
+          heading={blogCopy.sampleDesigns(occasion)}
+        />
 
         <section
           aria-labelledby="cta-heading"
