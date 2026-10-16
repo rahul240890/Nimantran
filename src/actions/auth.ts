@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { profileSchema, safeNext, type Account, type AuthFailure } from "@/lib/auth/account";
+import { phoneSignIn } from "@/lib/auth/mode";
 import { isOtp, normalizePhone } from "@/lib/auth/phone";
 import {
   getAccount,
@@ -25,6 +26,8 @@ export type SendCodeResult =
   | { status: "failed"; error: AuthFailure };
 
 export async function sendCode(input: string): Promise<SendCodeResult> {
+  // No SMS goes out while sign-in by number is switched off, whatever the browser sends
+  if (!phoneSignIn()) return { status: "failed", error: "provider-off" };
   const parsed = normalizePhone(String(input ?? ""));
   if ("error" in parsed) return { status: "invalid", error: parsed.error };
   const result = await sendPhoneCode(parsed.phone);

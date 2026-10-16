@@ -20,6 +20,18 @@ export function authMode(): AuthMode {
   return "off";
 }
 
+/**
+ * Whether hosts can sign in with a mobile number. Real SMS codes in India need DLT
+ * registration (docs/LAUNCH.md, step 8), so the live site offers Google alone until
+ * PHONE_SIGN_IN=on is set in Vercel (owner, 2026-10-16). Preview mode keeps it: the tests
+ * sign in with a number.
+ */
+export function phoneSignIn(): boolean {
+  const mode = authMode();
+  if (mode === "preview") return true;
+  return mode === "supabase" && process.env.PHONE_SIGN_IN?.trim() === "on";
+}
+
 /** The code that signs anyone in, in preview mode only. */
 export const PREVIEW_CODE = "123456";
 

@@ -8,6 +8,7 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
+import { phoneSignIn } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
 import { CATEGORIES, isCategoryId } from "@/lib/categories/catalog";
 import { newDraft } from "@/lib/editor/draft";
@@ -105,7 +106,9 @@ async function JoinCard({
                   {joinCopy.signIn}
                 </Link>
               </Button>
-              <p className="text-sm text-ink-muted">{joinCopy.signInNote}</p>
+              <p className="text-sm text-ink-muted">
+                {phoneSignIn() ? joinCopy.signInNote : joinCopy.signInNoteGoogle}
+              </p>
             </div>
           )}
         </div>
