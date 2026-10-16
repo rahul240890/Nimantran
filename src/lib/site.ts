@@ -1,3 +1,5 @@
+import type { UiLocale } from "@/i18n/locales";
+
 /** Explicit URL first, then Vercel's production and deployment URLs, so link previews never point at localhost. */
 function siteUrl(): string {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL;
@@ -16,6 +18,14 @@ export const site = {
   shortName: "Shubh",
   /** Used on Hindi pages. */
   nameDevanagari: "शुभ इन्विटेशन",
+  /** The full brand as each Indian-language page writes it (docs/BRAND_SEO.md). */
+  localNames: {
+    hi: "शुभ इन्विटेशन",
+    mr: "शुभ इन्व्हिटेशन",
+    gu: "શુભ ઇન્વિટેશન",
+    bn: "শুভ ইনভিটেশন",
+    ta: "ஷுப் இன்விடேஷன்",
+  },
   tagline: "Invitations that come alive",
   description:
     "Create beautiful digital, animated and 3D invitations for every celebration, share them on WhatsApp, and collect RSVPs in one tap.",
@@ -23,3 +33,8 @@ export const site = {
   /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
 } as const;
+
+/** The brand as a page in this language writes it: "Shubh Invitation", "शुभ इन्विटेशन". */
+export function siteNameIn(locale: UiLocale): string {
+  return locale === "en" ? site.name : site.localNames[locale];
+}

@@ -92,7 +92,7 @@ export const profileCopy = {
   nameHint: "As the family knows you, in any script.",
   language: "Preferred language",
   languageHint:
-    "English and Hindi switch the app now; other languages follow as translations arrive. Invitations can use any language.",
+    "English, Hindi, Marathi, Gujarati, Bengali and Tamil switch the app now; other languages follow as translations arrive. Invitations can use any language.",
   signedInWith: "Signed in with",
   methods: { phone: "Mobile number", google: "Google" },
   save: "Save changes",

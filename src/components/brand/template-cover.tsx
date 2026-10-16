@@ -3,9 +3,14 @@ import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { MOTIFS } from "@/components/invitation/art/motifs";
 import { templates, type TemplateId } from "@/content/landing";
 import { templates as templatesHi } from "@/content/hi/landing";
+import { templates as templatesMr } from "@/content/mr/landing";
+import { templates as templatesGu } from "@/content/gu/landing";
+import { templates as templatesBn } from "@/content/bn/landing";
+import { templates as templatesTa } from "@/content/ta/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
 import { CARD_SAMPLES } from "@/lib/templates/story-words";
+import { cardMonth } from "@/lib/templates/themed-words";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
 import { Mandala } from "./mandala";
@@ -25,6 +30,31 @@ type Words = {
   /** The cover's small heading on motif designs; null keeps the design's own. */
   doors: string | null;
 };
+
+/** "With love" at the top of the rose cover, in each card language. */
+const WITH_LOVE = {
+  mr: "प्रेमपूर्वक",
+  gu: "પ્રેમ સહિત",
+  bn: "ভালোবাসায়",
+  ta: "அன்புடன்",
+} as const;
+
+/** A cover's words in one of the other card languages, from that language's own samples. */
+function localWords(lang: keyof typeof WITH_LOVE, sample: Omit<Words["sample"], "date">): Words {
+  const card = CARD_SAMPLES[lang];
+  const and = card.joiner ?? "&";
+  const wedding = `${card.doorLeft ?? ""} ${card.doorRight ?? ""}`.trim();
+  return {
+    sample: { ...sample, date: `12 ${cardMonth("2026-12-12", lang)} 2026` },
+    and,
+    rose: { eyebrow: WITH_LOVE[lang], and },
+    marigold: wedding,
+    emerald: wedding,
+    scroll: { eyebrow: card.blessing ?? wedding, and },
+    kasavu: wedding,
+    doors: wedding || null,
+  };
+}
 
 const WORDS: Record<UiLocale, Words> = {
   en: {
@@ -47,6 +77,10 @@ const WORDS: Record<UiLocale, Words> = {
     kasavu: "शुभ विवाह",
     doors: `${CARD_SAMPLES.hi.doorLeft} ${CARD_SAMPLES.hi.doorRight}`,
   },
+  mr: localWords("mr", templatesMr.sample),
+  gu: localWords("gu", templatesGu.sample),
+  bn: localWords("bn", templatesBn.sample),
+  ta: localWords("ta", templatesTa.sample),
 };
 
 /* Every cover uses container units, so it scales with the card it sits in */

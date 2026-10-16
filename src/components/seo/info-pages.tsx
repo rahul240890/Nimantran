@@ -111,12 +111,19 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
           })}
         </ul>
         <p className="mt-4 text-sm text-ink-muted">{invitesNote}</p>
-        <section aria-labelledby="by-design-heading" className="mt-10 flex flex-col gap-3">
+        <section className="mt-10 flex flex-col gap-3">
           <h3 id="by-design-heading" className="font-display text-xl sm:text-2xl">
             {copy.byDesignHeading}
           </h3>
           <p className="text-ink-muted">{copy.byDesignIntro}</p>
-          <div className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised">
+          {/* Named by the heading above. Wide scripts can push the table past a phone's width, so
+              the keyboard can scroll it too */}
+          <div
+            role="region"
+            aria-labelledby="by-design-heading"
+            tabIndex={0}
+            className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
             <table className="w-full text-start text-sm tabular-nums sm:text-base">
               <thead className="bg-paper">
                 <tr>

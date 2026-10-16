@@ -154,7 +154,7 @@ test.describe("landing page", () => {
     await expect(page.locator("main")).toBeFocused();
   });
 
-  test("the language menu lists every launch language, with English chosen and Hindi ready", async ({
+  test("the language menu lists every launch language, with English chosen and six ready", async ({
     page,
   }) => {
     await visit(page);
@@ -172,7 +172,13 @@ test.describe("landing page", () => {
       "aria-disabled",
       "true",
     );
-    await expect(menu.getByRole("menuitemradio", { name: /मराठी/ })).toHaveAttribute(
+    for (const name of [/मराठी/, /ગુજરાતી/, /বাংলা/, /தமிழ்/]) {
+      await expect(menu.getByRole("menuitemradio", { name })).not.toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    }
+    await expect(menu.getByRole("menuitemradio", { name: /తెలుగు/ })).toHaveAttribute(
       "aria-disabled",
       "true",
     );

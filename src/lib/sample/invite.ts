@@ -6,7 +6,7 @@ import { newDraft, withGalleryChoice, type InviteDraft } from "@/lib/editor/draf
 import { WEDDING_KIND_ENTRIES, suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import { designPhotos } from "@/lib/gallery/photos";
 import type { PublicPhoto } from "@/lib/invites/public";
-import { formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
+import { formatCardDate, isCardLanguage, type CardLanguage } from "@/lib/templates/card-languages";
 import { cardSuggestions } from "@/lib/templates/card-suggestions";
 import type { SuiteId } from "@/lib/suites/catalog";
 import type { Faith } from "@/lib/traditions/faith";
@@ -59,7 +59,8 @@ function photoCount(design: GalleryDesign, category: CategoryId): number {
 
 export function sampleInvite(design: GalleryDesign, locale: UiLocale): SampleInvite {
   const category = sampleOccasion(design);
-  const language: CardLanguage = locale === "hi" ? "hi" : "en";
+  // The sample speaks the site's language: each site language is also a card language
+  const language: CardLanguage = isCardLanguage(locale) ? locale : "en";
   const sample = galleryText[locale].galleryCopy.sample;
   const wedding = category === "wedding";
   const faith = wedding ? sampleFaith(design) : null;

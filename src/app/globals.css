@@ -4632,7 +4632,7 @@
   font-size: 0.8125rem;
 }
 
-:lang(hi) body {
+:is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) body {
   line-height: 1.65;
 }
 

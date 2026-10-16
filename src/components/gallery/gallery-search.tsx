@@ -17,12 +17,33 @@ import { searchGallery, type SearchHit } from "@/lib/gallery/search";
 import { DesignCard } from "./design-card";
 import { designWords, searchWords } from "./design-words";
 import { OccasionTile, PaintedTile } from "./occasion-tile";
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import type { UiLocale } from "@/i18n/locales";
+
+/** The occasions offered as quick searches in the languages written for later. */
+const QUICK: readonly CategoryId[] = [
+  "haldi",
+  "mehendi",
+  "sangeet",
+  "engagement",
+  "birthday",
+  "housewarming",
+];
+
+/** The quick searches in a language written for later: its occasions' own names. */
+const quick = (locale: "mr" | "gu" | "bn" | "ta") =>
+  QUICK.map((id) => CATEGORIES[id].names[locale]);
 
 /** Quick searches under the box, for hosts who would rather tap than type. */
-const SUGGESTIONS = {
+const SUGGESTIONS: Record<UiLocale, readonly string[]> = {
   en: ["Gujarati wedding", "Haldi", "Sangeet", "Bengali", "Nikah", "Birthday"],
   hi: ["गुजराती शादी", "हल्दी", "संगीत", "बंगाली", "निकाह", "जन्मदिन"],
-} as const;
+  // The occasions' own names, which the search always knows in every language
+  mr: quick("mr"),
+  gu: quick("gu"),
+  bn: quick("bn"),
+  ta: quick("ta"),
+};
 
 /**
  * The gallery's search box. While it is empty the occasions (children) show; once the host
@@ -156,8 +177,8 @@ function PlaceResult({
   other,
 }: {
   hit: Exclude<SearchHit, { type: "design" }>;
-  locale: "en" | "hi";
-  other: "en" | "hi";
+  locale: UiLocale;
+  other: UiLocale;
 }) {
   const { galleryCopy, occasionTaglines, weddingKindCopy } = useText(galleryText);
   if (hit.type === "kind") {

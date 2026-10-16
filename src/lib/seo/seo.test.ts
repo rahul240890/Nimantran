@@ -28,6 +28,10 @@ describe("public pages", () => {
       languages: {
         "en-IN": "/invitations/sangeet",
         "hi-IN": "/hi/invitations/sangeet",
+        "mr-IN": "/mr/invitations/sangeet",
+        "gu-IN": "/gu/invitations/sangeet",
+        "bn-IN": "/bn/invitations/sangeet",
+        "ta-IN": "/ta/invitations/sangeet",
         "x-default": "/invitations/sangeet",
       },
     });
@@ -54,6 +58,8 @@ describe("public pages", () => {
     expect(switchLocalePath("/hi/traditions/bengali", "en")).toBe("/traditions/bengali");
     expect(switchLocalePath("/privacy", "hi")).toBe("/hi/privacy");
     expect(switchLocalePath("/hi/terms", "en")).toBe("/terms");
+    expect(switchLocalePath("/ta/pricing", "gu")).toBe("/gu/pricing");
+    expect(switchLocalePath("/mr", "en")).toBe("/");
     expect(switchLocalePath("/create", "hi")).toBeNull();
     expect(switchLocalePath("/invites/abc", "hi")).toBeNull();
   });

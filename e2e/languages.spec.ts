@@ -1,7 +1,10 @@
 import { expect, test, type Page } from "@playwright/test";
 import { axe, noOverflow } from "./invite-helpers";
 
-/* English and Hindi: the home pages at / and /hi, the switcher, and the app following it. */
+/*
+ * The site's languages: the home pages at / and /hi (and /mr, /gu, /bn, /ta), the switcher,
+ * and the app following it.
+ */
 
 const wide = (page: Page) => page.viewportSize()!.width >= 1280;
 
@@ -47,6 +50,49 @@ for (const colorScheme of ["light", "dark"] as const) {
     });
   });
 }
+
+// Marathi, Gujarati, Bengali and Tamil: each home page in its own language and script
+const NEW_LOCALES = [
+  { code: "mr", script: /[\u0900-\u097F]/ },
+  { code: "gu", script: /[\u0A80-\u0AFF]/ },
+  { code: "bn", script: /[\u0980-\u09FF]/ },
+  { code: "ta", script: /[\u0B80-\u0BFF]/ },
+] as const;
+
+for (const [i, { code, script }] of NEW_LOCALES.entries()) {
+  const colorScheme = i % 2 ? "dark" : "light";
+  test(`the ${code} home page reads in its own script, fits and passes axe (${colorScheme})`, async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
+    await page.goto(`/${code}`);
+    await expect(page.locator("html")).toHaveAttribute("lang", code);
+    const title = page.getByRole("heading", { level: 1 });
+    await expect(title).toBeVisible();
+    expect(await title.textContent()).toMatch(script);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
+  test(`the ${code} app pages and policies follow the language`, async ({ page }) => {
+    await page
+      .context()
+      .addCookies([{ name: "shubhdwar-locale", value: code, url: "http://localhost:3100" }]);
+    await page.goto("/sign-in");
+    await expect(page.locator("html")).toHaveAttribute("lang", code);
+    expect(await page.getByRole("heading", { level: 1 }).textContent()).toMatch(script);
+    // The policies stay in English, the binding version, and say so in the page's language
+    await page.goto(`/${code}/privacy`);
+    await expect(page.getByRole("note").first()).toHaveAttribute("lang", code);
+    await expect(page.locator("article")).toHaveAttribute("lang", "en");
+    expect(await noOverflow(page)).toBe(true);
+  });
+}
+
+test("a language the site doesn't speak yet has no pages", async ({ request }) => {
+  expect((await request.get("/te")).status()).toBe(404);
+  expect((await request.get("/te/pricing")).status()).toBe(404);
+});
 
 test.describe("switching language", () => {
   test.use({ reducedMotion: "reduce" });

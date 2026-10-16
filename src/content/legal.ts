@@ -16,6 +16,8 @@ export type LegalDoc = {
 
 export const legalCopy = {
   updated: "Last updated",
+  /** In a site language whose legal pages aren't translated yet: why they read in English. */
+  inEnglish: "",
   onThisPage: "On this page",
   contactHeading: "Contact",
   contactEmail: (email: string) => `Write to us at ${email}. We reply within 7 working days.`,

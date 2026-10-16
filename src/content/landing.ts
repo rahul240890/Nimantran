@@ -69,7 +69,7 @@ export const shell = {
     label: "Language",
     current: (name: string) => `Language: ${name}`,
     soon: "Soon",
-    note: "Marathi, Gujarati, Bengali, Tamil and more follow once native speakers have checked them.",
+    note: "Marathi, Gujarati, Bengali and Tamil are new and being checked by native speakers. Telugu, Kannada, Malayalam and Punjabi follow.",
   },
   themeHeading: "Theme",
   footer: {
@@ -222,7 +222,7 @@ export const faq = {
     },
     {
       q: "Can I make the invite in Hindi, Tamil or another language?",
-      a: "Yes. The site speaks English and Hindi today, and your card can be written in any Indian language, even two side by side so every elder can read it.",
+      a: "Yes. The site speaks English, Hindi, Marathi, Gujarati, Bengali and Tamil, and your card can be written in any Indian language, even two side by side so every elder can read it.",
     },
     {
       q: "Can the card follow our family's traditions?",

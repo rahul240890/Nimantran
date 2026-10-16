@@ -55,12 +55,12 @@ export const guestText: GuestText = {
     addAll: "सर्व कॅलेंडरमध्ये जोडा",
     photos: "फोटो",
     photoAlt: (index) => `कुटुंबाचा फोटो ${index}`,
-    madeWith: `${site.nameDevanagari}ने बनवलेले`,
+    madeWith: `${site.localNames.mr}ने बनवलेले`,
     createYours: "आपले स्वतःचे निमंत्रण बनवा",
     notFoundTitle: "हे निमंत्रण उपलब्ध नाही",
     notFoundBody:
       "लिंक कदाचित चुकीची आहे, किंवा कुटुंबाने ते पाठवणे थांबवले आहे. त्यांना पुन्हा पाठवायला सांगा.",
-    home: `${site.nameDevanagari}वर जा`,
+    home: `${site.localNames.mr}वर जा`,
     scene: {
       label: "एकामागून एक सर्व सोहळे",
       previous: "मागील सोहळा",

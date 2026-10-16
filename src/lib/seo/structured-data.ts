@@ -1,5 +1,5 @@
 import { site } from "@/lib/site";
-import type { UiLocale } from "@/i18n/locales";
+import { intlLocale, type UiLocale } from "@/i18n/locales";
 
 /*
  * Structured data (schema.org JSON-LD) for the public pages, so search results can show
@@ -11,7 +11,7 @@ type Thing = Record<string, unknown>;
 
 export const absolute = (path: string) => new URL(path, site.url).toString();
 
-const inLanguage = (locale: UiLocale) => (locale === "hi" ? "hi-IN" : "en-IN");
+const inLanguage = (locale: UiLocale) => intlLocale[locale];
 
 export function organization(): Thing {
   return {

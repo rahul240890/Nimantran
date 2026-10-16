@@ -14,6 +14,7 @@ import { getAccount } from "@/lib/auth/server";
 import { upgradedFrom } from "@/lib/payments/editions";
 import { paymentHistory, type Payment } from "@/lib/payments/history";
 import { formatRupees } from "@/lib/plans/catalog";
+import { intlLocale } from "@/i18n/locales";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { paymentsCopy } = await getText(accountText);
@@ -37,12 +38,12 @@ export default async function PaymentsPage() {
     getText(editionsText, locale),
     paymentHistory(account, locale),
   ]);
-  const when = new Intl.DateTimeFormat(locale === "hi" ? "hi-IN" : "en-IN", {
+  const when = new Intl.DateTimeFormat(intlLocale[locale], {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "Asia/Kolkata",
   });
-  const day = new Intl.DateTimeFormat(locale === "hi" ? "hi-IN" : "en-IN", {
+  const day = new Intl.DateTimeFormat(intlLocale[locale], {
     dateStyle: "medium",
     timeZone: "Asia/Kolkata",
   });

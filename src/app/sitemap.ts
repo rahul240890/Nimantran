@@ -14,22 +14,24 @@ import { absolute } from "@/lib/seo/structured-data";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const byLocale = await Promise.all(UI_LOCALES.map(allPostsIn));
+  // A language's blog is listed once it has a post of its own, never as an empty page
+  const blogs = UI_LOCALES.filter((locale, i) => locale === "en" || byLocale[i]!.length > 0);
   const pages = publicPages().flatMap((page) => {
+    const locales = page.kind === "blog" ? blogs : UI_LOCALES;
     const legal = page.kind === "privacy" || page.kind === "terms" || page.kind === "refunds";
     const languages = {
-      ...Object.fromEntries(
-        UI_LOCALES.map((code) => [`${code}-IN`, absolute(pagePath(page, code))]),
-      ),
+      ...Object.fromEntries(locales.map((code) => [`${code}-IN`, absolute(pagePath(page, code))])),
       "x-default": absolute(pagePath(page, "en")),
     };
-    return UI_LOCALES.map((locale) => ({
+    return locales.map((locale) => ({
       url: absolute(pagePath(page, locale)),
       changeFrequency: legal ? ("yearly" as const) : ("weekly" as const),
       priority: page.kind === "home" ? 1 : page.kind === "designs" ? 0.8 : legal ? 0.2 : 0.7,
       alternates: { languages },
     }));
   });
-  const all = (await Promise.all(UI_LOCALES.map(allPostsIn))).flat();
+  const all = byLocale.flat();
   const posts = all.map((post) => {
     const languages = Object.fromEntries(
       UI_LOCALES.flatMap((locale) => {

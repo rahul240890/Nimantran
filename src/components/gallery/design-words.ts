@@ -1,6 +1,6 @@
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
-import type { UiLocale } from "@/i18n/locales";
+import { UI_LOCALES, type UiLocale } from "@/i18n/locales";
 import {
   OCCASIONS,
   WEDDING_KINDS,
@@ -21,14 +21,14 @@ export function designWords(
   return { name: suiteCopy.names[design.suite], description: suiteCopy.descriptions[design.suite] };
 }
 
-/** Everything the gallery search reads, in both site languages, so either one finds it. */
+/** Everything the gallery search reads, in every site language, so any of them finds it. */
 export function searchWords(): SearchWords {
-  const locales: UiLocale[] = ["en", "hi"];
+  const locales: readonly UiLocale[] = UI_LOCALES;
   return {
     occasion: (id) => {
       const occasion = OCCASIONS.find((o) => o.id === id);
       return [
-        ...(occasion ? [occasion.names.en, occasion.names.hi] : []),
+        ...(occasion ? Object.values(occasion.names) : []),
         ...locales.map((l) => galleryText[l].occasionTaglines[id] ?? ""),
       ];
     },
