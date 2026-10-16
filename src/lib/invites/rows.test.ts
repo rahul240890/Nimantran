@@ -103,6 +103,7 @@ describe("invite rows", () => {
         id: "gujarati" as const,
         symbol: "none" as const,
         invocation: "latin" as const,
+        faith: "jain" as const,
         wording: { children: "મારા મામાના લગ્નમાં જરૂર આવજો" },
       },
     };

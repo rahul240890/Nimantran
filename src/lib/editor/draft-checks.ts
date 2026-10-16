@@ -1,4 +1,5 @@
 import { INVITE_FORMATS } from "./formats";
+import { FAITHS } from "@/lib/traditions/faith";
 import { OPENING_GODS, OPENING_STYLES, noOpening } from "@/lib/opening/catalog";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
@@ -122,6 +123,8 @@ const traditionSchema = z.object({
     .nullable()
     .catch(null),
   invocation: z.enum(INVOCATION_MODES).catch("script"),
+  /** The family's faith, for the religious wording offered; null follows the default (faith.ts). */
+  faith: z.enum(FAITHS).nullable().catch(null),
   /** The pack's labelled wording blocks, as the family wrote them. */
   wording: z.partialRecord(z.enum(WORDING_IDS), z.string().max(WORDING_MAX)).catch({}),
 });

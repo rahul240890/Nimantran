@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
+import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import { slotLabels } from "@/content/templates-review";
 import {
@@ -14,10 +15,12 @@ import {
   NAME_SLOTS,
   draftPeople,
   coupleValue,
+  draftFaith,
   type CardLanguage,
 } from "@/lib/editor/draft";
 import {
   cardSuggestions,
+  doorIdeas,
   SUGGESTED_SLOTS,
   type SuggestedSlot,
 } from "@/lib/templates/card-suggestions";
@@ -32,6 +35,7 @@ import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
 import { CardLanguagePicker } from "./language-step";
 import { Fold } from "./fold";
+import { FaithPicker } from "./faith-picker";
 import { Ideas } from "./ideas";
 import { SacredElements } from "./sacred-elements";
 import { cn } from "@/lib/cn";
@@ -208,9 +212,12 @@ export function lineIdeas(
   return (SUGGESTED_SLOTS as readonly string[]).includes(id) ? (
     <Ideas
       field={slotLabels[id]}
-      ideas={cardSuggestions(draft.categoryId, language, id as SuggestedSlot).filter(
-        (idea) => idea.length <= SLOT_RULES[id].maxLength,
-      )}
+      ideas={cardSuggestions(
+        draft.categoryId,
+        language,
+        id as SuggestedSlot,
+        draftFaith(draft),
+      ).filter((idea) => idea.length <= SLOT_RULES[id].maxLength)}
       value={value}
       language={language}
       onPick={pick}
@@ -305,8 +312,15 @@ export function WordsStep({ draft, update, errors }: StepProps) {
   const ownSamples = main === "en" ? null : CARD_SAMPLES[main];
   const typeChanged = JSON.stringify(draft.type) !== JSON.stringify(defaultType);
 
+  const setDoors = (left: string, right: string) =>
+    update((current) => ({
+      ...current,
+      content: { ...current.content, doorLeft: left, doorRight: right },
+    }));
+
   return (
     <div className="flex flex-col gap-8">
+      <FaithPicker draft={draft} update={update} />
       <SacredElements draft={draft} update={update} />
       {wording.length > 0 && (
         <div className="grid gap-5 sm:grid-cols-2">
@@ -330,6 +344,15 @@ export function WordsStep({ draft, update, errors }: StepProps) {
                   {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
                 />
                 {lineIdeas(draft, id, main, value, (next) => set(id, next))}
+                {id === "doorLeft" && (
+                  <DoorIdeas
+                    draft={draft}
+                    language={main}
+                    left={value}
+                    right={coupleValue(draft, template, "doorRight")}
+                    onPick={setDoors}
+                  />
+                )}
               </div>
             );
           })}
@@ -343,6 +366,64 @@ export function WordsStep({ draft, update, errors }: StepProps) {
       >
         <Lettering draft={draft} update={update} headless />
       </Fold>
+    </div>
+  );
+}
+
+/** A wedding's gate words as pairs: tapping one fills both doors. */
+function DoorIdeas({
+  draft,
+  language,
+  left,
+  right,
+  onPick,
+}: {
+  draft: StepProps["draft"];
+  language: CardLanguage;
+  left: string;
+  right: string;
+  onPick: (left: string, right: string) => void;
+}) {
+  const { faithCopy } = useText(editorText);
+  const pairs = doorIdeas(draft.categoryId, language, draftFaith(draft)).filter(
+    ([a, b]) =>
+      a.length <= SLOT_RULES.doorLeft.maxLength && b.length <= SLOT_RULES.doorRight.maxLength,
+  );
+  if (pairs.length === 0) return null;
+  return (
+    <div role="group" aria-label={faithCopy.doorIdeas} className="flex flex-col gap-2">
+      <span
+        aria-hidden
+        className="flex items-center gap-1.5 font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+      >
+        <Sparkles className="size-3.5 text-accent-text" />
+        {faithCopy.doorIdeas}
+      </span>
+      <ul className="flex flex-wrap gap-2">
+        {pairs.map(([a, b]) => {
+          const chosen = left.trim() === a && right.trim() === b;
+          return (
+            <li key={`${a}|${b}`}>
+              <button
+                type="button"
+                lang={language}
+                aria-pressed={chosen}
+                aria-label={faithCopy.doorIdea(a, b)}
+                onClick={() => onPick(a, b)}
+                className={cn(
+                  "min-h-11 cursor-pointer rounded-full border px-4 py-2 text-sm leading-snug transition-[background-color,border-color,color,transform] duration-150 motion-safe:active:scale-95",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                  chosen
+                    ? "border-marigold bg-marigold/15 font-semibold text-accent-text"
+                    : "border-line-strong bg-surface text-ink-muted hover:border-line-control hover:text-ink",
+                )}
+              >
+                {a} · {b}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }

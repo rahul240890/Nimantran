@@ -741,6 +741,23 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   },
 };
 
+export const faithCopy: Translation<typeof en.faithCopy> = {
+  heading: "आपकी आस्था के अनुसार शब्द",
+  intro:
+    "नीचे सुझाए गए आशीर्वाद, पंक्तियाँ और द्वार के शब्द इसी के अनुसार हैं। सब कुछ आप बदल सकते हैं।",
+  label: "आस्था",
+  names: {
+    hindu: "हिंदू",
+    sikh: "सिख",
+    muslim: "मुस्लिम",
+    christian: "ईसाई",
+    jain: "जैन",
+    none: "धार्मिक पंक्तियाँ नहीं",
+  },
+  doorIdeas: "द्वार के शब्द",
+  doorIdea: (left, right) => `“${left}” और “${right}” लिखें`,
+};
+
 export const traditionCopy: Translation<typeof en.traditionCopy> = {
   group: "परंपराएँ",
   none: "कोई परंपरा नहीं",

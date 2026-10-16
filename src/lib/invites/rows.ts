@@ -95,6 +95,7 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
       religious: {
         symbol: draft.tradition.symbol,
         invocation: draft.tradition.invocation,
+        faith: draft.tradition.faith,
         wording: draft.tradition.wording,
         // The events table has no column of its own for the second language's wording
         translation: draft.translation,

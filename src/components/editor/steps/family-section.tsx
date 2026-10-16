@@ -20,7 +20,9 @@ import {
   type FamilySide,
   type Relation,
 } from "@/lib/editor/family";
+import { wordingIdeas } from "@/lib/templates/card-suggestions";
 import { WORDING_IDS, WORDING_MAX, type WordingId } from "@/lib/traditions/schema";
+import { Ideas } from "./ideas";
 import type { StepProps } from "./types";
 
 /**
@@ -126,15 +128,24 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
                 }
                 optionalLabel={editor.optional}
               >
-                <Input
-                  value={draft.tradition.wording[id] ?? ""}
-                  maxLength={WORDING_MAX}
-                  placeholder={own?.example ?? familyCopy.examples[id]}
-                  lang={language}
-                  autoComplete="off"
-                  data-wording={id}
-                  onChange={(event) => setWording(id, event.target.value)}
-                />
+                <div className="flex flex-col gap-2.5">
+                  <Input
+                    value={draft.tradition.wording[id] ?? ""}
+                    maxLength={WORDING_MAX}
+                    placeholder={own?.example ?? familyCopy.examples[id]}
+                    lang={language}
+                    autoComplete="off"
+                    data-wording={id}
+                    onChange={(event) => setWording(id, event.target.value)}
+                  />
+                  <Ideas
+                    field={traditionCopy.wordingLabels[id]}
+                    ideas={wordingIdeas(draft.categoryId, language, id)}
+                    value={draft.tradition.wording[id] ?? ""}
+                    language={language}
+                    onPick={(idea) => setWording(id, idea)}
+                  />
+                </div>
               </Field>
             );
           })}

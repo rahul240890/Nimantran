@@ -11,6 +11,7 @@ import {
 import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS, isTemplateId, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS } from "@/lib/traditions/catalog";
+import type { Faith } from "@/lib/traditions/faith";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { WeddingKind } from "./ids";
 import { mixDesigns } from "./photos";
@@ -381,6 +382,8 @@ export type WeddingKindEntry = {
   id: WeddingKind;
   /** The tradition pack that gives its ceremony names, blessing and language, if one exists. */
   tradition: TraditionId | null;
+  /** The faith its wording follows, where it isn't the Hindu packs' (a Nikah is Muslim). */
+  faith?: Faith;
   /** Its name in its own script, for the tile. */
   nativeName: { text: string; lang: string } | null;
   /** The painting on its tile. */
@@ -620,6 +623,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
   punjabi: {
     id: "punjabi",
     tradition: null,
+    faith: "sikh",
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
     suites: [
@@ -641,6 +645,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
   muslim: {
     id: "muslim",
     tradition: null,
+    faith: "muslim",
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
@@ -812,8 +817,9 @@ export function designHref(
   context: { category: CategoryId; kind?: WeddingKind | null },
 ): string {
   const params = new URLSearchParams({ category: context.category });
-  const tradition = context.kind ? WEDDING_KIND_ENTRIES[context.kind].tradition : null;
-  if (tradition) params.set("tradition", tradition);
+  const entry = context.kind ? WEDDING_KIND_ENTRIES[context.kind] : null;
+  if (entry?.tradition) params.set("tradition", entry.tradition);
+  if (entry?.faith) params.set("faith", entry.faith);
   params.set("suite", design.suite);
   params.set("template", design.template);
   if (design.format) params.set("format", design.format);
