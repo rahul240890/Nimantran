@@ -15,6 +15,7 @@ import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
+import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
@@ -90,6 +91,8 @@ export function ThemedDetails({
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
   const [burst, setBurst] = useState(0);
   const flowers = [look.flower, look.secondFlower] as const;
+  // Each theme lays its parts out its own way (section-layouts.ts)
+  const layouts = sectionLayouts(suite);
 
   return (
     <div
@@ -107,13 +110,14 @@ export function ThemedDetails({
         onShower={() => setBurst((was) => was + 1)}
         showered={burst > 0}
       />
-      {main && <SaveTheDate main={main} look={look} lang={lang} />}
+      {main && <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />}
       <Celebrations
         suite={suite}
         look={look}
         lang={lang}
         functions={functions}
         allIcsUrl={allIcsUrl}
+        layouts={layouts}
       />
       {(photos.length > 0 || family.length > 0) && (
         <Dusk
@@ -123,6 +127,7 @@ export function ThemedDetails({
           familyLang={familyLang}
           look={look}
           lang={lang}
+          layouts={layouts}
         />
       )}
       <Night copy={copy} lang={lang} look={look} reply={reply} />
@@ -322,24 +327,45 @@ function Welcome({
   );
 }
 
+/** Monday to Sunday in a known week, for a calendar page's head in the card's language. */
+const WEEK = [1, 2, 3, 4, 5, 6, 7].map((day) => new Date(Date.UTC(2024, 0, day)));
+
+/** The days of the date's month, Monday first, with blanks before the first. */
+function monthGrid(date: Date): (number | null)[] {
+  const first = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+  const blanks = (first.getUTCDay() + 6) % 7;
+  const days = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)).getUTCDate();
+  return [
+    ...Array.from({ length: blanks }, () => null),
+    ...Array.from({ length: days }, (_, i) => i + 1),
+  ];
+}
+
 function SaveTheDate({
   main,
   look,
   lang,
+  layout,
 }: {
   main: { date: string; venue: string };
   look: GuestLook;
   lang: CardLanguage;
+  layout: SectionLayouts["date"];
 }) {
   const cardWords = CARD_THEMED_WORDS[lang];
   const day = parseISO(main.date);
   const [ref, seen] = useInView<HTMLDivElement>("0px 0px -20% 0px");
   const mounted = useMounted();
+  const month = cardMonth(main.date, lang);
+  const weekday = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "narrow", timeZone: "UTC" });
+  const longDay = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "long", timeZone: "UTC" });
+  const reveal = mounted ? (seen ? "in" : "wait") : undefined;
   return (
     <section
       aria-labelledby="guest-save-date"
       data-mood="day"
       data-tour="8"
+      data-layout={layout}
       className="guest-sky relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
     >
       {look.style === "garden" && (
@@ -351,25 +377,87 @@ function SaveTheDate({
         label={cardWords.saveDateLabel}
         title={cardWords.saveDate}
       />
-      <div
-        ref={ref}
-        data-reveal={mounted ? (seen ? "in" : "wait") : undefined}
-        className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem,56svh)] place-items-center"
-      >
-        <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
-        <div className="guest-date-disc relative grid aspect-square w-[48%] place-content-center rounded-full text-center">
-          <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase sm:text-xs">
-            {cardMonth(main.date, lang)}
+      {layout === "medallion" && (
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem,56svh)] place-items-center"
+        >
+          <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
+          <div className="guest-date-disc relative grid aspect-square w-[48%] place-content-center rounded-full text-center">
+            <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase sm:text-xs">
+              {month}
+            </p>
+            <p className="font-display text-[3.4rem] leading-none text-ink tabular-nums sm:text-[4.5rem]">
+              {format(day, "d")}
+            </p>
+            <p className="font-label text-sm tracking-[0.3em] text-accent-text">
+              {format(day, "yyyy")}
+            </p>
+          </div>
+        </div>
+      )}
+      {layout === "calendar" && (
+        // A page torn from the month's calendar, the day ringed in flowers
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          lang={lang}
+          className="guest-reveal guest-card guest-calendar mx-auto mt-10 w-[min(88vw,24rem)] px-5 pt-6 pb-7"
+        >
+          <p className="text-center font-display text-2xl text-ink">
+            {month} <span className="text-accent-text tabular-nums">{format(day, "yyyy")}</span>
           </p>
-          <p className="font-display text-[3.4rem] leading-none text-ink tabular-nums sm:text-[4.5rem]">
-            {format(day, "d")}
-          </p>
-          <p className="font-label text-sm tracking-[0.3em] text-accent-text">
-            {format(day, "yyyy")}
+          <div aria-hidden className="mt-4 grid grid-cols-7 gap-y-1.5 text-center">
+            {WEEK.map((date) => (
+              <span key={date.getTime()} className="font-label text-[0.7rem] text-ink-muted">
+                {weekday.format(date)}
+              </span>
+            ))}
+            {monthGrid(day).map((number, index) => (
+              <span
+                key={index}
+                data-day={number === day.getDate() ? "chosen" : undefined}
+                className="guest-calendar-day mx-auto grid size-9 place-items-center rounded-full text-sm text-ink tabular-nums"
+              >
+                {number}
+              </span>
+            ))}
+          </div>
+          <p className="mt-4 text-center text-sm text-ink-muted">
+            {longDay.format(new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())))},{" "}
+            {format(day, "d")} {month}
           </p>
         </div>
-      </div>
-      {main.venue && (
+      )}
+      {layout === "ticket" && (
+        // A ticket to the day: the date large on the stub, the place on the counterfoil
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          lang={lang}
+          className="guest-reveal guest-ticket mx-auto mt-10 grid w-[min(92vw,30rem)] grid-cols-[auto_1fr] items-stretch"
+        >
+          <div className="guest-ticket-stub flex flex-col items-center justify-center px-5 py-6 text-center">
+            <p className="font-display text-[3.6rem] leading-none text-ink tabular-nums">
+              {format(day, "d")}
+            </p>
+            <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase">
+              {month}
+            </p>
+          </div>
+          <div className="guest-ticket-body flex flex-col justify-center gap-1 px-5 py-6">
+            <p className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
+              {longDay.format(new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())))}
+            </p>
+            <p className="font-display text-2xl leading-tight text-ink tabular-nums">
+              {format(day, "yyyy")}
+            </p>
+            {main.venue && <p className="text-sm text-balance text-ink-muted">{main.venue}</p>}
+          </div>
+        </div>
+      )}
+      {main.venue && layout !== "ticket" && (
         <p className="mt-8 text-center font-display text-2xl text-balance text-ink">{main.venue}</p>
       )}
     </section>
@@ -383,16 +471,19 @@ function Celebrations({
   lang,
   functions,
   allIcsUrl,
+  layouts,
 }: {
   suite: SuiteId;
   look: GuestLook;
   lang: CardLanguage;
   functions: readonly GuestFunction[];
   allIcsUrl: string | null;
+  layouts: SectionLayouts;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
+  const plan = layouts.plan;
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
       <div
@@ -411,13 +502,33 @@ function Celebrations({
           title={cardWords.celebrations}
         />
         {functions.length > 1 && (
-          <Reveal className="mx-auto mt-8 w-full max-w-md">
-            <ol lang={lang} className="guest-stagger flex flex-col gap-3">
+          <Reveal
+            className={cn("mx-auto mt-8 w-full", plan === "tiles" ? "max-w-2xl" : "max-w-md")}
+          >
+            <ol
+              lang={lang}
+              data-layout={plan}
+              className={cn(
+                "guest-stagger",
+                plan === "cards" && "flex flex-col gap-3",
+                plan === "timeline" && "guest-timeline flex flex-col gap-1 ps-2",
+                plan === "tiles" && "grid grid-cols-2 gap-3 sm:grid-cols-3",
+              )}
+            >
               {functions.map((fn) => (
-                <li key={fn.kind}>
+                <li key={fn.kind} className={cn(plan === "timeline" && "relative ps-9")}>
+                  {plan === "timeline" && (
+                    <span aria-hidden className="guest-timeline-dot absolute start-0 top-4" />
+                  )}
                   <a
                     href={`#fn-${fn.kind}`}
-                    className="guest-card flex min-h-14 flex-col items-center gap-0.5 px-5 py-3 text-center transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0"
+                    className={cn(
+                      "flex min-h-14 flex-col gap-0.5 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0",
+                      plan === "cards" && "guest-card items-center px-5 py-3 text-center",
+                      plan === "timeline" && "rounded-xl px-2 py-2.5 text-start",
+                      plan === "tiles" &&
+                        "guest-card guest-tile h-full items-center justify-center px-3 py-5 text-center",
+                    )}
                   >
                     <span className="max-w-full font-display text-xl leading-tight break-words text-ink">
                       {fn.name}
@@ -444,11 +555,14 @@ function Celebrations({
           </div>
         )}
       </div>
-      <ol>
-        {functions.map((fn) => {
+      <ol data-layout={layouts.hours}>
+        {functions.map((fn, index) => {
           const { art, mood } = pageLook(fn.kind);
           const image = images[art] ?? images.cover;
           const headingId = `fn-${fn.kind}`;
+          const overlay = layouts.hours === "overlay" && Boolean(image);
+          // Zigzag: every other hour sets its painting on the far side
+          const flipped = layouts.hours === "zigzag" && index % 2 === 1;
           return (
             <li
               key={fn.kind}
@@ -457,11 +571,31 @@ function Celebrations({
               className="guest-sky guest-hour relative isolate flex min-h-svh flex-col justify-center px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
             >
               <Divider look={look} />
-              <Reveal className="guest-hour-body mx-auto grid w-full max-w-5xl items-center gap-6 pt-12 sm:gap-10 md:grid-cols-2 md:gap-14 md:pt-16">
-                {image && (
+              {overlay && image && (
+                // The hour's painting fills the screen, the card held over it
+                <div aria-hidden className="guest-hour-backdrop absolute inset-0 -z-10">
+                  <Image
+                    src={image}
+                    alt=""
+                    fill
+                    sizes="100vw"
+                    className="object-cover object-[50%_40%]"
+                  />
+                </div>
+              )}
+              <Reveal
+                className={cn(
+                  "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
+                  overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
+                )}
+              >
+                {image && !overlay && (
                   <Framed
                     look={look}
-                    className="guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]"
+                    className={cn(
+                      "guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]",
+                      flipped && "md:order-2",
+                    )}
                   >
                     <Image
                       src={image}
@@ -506,6 +640,7 @@ function Dusk({
   familyLang,
   look,
   lang,
+  layouts,
 }: {
   /** Whether the welcome already shows the first photo, so these count on from the second. */
   first: boolean;
@@ -514,6 +649,7 @@ function Dusk({
   familyLang: string | undefined;
   look: GuestLook;
   lang: CardLanguage;
+  layouts: SectionLayouts;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
@@ -525,6 +661,7 @@ function Dusk({
         <section
           aria-labelledby="guest-photos"
           data-tour="9"
+          data-layout={layouts.photos}
           className="relative flex min-h-svh flex-col justify-center pt-20 pb-6"
         >
           <div className="px-4 sm:px-6">
@@ -535,35 +672,80 @@ function Dusk({
               title={cardWords.photos}
             />
           </div>
-          {/* Scrolls sideways; focusable so a keyboard can scroll it too */}
-          <div
-            role="group"
-            aria-labelledby="guest-photos"
-            tabIndex={0}
-            className="guest-gallery mt-10 snap-x snap-mandatory overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
-          >
-            <ul className="flex w-max gap-10 px-[max(2rem,calc(50vw-32rem))] pt-8 pb-12">
-              {photos.map((photo, index) => (
-                <li key={photo.id} className="guest-photo w-[min(62vw,15rem)] shrink-0 snap-center">
-                  <Framed look={look}>
+          {layouts.photos !== "film" && (
+            <Reveal className="mx-auto mt-10 w-full max-w-4xl px-4 sm:px-6">
+              <ul
+                className={cn(
+                  layouts.photos === "polaroids" &&
+                    "flex flex-wrap justify-center gap-x-4 gap-y-8 pt-2 pb-6",
+                  layouts.photos === "mosaic" && "grid grid-cols-2 gap-3 sm:grid-cols-3",
+                )}
+              >
+                {photos.map((photo, index) => (
+                  <li
+                    key={photo.id}
+                    className={cn(
+                      layouts.photos === "polaroids" &&
+                        "guest-polaroid w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
+                      layouts.photos === "mosaic" &&
+                        "guest-mosaic overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
+                    )}
+                    style={
+                      layouts.photos === "polaroids"
+                        ? { rotate: `${[-3, 2, -1.5, 3, -2.5, 1.5][index % 6]}deg` }
+                        : undefined
+                    }
+                  >
                     <FramedPhoto
                       photo={{ src: photo.url, alt: "", fit: photo.fit }}
                       alt={guestCopy.photoAlt(index + (first ? 2 : 1))}
                       frameAspect={GALLERY_ASPECT}
                       lazy
-                      className="size-full"
+                      className={cn(
+                        "w-full",
+                        layouts.photos === "polaroids" ? "aspect-[4/5]" : "aspect-[4/5] h-full",
+                      )}
                     />
-                  </Framed>
-                </li>
-              ))}
-            </ul>
-          </div>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          )}
+          {/* Scrolls sideways; focusable so a keyboard can scroll it too */}
+          {layouts.photos === "film" && (
+            <div
+              role="group"
+              aria-labelledby="guest-photos"
+              tabIndex={0}
+              className="guest-gallery mt-10 snap-x snap-mandatory overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+            >
+              <ul className="flex w-max gap-10 px-[max(2rem,calc(50vw-32rem))] pt-8 pb-12">
+                {photos.map((photo, index) => (
+                  <li
+                    key={photo.id}
+                    className="guest-photo w-[min(62vw,15rem)] shrink-0 snap-center"
+                  >
+                    <Framed look={look}>
+                      <FramedPhoto
+                        photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                        alt={guestCopy.photoAlt(index + (first ? 2 : 1))}
+                        frameAspect={GALLERY_ASPECT}
+                        lazy
+                        className="size-full"
+                      />
+                    </Framed>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </section>
       )}
       {family.length > 0 && (
         <section
           aria-labelledby="guest-family"
           data-tour="9"
+          data-layout={layouts.family}
           className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
         >
           <Heading
@@ -573,17 +755,38 @@ function Dusk({
             title={cardWords.family}
           />
           <Reveal className="mx-auto mt-10 w-full max-w-4xl">
-            <dl lang={familyLang} className="guest-stagger flex flex-wrap justify-center gap-6">
-              {family.map((block) => (
+            <dl
+              lang={familyLang}
+              className={cn(
+                "guest-stagger",
+                layouts.family === "scroll"
+                  ? "guest-card guest-scroll mx-auto flex max-w-xl flex-col items-center gap-0 px-6 py-10"
+                  : "flex flex-wrap justify-center gap-6",
+              )}
+            >
+              {family.map((block, index) => (
                 <div
                   key={block.id}
                   className={cn(
-                    "guest-card guest-family flex w-full flex-col items-center gap-2 px-6 py-8 text-center",
+                    "flex w-full flex-col items-center gap-2 text-center",
+                    layouts.family === "cards" && "guest-card guest-family px-6 py-8",
+                    layouts.family === "ribbons" && "guest-ribbon-block px-4 pt-2 pb-6",
+                    layouts.family === "scroll" && "py-5",
                     // Both sides' parents side by side; the blessings and hosts each a full row
-                    pairedSide(family, block) && "sm:w-[calc(50%-0.75rem)]",
+                    layouts.family !== "scroll" &&
+                      pairedSide(family, block) &&
+                      "sm:w-[calc(50%-0.75rem)]",
                   )}
                 >
-                  <dt className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
+                  {layouts.family === "scroll" && index > 0 && (
+                    <span aria-hidden className="guest-rule mb-4" />
+                  )}
+                  <dt
+                    className={cn(
+                      "font-label text-xs tracking-[0.25em] uppercase",
+                      layouts.family === "ribbons" ? "guest-ribbon px-6 py-2" : "text-accent-text",
+                    )}
+                  >
                     {block.title}
                   </dt>
                   <FamilyWords
