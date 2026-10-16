@@ -10,20 +10,26 @@ import {
   LayoutGrid,
   Rotate3d,
   Search,
+  SlidersHorizontal,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useDeferredValue, useMemo } from "react";
+import { Suspense, useDeferredValue, useId, useMemo, useState, type ReactNode } from "react";
+import { usePricing } from "@/components/pricing/pricing-provider";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { Select } from "@/components/ui/select";
 import { ScrollRow } from "@/components/ui/scroll-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { cn } from "@/lib/cn";
 import { WEDDING_KINDS, type WeddingKind } from "@/lib/gallery/catalog";
+import { formatRupees } from "@/lib/plans/catalog";
+import { DESIGN_TIERS, tierPricePaise, type DesignTier } from "@/lib/plans/design-tiers";
 import {
+  CATALOG_SORTS,
   NO_FILTERS,
   PHOTO_GROUPS,
   designCatalog,
@@ -31,7 +37,9 @@ import {
   filtersFromParams,
   filtersToParams,
   hasFilters,
+  tierOf,
   type CatalogEntry,
+  type CatalogSort,
   type DesignFilters,
   type DesignFormat,
   type PhotoGroup,
@@ -69,6 +77,9 @@ const CHIP_OCCASIONS = [
   "shop-opening",
 ] as const satisfies readonly CategoryId[];
 
+/** The occasions the filters show first: the wedding and the quick links above. */
+const QUICK_OCCASIONS: readonly CategoryId[] = ["wedding", ...CHIP_OCCASIONS];
+
 const FORMAT_ICONS = {
   all: LayoutGrid,
   moving: Clapperboard,
@@ -93,12 +104,15 @@ function ChipRow<T extends string>({
   value,
   options,
   onChange,
+  after,
 }: {
   label: string;
   allLabel: string;
   value: T | null;
   options: readonly { id: T; label: string }[];
   onChange: (value: T | null) => void;
+  /** A last control in the row, such as More occasions. */
+  after?: ReactNode;
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
@@ -127,6 +141,7 @@ function ChipRow<T extends string>({
             {option.label}
           </button>
         ))}
+        {after}
       </div>
     </div>
   );
@@ -331,18 +346,40 @@ function Results({
   const { galleryCopy, catalogCopy, shelfCopy, weddingKindCopy, collectionCopy } =
     useText(galleryText);
   const text = useSearchText(entries);
+  const pricing = usePricing();
   const deferred = useDeferredValue(filters);
   const shown = useMemo(
-    () => filterCatalog(entries, deferred, (design) => text(design.id)),
-    [entries, deferred, text],
+    () => filterCatalog(entries, deferred, (design) => text(design.id), pricing),
+    [entries, deferred, text, pricing],
   );
   const set = (change: Partial<DesignFilters>) => onChange({ ...filters, ...change });
   const showKinds = !filters.occasion || filters.occasion === "wedding";
+  // The occasions most families look for first; the rest are one tap away
+  const chosenOccasion = filters.kind ? "wedding" : filters.occasion;
+  const [allOccasions, setAllOccasions] = useState(
+    () => !!chosenOccasion && !QUICK_OCCASIONS.includes(chosenOccasion),
+  );
+  // Tradition, collection and price wait behind More filters, open while one is chosen
+  const extras = [showKinds && filters.kind, filters.collection, filters.price].filter(
+    Boolean,
+  ).length;
+  const [moreOpen, setMoreOpen] = useState(extras > 0);
+  const moreId = useId();
+  // Only the prices some design has (Signature is empty until the admin moves a design there)
+  const prices = DESIGN_TIERS.filter((tier) =>
+    entries.some((entry) => tierOf(pricing, entry.design.id) === tier),
+  );
+  const priceLabel = (tier: DesignTier) => {
+    const paise = tierPricePaise(pricing, tier);
+    return paise
+      ? galleryCopy.tierPrice(galleryCopy.tiers[tier], formatRupees(paise))
+      : galleryCopy.tiers[tier];
+  };
   // A View all names its row: "Illustrated invitations · 89 designs"
-  const { query, kind, photos, format, occasion, collection } = filters;
+  const { query, kind, photos, format, occasion, collection, price } = filters;
   const only = (chosen: unknown) =>
     !query.trim() &&
-    [kind ?? occasion, photos, format, collection].filter(Boolean).length === 1 &&
+    [kind ?? occasion, photos, format, collection, price].filter(Boolean).length === 1 &&
     !!chosen;
   const title = only(collection)
     ? collectionCopy.name(collectionCopy.names[collection!].name)
@@ -367,6 +404,29 @@ function Results({
       </Link>
 
       <div className="flex flex-col gap-5 rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">
+        <ChipRow<CategoryId>
+          label={catalogCopy.occasionLabel}
+          allLabel={catalogCopy.allOccasions}
+          value={chosenOccasion}
+          options={(allOccasions ? CATEGORY_IDS : QUICK_OCCASIONS).map((id) => ({
+            id,
+            label: CATEGORIES[id].names[locale],
+          }))}
+          onChange={(occasion) =>
+            set({ occasion, kind: occasion === "wedding" ? filters.kind : null })
+          }
+          after={
+            <button
+              type="button"
+              aria-expanded={allOccasions}
+              onClick={() => setAllOccasions((open) => !open)}
+              className="inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-full px-3 text-sm font-semibold whitespace-nowrap text-accent-text underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {allOccasions ? catalogCopy.fewerOccasions : catalogCopy.moreOccasions}
+            </button>
+          }
+        />
+
         <RadioGroup
           label={galleryCopy.formats.label}
           variant="segment"
@@ -389,14 +449,6 @@ function Results({
           })}
         </RadioGroup>
 
-        <ChipRow<CollectionId>
-          label={collectionCopy.label}
-          allLabel={collectionCopy.all}
-          value={filters.collection}
-          options={COLLECTION_IDS.map((id) => ({ id, label: collectionCopy.names[id].name }))}
-          onChange={(collection) => set({ collection })}
-        />
-
         <ChipRow<PhotoGroup>
           label={catalogCopy.photosLabel}
           allLabel={catalogCopy.allPhotos}
@@ -405,25 +457,44 @@ function Results({
           onChange={(photos) => set({ photos })}
         />
 
-        <ChipRow<CategoryId>
-          label={catalogCopy.occasionLabel}
-          allLabel={catalogCopy.allOccasions}
-          value={filters.kind ? "wedding" : filters.occasion}
-          options={CATEGORY_IDS.map((id) => ({ id, label: CATEGORIES[id].names[locale] }))}
-          onChange={(occasion) =>
-            set({ occasion, kind: occasion === "wedding" ? filters.kind : null })
-          }
-        />
-
-        {showKinds && (
-          <ChipRow<WeddingKind>
-            label={catalogCopy.traditionLabel}
-            allLabel={catalogCopy.allTraditions}
-            value={filters.kind}
-            options={WEDDING_KINDS.map((id) => ({ id, label: weddingKindCopy[id].name }))}
-            onChange={(kind) => set({ kind })}
-          />
-        )}
+        <div className="flex flex-col gap-5 border-t border-line pt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-expanded={moreOpen}
+            aria-controls={moreId}
+            onClick={() => setMoreOpen((open) => !open)}
+            className="self-start"
+          >
+            <SlidersHorizontal aria-hidden />
+            {moreOpen ? catalogCopy.fewerFilters : catalogCopy.moreFilters(extras)}
+          </Button>
+          <div id={moreId} hidden={!moreOpen} className="flex flex-col gap-5">
+            {showKinds && (
+              <ChipRow<WeddingKind>
+                label={catalogCopy.traditionLabel}
+                allLabel={catalogCopy.allTraditions}
+                value={filters.kind}
+                options={WEDDING_KINDS.map((id) => ({ id, label: weddingKindCopy[id].name }))}
+                onChange={(kind) => set({ kind })}
+              />
+            )}
+            <ChipRow<DesignTier>
+              label={catalogCopy.priceLabel}
+              allLabel={catalogCopy.allPrices}
+              value={filters.price}
+              options={prices.map((id) => ({ id, label: priceLabel(id) }))}
+              onChange={(price) => set({ price })}
+            />
+            <ChipRow<CollectionId>
+              label={collectionCopy.label}
+              allLabel={collectionCopy.all}
+              value={filters.collection}
+              options={COLLECTION_IDS.map((id) => ({ id, label: collectionCopy.names[id].name }))}
+              onChange={(collection) => set({ collection })}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex min-h-11 flex-wrap items-center justify-between gap-3">
@@ -433,10 +504,19 @@ function Results({
             ? `${title} · ${catalogCopy.count(shown.length)}`
             : catalogCopy.count(shown.length)}
         </h2>
-        <Button variant="ghost" size="sm" onClick={() => onChange(NO_FILTERS)}>
-          <X aria-hidden />
-          {catalogCopy.clear}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Select
+            aria-label={catalogCopy.sortLabel}
+            value={filters.sort}
+            onValueChange={(sort) => set({ sort: sort as CatalogSort })}
+            options={CATALOG_SORTS.map((sort) => ({ value: sort, label: catalogCopy.sorts[sort] }))}
+            className="w-auto min-w-48"
+          />
+          <Button variant="ghost" size="sm" onClick={() => onChange(NO_FILTERS)}>
+            <X aria-hidden />
+            {catalogCopy.clear}
+          </Button>
+        </div>
       </div>
 
       {shown.length === 0 ? (
