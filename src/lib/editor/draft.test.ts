@@ -478,6 +478,19 @@ describe("the blessing on a card in another language", () => {
     expect(draftSymbol(plain)).toBeNull();
   });
 
+  it("keeps an occasion's own greeting where the faith doesn't change it", () => {
+    const card = (categoryId: InviteDraft["categoryId"], language: "en" | "hi") => ({
+      ...withCategory(newDraft("scroll"), categoryId),
+      languages: [language],
+    });
+    expect(draftCopy(card("birthday", "en")).blessing).toBe("Happy birthday");
+    expect(draftCopy(card("anniversary", "en")).blessing).toBe("Years of togetherness");
+    expect(draftCopy(card("baisakhi", "en")).blessing).toBe("Vaisakhi diyan lakh lakh vadhaiyan");
+    // A party never starts with Ganesha's name; a Hindi Christmas card greets for Christmas
+    expect(draftCopy(card("party", "en")).blessing).not.toMatch(/Ganesh/);
+    expect(draftCopy(card("christmas", "hi")).blessing).toBe("क्रिसमस की शुभकामनाएँ");
+  });
+
   it("stays empty on a design without a sample blessing", () => {
     const draft: InviteDraft = { ...newDraft("marigold"), languages: ["gu"] };
     expect(draftCopy(draft).blessing).toBe("");

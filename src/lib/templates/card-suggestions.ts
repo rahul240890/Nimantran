@@ -1089,6 +1089,11 @@ const DOOR_IDEAS: Record<Faith, Partial<Record<CardLanguage, readonly DoorPair[]
 /** Kinds of occasion whose wording follows the family's faith. */
 const FAITH_KINDS: readonly Kind[] = ["wedding", "sacred", "remembrance"];
 
+/** Whether the occasion's wording follows the family's faith: a wedding, a puja, a prayer meet. */
+export function followsFaith(categoryId: CategoryId): boolean {
+  return FAITH_KINDS.includes(kindOf(categoryId));
+}
+
 /**
  * The wording offered for one of the card's lines, in its language and the family's faith:
  * the occasion's own sample first (an English card's from the occasion, others' from their

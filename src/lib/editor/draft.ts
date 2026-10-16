@@ -11,10 +11,10 @@ import {
 } from "@/lib/templates/card-languages";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { toCardCopy, type CardCopy } from "@/lib/templates/content";
-import { cardSuggestions } from "@/lib/templates/card-suggestions";
+import { cardSuggestions, followsFaith } from "@/lib/templates/card-suggestions";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
-import { cardFaith, type Faith } from "@/lib/traditions/faith";
+import { cardFaith, faithChoosable, type Faith } from "@/lib/traditions/faith";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
 import { SLOT_IDS, SLOT_RULES, type SlotId, type TemplateId } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
@@ -440,8 +440,12 @@ export function draftCopy(
   // Untyped slots preview in the card's own language: the occasion's and the design's
   // samples are English, so other languages use their own sample wording instead
   const samples = language === "en" ? draftCategory(draft).wording : cardSamples(draft, language);
-  // Samples bless the Hindu way (Shri Ganeshaya Namah): another faith starts with its own
-  const ownFaith = draftFaith(draft) !== "hindu";
+  // Samples bless the Hindu way (Shri Ganeshaya Namah): a wedding or a puja of another faith,
+  // or with no religious lines, starts with its own, as does another faith's festival in an
+  // Indian language. A birthday's "Happy birthday" and an English festival greeting stay.
+  const faith = draftFaith(draft);
+  const chosenWording = faithChoosable(draft.categoryId) && followsFaith(draft.categoryId);
+  const ownFaith = faith !== "hindu" && (chosenWording || (faith !== "none" && language !== "en"));
   for (const id of COUPLE_SLOTS) {
     // The tradition's wording in the second language beats the main card's typed words
     const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
