@@ -1,27 +1,49 @@
+/* eslint-disable @next/next/no-img-element -- next/og draws these into the preview picture; no page shows them */
+import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import type { CSSProperties } from "react";
 import { ImageResponse } from "next/og";
 import { draftCopy, draftTemplate } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
 import { firstReadable, readableOn } from "@/lib/og/contrast";
-import { asJpeg } from "@/lib/og/jpeg";
+import { textPicture, type TextPicture } from "@/lib/og/text";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { draftSuite } from "@/lib/publish/story";
 import { suitePreview } from "@/lib/suites/catalog";
 import { site } from "@/lib/site";
 
-export const alt = "The invitation's cover";
-export const size = { width: 1200, height: 630 };
-// JPEG keeps the file small enough for WhatsApp to show it (src/lib/og/jpeg.ts)
-export const contentType = "image/jpeg";
+/*
+ * The picture WhatsApp and other apps show under an invitation's link: the family's card,
+ * in its colours. The names, date and place are drawn by sharp (src/lib/og/text.ts), so
+ * every card language reads right.
+ */
 
-/** The picture WhatsApp and other apps show under the link: the family's card, in its colours. */
-export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  return asJpeg(await drawCover((await params).slug));
+export const COVER_SIZE = { width: 1200, height: 630 };
+export const COVER_ALT = "The invitation's cover";
+const size = COVER_SIZE;
+
+/** The words' column: the preview's width less its padding, the gap and the painting. */
+const TEXT_WIDTH = 660;
+
+/**
+ * The cover's address. The version changes with every save, so apps and the CDN may keep a
+ * copy for good, and an edited invite gets a fresh picture.
+ */
+export function coverPath(slug: string, updatedAt: string): string {
+  const version = (Date.parse(updatedAt) || 0).toString(36);
+  return `/i/${slug}/cover?v=${version}`;
 }
 
-async function drawCover(slug: string): Promise<Response> {
+/** A piece of text drawn by sharp, at its own size. */
+function TextImage({ picture, style }: { picture: TextPicture; style?: CSSProperties }) {
+  return (
+    <img src={picture.src} alt="" width={picture.width} height={picture.height} style={style} />
+  );
+}
+
+export async function drawCover(slug: string): Promise<Response> {
   const [invite, tokens, fonts] = await Promise.all([
     findPublishedInvite(slug),
     lightTokens(),
@@ -65,8 +87,21 @@ async function drawCover(slug: string): Promise<Response> {
   const detail = firstReadable(back, 3, gold, accentText, text);
   const when = inviteWhen(draft);
   const where = inviteWhere(draft);
+  const names = inviteNames(draft);
   // A painted theme shows its own cover painting, the first thing guests will open
-  const painting = await paintedCover(draftSuite(draft));
+  const [painting, namesPicture, whenPicture, wherePicture] = await Promise.all([
+    paintedCover(draftSuite(draft)),
+    textPicture(names, {
+      look: "display",
+      size: names.length > 22 ? 64 : 84,
+      colour: text,
+      width: TEXT_WIDTH,
+    }),
+    when ? textPicture(when, { look: "label", size: 30, colour: text, width: TEXT_WIDTH }) : null,
+    where
+      ? textPicture(where, { look: "label", size: 26, colour: detail, width: TEXT_WIDTH })
+      : null,
+  ]);
 
   return new ImageResponse(
     <div
@@ -85,19 +120,9 @@ async function drawCover(slug: string): Promise<Response> {
         <div style={{ fontFamily: "Tenor Sans", fontSize: 26, letterSpacing: 8, color: detail }}>
           {`YOU'RE INVITED · ${occasionName(draft).toUpperCase()}`}
         </div>
-        <div
-          style={{
-            fontFamily: "Rozha One",
-            fontSize: inviteNames(draft).length > 22 ? 64 : 84,
-            lineHeight: 1.05,
-          }}
-        >
-          {inviteNames(draft)}
-        </div>
-        {when && <div style={{ fontFamily: "Tenor Sans", fontSize: 30, marginTop: 8 }}>{when}</div>}
-        {where && (
-          <div style={{ fontFamily: "Tenor Sans", fontSize: 26, color: detail }}>{where}</div>
-        )}
+        <TextImage picture={namesPicture} />
+        {whenPicture && <TextImage picture={whenPicture} style={{ marginTop: 8 }} />}
+        {wherePicture && <TextImage picture={wherePicture} />}
       </div>
 
       {painting ? (

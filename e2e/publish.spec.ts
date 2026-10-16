@@ -107,16 +107,18 @@ test.describe("publish and share", () => {
     await expect(guest.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(guest.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      /opengraph-image/,
+      /\/i\/[a-z0-9-]+\/cover\?v=[0-9a-z]+$/,
     );
     // The preview WhatsApp shows is a real image, on the host the guest opened, and small enough
     // for WhatsApp to show it at all (it drops pictures over about 300 KB)
     const image = await guest.locator('meta[property="og:image"]').getAttribute("content");
     expect(new URL(image!).origin).toBe(new URL(link).origin);
-    const preview = await page.request.get(new URL(image!).pathname);
+    const preview = await page.request.get(`${new URL(image!).pathname}${new URL(image!).search}`);
     expect(preview.ok()).toBe(true);
     expect(preview.headers()["content-type"]).toBe("image/jpeg");
     expect((await preview.body()).byteLength).toBeLessThan(300_000);
+    // Versioned, so the CDN keeps it and WhatsApp gets it at once
+    expect(preview.headers()["cache-control"]).toContain("s-maxage=31536000");
     const haldi = guest.getByRole("article", { name: "Haldi" });
     await expect(haldi.getByText("Wednesday, 14 October 2026")).toBeVisible();
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();

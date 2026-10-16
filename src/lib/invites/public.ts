@@ -52,25 +52,27 @@ async function fromSupabase(slug: string): Promise<PublicInvite | null> {
     [],
     (row.questions ?? []).flatMap((question) => (question.preset ? [question.preset] : [])),
   );
-  let photos: PublicPhoto[] = [];
-  if (row.photos.length) {
-    const { data: links } = await supabase.storage.from("event-media").createSignedUrls(
-      row.photos.map((photo) => photo.path),
-      PHOTO_LINK_SECONDS,
-    );
-    const byPath = new Map((links ?? []).map((link) => [link.path, link.signedUrl]));
-    photos = row.photos.flatMap((photo) => {
-      const url = byPath.get(photo.path);
-      return url ? [{ id: photo.id, url, width: photo.width ?? 1, height: photo.height ?? 1 }] : [];
-    });
-  }
-  // The clip sits beside the photos, so the same policy lets guests read it
+  // The photos' and the clip's links at once: each is a trip to the database
   const clip = draft.music.clip;
-  const clipLink = clip
-    ? await supabase.storage
-        .from("event-media")
-        .createSignedUrl(clipPath(row.id, clip), PHOTO_LINK_SECONDS)
-    : null;
+  const [photoLinks, clipLink] = await Promise.all([
+    row.photos.length
+      ? supabase.storage.from("event-media").createSignedUrls(
+          row.photos.map((photo) => photo.path),
+          PHOTO_LINK_SECONDS,
+        )
+      : null,
+    // The clip sits beside the photos, so the same policy lets guests read it
+    clip
+      ? supabase.storage
+          .from("event-media")
+          .createSignedUrl(clipPath(row.id, clip), PHOTO_LINK_SECONDS)
+      : null,
+  ]);
+  const byPath = new Map((photoLinks?.data ?? []).map((link) => [link.path, link.signedUrl]));
+  const photos: PublicPhoto[] = row.photos.flatMap((photo) => {
+    const url = byPath.get(photo.path);
+    return url ? [{ id: photo.id, url, width: photo.width ?? 1, height: photo.height ?? 1 }] : [];
+  });
   return {
     id: row.id,
     slug: row.slug ?? slug,

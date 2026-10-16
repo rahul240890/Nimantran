@@ -10,6 +10,7 @@ import { VideoCard } from "@/components/publish/video-card";
 import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
 import { findPublishedInvite } from "@/lib/invites/public";
+import { coverPath } from "@/lib/og/cover";
 import { hostReplies } from "@/lib/invites/rsvp";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
@@ -80,6 +81,9 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           url={url}
           names={names}
           // The same title and line the guest page gives WhatsApp (src/app/(app)/i/[slug]/page.tsx)
+          coverUrl={
+            published ? coverPath(published.slug, published.updatedAt) : `/i/${draft.slug}/cover`
+          }
           previewTitle={guestCopy.metaTitle(names, occasion)}
           previewDescription={guestCopy.metaDescription(when, where)}
           message={shareCopy.message({ names, occasion, when, where })}
