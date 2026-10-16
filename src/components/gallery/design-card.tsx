@@ -19,6 +19,7 @@ import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
@@ -414,6 +415,8 @@ export function DesignPreview({
                 ))}
               </ul>
             )}
+            {/* Admin, Designs brings its own badge and choice of tier in place of the prices */}
+            {!badge && <DesignPackages designId={design.id} />}
             {action ??
               (href && (
                 <Button asChild size="lg" fullWidth>

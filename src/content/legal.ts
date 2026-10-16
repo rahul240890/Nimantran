@@ -168,7 +168,7 @@ export const privacy: LegalDoc = {
 export const refunds: LegalDoc = {
   title: "Refund and cancellation policy",
   description:
-    "How paid packages are delivered, when you can cancel, and how to get a full refund within 7 days if your invitation hasn't been sent.",
+    "How paid packages are delivered, when you can cancel, and how to get a full refund within 7 days if no guest has opened your invitation yet.",
   intro:
     "Paid packages on Shubh Invitation are digital: they unlock features on one invitation the moment your payment is confirmed. This page says when you can get your money back, and how.",
   sections: [
@@ -192,7 +192,7 @@ export const refunds: LegalDoc = {
       id: "full-refund",
       heading: "Full refund within 7 days",
       body: [
-        "Ask within 7 days of paying, and we refund the full amount if the invitation hasn't been sent to any guest yet: no guest has opened its link.",
+        "Ask within 7 days of paying, and we refund the full amount if no guest has opened your invitation yet. Sharing the link isn't enough to count: a guest has to open it.",
         "Whatever the date, we also refund in full when:",
         {
           list: [
@@ -289,7 +289,7 @@ export const terms: LegalDoc = {
       body: [
         "Making and sharing an invitation is free. Paid packages (Basic, Celebration and Grand) unlock more for one invitation, such as paid designs, more invites, the video and no watermark. Our pricing page lists what each includes.",
         "Prices are in Indian rupees and include any applicable taxes. You pay once per invitation, through Razorpay, by UPI, card or netbanking; there is no subscription and nothing renews by itself. We never see or store your card details.",
-        "The package unlocks as soon as the payment is confirmed. Refunds follow our refund and cancellation policy: a full refund within 7 days if the invitation hasn't been sent to any guest.",
+        "The package unlocks as soon as the payment is confirmed. Refunds follow our refund and cancellation policy: a full refund within 7 days if no guest has opened the invitation yet.",
         "We may change prices for future purchases, never for a package you have already bought. Shubh Invitation never holds money sent between guests and families.",
       ],
     },

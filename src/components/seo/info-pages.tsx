@@ -2,15 +2,16 @@ import { Check, Mail } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { editionsText } from "@/i18n/copy/editions";
+import { galleryText } from "@/i18n/copy/gallery";
 import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import type { Business } from "@/lib/payments/business-details";
 import { PAID_PLAN_IDS, formatRupees, inviteLimit, packagePrice } from "@/lib/plans/catalog";
+import { DESIGN_TIERS } from "@/lib/plans/design-tiers";
 import { getPricing } from "@/lib/plans/pricing";
 import { pagePath } from "@/lib/seo/paths";
 import { faqPage } from "@/lib/seo/structured-data";
-import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { Block, PageHero, PublicShell, type Crumb } from "./public-page";
 
@@ -27,7 +28,8 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
   const { pricingPageCopy: copy } = pagesText[locale];
   // The admin's prices (Admin, Designs), shown for a Premium design
   const pricing = await getPricing();
-  const { planCopy, invitesLine } = editionsText[locale];
+  const { planCopy, invitesLine, invitesNote } = editionsText[locale];
+  const { tiers } = galleryText[locale].galleryCopy;
   const design = formatRupees(pricing.designs.premium);
   return (
     <PublicShell
@@ -106,6 +108,53 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
             );
           })}
         </ul>
+        <p className="mt-4 text-sm text-ink-muted">{invitesNote}</p>
+        <section aria-labelledby="by-design-heading" className="mt-10 flex flex-col gap-3">
+          <h3 id="by-design-heading" className="font-display text-xl sm:text-2xl">
+            {copy.byDesignHeading}
+          </h3>
+          <p className="text-ink-muted">{copy.byDesignIntro}</p>
+          <div className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised">
+            <table className="w-full text-start text-sm tabular-nums sm:text-base">
+              <thead className="bg-paper">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-1.5 py-3 text-start text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal sm:tracking-[0.14em] sm:uppercase"
+                  >
+                    {copy.designColumn}
+                  </th>
+                  {PAID_PLAN_IDS.map((id) => (
+                    <th
+                      key={id}
+                      scope="col"
+                      className="px-1.5 py-3 text-end text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal sm:tracking-[0.14em] sm:uppercase"
+                    >
+                      {planCopy[id].name}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {DESIGN_TIERS.map((tier) => (
+                  <tr key={tier} data-tier={tier} className="border-t border-line">
+                    <th scope="row" className="px-1.5 py-3 text-start font-semibold sm:px-4">
+                      {tiers[tier]}
+                    </th>
+                    {PAID_PLAN_IDS.map((id) => {
+                      const paise = packagePrice(id, tier, pricing);
+                      return (
+                        <td key={id} className="px-1.5 py-3 text-end sm:px-4">
+                          {paise === 0 ? copy.free : formatRupees(paise)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
         <div className="mt-10 grid gap-8 lg:grid-cols-2">
           <section aria-labelledby="notes-heading" className="flex flex-col gap-3">
             <h3 id="notes-heading" className="font-display text-xl sm:text-2xl">
@@ -147,7 +196,15 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
 }
 
 /** Who runs the site and how to reach them; the business lines come from Admin, Business details. */
-export function ContactPage({ locale, business }: { locale: UiLocale; business: Business }) {
+export function ContactPage({
+  locale,
+  business,
+  email,
+}: {
+  locale: UiLocale;
+  business: Business;
+  email: string | null;
+}) {
   const { contactPageCopy: copy } = pagesText[locale];
   const rows = (
     [
@@ -157,7 +214,6 @@ export function ContactPage({ locale, business }: { locale: UiLocale; business: 
       ["gstin", business.gstin],
     ] as const
   ).filter(([, value]) => value);
-  const email = site.contactEmail ?? (business.email || null);
   return (
     <PublicShell
       locale={locale}

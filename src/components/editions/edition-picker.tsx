@@ -124,7 +124,7 @@ export function EditionPicker({
   publishHref,
   video = null,
 }: EditionPickerProps) {
-  const { upgradeCopy, planCopy, invitesCount } = useText(editionsText);
+  const { upgradeCopy, planCopy, invitesCount, invitesNote } = useText(editionsText);
   const router = useRouter();
   const [coupon, setCoupon] = useState<{
     code: string;
@@ -424,6 +424,7 @@ export function EditionPicker({
           <ShieldCheck aria-hidden className="size-4 shrink-0 text-success" />
           {upgradeCopy.secure}
         </p>
+        <p>{invitesNote}</p>
         <p>{upgradeCopy.refunds}</p>
       </div>
 

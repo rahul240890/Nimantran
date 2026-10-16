@@ -139,8 +139,12 @@ export async function saveBusinessDetails(
   const saved = await saveBusiness(parsed.data, admin.account);
   if (saved) {
     revalidatePath("/admin/business");
-    // The contact pages print the business name and address
-    for (const locale of UI_LOCALES) revalidatePath(pagePath({ kind: "contact" }, locale));
+    // The contact and policy pages print the business name, address and email
+    for (const locale of UI_LOCALES) {
+      for (const kind of ["contact", "terms", "refunds", "privacy"] as const) {
+        revalidatePath(pagePath({ kind }, locale));
+      }
+    }
   }
   return saved ? "saved" : "failed";
 }

@@ -86,6 +86,9 @@ export const galleryCopy = {
   },
   preview: (name: string) => `Preview ${name}`,
   useDesign: "Use this design",
+  packagesHeading: "Packages for this design",
+  packageFree: "Free",
+  comparePackages: "Compare the packages",
   close: "Close preview",
   pagesLabel: "Pages in this design",
   cardNote:

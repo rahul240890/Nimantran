@@ -8,6 +8,7 @@ import {
   type Business,
 } from "@/lib/payments/business-details";
 import { authMode } from "@/lib/auth/mode";
+import { site } from "@/lib/site";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
 
@@ -54,4 +55,10 @@ export async function saveBusiness(business: Business, admin: Account): Promise<
     updated_by: admin.id,
   });
   return !error;
+}
+
+/** Where customers write: the address set for the site, else the one in Business details. */
+export async function contactEmail(): Promise<string | null> {
+  if (site.contactEmail) return site.contactEmail;
+  return (await getBusiness()).email || null;
 }
