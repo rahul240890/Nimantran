@@ -5,6 +5,7 @@ import {
   Clapperboard,
   ArrowLeft,
   ArrowRight,
+  ChevronDown,
   Image as ImageIcon,
   Layers,
   LayoutGrid,
@@ -319,6 +320,7 @@ function Browse({
                 total={total}
                 covers={covers}
                 priority={groupIndex === 0 && index === 0}
+                lazy={groupIndex > 0 && index > 0}
               />
             );
           })}
@@ -327,6 +329,9 @@ function Browse({
     </>
   );
 }
+
+/** How many matching designs the grid draws before Show all. */
+const FIRST_RESULTS = 48;
 
 /** The page with filters chosen: every matching design in a grid, and the filters to change. */
 function Results({
@@ -352,6 +357,10 @@ function Results({
     () => filterCatalog(entries, deferred, (design) => text(design.id), pricing),
     [entries, deferred, text, pricing],
   );
+  // A long list draws its first designs; Show all draws the rest, until the filters change
+  const signature = filtersToParams(deferred);
+  const [allFor, setAllFor] = useState<string | null>(null);
+  const drawn = allFor === signature ? shown : shown.slice(0, FIRST_RESULTS);
   const set = (change: Partial<DesignFilters>) => onChange({ ...filters, ...change });
   const showKinds = !filters.occasion || filters.occasion === "wedding";
   // The occasions most families look for first; the rest are one tap away
@@ -527,13 +536,31 @@ function Results({
           </Button>
         </div>
       ) : (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
-          {shown.map((entry, index) => (
-            <li key={entry.design.id} data-format-item={entry.format}>
-              <CatalogCard entry={entry} filters={deferred} covers={covers} priority={index < 4} />
-            </li>
-          ))}
-        </ul>
+        <div className="flex flex-col gap-6">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+            {drawn.map((entry, index) => (
+              <li key={entry.design.id} data-format-item={entry.format}>
+                <CatalogCard
+                  entry={entry}
+                  filters={deferred}
+                  covers={covers}
+                  priority={index < 4}
+                />
+              </li>
+            ))}
+          </ul>
+          {drawn.length < shown.length && (
+            <Button
+              variant="secondary"
+              size="lg"
+              className="self-center"
+              onClick={() => setAllFor(signature)}
+            >
+              {galleryCopy.showAll(shown.length)}
+              <ChevronDown aria-hidden />
+            </Button>
+          )}
+        </div>
       )}
     </>
   );

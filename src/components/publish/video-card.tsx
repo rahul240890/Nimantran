@@ -194,7 +194,8 @@ export function VideoCard(props: VideoCardProps) {
               controlsList={clean ? undefined : "nodownload"}
               playsInline
               aria-label={videoCopy.player(names)}
-              className="size-full object-cover"
+              // Full screen on a wide screen: the whole upright video, centred like a reel
+              className="size-full object-cover [&:fullscreen]:bg-night [&:fullscreen]:object-contain"
             />
           ) : (
             <canvas
@@ -581,7 +582,8 @@ export function PackageVideo(props: PackageVideoProps) {
               playsInline
               controlsList="nodownload"
               aria-label={videoCopy.player(props.names)}
-              className="size-full object-cover"
+              // Full screen on a wide screen: the whole upright video, centred like a reel
+              className="size-full object-cover [&:fullscreen]:bg-night [&:fullscreen]:object-contain"
             />
           ) : (
             <canvas

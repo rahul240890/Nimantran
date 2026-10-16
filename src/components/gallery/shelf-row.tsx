@@ -3,7 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
@@ -16,6 +16,7 @@ import {
   type DesignFilters,
 } from "@/lib/gallery/filters";
 import { designPhotos } from "@/lib/gallery/photos";
+import { samplePath } from "@/lib/sample/paths";
 import { shelfHref, traditionShelf } from "@/lib/gallery/shelves";
 import type { TemplateId } from "@/lib/templates/ids";
 import { DesignCard } from "./design-card";
@@ -51,6 +52,7 @@ export function CatalogCard({
       name={name}
       description={description}
       href={catalogHref(entry, filters)}
+      sampleHref={samplePath(entry.design.id, filters)}
       photos={designPhotos(entry.design, catalogCategory(entry, filters))}
       priority={priority}
       cover={entry.design.suite === "classic" ? covers[entry.design.template] : undefined}
@@ -74,6 +76,7 @@ export function ShelfRow({
   total,
   covers,
   priority,
+  lazy = false,
 }: {
   id: string;
   title: string;
@@ -84,15 +87,26 @@ export function ShelfRow({
   total: number;
   covers: Covers;
   priority: boolean;
+  /**
+   * Far down a long page: its heading and View all come with the page, its designs once
+   * it scrolls near, so a phone doesn't lay out every row's paintings before the first.
+   */
+  lazy?: boolean;
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   const label = shelfCopy.viewAllLabel(title, total);
   const row = useScrollRow();
+  const [near, watch] = useNear(lazy);
   const item =
     "w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4.5rem)/4.4)] xl:w-[calc((100%-6rem)/5.3)]";
 
   return (
-    <section aria-labelledby={`${id}-heading`} data-shelf={id} className="flex flex-col gap-4">
+    <section
+      ref={watch}
+      aria-labelledby={`${id}-heading`}
+      data-shelf={id}
+      className="flex flex-col gap-4"
+    >
       <div className="flex items-end justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1">
           <h3
@@ -130,18 +144,27 @@ export function ShelfRow({
         track
         className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:gap-5 lg:px-0"
       >
-        {entries.map((entry, index) => (
-          <li key={entry.design.id} data-format-item={entry.format} className={item}>
-            <CatalogCard
-              entry={entry}
-              filters={NO_FILTERS}
-              covers={covers}
-              priority={priority && index < 2}
-              compact
-            />
-          </li>
-        ))}
-        {href && total > entries.length && (
+        {/* Until the row is near, empty tiles of the same size hold its place */}
+        {!near &&
+          entries.slice(0, 6).map((entry) => (
+            <li key={entry.design.id} aria-hidden className={item}>
+              <span className="block aspect-[3/4] rounded-2xl bg-surface-2" />
+              <span className="block h-16" />
+            </li>
+          ))}
+        {near &&
+          entries.map((entry, index) => (
+            <li key={entry.design.id} data-format-item={entry.format} className={item}>
+              <CatalogCard
+                entry={entry}
+                filters={NO_FILTERS}
+                covers={covers}
+                priority={priority && index < 2}
+                compact
+              />
+            </li>
+          ))}
+        {near && href && total > entries.length && (
           <li className={item}>
             <Link
               href={href}
@@ -230,4 +253,22 @@ export function TraditionTiles({
       </ScrollRow>
     </section>
   );
+}
+
+/** Whether a lazy row has come near the screen (600px ahead), and the ref that watches for it. */
+function useNear(lazy: boolean) {
+  const [element, watch] = useState<HTMLElement | null>(null);
+  const [near, setNear] = useState(!lazy);
+  useEffect(() => {
+    if (near || !element || typeof IntersectionObserver === "undefined") return;
+    const observer = new IntersectionObserver(
+      (seen) => {
+        if (seen.some((entry) => entry.isIntersecting)) setNear(true);
+      },
+      { rootMargin: "600px 0px" },
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [near, element]);
+  return [near, watch] as const;
 }

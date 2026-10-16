@@ -1,63 +1,73 @@
-import { ArrowRight, Eye, Shuffle } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+type Step = { href: string; label: string; short: string };
+
 /**
- * Across the top of a design's public sample: it says the names are made up, and leads
- * into the editor with this design, the same as Use this design in the gallery. A demo from
- * the home page also offers another design.
+ * Across the top of a design's public sample: Previous and Next to walk on to other designs
+ * as a guest would see them, and Choose this design, which leads into the editor with it.
+ * That the names are made up is said to screen readers; sighted visitors see the sample.
  */
 export function SampleBar({
   label,
-  note,
   action,
   href,
-  another = null,
+  nav,
+  previous = null,
+  next = null,
 }: {
+  /** "Sample invitation: the names, dates and places are made up". */
   label: string;
-  note: string;
   action: string;
   href: string;
-  /** The next demo design, when this one came from "Open a live invitation". */
-  another?: { href: string; label: string } | null;
+  /** The name of the Previous and Next pair. */
+  nav: string;
+  previous?: Step | null;
+  next?: Step | null;
 }) {
+  const step =
+    "min-w-11 px-2.5 text-card-ivory hover:bg-card-ivory/10 focus-visible:outline-card-ivory sm:px-3";
   return (
     <div
       data-sample-bar
       className="fixed inset-x-0 top-0 z-40 border-b border-card-ivory/15 bg-night/85 pt-[env(safe-area-inset-top)] text-card-ivory backdrop-blur-md print:hidden"
     >
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-2">
-        <p className="flex min-w-0 flex-1 flex-col leading-tight">
-          <span className="flex min-w-0 items-center gap-1.5 font-label text-[0.65rem] tracking-[0.18em] uppercase">
-            <Eye aria-hidden className="size-3.5 shrink-0" />
-            <span className="truncate">{label}</span>
-          </span>
-          <span className="truncate text-xs text-card-ivory/75">{note}</span>
-        </p>
-        <div className="flex shrink-0 items-center gap-2">
-          {another && (
-            <Button
-              asChild
-              size="sm"
-              variant="ghost"
-              className="min-w-11 px-2.5 text-card-ivory hover:bg-card-ivory/10 sm:px-3"
-            >
-              {/* The next demo is picked by its address: a fresh request every time */}
-              <Link href={another.href} prefetch={false} aria-label={another.label}>
-                <Shuffle aria-hidden />
-                <span aria-hidden className="hidden sm:inline">
-                  {another.label}
-                </span>
-              </Link>
-            </Button>
-          )}
-          <Button asChild size="sm">
-            <Link href={href}>
-              {action}
-              <ArrowRight aria-hidden className="rtl:rotate-180" />
-            </Link>
-          </Button>
-        </div>
+      <p className="sr-only">{label}</p>
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-3 py-2 sm:px-4">
+        {previous || next ? (
+          <nav aria-label={nav} className="flex items-center gap-1">
+            {/* Each is a new request: a sample is drawn for its design on the server */}
+            {previous && (
+              <Button asChild size="sm" variant="ghost" className={step}>
+                <Link href={previous.href} prefetch={false} aria-label={previous.label} rel="prev">
+                  <ChevronLeft aria-hidden className="rtl:rotate-180" />
+                  <span aria-hidden className="hidden sm:inline">
+                    {previous.short}
+                  </span>
+                </Link>
+              </Button>
+            )}
+            {next && (
+              <Button asChild size="sm" variant="ghost" className={step}>
+                <Link href={next.href} prefetch={false} aria-label={next.label} rel="next">
+                  <span aria-hidden className="hidden sm:inline">
+                    {next.short}
+                  </span>
+                  <ChevronRight aria-hidden className="rtl:rotate-180" />
+                </Link>
+              </Button>
+            )}
+          </nav>
+        ) : (
+          <span />
+        )}
+        <Button asChild size="sm" className="shrink-0">
+          <Link href={href}>
+            {action}
+            <ArrowRight aria-hidden className="rtl:rotate-180" />
+          </Link>
+        </Button>
       </div>
     </div>
   );

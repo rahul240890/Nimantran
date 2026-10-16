@@ -13,12 +13,13 @@ import { designById, designHref } from "@/lib/gallery/catalog";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 import { sampleInvite } from "@/lib/sample/invite";
-import { anotherDemoPath } from "@/lib/sample/paths";
+import { sampleWalk } from "@/lib/sample/browse";
 
 /*
  * A design's public sample, one tap from the gallery and the home page: the invitation a
  * guest would get, opening, music and replies included, with made-up names. No sign-in,
- * nothing saved, and replies thank the visitor without going anywhere.
+ * nothing saved, and replies thank the visitor without going anywhere. Previous and Next
+ * walk the home page's tour, or the designs of the listing it was opened from (browse.ts).
  */
 
 export async function generateMetadata({
@@ -39,10 +40,13 @@ export async function generateMetadata({
 
 export default async function SamplePage({ params, searchParams }: PageProps<"/sample/[design]">) {
   const { design: id } = await params;
-  // A demo from the home page ("Open a live invitation") offers the next one
-  const demo = (await searchParams).demo === "1";
   const design = designById(id);
   if (!design) notFound();
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(await searchParams)) {
+    if (typeof value === "string") search.set(key, value);
+  }
+  const walk = sampleWalk(design, search);
   const locale = await getLocale();
   const { galleryCopy } = galleryText[locale];
   const { functionCopy } = editorText[locale];
@@ -65,15 +69,28 @@ export default async function SamplePage({ params, searchParams }: PageProps<"/s
     <>
       <FunnelMark step="Sample opened" design={design.id} />
       <SampleBar
-        label={galleryCopy.sampleLabel}
-        note={galleryCopy.sampleNote}
-        action={galleryCopy.useDesign}
-        href={designHref(design, { category })}
-        another={
-          demo ? { href: anotherDemoPath(design.id), label: galleryCopy.sampleAnother } : null
+        label={`${galleryCopy.sampleLabel}: ${galleryCopy.sampleNote}`}
+        action={galleryCopy.sampleChoose}
+        href={walk.choose ?? designHref(design, { category })}
+        nav={galleryCopy.sampleWalk}
+        previous={
+          walk.previous
+            ? {
+                href: walk.previous,
+                label: galleryCopy.samplePrevious,
+                short: galleryCopy.samplePreviousShort,
+              }
+            : null
+        }
+        next={
+          walk.next
+            ? { href: walk.next, label: galleryCopy.sampleNext, short: galleryCopy.sampleNextShort }
+            : null
         }
       />
+      {/* A new design starts from its own closed invitation, not the last one's open pages */}
       <GuestView
+        key={design.id}
         slug="sample"
         draft={draft}
         functions={functions}

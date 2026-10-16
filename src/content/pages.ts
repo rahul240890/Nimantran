@@ -45,7 +45,7 @@ export const pricingPageCopy = {
     },
     {
       q: "Which package do I need for a wedding?",
-      a: "Every package covers every function. Most families choose Celebration for the invitation video and more invites; Grand adds unlimited invites and a video for every function.",
+      a: "Every package covers every function. For most weddings we suggest Celebration, for the invitation video and more invites; Grand adds unlimited invites and a video for every function.",
     },
     {
       q: "Do guests pay anything?",
