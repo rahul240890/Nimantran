@@ -24,7 +24,7 @@ export const pricingPageCopy: Translation<typeof en.pricingPageCopy> = {
   designColumn: "डिज़ाइन",
   free: "मुफ़्त",
   bestFor: "किसके लिए",
-  popular: "सबसे ज़्यादा चुना गया",
+  popular: "शादियों के लिए सुझाया गया",
   notesHeading: "जानने लायक़",
   notes: [
     "क़ीमतें रुपयों में हैं और उनमें सभी लागू कर शामिल हैं। हर भुगतान की रसीद मिलती है।",

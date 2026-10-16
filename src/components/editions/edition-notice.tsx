@@ -2,8 +2,6 @@
 
 import { Lock, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { inviteEdition, type InviteEdition } from "@/actions/checkout";
 import { useDesignTier } from "@/components/pricing/pricing-provider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,6 +10,7 @@ import { editionsText } from "@/i18n/copy/editions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import { PAID_PLAN_IDS, editionAfter, formatRupees, planShortfalls } from "@/lib/plans/catalog";
 import { draftDesignId } from "@/lib/plans/design-defaults";
+import { useInviteEdition } from "./use-invite-edition";
 
 /**
  * In the editor's last step: what this invite uses beyond its package, while payments are
@@ -19,21 +18,11 @@ import { draftDesignId } from "@/lib/plans/design-defaults";
  */
 export function EditionNotice({ draft, inviteId }: { draft: InviteDraft; inviteId: string }) {
   const { limitCopy, planCopy } = useText(editionsText);
-  const [edition, setEdition] = useState<InviteEdition>(null);
   // A paid design asks for a package at its price (Admin, Designs), and a package bought
   // for another design counts for nothing on this one
   const designId = draftDesignId(draft);
   const design = useDesignTier(designId).tier;
-
-  useEffect(() => {
-    let live = true;
-    inviteEdition(inviteId, designId)
-      .then((result) => live && setEdition(result))
-      .catch(() => undefined);
-    return () => {
-      live = false;
-    };
-  }, [inviteId, designId]);
+  const edition = useInviteEdition(inviteId, designId);
 
   if (!edition) return null;
   const shortfalls = planShortfalls(draft, edition.edition, design);

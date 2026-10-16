@@ -24,7 +24,7 @@ export const pricingPageCopy = {
   designColumn: "Design",
   free: "Free",
   bestFor: "Best for",
-  popular: "Most chosen",
+  popular: "Recommended for weddings",
   notesHeading: "Good to know",
   notes: [
     "Prices are in rupees and include any taxes. You get a receipt for every payment.",

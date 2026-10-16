@@ -70,7 +70,7 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   current: "आपका पैकेज",
   currentBadge: "अभी",
   needed: "आपके निमंत्रण के लिए सही",
-  popular: "सबसे ज़्यादा चुना गया",
+  popular: "सुझाया गया",
   included: "शामिल",
   free: "फ़्री",
   designPrice: (price) => `डिज़ाइन ${price}`,
@@ -93,6 +93,7 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   checking: "आपका भुगतान जाँचा जा रहा है…",
   paid: (plan) => `${plan} चालू हो गया। धन्यवाद!`,
   paidBody: "आपके पैकेज की हर सुविधा खुल गई है।",
+  paidBadge: (plan) => `भुगतान हो गया · ${plan}`,
   cancelled: "भुगतान पूरा नहीं हुआ। कोई पैसा नहीं कटा।",
   declined:
     "भुगतान नहीं हो सका। कोई पैसा नहीं कटा। फिर कोशिश करें, या भुगतान का कोई और तरीका चुनें।",

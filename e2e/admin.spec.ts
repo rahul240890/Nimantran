@@ -258,9 +258,10 @@ test.describe("packages", () => {
     // This page's clock is held in September while the account's saves are dated today, so
     // the editor reopens on the account's copy; pick the paid-for design again to be sure
     const kayal = page.getByRole("radio", { name: /^Kayal/ });
-    if (!(await kayal.isVisible())) {
-      await page.getByRole("button", { name: "Change design" }).first().click();
-    }
+    const change = page.getByRole("button", { name: "Change design" }).first();
+    // Wait for the editor to show one or the other before deciding
+    await expect(kayal.or(change)).toBeVisible({ timeout: 20_000 });
+    if (!(await kayal.isVisible())) await change.click();
     await kayal.click();
     await expect(kayal).toBeChecked();
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
@@ -399,6 +400,23 @@ test.describe("coupons, invoices and refunds", () => {
       .getByRole("button", { name: "Pay (test)" })
       .click();
     await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    // The cards show what's paid now, never the coupon's prices from before
+    await expect(basic.getByText("Your package")).toBeVisible();
+    await expect(basic.getByRole("button", { name: /^Pay / })).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("article", { name: "Celebration" })
+        .getByRole("button", { name: /^Upgrade for ₹/ }),
+    ).toBeVisible();
+    // and the editor says the design is paid for, in place of its price
+    const packages = page.url();
+    const inviteId = new URL(packages).pathname.split("/")[2];
+    await page.goto(`/create?invite=${inviteId}`);
+    // Once the editor has tidied its address, which can take a moment on a busy machine
+    await expect(page.locator("[data-paid]").first()).toHaveText("Paid · Basic", {
+      timeout: 15_000,
+    });
+    await page.goto(packages);
 
     await page.getByRole("link", { name: "Invoice" }).first().click();
     await expect(page.getByRole("heading", { name: "Tax invoice" })).toBeVisible();

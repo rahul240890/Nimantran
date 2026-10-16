@@ -192,7 +192,7 @@ export const refunds: LegalDoc = {
       id: "full-refund",
       heading: "Full refund within 7 days",
       body: [
-        "Ask within 7 days of paying, and we refund the full amount if no guest has opened your invitation yet. Sharing the link isn't enough to count: a guest has to open it.",
+        "Ask within 7 days of paying, and we refund the full amount if no guest has opened your invitation yet. Sharing the link isn't enough to count: a guest has to open it. The preview WhatsApp or another app shows of a link never counts, and nor does your own look at the invitation in the editor or through its main link.",
         "Whatever the date, we also refund in full when:",
         {
           list: [

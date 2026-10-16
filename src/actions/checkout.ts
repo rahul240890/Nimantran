@@ -107,6 +107,8 @@ export async function tryCoupon(input: unknown): Promise<CouponCheck> {
 
 export type InviteEdition = {
   edition: Edition;
+  /** The package paid for and the design it's for, whichever design the editor shows. */
+  paid: Edition;
   prices: Partial<Record<PaidPlanId, Price>>;
 } | null;
 
@@ -132,6 +134,7 @@ export async function inviteEdition(
   const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
   return {
     edition,
+    paid: had,
     prices: pricesFor(edition, chosen.tier, coupons, null, new Date(), pricing),
   };
 }
