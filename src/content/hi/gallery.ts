@@ -62,6 +62,12 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     second: "सिया",
     one: "आन्या",
     blessing: "श्री गणेश जी के आशीर्वाद से",
+    faithNames: {
+      sikh: { first: "अर्जन", second: "सिमरन" },
+      muslim: { first: "अयान", second: "ज़ोया" },
+      christian: { first: "जोएल", second: "एना" },
+      jain: { first: "ऋषभ", second: "विधि" },
+    },
     families: "अपने परिवारों के साथ",
     line: "आपको सपरिवार सादर आमंत्रित करते हैं",
     venues: {
