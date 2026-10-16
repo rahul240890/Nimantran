@@ -3,11 +3,23 @@
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { keepDate } from "@/lib/suites/lettering";
-import type { WelcomeKind } from "@/lib/opening/catalog";
+import { darkWelcome, type WelcomeScene } from "@/lib/opening/catalog";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_GREETING_WORDS } from "@/lib/templates/story-words";
 import { Toran } from "./opening-art";
+import {
+  Fireflies,
+  Garden,
+  Ghat,
+  Kites,
+  Mandala,
+  Peacock,
+  Rangoli,
+  SkyLanterns,
+  Sunrise,
+  Waves,
+} from "./welcome-scenes";
 
 /*
  * The moment between the opening and the invitation (Step 12y, redrawn): the words alone,
@@ -282,27 +294,30 @@ function Letter() {
   );
 }
 
-const ART: Record<WelcomeKind, () => ReactNode> = {
+const ART: Record<WelcomeScene, () => ReactNode> = {
   royal: Royal,
   bloom: Bloom,
   lamps: Lamps,
   night: Night,
   party: Party,
   letter: Letter,
+  mandala: Mandala,
+  peacock: Peacock,
+  sunrise: Sunrise,
+  garden: Garden,
+  rangoli: Rangoli,
+  ghat: Ghat,
+  fireflies: Fireflies,
+  "sky-lanterns": SkyLanterns,
+  kites: Kites,
+  waves: Waves,
 };
 
-/** Dark skies carry ivory words; card stock carries ink. */
-const DARK: Record<WelcomeKind, boolean> = {
-  royal: false,
-  bloom: false,
-  lamps: true,
-  night: true,
-  party: true,
-  letter: false,
-};
+/** Scenes with a horizon low down lift the words above it. */
+const LIFTED: readonly WelcomeScene[] = ["lamps", "sunrise", "ghat", "waves", "peacock"];
 
 export function OpeningWelcome({
-  kind,
+  scene,
   copy,
   lang,
   guest,
@@ -313,7 +328,7 @@ export function OpeningWelcome({
   over = false,
   onSkip,
 }: {
-  kind: WelcomeKind;
+  scene: WelcomeScene;
   copy: CardCopy;
   lang: CardLanguage;
   guest: string | null;
@@ -329,8 +344,8 @@ export function OpeningWelcome({
   const words = CARD_GREETING_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   // Over a painting the words sit on a veil of card stock, so they are always ink
-  const dark = DARK[kind] && !over;
-  const Art = ART[kind];
+  const dark = darkWelcome(scene) && !over;
+  const Art = ART[scene];
   const button = useRef<HTMLButtonElement>(null);
   useEffect(() => button.current?.focus({ preventScroll: true }), []);
   const rise = (ms: number) => ({ "--d": `${ms}ms` }) as CSSProperties;
@@ -341,7 +356,7 @@ export function OpeningWelcome({
     <div
       lang={lang}
       data-testid="opening-welcome"
-      data-welcome={kind}
+      data-welcome={scene}
       data-over={over ? "art" : undefined}
       data-tone={dark ? "dark" : "light"}
       onClick={onSkip}
@@ -353,9 +368,9 @@ export function OpeningWelcome({
       <div
         className={cn(
           "relative flex h-full flex-col items-center justify-center gap-[2cqh] text-center",
-          kind === "letter" ? "px-[14cqw]" : "px-[8cqw]",
-          kind === "lamps" && "pb-[14cqh]",
-          kind === "royal" && "pt-[8cqh]",
+          scene === "letter" ? "px-[14cqw]" : "px-[8cqw]",
+          LIFTED.includes(scene) && "pb-[14cqh]",
+          scene === "royal" && "pt-[8cqh]",
         )}
       >
         {eyebrow && (

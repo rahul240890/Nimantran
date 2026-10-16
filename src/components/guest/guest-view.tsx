@@ -118,6 +118,8 @@ type GuestViewProps = {
   preview?: boolean;
   /** A design's public sample with made-up names: replies thank the visitor but go nowhere. */
   sample?: boolean;
+  /** For reviewing a welcome scene (/engine/guest?hold=1): it stays until Continue. */
+  holdWelcome?: boolean;
 };
 
 export function GuestView({
@@ -133,6 +135,7 @@ export function GuestView({
   previewNow,
   preview = false,
   sample = false,
+  holdWelcome = false,
 }: GuestViewProps) {
   const locale = useLocale();
   const languages = cardLanguages(draft);
@@ -370,6 +373,8 @@ export function GuestView({
                 suite={suite}
                 style={opening}
                 god={god}
+                welcomeChoice={draft.opening.welcome}
+                holdWelcome={holdWelcome}
                 copy={copy}
                 lang={language}
                 languages={languages}

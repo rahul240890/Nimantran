@@ -437,9 +437,11 @@ export type OpeningChoice = {
   style: OpeningStyle | null;
   /** Null opens without a god or symbol. */
   god: OpeningGod | null;
+  /** The welcome after it; null picks one that suits the opening, another each visit. */
+  welcome: WelcomeScene | null;
 };
 
-export const noOpening: OpeningChoice = { style: null, god: null };
+export const noOpening: OpeningChoice = { style: null, god: null, welcome: null };
 
 /** Each painting's file and its width over height, so it is laid out whole. */
 export const GOD_PAINTINGS: Partial<Record<OpeningGod, { src: string; aspect: number }>> = {
@@ -519,7 +521,7 @@ const STORY_GATE: Record<StoryId, PaintedGate> = {
 
 /** The style the guest sees: the host's pick when it fits, else the design's own. */
 export function openingStyle(
-  choice: OpeningChoice,
+  choice: Pick<OpeningChoice, "style"> & Partial<OpeningChoice>,
   suite: SuiteId,
   scene: boolean,
   category?: CategoryId,
@@ -539,7 +541,7 @@ export function openingStyle(
  * family's faith doesn't (a Ganesha picked before the card became a Nikah's).
  */
 export function openingGod(
-  choice: OpeningChoice,
+  choice: Pick<OpeningChoice, "god"> & Partial<OpeningChoice>,
   category: CategoryId,
   faith?: { faith: Faith; chosen: boolean },
 ): OpeningGod | null {
@@ -555,6 +557,84 @@ export function openingGod(
  */
 export const WELCOME_KINDS = ["royal", "bloom", "lamps", "night", "party", "letter"] as const;
 export type WelcomeKind = (typeof WELCOME_KINDS)[number];
+
+/**
+ * Every welcome a guest can see: the six feelings' own scenes, and ten more drawn as
+ * scenery (welcome-scenes.tsx): a mandala, a peacock's fan, a sunrise, a garden, a rangoli,
+ * diyas on the ghat, fireflies, sky lanterns, kites and the sea.
+ */
+export const WELCOME_SCENES = [
+  ...WELCOME_KINDS,
+  "mandala",
+  "peacock",
+  "sunrise",
+  "garden",
+  "rangoli",
+  "ghat",
+  "fireflies",
+  "sky-lanterns",
+  "kites",
+  "waves",
+] as const;
+export type WelcomeScene = (typeof WELCOME_SCENES)[number];
+
+/** The scenes that share each opening's feeling, its own first. */
+export const WELCOME_POOLS: Record<WelcomeKind, readonly WelcomeScene[]> = {
+  royal: ["royal", "mandala", "peacock", "sunrise"],
+  bloom: ["bloom", "garden", "peacock", "rangoli"],
+  lamps: ["lamps", "ghat", "fireflies", "rangoli"],
+  night: ["night", "sky-lanterns", "fireflies", "waves"],
+  party: ["party", "kites", "sunrise", "garden"],
+  letter: ["letter", "rangoli", "mandala", "garden"],
+};
+
+/**
+ * The welcome a guest sees after this opening: the host's pick, else one of the scenes
+ * that share the opening's feeling, `pick` (0 to 1) choosing which, so each visit can
+ * bring another.
+ */
+export function welcomeScene(
+  choice: Pick<OpeningChoice, "welcome">,
+  style: OpeningStyle,
+  pick = 0,
+): WelcomeScene {
+  if (choice.welcome) return choice.welcome;
+  const pool = WELCOME_POOLS[welcomeKind(style)];
+  return pool[Math.min(pool.length - 1, Math.floor(pick * pool.length))]!;
+}
+
+/** Scenes with a night sky or dark water carry ivory words, as the dark feelings do. */
+const DARK_SCENES: readonly WelcomeScene[] = [
+  "lamps",
+  "night",
+  "party",
+  "peacock",
+  "ghat",
+  "fireflies",
+  "sky-lanterns",
+];
+export const darkWelcome = (scene: WelcomeScene) => DARK_SCENES.includes(scene);
+
+/** The video draws the six feelings' scenes; each newer scene films as the nearest one. */
+const FILMED_AS: Record<WelcomeScene, WelcomeKind> = {
+  royal: "royal",
+  bloom: "bloom",
+  lamps: "lamps",
+  night: "night",
+  party: "party",
+  letter: "letter",
+  mandala: "royal",
+  peacock: "night",
+  sunrise: "royal",
+  garden: "bloom",
+  rangoli: "bloom",
+  ghat: "lamps",
+  fireflies: "lamps",
+  "sky-lanterns": "night",
+  kites: "party",
+  waves: "bloom",
+};
+export const filmedWelcome = (scene: WelcomeScene): WelcomeKind => FILMED_AS[scene];
 
 const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   pankhi: "royal",

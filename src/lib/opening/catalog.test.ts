@@ -3,6 +3,12 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { STORY_IDS, THEMED_IDS } from "@/lib/suites/catalog";
 import {
+  WELCOME_KINDS,
+  WELCOME_POOLS,
+  WELCOME_SCENES,
+  darkWelcome,
+  filmedWelcome,
+  welcomeScene,
   FRESH_OPENINGS,
   OPENING_GROUPS,
   OPENING_STYLES,
@@ -118,5 +124,28 @@ describe("openings", () => {
     expect(welcomeKind("balloons")).toBe("party");
     expect(welcomeKind("envelope")).toBe("letter");
     for (const style of OPENING_STYLES) expect(welcomeKind(style)).toBeTruthy();
+  });
+});
+
+describe("the welcome after the opening", () => {
+  it("brings one of several scenes that suit the opening, a different one by the pick", () => {
+    const seen = new Set([0, 0.3, 0.6, 0.9].map((pick) => welcomeScene(noOpening, "palace", pick)));
+    expect([...seen]).toEqual(WELCOME_POOLS.royal);
+    // A pick of 1 still lands in the pool
+    expect(WELCOME_POOLS.royal).toContain(welcomeScene(noOpening, "palace", 1));
+    // Every opening's pool is four scenes, its own feeling first, every scene in some pool
+    for (const kind of WELCOME_KINDS) {
+      expect(WELCOME_POOLS[kind]).toHaveLength(4);
+      expect(WELCOME_POOLS[kind][0]).toBe(kind);
+    }
+    const pooled = new Set(Object.values(WELCOME_POOLS).flat());
+    for (const scene of WELCOME_SCENES) expect(pooled.has(scene), scene).toBe(true);
+  });
+
+  it("keeps the host's own pick, and films each scene as one the video draws", () => {
+    expect(welcomeScene({ welcome: "kites" }, "palace", 0.9)).toBe("kites");
+    for (const scene of WELCOME_SCENES) expect(WELCOME_KINDS).toContain(filmedWelcome(scene));
+    expect(darkWelcome("fireflies")).toBe(true);
+    expect(darkWelcome("sunrise")).toBe(false);
   });
 });

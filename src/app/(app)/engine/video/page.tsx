@@ -44,7 +44,11 @@ export default async function VideoPreviewPage({ searchParams }: PageProps<"/eng
   const chosen = OPENING_GODS.find((id) => id === god) as OpeningGod | undefined;
   const draft = {
     ...sampled,
-    opening: { style: style ?? sampled.opening.style, god: chosen ?? sampled.opening.god },
+    opening: {
+      ...sampled.opening,
+      style: style ?? sampled.opening.style,
+      god: chosen ?? sampled.opening.god,
+    },
   };
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8">

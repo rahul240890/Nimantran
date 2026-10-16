@@ -10,8 +10,10 @@ import { storyFunctions } from "@/lib/publish/story";
 import { isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import {
   OPENING_GODS,
+  WELCOME_SCENES,
   OPENING_STYLES,
   type OpeningGod,
+  type WelcomeScene,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
 import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
@@ -29,7 +31,8 @@ export const metadata: Metadata = {
  * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
  * ?opening=palace (or any style in lib/opening/catalog.ts) and ?god=ganesha choose the
  * first screen (Step 12x); ?faith=sikh (or muslim, christian, jain, none) sets the family's
- * faith, which decides the gods and symbols it can show.
+ * faith, which decides the gods and symbols it can show. ?welcome=peacock (any of
+ * WELCOME_SCENES) chooses the welcome after it, and ?hold=1 keeps it up until Continue.
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  */
@@ -42,6 +45,8 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     now,
     opening,
     god,
+    welcome,
+    hold,
     turn,
     faith,
   } = await searchParams;
@@ -75,6 +80,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     opening: {
       style: OPENING_STYLES.includes(opening as OpeningStyle) ? (opening as OpeningStyle) : null,
       god: OPENING_GODS.includes(god as OpeningGod) ? (god as OpeningGod) : null,
+      welcome: WELCOME_SCENES.includes(welcome as WelcomeScene) ? (welcome as WelcomeScene) : null,
     },
   };
   const { functionCopy } = editorText[locale];
@@ -102,6 +108,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       rsvpFunctions={rsvpFunctions}
       questions={[]}
       previewNow={previewNow}
+      holdWelcome={hold === "1"}
     />
   );
 }

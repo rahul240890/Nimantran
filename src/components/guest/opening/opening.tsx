@@ -16,9 +16,10 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
-  welcomeKind,
+  welcomeScene,
   type OpeningGod,
   type OpeningStyle,
+  type WelcomeScene,
 } from "@/lib/opening/catalog";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
@@ -161,6 +162,10 @@ export type OpeningProps = {
   suite: SuiteId;
   style: OpeningStyle;
   god: OpeningGod | null;
+  /** The host's own welcome scene; none picks one that suits the opening, each visit. */
+  welcomeChoice?: WelcomeScene | null;
+  /** Keeps the welcome up until Continue, for reviewing a scene. */
+  holdWelcome?: boolean;
   copy: CardCopy;
   lang: CardLanguage;
   languages: readonly CardLanguage[];
@@ -232,6 +237,8 @@ export function Opening({
   onCarryOn,
   replay = 0,
   after,
+  welcomeChoice = null,
+  holdWelcome = false,
 }: OpeningProps) {
   const { guestCopy, invitation } = useGuestText();
   const still = useReducedMotion();
@@ -271,6 +278,8 @@ export function Opening({
     latest.current = after;
   });
   const [welcome, setWelcome] = useState(false);
+  // Which of the welcomes that suit this opening comes this time: another each visit
+  const [pick, setPick] = useState(0);
   const goIn = () => {
     setWelcome(false);
     const next = latest.current;
@@ -285,16 +294,20 @@ export function Opening({
   useEffect(() => {
     if (!open || pages || welcome) return;
     const timer = window.setTimeout(
-      () => (still ? goInLatest.current() : setWelcome(true)),
+      () => {
+        if (still) return goInLatest.current();
+        setPick(Math.random());
+        setWelcome(true);
+      },
       still ? 0 : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
   }, [open, pages, welcome, still, gate, fresh, themed]);
   useEffect(() => {
-    if (!welcome) return;
+    if (!welcome || holdWelcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
     return () => window.clearTimeout(timer);
-  }, [welcome]);
+  }, [welcome, holdWelcome]);
 
   const button = useRef<HTMLButtonElement>(null);
   const returnFocus = useRef(false);
@@ -571,7 +584,7 @@ export function Opening({
         </div>
         {welcome && (
           <OpeningWelcome
-            kind={welcomeKind(style)}
+            scene={welcomeScene({ welcome: welcomeChoice }, style, pick)}
             seconds={WELCOME_MS / 1000}
             copy={copy}
             lang={lang}

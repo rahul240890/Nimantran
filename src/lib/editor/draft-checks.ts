@@ -1,6 +1,6 @@
 import { INVITE_FORMATS } from "./formats";
 import { FAITHS } from "@/lib/traditions/faith";
-import { OPENING_GODS, OPENING_STYLES, noOpening } from "@/lib/opening/catalog";
+import { OPENING_GODS, OPENING_STYLES, WELCOME_SCENES, noOpening } from "@/lib/opening/catalog";
 import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
@@ -233,6 +233,7 @@ export const draftSchema = z.object({
     .object({
       style: z.enum(OPENING_STYLES).nullable().catch(null),
       god: z.enum(OPENING_GODS).nullable().catch(null),
+      welcome: z.enum(WELCOME_SCENES).nullable().catch(null),
     })
     .catch(noOpening),
   /** Seconds on every page, which sets the music's length (Step 12y); null times each page. */

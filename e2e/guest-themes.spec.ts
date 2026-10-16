@@ -247,6 +247,44 @@ test("the welcome before the pages", async ({ page }) => {
   await expect(page.locator("[data-story-beat]").first()).toBeVisible();
 });
 
+// Every welcome scene, held still while it is checked, over a few themes in both colours
+for (const [i, scene] of (
+  [
+    "mandala",
+    "peacock",
+    "sunrise",
+    "garden",
+    "rangoli",
+    "ghat",
+    "fireflies",
+    "sky-lanterns",
+    "kites",
+    "waves",
+  ] as const
+).entries()) {
+  const suite = ["rajwada-bagh", "kayal", "noor-bagh", "pichwai"][i % 4];
+  test(`the ${scene} welcome, ${i % 2 ? "dark" : "light"} theme`, async ({ page }) => {
+    await page.emulateMedia({
+      colorScheme: i % 2 ? "dark" : "light",
+      reducedMotion: "no-preference",
+    });
+    // Held up until Continue, so it can be looked at as long as the check takes
+    await page.goto(`/engine/guest?suite=${suite}&opening=palace&welcome=${scene}&hold=1`);
+    await page.getByRole("button", { name: "Open the invitation" }).click();
+    const welcome = page.getByTestId("opening-welcome");
+    await expect(welcome).toHaveAttribute("data-welcome", scene, { timeout: 15_000 });
+    await expect(welcome).toContainText("Arjun");
+    // Once the words have come in
+    await page.waitForTimeout(3200);
+    expect(await noOverflow(page)).toBe(true);
+    expect(
+      (await axe(page).include('[data-testid="opening-welcome"]').analyze()).violations,
+    ).toEqual([]);
+    await page.getByRole("button", { name: "Continue" }).click();
+    await expect(welcome).toHaveCount(0);
+  });
+}
+
 // The guest's first tap starts the music and keeps the screen on; once the invitation has
 // played to the reply form, it offers to play again, from the top, music and all
 test("the music starts on the first tap, and the invitation opens again at the end", async ({
