@@ -437,6 +437,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
     "தொடக்கம், முடிவு நேரத்தை நிமிடம் வரை சரியாகத் தேர்ந்தெடுக்கவும். நீங்கள் அமைத்தபடியே விருந்தினர்கள் பார்ப்பார்கள்.",
   moreDetails: "மேலும் விவரங்கள்",
   moreDetailsHint: "முடியும் நேரம், முகவரி, வரைபடப் பின், வாகன நிறுத்தம், உடை",
+  samePlace: "வேறு நிகழ்ச்சியின் அதே இடம்",
+  sameAs: (name: string) => `${name} இடமே`,
+  placeToEmpty: (count: number) => `இதே இடத்தை மீதி ${count} நிகழ்ச்சிகளுக்கும் நிரப்பவும்`,
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {

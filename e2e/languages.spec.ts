@@ -86,6 +86,10 @@ for (const [i, { code, script }] of NEW_LOCALES.entries()) {
     await expect(page.getByRole("note").first()).toHaveAttribute("lang", code);
     await expect(page.locator("article")).toHaveAttribute("lang", "en");
     expect(await noOverflow(page)).toBe(true);
+    // A guest's invitation in the language: its longer buttons wrap on a phone, never run off
+    await page.goto("/sample/kayal-scene");
+    await expect(page.locator("html")).toHaveAttribute("lang", code);
+    expect(await noOverflow(page)).toBe(true);
   });
 }
 

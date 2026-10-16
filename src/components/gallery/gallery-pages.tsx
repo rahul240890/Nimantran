@@ -445,7 +445,7 @@ export function WeddingKindPage({ kind, locale }: { kind: WeddingKind; locale: U
     >
       <GalleryHero
         eyebrow={wedding}
-        heading={galleryCopy.kindMeta(words.name).title}
+        heading={(galleryCopy.kindSearch[kind] ?? galleryCopy.kindMeta(words.name)).title}
         intro={`${words.description} ${galleryCopy.kindIntro}`}
         native={entry.nativeName}
       />

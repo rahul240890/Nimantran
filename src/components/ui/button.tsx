@@ -37,11 +37,14 @@ const variants: Record<ButtonVariant, string> = {
   ghost: "text-ink hover:bg-surface-2 active:translate-y-px active:bg-line/60",
 };
 
-/* Every size keeps a 44px minimum touch target */
+/*
+ * Every size keeps a 44px minimum touch target. A large button's words wrap when they can't
+ * fit the screen (a longer language's on a narrow phone), so it grows instead of running off.
+ */
 const sizes: Record<ButtonSize, string> = {
   sm: "h-11 px-4 text-sm [&_svg]:size-4",
   md: "h-12 px-5 text-base",
-  lg: "h-14 px-7 text-lg",
+  lg: "min-h-14 px-7 py-2 text-lg text-balance whitespace-normal",
 };
 
 /* Disabled buttons flatten: no edge, no press, lower contrast (exempt from contrast rules) */

@@ -94,6 +94,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sampleNote: "নাম, তারিখ আর জায়গা সবই কাল্পনিক",
   showAll: (count: number) => `সব ${count}টি ডিজাইন দেখান`,
   sampleChoose: "এই ডিজাইনটি বেছে নিন",
+  sampleChooseShort: "বেছে নিন",
+  sampleBack: "ফিরে যান",
   sampleWalk: "অন্য ডিজাইন",
   samplePrevious: "আগের ডিজাইন",
   samplePreviousShort: "আগের",
@@ -125,6 +127,13 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     title: `${name} বিয়ের নিমন্ত্রণপত্র`,
     description: `${name} পরিবারের জন্য বিয়ের নিমন্ত্রণপত্র: প্রতিটি অনুষ্ঠানের আঁকা পাতা, প্রতিটি রীতি তার নিজের নামে, আর WhatsApp-এ RSVP।`,
   }),
+  kindSearch: {
+    bengali: {
+      title: "বাংলা বিয়ের কার্ড অনলাইন",
+      description:
+        "বাংলা বিয়ের ডিজিটাল কার্ড: শুভ বিবাহ, আইবুড়োভাত, গায়ে হলুদ আর বউভাত ছবির পাতায়, WhatsApp-এ উত্তর। বিনামূল্যে বানান।",
+    },
+  },
   moreOccasions: "আরও উপলক্ষ",
   wordingHeading: "নিমন্ত্রণের লেখা",
   wordingIntro: "কার্ড আর WhatsApp-এর জন্য কপি করার মতো বার্তা, আমাদের ব্লগ থেকে।",

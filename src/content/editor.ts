@@ -438,6 +438,11 @@ export const functionFields = {
     "choose the exact start and end, to the minute. Guests see them just as you set them.",
   moreDetails: "More details",
   moreDetailsHint: "End time, address, map pin, parking and dress code",
+  /** Copying a place typed for one event into another, so it is typed once. */
+  samePlace: "Same place as another event",
+  sameAs: (name: string) => `Same as ${name}`,
+  placeToEmpty: (count: number) =>
+    count === 1 ? "Use this place for the other event" : `Use this place for ${count} other events`,
 } as const;
 
 export const coupleCopy = {

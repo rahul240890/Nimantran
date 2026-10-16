@@ -598,6 +598,39 @@ test.describe("invite editor", () => {
     expect(await noOverflow(page)).toBe(true);
   });
 
+  test("a place typed for one event fills the others in a tap", async ({ page }) => {
+    await page.goto("/create?suite=udaipur-lake");
+    await fillCouple(page);
+    await next(page);
+    await next(page); // family
+    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
+    await page.getByRole("checkbox", { name: /Haldi/ }).check();
+    const wedding = page.locator('[data-page-target="fn-wedding"]');
+    const sangeet = page.locator('[data-page-target="fn-sangeet"]');
+    const haldi = page.locator('[data-page-target="fn-haldi"]');
+    await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Taj Falaknuma, Hyderabad");
+    await wedding.getByRole("button", { name: "More details" }).click();
+    await wedding.getByRole("textbox", { name: /^Address/ }).fill("Engine Bowli, Falaknuma");
+
+    // The sangeet takes the wedding's venue and address, which open its details to show them
+    await sangeet.getByRole("button", { name: "Same as Wedding" }).click();
+    await expect(sangeet.getByRole("textbox", { name: /^Venue/ })).toHaveValue(
+      "Taj Falaknuma, Hyderabad",
+    );
+    await expect(sangeet.getByRole("textbox", { name: /^Address/ })).toHaveValue(
+      "Engine Bowli, Falaknuma",
+    );
+    // Its chip goes once the places match
+    await expect(sangeet.getByRole("button", { name: "Same as Wedding" })).toHaveCount(0);
+
+    // Every event still without a place, from the wedding at once
+    await wedding.getByRole("button", { name: /^Use this place for/ }).click();
+    await expect(haldi.getByRole("textbox", { name: /^Venue/ })).toHaveValue(
+      "Taj Falaknuma, Hyderabad",
+    );
+    await expect(wedding.getByRole("button", { name: /^Use this place for/ })).toHaveCount(0);
+  });
+
   test("a Scene keeps its painting and holds the function being filled in", async ({ page }) => {
     test.skip(page.viewportSize()!.width < 1024, "the phone beside the form");
     await page.goto("/create?suite=udaipur-lake&format=scene");
@@ -621,6 +654,8 @@ test.describe("invite editor", () => {
 
   test("the button bar fits common phone widths on every step", async ({ browser }, info) => {
     test.skip(info.project.name !== "phone-320", "phones only");
+    // The whole editor, three times over
+    test.setTimeout(90_000);
     for (const width of [360, 375, 414]) {
       // A fresh phone each time, so no saved draft or step carries over
       const context = await browser.newContext({

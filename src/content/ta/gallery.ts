@@ -96,6 +96,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sampleNote: "பெயர்கள், தேதிகள் மற்றும் இடங்கள் கற்பனையானவை",
   showAll: (count: number) => `அனைத்து ${count} டிசைன்களையும் காட்டவும்`,
   sampleChoose: "இதைத் தேர்வுசெய்க",
+  sampleChooseShort: "தேர்வுசெய்க",
+  sampleBack: "பின்செல்",
   sampleWalk: "மற்ற டிசைன்கள்",
   samplePrevious: "முந்தைய டிசைன்",
   samplePreviousShort: "முந்தைய",
@@ -128,6 +130,13 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     title: `${name} திருமண அழைப்பிதழ்கள்`,
     description: `${name} குடும்பங்களுக்கான திருமண அழைப்பிதழ்கள்: ஒவ்வொரு நிகழ்ச்சிக்கும் ஓவியப் பக்கம், WhatsApp-இல் RSVP.`,
   }),
+  kindSearch: {
+    tamil: {
+      title: "தமிழ் திருமண அழைப்பிதழ் ஆன்லைன்",
+      description:
+        "தமிழ் திருமண அழைப்பிதழ் ஆன்லைனில்: நிச்சயதார்த்தம், நலங்கு, முகூர்த்தம், வரவேற்பு ஓவியப் பக்கங்களில், WhatsApp-இல் பதில். இலவசமாக உருவாக்குங்கள்.",
+    },
+  },
   moreOccasions: "மேலும் நிகழ்வுகள்",
   wordingHeading: "வாசக யோசனைகள்",
   wordingIntro:

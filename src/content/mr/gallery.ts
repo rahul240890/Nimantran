@@ -91,6 +91,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sampleNote: "नावे, तारखा आणि ठिकाणे काल्पनिक आहेत",
   showAll: (count: number) => `सर्व ${count} डिझाइन दाखवा`,
   sampleChoose: "हे डिझाइन निवडा",
+  sampleChooseShort: "निवडा",
+  sampleBack: "मागे",
   sampleWalk: "इतर डिझाइन",
   samplePrevious: "मागील डिझाइन",
   samplePreviousShort: "मागील",
@@ -122,6 +124,13 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     title: `${name} लग्नाची निमंत्रणे`,
     description: `${name} कुटुंबांसाठी लग्नाची निमंत्रणे: प्रत्येक सोहळ्यासाठी चित्रित पान, प्रत्येक विधी त्याच्या स्वतःच्या नावाने, आणि WhatsApp वर RSVP.`,
   }),
+  kindSearch: {
+    marathi: {
+      title: "मराठी लग्नपत्रिका आणि डिजिटल निमंत्रण",
+      description:
+        "मराठी लग्नाची डिजिटल लग्नपत्रिका: साखरपुडा, हळद, लग्न आणि स्वागत समारंभ चित्रांच्या पानांवर, WhatsApp वर उत्तर. मोफत बनवा.",
+    },
+  },
   moreOccasions: "आणखी प्रसंग",
   wordingHeading: "निमंत्रणाचे शब्द",
   wordingIntro: "कार्ड आणि WhatsApp साठी कॉपी करण्याजोगे संदेश, आमच्या ब्लॉगवरून.",

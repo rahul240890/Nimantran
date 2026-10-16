@@ -91,6 +91,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sampleNote: "नाम, तारीख़ें और जगहें काल्पनिक हैं",
   showAll: (count: number) => `सभी ${count} डिज़ाइन दिखाएँ`,
   sampleChoose: "यह डिज़ाइन चुनें",
+  sampleChooseShort: "चुनें",
+  sampleBack: "वापस",
   sampleWalk: "और डिज़ाइन",
   samplePrevious: "पिछला डिज़ाइन",
   samplePreviousShort: "पिछला",
@@ -122,6 +124,23 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     title: `${name} शादी के निमंत्रण`,
     description: `${name} परिवारों के लिए शादी के निमंत्रण: हर रस्म का चित्रित पन्ना, रस्मों के अपने नाम, और WhatsApp पर जवाब।`,
   }),
+  kindSearch: {
+    gujarati: {
+      title: "गुजराती शादी कार्ड और डिजिटल कंकोत्री",
+      description:
+        "गुजराती शादी की डिजिटल कंकोत्री: श्री गणेश, मंडप मुहूर्त से पीठी और रास तक हर प्रसंग अपने पन्ने पर, WhatsApp पर जवाब। मुफ़्त बनाएँ।",
+    },
+    marathi: {
+      title: "मराठी शादी कार्ड और लग्न पत्रिका",
+      description:
+        "मराठी शादी की डिजिटल लग्न पत्रिका: साखरपुडा, हल्दी, लग्न और रिसेप्शन चित्रों वाले पन्नों पर, WhatsApp पर जवाब। मुफ़्त बनाएँ।",
+    },
+    punjabi: {
+      title: "पंजाबी और आनंद कारज शादी कार्ड",
+      description:
+        "पंजाबी और सिख शादी के निमंत्रण: आनंद कारज, मेहंदी, जागो, संगीत और रिसेप्शन चित्रों वाले पन्नों पर, WhatsApp पर जवाब। मुफ़्त बनाएँ।",
+    },
+  },
   moreOccasions: "और अवसर",
   wordingHeading: "निमंत्रण के शब्द",
   wordingIntro: "कार्ड और WhatsApp के लिए कॉपी करने लायक़ संदेश, हमारे ब्लॉग से।",
