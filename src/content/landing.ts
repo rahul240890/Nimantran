@@ -87,6 +87,8 @@ export const hero = {
   title: "Invitations that come alive.",
   body: "Find a painted design for your occasion, add your names and dates, and share it on WhatsApp. Guests reply in one tap.",
   primary: "Browse all designs",
+  /** Opens a whole invitation as a guest gets it, with made-up names (/sample). */
+  sample: "Open a live invitation",
   popular: "Popular",
   popularSearches: ["Gujarati wedding", "Haldi", "Birthday", "Nikah", "Diwali"],
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },

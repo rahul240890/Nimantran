@@ -104,12 +104,15 @@ export function RsvpForm({
   functions: allFunctions,
   questions,
   preview = false,
+  sample = false,
 }: {
   slug: string;
   functions: RsvpFunction[];
   questions: RsvpQuestionId[];
   /** The host's own look before publishing: the form works, but nothing is sent. */
   preview?: boolean;
+  /** A design's public sample: the reply goes through to the thanks, and nothing is sent. */
+  sample?: boolean;
 }) {
   const language = useGuestLanguage();
   const { rsvpCopy } = useGuestText();
@@ -208,6 +211,12 @@ export function RsvpForm({
       setError(rsvpCopy.previewOnly);
       return;
     }
+    if (sample) {
+      focusNext.current = "thanks";
+      setSent({ name: name.trim() });
+      setReplied(true);
+      return;
+    }
     setBusy(true);
     const result = await sendReply(slug, token, {
       name: name.trim(),
@@ -256,7 +265,7 @@ export function RsvpForm({
             >
               {rsvpCopy.thanksTitle(sent.name.split(" ")[0] ?? sent.name)}
             </h3>
-            <p className="text-ink-muted">{rsvpCopy.thanksBody}</p>
+            <p className="text-ink-muted">{sample ? rsvpCopy.sampleSent : rsvpCopy.thanksBody}</p>
           </div>
         </div>
         <ul className="flex flex-col gap-2">

@@ -21,10 +21,16 @@ const LEAF = "var(--flower-leaf)";
 const LEAF_DEEP = "var(--flower-leaf-deep)";
 const GILT = "var(--guest-gilt)";
 
+/*
+ * Trigonometry can differ in its last digit between the server and the browser, which React
+ * reports as a mismatch; a thousandth of a unit is finer than any screen draws.
+ */
+const fine = (n: number) => Math.round(n * 1000) / 1000;
+
 const around = (count: number, radius: number, turn = 0) =>
   Array.from({ length: count }, (_, i) => {
     const angle = (i / count) * Math.PI * 2 + turn;
-    return [Math.cos(angle) * radius, Math.sin(angle) * radius] as const;
+    return [fine(Math.cos(angle) * radius), fine(Math.sin(angle) * radius)] as const;
   });
 
 /** The symbols every flower on the page points at. Rendered once per page. */
@@ -243,14 +249,14 @@ export function FlowerFrame({
     // An oval, like a lotus pond seen from the bank
     for (let i = 0; i < 28; i++) {
       const a = (i / 28) * Math.PI * 2;
-      points.push([50 + Math.cos(a) * 49, 62.5 + Math.sin(a) * 61]);
+      points.push([fine(50 + Math.cos(a) * 49), fine(62.5 + Math.sin(a) * 61)]);
     }
   } else {
     // Up the right side, over the round top, down the left
     for (let y = 122; y > 50; y -= 9) points.push([98, y]);
     for (let i = 0; i <= 12; i++) {
       const a = (i / 12) * Math.PI;
-      points.push([50 + Math.cos(a) * 48, 50 - Math.sin(a) * 48]);
+      points.push([fine(50 + Math.cos(a) * 48), fine(50 - Math.sin(a) * 48)]);
     }
     for (let y = 59; y <= 122; y += 9) points.push([2, y]);
   }
@@ -286,7 +292,7 @@ export function FlowerFrame({
 /* A few numbers that look scattered but stay the same on every render */
 const scatter = (i: number, salt: number) => {
   const v = Math.sin(i * 12.9898 + salt * 78.233) * 43758.5453;
-  return v - Math.floor(v);
+  return fine(v - Math.floor(v));
 };
 
 /** Petals drifting down behind a section, all the time; still petals when motion is off. */

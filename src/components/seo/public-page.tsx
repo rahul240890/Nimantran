@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronRight, MailCheck, Rotate3d, Send } from "lucide-react";
+import { ArrowRight, ChevronRight, Eye, MailCheck, Rotate3d, Send } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
@@ -85,6 +85,7 @@ export function PageHero({
   intro,
   createHref,
   createLabel,
+  sampleHref,
   aside,
   children,
 }: {
@@ -94,6 +95,8 @@ export function PageHero({
   intro: string;
   createHref: string;
   createLabel?: string;
+  /** A design's live sample, opened as a guest gets it. */
+  sampleHref?: string;
   aside?: ReactNode;
   children?: ReactNode;
 }) {
@@ -132,6 +135,14 @@ export function PageHero({
                 <ArrowRight aria-hidden className="rtl:rotate-180" />
               </Link>
             </Button>
+            {sampleHref && (
+              <Button asChild size="lg" variant="secondary">
+                <Link href={sampleHref}>
+                  <Eye aria-hidden />
+                  {seoCopy.seeSample}
+                </Link>
+              </Button>
+            )}
           </div>
           <p className="text-sm text-ink-muted">{seoCopy.freeNote}</p>
         </div>

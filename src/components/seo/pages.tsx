@@ -12,6 +12,7 @@ import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
+import { samplePath } from "@/lib/sample/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITIONS, TRADITION_LIST } from "@/lib/traditions/catalog";
@@ -245,6 +246,7 @@ export function DesignPage({ id, locale }: { id: TemplateId; locale: UiLocale })
         intro={design.description}
         createHref={`/create?template=${id}`}
         createLabel={seoCopy.useDesign}
+        sampleHref={samplePath(`card-${id}`)}
         aside={<Cover id={id} locale={locale} />}
       >
         {raga && (

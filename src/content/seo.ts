@@ -55,6 +55,7 @@ export const seoCopy = {
   suitsHeading: "Made for",
   raga: "Music",
   useDesign: "Use this design",
+  seeSample: "Open it as a guest",
   allDesigns: "All designs",
   footerInvitations: "Invitations",
   footerMore: "Designs and traditions",

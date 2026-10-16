@@ -80,6 +80,12 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "इस डिज़ाइन के पैकेज",
   packageFree: "मुफ़्त",
   comparePackages: "पैकेज की तुलना करें",
+  seeSample: "मेहमान की तरह खोलें",
+  sampleLabel: "नमूना निमंत्रण",
+  sampleNote: "नाम, तारीख़ें और जगहें काल्पनिक हैं",
+  sampleTitle: (name) => `नमूना निमंत्रण: ${name}`,
+  sampleDescription:
+    "यह डिज़ाइन वैसे देखिए जैसे आपके मेहमान देखेंगे: यह खुलता है, संगीत बजाता है और जवाब लेता है।",
   close: "झलक बंद करें",
   pagesLabel: "इस डिज़ाइन के पन्ने",
   cardNote: "मेहमान के फ़ोन पर खुलने वाला 3D कार्ड, फिर कार्ड के अपने रंगों में पन्ने।",

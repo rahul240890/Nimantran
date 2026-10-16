@@ -201,6 +201,8 @@ export const rsvpCopy = {
     count === 1 ? "One answer still needs you." : `${count} answers still need you.`,
   thanksTitle: (name: string) => `Thank you, ${name}!`,
   thanksBody: "Your reply is with the family. You can change it here any time.",
+  sampleSent:
+    "This is a sample, so nothing was sent. On your own invitation, every reply comes straight to you.",
   change: "Change my reply",
   people: (count: number) => (count === 1 ? "1 person" : `${count} people`),
 } as const;

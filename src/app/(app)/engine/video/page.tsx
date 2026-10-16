@@ -8,7 +8,7 @@ import {
   type OpeningGod,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
-import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "../_sample";
+import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
 import { FilmStrip } from "./_strip";
 
 export const metadata: Metadata = {

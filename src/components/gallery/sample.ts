@@ -8,7 +8,7 @@ import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
 import type { StoryFunction } from "@/lib/engine/story";
-import type { FunctionId } from "@/lib/events/functions";
+import { SAMPLE_DAYS, SAMPLE_OCCASION_DAY, type SampleFunction } from "@/lib/sample/days";
 import { isWeddingJourney } from "@/lib/suites/catalog";
 import { formatCardDate, formatCardTime } from "@/lib/templates/card-languages";
 import { cardSuggestions } from "@/lib/templates/card-suggestions";
@@ -22,20 +22,7 @@ import type { CardCopy } from "@/lib/templates/content";
  * wording and its one celebration, so a birthday never previews as a haldi.
  */
 
-/** Each celebration's sample day and time. */
-const DAYS = {
-  haldi: ["2027-02-12", "10:00"],
-  mehendi: ["2027-02-12", "16:00"],
-  sangeet: ["2027-02-12", "20:00"],
-  baraat: ["2027-02-13", "17:00"],
-  wedding: ["2027-02-13", "19:30"],
-  reception: ["2027-02-14", "20:00"],
-} as const satisfies Partial<Record<FunctionId, readonly [string, string]>>;
-
-export type SampleFunction = keyof typeof DAYS;
-
-/** An occasion's one celebration, on the sample wedding day. */
-const OCCASION_DAY = ["2027-02-13", "18:00"] as const;
+export type { SampleFunction };
 
 export function useSampleInvite(
   kinds: readonly SampleFunction[],
@@ -61,7 +48,7 @@ export function useSampleInvite(
       joiner: locale === "hi" ? "संग" : "&",
       second: sample.second,
       line: sample.line,
-      date: formatCardDate(DAYS.wedding[0], locale),
+      date: formatCardDate(SAMPLE_DAYS.wedding[0], locale),
       venue: sample.venues.wedding,
     };
     if (!other) return wedding;
@@ -75,7 +62,7 @@ export function useSampleInvite(
       families: words("families"),
       line: words("line"),
       ...(one && { first: sample.one, joiner: "", second: "" }),
-      date: formatCardDate(OCCASION_DAY[0], locale),
+      date: formatCardDate(SAMPLE_OCCASION_DAY[0], locale),
       venue: sample.venues.other,
     };
   }, [sample, locale, other]);
@@ -89,8 +76,8 @@ export function useSampleInvite(
           kind,
           name: functionCopy[kind].name,
           localName: null,
-          date: formatCardDate(OCCASION_DAY[0], locale),
-          time: formatCardTime(OCCASION_DAY[1], null, locale),
+          date: formatCardDate(SAMPLE_OCCASION_DAY[0], locale),
+          time: formatCardTime(SAMPLE_OCCASION_DAY[1], null, locale),
           muhurat: null,
           venue: sample.venues.other,
         },
@@ -100,8 +87,8 @@ export function useSampleInvite(
       kind,
       name: functionCopy[kind].name,
       localName: null,
-      date: formatCardDate(DAYS[kind][0], locale),
-      time: formatCardTime(DAYS[kind][1], null, locale),
+      date: formatCardDate(SAMPLE_DAYS[kind][0], locale),
+      time: formatCardTime(SAMPLE_DAYS[kind][1], null, locale),
       muhurat: null,
       venue: sample.venues[kind],
     }));
