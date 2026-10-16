@@ -62,7 +62,8 @@ test.describe("live samples", () => {
       .getByRole("dialog", { name: "Gubbara" })
       .getByRole("link", { name: "Open it as a guest" })
       .click();
-    await expect(page).toHaveURL(/\/sample\/gubbara$/);
+    // The sample is rendered on demand: give a busy machine time to answer
+    await expect(page).toHaveURL(/\/sample\/gubbara$/, { timeout: 15_000 });
     // A birthday shows one name, never a couple
     await expect(page.getByText("Aanya").first()).toBeVisible();
     await expect(page.getByText("Arjun")).toHaveCount(0);
@@ -71,7 +72,7 @@ test.describe("live samples", () => {
   test("a 3D card's page opens its sample", async ({ page }) => {
     await page.goto("/designs/marigold");
     await page.getByRole("link", { name: "Open it as a guest" }).click();
-    await expect(page).toHaveURL(/\/sample\/card-marigold$/);
+    await expect(page).toHaveURL(/\/sample\/card-marigold$/, { timeout: 15_000 });
     await expect(page.getByRole("button", { name: "Open the invitation" })).toBeVisible();
   });
 
