@@ -1,6 +1,8 @@
 import type { CategoryId } from "@/lib/categories/catalog";
 import type { StoryId, SuiteId, ThemedId } from "@/lib/suites/catalog";
 import { isStoryId, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
+import { FAITH_SYMBOLS, type Faith } from "@/lib/traditions/faith";
+import { SYMBOL_IDS, type SymbolId } from "@/lib/traditions/schema";
 
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
@@ -397,22 +399,38 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 
-/**
- * What sits top-centre above the opening: a god painted for us (the owner's own art from
- * the blessing pages, shown whole) or a sacred symbol drawn in code (TRADITIONS.md, 5).
- */
-export const OPENING_GODS = [
+/** The gods painted for us: the owner's own art from the blessing pages, shown whole. */
+export const PAINTED_GODS = [
   "ganesha",
   "ganesha-gold",
   "lakshmi-ganesha",
   "shrinathji",
   "venkateswara",
   "jagannath",
-  "om",
-  "swastik",
-  "kalash",
 ] as const;
+
+/**
+ * What sits top-centre above the opening: a god painted for us, or one of the sacred
+ * symbols drawn in code for every faith's cards (TRADITIONS.md, 5).
+ */
+export const OPENING_GODS = [...PAINTED_GODS, ...SYMBOL_IDS] as const;
 export type OpeningGod = (typeof OPENING_GODS)[number];
+
+/** The symbol an opening's god is, when it isn't a painting. */
+export function godSymbol(god: OpeningGod): SymbolId | null {
+  return (SYMBOL_IDS as readonly string[]).includes(god) ? (god as SymbolId) : null;
+}
+
+/**
+ * The gods and symbols offered over a family's opening: the painted gods and Hindu symbols
+ * for a Hindu card, only its own faith's symbols for any other, none for a family that
+ * wants no religious lines. An occasion with no religious wording (a birthday) offers what
+ * a Hindu card does, as it always has, for families who want Ganesha there.
+ */
+export function openingGods(faith: Faith, chosen: boolean): readonly OpeningGod[] {
+  if (faith === "none") return chosen ? [] : [...PAINTED_GODS, ...FAITH_SYMBOLS.hindu];
+  return faith === "hindu" ? [...PAINTED_GODS, ...FAITH_SYMBOLS.hindu] : FAITH_SYMBOLS[faith];
+}
 
 export type OpeningChoice = {
   /** Null follows the design: the cover's doors on a painted theme, else a painted gate. */
@@ -433,15 +451,11 @@ export const GOD_PAINTINGS: Partial<Record<OpeningGod, { src: string; aspect: nu
   jagannath: { src: "/openings/jagannath.webp", aspect: 768 / 668 },
 };
 
-/** Occasions where a god is not offered by default (TRADITIONS.md: not in party categories). */
-const NO_GODS: readonly CategoryId[] = [
-  "party",
-  "farewell-party",
-  "launch",
-  "retirement",
-  "eid",
-  "christening",
-];
+/**
+ * Occasions where a god is not offered by default (TRADITIONS.md: not in party categories).
+ * Eid and a christening offer their own faith's symbols (openingGods).
+ */
+const NO_GODS: readonly CategoryId[] = ["party", "farewell-party", "launch", "retirement"];
 
 export function offersGods(category: CategoryId): boolean {
   return !NO_GODS.includes(category);
@@ -520,9 +534,18 @@ export function openingStyle(
   return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }
 
-/** The god the guest sees, dropped where the occasion doesn't offer one. */
-export function openingGod(choice: OpeningChoice, category: CategoryId): OpeningGod | null {
-  return choice.god && offersGods(category) ? choice.god : null;
+/**
+ * The god the guest sees, dropped where the occasion doesn't offer one, or where the
+ * family's faith doesn't (a Ganesha picked before the card became a Nikah's).
+ */
+export function openingGod(
+  choice: OpeningChoice,
+  category: CategoryId,
+  faith?: { faith: Faith; chosen: boolean },
+): OpeningGod | null {
+  if (!choice.god || !offersGods(category)) return null;
+  if (faith && !openingGods(faith.faith, faith.chosen).includes(choice.god)) return null;
+  return choice.god;
 }
 
 /**

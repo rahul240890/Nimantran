@@ -4,6 +4,8 @@ import {
   cardLanguages,
   coupleValue,
   draftCopy,
+  draftOpeningGod,
+  draftOpeningGods,
   draftSymbol,
   draftTemplate,
   draftTradition,
@@ -12,12 +14,16 @@ import {
   mainFunction,
   muhuratName,
   newDraft,
+  symbolOptions,
   withCategory,
   withGalleryChoice,
   type InviteDraft,
 } from "./draft";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { TEMPLATES } from "@/lib/templates/catalog";
+import type { OpeningGod } from "@/lib/opening/catalog";
+import type { Faith } from "@/lib/traditions/faith";
+import type { SymbolId } from "@/lib/traditions/schema";
 import { draftProblems, parseDraft, stepErrors } from "./draft-checks";
 
 function complete(): InviteDraft {
@@ -264,8 +270,9 @@ describe("tradition packs", () => {
     expect(draftCopy(withTradition({ id: "bengali", invocation: "off" })).blessing).toBe("");
     expect(draftCopy(withTradition({ id: "tamil", symbol: "none" })).symbol).toBeNull();
     expect(draftCopy(withTradition({ id: "tamil", symbol: "diya" })).symbol).toBe("diya");
-    // A symbol the pack doesn't offer falls back to its own
-    expect(draftCopy(withTradition({ id: "bengali", symbol: "swastik" })).symbol).toBe("prajapati");
+    // Every Hindu symbol is offered with a pack; another faith's falls back to the pack's own
+    expect(draftCopy(withTradition({ id: "bengali", symbol: "shankh" })).symbol).toBe("shankh");
+    expect(draftCopy(withTradition({ id: "bengali", symbol: "cross" })).symbol).toBe("prajapati");
   });
 
   it("never replace words the family typed", () => {
@@ -489,6 +496,45 @@ describe("the blessing on a card in another language", () => {
     // A party never starts with Ganesha's name; a Hindi Christmas card greets for Christmas
     expect(draftCopy(card("party", "en")).blessing).not.toMatch(/Ganesh/);
     expect(draftCopy(card("christmas", "hi")).blessing).toBe("क्रिसमस की शुभकामनाएँ");
+  });
+
+  it("offers each faith its own symbols for the top of the card", () => {
+    const wedding = newDraft("scroll");
+    const as = (faith: Faith | null, symbol: SymbolId | "none" | null = null): InviteDraft => ({
+      ...wedding,
+      tradition: { ...wedding.tradition, faith, symbol },
+    });
+    // A Hindu card without a pack shows none until one is picked, as before
+    expect(draftSymbol(as(null))).toBeNull();
+    expect(symbolOptions(as(null))).toContain("shri");
+    expect(draftSymbol(as(null, "shri"))).toBe("shri");
+    // A faith the family chose starts with its own symbol, and never another faith's
+    expect(draftSymbol(as("sikh"))).toBe("khanda");
+    expect(draftSymbol(as("muslim"))).toBe("chand-tara");
+    expect(draftSymbol(as("christian"))).toBe("cross");
+    expect(draftSymbol(as("jain"))).toBe("jain");
+    expect(draftSymbol(as("muslim", "kalash"))).toBe("chand-tara");
+    expect(symbolOptions(as("muslim"))).not.toContain("om");
+    expect(draftSymbol(as("sikh", "none"))).toBeNull();
+    expect(symbolOptions(as("none"))).toEqual([]);
+    // A birthday has no religious lines, so no symbol
+    expect(symbolOptions({ ...newDraft("scroll"), categoryId: "birthday" })).toEqual([]);
+  });
+
+  it("offers the opening's painted gods only to a Hindu card", () => {
+    const wedding = newDraft("scroll");
+    const as = (faith: Faith | null, god: OpeningGod | null): InviteDraft => ({
+      ...wedding,
+      tradition: { ...wedding.tradition, faith },
+      opening: { ...wedding.opening, god },
+    });
+    expect(draftOpeningGod(as(null, "ganesha"))).toBe("ganesha");
+    expect(draftOpeningGod(as("muslim", "ganesha"))).toBeNull();
+    expect(draftOpeningGod(as("muslim", "bismillah"))).toBe("bismillah");
+    expect(draftOpeningGods(as("sikh", null))).toEqual(["khanda", "ik-onkar"]);
+    expect(draftOpeningGods(as("none", null))).toEqual([]);
+    // Eid offers its own faith's symbols now
+    expect(draftOpeningGods({ ...as(null, null), categoryId: "eid" })).toContain("chand-tara");
   });
 
   it("stays empty on a design without a sample blessing", () => {

@@ -2,7 +2,7 @@ import { FlowerMark } from "@/components/invitation/art/flower-mark";
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
-import { SYMBOLS } from "@/components/invitation/art/symbols";
+import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { cn } from "@/lib/cn";
 import {
   Balloons,
@@ -22,6 +22,7 @@ import {
 import {
   FRESH_OPENINGS,
   GOD_PAINTINGS,
+  godSymbol,
   THEMED_OPENINGS,
   isFreshOpening,
   isPaintedGate,
@@ -676,11 +677,15 @@ export function GodCrest({ god, label }: { god: OpeningGod; label?: string }) {
 
 /** A sacred symbol drawn to fill its (sized) parent, in the card's gold. */
 export function SymbolMark({ god }: { god: OpeningGod }) {
-  const symbol = god === "om" ? SYMBOLS.om : god === "swastik" ? SYMBOLS.swastik : SYMBOLS.kalash;
+  const symbol = SYMBOLS[godSymbol(god) ?? "kalash"];
   return symbol.kind === "glyph" ? (
     <span
       aria-hidden
-      className="font-display text-[62cqh] leading-none text-(--open-medallion-ink,var(--card-gold-text))"
+      className={cn(
+        "leading-none whitespace-nowrap text-(--open-medallion-ink,var(--card-gold-text))",
+        symbol.font === "display" ? "font-display" : "font-sans",
+      )}
+      style={{ fontSize: `${62 * glyphScale(symbol)}cqh` }}
     >
       {symbol.text}
     </span>

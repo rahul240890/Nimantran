@@ -164,32 +164,36 @@ for (const [style, god] of [
   }
 }
 
-// The thirteen openings added in Step 12y, each in one of the colour themes
-for (const [i, [style, god]] of (
+// The thirteen openings added in Step 12y, each in one of the colour themes, with the
+// symbols of every faith over some of them
+for (const [i, [style, god, faith]] of (
   [
-    ["mandap", "ganesha-gold"],
-    ["jharokha", null],
-    ["phool", "swastik"],
-    ["scroll", null],
-    ["diyas", "om"],
-    ["rangoli", null],
-    ["peacock", "shrinathji"],
-    ["storybook", null],
-    ["lanterns", null],
-    ["moonlit", null],
-    ["fireworks", null],
-    ["balloons", null],
-    ["gift", "kalash"],
+    ["mandap", "ganesha-gold", null],
+    ["jharokha", "khanda", "sikh"],
+    ["phool", "swastik", null],
+    ["scroll", "bismillah", "muslim"],
+    ["diyas", "om", null],
+    ["rangoli", "shri", null],
+    ["peacock", "shrinathji", null],
+    ["storybook", "cross", "christian"],
+    ["lanterns", "chand-tara", "muslim"],
+    ["moonlit", "786", "muslim"],
+    ["fireworks", null, null],
+    ["balloons", null, null],
+    ["gift", "kalash", null],
   ] as const
 ).entries()) {
   const colorScheme = i % 2 === 0 ? "light" : "dark";
   const suite = ["rajwada-bagh", "kayal", "noor-bagh", "gubbara"][i % 4];
   test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
     await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
-    await page.goto(`/engine/guest?suite=${suite}&opening=${style}${god ? `&god=${god}` : ""}`);
+    const chosen = `${god ? `&god=${god}` : ""}${faith ? `&faith=${faith}` : ""}`;
+    await page.goto(`/engine/guest?suite=${suite}&opening=${style}${chosen}`);
     const opening = page.locator(`[data-opening="${style}"]`);
     await expect(opening).toHaveAttribute("data-doorway", "closed");
     await expect(opening.getByRole("heading", { level: 1 })).toBeVisible();
+    // The faith's own symbol shows whole over the opening, never another faith's
+    if (faith && god) await expect(opening.locator(".opening-medallion")).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await page.getByRole("button", { name: "Open the invitation" }).click();

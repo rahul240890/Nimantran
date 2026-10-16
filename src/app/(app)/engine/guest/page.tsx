@@ -15,6 +15,7 @@ import {
   type OpeningStyle,
 } from "@/lib/opening/catalog";
 import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
+import { isFaith } from "@/lib/traditions/faith";
 
 export const metadata: Metadata = {
   title: "Guest page preview",
@@ -27,12 +28,23 @@ export const metadata: Metadata = {
  * for ?suite=<theme> (and ?lang=hi, mr, gu, bn or ta for a card in that language) with made-up names, dates and pictures, and nothing saved.
  * ?format=scene shows One Scene instead of the pages, with ?photos=0, 1 or 2 (default 2).
  * ?opening=palace (or any style in lib/opening/catalog.ts) and ?god=ganesha choose the
- * first screen (Step 12x).
+ * first screen (Step 12x); ?faith=sikh (or muslim, christian, jain, none) sets the family's
+ * faith, which decides the gods and symbols it can show.
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
-  const { suite: asked, lang, format, photos: count, now, opening, god, turn } = await searchParams;
+  const {
+    suite: asked,
+    lang,
+    format,
+    photos: count,
+    now,
+    opening,
+    god,
+    turn,
+    faith,
+  } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
       ? Date.parse(`${now}:00+05:30`)
@@ -52,6 +64,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
   const placed = scene ? sceneDraft(base, sceneCount) : base;
   const draft: InviteDraft = {
     ...placed,
+    tradition: { ...placed.tradition, faith: isFaith(faith) ? faith : placed.tradition.faith },
     couplePhotos:
       shown[0] && [1, 2, 3].includes(turns)
         ? {

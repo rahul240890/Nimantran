@@ -14,7 +14,7 @@ import { toCardCopy, type CardCopy } from "@/lib/templates/content";
 import { cardSuggestions, followsFaith } from "@/lib/templates/card-suggestions";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
-import { cardFaith, faithChoosable, type Faith } from "@/lib/traditions/faith";
+import { FAITH_SYMBOLS, cardFaith, faithChoosable, type Faith } from "@/lib/traditions/faith";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
 import { SLOT_IDS, SLOT_RULES, type SlotId, type TemplateId } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
@@ -25,7 +25,7 @@ import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
 import { noPages } from "./pages";
 import { defaultType } from "./type";
-import { noOpening } from "@/lib/opening/catalog";
+import { noOpening, openingGod, openingGods, type OpeningGod } from "@/lib/opening/catalog";
 import type {
   DraftTradition,
   EventFunction,
@@ -321,14 +321,50 @@ export function draftFaith(draft: InviteDraft): Faith {
   return cardFaith(draft.categoryId, draft.tradition.id, draft.tradition.faith);
 }
 
-/** The sacred symbol on the card: the family's pick, else the pack's own. */
-export function draftSymbol(draft: InviteDraft): SymbolId | null {
+/** The faith the opening's gods follow, and whether the family chose it. */
+const godFaith = (draft: InviteDraft) => ({
+  faith: draftFaith(draft),
+  chosen: draft.tradition.faith !== null,
+});
+
+/** The gods and symbols the opening offers this family (opening/catalog.ts). */
+export function draftOpeningGods(draft: InviteDraft): readonly OpeningGod[] {
+  const { faith, chosen } = godFaith(draft);
+  return openingGods(faith, chosen);
+}
+
+/** The god or symbol over the guest's opening, if the occasion and the faith allow it. */
+export function draftOpeningGod(draft: InviteDraft): OpeningGod | null {
+  return openingGod(draft.opening, draft.categoryId, godFaith(draft));
+}
+
+/**
+ * The symbols the card's top can take: the pack's own first, then the rest of its faith's
+ * (faith.ts). None on a card with no religious lines, or on an occasion without them.
+ */
+export function symbolOptions(draft: InviteDraft): readonly SymbolId[] {
+  const faith = draftFaith(draft);
+  if (faith === "none") return [];
   const pack = draftTradition(draft);
-  // A family that wants no religious lines keeps the pack's ceremonies, not its symbol
-  if (!pack || draftFaith(draft) === "none") return null;
-  const { symbol } = draft.tradition;
-  if (symbol === "none") return null;
-  return symbol && pack.symbols.options.includes(symbol) ? symbol : pack.symbols.default;
+  return pack
+    ? [...new Set([...pack.symbols.options, ...FAITH_SYMBOLS[faith]])]
+    : FAITH_SYMBOLS[faith];
+}
+
+/**
+ * The sacred symbol on the card: the family's pick, else the pack's own, else the own
+ * symbol of a faith the family chose (a Khanda, a cross). A Hindu card without a pack shows
+ * none until one is picked, as it always has.
+ */
+export function draftSymbol(draft: InviteDraft): SymbolId | null {
+  const options = symbolOptions(draft);
+  const { symbol, faith: chosen } = draft.tradition;
+  if (options.length === 0 || symbol === "none") return null;
+  if (symbol && options.includes(symbol)) return symbol;
+  const pack = draftTradition(draft);
+  if (pack) return pack.symbols.default;
+  const faith = draftFaith(draft);
+  return chosen && faith !== "hindu" ? (options[0] ?? null) : null;
 }
 
 /**

@@ -1,6 +1,6 @@
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import { TRADITIONS } from "./catalog";
-import type { TraditionId } from "./schema";
+import type { SymbolId, TraditionId } from "./schema";
 
 /*
  * The family's faith, for the religious wording a card is offered: Shri Ganeshaya Namah
@@ -62,3 +62,17 @@ export function cardFaith(
 ): Faith {
   return chosen && faithChoosable(categoryId) ? chosen : defaultFaith(categoryId, traditionId);
 }
+
+/**
+ * The sacred symbols each faith's cards are offered for their top, its own first: no deity
+ * or Hindu mark on a Sikh, Muslim or Christian card (docs/TRADITIONS.md, 5), and none when
+ * the family wants no religious lines.
+ */
+export const FAITH_SYMBOLS: Record<Faith, readonly SymbolId[]> = {
+  hindu: ["kalash", "swastik", "om", "shri", "diya", "kamal", "shankh", "prajapati", "suzhi"],
+  sikh: ["khanda", "ik-onkar"],
+  muslim: ["chand-tara", "786", "bismillah"],
+  christian: ["cross", "dove"],
+  jain: ["jain", "swastik", "kalash", "kamal"],
+  none: [],
+};
