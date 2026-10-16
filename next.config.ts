@@ -47,6 +47,10 @@ const nextConfig: NextConfig = {
       "./src/app/globals.css",
       "./node_modules/@fontsource/rozha-one/files/rozha-one-{latin,devanagari}-400-normal.woff",
       "./node_modules/@fontsource/tenor-sans/files/tenor-sans-latin-400-normal.woff",
+      // The scripts the preview's names and places may be in (src/lib/og/text.ts)
+      "./node_modules/@fontsource/baloo-bhai-2/files/baloo-bhai-2-gujarati-600-normal.woff",
+      "./node_modules/@fontsource/baloo-da-2/files/baloo-da-2-bengali-600-normal.woff",
+      "./node_modules/@fontsource/catamaran/files/catamaran-tamil-600-normal.woff",
       "./public/suites/*/preview.jpg",
     ],
   },

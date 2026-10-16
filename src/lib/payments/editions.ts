@@ -294,8 +294,9 @@ export async function publishedPlan(slug: string, eventId: string): Promise<Plan
 
 /** Whether the guest page carries "Made with Shubh". */
 export async function showsWatermark(slug: string, eventId: string): Promise<boolean> {
-  if (!(await editionsActive())) return false;
-  return PLANS[await publishedPlan(slug, eventId)].watermark;
+  // Both at once: the guest page waits on them
+  const [active, plan] = await Promise.all([editionsActive(), publishedPlan(slug, eventId)]);
+  return active && PLANS[plan].watermark;
 }
 
 /* ---------- Checkout ---------- */

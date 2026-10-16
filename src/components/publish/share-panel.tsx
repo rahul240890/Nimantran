@@ -33,6 +33,8 @@ type SharePanelProps = {
   url: string;
   names: string;
   /** The title and line WhatsApp shows on the link's card, from the guest page's tags. */
+  /** The link preview's picture, at the address WhatsApp is given (coverPath). */
+  coverUrl: string;
   previewTitle: string;
   previewDescription: string;
   message: string;
@@ -61,6 +63,7 @@ export function SharePanel({
   slug,
   url,
   names,
+  coverUrl,
   previewTitle,
   previewDescription,
   message: initialMessage,
@@ -194,7 +197,7 @@ export function SharePanel({
                 <div className="overflow-hidden rounded-md bg-surface/80">
                   {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
                   <img
-                    src={`/i/${slug}/cover`}
+                    src={coverUrl}
                     alt=""
                     width={1200}
                     height={630}

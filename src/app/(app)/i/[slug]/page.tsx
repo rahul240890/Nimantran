@@ -7,6 +7,7 @@ import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
 import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
 import { findPublishedInvite } from "@/lib/invites/public";
+import { COVER_ALT, COVER_SIZE, coverPath } from "@/lib/og/cover";
 import { showsWatermark } from "@/lib/payments/editions";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
@@ -38,6 +39,13 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
   const { draft } = invite;
   const title = guestCopy.metaTitle(inviteNames(draft), occasionName(draft, locale));
   const description = guestCopy.metaDescription(inviteWhen(draft, locale), inviteWhere(draft));
+  // The cover at a versioned address the CDN keeps, so WhatsApp gets it at once
+  const image = {
+    url: coverPath(invite.slug, invite.updatedAt),
+    ...COVER_SIZE,
+    type: "image/jpeg",
+    alt: COVER_ALT,
+  };
   return {
     title: { absolute: title },
     description,
@@ -52,8 +60,9 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
       title,
       description,
       url: `/i/${invite.slug}`,
+      images: [image],
     },
-    twitter: { card: "summary_large_image", title, description },
+    twitter: { card: "summary_large_image", title, description, images: [image] },
   };
 }
 
