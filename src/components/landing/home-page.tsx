@@ -4,7 +4,7 @@ import { Faq } from "./faq";
 import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
-import { HomeDesigns, HomeKinds, HomeMore, HomeOccasions } from "./home-gallery";
+import { HomeDesigns, HomeKinds, HomeOccasions } from "./home-gallery";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
 import { siteMenu } from "@/components/shell/site-menu";
@@ -26,7 +26,6 @@ export function HomePage({ locale }: { locale: UiLocale }) {
           </Hero>
           <HomeDesigns locale={locale} />
           <HomeKinds locale={locale} />
-          <HomeMore locale={locale} />
           <HowItWorks locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />

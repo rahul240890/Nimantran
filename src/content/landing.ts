@@ -93,7 +93,7 @@ export const hero = {
   popularSearches: ["Gujarati wedding", "Haldi", "Birthday", "Nikah", "Diwali"],
   cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
   hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
-  proof: ["No app to install", "RSVP in one tap", "In your family's own language"],
+  proof: ["Create free", "No app for guests", "Pay once, no subscription"],
   card: {
     doors: ["SHUBH", "VIVAH"],
     blessing: "",
@@ -121,13 +121,10 @@ export const homeGallery = {
   allOccasions: "Every occasion",
   designsEyebrow: "Designs",
   designsTitle: "Find your invitation",
-  designsIntro: "Start with your tradition, or with how many photos you want on the invite.",
+  designsIntro: "Start with your family's tradition, or with the designs other hosts are choosing.",
   kindsEyebrow: "Three ways to invite",
   kindsTitle: "Pick how it opens",
   kindsIntro: "Every design comes as one of these. Tap one to see them all.",
-  moreEyebrow: "More celebrations",
-  moreTitle: "Birthdays, anniversaries and more",
-  moreIntro: "Painted designs for the family's other big days.",
   allDesigns: "See all designs",
 };
 
