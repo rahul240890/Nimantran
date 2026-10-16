@@ -1,10 +1,11 @@
 "use client";
 
-import { Clapperboard, Crown, Gift, Sparkles } from "lucide-react";
+import { Check, Clapperboard, Crown, Gift, Sparkles } from "lucide-react";
 import { useText } from "@/i18n/client";
+import { editionsText } from "@/i18n/copy/editions";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
-import { formatRupees } from "@/lib/plans/catalog";
+import { formatRupees, type PlanId } from "@/lib/plans/catalog";
 import type { DesignTier } from "@/lib/plans/design-tiers";
 import { useDesignTier } from "./pricing-provider";
 
@@ -33,24 +34,52 @@ const TONES = {
   },
 } satisfies Record<string, Record<DesignTier, string>>;
 
+/** A design already paid for, on a painting or on the page. */
+const PAID_TONES: Record<keyof typeof TONES, string> = {
+  overlay: "bg-night/75 text-card-ivory ring-1 ring-card-ivory/30 backdrop-blur-sm",
+  plain: "border border-success/35 bg-success/10 text-success",
+};
+
 /**
  * A design's tier and price: "Free", "Premium · ₹499" or "Royal · ₹1,999". The price is
- * the tier's edition, which is what publishing the design without a watermark costs.
+ * the tier's edition, which is what publishing the design without a watermark costs. Once
+ * the host has paid for the design, it says so instead: "Paid · Celebration".
  */
 export function TierBadge({
   designId,
   variant = "overlay",
+  paid = "free",
   className,
 }: {
   designId: string;
   variant?: keyof typeof TONES;
+  /** The package the host's invite has on this design, if any. */
+  paid?: PlanId;
   className?: string;
 }) {
   const { galleryCopy } = useText(galleryText);
+  const { upgradeCopy, planCopy } = useText(editionsText);
   const { tier, pricePaise } = useDesignTier(designId);
   const name = galleryCopy.tiers[tier];
   const price = pricePaise ? formatRupees(pricePaise) : null;
   const Icon = ICONS[tier];
+
+  if (paid !== "free") {
+    return (
+      <span
+        data-tier={tier}
+        data-paid={paid}
+        className={cn(
+          "inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-label text-[0.65rem] tracking-[0.12em] whitespace-nowrap uppercase",
+          PAID_TONES[variant],
+          className,
+        )}
+      >
+        <Check aria-hidden className="size-3.5 shrink-0" strokeWidth={2.5} />
+        {upgradeCopy.paidBadge(planCopy[paid].name)}
+      </span>
+    );
+  }
 
   return (
     <span

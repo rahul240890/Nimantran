@@ -399,6 +399,23 @@ test.describe("coupons, invoices and refunds", () => {
       .getByRole("button", { name: "Pay (test)" })
       .click();
     await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    // The cards show what's paid now, never the coupon's prices from before
+    await expect(basic.getByText("Your package")).toBeVisible();
+    await expect(basic.getByRole("button", { name: /^Pay / })).toHaveCount(0);
+    await expect(
+      page
+        .getByRole("article", { name: "Celebration" })
+        .getByRole("button", { name: /^Upgrade for ₹/ }),
+    ).toBeVisible();
+    // and the editor says the design is paid for, in place of its price
+    const packages = page.url();
+    const inviteId = new URL(packages).pathname.split("/")[2];
+    await page.goto(`/create?invite=${inviteId}`);
+    // Once the editor has tidied its address, which can take a moment on a busy machine
+    await expect(page.locator("[data-paid]").first()).toHaveText("Paid · Basic", {
+      timeout: 15_000,
+    });
+    await page.goto(packages);
 
     await page.getByRole("link", { name: "Invoice" }).first().click();
     await expect(page.getByRole("heading", { name: "Tax invoice" })).toBeVisible();

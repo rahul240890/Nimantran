@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
 import { useText } from "@/i18n/client";
@@ -13,7 +14,7 @@ import { SUITES } from "@/lib/suites/catalog";
 
 /**
  * Past the design stage, the chosen design sits at the top as one small strip: its cover
- * painting, its name and price, and the way back to change it.
+ * painting, its name and price (or the package paid for it), and the way back to change it.
  */
 export function DesignBar({
   draft,
@@ -25,6 +26,9 @@ export function DesignBar({
   className?: string;
 }) {
   const { editor, suiteCopy, designCopy } = useText(editorText);
+  const designId = draftDesignId(draft);
+  // Once this design is paid for, the strip says so rather than showing its price
+  const paidOn = usePaidOn(draft.remoteId ?? null);
   const suite = draftSuite(draft);
   const cover = SUITES[suite].images.cover ?? null;
   const name =
@@ -44,7 +48,7 @@ export function DesignBar({
         <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-sm">
           <span className="sr-only">{editor.designChosen}: </span>
           <span className="truncate font-semibold text-ink">{name}</span>
-          <TierBadge designId={draftDesignId(draft)} variant="plain" />
+          <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
         </span>
         <Button
           variant="ghost"

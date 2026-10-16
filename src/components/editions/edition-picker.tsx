@@ -75,6 +75,8 @@ function releasePage() {
   }, 300);
 }
 
+const reducedMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /** The site's marigold for Razorpay's window, read from the design tokens. */
 const brandColour = () =>
   getComputedStyle(document.documentElement).getPropertyValue("--marigold").trim() || undefined;
@@ -153,7 +155,12 @@ export function EditionPicker({
         description: upgradeCopy.paidBody,
         tone: "success",
       });
+      // A coupon's prices were for the package before this one: the page's new prices,
+      // with what's now paid marked as yours, take their place
+      setCoupon(null);
       router.refresh();
+      // The way on (publishing, or putting the design live) shows at the top of the page
+      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
     } else {
       toast({ title: upgradeCopy.failed, tone: "error" });
     }

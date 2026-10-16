@@ -4,6 +4,7 @@ import { Image as ImageIcon, Layers } from "lucide-react";
 import { isInviteFormat } from "@/lib/editor/formats";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TierBadge } from "@/components/pricing/tier-badge";
+import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
@@ -33,6 +34,8 @@ export function DesignStep({ draft, update }: StepProps) {
   const { designCopy, occasionCopy, suiteCopy } = useText(editorText);
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
+  // The design already paid for says so in place of its price
+  const paidOn = usePaidOn(draft.remoteId ?? null);
   const category = draftCategory(draft);
   // The tradition's designs lead, then the occasion's
   const tradition = draftTradition(draft);
@@ -125,6 +128,7 @@ export function DesignStep({ draft, update }: StepProps) {
                     <TierBadge
                       designId={themeDesign(id)}
                       variant="plain"
+                      paid={paidOn(themeDesign(id))}
                       className="mb-1.5 flex w-fit"
                     />
                     {suiteCopy.descriptions[id]}
@@ -173,6 +177,7 @@ export function DesignStep({ draft, update }: StepProps) {
                     <TierBadge
                       designId={themeDesign(suite, format)}
                       variant="plain"
+                      paid={paidOn(themeDesign(suite, format))}
                       className="mb-1.5 flex w-fit"
                     />
                     {suiteCopy.formats[format].description}
@@ -247,6 +252,7 @@ export function DesignStep({ draft, update }: StepProps) {
                       <TierBadge
                         designId={`card-${id}`}
                         variant="plain"
+                        paid={paidOn(`card-${id}`)}
                         className="mb-1.5 flex w-fit"
                       />
                       {designCopy[id].description}

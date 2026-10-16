@@ -75,7 +75,7 @@ export const upgradeCopy = {
   current: "Your package",
   currentBadge: "Current",
   needed: "Fits your invite",
-  popular: "Most chosen",
+  popular: "Recommended",
   included: "Included",
   free: "Free",
   designPrice: (price: string) => `Design ${price}`,
@@ -99,6 +99,8 @@ export const upgradeCopy = {
   checking: "Confirming your payment…",
   paid: (plan: string) => `${plan} is on. Thank you!`,
   paidBody: "Everything in your package is unlocked.",
+  /** In the editor, on a design already paid for, instead of its price. */
+  paidBadge: (plan: string) => `Paid · ${plan}`,
   cancelled: "Payment not completed. Nothing was charged.",
   declined:
     "The payment didn't go through. Nothing was charged. Try again, or choose another way to pay.",
