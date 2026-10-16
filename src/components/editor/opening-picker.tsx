@@ -9,13 +9,11 @@ import { OPENING_PACE } from "@/components/guest/opening/opening-pace";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
-import type { InviteDraft } from "@/lib/editor/draft";
+import { draftOpeningGod, draftOpeningGods, type InviteDraft } from "@/lib/editor/draft";
 import {
   GOD_PAINTINGS,
-  OPENING_GODS,
   OPENING_GROUPS,
   offersGods,
-  openingGod,
   openingStyle,
   openingStyles,
   type OpeningGod,
@@ -59,7 +57,8 @@ export function OpeningPicker({
   const { openingCopy } = useText(editorText);
   const still = useReducedMotion();
   const style = openingStyle(draft.opening, suite, scene, draft.categoryId);
-  const god = openingGod(draft.opening, draft.categoryId);
+  const god = draftOpeningGod(draft);
+  const gods = draftOpeningGods(draft);
   const beat = useBeat(!still);
   const offered = openingStyles(suite, scene);
   const setOpening = (change: Partial<InviteDraft["opening"]>) =>
@@ -143,7 +142,7 @@ export function OpeningPicker({
         })}
       </RadioPrimitive.Root>
 
-      {offersGods(draft.categoryId) && style !== "none" && (
+      {offersGods(draft.categoryId) && gods.length > 0 && style !== "none" && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
             <h4 id="opening-god-heading" className="font-semibold text-ink">
@@ -159,7 +158,7 @@ export function OpeningPicker({
             }
             className="flex flex-wrap gap-2"
           >
-            {[NONE, ...OPENING_GODS].map((id) => {
+            {[NONE, ...gods].map((id) => {
               const painting = id === NONE ? undefined : GOD_PAINTINGS[id as OpeningGod];
               return (
                 <RadioPrimitive.Item

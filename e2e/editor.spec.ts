@@ -390,11 +390,18 @@ test.describe("invite editor", () => {
     await expect(blessing).toHaveValue("Bismillah ir-Rahman ir-Rahim");
     await expect(ideas.first()).toHaveText("Bismillah ir-Rahman ir-Rahim");
     await expect(page.getByText("Shri Ganeshaya Namah")).toHaveCount(0);
+    // The top of the card takes the faith's own symbol, and offers no Hindu ones
+    const symbols = page.getByRole("radiogroup", { name: "Symbol at the top of the card" });
+    await expect(symbols.getByRole("radio", { name: "Crescent and star" })).toBeChecked();
+    await expect(symbols.getByRole("radio", { name: "Swastik" })).toHaveCount(0);
+    await symbols.getByRole("radio", { name: "786" }).click();
+    await expect(symbols.getByRole("radio", { name: "786" })).toBeChecked();
 
     // Another faith changes what was still as suggested
     await faith.getByRole("radio", { name: "Sikh" }).click();
     await expect(blessing).toHaveValue("Ik Onkar Satgur Prasad");
     await expect(ideas.first()).toHaveText("Ik Onkar Satgur Prasad");
+    await expect(symbols.getByRole("radio", { name: "Khanda" })).toBeChecked();
     // and keeps what the family wrote themselves
     await blessing.fill("With the blessings of our elders");
     await faith.getByRole("radio", { name: "Christian" }).click();

@@ -25,7 +25,13 @@ import { useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
 import { publishText } from "@/i18n/copy/publish";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
-import { cardLanguages, draftCopy, draftTemplate, type InviteDraft } from "@/lib/editor/draft";
+import {
+  cardLanguages,
+  draftCopy,
+  draftOpeningGod,
+  draftTemplate,
+  type InviteDraft,
+} from "@/lib/editor/draft";
 import { withClip } from "@/lib/editor/music-clip";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
@@ -63,7 +69,7 @@ import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
 import { readWatermarkLook, withWatermark } from "@/lib/video/watermark";
-import { openingGod, openingStyle, welcomeKind } from "@/lib/opening/catalog";
+import { openingStyle, welcomeKind } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "@/components/invitation/type/fonts.css";
@@ -756,7 +762,7 @@ export function useVideoFilm(
     if (!timeline) return null;
     return {
       style,
-      god: openingGod(draft.opening, draft.categoryId),
+      god: draftOpeningGod(draft),
       kind: welcomeKind(style),
       timeline,
     };

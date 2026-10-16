@@ -5,7 +5,7 @@
  * page, so the video matches the theme exactly. Browser only.
  */
 
-import { SYMBOLS } from "@/components/invitation/art/symbols";
+import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import type { PageType } from "@/lib/editor/type";
 import type { LineStyle, StoryBeat } from "@/lib/engine/story";
 import { seededRandom } from "@/lib/engine/particles";
@@ -626,7 +626,7 @@ function drawSymbol(
   fonts: Fonts,
 ) {
   if (symbol.kind === "glyph") {
-    ctx.font = `${size * 0.87}px ${symbol.font === "display" ? fonts.display : fonts.sans}`;
+    ctx.font = `${size * 0.87 * glyphScale(symbol)}px ${symbol.font === "display" ? fonts.display : fonts.sans}`;
     ctx.fillStyle = colours.accentText;
     ctx.fillText(symbol.text, x, y);
     return;

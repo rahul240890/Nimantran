@@ -1,9 +1,9 @@
 "use client";
 
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
-import { NO_SYMBOL, SYMBOLS } from "@/components/invitation/art/symbols";
+import { NO_SYMBOL, SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { draftFaith, draftSymbol, draftTradition } from "@/lib/editor/draft";
+import { draftFaith, draftSymbol, draftTradition, symbolOptions } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
 import { INVOCATION_MODES, type InvocationMode, type SymbolId } from "@/lib/traditions/schema";
@@ -32,12 +32,20 @@ export function SymbolChip({
         style={{ background: "var(--card-paper)" }}
       >
         {sacred?.kind === "glyph" ? (
-          <span
-            className={sacred.font === "display" ? "font-display text-2xl" : "text-2xl"}
-            style={{ color: "var(--card-gold-text)" }}
-          >
-            {sacred.text}
-          </span>
+          // Drawn like the other symbols, a picture beside its name, sized to fit the chip
+          <svg aria-hidden viewBox="0 0 24 24" className="size-8 overflow-visible">
+            <text
+              x="12"
+              y="12.5"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontSize={22 * glyphScale(sacred)}
+              fill="var(--card-gold-text)"
+              className={sacred.font === "display" ? "font-display" : "font-sans"}
+            >
+              {sacred.text}
+            </text>
+          </svg>
         ) : (
           <DecorSvg
             layers={[
@@ -62,17 +70,19 @@ export function SymbolChip({
 }
 
 /**
- * The top of the card in the card words: the tradition's sacred symbol and its invocation
- * (Shri Ganeshaya Namah and the like), each prefilled from the tradition. Choosing an
- * invocation puts it back in the blessing line, over anything typed there.
+ * The top of the card in the card words: its sacred symbol, offered to every family by
+ * their faith (a Khanda, a crescent, a cross, Shri or a kalash), and a tradition's own
+ * invocation (Shri Ganeshaya Namah and the like), each prefilled from the tradition.
+ * Choosing an invocation puts it back in the blessing line, over anything typed there.
  */
 export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { traditionCopy } = useText(editorText);
-  const pack = draftTradition(draft);
-  if (!pack || pack.community === "modern" || draftFaith(draft) === "none") return null;
+  const options = symbolOptions(draft);
+  const found = draftTradition(draft);
+  const pack = found && found.community !== "modern" && draftFaith(draft) !== "none" ? found : null;
+  const invocation = pack?.invocation ?? null;
+  if (options.length === 0 && !invocation) return null;
   const symbol = draftSymbol(draft);
-  const invocation = pack.invocation;
-  if (pack.symbols.options.length === 0 && !invocation) return null;
   const setTradition = (change: Partial<StepProps["draft"]["tradition"]>) =>
     update((current) => ({ ...current, tradition: { ...current.tradition, ...change } }));
   const setInvocation = (mode: InvocationMode) =>
@@ -90,14 +100,16 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
     >
       <div className="flex flex-col gap-1">
         <h2 id="elements-heading" className="font-display text-xl">
-          {traditionCopy.elements}
+          {invocation ? traditionCopy.elements : traditionCopy.symbol}
         </h2>
         <p className="text-sm text-ink-muted">
-          {traditionCopy.elementsIntro(traditionCopy.names[pack.id])}
+          {pack
+            ? traditionCopy.elementsIntro(traditionCopy.names[pack.id])
+            : traditionCopy.symbolIntro}
         </p>
       </div>
 
-      {pack.symbols.options.length > 0 && (
+      {options.length > 0 && (
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold">{traditionCopy.symbol}</h3>
           <RadioGroup
@@ -109,7 +121,7 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
             }
             className="grid-cols-2 min-[480px]:grid-cols-3 lg:grid-cols-5"
           >
-            {[...pack.symbols.options, null].map((id) => (
+            {[...options, null].map((id) => (
               <RadioItem
                 key={id ?? NONE}
                 value={id ?? NONE}
@@ -118,11 +130,14 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
               />
             ))}
           </RadioGroup>
-          <p className="text-sm text-ink-muted">{traditionCopy.symbolNote}</p>
+          {/* The painted gods are Hindu: only a Hindu card is pointed to them */}
+          {draftFaith(draft) === "hindu" && (
+            <p className="text-sm text-ink-muted">{traditionCopy.symbolNote}</p>
+          )}
         </div>
       )}
 
-      {invocation && (
+      {pack && invocation && (
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold">{traditionCopy.invocation}</h3>
           <RadioGroup

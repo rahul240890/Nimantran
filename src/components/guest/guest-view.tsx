@@ -28,6 +28,7 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import {
   cardLanguages,
   draftCopy,
+  draftOpeningGod,
   draftTemplate,
   mainFunction,
   type CardLanguage,
@@ -65,7 +66,7 @@ import {
   sceneCouple,
 } from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
-import { openingGod, openingStyle } from "@/lib/opening/catalog";
+import { openingStyle } from "@/lib/opening/catalog";
 import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale } from "@/i18n/client";
@@ -251,7 +252,7 @@ export function GuestView({
   }, [draft, photos, copy.second]);
   // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
   const opening = openingStyle(draft.opening, suite, Boolean(scene), draft.categoryId);
-  const god = openingGod(draft.opening, draft.categoryId);
+  const god = draftOpeningGod(draft);
   const [entered, setEntered] = useState(false);
   // Each time the pages end, the page below carries on by itself, section by section
   const [tour, setTour] = useState(0);

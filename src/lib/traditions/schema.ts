@@ -21,10 +21,29 @@ export const TRADITION_IDS = [
 export type TraditionId = (typeof TRADITION_IDS)[number];
 
 /**
- * Sacred symbols drawn from geometry or set as a letter, never copied artwork. Deities
- * arrive as commissioned art (content task C1).
+ * Sacred symbols drawn from geometry or set as a letter, never copied artwork, for every
+ * faith's cards (faith.ts says which each faith is offered). Deities are the owner's own
+ * paintings, on the opening (src/lib/opening/catalog.ts).
  */
-export const SYMBOL_IDS = ["om", "kalash", "swastik", "diya", "prajapati", "suzhi"] as const;
+export const SYMBOL_IDS = [
+  "om",
+  "kalash",
+  "swastik",
+  "diya",
+  "prajapati",
+  "suzhi",
+  "shri",
+  "shankh",
+  "kamal",
+  "ik-onkar",
+  "khanda",
+  "chand-tara",
+  "786",
+  "bismillah",
+  "cross",
+  "dove",
+  "jain",
+] as const;
 export type SymbolId = (typeof SYMBOL_IDS)[number];
 
 /** How the invocation is written on the card: in its own script, in English letters, or not at all. */

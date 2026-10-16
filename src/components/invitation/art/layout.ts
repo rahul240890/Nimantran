@@ -2,7 +2,7 @@ import type { CardCopy } from "@/lib/templates/content";
 import type { FontRole, StockRole, Template, TypeStyle } from "@/lib/templates/schema";
 import type { DoorSide, Motif } from "./motifs";
 import type { Layer } from "./decor";
-import { SYMBOLS } from "./symbols";
+import { SYMBOLS, glyphScale } from "./symbols";
 
 /*
  * Where each line of words sits on the card, worked out once and used by both the 2D card
@@ -150,7 +150,8 @@ export function layoutInside(copy: CardCopy, template: Template, motif: Motif): 
   if (sacred?.kind === "art") items.push({ kind: "symbol", gap: 0 });
   if (sacred?.kind === "glyph") {
     const style = { font: sacred.font, italic: false, uppercase: false, tracking: 0, scale: 1 };
-    text({ key: "symbol", text: sacred.text, style, size: 8.5, ink: "goldText", lines: 1 }, 0);
+    const size = 8.5 * glyphScale(sacred);
+    text({ key: "symbol", text: sacred.text, style, size, ink: "goldText", lines: 1 }, 0);
   }
   text(
     {
