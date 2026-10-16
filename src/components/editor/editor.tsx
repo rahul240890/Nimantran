@@ -40,6 +40,7 @@ import { deletePhoto } from "@/lib/editor/photos";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
 import type { SuiteId } from "@/lib/suites/catalog";
+import type { Faith } from "@/lib/traditions/faith";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { TemplateId } from "@/lib/templates/schema";
 import { cn } from "@/lib/cn";
@@ -195,6 +196,7 @@ export function Editor({
   initialTradition = null,
   initialSuite = null,
   initialFormat = null,
+  initialFaith = null,
   signedIn = false,
   initialInvite = null,
   fresh = false,
@@ -209,6 +211,8 @@ export function Editor({
   initialSuite?: SuiteId | null;
   /** The gallery's Scene or Story version of that design (?format=scene). */
   initialFormat?: InviteFormat | null;
+  /** The faith of the gallery's kind of wedding (?faith=muslim for a Nikah). */
+  initialFaith?: Faith | null;
   /** Drafts save to the account as well as the device. */
   signedIn?: boolean;
   /** An invite opened from My invites (?invite=<id>). */
@@ -323,6 +327,7 @@ export function Editor({
           suite: initialSuite,
           template: initialTemplate,
           format: initialFormat ?? undefined,
+          faith: initialFaith,
         };
         const current = inviteDraft.get().draft;
         const switched =
@@ -358,6 +363,7 @@ export function Editor({
     initialTradition,
     initialSuite,
     initialFormat,
+    initialFaith,
     update,
     router,
     syncCopy,

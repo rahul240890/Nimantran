@@ -2,8 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   ceremonyName,
   cardLanguages,
+  coupleValue,
   draftCopy,
+  draftSymbol,
   draftTemplate,
+  draftTradition,
   functionOrder,
   includedFunctions,
   mainFunction,
@@ -14,6 +17,7 @@ import {
   type InviteDraft,
 } from "./draft";
 import { CATEGORIES } from "@/lib/categories/catalog";
+import { TEMPLATES } from "@/lib/templates/catalog";
 import { draftProblems, parseDraft, stepErrors } from "./draft-checks";
 
 function complete(): InviteDraft {
@@ -442,11 +446,47 @@ describe("designs that suit the occasion", () => {
 describe("the blessing on a card in another language", () => {
   it("is written in the card's own script, never the design's English sample", () => {
     const draft: InviteDraft = { ...newDraft("scroll", "janmashtami"), languages: ["hi"] };
-    expect(draftCopy(draft).blessing).toBe("॥ श्री गणेशाय नमः ॥");
+    // The festival's own greeting, in its script
+    expect(draftCopy(draft).blessing).toBe("जय श्री कृष्ण");
+  });
+
+  it("follows the family's faith, on an English card too", () => {
+    const wedding: InviteDraft = { ...newDraft("scroll"), languages: ["en"] };
+    const nikah = { ...wedding, tradition: { ...wedding.tradition, faith: "muslim" as const } };
+    expect(draftCopy(nikah).blessing).toBe("Bismillah ir-Rahman ir-Rahim");
+    const sikh = {
+      ...nikah,
+      languages: ["hi" as const],
+      tradition: { ...nikah.tradition, faith: "sikh" as const },
+    };
+    expect(draftCopy(sikh).blessing).toBe("ੴ ਸਤਿਗੁਰ ਪ੍ਰਸਾਦਿ");
+    // A Hindu pack's invocation gives way to the family's own faith
+    const jain: InviteDraft = {
+      ...wedding,
+      languages: ["gu"],
+      tradition: { ...wedding.tradition, id: "gujarati", faith: "jain" },
+    };
+    expect(draftCopy(jain).blessing).toBe("॥ ણમો અરિહંતાણં ॥");
+    // No religious lines keeps the pack's ceremonies but not its invocation or symbol
+    const plain: InviteDraft = {
+      ...jain,
+      languages: ["en"],
+      tradition: { ...jain.tradition, faith: "none" },
+    };
+    expect(draftTradition(plain)?.id).toBe("gujarati");
+    expect(draftCopy(plain).blessing).toBe("Two hearts, one journey");
+    expect(draftSymbol(plain)).toBeNull();
   });
 
   it("stays empty on a design without a sample blessing", () => {
     const draft: InviteDraft = { ...newDraft("marigold"), languages: ["gu"] };
     expect(draftCopy(draft).blessing).toBe("");
+    // unless the family's faith opens with its own, and the field shows what the card does
+    const nikah = { ...draft, tradition: { ...draft.tradition, faith: "muslim" as const } };
+    expect(draftCopy(nikah).blessing).not.toBe("");
+    expect(coupleValue(nikah, TEMPLATES.marigold, "blessing")).toBe(draftCopy(nikah).blessing);
+    const english: InviteDraft = { ...newDraft("scroll"), languages: ["en"] };
+    const sikh = { ...english, tradition: { ...english.tradition, faith: "sikh" as const } };
+    expect(coupleValue(sikh, TEMPLATES.scroll, "blessing")).toBe("Ik Onkar Satgur Prasad");
   });
 });

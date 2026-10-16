@@ -786,6 +786,24 @@ export const extrasCopy = {
   },
 } as const;
 
+/** The family's faith, which the religious wording offered follows (lib/traditions/faith.ts). */
+export const faithCopy = {
+  heading: "Wording for your faith",
+  intro:
+    "The blessings, lines and gate words suggested below follow it. Everything stays yours to edit.",
+  label: "Faith",
+  names: {
+    hindu: "Hindu",
+    sikh: "Sikh",
+    muslim: "Muslim",
+    christian: "Christian",
+    jain: "Jain",
+    none: "No religious lines",
+  },
+  doorIdeas: "Gate words",
+  doorIdea: (left: string, right: string) => `Use “${left}” and “${right}”`,
+};
+
 export const traditionCopy = {
   group: "Traditions",
   none: "No tradition",

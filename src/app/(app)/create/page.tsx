@@ -1,6 +1,7 @@
 import { isInviteFormat } from "@/lib/editor/formats";
 import type { Metadata } from "next";
 import { isTraditionId } from "@/lib/traditions/catalog";
+import { isFaith } from "@/lib/traditions/faith";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Editor } from "@/components/editor/editor";
@@ -41,6 +42,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     tradition,
     suite,
     format,
+    faith,
     invite,
     new: fresh,
     publish,
@@ -67,6 +69,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     initialTradition: isTraditionId(tradition) ? tradition : null,
     initialSuite: isSuiteId(suite) ? suite : null,
     initialFormat: isInviteFormat(format) ? format : null,
+    initialFaith: isFaith(faith) ? faith : null,
     fresh: fresh === "1",
   };
   return (
@@ -81,6 +84,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
           params.initialTradition,
           params.initialSuite,
           params.initialFormat,
+          params.initialFaith,
         ].join("|")}
         {...params}
         signedIn={Boolean(account)}

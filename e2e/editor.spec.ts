@@ -367,6 +367,54 @@ test.describe("invite editor", () => {
     await expect(page.getByRole("radio", { name: "No symbol" })).toBeChecked();
   });
 
+  test("the family's faith sets the blessing and its ideas, and the host's own words stay", async ({
+    page,
+  }) => {
+    // A Nikah design from the gallery opens Muslim
+    await page.goto("/designs");
+    await page.locator('[data-kind="muslim"]').getByRole("link").click();
+    const use = page
+      .locator("[data-design]")
+      .first()
+      .getByRole("link", { name: /Use this design/ });
+    await expect(use).toHaveAttribute("href", /faith=muslim/);
+    await page.goto(`${await use.getAttribute("href")}&quality=2d`);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
+
+    const parts = page.getByRole("group", { name: "Your details, in six parts" });
+    await parts.getByRole("button", { name: /^Card words: / }).click();
+    const faith = page.getByRole("radiogroup", { name: "Faith" });
+    await expect(faith.getByRole("radio", { name: "Muslim" })).toBeChecked();
+    const blessing = page.getByRole("textbox", { name: /^Blessing/ });
+    const ideas = page.getByRole("group", { name: /Ideas for Blessing/ }).getByRole("button");
+    await expect(blessing).toHaveValue("Bismillah ir-Rahman ir-Rahim");
+    await expect(ideas.first()).toHaveText("Bismillah ir-Rahman ir-Rahim");
+    await expect(page.getByText("Shri Ganeshaya Namah")).toHaveCount(0);
+
+    // Another faith changes what was still as suggested
+    await faith.getByRole("radio", { name: "Sikh" }).click();
+    await expect(blessing).toHaveValue("Ik Onkar Satgur Prasad");
+    await expect(ideas.first()).toHaveText("Ik Onkar Satgur Prasad");
+    // and keeps what the family wrote themselves
+    await blessing.fill("With the blessings of our elders");
+    await faith.getByRole("radio", { name: "Christian" }).click();
+    await expect(blessing).toHaveValue("With the blessings of our elders");
+    expect(
+      await axe(page).include('section[aria-labelledby="faith-heading"]').analyze(),
+    ).toMatchObject({
+      violations: [],
+    });
+
+    await page.reload();
+    await expect(
+      page.getByRole("radiogroup", { name: "Faith" }).getByRole("radio", { name: "Christian" }),
+    ).toBeChecked();
+    await expect(page.getByRole("textbox", { name: /^Blessing/ })).toHaveValue(
+      "With the blessings of our elders",
+    );
+    expect(await noOverflow(page)).toBe(true);
+  });
+
   test("the family section keeps parents, the tradition's hosts line and whom to call", async ({
     page,
   }) => {

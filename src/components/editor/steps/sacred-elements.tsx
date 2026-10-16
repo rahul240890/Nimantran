@@ -3,7 +3,7 @@
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { NO_SYMBOL, SYMBOLS } from "@/components/invitation/art/symbols";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { draftSymbol, draftTradition } from "@/lib/editor/draft";
+import { draftFaith, draftSymbol, draftTradition } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
 import { INVOCATION_MODES, type InvocationMode, type SymbolId } from "@/lib/traditions/schema";
@@ -69,7 +69,7 @@ export function SymbolChip({
 export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { traditionCopy } = useText(editorText);
   const pack = draftTradition(draft);
-  if (!pack || pack.community === "modern") return null;
+  if (!pack || pack.community === "modern" || draftFaith(draft) === "none") return null;
   const symbol = draftSymbol(draft);
   const invocation = pack.invocation;
   if (pack.symbols.options.length === 0 && !invocation) return null;

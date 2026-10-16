@@ -14,6 +14,7 @@ import { toCardCopy, type CardCopy } from "@/lib/templates/content";
 import { cardSuggestions } from "@/lib/templates/card-suggestions";
 import { CARD_OCCASION_SAMPLES, CARD_SAMPLES, SAMPLE_DATE } from "@/lib/templates/story-words";
 import { allowsTradition, TRADITIONS } from "@/lib/traditions/catalog";
+import { cardFaith, type Faith } from "@/lib/traditions/faith";
 import type { SymbolId, TraditionPack } from "@/lib/traditions/schema";
 import { SLOT_IDS, SLOT_RULES, type SlotId, type TemplateId } from "@/lib/templates/ids";
 import type { Template } from "@/lib/templates/schema";
@@ -74,6 +75,7 @@ export const noTradition: DraftTradition = {
   id: null,
   symbol: null,
   invocation: "script",
+  faith: null,
   wording: {},
 };
 
@@ -175,6 +177,8 @@ export function withGalleryChoice(
     template: TemplateId | null;
     /** A Scene design opens as one painting; any other design as its story of pages. */
     format?: InviteFormat;
+    /** The faith the gallery's kind of wedding belongs to (a Nikah is Muslim). */
+    faith?: Faith | null;
   },
 ): InviteDraft {
   // An old or hand-made link can pair a theme with an occasion it isn't painted for
@@ -191,6 +195,9 @@ export function withGalleryChoice(
       : [traditionLanguage(choice.tradition)];
   if (next.tradition.id !== choice.tradition) {
     next = { ...next, tradition: { ...noTradition, id: choice.tradition } };
+  }
+  if (choice.faith !== undefined) {
+    next = { ...next, tradition: { ...next.tradition, faith: choice.faith } };
   }
   return {
     ...next,
@@ -216,7 +223,8 @@ export function withTradition(draft: InviteDraft, id: TraditionPack["id"] | null
   if (draft.tradition.id === id) return draft;
   return {
     ...draft,
-    tradition: { ...draft.tradition, id, symbol: null },
+    // A Hindu pack's wording is Hindu: the faith follows it again
+    tradition: { ...draft.tradition, id, symbol: null, faith: id ? null : draft.tradition.faith },
     languages: [traditionLanguage(id)],
   };
 }
@@ -297,16 +305,27 @@ export function draftTemplate(draft: InviteDraft): Template {
   return found;
 }
 
-/** The pack this invite follows, if its occasion takes one. */
+/** The pack this invite follows, if its occasion takes one and the family's faith is its own. */
 export function draftTradition(draft: InviteDraft): TraditionPack | null {
   const { id } = draft.tradition;
-  return id && allowsTradition(draftCategory(draft)) ? TRADITIONS[id] : null;
+  if (!id || !allowsTradition(draftCategory(draft))) return null;
+  // The packs are Hindu (and Modern): a Sikh, Muslim, Christian or Jain card leaves them aside
+  return OTHER_FAITHS.includes(draftFaith(draft)) ? null : TRADITIONS[id];
+}
+
+/** Faiths whose wording no Hindu tradition pack gives. */
+const OTHER_FAITHS: readonly Faith[] = ["sikh", "muslim", "christian", "jain"];
+
+/** The faith the card's religious wording follows (src/lib/traditions/faith.ts). */
+export function draftFaith(draft: InviteDraft): Faith {
+  return cardFaith(draft.categoryId, draft.tradition.id, draft.tradition.faith);
 }
 
 /** The sacred symbol on the card: the family's pick, else the pack's own. */
 export function draftSymbol(draft: InviteDraft): SymbolId | null {
   const pack = draftTradition(draft);
-  if (!pack) return null;
+  // A family that wants no religious lines keeps the pack's ceremonies, not its symbol
+  if (!pack || draftFaith(draft) === "none") return null;
   const { symbol } = draft.tradition;
   if (symbol === "none") return null;
   return symbol && pack.symbols.options.includes(symbol) ? symbol : pack.symbols.default;
@@ -336,7 +355,10 @@ export function traditionWording(
   const own = language === "en" || sameScript(pack.language, language);
   const local = own ? pack : languagePack(language);
   const invocation = mode === "script" ? local?.invocation : pack.invocation;
-  wording.blessing = invocation && mode !== "off" ? invocation[mode] : "";
+  // A family that wants no religious lines gets the occasion's own plain blessing instead
+  if (draftFaith(draft) !== "none") {
+    wording.blessing = invocation && mode !== "off" ? invocation[mode] : "";
+  }
   if (pack.doors && draft.categoryId === "wedding") {
     // A Hindi card's gates say शुभ विवाह; only its English side says Shubh Vivah
     const doors =
@@ -418,6 +440,8 @@ export function draftCopy(
   // Untyped slots preview in the card's own language: the occasion's and the design's
   // samples are English, so other languages use their own sample wording instead
   const samples = language === "en" ? draftCategory(draft).wording : cardSamples(draft, language);
+  // Samples bless the Hindu way (Shri Ganeshaya Namah): another faith starts with its own
+  const ownFaith = draftFaith(draft) !== "hindu";
   for (const id of COUPLE_SLOTS) {
     // The tradition's wording in the second language beats the main card's typed words
     const own = second ? draft.translation[id]?.trim() || undefined : draft.content[id];
@@ -425,7 +449,7 @@ export function draftCopy(
       own ??
       tradition[id] ??
       words[id] ??
-      samples[id] ??
+      (ownFaith && id === "blessing" ? undefined : samples[id]) ??
       localBlessing(draft, template, id, language);
     if (value !== undefined) content[id] = value;
   }
@@ -458,9 +482,10 @@ export function draftCopy(
 }
 
 /**
- * A design's sample blessing is English ("Shri Ganeshaya Namah"), so a card in another
- * language starts with the occasion's own blessing in its script instead (॥ श्री गणेशाय
- * नमः ॥, जय श्री कृष्ण), and a design without one keeps none.
+ * A design's sample blessing is English and Hindu ("Shri Ganeshaya Namah"), so a card in
+ * another language starts with the occasion's own blessing in its script instead (॥ श्री
+ * गणेशाय नमः ॥, जय श्री कृष्ण), a card of another faith with that faith's own (Bismillah,
+ * Ik Onkar), and a design without a blessing line keeps none unless the faith opens with one.
  */
 function localBlessing(
   draft: InviteDraft,
@@ -468,9 +493,14 @@ function localBlessing(
   id: SlotId,
   language: CardLanguage,
 ): string | undefined {
-  if (id !== "blessing" || language === "en") return undefined;
-  if (!sampleOf(template, "blessing").trim()) return "";
-  return cardSuggestions(draft.categoryId, language, "blessing")[0] ?? "";
+  if (id !== "blessing") return undefined;
+  const faith = draftFaith(draft);
+  if (language === "en" && faith === "hindu") return undefined;
+  // A faith that opens with its own invocation (Bismillah on a Nikah card) keeps it even
+  // on a design whose sample left the line empty rather than bless the Hindu way
+  const invokes = faith !== "hindu" && faith !== "none";
+  if (!invokes && !sampleOf(template, "blessing").trim()) return "";
+  return cardSuggestions(draft.categoryId, language, "blessing", faith)[0] ?? "";
 }
 
 /** The wording a slot starts with: the occasion's, else the design's sample. */
@@ -481,6 +511,10 @@ export function sampleOf(template: Template, id: SlotId, category?: Category): s
 /** A slot's starting wording in the card's main language (the samples are English). */
 function languageSample(draft: InviteDraft, template: Template, id: SlotId): string {
   const main = cardLanguages(draft)[0];
+  // The field starts where the card does: another faith's blessing is its own
+  if (id === "blessing" && draftFaith(draft) !== "hindu") {
+    return localBlessing(draft, template, id, main) ?? "";
+  }
   return main === "en"
     ? sampleOf(template, id, draftCategory(draft))
     : (cardSamples(draft, main)[id] ?? "");
