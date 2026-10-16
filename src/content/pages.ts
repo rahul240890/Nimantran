@@ -67,6 +67,11 @@ export const contactPageCopy = {
   emailNote: "We reply within 3 working days, and within 1 working day about a payment.",
   emailPending:
     "Our email address will appear here before launch. Until then, reply to any message from the Shubh Invitation team.",
+  whatsappHeading: "WhatsApp",
+  whatsappAction: "Chat with us on WhatsApp",
+  whatsappText: "Hello Shubh Invitation, I have a question about my invitation.",
+  whatsappNote:
+    "Send your question with your invitation's link, if you have one. A person replies.",
   businessHeading: "Business details",
   legalName: "Business name",
   address: "Address",
@@ -111,5 +116,7 @@ export const blogCopy = {
     "Choose a design, add your words and functions, and send it on WhatsApp. Guests reply in one tap. Free to start.",
   ctaCreate: "Create your invitation",
   ctaDesigns: (occasion: string) => `See ${occasion.toLowerCase()} designs`,
+  /** Above a few designs for the post's occasion, each opening as a live invitation. */
+  sampleDesigns: (occasion: string) => `${occasion} designs to open as a guest`,
   morePosts: "More to read",
 } as const;

@@ -1,6 +1,7 @@
-import { Check, Mail } from "lucide-react";
+import { Check, Mail, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { editionsText } from "@/i18n/copy/editions";
 import { galleryText } from "@/i18n/copy/gallery";
 import { pagesText } from "@/i18n/copy/pages";
@@ -10,6 +11,7 @@ import type { Business } from "@/lib/payments/business-details";
 import { PAID_PLAN_IDS, formatRupees, inviteLimit, packagePrice } from "@/lib/plans/catalog";
 import { DESIGN_TIERS } from "@/lib/plans/design-tiers";
 import { getPricing } from "@/lib/plans/pricing";
+import { supportWhatsAppUrl } from "@/lib/publish/links";
 import { pagePath } from "@/lib/seo/paths";
 import { faqPage } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
@@ -214,6 +216,7 @@ export function ContactPage({
       ["gstin", business.gstin],
     ] as const
   ).filter(([, value]) => value);
+  const whatsapp = supportWhatsAppUrl(business.phone, copy.whatsappText);
   return (
     <PublicShell
       locale={locale}
@@ -257,6 +260,26 @@ export function ContactPage({
             <p>{copy.emailPending}</p>
           )}
         </section>
+
+        {whatsapp && (
+          <section
+            aria-labelledby="whatsapp-heading"
+            className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5 shadow-raised sm:p-6"
+          >
+            <h2 id="whatsapp-heading" className="font-display text-2xl">
+              {copy.whatsappHeading}
+            </h2>
+            <p>
+              <Button asChild>
+                <a href={whatsapp} target="_blank" rel="noopener noreferrer" data-support-whatsapp>
+                  <MessageCircle aria-hidden />
+                  {copy.whatsappAction}
+                </a>
+              </Button>
+            </p>
+            <p className="text-ink-muted">{copy.whatsappNote}</p>
+          </section>
+        )}
 
         {rows.length > 0 && (
           <section aria-labelledby="business-heading" className="flex flex-col gap-3">

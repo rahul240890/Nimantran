@@ -64,6 +64,7 @@ import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { uiText } from "@/i18n/copy/ui";
+import { funnel } from "@/lib/funnel";
 
 const WIDE = "(min-width: 64rem)";
 
@@ -269,6 +270,16 @@ export function Editor({
   useEffect(() => {
     publishOnArrival = false;
   }, []);
+  // The funnel counts a visit to the editor once, and reaching the preview once
+  useEffect(() => {
+    funnel("Editor opened", { category: inviteDraft.get().draft.categoryId });
+  }, []);
+  const previewCounted = useRef(false);
+  useEffect(() => {
+    if (step !== "preview" || previewCounted.current) return;
+    previewCounted.current = true;
+    funnel("Preview reached", { category: draft.categoryId });
+  }, [step, draft.categoryId]);
   const [sheet, setSheet] = useState(false);
   const miniHidden = useSyncExternalStore(miniStore.subscribe, miniStore.get, () => false);
   const mini = !wide && MINI_STEPS.has(step) && !sheet;
