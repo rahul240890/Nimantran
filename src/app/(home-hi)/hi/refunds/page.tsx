@@ -3,6 +3,9 @@ import { publicMetadata } from "@/components/seo/pages";
 
 export const metadata = publicMetadata({ kind: "refunds" }, "hi");
 
-export default function Page() {
+/* The address to write to can come from Admin, Business details; saving them refreshes this page. */
+export const revalidate = 3600;
+
+export default async function Page() {
   return <LegalPage locale="hi" kind="refunds" />;
 }

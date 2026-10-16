@@ -35,7 +35,7 @@ Every design has a price the master admin sets (**Admin, Designs**): Free, Premi
 | On a ₹799 design                      | —                       | ₹799                       | ₹1,199                    | ₹1,399            |
 | On a free design                      | ₹0                      | ₹0 (same as Free, no mark) | ₹400                      | ₹600              |
 | Watermark                             | Small “Made with Shubh” | No                         | No                        | No                |
-| Invites by link (guests + open link)  | 100                     | 100                        | 500                       | Unlimited         |
+| Guests or families (list + open link) | 100                     | 100                        | 500                       | Unlimited         |
 | Functions, RSVP, guest list, own link | Every function          | Every function             | Every function            | Every function    |
 | Card languages                        | 1                       | 1                          | 2                         | 2                 |
 | Own song                              | Yes                     | Yes                        | Yes                       | Yes               |
@@ -108,7 +108,7 @@ Yearly business plans give about two months free. GST invoices carry the busines
 
 ## 6. Rules
 
-- **Refunds:** full refund within 7 days if the invite has not been sent to any guest; after sending, no refund but free edits until the event.
+- **Refunds:** full refund within 7 days if no guest has opened the invite yet (sharing the link alone doesn't count); once a guest has opened it, no refund but free edits until the event. Every page says it the same way: "if no guest has opened your invitation yet".
 - **Upgrades:** pay the difference; features unlock instantly.
 - **Subscriptions:** UPI AutoPay mandates and cards through the payment provider; renewal reminder 7 days before; cancel any time, access continues to the end of the paid period.
 - **Downgrade or lapse:** published invites stay live until their event plus 7 days; nothing a guest has seen ever breaks.

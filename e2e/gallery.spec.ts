@@ -74,6 +74,16 @@ test.describe("finding a design", () => {
     await expect(preview.getByText("Page 1 of 9")).toBeVisible();
     await preview.getByRole("button", { name: "Next page" }).click();
     await expect(preview.getByText("Page 2 of 9")).toBeVisible();
+    // A Story is Royal: what each package costs on it, not just the design's own price
+    const packages = preview.getByRole("region", { name: "Packages for this design" });
+    for (const [plan, price] of [
+      ["basic", "₹799"],
+      ["celebration", "₹1,199"],
+      ["grand", "₹1,399"],
+    ] as const) {
+      await expect(packages.locator(`[data-plan="${plan}"]`)).toContainText(price);
+    }
+    await expect(packages.locator('[data-plan="basic"]')).toContainText("100 guests or families");
     await preview.getByRole("link", { name: "Use this design" }).click();
     await expect(page).toHaveURL(/\/create$/);
     // The names come first, in the card's language: a Gujarati wedding suggests Gujarati

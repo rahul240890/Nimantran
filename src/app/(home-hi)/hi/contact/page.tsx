@@ -1,6 +1,6 @@
 import { ContactPage } from "@/components/seo/info-pages";
 import { publicMetadata } from "@/components/seo/pages";
-import { getBusiness } from "@/lib/payments/business";
+import { contactEmail, getBusiness } from "@/lib/payments/business";
 
 export const metadata = publicMetadata({ kind: "contact" }, "hi");
 
@@ -8,5 +8,6 @@ export const metadata = publicMetadata({ kind: "contact" }, "hi");
 export const revalidate = 3600;
 
 export default async function Page() {
-  return <ContactPage locale="hi" business={await getBusiness()} />;
+  const [business, email] = await Promise.all([getBusiness(), contactEmail()]);
+  return <ContactPage locale="hi" business={business} email={email} />;
 }

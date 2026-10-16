@@ -54,13 +54,17 @@ export const planCopy = {
 
 /** The invites line on each package: guests by personal link or the open link. */
 export const invitesLine = (count: number | null) =>
-  count === null ? "Unlimited invites" : `${count.toLocaleString("en-IN")} invites by link`;
+  count === null ? "Unlimited guests" : `Up to ${count.toLocaleString("en-IN")} guests or families`;
 
 /** The invites count on each package card, large: the number, then what it counts. */
 export const invitesCount = (count: number | null) =>
   count === null
-    ? { value: "Unlimited", label: "invites" }
-    : { value: count.toLocaleString("en-IN"), label: "invites by link" };
+    ? { value: "Unlimited", label: "guests" }
+    : { value: count.toLocaleString("en-IN"), label: "guests or families" };
+
+/** What the guest count counts, wherever packages are compared. */
+export const invitesNote: string =
+  "Each guest or family on your list counts once and gets their own link. Guests who reply through your shared link count too.";
 
 export const upgradeCopy = {
   metaTitle: "Choose your package",
@@ -147,7 +151,7 @@ export const upgradeCopy = {
   },
   invoice: "Invoice",
   refunded: "Refunded",
-  refunds: "Full refund within 7 days if the invite hasn't been sent to any guest.",
+  refunds: "Full refund within 7 days if no guest has opened your invitation yet.",
 } as const;
 
 const TIER_NAMES = ["Free", "Premium", "Royal", "Signature"];

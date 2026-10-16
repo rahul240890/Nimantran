@@ -51,12 +51,15 @@ export const planCopy: Translation<typeof en.planCopy> = {
 };
 
 export const invitesLine: typeof en.invitesLine = (count) =>
-  count === null ? "असीमित इनवाइट" : `लिंक से ${count.toLocaleString("en-IN")} इनवाइट`;
+  count === null ? "असीमित मेहमान" : `${count.toLocaleString("en-IN")} तक मेहमान या परिवार`;
 
 export const invitesCount: typeof en.invitesCount = (count) =>
   count === null
-    ? { value: "असीमित", label: "इनवाइट" }
-    : { value: count.toLocaleString("en-IN"), label: "इनवाइट, लिंक से" };
+    ? { value: "असीमित", label: "मेहमान" }
+    : { value: count.toLocaleString("en-IN"), label: "मेहमान या परिवार" };
+
+export const invitesNote: string =
+  "आपकी सूची का हर मेहमान या परिवार एक बार गिना जाता है और उसे अपना लिंक मिलता है। आपके साझा लिंक से जवाब देने वाले मेहमान भी गिने जाते हैं।";
 
 export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   metaTitle: "अपना पैकेज चुनें",
@@ -142,7 +145,7 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   },
   invoice: "इनवॉइस",
   refunded: "पैसा वापस",
-  refunds: "अगर निमंत्रण किसी मेहमान को नहीं भेजा गया है, तो 7 दिनों के अंदर पूरा पैसा वापस।",
+  refunds: "अगर किसी मेहमान ने अभी तक निमंत्रण नहीं खोला, तो 7 दिनों के अंदर पूरा पैसा वापस।",
 };
 
 const TIER_NAMES = ["फ़्री", "प्रीमियम", "रॉयल"];

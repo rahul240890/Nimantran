@@ -117,6 +117,18 @@ test.describe("pages for payments", () => {
       const plan = page.getByRole("article", { name, exact: true });
       await expect(plan.getByText(price, { exact: true })).toBeVisible();
     }
+    await expect(
+      page
+        .getByRole("article", { name: "Basic", exact: true })
+        .getByText("Up to 100 guests or families"),
+    ).toBeVisible();
+    // Every kind of design, with what each package costs on it
+    const table = page.getByRole("table");
+    await expect(table.getByRole("row", { name: /^Free/ })).toContainText("₹400");
+    await expect(table.getByRole("row", { name: /^Royal/ })).toContainText("₹799");
+    await expect(table.getByRole("row", { name: /^Royal/ })).toContainText("₹1,399");
+    await expect(page.getByText("no guest has opened your invitation yet")).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
     await page.getByRole("link", { name: "Read the refund policy" }).click();
     await expect(page).toHaveURL(/\/refunds$/);
   });

@@ -5,8 +5,8 @@ import { dateLocale } from "@/i18n/dates";
 import type { UiLocale } from "@/i18n/locales";
 import type { Block } from "@/content/legal";
 import { LEGAL_UPDATED } from "@/lib/legal";
+import { contactEmail } from "@/lib/payments/business";
 import { pagePath } from "@/lib/seo/paths";
-import { site } from "@/lib/site";
 import { PublicShell } from "./public-page";
 
 function Paragraphs({ blocks }: { blocks: readonly Block[] }) {
@@ -24,7 +24,7 @@ function Paragraphs({ blocks }: { blocks: readonly Block[] }) {
 }
 
 /** The privacy policy, the terms or the refund policy: plain reading, a list of sections, and who to write to. */
-export function LegalPage({
+export async function LegalPage({
   locale,
   kind,
 }: {
@@ -33,6 +33,7 @@ export function LegalPage({
 }) {
   const { legalCopy, [kind]: doc } = legalText[locale];
   const { seoCopy } = seoText[locale];
+  const email = await contactEmail();
   const updated = format(new Date(`${LEGAL_UPDATED}T00:00:00`), "d MMMM yyyy", {
     locale: dateLocale[locale],
   });
@@ -107,16 +108,16 @@ export function LegalPage({
           <h2 id="contact-heading" className="font-display text-2xl sm:text-3xl">
             {legalCopy.contactHeading}
           </h2>
-          {site.contactEmail ? (
+          {email ? (
             <p>
-              {legalCopy.contactEmail(site.contactEmail).split(site.contactEmail)[0]}
+              {legalCopy.contactEmail(email).split(email)[0]}
               <a
-                href={`mailto:${site.contactEmail}`}
+                href={`mailto:${email}`}
                 className="font-semibold text-accent-text underline underline-offset-4"
               >
-                {site.contactEmail}
+                {email}
               </a>
-              {legalCopy.contactEmail(site.contactEmail).split(site.contactEmail)[1]}
+              {legalCopy.contactEmail(email).split(email)[1]}
             </p>
           ) : (
             <p>{legalCopy.contactPending}</p>
