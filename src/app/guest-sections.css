@@ -1,0 +1,134 @@
+/*
+ * The other layouts of the guest page's parts below a painted theme (section-layouts.ts,
+ * themed-details.tsx). They dress in the theme's own guest colours (--guest-* in
+ * globals.css), so a calendar page in a palace is cloth and gilt, by the water ivory and
+ * kasavu gold.
+ */
+
+/* Save the date as a page torn from the month */
+.guest-calendar {
+  border-radius: 0.75rem 0.75rem 1.25rem 1.25rem;
+}
+.guest-calendar::before {
+  /* The rings it hangs from */
+  content: "";
+  position: absolute;
+  inset: -0.6rem 22% auto;
+  height: 1.2rem;
+  background: radial-gradient(circle, var(--guest-gilt) 0 0.32rem, transparent 0.34rem) 0 50% / 25%
+    100% repeat-x;
+}
+/* Ivory on the theme's jewel deepened, so it reads in every theme, pale jewels too */
+.guest-calendar-day[data-day="chosen"] {
+  color: var(--card-ivory);
+  background: color-mix(in oklab, var(--guest-jewel) 55%, black);
+  box-shadow:
+    0 0 0 3px var(--guest-cloth),
+    0 0 0 5px var(--guest-gilt);
+  font-weight: 700;
+}
+
+/* Save the date as a ticket: a stub and its counterfoil, torn along the dots */
+.guest-ticket {
+  position: relative;
+  border-radius: 1rem;
+  background: var(--guest-cloth);
+  box-shadow:
+    inset 0 0 0 1px var(--guest-gilt),
+    0 28px 50px -26px rgb(0 0 0 / 0.5);
+  /* The notches where it tears */
+  mask:
+    radial-gradient(circle at 0 50%, transparent 0.7rem, black 0.72rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 50%, transparent 0.7rem, black 0.72rem) right / 51% 100%
+      no-repeat;
+}
+.guest-ticket-stub {
+  border-inline-end: 2px dashed color-mix(in oklab, var(--guest-gilt) 70%, transparent);
+  background: color-mix(in oklab, var(--guest-jewel) 10%, var(--guest-cloth));
+  border-start-start-radius: 1rem;
+  border-end-start-radius: 1rem;
+}
+
+/* The day's plan on a timeline: a gilt thread with a bead at each celebration */
+.guest-timeline {
+  position: relative;
+}
+.guest-timeline::before {
+  content: "";
+  position: absolute;
+  inset-block: 1.25rem;
+  inset-inline-start: calc(0.5rem + 0.55rem);
+  width: 2px;
+  background: linear-gradient(
+    var(--guest-gilt),
+    color-mix(in oklab, var(--guest-gilt) 30%, transparent)
+  );
+}
+.guest-timeline-dot {
+  width: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--guest-jewel);
+  box-shadow:
+    0 0 0 3px var(--guest-cloth),
+    0 0 0 4.5px var(--guest-gilt);
+}
+.guest-timeline a {
+  background: color-mix(in oklab, var(--guest-cloth) 80%, transparent);
+}
+
+/* The day's plan as tiles, each with a gilt corner */
+.guest-tile {
+  border-radius: 1rem 1rem 1rem 0.25rem;
+}
+
+/* An hour whose painting fills the screen, the card held over it */
+.guest-hour-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, black 10%, transparent),
+    color-mix(in oklab, black 45%, transparent)
+  );
+}
+
+/* Photos as polaroids on a table */
+.guest-polaroid {
+  background: var(--guest-cloth);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--guest-gilt) 50%, transparent),
+    0 18px 30px -18px rgb(0 0 0 / 0.55);
+  transition: rotate 300ms ease;
+}
+.guest-polaroid:hover {
+  rotate: 0deg !important;
+}
+.guest-mosaic {
+  box-shadow:
+    0 0 0 2px var(--guest-cloth),
+    0 0 0 3px var(--guest-gilt);
+}
+
+/* The family on one scroll, an ornament between each part */
+.guest-scroll {
+  border-radius: 2rem;
+}
+
+/* The family under ribbons */
+.guest-ribbon {
+  position: relative;
+  color: var(--card-ivory);
+  background: color-mix(in oklab, var(--guest-jewel) 55%, black);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.7rem) 50%, 100% 100%, 0 100%, 0.7rem 50%);
+}
+.guest-ribbon-block {
+  border-bottom: 1px solid color-mix(in oklab, var(--guest-gilt) 45%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guest-polaroid {
+    transition: none;
+  }
+}

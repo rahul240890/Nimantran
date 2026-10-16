@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { sectionLayouts } from "../src/lib/suites/section-layouts";
 import { noOverflow } from "./invite-helpers";
 
 // Best practice too, as the keyboard test on a real guest page checks
@@ -68,6 +69,20 @@ for (const suite of THEMES) {
         await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
         // Each celebration takes its own hour's light
         await expect(page.locator("li.guest-hour[data-mood]")).toHaveCount(3);
+        // Laid out in the theme's own mix of layouts
+        const layouts = sectionLayouts(suite);
+        await expect(page.locator('section[aria-labelledby="guest-save-date"]')).toHaveAttribute(
+          "data-layout",
+          layouts.date,
+        );
+        await expect(page.locator("ol:has(> li.guest-hour)")).toHaveAttribute(
+          "data-layout",
+          layouts.hours,
+        );
+        await expect(page.locator('section[aria-labelledby="guest-family"]')).toHaveAttribute(
+          "data-layout",
+          layouts.family,
+        );
 
         await page.getByRole("button", { name: "Shower flowers on the couple" }).click();
         await expect(page.getByText("Your flowers are on their way")).toBeVisible();
