@@ -71,6 +71,13 @@ export const galleryCopy = {
     /** The one name on a birthday's or a party's sample. */
     one: "Aanya",
     blessing: "With the blessings of Lord Ganesha",
+    /** The couple on a Sikh, Muslim, Christian or Jain design's sample. */
+    faithNames: {
+      sikh: { first: "Arjan", second: "Simran" },
+      muslim: { first: "Ayaan", second: "Zoya" },
+      christian: { first: "Joel", second: "Anna" },
+      jain: { first: "Rishabh", second: "Vidhi" },
+    },
     families: "Together with their families",
     line: "invite you to celebrate their wedding",
     venues: {
@@ -93,6 +100,7 @@ export const galleryCopy = {
   seeSample: "Open it as a guest",
   sampleLabel: "Sample invitation",
   sampleNote: "The names, dates and places are made up",
+  sampleAnother: "Show another",
   sampleTitle: (name: string) => `Sample invitation: ${name}`,
   sampleDescription:
     "See this design as your guests will: it opens, plays its music and takes replies.",

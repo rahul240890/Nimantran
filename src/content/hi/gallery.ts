@@ -62,6 +62,12 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     second: "सिया",
     one: "आन्या",
     blessing: "श्री गणेश जी के आशीर्वाद से",
+    faithNames: {
+      sikh: { first: "अर्जन", second: "सिमरन" },
+      muslim: { first: "अयान", second: "ज़ोया" },
+      christian: { first: "जोएल", second: "एना" },
+      jain: { first: "ऋषभ", second: "विधि" },
+    },
     families: "अपने परिवारों के साथ",
     line: "आपको सपरिवार सादर आमंत्रित करते हैं",
     venues: {
@@ -83,6 +89,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   seeSample: "मेहमान की तरह खोलें",
   sampleLabel: "नमूना निमंत्रण",
   sampleNote: "नाम, तारीख़ें और जगहें काल्पनिक हैं",
+  sampleAnother: "दूसरा दिखाएँ",
   sampleTitle: (name) => `नमूना निमंत्रण: ${name}`,
   sampleDescription:
     "यह डिज़ाइन वैसे देखिए जैसे आपके मेहमान देखेंगे: यह खुलता है, संगीत बजाता है और जवाब लेता है।",

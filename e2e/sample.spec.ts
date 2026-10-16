@@ -1,4 +1,5 @@
 import { expect, test, type Request } from "@playwright/test";
+import { LIVE_DEMOS } from "../src/lib/sample/paths";
 import { axe, noOverflow } from "./invite-helpers";
 
 /* A design's live sample (/sample/<design>): the whole invitation as a guest gets it, no sign-in. */
@@ -11,7 +12,9 @@ for (const colorScheme of ["light", "dark"] as const) {
     test.use({ colorScheme, reducedMotion: "reduce" });
 
     test("fits the screen and passes an accessibility check", async ({ page }) => {
-      await page.goto("/sample/shahi-savari");
+      // As a home page demo, so the way to another design is checked too
+      await page.goto("/sample/shahi-savari?demo=1");
+      await expect(page.getByRole("link", { name: "Show another" })).toBeVisible();
       await expect(page.getByText("Sample invitation")).toBeVisible();
       await expect(page.getByRole("button", { name: "Open the invitation" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
@@ -28,8 +31,19 @@ test.describe("live samples", () => {
   }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
+    // Each visit opens one of the demo designs, and the bar offers another after it
     await page.getByRole("link", { name: "Open a live invitation" }).click();
-    await expect(page).toHaveURL(/\/sample\/rajwada-bagh$/);
+    const demo = /\/sample\/([a-z-]+)\?demo=1$/;
+    await expect(page).toHaveURL(demo, { timeout: 15_000 });
+    const first = demo.exec(page.url())![1]!;
+    expect(LIVE_DEMOS).toContain(first);
+    await page.getByRole("link", { name: "Show another" }).click();
+    await expect(page).not.toHaveURL(new RegExp(`/sample/${first}\\?`), { timeout: 15_000 });
+    await expect(page).toHaveURL(demo);
+    expect(LIVE_DEMOS).toContain(demo.exec(page.url())![1]!);
+
+    // The palace garden story, as a guest gets it
+    await page.goto("/sample/rajwada-bagh?demo=1");
     await expect(page).toHaveTitle(/Sample invitation: Rajwada Bagh/);
 
     await page.getByRole("button", { name: "Open the invitation" }).click();

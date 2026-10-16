@@ -3,11 +3,13 @@ import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
 import { newDraft, withGalleryChoice, type InviteDraft } from "@/lib/editor/draft";
-import { suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
+import { WEDDING_KIND_ENTRIES, suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import { designPhotos } from "@/lib/gallery/photos";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { formatCardDate, type CardLanguage } from "@/lib/templates/card-languages";
 import { cardSuggestions } from "@/lib/templates/card-suggestions";
+import type { SuiteId } from "@/lib/suites/catalog";
+import type { Faith } from "@/lib/traditions/faith";
 import { SAMPLE_DAYS, SAMPLE_OCCASION_DAY, type SampleFunction } from "./days";
 import { SCENE_PHOTOS, at } from "./drafts";
 
@@ -27,6 +29,28 @@ export function sampleOccasion(design: GalleryDesign): CategoryId {
   return holds("wedding") ? "wedding" : (CATEGORY_IDS.find(holds) ?? "wedding");
 }
 
+/** Designs painted around a faith's own place, whatever kinds of wedding list them. */
+const PLACE_FAITH: Partial<Record<SuiteId, Faith>> = { chapel: "christian" };
+
+/**
+ * The faith a wedding design's sample blesses in: the one every kind of wedding listing it
+ * shares (a Nikah garden's Bismillah, a phulkari haveli's Ik Onkar), Hindu where a Hindu
+ * kind lists it too, no religious line when only other faiths or modern weddings share it,
+ * and Hindu for the rest. A host's own invite follows their choice, never this.
+ */
+export function sampleFaith(design: GalleryDesign): Faith {
+  if (design.suite === "classic") return "hindu";
+  const place = PLACE_FAITH[design.suite];
+  if (place) return place;
+  const faiths = new Set(
+    Object.values(WEDDING_KIND_ENTRIES)
+      .filter((entry) => (entry.suites as readonly string[]).includes(design.suite))
+      .map((entry): Faith => entry.faith ?? (entry.id === "modern" ? "none" : "hindu")),
+  );
+  if (faiths.size === 0 || faiths.has("hindu")) return "hindu";
+  return faiths.size === 1 ? [...faiths][0]! : "none";
+}
+
 /** How many stand-in photos fill the design's frames. */
 function photoCount(design: GalleryDesign, category: CategoryId): number {
   const need = designPhotos(design, category);
@@ -37,18 +61,23 @@ export function sampleInvite(design: GalleryDesign, locale: UiLocale): SampleInv
   const category = sampleOccasion(design);
   const language: CardLanguage = locale === "hi" ? "hi" : "en";
   const sample = galleryText[locale].galleryCopy.sample;
+  const wedding = category === "wedding";
+  const faith = wedding ? sampleFaith(design) : null;
   const base = withGalleryChoice(newDraft(design.template, category), {
     category,
     tradition: null,
     suite: design.suite,
     template: design.template,
     format: design.format,
+    ...(faith && faith !== "hindu" ? { faith } : {}),
   });
-  const wedding = category === "wedding";
   const occasion: Category = CATEGORIES[category];
   const one = occasion.people === "one";
   const words = (slot: "blessing" | "families" | "line") =>
     cardSuggestions(category, language, slot)[0] ?? "";
+  // Another faith's wedding blesses its own way, with names its families give
+  const own = faith && faith !== "hindu" ? faith : null;
+  const names = own && own !== "none" ? sample.faithNames[own] : sample;
 
   // A wedding has its run of celebrations; any other occasion (a roka too) its one
   const days: Partial<Record<SampleFunction, readonly [string, string]>> = wedding
@@ -74,9 +103,13 @@ export function sampleInvite(design: GalleryDesign, locale: UiLocale): SampleInv
     step: "preview",
     languages: [language],
     content: {
-      first: one ? sample.one : sample.first,
-      second: one ? "" : sample.second,
-      blessing: wedding ? sample.blessing : words("blessing"),
+      first: one ? sample.one : names.first,
+      second: one ? "" : names.second,
+      blessing: !wedding
+        ? words("blessing")
+        : own
+          ? (cardSuggestions(category, language, "blessing", own)[0] ?? "")
+          : sample.blessing,
       families: wedding ? sample.families : words("families"),
       line: wedding ? sample.line : words("line") || sample.line,
       date: formatCardDate(wedding ? SAMPLE_DAYS.wedding[0] : SAMPLE_OCCASION_DAY[0], language),
