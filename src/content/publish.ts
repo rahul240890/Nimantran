@@ -1,3 +1,4 @@
+import { chatLines, detailLines, type ShareMessage } from "@/lib/publish/message";
 import { site } from "@/lib/site";
 
 /* Publishing, sharing and the guest page (Step 9). English copy, shaped for next-intl. */
@@ -41,17 +42,21 @@ export const shareCopy = {
   guestView: "See what guests see",
   edit: "Edit invite",
   messageLabel: "Message",
-  messageHint: "Sent with the link. Change it however you like.",
-  message: (names: string, occasion: string, when: string) =>
-    [
-      `You're warmly invited to ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}${names}.`,
-      when,
-      "Open your invitation and let us know if you can come:",
-    ]
-      .filter(Boolean)
-      .join("\n"),
+  messageHint:
+    "Sent with the link. Change it however you like: *stars* make words bold in WhatsApp.",
+  message: ({ names, occasion, when, where }: ShareMessage) =>
+    chatLines([
+      "✨ *You're warmly invited* ✨",
+      "",
+      occasion ? `to the ${occasion.toLowerCase()} of` : "",
+      `*${names}*`,
+      ...detailLines(when, where),
+      "",
+      "Please open your invitation and let us know if you can come 🙏",
+    ]),
   previewHeading: "How it looks in WhatsApp",
-  previewNote: "WhatsApp shows this picture, title and line under your message.",
+  previewNote:
+    "WhatsApp shows your invitation's picture, title and date above the message. When you send it, wait a moment for the picture to appear in WhatsApp before pressing send.",
   qrHeading: "QR code",
   qrBody:
     "Guests scan it with their phone camera. Print it on a card, a banner or the welcome board.",

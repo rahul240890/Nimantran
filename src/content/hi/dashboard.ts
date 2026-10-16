@@ -1,5 +1,6 @@
 import type * as en from "../dashboard";
 import type { Translation } from "@/i18n/text";
+import { chatLines } from "@/lib/publish/message";
 
 /* हिन्दी: मेज़बान डैशबोर्ड और सह-मेज़बान। English: src/content/dashboard.ts. */
 
@@ -214,22 +215,24 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
 
   messages: {
     invite: (name, names, occasion, when) =>
-      [
+      chatLines([
         `आदरणीय ${name},`,
+        "",
         occasion
-          ? `${names} के ${occasion} में आप सप्रेम आमंत्रित हैं।`
-          : `${names} की ओर से आपको सप्रेम आमंत्रण।`,
-        when,
-        "यह आपका निजी निमंत्रण है। कृपया खोलिए और बताइए कि आप आ पाएँगे:",
-      ]
-        .filter(Boolean)
-        .join("\n"),
+          ? `✨ *${names}* के ${occasion} में आप सप्रेम आमंत्रित हैं ✨`
+          : `✨ *${names}* की ओर से आपको सप्रेम आमंत्रण ✨`,
+        when && `🗓️ ${when}`,
+        "",
+        "यह आपका निजी निमंत्रण है। कृपया खोलिए और बताइए कि आप आ पाएँगे 🙏",
+      ]),
     reminder: (name, names, occasion, when) =>
-      [
+      chatLines([
         `आदरणीय ${name},`,
-        `${names} के ${occasion || "उत्सव"}${when ? ` (${when})` : ""} की एक विनम्र याद।`,
-        "हमें जानकर ख़ुशी होगी कि आप आ पाएँगे। जवाब देने में बस एक पल लगेगा:",
-      ].join("\n"),
+        "",
+        `*${names}* के ${occasion || "उत्सव"}${when ? ` (${when})` : ""} की एक विनम्र याद।`,
+        "",
+        "हमें जानकर ख़ुशी होगी कि आप आ पाएँगे। जवाब देने में बस एक पल लगेगा 🙏",
+      ]),
   },
 
   reminders: {
