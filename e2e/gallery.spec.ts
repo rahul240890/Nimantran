@@ -201,6 +201,40 @@ test.describe("the Designs page", () => {
     await expect(page).toHaveURL(/photos=none/);
   });
 
+  test("a price and an order narrow and sort the designs, and follow the address", async ({
+    page,
+  }) => {
+    await page.goto("/designs?occasion=wedding");
+    // The main filters show first; the quick occasions open out to every occasion
+    const occasions = page.getByRole("group", { name: "Occasion" });
+    await expect(occasions.getByRole("button", { name: "Birthday", exact: true })).toBeVisible();
+    await expect(occasions.getByRole("button", { name: "Retirement" })).toHaveCount(0);
+    await occasions.getByRole("button", { name: "More occasions" }).click();
+    await expect(occasions.getByRole("button", { name: "Retirement" })).toBeVisible();
+
+    await expect(page.getByRole("group", { name: "Price" })).toBeHidden();
+    await page.getByRole("button", { name: "More filters" }).click();
+    const prices = page.getByRole("group", { name: "Price" });
+    await prices.getByRole("button", { name: "Free", exact: true }).click();
+    await expect(page).toHaveURL(/price=free/);
+    // Every free design is a 3D card
+    const formats = await page
+      .locator("[data-format-item]")
+      .evaluateAll((items) => items.map((item) => item.getAttribute("data-format-item")));
+    expect(formats.length).toBeGreaterThan(0);
+    expect(new Set(formats)).toEqual(new Set(["card"]));
+
+    await prices.getByRole("button", { name: "Any price" }).click();
+    await page.getByRole("combobox", { name: "Sort designs" }).click();
+    await page.getByRole("option", { name: "Price: high to low" }).click();
+    await expect(page).toHaveURL(/sort=price-high/);
+    // The paid designs lead and the free 3D cards come last
+    const items = page.locator("[data-format-item]");
+    await expect(items.first()).not.toHaveAttribute("data-format-item", "card");
+    await expect(items.last()).toHaveAttribute("data-format-item", "card");
+    expect(await noOverflow(page)).toBe(true);
+  });
+
   test("search finds designs by name, and says so when nothing matches", async ({ page }) => {
     await page.goto("/designs");
     const search = page.getByRole("searchbox", { name: "Search designs" });

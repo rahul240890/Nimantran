@@ -223,6 +223,18 @@ export const catalogCopy: Translation<typeof en.catalogCopy> = {
   allPhotos: "कोई भी",
   photoGroups: { none: "चित्रित", one: "जोड़े की फ़ोटो", two: "दूल्हा-दुल्हन की फ़ोटो" },
   allDesigns: "सभी डिज़ाइन",
+  moreOccasions: "और अवसर",
+  fewerOccasions: "कम अवसर",
+  moreFilters: (chosen) => (chosen ? `और फ़िल्टर (${chosen})` : "और फ़िल्टर"),
+  fewerFilters: "कम फ़िल्टर",
+  priceLabel: "क़ीमत",
+  allPrices: "कोई भी क़ीमत",
+  sortLabel: "डिज़ाइन का क्रम",
+  sorts: {
+    recommended: "सुझाए गए",
+    "price-low": "क़ीमत: कम से ज़्यादा",
+    "price-high": "क़ीमत: ज़्यादा से कम",
+  },
 };
 
 /** संग्रह: डिज़ाइन उनके रूप और भाव के हिसाब से। */

@@ -235,6 +235,19 @@ export const catalogCopy = {
   allPhotos: "Any",
   photoGroups: { none: "Illustrated", one: "Couple photo", two: "Bride and groom photos" },
   allDesigns: "All designs",
+  moreOccasions: "More occasions",
+  fewerOccasions: "Fewer occasions",
+  /** Tradition, price and collection, behind one button; the count is how many are chosen. */
+  moreFilters: (chosen: number) => (chosen ? `More filters (${chosen})` : "More filters"),
+  fewerFilters: "Fewer filters",
+  priceLabel: "Price",
+  allPrices: "Any price",
+  sortLabel: "Sort designs",
+  sorts: {
+    recommended: "Recommended",
+    "price-low": "Price: low to high",
+    "price-high": "Price: high to low",
+  },
 };
 
 /** Collections (src/lib/gallery/collections.ts): the designs grouped by look and feeling. */

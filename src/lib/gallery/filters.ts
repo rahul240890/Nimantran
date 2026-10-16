@@ -1,4 +1,11 @@
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
+import { BUILT_PRICING } from "@/lib/plans/design-defaults";
+import {
+  DESIGN_TIERS,
+  tierPricePaise,
+  type DesignTier,
+  type Pricing,
+} from "@/lib/plans/design-tiers";
 import { isStoryId, suiteSuits } from "@/lib/suites/catalog";
 import { isMoving } from "@/lib/suites/moving";
 import {
@@ -47,6 +54,10 @@ export type CatalogEntry = {
   collection: CollectionId;
 };
 
+/** How the matching designs are ordered: the gallery's own mix, or by what the design costs. */
+export const CATALOG_SORTS = ["recommended", "price-low", "price-high"] as const;
+export type CatalogSort = (typeof CATALOG_SORTS)[number];
+
 export type DesignFilters = {
   query: string;
   occasion: CategoryId | null;
@@ -56,6 +67,9 @@ export type DesignFilters = {
   photos: PhotoGroup | null;
   /** A collection, such as Royal Wedding (collections.ts). */
   collection: CollectionId | null;
+  /** A price tier (Admin, Designs): Free, Premium, Royal or Signature. */
+  price: DesignTier | null;
+  sort: CatalogSort;
 };
 
 export const NO_FILTERS: DesignFilters = {
@@ -65,13 +79,22 @@ export const NO_FILTERS: DesignFilters = {
   format: null,
   photos: null,
   collection: null,
+  price: null,
+  sort: "recommended",
 };
 
 /** Whether any filter is chosen: if not, the Designs page shows its rows instead of a grid. */
 export function hasFilters(filters: DesignFilters): boolean {
   return (
     filters.query.trim() !== "" ||
-    !!(filters.occasion || filters.kind || filters.format || filters.photos || filters.collection)
+    !!(
+      filters.occasion ||
+      filters.kind ||
+      filters.format ||
+      filters.photos ||
+      filters.collection ||
+      filters.price
+    )
   );
 }
 
@@ -115,14 +138,20 @@ export function designCatalog(): CatalogEntry[] {
   return allDesigns().map(catalogEntry);
 }
 
+/** A design's tier at these prices; one missing from the list is never taken as free. */
+export const tierOf = (pricing: Pick<Pricing, "tiers">, designId: string): DesignTier =>
+  pricing.tiers[designId] ?? "premium";
+
 /**
- * The designs matching every filter. `words` gives each design's searchable text (its name,
- * description and wedding kinds, in every site language); every word typed must appear.
+ * The designs matching every filter, in the order asked for. `words` gives each design's
+ * searchable text (its name, description and wedding kinds, in every site language); every
+ * word typed must appear. `pricing` is the admin's, for the price filter and sorting.
  */
 export function filterCatalog(
   entries: readonly CatalogEntry[],
   filters: DesignFilters,
   words: (design: GalleryDesign) => string,
+  pricing: Pick<Pricing, "tiers" | "designs"> = BUILT_PRICING,
 ): CatalogEntry[] {
   const terms = normalize(filters.query).split(" ").filter(Boolean);
   const occasion = filters.kind ? "wedding" : filters.occasion;
@@ -133,12 +162,20 @@ export function filterCatalog(
       (!filters.kind || entry.kinds.includes(filters.kind)) &&
       (!filters.collection || entry.collection === filters.collection) &&
       (!filters.photos || PHOTO_GROUP_NEEDS[filters.photos].includes(entry.photos)) &&
+      (!filters.price || tierOf(pricing, entry.design.id) === filters.price) &&
       (terms.length === 0 || terms.every((term) => words(entry.design).includes(term))),
   );
   // A collection lists its best themes first
-  return filters.collection
-    ? shown.sort((a, b) => collectionRank(a.design.suite) - collectionRank(b.design.suite))
-    : shown;
+  if (filters.collection) {
+    shown.sort((a, b) => collectionRank(a.design.suite) - collectionRank(b.design.suite));
+  }
+  // By price, designs of one price keep the order above (the sort is stable)
+  if (filters.sort !== "recommended") {
+    const cost = (entry: CatalogEntry) => tierPricePaise(pricing, tierOf(pricing, entry.design.id));
+    const way = filters.sort === "price-low" ? 1 : -1;
+    shown.sort((a, b) => way * (cost(a) - cost(b)));
+  }
+  return shown;
 }
 
 /** The occasion a design opens for: the one the host filtered by, else its own. */
@@ -158,13 +195,18 @@ export function catalogHref(entry: CatalogEntry, filters: DesignFilters): string
   return designHref(entry.design, { category, kind });
 }
 
-/** The filters in an address (?occasion=haldi&format=scene&photos=none&q=red), ignoring unknown values. */
+/**
+ * The filters in an address (?occasion=haldi&format=scene&photos=none&price=free&sort=price-low&q=red),
+ * ignoring unknown values.
+ */
 export function filtersFromParams(params: URLSearchParams): DesignFilters {
   const occasion = params.get("occasion");
   const kind = params.get("tradition");
   const format = params.get("format");
   const photos = params.get("photos");
   const collection = params.get("collection");
+  const price = params.get("price");
+  const sort = params.get("sort");
   return {
     query: params.get("q") ?? "",
     occasion: (CATEGORY_IDS as readonly string[]).includes(occasion ?? "")
@@ -180,6 +222,10 @@ export function filtersFromParams(params: URLSearchParams): DesignFilters {
     collection: (COLLECTION_IDS as readonly string[]).includes(collection ?? "")
       ? (collection as CollectionId)
       : null,
+    price: (DESIGN_TIERS as readonly string[]).includes(price ?? "") ? (price as DesignTier) : null,
+    sort: (CATALOG_SORTS as readonly string[]).includes(sort ?? "")
+      ? (sort as CatalogSort)
+      : "recommended",
   };
 }
 
@@ -191,6 +237,8 @@ export function filtersToParams(filters: DesignFilters): string {
   if (filters.kind) params.set("tradition", filters.kind);
   if (filters.format) params.set("format", filters.format);
   if (filters.photos) params.set("photos", filters.photos);
+  if (filters.price) params.set("price", filters.price);
+  if (filters.sort !== "recommended") params.set("sort", filters.sort);
   const text = params.toString();
   return text ? `?${text}` : "";
 }

@@ -7,7 +7,9 @@ import {
   filtersFromParams,
   filtersToParams,
   hasFilters,
+  tierOf,
 } from "./filters";
+import { BUILT_PRICING } from "@/lib/plans/design-defaults";
 
 const entries = designCatalog();
 const ids = (filters: Partial<typeof NO_FILTERS>) =>
@@ -65,11 +67,61 @@ describe("design filters", () => {
       format: "story",
       photos: "none",
       collection: "garden",
+      price: "royal",
+      sort: "price-high",
     } as const;
     expect(filtersFromParams(new URLSearchParams(filtersToParams(filters)))).toEqual(filters);
     expect(
-      filtersFromParams(new URLSearchParams("occasion=moon&format=x&collection=moon")),
+      filtersFromParams(
+        new URLSearchParams("occasion=moon&format=x&collection=moon&price=gold&sort=cheap"),
+      ),
     ).toEqual(NO_FILTERS);
+  });
+});
+
+describe("price filter and sorting", () => {
+  const pricing = {
+    ...BUILT_PRICING,
+    designs: { premium: 49_900, royal: 79_900, signature: 99_900 },
+  };
+  const tiers = (filters: Partial<typeof NO_FILTERS>) =>
+    filterCatalog(entries, { ...NO_FILTERS, ...filters }, () => "", pricing).map((entry) =>
+      tierOf(pricing, entry.design.id),
+    );
+
+  it("a price shows only designs of that tier, and counts as a filter", () => {
+    expect(new Set(tiers({ price: "free" }))).toEqual(new Set(["free"]));
+    expect(tiers({ price: "free" }).length).toBeGreaterThan(0);
+    expect(hasFilters({ ...NO_FILTERS, price: "royal" })).toBe(true);
+    // Ordering alone is not a filter: the page keeps its rows
+    expect(hasFilters({ ...NO_FILTERS, sort: "price-low" })).toBe(false);
+  });
+
+  it("sorts by what each design costs, either way, keeping the mix within a price", () => {
+    const cost = (tier: string) => ["free", "premium", "royal", "signature"].indexOf(tier);
+    const low = tiers({ sort: "price-low" }).map(cost);
+    expect(low).toEqual([...low].sort((a, b) => a - b));
+    const high = tiers({ sort: "price-high" }).map(cost);
+    expect(high).toEqual([...high].sort((a, b) => b - a));
+    const free = (sort: "recommended" | "price-low") =>
+      filterCatalog(entries, { ...NO_FILTERS, sort, price: "free" }, () => "", pricing).map(
+        (entry) => entry.design.id,
+      );
+    expect(free("price-low")).toEqual(free("recommended"));
+  });
+
+  it("follows the admin's tiers", () => {
+    const moved = {
+      ...pricing,
+      tiers: { ...pricing.tiers, "card-marigold": "signature" as const },
+    };
+    const signature = filterCatalog(
+      entries,
+      { ...NO_FILTERS, price: "signature" },
+      () => "",
+      moved,
+    );
+    expect(signature.map((entry) => entry.design.id)).toContain("card-marigold");
   });
 });
 
