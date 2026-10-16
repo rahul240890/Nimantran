@@ -83,6 +83,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   seeSample: "मेहमान की तरह खोलें",
   sampleLabel: "नमूना निमंत्रण",
   sampleNote: "नाम, तारीख़ें और जगहें काल्पनिक हैं",
+  sampleAnother: "दूसरा दिखाएँ",
   sampleTitle: (name) => `नमूना निमंत्रण: ${name}`,
   sampleDescription:
     "यह डिज़ाइन वैसे देखिए जैसे आपके मेहमान देखेंगे: यह खुलता है, संगीत बजाता है और जवाब लेता है।",

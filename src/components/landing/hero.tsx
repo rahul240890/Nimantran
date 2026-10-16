@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
-import { HERO_SAMPLE, samplePath } from "@/lib/sample/paths";
+import { DEMO_PATH } from "@/lib/sample/paths";
 import { HeroDeck } from "./hero-deck";
 
 /**
@@ -93,7 +93,8 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
             <div className="flex flex-wrap gap-3">
               <Button asChild>
-                <Link href={samplePath(HERO_SAMPLE)} data-hero-sample>
+                {/* Another demo design each time: the address picks one, so never prefetched */}
+                <Link href={DEMO_PATH} prefetch={false} data-hero-sample>
                   <Eye aria-hidden />
                   {hero.sample}
                 </Link>

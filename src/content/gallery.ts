@@ -93,6 +93,7 @@ export const galleryCopy = {
   seeSample: "Open it as a guest",
   sampleLabel: "Sample invitation",
   sampleNote: "The names, dates and places are made up",
+  sampleAnother: "Show another",
   sampleTitle: (name: string) => `Sample invitation: ${name}`,
   sampleDescription:
     "See this design as your guests will: it opens, plays its music and takes replies.",

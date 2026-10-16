@@ -13,6 +13,7 @@ import { designById, designHref } from "@/lib/gallery/catalog";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 import { sampleInvite } from "@/lib/sample/invite";
+import { anotherDemoPath } from "@/lib/sample/paths";
 
 /*
  * A design's public sample, one tap from the gallery and the home page: the invitation a
@@ -36,8 +37,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function SamplePage({ params }: PageProps<"/sample/[design]">) {
+export default async function SamplePage({ params, searchParams }: PageProps<"/sample/[design]">) {
   const { design: id } = await params;
+  // A demo from the home page ("Open a live invitation") offers the next one
+  const demo = (await searchParams).demo === "1";
   const design = designById(id);
   if (!design) notFound();
   const locale = await getLocale();
@@ -66,6 +69,9 @@ export default async function SamplePage({ params }: PageProps<"/sample/[design]
         note={galleryCopy.sampleNote}
         action={galleryCopy.useDesign}
         href={designHref(design, { category })}
+        another={
+          demo ? { href: anotherDemoPath(design.id), label: galleryCopy.sampleAnother } : null
+        }
       />
       <GuestView
         slug="sample"
