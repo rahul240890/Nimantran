@@ -258,9 +258,10 @@ test.describe("packages", () => {
     // This page's clock is held in September while the account's saves are dated today, so
     // the editor reopens on the account's copy; pick the paid-for design again to be sure
     const kayal = page.getByRole("radio", { name: /^Kayal/ });
-    if (!(await kayal.isVisible())) {
-      await page.getByRole("button", { name: "Change design" }).first().click();
-    }
+    const change = page.getByRole("button", { name: "Change design" }).first();
+    // Wait for the editor to show one or the other before deciding
+    await expect(kayal.or(change)).toBeVisible({ timeout: 20_000 });
+    if (!(await kayal.isVisible())) await change.click();
     await kayal.click();
     await expect(kayal).toBeChecked();
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
