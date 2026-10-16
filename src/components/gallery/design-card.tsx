@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
+import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
@@ -419,12 +420,23 @@ export function DesignPreview({
             {!badge && <DesignPackages designId={design.id} />}
             {action ??
               (href && (
-                <Button asChild size="lg" fullWidth>
-                  <Link href={href}>
-                    {galleryCopy.useDesign}
-                    <ArrowRight aria-hidden className="rtl:rotate-180" />
+                <div className="flex flex-col gap-3">
+                  <Button asChild size="lg" fullWidth>
+                    <Link href={href}>
+                      {galleryCopy.useDesign}
+                      <ArrowRight aria-hidden className="rtl:rotate-180" />
+                    </Link>
+                  </Button>
+                  {/* The whole invitation as a guest gets it: opening, music and replies */}
+                  <Link
+                    href={samplePath(design.id)}
+                    data-sample-link
+                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-card-ivory/30 px-4 font-semibold text-card-ivory transition-colors hover:bg-card-ivory/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-ivory"
+                  >
+                    <Eye aria-hidden className="size-5" />
+                    {galleryCopy.seeSample}
                   </Link>
-                </Button>
+                </div>
               ))}
           </div>
         </DialogPrimitive.Content>

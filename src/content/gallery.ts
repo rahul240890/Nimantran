@@ -89,6 +89,13 @@ export const galleryCopy = {
   packagesHeading: "Packages for this design",
   packageFree: "Free",
   comparePackages: "Compare the packages",
+  /** The design's public sample: the whole invitation as a guest gets it. */
+  seeSample: "Open it as a guest",
+  sampleLabel: "Sample invitation",
+  sampleNote: "The names, dates and places are made up",
+  sampleTitle: (name: string) => `Sample invitation: ${name}`,
+  sampleDescription:
+    "See this design as your guests will: it opens, plays its music and takes replies.",
   close: "Close preview",
   pagesLabel: "Pages in this design",
   cardNote:

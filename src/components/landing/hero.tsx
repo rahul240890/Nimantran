@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Search } from "lucide-react";
+import { ArrowRight, Check, Eye, Search } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
+import { HERO_SAMPLE, samplePath } from "@/lib/sample/paths";
 import { HeroDeck } from "./hero-deck";
 
 /**
@@ -90,12 +91,20 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           </div>
 
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
-            <Button asChild variant="secondary">
-              <Link href={pagePath({ kind: "designs" }, locale)}>
-                {hero.primary}
-                <ArrowRight aria-hidden className="rtl:rotate-180" />
-              </Link>
-            </Button>
+            <div className="flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href={samplePath(HERO_SAMPLE)} data-hero-sample>
+                  <Eye aria-hidden />
+                  {hero.sample}
+                </Link>
+              </Button>
+              <Button asChild variant="secondary">
+                <Link href={pagePath({ kind: "designs" }, locale)}>
+                  {hero.primary}
+                  <ArrowRight aria-hidden className="rtl:rotate-180" />
+                </Link>
+              </Button>
+            </div>
             <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[0.95rem] text-ink-muted">
               {hero.proof.map((item) => (
                 <li key={item} className="inline-flex items-center gap-2">

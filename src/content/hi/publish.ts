@@ -198,6 +198,8 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   fixErrors: (count) => (count === 1 ? "एक जवाब बाक़ी है।" : `${count} जवाब बाक़ी हैं।`),
   thanksTitle: (name) => `धन्यवाद, ${name}!`,
   thanksBody: "आपका जवाब परिवार तक पहुँच गया। आप कभी भी यहाँ बदल सकते हैं।",
+  sampleSent:
+    "यह एक नमूना है, इसलिए कुछ भी नहीं भेजा गया। आपके अपने निमंत्रण पर हर जवाब सीधे आप तक पहुँचता है।",
   change: "अपना जवाब बदलें",
   people: (count) => (count === 1 ? "1 व्यक्ति" : `${count} लोग`),
 };

@@ -115,6 +115,8 @@ type GuestViewProps = {
   previewNow?: number;
   /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
   preview?: boolean;
+  /** A design's public sample with made-up names: replies thank the visitor but go nowhere. */
+  sample?: boolean;
 };
 
 export function GuestView({
@@ -129,6 +131,7 @@ export function GuestView({
   watermark = false,
   previewNow,
   preview = false,
+  sample = false,
 }: GuestViewProps) {
   const locale = useLocale();
   const languages = cardLanguages(draft);
@@ -293,7 +296,13 @@ export function GuestView({
   const family = storyFamily(draft, language);
   const rsvp =
     rsvpFunctions.length > 0 ? (
-      <RsvpForm slug={slug} functions={replyFunctions} questions={questions} preview={preview} />
+      <RsvpForm
+        slug={slug}
+        functions={replyFunctions}
+        questions={questions}
+        preview={preview}
+        sample={sample}
+      />
     ) : null;
 
   return (
@@ -506,7 +515,7 @@ export function GuestView({
               onAgain={replayable ? openAgain : undefined}
               againLabel={invitation.tour.again}
             />
-            {!preview && <PhotoWall slug={slug} />}
+            {!preview && !sample && <PhotoWall slug={slug} />}
           </main>
 
           <footer
