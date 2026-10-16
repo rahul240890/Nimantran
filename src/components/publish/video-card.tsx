@@ -69,7 +69,7 @@ import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
 import { readWatermarkLook, withWatermark } from "@/lib/video/watermark";
-import { openingStyle, welcomeKind } from "@/lib/opening/catalog";
+import { filmedWelcome, openingStyle, welcomeScene } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "@/components/invitation/type/fonts.css";
@@ -763,7 +763,8 @@ export function useVideoFilm(
     return {
       style,
       god: draftOpeningGod(draft),
-      kind: welcomeKind(style),
+      // The film is the same every time: the host's welcome, else the opening's own
+      kind: filmedWelcome(welcomeScene(draft.opening, style)),
       timeline,
     };
   }, [draft, photos, language]);

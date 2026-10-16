@@ -16,13 +16,16 @@ import {
   offersGods,
   openingStyle,
   openingStyles,
+  WELCOME_SCENES,
   type OpeningGod,
   type OpeningStyle,
+  type WelcomeScene,
 } from "@/lib/opening/catalog";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const NONE = "none";
+const AUTO = "auto";
 
 /** True every other beat while the chosen style plays its opening over and over. */
 function useBeat(on: boolean): boolean {
@@ -190,6 +193,42 @@ export function OpeningPicker({
                 </RadioPrimitive.Item>
               );
             })}
+          </RadioPrimitive.Root>
+        </div>
+      )}
+
+      {style !== "none" && (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <h4 id="opening-welcome-heading" className="font-semibold text-ink">
+              {openingCopy.welcomeHeading}
+            </h4>
+            <p className="max-w-2xl text-sm text-ink-muted">{openingCopy.welcomeIntro}</p>
+          </div>
+          <RadioPrimitive.Root
+            aria-labelledby="opening-welcome-heading"
+            value={draft.opening.welcome ?? AUTO}
+            onValueChange={(value) =>
+              setOpening({ welcome: value === AUTO ? null : (value as WelcomeScene) })
+            }
+            className="flex flex-wrap gap-2"
+          >
+            {[AUTO, ...WELCOME_SCENES].map((id) => (
+              <RadioPrimitive.Item
+                key={id}
+                value={id}
+                data-welcome-choice={id}
+                className={cn(
+                  "flex min-h-11 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-3.5 text-sm text-ink shadow-raised",
+                  "data-[state=checked]:border-marigold data-[state=checked]:bg-[color-mix(in_srgb,var(--marigold)_12%,var(--surface))] data-[state=checked]:shadow-[0_0_0_1px_var(--marigold)]",
+                  "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+                )}
+              >
+                {id === AUTO
+                  ? openingCopy.welcomeAuto
+                  : openingCopy.welcomeNames[id as WelcomeScene]}
+              </RadioPrimitive.Item>
+            ))}
           </RadioPrimitive.Root>
         </div>
       )}
