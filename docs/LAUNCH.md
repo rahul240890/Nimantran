@@ -84,7 +84,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 
 ### 8. Real text messages for sign-in codes
 
-Phone sign-in now uses a test number. Real SMS in India needs DLT registration:
+Sign-in by mobile number is switched off on the live site (2026-10-16): hosts sign in with Google. Once real SMS codes work, set `PHONE_SIGN_IN` to `on` in Vercel and redeploy to offer it again. Real SMS in India needs DLT registration:
 
 1. Register the business and a sign-in message template on a DLT portal (Jio, Airtel or Vodafone Idea). The SMS provider can help with this.
 2. Choose a provider that Supabase supports, such as Twilio, MessageBird or Vonage. For Indian providers such as MSG91, use Supabase's **Send SMS hook**. Ask Claude to set this up.

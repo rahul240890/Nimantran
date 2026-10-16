@@ -10,7 +10,7 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { safeNext } from "@/lib/auth/account";
-import { authMode } from "@/lib/auth/mode";
+import { authMode, phoneSignIn } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
 import { getText } from "@/i18n/server";
 import { suiteImage } from "@/lib/gallery/catalog";
@@ -119,6 +119,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
               <SignInForm
                 next={next}
                 preview={mode === "preview"}
+                phone={phoneSignIn()}
                 initialError={error}
                 askName={account ? { language: account.language } : undefined}
               />

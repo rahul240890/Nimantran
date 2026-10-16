@@ -43,7 +43,7 @@ export const signInCopy = {
     terms: "terms",
     and: " and ",
     privacy: "privacy policy",
-    after: ". We never share your number.",
+    after: ". We never share your details.",
   },
   success: (name: string) => (name ? `Welcome, ${name}` : "Welcome to Shubh"),
   nameStep: {

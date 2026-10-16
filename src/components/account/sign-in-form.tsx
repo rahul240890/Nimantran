@@ -66,12 +66,15 @@ function GoogleGlyph() {
 export function SignInForm({
   next,
   preview,
+  phone: byPhone = true,
   initialError,
   askName,
 }: {
   next: string;
   /** Preview mode: any number, code 123456. */
   preview: boolean;
+  /** Sign-in by mobile number; off on the live site until SMS codes are set up. */
+  phone?: boolean;
   initialError?: ErrorKey;
   /** Signed in, with no name yet: the form opens on the name step. */
   askName?: { language: Account["language"] };
@@ -85,7 +88,8 @@ export function SignInForm({
   const saved = useSyncExternalStore(noop, readSaved, () => null);
   const [flow, setFlow] = useState<Flow | null>(null);
   const { step, input, phone } =
-    flow ?? (saved ? { step: "code", ...saved } : { step: "phone", input: "", phone: "" });
+    flow ??
+    (saved && byPhone ? { step: "code", ...saved } : { step: "phone", input: "", phone: "" });
   const update = (change: Partial<Flow>) => setFlow({ step, input, phone, ...change });
   const [code, setCode] = useState("");
   const [error, setError] = useState<ErrorKey | undefined>(initialError);
@@ -287,7 +291,7 @@ export function SignInForm({
         </p>
       )}
 
-      {step === "phone" ? (
+      {!byPhone ? null : step === "phone" ? (
         <form
           noValidate
           onSubmit={(event) => {
@@ -395,15 +399,18 @@ export function SignInForm({
         </p>
       )}
 
-      {step === "phone" && (
+      {(step === "phone" || !byPhone) && (
         <>
-          <div className="flex items-center gap-4 text-sm text-ink-muted" aria-hidden>
-            <span className="h-px flex-1 bg-line" />
-            {signInCopy.or}
-            <span className="h-px flex-1 bg-line" />
-          </div>
+          {byPhone && (
+            <div className="flex items-center gap-4 text-sm text-ink-muted" aria-hidden>
+              <span className="h-px flex-1 bg-line" />
+              {signInCopy.or}
+              <span className="h-px flex-1 bg-line" />
+            </div>
+          )}
           <Button
-            variant="secondary"
+            // Google alone is the main way in
+            variant={byPhone ? "secondary" : "primary"}
             fullWidth
             loading={googling}
             leadingIcon={<GoogleGlyph />}

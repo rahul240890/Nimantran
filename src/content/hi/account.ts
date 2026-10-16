@@ -41,7 +41,7 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
     terms: "शर्तों",
     and: " और ",
     privacy: "गोपनीयता नीति",
-    after: " से सहमत होते हैं। हम आपका नंबर कभी साझा नहीं करते।",
+    after: " से सहमत होते हैं। हम आपकी जानकारी कभी साझा नहीं करते।",
   },
   success: (name) => (name ? `स्वागत है, ${name}` : "शुभ इन्विटेशन में स्वागत है"),
   nameStep: {

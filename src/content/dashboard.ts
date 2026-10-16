@@ -417,6 +417,8 @@ export const joinCopy = {
   accept: "Accept and open guest list",
   signIn: "Sign in to accept",
   signInNote: "Use your mobile number or Google. It takes a moment.",
+  /** While sign-in by number is off on the live site. */
+  signInNoteGoogle: "Sign in with your Google account. It takes a moment.",
   accepting: "Joining…",
   failed: "Couldn't accept just now. Try again.",
   full: "This invite already has all the co-hosts its package includes. Ask the family to upgrade it or remove someone, then open this link again.",
