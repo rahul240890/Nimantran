@@ -80,10 +80,12 @@ const brandColour = () =>
 
 export type EditionPickerProps = {
   inviteId: string;
-  /** The package the invite has, and the design tier paid for. */
+  /** The package the invite has on this design, and the design tier paid for. */
   edition: Edition;
   /** The tier of the design the invite is made with. */
   design: DesignTier;
+  /** That design's id: the package bought here is for it alone. */
+  designId: string;
   /** The lowest package the invite fits in as it stands. */
   needed: PlanId;
   /** A package to point at, from a link. */
@@ -110,6 +112,7 @@ export function EditionPicker({
   inviteId,
   edition,
   design,
+  designId,
   needed,
   focus,
   active,
@@ -157,9 +160,12 @@ export function EditionPicker({
   const buy = async (plan: PaidPlanId) => {
     if (pending) return;
     setPending({ plan, stage: "opening" });
-    const started = await beginCheckout({ inviteId, planId: plan, code: coupon?.code }).catch(
-      () => ({ ok: false, reason: "failed" }) as const,
-    );
+    const started = await beginCheckout({
+      inviteId,
+      planId: plan,
+      code: coupon?.code,
+      design: designId,
+    }).catch(() => ({ ok: false, reason: "failed" }) as const);
     if (!started.ok) {
       setPending(null);
       toast({
@@ -399,7 +405,12 @@ export function EditionPicker({
         })}
       </ul>
       {active && canPay && current !== "grand" && (
-        <CouponForm inviteId={inviteId} applied={coupon?.code ?? null} onApply={setCoupon} />
+        <CouponForm
+          inviteId={inviteId}
+          designId={designId}
+          applied={coupon?.code ?? null}
+          onApply={setCoupon}
+        />
       )}
       <p role="status" aria-live="polite" className="sr-only">
         {pending?.stage === "opening"
@@ -452,10 +463,12 @@ export function EditionPicker({
 /** "Have a coupon?": tries the code on the server and shows the new prices. */
 function CouponForm({
   inviteId,
+  designId,
   applied,
   onApply,
 }: {
   inviteId: string;
+  designId: string;
   applied: string | null;
   onApply: (coupon: { code: string; prices: Partial<Record<PaidPlanId, Price>> } | null) => void;
 }) {
@@ -486,7 +499,7 @@ function CouponForm({
         if (!code.trim() || busy) return;
         setBusy(true);
         setError(null);
-        const result = await tryCoupon({ inviteId, code }).catch(() => null);
+        const result = await tryCoupon({ inviteId, code, design: designId }).catch(() => null);
         setBusy(false);
         if (result?.ok) {
           onApply({ code: result.code, prices: result.prices });

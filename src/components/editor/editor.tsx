@@ -11,6 +11,7 @@ import {
   Eye,
   HardDrive,
   LoaderCircle,
+  Lock,
   Smartphone,
   X,
 } from "lucide-react";
@@ -44,6 +45,7 @@ import type { TemplateId } from "@/lib/templates/schema";
 import { cn } from "@/lib/cn";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { HeldBackNotice } from "@/components/editions/held-back";
 import { PublishButton } from "@/components/publish/publish-button";
 import { PreviewStage } from "./preview-stage";
 import { DesignBar } from "./design-bar";
@@ -156,6 +158,8 @@ function SaveStatus({
         <CloudCheck className="size-4 text-success" />
       ) : key === "offline" ? (
         <CloudOff className="size-4 text-warning" />
+      ) : key === "needs-plan" ? (
+        <Lock className="size-4 text-warning" />
       ) : (
         <Cloud className="size-4" />
       );
@@ -539,6 +543,8 @@ export function Editor({
 
             <div className="grid flex-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] xl:grid-cols-[minmax(0,1fr)_minmax(0,30rem)] xl:gap-12">
               <div className="flex min-w-0 flex-col xl:w-full xl:max-w-3xl xl:justify-self-center">
+                {/* A live invite's change its package doesn't cover stays off the live copy */}
+                {signedIn && <HeldBackNotice draft={draft} />}
                 {/* Past the design: what was chosen, with the way back to change it */}
                 {!PICKING.has(step) && (
                   <DesignBar

@@ -13,7 +13,8 @@ import { getAccount } from "@/lib/auth/server";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { PLANS } from "@/lib/plans/catalog";
+import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
+import { draftDesignId } from "@/lib/plans/design-defaults";
 import { inviteNames } from "@/lib/publish/describe";
 import { storyFunctions } from "@/lib/publish/story";
 import { requestOrigin } from "@/lib/request-origin";
@@ -52,7 +53,8 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
     return url ? [{ id: photo.id, url, width: photo.width, height: photo.height }] : [];
   });
   const clip = draft.music.clip;
-  const plan = PLANS[edition?.plan ?? "free"];
+  // The package as it stands on this design: one bought for another design gives nothing
+  const plan = PLANS[editionFor(edition ?? FREE_EDITION, draftDesignId(draft)).plan];
   const video = active ? plan.video : "every";
   // As the preview page: a free invite chooses its package before publishing
   const publishHref =

@@ -14,7 +14,10 @@ export type PaymentItem = {
   names: string;
   /** "Wedding", "Birthday"… */
   occasion: string | null;
-  /** The design the invite uses now, by name. Orders keep the tier paid for, not the design. */
+  /**
+   * The design the payment was for, by name; for orders from before payments named their
+   * design, the one the invite uses now.
+   */
   design: string | null;
 };
 
@@ -45,16 +48,24 @@ export async function paymentItems(
   return items;
 }
 
+/** What one order bought: its invite, named with the design that order paid for. */
+export function orderItem(
+  order: AdminOrder,
+  items: Map<string, PaymentItem>,
+  locale: UiLocale,
+): PaymentItem {
+  const item = (order.eventId ? items.get(order.eventId) : undefined) ?? {
+    names: order.names,
+    occasion: null,
+    design: null,
+  };
+  const paidFor = order.designId ? designById(order.designId) : undefined;
+  return paidFor ? { ...item, design: designWords(paidFor, locale).name } : item;
+}
+
 /** This person's payment history with what each payment bought, newest first. */
 export async function paymentHistory(account: Account, locale: UiLocale): Promise<Payment[]> {
   const orders = await accountOrders(account);
   const items = await paymentItems(account, orders, locale);
-  return orders.map((order) => ({
-    ...order,
-    item: (order.eventId ? items.get(order.eventId) : undefined) ?? {
-      names: order.names,
-      occasion: null,
-      design: null,
-    },
-  }));
+  return orders.map((order) => ({ ...order, item: orderItem(order, items, locale) }));
 }

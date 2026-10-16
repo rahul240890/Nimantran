@@ -53,7 +53,7 @@ describe("coupons", () => {
   });
 });
 
-const FREE = { plan: "free", tier: "free" } as const;
+const FREE = { plan: "free", tier: "free", design: null } as const;
 
 describe("prices", () => {
   it("are the plain package price without coupons", () => {
@@ -64,7 +64,14 @@ describe("prices", () => {
       coupon: null,
     });
     expect(
-      priceFor({ plan: "grand", tier: "royal" }, "celebration", "premium", [], null, now),
+      priceFor(
+        { plan: "grand", tier: "royal", design: null },
+        "celebration",
+        "premium",
+        [],
+        null,
+        now,
+      ),
     ).toBeNull();
   });
 
@@ -88,7 +95,7 @@ describe("prices", () => {
   });
 
   it("cover every package above the current one", () => {
-    const basic = { plan: "basic", tier: "premium" } as const;
+    const basic = { plan: "basic", tier: "premium", design: null } as const;
     expect(Object.keys(pricesFor(basic, "premium", [], null, now))).toEqual([
       "celebration",
       "grand",
@@ -103,7 +110,7 @@ describe("prices", () => {
     ).toBeNull();
     expect(
       codeProblem(
-        { plan: "grand", tier: "royal" },
+        { plan: "grand", tier: "royal", design: null },
         "premium",
         [coupon({ planIds: ["basic"] })],
         "DIWALI25",

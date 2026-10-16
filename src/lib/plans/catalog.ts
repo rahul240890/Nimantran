@@ -94,12 +94,24 @@ export function isPaidPlanId(value: unknown): value is PaidPlanId {
 export const planRank = (id: PlanId) => PLAN_IDS.indexOf(id);
 
 /**
- * What an invite has: its package, and the dearest design tier paid for. A free invite's
- * tier is "free"; Basic bought for a ₹499 design is { basic, premium }.
+ * What an invite has: its package, the dearest design tier paid for, and the one design the
+ * package was bought for. A free invite's tier is "free"; Basic bought for the ₹499 Kayal
+ * Scene is { basic, premium, "kayal-scene" }. `design` is null for a package an admin
+ * gave, which covers any design.
  */
-export type Edition = { plan: PlanId; tier: DesignTier };
+export type Edition = { plan: PlanId; tier: DesignTier; design: string | null };
 
-export const FREE_EDITION: Edition = { plan: "free", tier: "free" };
+export const FREE_EDITION: Edition = { plan: "free", tier: "free", design: null };
+
+/**
+ * What an invite's package covers on this design. One payment is for one design (owner,
+ * 2026-10-16): a package bought for another design covers nothing here, so a new design is
+ * bought afresh, while a bigger package on the same design pays only the difference.
+ */
+export function editionFor(edition: Edition, designId: string): Edition {
+  const elsewhere = edition.plan !== "free" && edition.design !== null;
+  return elsewhere && edition.design !== designId ? FREE_EDITION : edition;
+}
 
 /** A package's price for a design of this tier: the design, plus what the package adds. */
 export function packagePrice(
@@ -118,10 +130,19 @@ export function editionValue(
   return edition.plan === "free" ? 0 : packagePrice(edition.plan, edition.tier, pricing);
 }
 
-/** The edition an invite has after buying a package for its design; the tier never goes down. */
-export const editionAfter = (current: Edition, plan: PaidPlanId, design: DesignTier): Edition => ({
+/**
+ * The edition an invite has after buying a package for this design, from what it has on
+ * that design (editionFor); the tier never goes down.
+ */
+export const editionAfter = (
+  current: Edition,
+  plan: PaidPlanId,
+  design: DesignTier,
+  designId: string | null = current.design,
+): Edition => ({
   plan,
   tier: higherTier(current.tier, design),
+  design: designId,
 });
 
 /**
@@ -184,7 +205,7 @@ export function planNeeded(draft: InviteDraft, design: DesignTier = "free"): Pla
     PLAN_IDS.find(
       (plan) =>
         (plan !== "free" || design === "free") &&
-        planShortfalls(draft, { plan, tier: design }, design).length === 0,
+        planShortfalls(draft, { plan, tier: design, design: null }, design).length === 0,
     ) ?? "grand"
   );
 }

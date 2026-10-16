@@ -178,6 +178,104 @@ test.describe("packages", () => {
     await expect(page.locator("[data-watermark]")).toHaveCount(0);
   });
 
+  test("one payment covers one design: another design on a live invite needs its own", async ({
+    page,
+    browser,
+    context,
+  }, info) => {
+    test.setTimeout(150_000);
+    await context.addCookies([
+      { name: "shubh-preview-checkout", value: "on", url: info.project.use.baseURL! },
+    ]);
+    await writeInvite(page, numberFor(info), ["Ved", "Gauri"]);
+    await expect(async () => {
+      await page.getByRole("button", { name: "Publish" }).click();
+      await expect(page).toHaveURL(/\/edition\?publish=1$/, { timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
+    const id = new URL(page.url()).pathname.split("/")[2];
+    await page
+      .getByRole("article", { name: "Basic" })
+      .getByRole("button", { name: "Pay ₹799" })
+      .click();
+    await page
+      .getByRole("dialog", { name: "Test payment" })
+      .getByRole("button", { name: "Pay (test)" })
+      .click();
+    await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
+    const path = await publish(page, "ved-one-design");
+
+    // A guest, who sees the design that was paid for
+    const guestContext = await browser.newContext({
+      baseURL: info.project.use.baseURL,
+      viewport: info.project.use.viewport,
+      reducedMotion: "reduce",
+    });
+    const guest = await guestContext.newPage();
+    await guest.goto(`${path}?quality=2d`);
+    await expect(guest.locator("[data-suite]").first()).toHaveAttribute(
+      "data-suite",
+      "rajwada-bagh",
+    );
+
+    // Another ₹799 design on the live invite isn't saved: guests keep the paid one
+    await page.goto(`/create?invite=${id}&quality=2d`);
+    await page.getByRole("button", { name: "Change design" }).first().click();
+    await page.getByRole("radio", { name: /^Kayal/ }).click();
+    const held = page.locator("[data-held-back]");
+    await expect(held).toBeVisible({ timeout: 20_000 });
+    await expect(held).toContainText("Your package is for Rajwada Bagh");
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await guest.reload();
+    await expect(guest.locator("[data-suite]").first()).toHaveAttribute(
+      "data-suite",
+      "rajwada-bagh",
+    );
+
+    // Going back to the paid design saves again
+    await held.getByRole("button", { name: "Go back to Rajwada Bagh" }).click();
+    await expect(held).toHaveCount(0, { timeout: 20_000 });
+    await expect(page.getByRole("radio", { name: /Rajwada Bagh/ })).toBeChecked();
+
+    // Or the new design gets its own package, at its full price, and then goes live
+    await page.getByRole("radio", { name: /^Kayal/ }).click();
+    await expect(held).toBeVisible({ timeout: 20_000 });
+    await held.getByRole("link", { name: "Choose a package" }).click();
+    await expect(page).toHaveURL(/\/edition\?plan=basic&design=kayal$/);
+    await expect(
+      page.getByText(/Your package is for Rajwada Bagh\. Each package is for one design/),
+    ).toBeVisible();
+    const basic = page.getByRole("article", { name: "Basic" });
+    await basic.getByRole("button", { name: "Pay ₹799" }).click();
+    await page
+      .getByRole("dialog", { name: "Test payment" })
+      .getByRole("button", { name: "Pay (test)" })
+      .click();
+    await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    await page.getByRole("link", { name: "Put it live" }).click();
+    await expect(page).toHaveURL(/\/create/);
+    // This page's clock is held in September while the account's saves are dated today, so
+    // the editor reopens on the account's copy; pick the paid-for design again to be sure
+    const kayal = page.getByRole("radio", { name: /^Kayal/ });
+    if (!(await kayal.isVisible())) {
+      await page.getByRole("button", { name: "Change design" }).first().click();
+    }
+    await kayal.click();
+    await expect(kayal).toBeChecked();
+    await expect(page.locator("[data-held-back]")).toHaveCount(0);
+    await expect
+      .poll(
+        async () => {
+          await guest.reload();
+          return guest.locator("[data-suite]").first().getAttribute("data-suite");
+        },
+        { timeout: 30_000 },
+      )
+      .toBe("kayal");
+    await guestContext.close();
+  });
+
   test("a Free invite carries the watermark once checkout is on", async ({
     page,
     context,
@@ -186,6 +284,7 @@ test.describe("packages", () => {
     await writeInvite(page, numberFor(info), ["Kabir", "Isha"]);
     // Published while checkout is off: no limits yet
     const path = await publish(page, "kabir-free");
+    const id = new URL(page.url()).pathname.split("/")[2];
     await page.goto(`${path}?quality=2d`);
     await expect(page.locator("[data-watermark]")).toHaveCount(0);
     await context.addCookies([
@@ -194,6 +293,26 @@ test.describe("packages", () => {
     await page.reload();
     await expect(page.locator("[data-watermark]")).toHaveCount(1);
     expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Its paid design has no package, yet its words can still be corrected: only a change
+    // that adds what isn't paid for (another design, more languages) waits for a package
+    await page.goto(`/create?invite=${id}&quality=2d`);
+    await expect(page.getByText("Your invitation is live")).toBeVisible({ timeout: 30_000 });
+    for (let step = 0; step < 6; step++) {
+      await page.getByRole("button", { name: "Back", exact: true }).click();
+    }
+    await page.getByRole("textbox", { name: /Second name/ }).fill("Isha Rani");
+    await expect
+      .poll(
+        async () => {
+          await page.request.get("/"); // let the editor's save run
+          const guest = await page.request.get(path);
+          return (await guest.text()).includes("Isha Rani");
+        },
+        { timeout: 30_000 },
+      )
+      .toBe(true);
+    await expect(page.locator("[data-held-back]")).toHaveCount(0);
   });
 });
 
@@ -251,7 +370,8 @@ test.describe("coupons, invoices and refunds", () => {
     const notice = page.locator("[data-edition-notice]");
     await expect(notice.getByText("This invite needs a package")).toBeVisible();
     await notice.getByRole("link", { name: "Get Basic" }).click();
-    await expect(page).toHaveURL(/\/edition\?plan=basic$/);
+    // Bought for the design on screen: one payment, one design
+    await expect(page).toHaveURL(/\/edition\?plan=basic&design=rajwada-bagh$/);
 
     await page.getByRole("textbox", { name: "Coupon code" }).fill("NOPE123");
     await page.getByRole("button", { name: "Apply" }).click();

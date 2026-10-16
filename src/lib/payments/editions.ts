@@ -9,6 +9,7 @@ import {
   FREE_EDITION,
   PLANS,
   editionAfter,
+  editionFor,
   isPaidPlanId,
   isPlanId,
   planRank,
@@ -17,7 +18,7 @@ import {
   type PlanId,
 } from "@/lib/plans/catalog";
 import { receiptAfterPayment } from "@/lib/email/notify";
-import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { higherTier, isDesignTier, type DesignTier } from "@/lib/plans/design-tiers";
 import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
@@ -53,6 +54,12 @@ export type Order = {
   /** The design tier this order paid for, and the one the invite had before. */
   designTier: DesignTier;
   fromDesignTier: DesignTier;
+  /**
+   * The design this order paid for, and the one the invite's package was for before; null
+   * on orders from before packages were tied to one design, and for an admin's gift.
+   */
+  designId: string | null;
+  fromDesignId: string | null;
   /** The upgrade's price before any coupon. */
   listPricePaise: number;
   discountPaise: number;
@@ -69,6 +76,16 @@ export type Order = {
   invoiceNo: string | null;
   refundedAt: string | null;
 };
+
+/**
+ * The package an order upgraded from on the same design, for its receipt; null when it
+ * bought a package afresh (a free invite, or a new design).
+ */
+export function upgradedFrom(order: Order): PaidPlanId | null {
+  if (order.fromPlanId === "free") return null;
+  const sameDesign = order.fromDesignId === null || order.fromDesignId === order.designId;
+  return sameDesign ? order.fromPlanId : null;
+}
 
 /** An order as the admin's list shows it, with the invite it was for. */
 export type AdminOrder = Order & { slug: string | null; names: string };
@@ -154,10 +171,44 @@ export async function ownsInvite(account: Account, eventId: string): Promise<boo
   return data?.owner_id === account.id;
 }
 
+type PlanRow = { plan_id?: unknown; design_tier?: unknown; design_id?: unknown; source?: unknown };
+
+/*
+ * Until 20261016090000_one_design_per_package.sql has run on the database, the design
+ * columns aren't there: reads and writes fall back to the columns before them, so no paid
+ * invite looks unpaid and no payment fails to land in the meantime.
+ */
+const missingColumn = (error: { code?: string } | null) =>
+  error?.code === "42703" || error?.code === "PGRST204";
+const PLAN_COLUMNS = "plan_id, design_tier, design_id, source";
+const PLAN_COLUMNS_BEFORE = "plan_id, design_tier, source";
+
 /** An event_plans row as the app reads it; no row is a free invite. */
-function editionFromRow(row: { plan_id?: unknown; design_tier?: unknown } | null): Edition {
+function editionFromRow(row: PlanRow | null): Edition {
   if (!row || !isPaidPlanId(row.plan_id)) return FREE_EDITION;
-  return { plan: row.plan_id, tier: isDesignTier(row.design_tier) ? row.design_tier : "royal" };
+  return {
+    plan: row.plan_id,
+    tier: isDesignTier(row.design_tier) ? row.design_tier : "royal",
+    design: typeof row.design_id === "string" ? row.design_id : null,
+  };
+}
+
+/**
+ * A package bought before packages were tied to one design (2026-10-16) is for the design
+ * the invite has the first time it's read since, so the change takes nothing from anyone.
+ */
+async function claimDesign(account: Account, eventId: string): Promise<string | null> {
+  const draft = await inviteStore()?.get(account, eventId);
+  const service = supabaseService();
+  if (!draft || !service) return null;
+  const design = draftDesignId(draft);
+  const { error } = await service
+    .from("event_plans")
+    .update({ design_id: design })
+    .eq("event_id", eventId)
+    .eq("source", "purchase")
+    .is("design_id", null);
+  return error ? null : design;
 }
 
 /** The package a host's invite has; null when this person can't see the invite. */
@@ -175,21 +226,61 @@ export async function invitePlan(account: Account, eventId: string): Promise<Edi
     .eq("id", eventId)
     .maybeSingle();
   if (!event) return null;
-  const { data } = await supabase
-    .from("event_plans")
-    .select("plan_id, design_tier")
-    .eq("event_id", eventId)
-    .maybeSingle();
-  return editionFromRow(data);
+  const read = (columns: string) =>
+    supabase.from("event_plans").select(columns).eq("event_id", eventId).maybeSingle<PlanRow>();
+  let { data, error } = await read(PLAN_COLUMNS);
+  if (missingColumn(error)) ({ data, error } = await read(PLAN_COLUMNS_BEFORE));
+  if (missingColumn(error) || (error && !data)) return FREE_EDITION;
+  const edition = editionFromRow(data);
+  if (data?.source === "purchase" && edition.plan !== "free" && edition.design === null) {
+    return { ...edition, design: await claimDesign(account, eventId) };
+  }
+  return edition;
 }
 
-/** The design tier an invite is made with, as the admin has priced it. */
-export async function inviteDesignTier(
+/**
+ * Whether an invite is live, with its package: saving a live invite checks that its
+ * package covers what it would show. Null when this person can't see the invite.
+ */
+export async function liveEdition(
   account: Account,
   eventId: string,
-): Promise<DesignTier | null> {
+): Promise<{ live: boolean; edition: Edition } | null> {
+  if (isPreview()) {
+    const stored = previewDb.invites.get(eventId);
+    if (!stored || !previewHosts(stored, account.id)) return null;
+    const edition = preview.plans.get(eventId)?.edition ?? FREE_EDITION;
+    return { live: stored.event.status === "published", edition };
+  }
+  const supabase = await supabaseServer();
+  if (!supabase) return null;
+  const { data: event } = await supabase
+    .from("events")
+    .select("status")
+    .eq("id", eventId)
+    .maybeSingle();
+  if (!event) return null;
+  if (event.status !== "published") return { live: false, edition: FREE_EDITION };
+  const edition = await invitePlan(account, eventId);
+  return edition ? { live: true, edition } : null;
+}
+
+export type InviteDesign = { id: string; tier: DesignTier };
+
+/**
+ * The design a package is bought for, as the admin has priced it: the one the host is
+ * looking at when they ask (a live invite keeps its paid design until the new one is
+ * paid for), else the invite's saved design.
+ */
+export async function inviteDesign(
+  account: Account,
+  eventId: string,
+  wanted: string | null = null,
+): Promise<InviteDesign | null> {
   const [draft, pricing] = await Promise.all([inviteStore()?.get(account, eventId), getPricing()]);
-  return draft ? designTier(pricing, draftDesignId(draft)) : null;
+  if (!draft) return null;
+  const id = wanted && allDesignIds().includes(wanted) ? wanted : draftDesignId(draft);
+  return { id, tier: designTier(pricing, id) };
 }
 
 /** A published invite's package, for its guest page. */
@@ -229,16 +320,20 @@ export async function startCheckout(
   eventId: string,
   planId: PaidPlanId,
   code: string | null = null,
+  wantedDesign: string | null = null,
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
-  const [current, owner, pricing, design] = await Promise.all([
+  const [had, owner, pricing, chosen] = await Promise.all([
     invitePlan(account, eventId),
     ownsInvite(account, eventId),
     getPricing(),
-    inviteDesignTier(account, eventId),
+    inviteDesign(account, eventId, wantedDesign),
   ]);
-  if (!current || !owner || !design) return { ok: false, reason: "not-found" };
+  if (!had || !owner || !chosen) return { ok: false, reason: "not-found" };
+  // Priced on what the invite has on this design: nothing, when its package is for another
+  const current = editionFor(had, chosen.id);
+  const design = chosen.tier;
   const price = priceFor(
     current,
     planId,
@@ -250,14 +345,17 @@ export async function startCheckout(
   );
   if (!price) return { ok: false, reason: "already" };
   const { amountPaise } = price;
-  const next = editionAfter(current, planId, design);
+  const next = editionAfter(current, planId, design, chosen.id);
   const base = {
     eventId,
     userId: account.id,
     planId,
-    fromPlanId: current.plan,
+    // What the invite had before, whichever design it was for, so a refund puts it back
+    fromPlanId: had.plan,
     designTier: next.tier,
-    fromDesignTier: current.tier,
+    fromDesignTier: had.tier,
+    designId: chosen.id,
+    fromDesignId: had.design,
     listPricePaise: price.listPaise,
     discountPaise: price.discountPaise,
     couponId: price.coupon?.id ?? null,
@@ -291,26 +389,31 @@ export async function startCheckout(
     notes: {
       event_id: eventId,
       plan_id: planId,
+      design_id: chosen.id,
       design_tier: next.tier,
-      from_plan_id: current.plan,
+      from_plan_id: had.plan,
       coupon: price.coupon?.code ?? "",
     },
   });
   if (!order || order.amount !== amountPaise) return { ok: false, reason: "failed" };
-  const { error } = await service.from("orders").insert({
+  const row = {
     event_id: eventId,
     user_id: account.id,
     plan_id: planId,
-    from_plan_id: current.plan,
+    from_plan_id: had.plan,
     design_tier: next.tier,
-    from_design_tier: current.tier,
+    from_design_tier: had.tier,
     list_price_paise: price.listPaise,
     discount_paise: price.discountPaise,
     coupon_id: price.coupon?.id ?? null,
     amount_paise: amountPaise,
     provider_order_id: order.id,
     mode: keys.mode,
-  });
+  };
+  let { error } = await service
+    .from("orders")
+    .insert({ ...row, design_id: chosen.id, from_design_id: had.design });
+  if (missingColumn(error)) ({ error } = await service.from("orders").insert(row));
   if (error) return { ok: false, reason: "failed" };
   return { ok: true, provider, orderId: order.id, amountPaise, keyId: keys.keyId };
 }
@@ -372,7 +475,7 @@ export async function fulfilOrder(
       if (order.eventId) {
         raisePreviewPlan(
           order.eventId,
-          { plan: order.planId, tier: order.designTier },
+          { plan: order.planId, tier: order.designTier, design: order.designId },
           "purchase",
           order.providerOrderId,
         );
@@ -382,11 +485,26 @@ export async function fulfilOrder(
   }
   const service = supabaseService();
   if (!service) return null;
-  const { data: order } = await service
-    .from("orders")
-    .select("id, event_id, plan_id, design_tier, status, coupon_id")
-    .eq("provider_order_id", providerOrderId)
-    .maybeSingle();
+  type FulfilRow = {
+    id: string;
+    event_id: string | null;
+    plan_id: string;
+    design_tier: string | null;
+    design_id?: string | null;
+    status: OrderStatus;
+    coupon_id: string | null;
+  };
+  const readOrder = (columns: string) =>
+    service
+      .from("orders")
+      .select(columns)
+      .eq("provider_order_id", providerOrderId)
+      .maybeSingle<FulfilRow>();
+  const first = await readOrder("id, event_id, plan_id, design_tier, design_id, status, coupon_id");
+  let order = first.data;
+  if (missingColumn(first.error)) {
+    ({ data: order } = await readOrder("id, event_id, plan_id, design_tier, status, coupon_id"));
+  }
   if (!order || !isPaidPlanId(order.plan_id)) return null;
   // A refunded order stays refunded, whatever arrives late
   if (order.status === "refunded") return order.plan_id;
@@ -408,6 +526,7 @@ export async function fulfilOrder(
     const edition: Edition = {
       plan: order.plan_id,
       tier: isDesignTier(order.design_tier) ? order.design_tier : "royal",
+      design: typeof order.design_id === "string" ? order.design_id : null,
     };
     const raised = await raisePlan(order.event_id, edition, "purchase", order.id);
     if (!raised) return null;
@@ -431,15 +550,24 @@ export async function markOrderFailed(providerOrderId: string): Promise<void> {
     .eq("status", "created");
 }
 
-/** The higher of two editions, package by package and tier by tier. */
+/**
+ * What an invite has after a purchase: on the same design, the higher of the two, package
+ * by package and tier by tier; a package for another design replaces the old one, as one
+ * payment covers one design.
+ */
 function raised(current: Edition, next: Edition): Edition {
+  const elsewhere =
+    current.plan !== "free" && next.design !== null && current.design !== next.design;
+  if (elsewhere) return next;
   return {
     plan: planRank(next.plan) > planRank(current.plan) ? next.plan : current.plan,
     tier: higherTier(current.tier, next.tier),
+    design: next.design ?? current.design,
   };
 }
 
-const sameEdition = (a: Edition, b: Edition) => a.plan === b.plan && a.tier === b.tier;
+const sameEdition = (a: Edition, b: Edition) =>
+  a.plan === b.plan && a.tier === b.tier && a.design === b.design;
 
 function raisePreviewPlan(
   eventId: string,
@@ -448,7 +576,9 @@ function raisePreviewPlan(
   orderId?: string,
 ) {
   const current = preview.plans.get(eventId)?.edition ?? FREE_EDITION;
-  const next = raised(current, edition);
+  const raisedTo = raised(current, edition);
+  // An admin's gift covers any design
+  const next = source === "admin" ? { ...raisedTo, design: null } : raisedTo;
   if (!sameEdition(next, current)) preview.plans.set(eventId, { edition: next, source, orderId });
 }
 
@@ -461,22 +591,26 @@ async function raisePlan(
 ): Promise<boolean> {
   const service = supabaseService();
   if (!service) return false;
-  const { data: existing } = await service
-    .from("event_plans")
-    .select("plan_id, design_tier")
-    .eq("event_id", eventId)
-    .maybeSingle();
+  const read = (columns: string) =>
+    service.from("event_plans").select(columns).eq("event_id", eventId).maybeSingle<PlanRow>();
+  const first = await read(PLAN_COLUMNS);
+  const before = missingColumn(first.error);
+  const existing = before ? (await read(PLAN_COLUMNS_BEFORE)).data : first.data;
   const current = editionFromRow(existing);
-  const next = raised(current, edition);
+  const raisedTo = raised(current, edition);
+  // An admin's gift covers any design
+  const next = source === "admin" ? { ...raisedTo, design: null } : raisedTo;
   if (sameEdition(next, current)) return true;
-  const { error } = await service.from("event_plans").upsert({
+  const row: Record<string, string | null> = {
     event_id: eventId,
     plan_id: next.plan,
     design_tier: next.tier,
     source,
     order_id: orderId,
     updated_at: new Date().toISOString(),
-  });
+  };
+  if (!before) row.design_id = next.design;
+  const { error } = await service.from("event_plans").upsert(row);
   return !error;
 }
 
@@ -490,6 +624,8 @@ type OrderRow = {
   from_plan_id: string;
   design_tier: string | null;
   from_design_tier: string | null;
+  design_id: string | null;
+  from_design_id: string | null;
   list_price_paise: number | null;
   discount_paise: number;
   coupon_id: string | null;
@@ -507,7 +643,7 @@ type OrderRow = {
 };
 
 const ORDER_COLUMNS =
-  "id, event_id, user_id, plan_id, from_plan_id, design_tier, from_design_tier, list_price_paise, discount_paise, coupon_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at, invoice_no, refunded_at, coupons(code)";
+  "id, event_id, user_id, plan_id, from_plan_id, design_tier, from_design_tier, design_id, from_design_id, list_price_paise, discount_paise, coupon_id, amount_paise, status, provider_order_id, provider_payment_id, mode, created_at, paid_at, invoice_no, refunded_at, coupons(code)";
 
 function orderFromRow(row: OrderRow): Order {
   return {
@@ -518,6 +654,8 @@ function orderFromRow(row: OrderRow): Order {
     fromPlanId: isPlanId(row.from_plan_id) ? row.from_plan_id : "free",
     designTier: isDesignTier(row.design_tier) ? row.design_tier : "free",
     fromDesignTier: isDesignTier(row.from_design_tier) ? row.from_design_tier : "free",
+    designId: row.design_id ?? null,
+    fromDesignId: row.from_design_id ?? null,
     listPricePaise: row.list_price_paise ?? row.amount_paise + row.discount_paise,
     discountPaise: row.discount_paise,
     couponId: row.coupon_id,
@@ -626,7 +764,7 @@ export type GrantResult =
  * every design, so the host can change design freely.
  */
 export async function grantPlan(slug: string, planId: PaidPlanId): Promise<GrantResult> {
-  const edition: Edition = { plan: planId, tier: "royal" };
+  const edition: Edition = { plan: planId, tier: "royal", design: null };
   if (isPreview()) {
     const stored = [...previewDb.invites.values()].find((invite) => invite.event.slug === slug);
     if (!stored) return { ok: false, reason: "not-found" };
@@ -699,7 +837,11 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
       if (order.fromPlanId === "free") preview.plans.delete(order.eventId);
       else {
         preview.plans.set(order.eventId, {
-          edition: { plan: order.fromPlanId, tier: order.fromDesignTier },
+          edition: {
+            plan: order.fromPlanId,
+            tier: order.fromDesignTier,
+            design: order.fromDesignId,
+          },
           source: "purchase",
         });
       }
@@ -711,7 +853,7 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
   const { data: order } = await service
     .from("orders")
     .select(
-      "id, event_id, from_plan_id, from_design_tier, amount_paise, status, provider_payment_id, mode",
+      "id, event_id, from_plan_id, from_design_tier, from_design_id, amount_paise, status, provider_payment_id, mode",
     )
     .eq("id", orderId)
     .maybeSingle();
@@ -746,6 +888,7 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
           .update({
             plan_id: order.from_plan_id,
             design_tier: isDesignTier(order.from_design_tier) ? order.from_design_tier : "free",
+            design_id: order.from_design_id ?? null,
             order_id: null,
             updated_at: now,
           })

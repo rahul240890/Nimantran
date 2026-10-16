@@ -81,6 +81,10 @@ export const upgradeCopy = {
   difference: "You pay only the difference.",
   continueFree: "Continue free",
   publishNow: "Publish your invite",
+  /** A live invite's new design, now paid for, waits in the editor to go live. */
+  liveDesignReady: (design: string) =>
+    `Your package now covers ${design}. Open the editor to put it live for your guests.`,
+  liveDesignLink: "Put it live",
   publishBody: "Your package is ready. Publish the invite to get its link.",
   publishFreeBody:
     "Payments open very soon, so your invite publishes free with everything for now.",
@@ -163,4 +167,19 @@ export const limitCopy = {
     `${plan} covers everything this invite uses, for ${price}.`,
   unlock: (plan: string) => `Get ${plan}`,
   upgrade: "Upgrade",
+  /** One package is for one design (owner, 2026-10-16). */
+  oneDesign: "Each package is for one design. Another design needs its own package.",
+  paidFor: (design: string) => `Your package is for ${design}.`,
+} as const;
+
+/** In the editor when a live invite's change isn't saved: its package doesn't cover it. */
+export const heldCopy = {
+  title: "Your changes aren't live yet",
+  body: "Your invitation is live, and this change needs a package it doesn't have. Guests keep seeing it as it was until you choose one.",
+  design: (paid: string) =>
+    `Your package is for ${paid}. Each package is for one design, so this one needs its own.`,
+  choose: "Choose a package",
+  back: (paid: string) => `Go back to ${paid}`,
+  backPlain: "Go back to the design you paid for",
+  backFailed: "Couldn't load your live invitation. Check your connection and try again.",
 } as const;

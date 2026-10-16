@@ -233,6 +233,18 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   share: "वीडियो भेजें",
   download: "MP4 डाउनलोड करें",
   again: "फिर से बनाएँ",
+  fullScreen: "पूरी स्क्रीन",
+  watchFullScreen: "वीडियो पूरी स्क्रीन पर देखें",
+  remove: "वीडियो हटाएँ",
+  removeTitle: "यह वीडियो हटाएँ?",
+  removeBody:
+    "यह इस फ़ोन या कंप्यूटर से हट जाएगा। आपका निमंत्रण वैसा ही रहेगा, और आप वीडियो कभी भी फिर से बना सकते हैं।",
+  removeConfirm: "वीडियो हटाएँ",
+  keep: "रहने दें",
+  removed: "वीडियो हटा दिया गया",
+  downloadLocked: "MP4 डाउनलोड करें",
+  lockedPackage: "डाउनलोड सेलिब्रेशन और ग्रैंड पैकेज के साथ मिलता है।",
+  lockedPublish: "निमंत्रण लाइव होने पर डाउनलोड करें: वीडियो उसके लिंक पर ख़त्म होता है।",
   failed: "वीडियो नहीं बन सका। फिर कोशिश करें, या Chrome या Safari में खोलें।",
   unsupported:
     "यह ब्राउज़र वीडियो नहीं बना सकता। यह पन्ना Chrome, Edge या Safari के नए वर्शन में खोलें।",

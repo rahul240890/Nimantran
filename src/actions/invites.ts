@@ -5,8 +5,16 @@ import { getAccount } from "@/lib/auth/server";
 import { type InviteDraft } from "@/lib/editor/draft";
 import { draftProblems, parseDraft } from "@/lib/editor/draft-checks";
 import { inviteStore } from "@/lib/invites/store";
-import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { planNeeded, planShortfalls, type PlanId, type PlanNeed } from "@/lib/plans/catalog";
+import { editionsActive, invitePlan, liveEdition } from "@/lib/payments/editions";
+import {
+  FREE_EDITION,
+  editionFor,
+  planNeeded,
+  planShortfalls,
+  type Edition,
+  type PlanId,
+  type PlanNeed,
+} from "@/lib/plans/catalog";
 import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { getPricing } from "@/lib/plans/pricing";
 import { isSlug, slugAlternatives } from "@/lib/publish/slug";
@@ -18,8 +26,44 @@ import { isSlug, slugAlternatives } from "@/lib/publish/slug";
 
 export type SyncResult =
   | { status: "saved"; id: string; savedAt: number; missingPhotos: string[]; missingClip: boolean }
+  /**
+   * The invite is live and this change needs a package it doesn't have, such as another
+   * design than the one paid for: nothing was saved, and guests keep what they see.
+   */
+  | { status: "needs-plan"; plan: PlanId; shortfalls: PlanNeed[]; paidDesign: string | null }
   | { status: "signed-out" }
   | { status: "failed" };
+
+const id = z.uuid();
+
+/** What a draft needs beyond its package while payments are on; empty when it's covered. */
+async function shortfallsFor(draft: InviteDraft, edition: Edition) {
+  const pricing = await getPricing();
+  const designId = draftDesignId(draft);
+  // A paid design asks for at least Basic at its price; a package for another design covers
+  // nothing on this one (one payment, one design)
+  const design = designTier(pricing, designId);
+  const shortfalls = planShortfalls(draft, editionFor(edition, designId), design);
+  return { shortfalls, plan: planNeeded(draft, design) };
+}
+
+/**
+ * Whether a change to a live invite adds something its package doesn't cover: another
+ * design it wasn't bought for, or more card languages than the live copy has. Words and
+ * dates always save, so an invite published before payments began can still be corrected.
+ */
+async function addsShortfall(draft: InviteDraft, live: InviteDraft, edition: Edition) {
+  const [now, was] = await Promise.all([
+    shortfallsFor(draft, edition),
+    shortfallsFor(live, edition),
+  ]);
+  const newDesign = draftDesignId(draft) !== draftDesignId(live);
+  return now.shortfalls.some((need) => {
+    if (need.limit === "design") return newDesign;
+    const had = was.shortfalls.find((old) => old.limit === need.limit);
+    return !had || need.used > had.used;
+  });
+}
 
 export async function saveInvite(input: unknown): Promise<SyncResult> {
   const draft = parseDraft(input);
@@ -27,6 +71,17 @@ export async function saveInvite(input: unknown): Promise<SyncResult> {
   if (!draft || !store) return { status: "failed" };
   const account = await getAccount();
   if (!account) return { status: "signed-out" };
+  // Guests see a live invite's saved copy: a change can't add what its package doesn't cover
+  if (draft.remoteId && id.safeParse(draft.remoteId).success && (await editionsActive())) {
+    const live = await liveEdition(account, draft.remoteId);
+    if (live?.live) {
+      const { shortfalls, plan } = await shortfallsFor(draft, live.edition);
+      const before = shortfalls.length > 0 ? await store.get(account, draft.remoteId) : null;
+      if (before && (await addsShortfall(draft, before, live.edition))) {
+        return { status: "needs-plan", plan, shortfalls, paidDesign: live.edition.design };
+      }
+    }
+  }
   const result = await store.save(account, draft);
   return result.ok
     ? {
@@ -38,8 +93,6 @@ export async function saveInvite(input: unknown): Promise<SyncResult> {
       }
     : { status: "failed" };
 }
-
-const id = z.uuid();
 
 export async function loadInvite(inviteId: string): Promise<InviteDraft | null> {
   const store = inviteStore();
@@ -105,12 +158,9 @@ export async function publishInvite(inviteId: string, slug: string): Promise<Pub
   if (!draft) return { status: "failed" };
   if (draftProblems(draft).length > 0) return { status: "not-ready" };
   if (await editionsActive()) {
-    const [plan, pricing] = await Promise.all([invitePlan(account, inviteId), getPricing()]);
-    // A paid design asks for at least Basic at its price, whatever else the invite uses
-    const design = designTier(pricing, draftDesignId(draft));
-    const shortfalls = planShortfalls(draft, plan ?? { plan: "free", tier: "free" }, design);
-    if (shortfalls.length > 0)
-      return { status: "needs-plan", plan: planNeeded(draft, design), shortfalls };
+    const edition = (await invitePlan(account, inviteId)) ?? FREE_EDITION;
+    const { shortfalls, plan } = await shortfallsFor(draft, edition);
+    if (shortfalls.length > 0) return { status: "needs-plan", plan, shortfalls };
   }
   const result = await store.publish(account, inviteId, slug);
   if (result.ok) return { status: "published", slug: result.slug };

@@ -15,6 +15,7 @@ export const dashboardCopy = {
   cohostBadge: "Co-host",
   share: "Share",
   edit: "Edit invite",
+  video: "Invitation video",
   open: "Open invitation",
   guestsOnly: {
     title: "You're looking after the guests",

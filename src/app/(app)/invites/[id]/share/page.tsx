@@ -12,7 +12,8 @@ import { getAccount } from "@/lib/auth/server";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { hostReplies } from "@/lib/invites/rsvp";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { PLANS } from "@/lib/plans/catalog";
+import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
+import { draftDesignId } from "@/lib/plans/design-defaults";
 import { inviteStore } from "@/lib/invites/store";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
@@ -60,9 +61,11 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
     invitePlan(account, id),
     findPublishedInvite(draft.slug),
   ]);
-  const video = active ? PLANS[plan?.plan ?? "free"].video : "every";
   // What guests get is the published invite, which is what WhatsApp's preview reads too
   const live = published?.draft ?? draft;
+  // The package as it stands on the live design: one bought for another design gives no video
+  const covered = editionFor(plan ?? FREE_EDITION, draftDesignId(live));
+  const video = active ? PLANS[covered.plan].video : "every";
   const names = inviteNames(live);
   const occasion = occasionName(live, locale);
   const when = inviteWhen(live, locale);

@@ -10,8 +10,8 @@ import { planCopy } from "@/content/editions";
 import { getAdmin } from "@/lib/admin/access";
 import { getAccount } from "@/lib/auth/server";
 import { getBusiness } from "@/lib/payments/business";
-import { orderWithInvite } from "@/lib/payments/editions";
-import { paymentItems } from "@/lib/payments/history";
+import { orderWithInvite, upgradedFrom } from "@/lib/payments/editions";
+import { orderItem, paymentItems } from "@/lib/payments/history";
 import { gstSplit } from "@/lib/payments/invoice";
 import { formatRupees } from "@/lib/plans/catalog";
 import { site } from "@/lib/site";
@@ -56,7 +56,8 @@ export default async function InvoicePage({
   const buyer = account.id === order.userId ? account : null;
   const plan = planCopy[order.planId].name;
   // The invite's design by name, for its buyer; invoices stay in English
-  const item = buyer ? (await paymentItems(buyer, [order], "en")).get(order.eventId ?? "") : null;
+  const item = buyer ? orderItem(order, await paymentItems(buyer, [order], "en"), "en") : null;
+  const upgrade = upgradedFrom(order);
   const back =
     from === "payments"
       ? "/account/payments"
@@ -151,9 +152,7 @@ export default async function InvoicePage({
                   <span className="block">
                     Digital invitation{order.names ? ` for ${order.names}` : ""}
                     {item?.design ? `, ${item.design} design` : ""}
-                    {order.fromPlanId !== "free"
-                      ? `, upgrade from ${planCopy[order.fromPlanId].name}`
-                      : ""}
+                    {upgrade ? `, upgrade from ${planCopy[upgrade].name}` : ""}
                   </span>
                 </td>
                 <td className="py-3 text-end text-ink tabular-nums">

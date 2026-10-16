@@ -11,6 +11,7 @@ import { accountText } from "@/i18n/copy/account";
 import { editionsText } from "@/i18n/copy/editions";
 import { getLocale, getText } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
+import { upgradedFrom } from "@/lib/payments/editions";
 import { paymentHistory, type Payment } from "@/lib/payments/history";
 import { formatRupees } from "@/lib/plans/catalog";
 
@@ -55,6 +56,7 @@ export default async function PaymentsPage() {
     const at = payment.paidAt ?? payment.createdAt;
     const receipt = `/invoice/${payment.id}?from=payments`;
     const { item } = payment;
+    const upgrade = upgradedFrom(payment);
     return (
       <article
         aria-labelledby={`payment-${payment.id}`}
@@ -99,9 +101,7 @@ export default async function PaymentsPage() {
             {item.design ? `${copy.design(item.design)} · ` : ""}
             {copy.tier[payment.designTier]}
           </li>
-          {payment.fromPlanId !== "free" && (
-            <li>{copy.upgrade(planCopy[payment.fromPlanId].name)}</li>
-          )}
+          {upgrade && <li>{copy.upgrade(planCopy[upgrade].name)}</li>}
           {payment.discountPaise > 0 && (
             <li>{copy.coupon(payment.couponCode ?? "", formatRupees(payment.discountPaise))}</li>
           )}

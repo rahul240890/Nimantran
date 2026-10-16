@@ -15,6 +15,7 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
   cohostBadge: "सह-मेज़बान",
   share: "भेजें",
   edit: "निमंत्रण बदलें",
+  video: "निमंत्रण वीडियो",
   open: "निमंत्रण खोलें",
   guestsOnly: {
     title: "आप मेहमानों की देखभाल कर रहे हैं",
