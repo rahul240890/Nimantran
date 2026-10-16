@@ -124,6 +124,30 @@ test.describe("live samples", () => {
     await expect(page.getByRole("link", { name: "Choose this design" })).toBeVisible();
   });
 
+  test("Back, and the browser's back, return to where the sample was opened", async ({ page }) => {
+    // From the home page's tour: walking on doesn't fill the history
+    await page.goto("/");
+    await page.getByRole("link", { name: "Open a live invitation" }).click();
+    await expect(page).toHaveURL(/\/sample\/[a-z-]+\?tour=/, { timeout: 15_000 });
+    const first = page.url();
+    await page.getByRole("link", { name: "Next design" }).click();
+    await expect(page).not.toHaveURL(first, { timeout: 15_000 });
+    await page.getByRole("link", { name: "Next design" }).click();
+    await page.goBack();
+    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+    // And Back itself
+    await page.getByRole("link", { name: "Open a live invitation" }).click();
+    await expect(page).toHaveURL(/\/sample\/[a-z-]+\?tour=/, { timeout: 15_000 });
+    await page.getByRole("link", { name: "Next design" }).click();
+    await page.getByRole("link", { name: "Back", exact: true }).click();
+    await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
+
+    // Opened straight from a shared link, Back goes to the design's listing
+    await page.goto("/sample/kutch-toran?tradition=gujarati");
+    await page.getByRole("link", { name: "Back", exact: true }).click();
+    await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/, { timeout: 15_000 });
+  });
+
   test("an unknown design isn't found", async ({ request }) => {
     expect((await request.get("/sample/no-such-design")).status()).toBe(404);
   });

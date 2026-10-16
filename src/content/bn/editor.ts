@@ -422,6 +422,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
   muhuratHint: "শুরু আর শেষের সঠিক সময়, মিনিট পর্যন্ত, বেছে নিন। অতিথিরা ঠিক তেমনই দেখবেন।",
   moreDetails: "আরও তথ্য",
   moreDetailsHint: "শেষের সময়, ঠিকানা, ম্যাপ পিন, পার্কিং আর পোশাকবিধি",
+  samePlace: "অন্য অনুষ্ঠানের জায়গাই",
+  sameAs: (name: string) => `${name}-এর জায়গাই`,
+  placeToEmpty: (count: number) => `এই জায়গা বাকি ${count}টি অনুষ্ঠানে বসান`,
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {

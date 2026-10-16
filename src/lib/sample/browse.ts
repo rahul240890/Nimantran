@@ -7,6 +7,7 @@ import {
   designCatalog,
   filterCatalog,
   filtersFromParams,
+  filtersToParams,
   hasFilters,
   type DesignFilters,
 } from "@/lib/gallery/filters";
@@ -24,6 +25,8 @@ export type SampleWalk = {
   next: string | null;
   /** Use this design, set up for the listing's occasion and tradition; null for the sample's own. */
   choose: string | null;
+  /** The listing walked, for Back from a sample opened from outside; null on the tour. */
+  listing: DesignFilters | null;
 };
 
 /** The listing a sample's address names, with nothing that would need the search words. */
@@ -51,7 +54,12 @@ export function sampleWalk(design: GalleryDesign, search: URLSearchParams): Samp
   const tour = search.get("tour");
   if (isTourSeed(tour) && (LIVE_DEMOS as readonly string[]).includes(design.id)) {
     const [previous, next] = around(tourOrder(tour), design.id)!;
-    return { previous: tourPath(previous, tour), next: tourPath(next, tour), choose: null };
+    return {
+      previous: tourPath(previous, tour),
+      next: tourPath(next, tour),
+      choose: null,
+      listing: null,
+    };
   }
   const named = listing(search);
   const catalog = designCatalog();
@@ -72,5 +80,21 @@ export function sampleWalk(design: GalleryDesign, search: URLSearchParams): Samp
     previous: walk ? samplePath(walk[0], context) : null,
     next: walk ? samplePath(walk[1], context) : null,
     choose: own ? null : catalogHref(entry, filters),
+    listing: filters,
   };
+}
+
+/** The page a listing is: its occasion's or wedding tradition's, else the Designs page filtered. */
+export function listingPath(
+  listing: DesignFilters,
+  paths: {
+    occasion: (id: string) => string;
+    kind: (id: string) => string;
+    designs: string;
+  },
+): string {
+  const narrowed = listing.collection || listing.format || listing.photos;
+  if (listing.kind && !narrowed) return paths.kind(listing.kind);
+  if (listing.occasion && !narrowed) return paths.occasion(listing.occasion);
+  return `${paths.designs}${filtersToParams(listing)}`;
 }

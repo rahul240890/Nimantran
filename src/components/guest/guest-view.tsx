@@ -535,6 +535,8 @@ export function GuestView({
                   variant="secondary"
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={openAgain}
+                  // A longer language's words wrap on a narrow phone instead of running off it
+                  className="h-auto min-h-12 max-w-full py-2 text-balance whitespace-normal"
                 >
                   {invitation.tour.again}
                 </Button>
@@ -546,9 +548,14 @@ export function GuestView({
                 {guestCopy.madeWith}
               </p>
               {/* Light or dark for the details; kept off the invitation's own full-screen pages */}
-              <div className="flex items-center gap-2">
+              <div className="flex max-w-full flex-wrap items-center justify-center gap-2">
                 <ThemeMenu labels={theme} />
-                <Button asChild variant="ghost" size="sm">
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="h-auto min-h-11 max-w-full py-2 text-balance whitespace-normal"
+                >
                   <Link href="/">{guestCopy.createYours}</Link>
                 </Button>
               </div>

@@ -300,7 +300,7 @@ function Welcome({
             </p>
           )}
           <div className="flex flex-col items-center gap-2 lg:items-start">
-            <Button onClick={onShower} size="lg" className="rounded-full">
+            <Button onClick={onShower} size="lg" className="max-w-full rounded-full">
               <Flower2 aria-hidden />
               {words.shower}
             </Button>

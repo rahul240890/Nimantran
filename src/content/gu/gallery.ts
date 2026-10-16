@@ -90,6 +90,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   sampleNote: "નામ, તારીખો અને સ્થળો કાલ્પનિક છે",
   showAll: (count: number) => `બધી ${count} ડિઝાઇન બતાવો`,
   sampleChoose: "આ ડિઝાઇન પસંદ કરો",
+  sampleChooseShort: "પસંદ કરો",
+  sampleBack: "પાછા",
   sampleWalk: "બીજી ડિઝાઇન",
   samplePrevious: "પાછલી ડિઝાઇન",
   samplePreviousShort: "પાછલી",
@@ -121,6 +123,13 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     title: `${name} લગ્નનાં આમંત્રણ`,
     description: `${name} પરિવારો માટે લગ્નનાં આમંત્રણ: દરેક પ્રસંગનું ચિત્રવાળું પાનું, દરેક વિધિ તેના પોતાના નામે, અને WhatsApp પર જવાબ.`,
   }),
+  kindSearch: {
+    gujarati: {
+      title: "ગુજરાતી લગ્નની ડિજિટલ કંકોતરી",
+      description:
+        "ગુજરાતી લગ્નની ડિજિટલ કંકોતરી: શ્રી ગણેશ, મંડપ મુહૂર્તથી પીઠી અને રાસ સુધી દરેક પ્રસંગ પોતાના પાને, WhatsApp પર જવાબ. મફત બનાવો.",
+    },
+  },
   moreOccasions: "વધુ પ્રસંગો",
   wordingHeading: "આમંત્રણના શબ્દો",
   wordingIntro: "કાર્ડ અને WhatsApp માટે કૉપી કરવા જેવા સંદેશ, અમારા બ્લૉગમાંથી.",

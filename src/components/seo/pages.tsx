@@ -54,7 +54,7 @@ function wordsFor(page: PublicPage, locale: UiLocale): Words {
       return seoCopy.occasions[page.id];
     case "wedding-kind": {
       const { galleryCopy, weddingKindCopy } = galleryText[locale];
-      return galleryCopy.kindMeta(weddingKindCopy[page.id].name);
+      return galleryCopy.kindSearch[page.id] ?? galleryCopy.kindMeta(weddingKindCopy[page.id].name);
     }
     case "tradition":
       return seoCopy.traditionPages[page.id];

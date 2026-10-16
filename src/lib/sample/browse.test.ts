@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { designById, kindDesigns, type GalleryDesign } from "@/lib/gallery/catalog";
 import { catalogEntry } from "@/lib/gallery/filters";
-import { sampleWalk } from "./browse";
+import { listingPath, sampleWalk } from "./browse";
 import { LIVE_DEMOS, tourOrder } from "./paths";
 
 const design = (id: string): GalleryDesign => designById(id)!;
@@ -62,5 +62,31 @@ describe("a sample's Previous and Next", () => {
       expect(previous, id).toMatch(/\?tour=abc$/);
       expect(next, id).toMatch(/\?tour=abc$/);
     }
+  });
+});
+
+describe("Back from a sample opened from outside", () => {
+  const paths = {
+    occasion: (id: string) => `/invitations/${id}`,
+    kind: (id: string) => `/invitations/wedding/${id}`,
+    designs: "/designs",
+  };
+  it("goes to the listing it walks", () => {
+    expect(listingPath(walk("gubbara", "occasion=birthday").listing!, paths)).toBe(
+      "/invitations/birthday",
+    );
+    expect(listingPath(walk("kutch-toran", "tradition=gujarati").listing!, paths)).toBe(
+      "/invitations/wedding/gujarati",
+    );
+    expect(listingPath(walk("card-marigold").listing!, paths)).toBe("/designs?format=card");
+    expect(listingPath({ ...walk("kayal").listing!, collection: "royal-wedding" }, paths)).toBe(
+      "/designs?collection=royal-wedding&occasion=wedding",
+    );
+    // With no listing named, the design's own occasion
+    expect(listingPath(walk("kayal").listing!, paths)).toBe("/invitations/wedding");
+  });
+
+  it("has no listing on the tour, which began on the home page", () => {
+    expect(walk(tourOrder("k3x")[0]!, "tour=k3x").listing).toBeNull();
   });
 });

@@ -104,6 +104,8 @@ export const galleryCopy = {
   /** Under a long list of designs, for the ones past the first few. */
   showAll: (count: number) => `Show all ${count} designs`,
   sampleChoose: "Choose this design",
+  sampleChooseShort: "Choose",
+  sampleBack: "Back",
   sampleWalk: "Other designs",
   samplePrevious: "Previous design",
   samplePreviousShort: "Previous",
@@ -136,6 +138,34 @@ export const galleryCopy = {
     title: `${name} wedding invitations`,
     description: `Wedding invitations made for ${name} families: painted pages for every function, each ceremony by its own name, and RSVP on WhatsApp.`,
   }),
+  /** Search titles for the traditions families search by their own word (kankotri, lagna patrika). */
+  kindSearch: {
+    gujarati: {
+      title: "Gujarati wedding invitation & digital kankotri",
+      description:
+        "Digital kankotri for Gujarati weddings: Shri Ganesh, every prasang from mandap muhurat to pithi and raas on its own page, RSVP on WhatsApp. Free to make.",
+    },
+    marathi: {
+      title: "Marathi wedding invitation & lagna patrika",
+      description:
+        "Digital lagna patrika for Marathi weddings: sakharpuda, haldi, lagna and reception on painted pages, with RSVP on WhatsApp. Make yours free.",
+    },
+    bengali: {
+      title: "Bengali wedding card online (biyer card)",
+      description:
+        "Bengali biyer card online: Shubho Bibaho, aiburobhat, gaye holud and bou bhaat on painted pages, with RSVP on WhatsApp. Make yours free.",
+    },
+    tamil: {
+      title: "Tamil wedding invitation (thirumana patrikai)",
+      description:
+        "Tamil wedding invitations online: nichayathartham, nalangu, muhurtham and reception on painted pages, with RSVP on WhatsApp. Make yours free.",
+    },
+    punjabi: {
+      title: "Punjabi & Anand Karaj wedding invitations",
+      description:
+        "Punjabi and Sikh wedding invitations: Anand Karaj, mehendi, jaggo, sangeet and reception on painted pages, with RSVP on WhatsApp. Make yours free.",
+    },
+  } as Partial<Record<WeddingKind, { title: string; description: string }>>,
   moreOccasions: "More occasions",
   wordingHeading: "Wording ideas",
   wordingIntro: "Messages to copy for your card and WhatsApp, from our blog.",

@@ -563,7 +563,8 @@ export function Opening({
               aria-expanded={open}
               aria-busy={waiting || undefined}
               disabled={open}
-              className="min-w-[min(16rem,80cqw)]"
+              // Its words wrap within the doorway on a narrow phone, in a longer language
+              className="max-w-[92cqw] min-w-[min(16rem,80cqw)]"
             >
               {guestCopy.doorway.open}
             </Button>

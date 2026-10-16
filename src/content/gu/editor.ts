@@ -421,6 +421,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
   muhuratHint: "શરૂ અને પૂરા થવાનો ચોક્કસ સમય, મિનિટ સુધી, પસંદ કરો. મહેમાનોને બરાબર એવો જ દેખાશે.",
   moreDetails: "વધુ વિગતો",
   moreDetailsHint: "પૂરો થવાનો સમય, સરનામું, નકશાની પિન, પાર્કિંગ અને ડ્રેસ કોડ",
+  samePlace: "બીજા પ્રસંગનું જ સ્થળ",
+  sameAs: (name: string) => `${name} જેવું જ સ્થળ`,
+  placeToEmpty: (count: number) => `આ જ સ્થળ બાકીના ${count} પ્રસંગોમાં ભરો`,
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {

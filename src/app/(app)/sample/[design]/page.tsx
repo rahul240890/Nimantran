@@ -13,7 +13,10 @@ import { designById, designHref } from "@/lib/gallery/catalog";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
 import { sampleInvite } from "@/lib/sample/invite";
-import { sampleWalk } from "@/lib/sample/browse";
+import { listingPath, sampleWalk } from "@/lib/sample/browse";
+import { pagePath } from "@/lib/seo/paths";
+import type { CategoryId } from "@/lib/categories/catalog";
+import type { WeddingKind } from "@/lib/gallery/catalog";
 
 /*
  * A design's public sample, one tap from the gallery and the home page: the invitation a
@@ -71,6 +74,19 @@ export default async function SamplePage({ params, searchParams }: PageProps<"/s
       <SampleBar
         label={`${galleryCopy.sampleLabel}: ${galleryCopy.sampleNote}`}
         action={galleryCopy.sampleChoose}
+        actionShort={galleryCopy.sampleChooseShort}
+        back={{
+          label: galleryCopy.sampleBack,
+          // The tour began on the home page; a listing's sample goes back to that listing
+          href: walk.listing
+            ? listingPath(walk.listing, {
+                occasion: (occasion) =>
+                  pagePath({ kind: "occasion", id: occasion as CategoryId }, locale),
+                kind: (kind) => pagePath({ kind: "wedding-kind", id: kind as WeddingKind }, locale),
+                designs: pagePath({ kind: "designs" }, locale),
+              })
+            : pagePath({ kind: "home" }, locale),
+        }}
         href={walk.choose ?? designHref(design, { category })}
         nav={galleryCopy.sampleWalk}
         previous={

@@ -423,6 +423,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
     "सुरू होण्याची आणि संपण्याची अचूक वेळ, मिनिटापर्यंत, निवडा. पाहुण्यांना ती अगदी तशीच दिसेल.",
   moreDetails: "आणखी माहिती",
   moreDetailsHint: "संपण्याची वेळ, पत्ता, नकाशाची पिन, पार्किंग आणि ड्रेस कोड",
+  samePlace: "दुसऱ्या सोहळ्याचीच जागा",
+  sameAs: (name: string) => `${name} प्रमाणेच`,
+  placeToEmpty: (count: number) => `हीच जागा उरलेल्या ${count} सोहळ्यांत भरा`,
 };
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {

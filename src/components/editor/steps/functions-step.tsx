@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { Car, ChevronDown, CircleAlert, MapPin, MapPinned, Shirt } from "lucide-react";
+import { Car, ChevronDown, CircleAlert, CopyCheck, MapPin, MapPinned, Shirt } from "lucide-react";
 import { useId, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,9 @@ import { editorText } from "@/i18n/copy/editor";
 /** Where an empty time list opens: mid-morning, so the rest of the day is a short scroll. */
 const DAY_STARTS = "10:00";
 
+/** Another event whose place this one can take, typed once: its name and venue. */
+type PlaceSource = { id: FunctionId; name: string };
+
 function FunctionFields({
   id,
   fn,
@@ -40,6 +43,10 @@ function FunctionFields({
   set,
   guide,
   setGuide,
+  sources,
+  copyFrom,
+  emptyOthers,
+  copyToEmpty,
 }: {
   id: FunctionId;
   fn: EventFunction;
@@ -52,6 +59,12 @@ function FunctionFields({
   /** The map pin and parking guests see on the day. */
   guide: FunctionGuide;
   setGuide: (change: Partial<FunctionGuide>) => void;
+  /** The other events with a place typed in, to take theirs. */
+  sources: readonly PlaceSource[];
+  copyFrom: (from: FunctionId) => void;
+  /** How many other events have no place yet, to give them this one's. */
+  emptyOthers: number;
+  copyToEmpty: () => void;
 }) {
   const { editor } = useText(editorText);
   const message = (error: string | undefined) =>
@@ -64,11 +77,13 @@ function FunctionFields({
     return { today: now, end: new Date(now.getFullYear() + 2, 11, 31) };
   }, []);
 
-  // The rarer details fold away until asked for, or once one of them is filled in
+  // The rarer details fold away until asked for, or once one of them is filled in (by hand
+  // or copied from another event)
   const filled = Boolean(
     fn.endTime || fn.address || fn.dressCode || guide.pin.trim() || guide.parking.trim(),
   );
-  const [open, setOpen] = useState(filled);
+  const [toggled, setOpen] = useState<boolean | null>(null);
+  const open = toggled ?? filled;
   const moreId = useId();
   const endTime = (
     <Field
@@ -143,6 +158,38 @@ function FunctionFields({
           onChange={(event) => set({ venue: event.target.value })}
         />
       </Field>
+      {withTime && sources.length > 0 && (
+        <div role="group" aria-label={functionFields.samePlace} className="-mt-2 sm:col-span-2">
+          <ul className="flex flex-wrap gap-2">
+            {sources.map((source) => (
+              <li key={source.id}>
+                <button
+                  type="button"
+                  onClick={() => copyFrom(source.id)}
+                  className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 text-sm text-ink-muted transition-[background-color,border-color,color,transform] duration-150 hover:border-line-control hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-95 motion-reduce:transition-none"
+                >
+                  <MapPin aria-hidden className="size-4 shrink-0" />
+                  {functionFields.sameAs(source.name)}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      {withTime && fn.venue.trim() && emptyOthers > 0 && (
+        <div className="-mt-2 sm:col-span-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            leadingIcon={<CopyCheck aria-hidden />}
+            onClick={copyToEmpty}
+            className="-ms-2 text-accent-text"
+          >
+            {functionFields.placeToEmpty(emptyOthers)}
+          </Button>
+        </div>
+      )}
       {withTime && (
         <div className="sm:col-span-2">
           <Button
@@ -292,6 +339,23 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
       guide: { ...current.guide, [id]: { ...functionGuide(current.guide, id), ...change } },
     }));
 
+  // A place is typed once: its venue, address, map pin and parking go to other events
+  const copyPlace = (from: FunctionId, to: readonly FunctionId[]) =>
+    update((current) => {
+      const source = current.functions[from];
+      const { pin, parking } = functionGuide(current.guide, from);
+      const functions = { ...current.functions };
+      const guide = { ...current.guide };
+      for (const id of to) {
+        functions[id] = { ...functions[id], venue: source.venue, address: source.address };
+        guide[id] = { ...functionGuide(current.guide, id), pin, parking };
+      }
+      return { ...current, functions, guide };
+    });
+  const included = [...suggested, ...more].filter((id) => draft.functions[id].included);
+  const withPlace = included.filter((id) => draft.functions[id].venue.trim());
+  const withoutPlace = included.filter((id) => !draft.functions[id].venue.trim());
+
   const item = (id: FunctionId) => {
     const fn = draft.functions[id];
     const copy = functionCopy[id];
@@ -347,6 +411,19 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
             set={(change) => setFunction(id, change)}
             guide={functionGuide(draft.guide, id)}
             setGuide={(change) => setGuide(id, change)}
+            sources={withPlace
+              .filter(
+                (other) => other !== id && draft.functions[other].venue.trim() !== fn.venue.trim(),
+              )
+              .map((other) => ({ id: other, name: functionCopy[other].name }))}
+            copyFrom={(from) => copyPlace(from, [id])}
+            emptyOthers={withoutPlace.filter((other) => other !== id).length}
+            copyToEmpty={() =>
+              copyPlace(
+                id,
+                withoutPlace.filter((other) => other !== id),
+              )
+            }
           />
         )}
       </li>

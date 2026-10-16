@@ -9,7 +9,7 @@ for (const colorScheme of ["light", "dark"] as const) {
 
     for (const [path, heading] of [
       ["/invitations", "What are you celebrating?"],
-      ["/invitations/wedding/gujarati", "ગુજરાતીGujarati wedding invitations"],
+      ["/invitations/wedding/gujarati", "ગુજરાતીGujarati wedding invitation & digital kankotri"],
       ["/invitations/birthday", "Birthday invitations full of balloons and cake"],
       ["/hi/invitations", "आप क्या मना रहे हैं?"],
       ["/designs?occasion=wedding&tradition=gujarati", "Find your invitation design"],
