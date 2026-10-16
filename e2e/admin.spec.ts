@@ -59,7 +59,8 @@ test.describe("designs and prices", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("an admin makes a design free and its tile says so", async ({ page }, info) => {
-    test.setTimeout(90_000);
+    // Two accessibility checks of every design's tile, a save, and the same again to undo
+    test.setTimeout(150_000);
     const [id, word, name] = ["kayal-scene", "kayal", "Kayal"];
     await page.goto(`/designs?q=${word}`);
     // The search's own result, first on the page: the shelves below can show it too

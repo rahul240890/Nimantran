@@ -100,7 +100,15 @@ export const galleryCopy = {
   seeSample: "Open it as a guest",
   sampleLabel: "Sample invitation",
   sampleNote: "The names, dates and places are made up",
-  sampleAnother: "Show another",
+  /** Over a sample: Previous and Next walk on to other designs, Choose this design opens the editor. */
+  /** Under a long list of designs, for the ones past the first few. */
+  showAll: (count: number) => `Show all ${count} designs`,
+  sampleChoose: "Choose this design",
+  sampleWalk: "Other designs",
+  samplePrevious: "Previous design",
+  samplePreviousShort: "Previous",
+  sampleNext: "Next design",
+  sampleNextShort: "Next",
   sampleTitle: (name: string) => `Sample invitation: ${name}`,
   sampleDescription:
     "See this design as your guests will: it opens, plays its music and takes replies.",

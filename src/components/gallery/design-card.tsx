@@ -41,6 +41,11 @@ type DesignCardProps = {
   description: string;
   /** Where Use this design leads: the editor, set up for this choice. */
   href: string;
+  /**
+   * Where Open it as a guest leads: the design's sample, naming the listing it is shown in
+   * so the sample's Previous and Next walk that listing (samplePath). Its own, if missing.
+   */
+  sampleHref?: string;
   /** What photos the design takes (designPhotos), shown under its name. */
   photos: PhotoNeed;
   priority?: boolean;
@@ -71,6 +76,7 @@ export function DesignCard({
   name,
   description,
   href,
+  sampleHref,
   photos,
   priority,
   cover,
@@ -250,6 +256,7 @@ export function DesignCard({
         name={name}
         description={description}
         href={href}
+        sampleHref={sampleHref}
         photos={photos}
         pages={pages}
       />
@@ -269,6 +276,7 @@ export function DesignPreview({
   name,
   description,
   href,
+  sampleHref,
   photos,
   pages,
   badge,
@@ -433,7 +441,7 @@ export function DesignPreview({
                   </Button>
                   {/* The whole invitation as a guest gets it: opening, music and replies */}
                   <Link
-                    href={samplePath(design.id)}
+                    href={sampleHref ?? samplePath(design.id)}
                     data-sample-link
                     className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-card-ivory/30 px-4 font-semibold text-card-ivory transition-colors hover:bg-card-ivory/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-ivory"
                   >

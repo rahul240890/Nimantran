@@ -26,8 +26,11 @@ import { blogPostPath, postsIn } from "@/lib/blog/posts";
 import { pagePath } from "@/lib/seo/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
+import { samplePath } from "@/lib/sample/paths";
 import { DesignCard } from "./design-card";
-import { FormatFilter, type DesignFormat } from "./format-filter";
+import { FormatFilter } from "./format-filter";
+import { designFormat } from "./design-format";
+import { MoreDesigns } from "./more-designs";
 import { designWords } from "./design-words";
 import { GallerySearch } from "./gallery-search";
 import { OccasionTile, PaintedTile } from "./occasion-tile";
@@ -140,6 +143,9 @@ function occasionTile(occasion: Occasion, locale: UiLocale, index: number, featu
   );
 }
 
+/** How many of a list's designs the server draws; the rest wait for Show all (MoreDesigns). */
+const FIRST_DESIGNS = 24;
+
 function DesignGallery({
   locale,
   designs,
@@ -151,32 +157,42 @@ function DesignGallery({
   category: CategoryId;
   kind?: WeddingKind | null;
 }) {
-  const formatOf = (design: GalleryDesign): DesignFormat =>
-    design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
-  const formats = [...new Set(designs.map(formatOf))];
+  const formats = [...new Set(designs.map(designFormat))];
+  const first = designs.slice(0, FIRST_DESIGNS);
+  const rest = designs.slice(FIRST_DESIGNS);
+  const cover = (design: GalleryDesign) => (
+    <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
+  );
   return (
-    <FormatFilter formats={formats}>
+    <FormatFilter formats={formats} more={rest.length} total={designs.length}>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
-        {designs.map((design, index) => {
+        {first.map((design, index) => {
           const { name, description } = designWords(design, locale);
           return (
-            <li key={design.id} data-format-item={formatOf(design)}>
+            <li key={design.id} data-format-item={designFormat(design)}>
               <DesignCard
                 design={design}
                 name={name}
                 description={description}
                 href={designHref(design, { category, kind })}
+                sampleHref={samplePath(design.id, kind ? { kind } : { occasion: category })}
                 photos={designPhotos(design, category)}
                 priority={index < 4}
-                cover={
-                  design.suite === "classic" ? (
-                    <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
-                  ) : undefined
-                }
+                cover={design.suite === "classic" ? cover(design) : undefined}
               />
             </li>
           );
         })}
+        <MoreDesigns
+          designs={rest}
+          category={category}
+          kind={kind}
+          covers={Object.fromEntries(
+            rest
+              .filter((design) => design.suite === "classic")
+              .map((design) => [design.template, cover(design)]),
+          )}
+        />
       </ul>
     </FormatFilter>
   );

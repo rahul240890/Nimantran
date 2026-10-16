@@ -95,6 +95,9 @@ test.describe("finding a design", () => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
     await page.goto("/invitations/birthday");
+    // A long list shows its first designs; the rest come with Show all
+    await expect(page.locator("[data-design]")).toHaveCount(24);
+    await page.getByRole("button", { name: /^Show all \d+ designs$/ }).click();
     await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
     // Wedding themes stay with weddings
     await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
@@ -122,6 +125,9 @@ test.describe("the Designs page", () => {
   test("rows show a few designs each, and View all opens the whole list", async ({ page }) => {
     await page.goto("/designs");
     const folkArt = page.locator('[data-shelf="collection-folk-art"]');
+    // Rows far down draw their designs as they come near
+    await expect(folkArt.locator("[data-design]")).toHaveCount(0);
+    await folkArt.scrollIntoViewIfNeeded();
     await expect(folkArt.locator("[data-design]")).toHaveCount(10);
     await folkArt
       .getByRole("link", { name: /^View all \d+ designs: Folk Art Collection$/ })
@@ -228,7 +234,8 @@ test.describe("the Designs page", () => {
     await page.getByRole("combobox", { name: "Sort designs" }).click();
     await page.getByRole("option", { name: "Price: high to low" }).click();
     await expect(page).toHaveURL(/sort=price-high/);
-    // The paid designs lead and the free 3D cards come last
+    // The paid designs lead and the free 3D cards come last, past the first few
+    await page.getByRole("button", { name: /^Show all \d+ designs$/ }).click();
     const items = page.locator("[data-format-item]");
     await expect(items.first()).not.toHaveAttribute("data-format-item", "card");
     await expect(items.last()).toHaveAttribute("data-format-item", "card");
