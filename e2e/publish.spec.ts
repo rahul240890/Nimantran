@@ -306,7 +306,7 @@ test.describe("publish and share", () => {
     // Five days before the wedding, in India
     await guest.clock.install({ time: new Date("2026-10-10T09:00:00+05:30") });
     await guest.goto(`${path}?quality=2d`);
-    // The painted theme opens as a doorway, counting down to the wedding
+    // The painted theme opens at its gate, counting down to the wedding
     const door = guest.locator("[data-doorway]");
     await expect(door).toHaveAttribute("data-doorway", "closed");
     await expect(guest.getByRole("timer", { name: /In 5 days/ })).toBeVisible();
@@ -314,11 +314,13 @@ test.describe("publish and share", () => {
     // An English-speaking guest sees the English card first
     await expect(toggle.getByRole("radio", { name: "English" })).toBeChecked();
     await expect(door.getByRole("heading", { level: 1 })).toContainText("Aarav");
-    await expect(door.getByText("Shri Ganeshaya Namah")).toBeVisible();
+    // A gate's names plate is drawn whole, then as the two halves that split with its doors
+    const plate = (text: string) => door.getByText(text).first();
+    await expect(plate("Shri Ganeshaya Namah")).toBeVisible();
     await toggle.getByRole("radio", { name: "ગુજરાતી" }).click();
     await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
-    await expect(door.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
-    await expect(door.getByText("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeVisible();
+    await expect(plate("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
+    await expect(plate("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeVisible();
     // The countdown and the buttons around the card speak the card's language too
     await expect(door.getByText("દિવસ", { exact: true })).toBeVisible();
     await expect(guest.getByRole("radiogroup", { name: "કાર્ડની ભાષા" })).toBeVisible();
