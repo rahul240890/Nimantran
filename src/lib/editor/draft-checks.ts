@@ -6,7 +6,7 @@ import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
 import { SUITE_IDS } from "@/lib/suites/catalog";
 import { clipSchema } from "./music-clip";
-import { defaultType, typeSchema } from "./type";
+import { FONT_IDS, NAME_COLOURS, TYPE_SIZES, defaultType, type TypeStyle } from "./type";
 import { GUIDE_RULES, noFunctionGuide } from "./guide";
 import {
   CONTACT_NAME_MAX,
@@ -93,6 +93,17 @@ const cropSchema = z.object({
   zoom: z.number().min(MIN_ZOOM).max(MAX_ZOOM),
   turn: z.number().int().min(0).max(3),
   tilt: z.number().min(-MAX_TILT).max(MAX_TILT),
+});
+
+/** The host's lettering on the pages (type.ts); anything broken falls back on its own. */
+const typeSchema: z.ZodType<TypeStyle> = z.object({
+  names: z.enum(FONT_IDS).nullable().catch(null),
+  words: z.enum(FONT_IDS).nullable().catch(null),
+  size: z.enum(TYPE_SIZES).catch("medium"),
+  bold: z.boolean().catch(false),
+  italic: z.boolean().catch(false),
+  capitals: z.boolean().catch(false),
+  colour: z.enum(NAME_COLOURS).catch("theme"),
 });
 
 const couplePhotosSchema = z.object({

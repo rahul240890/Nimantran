@@ -15,7 +15,8 @@ import {
 import { designPhotos } from "@/lib/gallery/photos";
 import { searchGallery, type SearchHit } from "@/lib/gallery/search";
 import { DesignCard } from "./design-card";
-import { designWords, searchWords } from "./design-words";
+import { nameOf, type DesignNames } from "./design-name";
+import { useSearchWords } from "./design-names";
 import { OccasionTile, PaintedTile } from "./occasion-tile";
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import type { UiLocale } from "@/i18n/locales";
@@ -60,14 +61,21 @@ function useAddressQuery(): string {
   );
 }
 
-export function GallerySearch({ children }: { children: ReactNode }) {
+export function GallerySearch({
+  names,
+  children,
+}: {
+  /** The designs' names in the page's language, from the server (design-names.tsx). */
+  names: DesignNames;
+  children: ReactNode;
+}) {
   const locale = useLocale();
   const { galleryCopy } = useText(galleryText);
   const fromAddress = useAddressQuery();
   const [typed, setQuery] = useState<string | null>(null);
   const query = typed ?? fromAddress;
   const deferred = useDeferredValue(query);
-  const words = useMemo(() => searchWords(), []);
+  const words = useSearchWords(names, query.trim().length > 0);
   const hits = useMemo(() => searchGallery(deferred, words), [deferred, words]);
   const searching = deferred.trim().length > 0;
 
@@ -147,7 +155,7 @@ export function GallerySearch({ children }: { children: ReactNode }) {
           {designs.length > 0 && (
             <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
               {designs.map((design) => {
-                const { name, description } = designWords(design, locale);
+                const { name, description } = nameOf(names, design);
                 return (
                   <li key={design.id}>
                     <DesignCard

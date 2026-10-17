@@ -1,8 +1,6 @@
 @import "tailwindcss";
-@import "./fresh-openings.css";
-@import "./reveals.css";
-@import "./guest-sections.css";
-@import "./welcome-scenes.css";
+/* The invitation's own motion (openings, reveals, sections, welcomes) is imported by the
+   components that play it, so the site's other pages don't wait for it before painting */
 
 /*
  * Shubh Invitation design tokens.

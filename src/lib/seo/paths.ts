@@ -4,7 +4,7 @@ import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
 import { TRADITION_IDS, type TraditionId } from "@/lib/traditions/schema";
 import { UI_LOCALES, homePath, type UiLocale } from "@/i18n/locales";
 import { WEDDING_KINDS, type WeddingKind } from "@/lib/gallery/ids";
-import { blogPostPath, translatedPost } from "@/lib/blog/posts";
+import { blogPostPath, pairedPost } from "@/lib/blog/addresses";
 
 /*
  * The public, indexable pages (docs/BRAND_SEO.md, section 6), generated from data: one
@@ -108,10 +108,11 @@ export function switchLocalePath(pathname: string, locale: UiLocale): string | n
     (home) => home !== "/" && (pathname === home || pathname.startsWith(`${home}/`)),
   );
   const rest = prefix ? pathname.slice(prefix.length) || "/" : pathname;
+  const current = UI_LOCALES.find((code) => homePath(code) === prefix) ?? "en";
   if (rest !== "/" && !LOCALIZED.test(rest)) return null;
   if (rest === "/") return homePath(locale);
   // A post is written in one language: the other language goes to its own blog
   const post = /^\/blog\/(.+)$/.exec(rest)?.[1];
-  if (post) return blogPostPath(translatedPost(post, locale) ?? null, locale);
+  if (post) return blogPostPath(pairedPost(post, current, locale), locale);
   return locale === "en" ? rest : `${homePath(locale)}${rest}`;
 }

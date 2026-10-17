@@ -15,7 +15,8 @@ import { NO_FILTERS, designCatalog, filterCatalog, filtersToParams } from "@/lib
 import type { DesignFilters } from "@/lib/gallery/filters";
 import { normalize } from "@/lib/gallery/search";
 import { pagePath } from "@/lib/seo/paths";
-import { searchWords } from "@/components/gallery/design-words";
+import { allSearchWords } from "@/components/gallery/design-words";
+import type { MenuLink, SiteMenu } from "./menu";
 
 /*
  * The header's menus, worked out on the server so the header ships only these words and
@@ -24,29 +25,6 @@ import { searchWords } from "@/components/gallery/design-words";
  * (by section). Each link lands on a list:
  * a View all of the Designs page, or a gallery page.
  */
-
-export type MenuLink = {
-  label: string;
-  href: string;
-  /** A short second line, such as how many designs there are. */
-  note?: string;
-  /** Its name in its own script, beside the label. */
-  native?: { text: string; lang: string } | null;
-};
-
-export type MenuPanel = {
-  groups: { title: string; links: MenuLink[] }[];
-  all: MenuLink;
-  feature: { title: string; text: string; image: string; href: string };
-};
-
-export type SiteMenu = Record<"designs" | "collections" | "weddings" | "occasions", MenuPanel>;
-
-export const MENU_IDS = ["designs", "collections", "weddings", "occasions"] as const;
-
-export function isMenuId(id: string): id is keyof SiteMenu {
-  return (MENU_IDS as readonly string[]).includes(id);
-}
 
 const POPULAR: readonly Partial<DesignFilters>[] = [
   { kind: "gujarati" },
@@ -81,7 +59,7 @@ export function siteMenu(locale: UiLocale): SiteMenu {
     galleryText[locale];
   const designs = pagePath({ kind: "designs" }, locale);
   const entries = designCatalog();
-  const words = searchWords();
+  const words = allSearchWords();
   const text = new Map(
     entries.map((entry) => [entry.design.id, normalize(words.design(entry.design).join(" "))]),
   );

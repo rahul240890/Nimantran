@@ -1,18 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import "@fontsource/rozha-one";
-import "@fontsource/tenor-sans";
-import "@fontsource-variable/karla";
-import "@fontsource-variable/karla/wght-italic.css";
-import "@fontsource-variable/noto-sans-devanagari";
-import { Providers } from "@/components/providers";
-import { SiteAnalytics } from "@/components/shell/site-analytics";
+import { RootFrame } from "@/components/root-frame";
 import { landingText } from "@/i18n/copy/landing";
 import type { Pricing } from "@/lib/plans/design-tiers";
 import { ogLocale, type UiLocale } from "@/i18n/locales";
+import { sampleWords } from "@/lib/sample/words";
 import { site, siteNameIn } from "@/lib/site";
-import { themeInitScript } from "@/lib/theme";
-import "@/app/globals.css";
 
 /*
  * The page frame every root layout shares: the language on <html>, the theme set before
@@ -80,20 +73,8 @@ export function RootHtml({
   children: ReactNode;
 }) {
   return (
-    // The theme script sets data-theme on <html> before hydration, so React must not flag it
-    <html lang={locale} className="h-full" suppressHydrationWarning>
-      {/* Rendered only by the app's root layouts, where a plain <head> is the right element */}
-      {/* eslint-disable-next-line @next/next/no-head-element */}
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
-      </head>
-      <body className="flex min-h-full flex-col">
-        <Providers locale={locale} pricing={pricing}>
-          {children}
-        </Providers>
-        {/* Counted only on the live site, where Analytics is switched on (docs/LAUNCH.md) */}
-        {process.env.VERCEL_ENV === "production" && <SiteAnalytics />}
-      </body>
-    </html>
+    <RootFrame locale={locale} pricing={pricing} sampleWords={sampleWords(locale)}>
+      {children}
+    </RootFrame>
   );
 }

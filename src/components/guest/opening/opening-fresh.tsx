@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import type { FreshOpening } from "@/lib/opening/catalog";
+import "@/app/fresh-openings.css";
 
 /*
  * The fresh openings (the owner's paintings, shubhdwar/fresh-opening-prompts.md): each one

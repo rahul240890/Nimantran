@@ -8,6 +8,8 @@ import { LocaleProvider } from "@/i18n/client";
 import { uiText } from "@/i18n/copy/ui";
 import type { UiLocale } from "@/i18n/locales";
 import { DEFAULT_PRICING, type Pricing } from "@/lib/plans/design-tiers";
+import type { SampleWords } from "@/lib/sample/words";
+import { SampleWordsProvider } from "./gallery/sample-words";
 
 /**
  * App-wide client providers: the page's language, design tiers and prices, one tooltip
@@ -16,10 +18,13 @@ import { DEFAULT_PRICING, type Pricing } from "@/lib/plans/design-tiers";
 export function Providers({
   locale,
   pricing = DEFAULT_PRICING,
+  sampleWords = { functions: {}, occasions: {} },
   children,
 }: {
   locale: UiLocale;
   pricing?: Pricing;
+  /** The words design previews print (lib/sample/words.ts). */
+  sampleWords?: SampleWords;
   children: ReactNode;
 }) {
   const { uiStrings } = uiText[locale];
@@ -27,7 +32,7 @@ export function Providers({
     <LocaleProvider locale={locale}>
       <PricingProvider pricing={pricing}>
         <TooltipProvider delayDuration={400} skipDelayDuration={200}>
-          {children}
+          <SampleWordsProvider words={sampleWords}>{children}</SampleWordsProvider>
           <Toaster closeLabel={uiStrings.close} regionLabel={uiStrings.notifications} />
         </TooltipProvider>
       </PricingProvider>

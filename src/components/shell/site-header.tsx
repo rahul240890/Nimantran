@@ -21,7 +21,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { AccountMenu } from "@/components/account/account-menu";
 import { LanguageSwitcher } from "./language-switcher";
 import { isPageLink, navHref } from "./nav-links";
-import { isMenuId, type MenuPanel, type SiteMenu } from "./site-menu";
+import { isMenuId, type MenuPanel, type SiteMenu } from "./menu";
 import { useActiveSection } from "./use-active-section";
 
 /**

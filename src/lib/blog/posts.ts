@@ -1,7 +1,10 @@
 import { POSTS } from "@/content/blog";
 import type { BlogPost } from "@/content/blog/types";
-import { homePath, type UiLocale } from "@/i18n/locales";
+import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
+import { blogPostPath } from "./addresses";
+
+export { blogPostPath };
 
 /* The blog's posts, newest first, and their addresses. */
 
@@ -22,12 +25,6 @@ export function translatedPost(slug: string, locale: UiLocale): string | undefin
   if (post.locale === locale) return post.slug;
   if (!post.pair) return undefined;
   return POSTS.find((item) => item.locale === locale && item.pair === post.pair)?.slug;
-}
-
-/** /blog/<slug> in English, /hi/blog/<slug> in Hindi; the blog's front page without a slug. */
-export function blogPostPath(slug: string | null, locale: UiLocale): string {
-  const blog = locale === "en" ? "/blog" : `${homePath(locale)}/blog`;
-  return slug ? `${blog}/${slug}` : blog;
 }
 
 /** About how long a post takes to read, in minutes. */

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import { BY_LETTER, type NameReveal, type PhotoReveal } from "@/lib/suites/reveal";
+import "@/app/reveals.css";
 
 /*
  * The theme's own way of bringing in the couple's photos and names (lib/suites/reveal.ts),

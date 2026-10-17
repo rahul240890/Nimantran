@@ -14,6 +14,7 @@ import { TemplateCover } from "@/components/brand/template-cover";
 import { ScenePoster } from "@/components/gallery/scene-poster";
 import { Button } from "@/components/ui/button";
 import { ScrollRow } from "@/components/ui/scroll-row";
+import { designNamesText } from "@/i18n/copy/design-names";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
@@ -121,7 +122,8 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
                     src={image}
                     alt=""
                     fill
-                    priority={index < 5}
+                    // Small, and below the first screen on a phone: no need to jump the queue
+                    loading={index < 7 ? "eager" : "lazy"}
                     sizes="5rem"
                     className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-110 motion-still:transition-none motion-still:group-hover:scale-100"
                   />
@@ -172,7 +174,11 @@ export function HomeDesigns({ locale }: { locale: UiLocale }) {
           title={homeGallery.designsTitle}
           intro={homeGallery.designsIntro}
         />
-        <HomeShelves designsPath={designsPath} covers={covers(locale)} />
+        <HomeShelves
+          designsPath={designsPath}
+          covers={covers(locale)}
+          names={designNamesText[locale]}
+        />
         <Button asChild variant="secondary" className="self-center">
           <Link href={designsPath}>
             {homeGallery.allDesigns}

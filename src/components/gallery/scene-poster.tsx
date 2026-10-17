@@ -93,7 +93,7 @@ export function ScenePoster({
         src={(page.card && SUITES[suite].images.cover) || page.image}
         alt=""
         fill
-        priority={priority}
+        loading={priority ? "eager" : "lazy"}
         sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
         className="object-cover"
       />

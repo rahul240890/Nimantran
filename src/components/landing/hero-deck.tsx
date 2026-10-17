@@ -5,19 +5,15 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { useText } from "@/i18n/client";
-import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
 import { cn } from "@/lib/cn";
-import { PAINTED_SUITES as ALL_PAINTED } from "@/lib/gallery/catalog";
 import { textArea } from "@/lib/suites/areas";
-import { SUITES } from "@/lib/suites/catalog";
+import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { DECK_SUITES } from "./deck-suites";
 
 const noSubscribe = () => () => {};
-
-/** The deck prints a couple's names, so it deals only the wedding themes. */
-const PAINTED_SUITES = ALL_PAINTED.filter((suite) => !SUITES[suite].occasions);
 
 /** At most this many dots show, a window that slides along with the deck. */
 const MAX_DOTS = 7;
@@ -31,15 +27,14 @@ const TURN_MS = 4500;
  * (never in still mode, and it pauses while the pointer or focus is on it); the theme
  * names under it bring any one forward.
  */
-export function HeroDeck() {
+export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
   const { hero, homeGallery } = useText(landingText);
-  const { suiteCopy } = useText(editorText);
   const still = useReducedMotion();
   // Below the sm breakpoint the dots are too small to tap, so they leave the tab order
   const phone = useMediaQuery("(width < 40rem)");
   const [current, setCurrent] = useState(0);
   const [held, setHeld] = useState(false);
-  const total = PAINTED_SUITES.length;
+  const total = DECK_SUITES.length;
   // Marks when the deck answers taps, for tests that wait for the page to come alive
   const live = useSyncExternalStore(
     noSubscribe,
@@ -53,11 +48,11 @@ export function HeroDeck() {
     return () => clearInterval(timer);
   }, [still, held, total]);
 
-  const front = PAINTED_SUITES[current]!;
+  const front = DECK_SUITES[current]!;
   // The dots' window keeps the front theme near its middle
   const dots = Math.min(MAX_DOTS, total);
   const first = Math.min(Math.max(current - Math.floor(dots / 2), 0), total - dots);
-  const windowed = PAINTED_SUITES.slice(first, first + dots);
+  const windowed = DECK_SUITES.slice(first, first + dots);
   const area = textArea(front, "cover");
 
   return (
@@ -71,7 +66,7 @@ export function HeroDeck() {
     >
       <div
         role="img"
-        aria-label={`${homeGallery.deckLabel}: ${suiteCopy.names[front]}`}
+        aria-label={`${homeGallery.deckLabel}: ${names[front]}`}
         className="relative isolate aspect-[4/5] w-full max-w-[26rem] sm:max-w-[30rem]"
       >
         <div
@@ -82,7 +77,7 @@ export function HeroDeck() {
               "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 34%, transparent), color-mix(in srgb, var(--rose) 10%, transparent) 60%, transparent)",
           }}
         />
-        {PAINTED_SUITES.map((suite, index) => {
+        {DECK_SUITES.map((suite, index) => {
           // Where this card sits in the fan: 0 in front, then alternating to either side
           let offset = index - current;
           if (offset > total / 2) offset -= total;
@@ -113,7 +108,8 @@ export function HeroDeck() {
                 src={SUITES[suite].images.cover!}
                 alt=""
                 fill
-                priority={away <= 1}
+                // The card in front is fetched at once; the ones fanned behind it in turn
+                loading={away === 0 ? "eager" : "lazy"}
                 sizes="(min-width: 64rem) 17rem, 55vw"
                 className="object-cover"
               />
@@ -173,7 +169,7 @@ export function HeroDeck() {
                 <button
                   type="button"
                   aria-pressed={index === current}
-                  aria-label={homeGallery.showTheme(suiteCopy.names[suite])}
+                  aria-label={homeGallery.showTheme(names[suite])}
                   onClick={() => setCurrent(index)}
                   className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-6 sm:w-11"
                   tabIndex={phone ? -1 : undefined}

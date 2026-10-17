@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 /*
  * Which designs are free and which cost money, and what the three packages cost on top
  * (docs/PRICING.md). The admin decides all of it (Admin, Designs); until they change
@@ -7,7 +5,8 @@ import { z } from "zod";
  * publishing asks for a package.
  *
  * This file stays light, for every page's badges; the defaults, which need the whole
- * design catalogue, live in design-defaults.ts and are worked out on the server.
+ * design catalogue, live in design-defaults.ts and are worked out on the server, and the
+ * checks on saved settings in pricing-schema.ts.
  */
 
 /**
@@ -57,40 +56,16 @@ export const DEFAULT_PRICING: Pricing = {
 };
 
 /** Whole rupees from ₹1 to ₹1,00,000, so a typo can't price anything at nothing. */
-const pricePaise = z
-  .number()
-  .int()
-  .min(100)
-  .max(1_00_000_00)
-  .refine((paise) => paise % 100 === 0);
-
-const inviteCount = z.number().int().min(1).max(1_00_000);
-
-export const pricingSchema = z.object({
-  // Settings saved before Signature existed keep their prices, with Signature at its default
-  designs: z.object({
-    premium: pricePaise,
-    royal: pricePaise,
-    signature: pricePaise.default(DEFAULT_PRICING.designs.signature),
-  }),
-  packages: z.object({ celebration: pricePaise, grand: pricePaise }),
-  invites: z.object({ basic: inviteCount, celebration: inviteCount }),
-  tiers: z.record(z.string().regex(/^[a-z0-9-]{1,60}$/), z.enum(DESIGN_TIERS)),
-});
-
-const tiersSchema = z.object({
-  tiers: z.record(z.string().regex(/^[a-z0-9-]{1,60}$/), z.enum(DESIGN_TIERS)),
-});
-
 /**
- * Stored settings, read leniently: anything missing or broken falls back to the defaults.
- * Settings saved before the packages (one price per edition) keep only their design tiers.
+ * Whether what /api/pricing sent is a pricing, which the server has already read with
+ * parsePricing (pricing-schema.ts): the browser only checks its shape, without Zod.
  */
-export function parsePricing(value: unknown): Pricing {
-  const parsed = pricingSchema.safeParse(value);
-  if (parsed.success) return parsed.data;
-  const tiers = tiersSchema.safeParse(value);
-  return tiers.success ? { ...DEFAULT_PRICING, tiers: tiers.data.tiers } : DEFAULT_PRICING;
+export function isPricing(value: unknown): value is Pricing {
+  if (!value || typeof value !== "object") return false;
+  const pricing = value as Record<keyof Pricing, unknown>;
+  return (["designs", "packages", "invites", "tiers"] as const).every(
+    (key) => typeof pricing[key] === "object" && pricing[key] !== null,
+  );
 }
 
 /**

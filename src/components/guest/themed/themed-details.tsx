@@ -31,6 +31,7 @@ import {
   Palm,
 } from "./scenery";
 import { useInView, useOnScreen } from "./use-in-view";
+import "@/app/guest-sections.css";
 
 const noSubscribe = () => () => {};
 /** True in the browser once hydrated: sections wait to play their entrance only there. */

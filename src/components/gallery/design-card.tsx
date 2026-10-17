@@ -134,7 +134,7 @@ export function DesignCard({
               src={pages[0]!.src}
               alt=""
               fill
-              priority={priority}
+              loading={priority ? "eager" : "lazy"}
               sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
               className="object-cover object-top transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
             />

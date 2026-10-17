@@ -21,7 +21,7 @@ import {
 import Image from "next/image";
 import { useDeferredValue, useMemo, useState } from "react";
 import { DesignPreview, paintedPages } from "@/components/gallery/design-card";
-import { searchWords } from "@/components/gallery/design-words";
+import { allSearchWords } from "@/components/gallery/design-words";
 import { ScenePoster } from "@/components/gallery/scene-poster";
 import type { Covers } from "@/components/gallery/shelf-row";
 import { Badge } from "@/components/ui/badge";
@@ -325,7 +325,7 @@ export function DesignTierList({
     onTiersChange((current) => ({ ...current, [id]: tier }));
 
   const text = useMemo(() => {
-    const words = searchWords();
+    const words = allSearchWords();
     const map = new Map(
       rows.map((row) => [row.id, normalize(`${words.design(row.design).join(" ")} ${row.id}`)]),
     );

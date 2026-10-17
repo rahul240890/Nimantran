@@ -1,14 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useLocale } from "@/i18n/client";
 import { designHref, type GalleryDesign, type WeddingKind } from "@/lib/gallery/catalog";
 import { designPhotos } from "@/lib/gallery/photos";
 import type { CategoryId } from "@/lib/categories/catalog";
 import { samplePath } from "@/lib/sample/paths";
 import type { TemplateId } from "@/lib/templates/ids";
 import { DesignCard } from "./design-card";
-import { designWords } from "./design-words";
 import { designFormat } from "./design-format";
 import { useAllShown } from "./format-filter";
 
@@ -22,16 +20,15 @@ export function MoreDesigns({
   kind,
   covers,
 }: {
-  designs: readonly GalleryDesign[];
+  /** With their names and descriptions in the page's language, from the server. */
+  designs: readonly { design: GalleryDesign; name: string; description: string }[];
   category: CategoryId;
   kind: WeddingKind | null;
   /** The 3D cards' covers among them, drawn on the server (see DesignCard's cover). */
   covers: Partial<Record<TemplateId, ReactNode>>;
 }) {
-  const locale = useLocale();
   if (!useAllShown()) return null;
-  return designs.map((design) => {
-    const { name, description } = designWords(design, locale);
+  return designs.map(({ design, name, description }) => {
     return (
       <li key={design.id} data-format-item={designFormat(design)}>
         <DesignCard

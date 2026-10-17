@@ -7,6 +7,9 @@ import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
 import { DEMO_PATH } from "@/lib/sample/paths";
+import { designNamesText } from "@/i18n/copy/design-names";
+import type { SuiteId } from "@/lib/suites/catalog";
+import { DECK_SUITES } from "./deck-suites";
 import { HeroDeck } from "./hero-deck";
 
 /**
@@ -29,7 +32,9 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           src="/home/doorway.webp"
           alt=""
           fill
-          priority
+          // The first screen's largest picture: fetched first, ahead of everything below
+          loading="eager"
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover object-[78%_center] opacity-20 lg:object-right lg:opacity-60 dark:opacity-15 lg:dark:opacity-35"
         />
@@ -117,7 +122,14 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           </div>
         </div>
         <div className="order-3 min-w-0 lg:order-2">
-          <HeroDeck />
+          {/* The deck's theme names only go to the browser, not every design's */}
+          <HeroDeck
+            names={
+              Object.fromEntries(
+                DECK_SUITES.map((suite) => [suite, designNamesText[locale].names[suite]]),
+              ) as Record<SuiteId, string>
+            }
+          />
         </div>
         {children && <div className="order-2 min-w-0 lg:order-3 lg:col-span-2">{children}</div>}
       </div>
