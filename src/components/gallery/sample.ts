@@ -3,16 +3,16 @@
 import { useMemo } from "react";
 import { useLocale, useText } from "@/i18n/client";
 import type { UiLocale } from "@/i18n/locales";
-import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
 import type { StoryFunction } from "@/lib/engine/story";
+import type { FunctionId } from "@/lib/events/functions";
 import { SAMPLE_DAYS, SAMPLE_OCCASION_DAY, type SampleFunction } from "@/lib/sample/days";
 import { isWeddingJourney } from "@/lib/suites/catalog";
 import { formatCardDate, formatCardTime } from "@/lib/templates/card-languages";
-import { cardSuggestions } from "@/lib/templates/card-suggestions";
 import type { CardCopy } from "@/lib/templates/content";
+import { useSampleWords } from "./sample-words";
 
 /*
  * The made-up celebration the gallery's previews show a design with, so a guest's view of
@@ -35,7 +35,7 @@ export function useSampleInvite(
 } {
   const locale = useLocale();
   const { galleryCopy } = useText(galleryText);
-  const { functionCopy } = useText(editorText);
+  const words = useSampleWords();
   const sample = galleryCopy.sample;
   const key = kinds.join(",");
   const other = occasion && !isWeddingJourney(occasion) ? occasion : null;
@@ -52,21 +52,22 @@ export function useSampleInvite(
       venue: sample.venues.wedding,
     };
     if (!other) return wedding;
-    const words = (slot: "blessing" | "families" | "line") =>
-      cardSuggestions(other, locale, slot)[0] ?? wedding[slot];
+    const own = words.occasions[other];
+    const line = (slot: "blessing" | "families" | "line") => own?.[slot] ?? wedding[slot];
     const category: Category = CATEGORIES[other];
     const one = category.people === "one";
     return {
       ...wedding,
-      blessing: words("blessing"),
-      families: words("families"),
-      line: words("line"),
+      blessing: line("blessing"),
+      families: line("families"),
+      line: line("line"),
       ...(one && { first: sample.one, joiner: "", second: "" }),
       date: formatCardDate(SAMPLE_OCCASION_DAY[0], locale),
       venue: sample.venues.other,
     };
-  }, [sample, locale, other]);
+  }, [sample, locale, other, words]);
   const functions = useMemo<StoryFunction[]>(() => {
+    const named = (kind: FunctionId) => words.functions[kind] ?? kind;
     if (other) {
       // The occasion's own celebration, once, whichever painting stands in for it
       if (!key) return [];
@@ -74,7 +75,7 @@ export function useSampleInvite(
       return [
         {
           kind,
-          name: functionCopy[kind].name,
+          name: named(kind),
           localName: null,
           date: formatCardDate(SAMPLE_OCCASION_DAY[0], locale),
           time: formatCardTime(SAMPLE_OCCASION_DAY[1], null, locale),
@@ -85,13 +86,13 @@ export function useSampleInvite(
     }
     return (key ? (key.split(",") as SampleFunction[]) : []).map((kind) => ({
       kind,
-      name: functionCopy[kind].name,
+      name: named(kind),
       localName: null,
       date: formatCardDate(SAMPLE_DAYS[kind][0], locale),
       time: formatCardTime(SAMPLE_DAYS[kind][1], null, locale),
       muhurat: null,
       venue: sample.venues[kind],
     }));
-  }, [key, functionCopy, locale, sample, other]);
+  }, [key, words, locale, sample, other]);
   return { copy, functions, lang: locale };
 }

@@ -57,7 +57,8 @@ import {
 import { CollectionTiles } from "./collection-tiles";
 import { TrendingRow } from "./trending-row";
 import { pagePath } from "@/lib/seo/paths";
-import { searchWords } from "./design-words";
+import type { DesignNames } from "./design-name";
+import { DesignNamesProvider, useDesignNames, useSearchWords } from "./design-names";
 import { CatalogCard, ShelfRow, TraditionTiles, type Covers } from "./shelf-row";
 
 /** The occasions offered as quick links at the head of the page; All occasions has the rest. */
@@ -148,15 +149,15 @@ function ChipRow<T extends string>({
   );
 }
 
-/** Every design's searchable words, in every site language, by design id. */
-function useSearchText(entries: readonly CatalogEntry[]) {
+/** Every design's searchable words by design id: in every site language once searching. */
+function useSearchText(entries: readonly CatalogEntry[], searching: boolean) {
+  const words = useSearchWords(useDesignNames(), searching);
   return useMemo(() => {
-    const words = searchWords();
     const map = new Map(
       entries.map((entry) => [entry.design.id, normalize(words.design(entry.design).join(" "))]),
     );
     return (id: string) => map.get(id) ?? "";
-  }, [entries]);
+  }, [entries, words]);
 }
 
 function SearchBox({ value, onChange }: { value: string; onChange: (value: string) => void }) {
@@ -319,8 +320,10 @@ function Browse({
                 entries={shown}
                 total={total}
                 covers={covers}
-                priority={groupIndex === 0 && index === 0}
-                lazy={groupIndex > 0 && index > 0}
+                priority={false}
+                // Only the first row draws its designs with the page; on a phone every row
+                // is below the fold, and each card is work before the page can respond
+                lazy={groupIndex > 0 || index > 0}
               />
             );
           })}
@@ -350,7 +353,7 @@ function Results({
   const locale = useLocale();
   const { galleryCopy, catalogCopy, shelfCopy, weddingKindCopy, collectionCopy } =
     useText(galleryText);
-  const text = useSearchText(entries);
+  const text = useSearchText(entries, filters.query.trim().length > 0);
   const pricing = usePricing();
   const deferred = useDeferredValue(filters);
   const shown = useMemo(
@@ -633,24 +636,29 @@ function AddressedCatalog({ covers }: { covers: Covers }) {
 export function DesignCatalog({
   covers,
   designsPath,
+  names,
 }: {
   /** The 3D cards' covers, drawn on the server (see DesignCard). */
   covers: Covers;
   /** This page's address in the site language, for View all. */
   designsPath: string;
+  /** The designs' names in the page's language (design-names.tsx). */
+  names: DesignNames;
 }) {
   return (
-    <Suspense
-      fallback={
-        <Catalog
-          filters={NO_FILTERS}
-          covers={covers}
-          designsPath={designsPath}
-          onChange={() => {}}
-        />
-      }
-    >
-      <AddressedCatalog covers={covers} />
-    </Suspense>
+    <DesignNamesProvider names={names}>
+      <Suspense
+        fallback={
+          <Catalog
+            filters={NO_FILTERS}
+            covers={covers}
+            designsPath={designsPath}
+            onChange={() => {}}
+          />
+        }
+      >
+        <AddressedCatalog covers={covers} />
+      </Suspense>
+    </DesignNamesProvider>
   );
 }

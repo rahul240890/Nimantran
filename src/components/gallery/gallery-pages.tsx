@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { FeatureRow, LinkPills, PublicShell, type Crumb } from "@/components/seo/public-page";
+import { designNamesText } from "@/i18n/copy/design-names";
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { seoText } from "@/i18n/copy/seo";
@@ -84,7 +85,10 @@ export function GalleryHero({
         className="font-display text-[2.3rem] leading-[1.06] break-words sm:text-[3.2rem] lg:text-[3.6rem]"
       >
         {native && (
-          <span lang={native.lang} className="block text-[0.55em] leading-tight text-accent-text">
+          <span
+            lang={native.lang}
+            className="block font-system text-[0.55em] leading-tight text-accent-text"
+          >
             {native.text}
           </span>
         )}
@@ -184,7 +188,7 @@ function DesignGallery({
           );
         })}
         <MoreDesigns
-          designs={rest}
+          designs={rest.map((design) => ({ design, ...designWords(design, locale) }))}
           category={category}
           kind={kind}
           covers={Object.fromEntries(
@@ -279,7 +283,7 @@ export function GalleryIndexPage({ locale }: { locale: UiLocale }) {
         heading={galleryCopy.heading}
         intro={galleryCopy.intro}
       />
-      <GallerySearch>
+      <GallerySearch names={designNamesText[locale]}>
         <div className="pt-10">
           {(["wedding", "more"] as const).map((shelf) => {
             const wedding = shelf === "wedding";

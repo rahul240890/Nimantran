@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { searchWords } from "@/components/gallery/design-words";
+import { allSearchWords } from "@/components/gallery/design-words";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { newDraft, withGalleryChoice } from "@/lib/editor/draft";
 import { SUITES, suiteFor, suiteSuits, weddingFit } from "@/lib/suites/catalog";
@@ -136,7 +136,7 @@ describe("gallery catalog", () => {
 });
 
 describe("gallery search", () => {
-  const words = searchWords();
+  const words = allSearchWords();
 
   it("needs every word to match", () => {
     const hits = searchGallery("gujarati wedding", words);

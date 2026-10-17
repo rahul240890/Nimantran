@@ -67,6 +67,7 @@ import { PageEffects } from "./page-effects";
 import { PhotoArches, PhotoWindows } from "./photo-windows";
 import { SuiteBackdrop } from "./suite-backdrop";
 import "@/components/invitation/type/fonts.css";
+import "@/app/reveals.css";
 
 export type StoryLabels = {
   story: string;

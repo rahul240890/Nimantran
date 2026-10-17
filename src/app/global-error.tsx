@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
-import { RootHtml } from "@/components/root-html";
+import { RootFrame } from "@/components/root-frame";
 import { Button } from "@/components/ui/button";
 import { uiText } from "@/i18n/copy/ui";
 import { reportError } from "@/lib/errors/report";
@@ -27,7 +27,7 @@ export default function GlobalError({
     reportError(error, "boundary");
   }, [error]);
   return (
-    <RootHtml locale="en">
+    <RootFrame locale="en">
       <title>{`${en.title} · ${site.name}`}</title>
       <main id="main" className="grid min-h-dvh place-items-center px-4 py-16">
         <div role="alert" className="flex max-w-md flex-col items-center gap-5 text-center">
@@ -45,6 +45,6 @@ export default function GlobalError({
           </Button>
         </div>
       </main>
-    </RootHtml>
+    </RootFrame>
   );
 }

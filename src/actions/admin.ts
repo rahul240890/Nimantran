@@ -18,7 +18,8 @@ import {
 import { checkConnection, type ConnectionCheck } from "@/lib/payments/razorpay";
 import { PAID_PLAN_IDS } from "@/lib/plans/catalog";
 import { allDesignIds, defaultTier } from "@/lib/plans/design-defaults";
-import { pricesInOrder, pricingSchema } from "@/lib/plans/design-tiers";
+import { pricesInOrder } from "@/lib/plans/design-tiers";
+import { pricingSchema } from "@/lib/plans/pricing-schema";
 import { COUPON_CODE, cleanCouponCode } from "@/lib/plans/offers";
 import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";

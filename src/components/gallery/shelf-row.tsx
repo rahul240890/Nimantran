@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
-import { useLocale, useText } from "@/i18n/client";
+import { useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { WEDDING_KINDS, WEDDING_KIND_ENTRIES, suiteImage } from "@/lib/gallery/catalog";
 import {
@@ -20,7 +20,7 @@ import { samplePath } from "@/lib/sample/paths";
 import { shelfHref, traditionShelf } from "@/lib/gallery/shelves";
 import type { TemplateId } from "@/lib/templates/ids";
 import { DesignCard } from "./design-card";
-import { designWords } from "./design-words";
+import { useDesignWords } from "./design-names";
 
 /*
  * The pieces a catalogue is browsed with, shared by the Designs page and the home page:
@@ -44,8 +44,7 @@ export function CatalogCard({
   /** In a sideways row (see DesignCard). */
   compact?: boolean;
 }) {
-  const locale = useLocale();
-  const { name, description } = designWords(entry.design, locale);
+  const { name, description } = useDesignWords()(entry.design);
   return (
     <DesignCard
       design={entry.design}
@@ -238,7 +237,10 @@ export function TraditionTiles({
                 </span>
                 <span className="flex flex-col gap-0.5">
                   {entry.nativeName && (
-                    <span lang={entry.nativeName.lang} className="text-xs text-accent-text">
+                    <span
+                      lang={entry.nativeName.lang}
+                      className="font-system text-xs text-accent-text"
+                    >
                       {entry.nativeName.text}
                     </span>
                   )}

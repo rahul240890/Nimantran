@@ -3,7 +3,8 @@ import { allDesigns } from "@/lib/gallery/catalog";
 import { newDraft } from "@/lib/editor/draft";
 import { planNeeded, planShortfalls, upgradePricePaise } from "./catalog";
 import { allDesignIds, defaultTier, draftDesignId, resolvePricing } from "./design-defaults";
-import { DEFAULT_PRICING, parsePricing, pricesInOrder, tierPricePaise } from "./design-tiers";
+import { DEFAULT_PRICING, pricesInOrder, tierPricePaise } from "./design-tiers";
+import { parsePricing } from "./pricing-schema";
 import { priceFor } from "./offers";
 
 describe("design tiers", () => {

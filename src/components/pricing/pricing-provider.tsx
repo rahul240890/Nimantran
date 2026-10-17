@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import {
   DEFAULT_PRICING,
-  parsePricing,
+  isPricing,
   tierPricePaise,
   type DesignTier,
   type Pricing,
@@ -25,10 +25,9 @@ export function PricingProvider({ pricing, children }: { pricing: Pricing; child
     fetch("/api/pricing")
       .then((response) => (response.ok ? response.json() : null))
       .then((stored: unknown) => {
-        if (!live || !stored) return;
+        if (!live || !isPricing(stored)) return;
         // Stored, it lists only the designs the admin moved; the rest keep their default
-        const admin = parsePricing(stored);
-        setCurrent({ ...admin, tiers: { ...pricing.tiers, ...admin.tiers } });
+        setCurrent({ ...stored, tiers: { ...pricing.tiers, ...stored.tiers } });
       })
       .catch(() => undefined);
     return () => {

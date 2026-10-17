@@ -136,7 +136,7 @@ export function OccasionTile({
         </span>
         <span className="mt-auto flex min-w-0 flex-col gap-0.5">
           {otherName && (
-            <span lang={otherName.lang} className="text-sm text-accent-text">
+            <span lang={otherName.lang} className="font-system text-sm text-accent-text">
               {otherName.text}
             </span>
           )}
@@ -213,7 +213,7 @@ export function PaintedTile({
           src={image}
           alt=""
           fill
-          priority={priority}
+          loading={priority ? "eager" : "lazy"}
           sizes={
             feature
               ? "(min-width: 64rem) 40vw, 100vw"
@@ -237,7 +237,10 @@ export function PaintedTile({
       >
         <span className="flex min-w-0 flex-col gap-0.5">
           {otherName && (
-            <span lang={otherName.lang} className="text-sm leading-snug text-accent-text">
+            <span
+              lang={otherName.lang}
+              className="font-system text-sm leading-snug text-accent-text"
+            >
               {otherName.text}
             </span>
           )}

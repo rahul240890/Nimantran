@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { POSTS } from "@/content/blog";
+import { POST_PAIRS } from "@/lib/blog/addresses";
 import { UI_LOCALES } from "@/i18n/locales";
 import { pagePath, publicPages, switchLocalePath } from "@/lib/seo/paths";
 import {
@@ -79,5 +80,18 @@ describe("blog posts", () => {
     const wording = posts.find((post) => post.slug === "wedding-invitation-wording")!;
     const linked = postLinks(wording);
     expect(linked).toContain(blogPostPath(relatedPosts(wording, posts)[0]!.slug, "en"));
+  });
+});
+
+describe("the language menu's list of posts in two languages", () => {
+  it("matches the posts' own pairs", () => {
+    const pairs = new Map<string, Partial<Record<string, string>>>();
+    for (const post of POSTS) {
+      if (!post.pair) continue;
+      pairs.set(post.pair, { ...pairs.get(post.pair), [post.locale]: post.slug });
+    }
+    const sorted = (list: Partial<Record<string, string>>[]) =>
+      list.map((pair) => JSON.stringify(Object.entries(pair).sort())).sort();
+    expect(sorted([...POST_PAIRS])).toEqual(sorted([...pairs.values()]));
   });
 });

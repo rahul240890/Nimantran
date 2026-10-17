@@ -4,7 +4,8 @@ import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
-import { DEFAULT_PRICING, parsePricing, type Pricing } from "./design-tiers";
+import { DEFAULT_PRICING, type Pricing } from "./design-tiers";
+import { parsePricing } from "./pricing-schema";
 
 /*
  * The admin's design tiers and edition prices (Admin, Designs), kept in app_settings under

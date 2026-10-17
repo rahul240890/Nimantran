@@ -1,4 +1,3 @@
-import { z } from "zod";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 
 /*
@@ -334,17 +333,17 @@ export const NAME_COLOUR_VALUE: Record<Exclude<NameColour, "theme">, string> = {
   ivory: "var(--card-ivory)",
 };
 
-export const typeSchema = z.object({
+/** The host's lettering; checked when a draft is read (draft-checks.ts), so Zod stays off phones. */
+export type TypeStyle = {
   /** Null keeps the theme's own lettering. */
-  names: z.enum(FONT_IDS).nullable().catch(null),
-  words: z.enum(FONT_IDS).nullable().catch(null),
-  size: z.enum(TYPE_SIZES).catch("medium"),
-  bold: z.boolean().catch(false),
-  italic: z.boolean().catch(false),
-  capitals: z.boolean().catch(false),
-  colour: z.enum(NAME_COLOURS).catch("theme"),
-});
-export type TypeStyle = z.infer<typeof typeSchema>;
+  names: FontId | null;
+  words: FontId | null;
+  size: TypeSize;
+  bold: boolean;
+  italic: boolean;
+  capitals: boolean;
+  colour: NameColour;
+};
 
 export const defaultType: TypeStyle = {
   names: null,

@@ -3,6 +3,7 @@ import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { DesignCatalog } from "@/components/gallery/design-catalog";
 import { GalleryHero } from "@/components/gallery/gallery-pages";
+import { designNamesText } from "@/i18n/copy/design-names";
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
@@ -300,6 +301,7 @@ export function DesignsPage({ locale }: { locale: UiLocale }) {
       />
       <DesignCatalog
         designsPath={pagePath({ kind: "designs" }, locale)}
+        names={designNamesText[locale]}
         covers={Object.fromEntries(
           TEMPLATE_IDS.map((id) => [
             id,
