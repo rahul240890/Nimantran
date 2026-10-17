@@ -4,6 +4,7 @@ import { CalendarPlus, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
+import { SocialLinks } from "@/components/brand/social-links";
 import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
@@ -144,7 +145,7 @@ export function GuestView({
     () => languages.find((code) => code === locale) ?? languages[0],
   );
   // Everything around the card speaks the card's language too, and switches with it
-  const { guestCopy, rsvpCopy, invitation, theme } = guestText[language];
+  const { guestCopy, rsvpCopy, invitation, theme, social } = guestText[language];
   const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
   const designed = draftTemplate(draft);
   const template = useMemo(() => withClip(designed, clipUrl), [designed, clipUrl]);
@@ -543,10 +544,14 @@ export function GuestView({
               </div>
             )}
             <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
-              <p className="flex items-center gap-2 text-sm text-ink-muted">
-                <BrandMark className="size-6 text-accent-text" />
-                {guestCopy.madeWith}
-              </p>
+              <div className="flex flex-col items-center gap-3 sm:items-start">
+                <p className="flex items-center gap-2 text-sm text-ink-muted">
+                  <BrandMark className="size-6 text-accent-text" />
+                  {guestCopy.madeWith}
+                </p>
+                {/* Guests who liked the card can follow the brand that made it */}
+                <SocialLinks labels={social} />
+              </div>
               {/* Light or dark for the details; kept off the invitation's own full-screen pages */}
               <div className="flex max-w-full flex-wrap items-center justify-center gap-2">
                 <ThemeMenu labels={theme} />

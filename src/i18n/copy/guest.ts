@@ -21,6 +21,7 @@ type GuestCopy = {
   questionLabels: typeof enCategories.questionLabels;
   invitation: typeof enUi.invitation;
   theme: typeof enUi.theme;
+  social: typeof enUi.social;
 };
 
 export type GuestText = Translation<GuestCopy>;
@@ -38,6 +39,7 @@ export const guestText: Record<CardLanguage, GuestText> = {
     questionLabels: enCategories.questionLabels,
     invitation: enUi.invitation,
     theme: enUi.theme,
+    social: enUi.social,
   },
   hi: {
     guestCopy: hiPublish.guestCopy,
@@ -46,6 +48,7 @@ export const guestText: Record<CardLanguage, GuestText> = {
     questionLabels: hiCategories.questionLabels,
     invitation: hiUi.invitation,
     theme: hiUi.theme,
+    social: hiUi.social,
   },
   mr,
   gu,

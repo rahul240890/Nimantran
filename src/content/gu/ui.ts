@@ -1,5 +1,6 @@
 import type { uiStrings as en } from "@/lib/ui-strings";
 import type { Translation } from "@/i18n/text";
+import { site } from "@/lib/site";
 
 /* ગુજરાતી: સહિયારાં બટન અને થીમનાં નામ. English: src/lib/ui-strings.ts. Draft for a native proofreader. */
 
@@ -7,6 +8,12 @@ export const uiStrings: Translation<typeof en> = {
   close: "બંધ કરો",
   notifications: "સૂચનાઓ",
   theme: { group: "રંગ થીમ", system: "ડિવાઇસ પ્રમાણે", light: "આછી", dark: "ઘેરી" },
+  social: {
+    heading: `${site.localNames.gu}ને ફૉલો કરો`,
+    instagram: `Instagram પર ${site.localNames.gu}`,
+    whatsapp: `${site.localNames.gu}ની WhatsApp ચેનલ`,
+    youtube: `YouTube પર ${site.localNames.gu}`,
+  },
   invitation: {
     open: "આમંત્રણ ખોલો",
     close: "આમંત્રણ બંધ કરો",

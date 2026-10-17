@@ -1,5 +1,6 @@
 import type { uiStrings as en } from "@/lib/ui-strings";
 import type { Translation } from "@/i18n/text";
+import { site } from "@/lib/site";
 
 /*
  * বাংলা: সবখানে থাকা বোতাম আর থিমের নাম। English: src/lib/ui-strings.ts.
@@ -10,6 +11,12 @@ export const uiStrings: Translation<typeof en> = {
   close: "বন্ধ করুন",
   notifications: "বিজ্ঞপ্তি",
   theme: { group: "রঙের থিম", system: "ডিভাইসের মতো", light: "হালকা", dark: "গাঢ়" },
+  social: {
+    heading: `${site.localNames.bn}কে ফলো করুন`,
+    instagram: `Instagram-এ ${site.localNames.bn}`,
+    whatsapp: `${site.localNames.bn}-এর WhatsApp চ্যানেল`,
+    youtube: `YouTube-এ ${site.localNames.bn}`,
+  },
   invitation: {
     open: "নিমন্ত্রণপত্র খুলুন",
     close: "নিমন্ত্রণপত্র বন্ধ করুন",

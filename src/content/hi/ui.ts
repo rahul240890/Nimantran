@@ -1,5 +1,6 @@
 import type { uiStrings as en } from "@/lib/ui-strings";
 import type { Translation } from "@/i18n/text";
+import { site } from "@/lib/site";
 
 /* हिन्दी: साझा बटन और थीम के नाम। English: src/lib/ui-strings.ts. */
 
@@ -7,6 +8,12 @@ export const uiStrings: Translation<typeof en> = {
   close: "बंद करें",
   notifications: "सूचनाएँ",
   theme: { group: "रंग थीम", system: "डिवाइस जैसा", light: "हल्की", dark: "गहरी" },
+  social: {
+    heading: `${site.localNames.hi} को फ़ॉलो करें`,
+    instagram: `Instagram पर ${site.localNames.hi}`,
+    whatsapp: `${site.localNames.hi} का WhatsApp चैनल`,
+    youtube: `YouTube पर ${site.localNames.hi}`,
+  },
   invitation: {
     open: "निमंत्रण खोलें",
     close: "निमंत्रण बंद करें",

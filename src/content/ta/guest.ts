@@ -1,5 +1,6 @@
 import type { GuestText } from "@/i18n/copy/guest";
 import { site } from "@/lib/site";
+import { uiStrings } from "./ui";
 
 /*
  * தமிழ்: விருந்தினர் பக்கம், பதில் மற்றும் புகைப்படச் சுவர். English: src/content/publish.ts
@@ -224,4 +225,5 @@ export const guestText: GuestText = {
     },
   },
   theme: { group: "வண்ணத் தீம்", system: "சாதனத்தைப் போல", light: "வெளிர்", dark: "இருண்ட" },
+  social: uiStrings.social,
 };
