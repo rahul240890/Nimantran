@@ -5,6 +5,7 @@ import { OneScene } from "@/components/invitation/scene/one-scene";
 import type { CategoryId } from "@/lib/categories/catalog";
 import { cn } from "@/lib/cn";
 import type { StoryPhoto } from "@/lib/engine/story";
+import { scenePicture } from "@/lib/gallery/pictures";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { PAINTING_ASPECT } from "@/lib/suites/photo-frames";
 import { sceneLine } from "@/lib/suites/scene-type";
@@ -53,10 +54,13 @@ function samplePhotos(suite: SuiteId): StoryPhoto[] {
 
 export function ScenePoster({
   suite,
+  alt = "",
   priority,
   className,
 }: {
   suite: SuiteId;
+  /** The painting described (galleryCopy.designImage); none where words beside it name it. */
+  alt?: string;
   priority?: boolean;
   className?: string;
 }) {
@@ -90,8 +94,8 @@ export function ScenePoster({
       )}
       {/* A Scene theme shows its painting with the card in place */}
       <Image
-        src={(page.card && SUITES[suite].images.cover) || page.image}
-        alt=""
+        src={scenePicture(suite)!}
+        alt={alt}
         fill
         loading={priority ? "eager" : "lazy"}
         sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"

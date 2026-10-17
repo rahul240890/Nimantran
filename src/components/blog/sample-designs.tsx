@@ -4,7 +4,7 @@ import Link from "next/link";
 import { designWords } from "@/components/gallery/design-words";
 import { galleryText } from "@/i18n/copy/gallery";
 import type { UiLocale } from "@/i18n/locales";
-import type { CategoryId } from "@/lib/categories/catalog";
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import { occasionDesigns, suiteImage } from "@/lib/gallery/catalog";
 import { samplePath } from "@/lib/sample/paths";
 
@@ -41,7 +41,7 @@ export function SampleDesigns({
       </h2>
       <ul className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {designs.slice(0, SHOWN).map((design) => {
-          const { name } = designWords(design, locale);
+          const { name, description } = designWords(design, locale);
           return (
             <li key={design.id}>
               <Link
@@ -52,7 +52,11 @@ export function SampleDesigns({
                 <span className="relative block aspect-[9/16] overflow-hidden rounded-xl bg-night shadow-raised ring-1 ring-line">
                   <Image
                     src={suiteImage(design.suite)!}
-                    alt=""
+                    alt={galleryCopy.designImage(
+                      name,
+                      CATEGORIES[occasion].names[locale],
+                      description,
+                    )}
                     fill
                     sizes="(min-width: 40rem) 11rem, 45vw"
                     className="object-cover object-top transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"

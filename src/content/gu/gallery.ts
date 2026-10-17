@@ -81,6 +81,9 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   },
   pagesCount: (count: number) => `${count} પાનાં`,
   preview: (name: string) => `${name} ની ઝલક જુઓ`,
+  designImage: (name: string, occasion: string, description: string) =>
+    `${name}: ${occasion} આમંત્રણ ડિઝાઇન. ${description}`,
+  kindOccasion: (name: string) => `${name} લગ્ન`,
   useDesign: "આ ડિઝાઇન વાપરો",
   packagesHeading: "આ ડિઝાઇન માટે પૅકેજ",
   packageFree: "મફત",

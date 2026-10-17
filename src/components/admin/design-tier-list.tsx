@@ -20,7 +20,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { useDeferredValue, useMemo, useState } from "react";
-import { DesignPreview, paintedPages } from "@/components/gallery/design-card";
+import { DesignPreview } from "@/components/gallery/design-card";
+import { paintedPages } from "@/lib/gallery/pictures";
 import { allSearchWords } from "@/components/gallery/design-words";
 import { ScenePoster } from "@/components/gallery/scene-poster";
 import type { Covers } from "@/components/gallery/shelf-row";

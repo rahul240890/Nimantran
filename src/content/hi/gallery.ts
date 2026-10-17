@@ -82,6 +82,9 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   },
   pagesCount: (count: number) => `${count} पन्ने`,
   preview: (name: string) => `${name} की झलक देखें`,
+  designImage: (name: string, occasion: string, description: string) =>
+    `${name}: ${occasion} निमंत्रण डिज़ाइन। ${description}`,
+  kindOccasion: (name: string) => `${name} विवाह`,
   useDesign: "यह डिज़ाइन चुनें",
   packagesHeading: "इस डिज़ाइन के पैकेज",
   packageFree: "मुफ़्त",

@@ -87,6 +87,9 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   },
   pagesCount: (count: number) => `${count} பக்கங்கள்`,
   preview: (name: string) => `${name} முன்னோட்டம்`,
+  designImage: (name: string, occasion: string, description: string) =>
+    `${name}: ${occasion} அழைப்பிதழ் வடிவமைப்பு. ${description}`,
+  kindOccasion: (name: string) => `${name} திருமண`,
   useDesign: "இந்த டிசைனைப் பயன்படுத்தவும்",
   packagesHeading: "இந்த டிசைனுக்கான பேக்கேஜ்கள்",
   packageFree: "இலவசம்",

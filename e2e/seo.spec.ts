@@ -73,6 +73,25 @@ test.describe("search engines", () => {
     expect(robots).not.toMatch(/Disallow: \/design\b/);
   });
 
+  test("design pictures are described for image search and listed in the sitemap", async ({
+    page,
+    request,
+  }) => {
+    // Google Images reads a picture by its description: name, occasion and scene
+    await page.goto("/invitations/wedding/gujarati");
+    await expect(
+      page.locator('[data-design] img[alt*=": Gujarati wedding invitation design. "]').first(),
+    ).toBeAttached();
+    await page.goto("/hi/invitations/haldi");
+    await expect(
+      page.locator('[data-design] img[alt*=": हल्दी निमंत्रण डिज़ाइन। "]').first(),
+    ).toBeAttached();
+
+    const sitemap = await (await request.get("/sitemap.xml")).text();
+    expect(sitemap).toContain('xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"');
+    expect(sitemap).toMatch(/<image:loc>[^<]*\/suites\/[^<]+\.webp<\/image:loc>/);
+  });
+
   test("app pages ask not to be indexed", async ({ page }) => {
     await page.goto("/sign-in");
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
