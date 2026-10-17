@@ -38,7 +38,14 @@ export type GuestReply = ReplyInput & {
 };
 
 export type SubmitResult =
-  { ok: true; token: string } | { ok: false; reason: "missing" | "not-invited" | "failed" };
+  | { ok: true; token: string }
+  | { ok: false; reason: "missing" | "not-invited" | "too-many" | "failed" };
+
+/** New guests one network can add to an invitation, as reply_senders counts them. */
+const SENDER_LIMITS = [
+  { within: 60 * 60 * 1000, most: 10 },
+  { within: 24 * 60 * 60 * 1000, most: 30 },
+] as const;
 
 type RpcReply = {
   name: string;
@@ -98,16 +105,21 @@ export async function findReply(slug: string, token: string): Promise<GuestReply
   return null;
 }
 
+/**
+ * Saves a reply. `sender` is the network's hash from reply-sender.ts; the database limits
+ * how many new guests it can add.
+ */
 export async function submitReply(
   slug: string,
   token: string | null,
   input: ReplyInput,
+  sender: string | null = null,
 ): Promise<SubmitResult> {
   const mode = authMode();
   if (mode === "supabase") {
     const supabase = supabasePublic();
     if (!supabase) return { ok: false, reason: "failed" };
-    const { data, error } = await supabase.rpc("submit_rsvp", {
+    const args = {
       p_slug: slug,
       p_token: token,
       p_name: input.name,
@@ -119,13 +131,17 @@ export async function submitReply(
       })),
       p_message: input.message,
       p_answers: input.answers,
-    });
+    };
+    let { data, error } = await supabase.rpc("submit_rsvp", { ...args, p_sender: sender });
+    // Until 20261017090000_reply_limits.sql runs, submit_rsvp() has no p_sender
+    if (error?.code === "PGRST202") ({ data, error } = await supabase.rpc("submit_rsvp", args));
     if (error?.code === "P0002") return { ok: false, reason: "missing" };
     if (error?.code === "42501") return { ok: false, reason: "not-invited" };
+    if (error?.code === "P0429") return { ok: false, reason: "too-many" };
     if (error || typeof data !== "string") return { ok: false, reason: "failed" };
     return { ok: true, token: data };
   }
-  if (mode === "preview") return submitPreview(slug, token, input);
+  if (mode === "preview") return submitPreview(slug, token, input, sender);
   return { ok: false, reason: "failed" };
 }
 
@@ -133,6 +149,7 @@ async function submitPreview(
   slug: string,
   token: string | null,
   input: ReplyInput,
+  sender: string | null,
 ): Promise<SubmitResult> {
   const invite = await findPublishedInvite(slug);
   if (!invite) return { ok: false, reason: "missing" };
@@ -147,6 +164,21 @@ async function submitPreview(
     input.replies.some((reply) => !guest!.functionIds.includes(reply.functionId))
   ) {
     return { ok: false, reason: "not-invited" };
+  }
+  if (!guest && sender) {
+    const now = Date.now();
+    previewDb.senders = previewDb.senders.filter((row) => now - row.at < 2 * 86_400_000);
+    const mine = previewDb.senders.filter(
+      (row) => row.eventId === invite.id && row.sender === sender,
+    );
+    if (
+      SENDER_LIMITS.some(
+        ({ within, most }) => mine.filter((row) => now - row.at < within).length >= most,
+      )
+    ) {
+      return { ok: false, reason: "too-many" };
+    }
+    previewDb.senders.push({ eventId: invite.id, sender, at: now });
   }
   if (!guest) {
     guest = {

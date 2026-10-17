@@ -41,6 +41,13 @@ test.describe("guest RSVP", () => {
       await form.getByRole("textbox", { name: /A note for the family/ }).fill("See you there!");
       expect(await noOverflow(guest)).toBe(true);
       expect((await axe(guest).analyze()).violations).toEqual([]);
+
+      // A bot that fills in the field people never see gets nowhere
+      const trap = form.locator('input[name="website"]');
+      await trap.fill("https://spam.example", { force: true });
+      await form.getByRole("button", { name: "Send reply" }).click();
+      await expect(form.getByRole("alert")).toHaveText(/Couldn't send your reply/);
+      await trap.fill("", { force: true });
       await form.getByRole("button", { name: "Send reply" }).click();
 
       await expect(form.getByRole("heading", { name: "Thank you, Rohan!" })).toBeFocused();

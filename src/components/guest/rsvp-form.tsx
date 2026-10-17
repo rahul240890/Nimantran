@@ -128,6 +128,8 @@ export function RsvpForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
+  // Hidden from people; a bot that fills in every field fills this too
+  const trap = useRef<HTMLInputElement>(null);
   const thanks = useRef<HTMLHeadingElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   // Where focus goes once the form or the thanks has rendered, after a send or "change"
@@ -222,6 +224,7 @@ export function RsvpForm({
       name: name.trim(),
       message,
       answers,
+      website: trap.current?.value ?? "",
       replies: functions.map((fn) => {
         const choice = choiceOf(fn.id);
         return {
@@ -241,7 +244,9 @@ export function RsvpForm({
             ? rsvpCopy.notInvited
             : result.reason === "full"
               ? rsvpCopy.full
-              : rsvpCopy.failed,
+              : result.reason === "too-many"
+                ? rsvpCopy.tooMany
+                : rsvpCopy.failed,
       );
       return;
     }
@@ -314,6 +319,16 @@ export function RsvpForm({
       }}
       className="flex flex-col gap-6"
     >
+      <div aria-hidden className="sr-only">
+        <input
+          ref={trap}
+          type="text"
+          name="website"
+          aria-label="Website"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
       <Field
         label={rsvpCopy.yourName}
         required

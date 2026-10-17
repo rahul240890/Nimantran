@@ -77,6 +77,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
    - `step15-admin-and-editions.sql`, `step17-coupons-invoices.sql`
    - `step24-photo-wall.sql`, `step-cohosts-part2.sql`, `guest-opens.sql`, `step-occasions-2.sql`
    - `blog-posts.sql` (Admin, Blog)
+   - `supabase/migrations/20261017090000_reply_limits.sql` (spam protection for guest replies)
 
    To run each one: Supabase, then **SQL Editor**, then **New query**, paste the file, then **Run**.
 

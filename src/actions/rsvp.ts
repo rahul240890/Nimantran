@@ -9,13 +9,14 @@ import {
   type GuestReply,
   type SubmitResult,
 } from "@/lib/invites/rsvp";
+import { replySender } from "@/lib/invites/reply-sender";
 import { openLinkHasRoom } from "@/lib/payments/invite-room";
 import { isSlug } from "@/lib/publish/slug";
 
 /*
  * Guests reply from the invitation page without signing in. Everything is checked here
  * and again in the database, which only accepts replies to a published invite's own
- * functions.
+ * functions, and only so many new guests from one network.
  */
 
 const token = z.string().regex(/^[0-9a-f]{16,64}$/);
@@ -35,6 +36,8 @@ const replySchema = z.object({
     .max(20),
   message: z.string().trim().max(280),
   answers: z.partialRecord(z.enum(RSVP_QUESTION_IDS), z.string().trim().max(120)),
+  /** A field people never see: only a bot fills it in. */
+  website: z.string().max(0).optional(),
 });
 
 export async function loadReply(slug: string, guestToken: string): Promise<GuestReply | null> {
@@ -59,7 +62,9 @@ export async function sendReply(
   const answers = Object.fromEntries(
     Object.entries(parsed.data.answers).filter(([, value]) => value),
   ) as Record<string, string>;
-  return submitReply(slug, known, { ...parsed.data, answers }).catch(
+  const { name, replies, message } = parsed.data;
+  const sender = await replySender(slug).catch(() => null);
+  return submitReply(slug, known, { name, replies, message, answers }, sender).catch(
     () => ({ ok: false, reason: "failed" }) as const,
   );
 }

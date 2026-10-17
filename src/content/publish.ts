@@ -197,6 +197,8 @@ export const rsvpCopy = {
   notInvited: "This link isn't for one of those celebrations. Ask the family to check it.",
   previewOnly: "This is your preview, so nothing was sent. Guests can reply once you publish.",
   full: "Replies on this invitation are full for now. Please send your reply to the family directly.",
+  tooMany:
+    "A lot of new replies have come from this network just now. Please try again in an hour, or send your reply to the family directly.",
   fixErrors: (count: number) =>
     count === 1 ? "One answer still needs you." : `${count} answers still need you.`,
   thanksTitle: (name: string) => `Thank you, ${name}!`,
