@@ -65,6 +65,13 @@ describe("blog posts", () => {
     expect(switchLocalePath("/hi/blog/shadi-card-matter-hindi", "hi")).toBe(
       "/hi/blog/shadi-card-matter-hindi",
     );
+    expect(switchLocalePath("/blog/gujarati-wedding-invitation-wording", "gu")).toBe(
+      "/gu/blog/kankotri-lakhan",
+    );
+    expect(switchLocalePath("/gu/blog/kankotri-lakhan", "en")).toBe(
+      "/blog/gujarati-wedding-invitation-wording",
+    );
+    expect(switchLocalePath("/gu/blog/kankotri-lakhan", "mr")).toBe("/mr/blog");
     expect(switchLocalePath("/blog", "hi")).toBe("/hi/blog");
     expect(switchLocalePath("/pricing", "hi")).toBe("/hi/pricing");
     expect(switchLocalePath("/hi/refunds", "en")).toBe("/refunds");

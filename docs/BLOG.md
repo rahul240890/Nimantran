@@ -1,6 +1,6 @@
 # Blog
 
-The blog brings visitors from search: people looking for invitation wording, messages and planning help, who then make their invitation on Shubh. It lives at `/blog` (English) and `/hi/blog` (Hindi).
+The blog brings visitors from search: people looking for invitation wording, messages and planning help, who then make their invitation on Shubh. It lives at `/blog` (English) and at `/hi/blog`, `/mr/blog`, `/gu/blog`, `/bn/blog` and `/ta/blog` for the other site languages. A language's blog appears once it has a post of its own.
 
 ## How a post is made
 
@@ -8,7 +8,7 @@ The blog brings visitors from search: people looking for invitation wording, mes
 2. Claude writes it as one file in `src/content/blog/`, adds it to `src/content/blog/index.ts`, and opens a PR.
 3. The post goes live when the PR is merged. The sitemap, the blog's front page and "More to read" pick it up by themselves.
 
-A post is written in one language. A Hindi post is a separate file with `locale: "hi"`, and its address is `/hi/blog/<slug>`. When a post exists in both languages, give both the same `pair` key so each lists the other as its language version.
+A post is written in one language. A post in another language is a separate file with its `locale` (`"hi"`, `"mr"`, `"gu"`, `"bn"` or `"ta"`), and its address is `/<locale>/blog/<slug>`, for example `/hi/blog/<slug>`. Its file name starts with the locale (`gu-kankotri-lakhan.ts`). When a post exists in two languages, give both the same `pair` key so each lists the other as its language version, and add the pair to `POST_PAIRS` in `src/lib/blog/addresses.ts` (a unit test checks they agree).
 
 ## What each post has
 
@@ -50,30 +50,30 @@ The post is written in a light markup shown under the box: `## Section`, `### Sm
 - Copyable messages near the top: that is what searchers came for.
 - FAQ answers in the words people search, sent to Google as FAQ structured data, with Article structured data, breadcrumbs, a canonical address and `hreflang` links to the other language's version when a `pair` exists.
 - Internal links: every post links to its occasion's designs page and to two or three related posts. "More to read" under a post shows the posts it links to, then posts that link to it, then the same occasion. Each occasion's designs page (`/invitations/<occasion>`) lists that occasion's posts under "Wording ideas".
-- A Hindi post is written for Hindi searchers (Devanagari keywords and Hinglish spellings), not translated word for word.
+- A post in an Indian language is written for that language's searchers (keywords in its own script and the romanised spellings people type, such as "kankotri lakhan"), not translated word for word. Very few sites write these well, so they are the easiest posts to rank.
 
 ## Keywords
 
 Research (3 October 2026): the searches families make around an invitation are for **wording and messages to copy**, by occasion and by language. Google's results for most of these are thin template sites, Canva/Adobe template pages and a few publishers (WeddingWire India for wedding messages, SmartPuja for puja and griha pravesh), so a complete, well-structured post can rank. Exact monthly volumes need Google Search Console after launch or Keyword Planner; the order below is by how often the phrase family appears in Google's suggestions and in competitors' pages, and by how close it is to making an invitation.
 
-Written (32 posts):
+Written (36 posts):
 
 - Wedding: wedding invitation wording; digital invitation on WhatsApp; haldi, mehendi and sangeet messages; wedding invitation video; Indian wedding functions; engagement invitation message; save the date message; reception invitation wording; wedding invitation message for friends; wedding RSVP message; thank you message after wedding; Muslim wedding invitation wording; Gujarati wedding invitation wording (kankotri).
 - Family: birthday invitation messages; 1st birthday invitation message; anniversary party invitation message; baby shower invitation message (godh bharai, seemantham); annaprashan invitation message; thread ceremony invitation message; griha pravesh invitation message; retirement party invitation message; shop opening invitation message.
 - Festivals and puja: Diwali party invitation message; Satyanarayan puja invitation message; Ganpati invitation message; garba night invitation message.
 - Hindi: शादी कार्ड मैटर; शादी का निमंत्रण WhatsApp संदेश; सगाई निमंत्रण संदेश; गृह प्रवेश निमंत्रण संदेश; जन्मदिन निमंत्रण संदेश; दिवाली निमंत्रण संदेश; सत्यनारायण कथा निमंत्रण.
+- In their own languages (17 October 2026): કંકોતરી લખાણ (Gujarati, paired with the English Gujarati wording post); लग्नपत्रिका मजकूर (Marathi); திருமண அழைப்பிதழ் வாசகம் (Tamil); বিয়ের কার্ডের লেখা (Bengali).
 
 Next, in order:
 
-1. Marathi lagna patrika wording
-2. Tamil wedding invitation wording
-3. Bengali wedding card wording
-4. Punjabi wedding (Anand Karaj) invitation wording
-5. Mundan ceremony invitation (needs a mundan occasion first)
-6. Naming ceremony (namkaran) invitation (needs a naming ceremony occasion first)
-7. Hindi: सगाई, हल्दी, मेहंदी के निमंत्रण संदेश; गणेश स्थापना निमंत्रण; मुंडन निमंत्रण
-8. Eid party invitation message
-9. Lohri and Makar Sankranti invitation messages, before January
-10. Christmas party invitation message, before December
+1. English versions of the Marathi, Tamil and Bengali posts (Marathi lagna patrika wording, Tamil wedding invitation wording, Bengali wedding card wording), paired with them
+2. More in their own languages: Gujarati ટહુકો and સીમંત (godh bharai) wording; Marathi साखरपुडा and बारसे invitations; Tamil வளைகாப்பு and புதுமனை புகுவிழா invitations; Bengali অন্নপ্রাশন and গৃহপ্রবেশ invitations
+3. Punjabi wedding (Anand Karaj) invitation wording
+4. Mundan ceremony invitation (needs a mundan occasion first)
+5. Naming ceremony (namkaran) invitation (needs a naming ceremony occasion first)
+6. Hindi: सगाई, हल्दी, मेहंदी के निमंत्रण संदेश; गणेश स्थापना निमंत्रण; मुंडन निमंत्रण
+7. Eid party invitation message
+8. Lohri and Makar Sankranti invitation messages, before January
+9. Christmas party invitation message, before December
 
 Festival posts should go live 4 to 6 weeks before the festival, so search engines have found them in time.

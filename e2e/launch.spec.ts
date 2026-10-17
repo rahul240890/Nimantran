@@ -176,10 +176,34 @@ test.describe("blog", () => {
     await expect(page.locator('link[hreflang="en-IN"]')).toHaveCount(0);
   });
 
+  test("a post in Gujarati is its own page, linked with its English version", async ({ page }) => {
+    await page.goto("/gu/blog");
+    await page
+      .getByRole("link", { name: /કંકોતરી લખાણ/ })
+      .first()
+      .click();
+    await expect(page).toHaveURL(/\/gu\/blog\/kankotri-lakhan$/);
+    await expect(page.locator("html")).toHaveAttribute("lang", "gu");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("કંકોતરી લખાણ");
+    await expect(page.locator('link[hreflang="en-IN"]')).toHaveAttribute(
+      "href",
+      /\/blog\/gujarati-wedding-invitation-wording$/,
+    );
+    expect(await noOverflow(page)).toBe(true);
+  });
+
   test("the sitemap lists every post", async ({ request }) => {
     const sitemap = await (await request.get("/sitemap.xml")).text();
     expect(sitemap).toContain("/blog/indian-wedding-functions");
     expect(sitemap).toContain("/hi/blog/shadi-card-matter-hindi");
+    for (const post of [
+      "/gu/blog/kankotri-lakhan",
+      "/mr/blog/lagna-patrika-majkur",
+      "/ta/blog/thirumana-azhaippithazh-vasagam",
+      "/bn/blog/biyer-card-lekha",
+    ]) {
+      expect(sitemap).toContain(`${post}</loc>`);
+    }
     expect(sitemap).toContain("/refunds");
   });
 });

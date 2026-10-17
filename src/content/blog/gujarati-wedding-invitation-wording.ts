@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const gujaratiWeddingInvitationWording: BlogPost = {
   slug: "gujarati-wedding-invitation-wording",
   locale: "en",
+  pair: "gujarati-wedding",
   title: "Gujarati wedding invitation wording: 25 lines",
   description:
     "Gujarati wedding invitation wording and kankotri matter in Gujarati script, with English: invitation lines, prasang times, closing names and tahuko.",
@@ -10,7 +11,7 @@ export const gujaratiWeddingInvitationWording: BlogPost = {
   intro:
     "A Gujarati kankotri has its own warm rhythm: Shri Ganesh at the top, a bhavbharyu amantran to the whole family, every prasang from Ganesh sthapana to hast melap, and a playful tahuko from the children at the end. Here are 25 lines in Gujarati script, with the English meaning, to copy as they are or change for your family.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-10-17",
   occasion: "wedding",
   keywords: [
     "gujarati wedding invitation wording",

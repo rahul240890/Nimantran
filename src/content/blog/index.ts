@@ -2,12 +2,14 @@ import { annaprashanInvitationMessage } from "./annaprashan-invitation-message";
 import { anniversaryPartyInvitationMessage } from "./anniversary-party-invitation-message";
 import { babyShowerInvitationMessage } from "./baby-shower-invitation-message";
 import { birthdayInvitationMessages } from "./birthday-invitation-messages";
+import { biyerCardLekha } from "./bn-biyer-card-lekha";
 import { digitalWeddingInvitationWhatsapp } from "./digital-wedding-invitation-whatsapp";
 import { diwaliPartyInvitationMessage } from "./diwali-party-invitation-message";
 import { engagementInvitationMessage } from "./engagement-invitation-message";
 import { firstBirthdayInvitationMessage } from "./first-birthday-invitation-message";
 import { ganeshChaturthiInvitationMessage } from "./ganesh-chaturthi-invitation-message";
 import { grihaPraveshInvitationMessage } from "./griha-pravesh-invitation-message";
+import { kankotriLakhan } from "./gu-kankotri-lakhan";
 import { gujaratiWeddingInvitationWording } from "./gujarati-wedding-invitation-wording";
 import { haldiMehendiSangeetMessages } from "./haldi-mehendi-sangeet-invitation-messages";
 import { diwaliNimantranSandesh } from "./hi-diwali-nimantran-sandesh";
@@ -18,6 +20,7 @@ import { satyanarayanKathaNimantran } from "./hi-satyanarayan-katha-nimantran";
 import { shadiCardMatterHindi } from "./hi-shadi-card-matter";
 import { shadiNimantranWhatsappSandesh } from "./hi-shadi-nimantran-whatsapp-sandesh";
 import { indianWeddingFunctions } from "./indian-wedding-functions";
+import { lagnaPatrikaMajkur } from "./mr-lagna-patrika-majkur";
 import { muslimWeddingInvitationWording } from "./muslim-wedding-invitation-wording";
 import { navratriGarbaInvitationMessage } from "./navratri-garba-invitation-message";
 import { receptionInvitationWording } from "./reception-invitation-wording";
@@ -25,6 +28,7 @@ import { retirementPartyInvitationMessage } from "./retirement-party-invitation-
 import { satyanarayanPujaInvitationMessage } from "./satyanarayan-puja-invitation-message";
 import { saveTheDateMessages } from "./save-the-date-messages";
 import { shopOpeningInvitationMessage } from "./shop-opening-invitation-message";
+import { thirumanaAzhaippithazhVasagam } from "./ta-thirumana-azhaippithazh-vasagam";
 import { threadCeremonyInvitationMessage } from "./thread-ceremony-invitation-message";
 import type { BlogPost } from "./types";
 import { weddingInvitationMessageForFriends } from "./wedding-invitation-message-for-friends";
@@ -69,4 +73,8 @@ export const POSTS: readonly BlogPost[] = [
   weddingInvitationMessageForFriends,
   weddingRsvpMessage,
   weddingThankYouMessages,
+  kankotriLakhan,
+  lagnaPatrikaMajkur,
+  thirumanaAzhaippithazhVasagam,
+  biyerCardLekha,
 ];
