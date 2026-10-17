@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import QRCode from "qrcode";
 import { z } from "zod";
 import { AccountShell } from "@/components/account/account-shell";
+import { CardsLink } from "@/components/cards/cards-link";
 import { PageTransition } from "@/components/motion/page-transition";
 import { RepliesCard } from "@/components/publish/replies-card";
 import { SharePanel } from "@/components/publish/share-panel";
@@ -104,6 +105,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
               testCodecs={authMode() === "preview"}
             />
           }
+          cards={<CardsLink inviteId={id} />}
         />
       </AccountShell>
     </PageTransition>

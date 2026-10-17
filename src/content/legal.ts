@@ -123,7 +123,7 @@ export const privacy: LegalDoc = {
       id: "how-long",
       heading: "How long we keep it",
       body: [
-        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubh Invitation opens to you. Technical error details are kept for at most 30 days.",
+        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubh Invitation opens to you. Technical error details are kept for at most 30 days. To stop spam replies, we keep a scrambled code for the network each new reply came from, which can't be turned back into an address, for two days.",
       ],
     },
     {

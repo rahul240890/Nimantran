@@ -42,6 +42,7 @@ Every design has a price the master admin sets (**Admin, Designs**): Free, Premi
 | WhatsApp Status and Reels video       | —                       | —                          | One video                 | One per function  |
 | Guest photo wall                      | —                       | —                          | 30 days                   | 1 year            |
 | Co-hosts                              | 1                       | 1                          | 3                         | Unlimited         |
+| Save-the-date and thank-you cards     | Preview with the mark   | Preview with the mark      | Preview with the mark     | Yes               |
 
 Rules:
 
@@ -55,7 +56,8 @@ Rules:
 - **Own song in every package** (owner, 2026-10-14): Free and Basic play the host's own clip too, so nobody has to remove a song they chose to publish.
 - **Video preview for everyone** (owner, 2026-10-14): any host makes the invitation video and watches it free, from the editor's last step (`/invites/<id>/video`), the invite's dashboard, the share page or the Celebration card. Without Celebration or Grand on its design it carries a "Made with Shubh" mark across the middle and can't be downloaded or shared; with them it downloads clean once the invite is live, since its last card carries the link.
 - **Video controls** (owner, 2026-10-16): once made, before or after paying, the host watches it full screen, makes it again or deletes it from the device. Download shows from the start: locked, it leads to the package (or to publishing) that unlocks it.
-- Not in any package yet, because they are not built: save-the-date and thank-you cards, PDF and printable QR. Add them to Grand when they exist.
+- **Save-the-date and thank-you cards in Grand** (2026-10-17): every host makes both pictures in their design (`/invites/<id>/cards`) and sees them with the “Made with Shubh” mark across; Grand downloads and shares them clean, before or after publishing (a save the date goes out before the invitation). While payments are off, everyone gets them clean.
+- Not in any package yet, because they are not built: PDF and printable QR.
 
 ## 3. Personal: Family Plus (yearly)
 

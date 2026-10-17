@@ -9,7 +9,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 - **Blog** at `/blog` and `/hi/blog` for search traffic. How to add a post: [BLOG.md](BLOG.md).
 - **Privacy policy and terms** are at `/privacy` and `/terms`, with Hindi versions at `/hi/privacy` and `/hi/terms`. The footer on every page links to them, and so does the sign-in page. Both are written for India's Digital Personal Data Protection Act, 2023. The wording lives in `src/content/legal.ts` and `src/content/hi/legal.ts`. Change `LEGAL_UPDATED` in `src/lib/legal.ts` whenever the wording changes.
 - **Visitor analytics** use Vercel Web Analytics. It sets no cookies and counts only on the live site. Invitation links, guest codes and anything after `?` are removed before a visit is counted (`src/lib/analytics.ts`), so the numbers never show whose invitation was opened. The funnel steps (`src/lib/funnel.ts`: sample opened, design previewed, editor opened, preview reached, checkout started, payment completed, invite published) are custom events carrying only a design, an occasion or a package; Vercel shows custom events on the Pro plan.
-- **Error reports**: errors in visitors' browsers and on the server are written to the Vercel logs, one line each:
+- **Error reports**: errors in visitors' browsers and on the server are written to the Vercel logs, one line each, and emailed to the admins (step 6):
   - Browser errors start with `[client-error]`.
   - Server errors start with `[server-error]`.
   - Pages that fail show a friendly "Something went wrong" page with a Try again button instead of a blank screen.
@@ -61,8 +61,9 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
 
 ### 6. Know where errors show up
 
-- In Vercel, open **Logs** and search for `client-error` or `server-error`.
-- On the free Hobby plan, logs are kept only briefly. If you move to Pro, you can add a log drain, or a service such as Sentry, to keep them longer and get emails on new errors. Ask Claude to add Sentry when you want it.
+- **Error emails** come by themselves once emails are set up ([EMAILS.md](EMAILS.md)): when a page breaks on the server, or a visitor's browser reports an error that isn't its own (a lost connection, an extension or an old page after a deploy never count), the site emails every admin's sign-in address. To send them somewhere else, set `ALERT_EMAIL` in Vercel to one address or several separated by commas, and redeploy. Each kind of error emails at most once a day, so fixing it stops the emails.
+- In Vercel, open **Logs** and search for `client-error` or `server-error` to see every time it happened.
+- On the free Hobby plan, logs are kept only briefly. If you move to Pro, you can add a log drain, or a service such as Sentry, to keep them longer.
 
 ### 7. Make the database launch-ready
 
@@ -77,6 +78,7 @@ The code for launch has been merged: privacy policy and terms, visitor analytics
    - `step15-admin-and-editions.sql`, `step17-coupons-invoices.sql`
    - `step24-photo-wall.sql`, `step-cohosts-part2.sql`, `guest-opens.sql`, `step-occasions-2.sql`
    - `blog-posts.sql` (Admin, Blog)
+   - `supabase/migrations/20261017090000_reply_limits.sql` (spam protection for guest replies)
 
    To run each one: Supabase, then **SQL Editor**, then **New query**, paste the file, then **Run**.
 

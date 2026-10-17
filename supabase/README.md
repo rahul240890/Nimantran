@@ -58,6 +58,9 @@ database keeps every invite. Applied so far after the first setup:
 - `20261016090000_one_design_per_package.sql` — one payment, one design: `event_plans.design_id`
   and `orders.design_id` / `from_design_id`. **Run it before the code that uses it goes live.**
   Packages bought before it keep working: each is tied to its invite's design on first use.
+- `20261017090000_reply_limits.sql` — spam protection for guest replies: `reply_senders` and
+  a new `submit_rsvp()` that lets one network add at most 10 new guests to an invite an hour
+  and 30 a day. Replies keep working before it runs, just without the limit.
 
 ## Setting up a project
 

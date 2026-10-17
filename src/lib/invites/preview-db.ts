@@ -102,6 +102,8 @@ type PreviewDb = {
   guests: Map<string, PreviewGuest>;
   /** Photo wall photos by id. */
   wall: Map<string, PreviewWallPhoto>;
+  /** New guests' senders, as reply_senders keeps them. */
+  senders: { eventId: string; sender: string; at: number }[];
 };
 
 const holder = globalThis as unknown as { __shubhdwarPreviewDb?: PreviewDb };
@@ -111,9 +113,11 @@ export const previewDb: PreviewDb = (holder.__shubhdwarPreviewDb ??= {
   files: new Map(),
   guests: new Map(),
   wall: new Map(),
+  senders: [],
 });
 previewDb.guests ??= new Map();
 previewDb.wall ??= new Map();
+previewDb.senders ??= [];
 
 /** A photo as a data URL: preview mode has no file storage to link to. */
 export function previewPhotoUrl(eventId: string, photoId: string): string | null {

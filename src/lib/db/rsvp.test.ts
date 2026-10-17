@@ -219,3 +219,61 @@ describe("guest replies", () => {
     expect(await t.as(null, () => q("select id from guests"))).toEqual([]);
   });
 });
+
+describe("new guests per network", () => {
+  const sender = "network-a-0123456789";
+  const from = (who: string, name: string, token: string | null = null) =>
+    t
+      .as(null, () =>
+        q<{ token: string }>("select public.submit_rsvp($1, $2, $3, $4, $5, $6, $7) as token", [
+          "priya-weds-arjun",
+          token,
+          name,
+          JSON.stringify([{ function_id: wedding, status: "attending", adults: 1 }]),
+          "",
+          JSON.stringify({}),
+          who,
+        ]),
+      )
+      .then((rows) => rows[0]!.token);
+  const guests = () => t.as(priya, () => q("select id from guests")).then((rows) => rows.length);
+
+  it("stop at ten an hour from one network, while others and known guests carry on", async () => {
+    const before = await guests();
+    let first = "";
+    for (let i = 0; i < 10; i++) {
+      const token = await from(sender, `Guest ${i}`);
+      first ||= token;
+    }
+    await expect(from(sender, "Guest 10")).rejects.toThrow(/too many new replies/);
+    expect(await guests()).toBe(before + 10);
+    // A guest changing their reply, and another network, are never held back
+    await expect(from(sender, "Guest 0 ji", first)).resolves.toBe(first);
+    await expect(from("network-b-0123456789", "Mausi")).resolves.toMatch(/^[0-9a-f]{24}$/);
+    // Without a sender (the old call) there's no limit to apply
+    await expect(
+      submit([{ function_id: wedding, status: "maybe" }], { name: "Kaka" }),
+    ).resolves.toMatch(/^[0-9a-f]{24}$/);
+  });
+
+  it("allow thirty a day, and forget a network after two days", async () => {
+    await t.db.exec("reset role");
+    await q("update reply_senders set created_at = now() - interval '2 hours'");
+    for (let i = 0; i < 10; i++) await from(sender, `Later ${i}`);
+    await q("update reply_senders set created_at = now() - interval '3 hours' where sender = $1", [
+      sender,
+    ]);
+    for (let i = 0; i < 10; i++) await from(sender, `Evening ${i}`);
+    await expect(from(sender, "One too many")).rejects.toThrow(/too many new replies/);
+
+    await q("update reply_senders set created_at = now() - interval '3 days'");
+    await expect(from(sender, "Next week")).resolves.toMatch(/^[0-9a-f]{24}$/);
+    const [kept] = await q<{ count: number }>("select count(*)::int as count from reply_senders");
+    expect(kept!.count).toBe(1);
+  });
+
+  it("keep the hashes away from guests and hosts", async () => {
+    await expect(t.as(null, () => q("select * from reply_senders"))).rejects.toThrow();
+    await expect(t.as(priya, () => q("select * from reply_senders"))).rejects.toThrow();
+  });
+});

@@ -244,3 +244,63 @@ export function draftReminderEmail(brand: Brand, d: DraftReminderDetails): Email
     ].join("\n"),
   };
 }
+
+/* ---------- Error alert ---------- */
+
+export type ErrorAlertDetails = {
+  /** Where it broke: on the server, or in a visitor's browser. */
+  where: "server" | "browser";
+  message: string;
+  stack?: string;
+  /** The page, trimmed as for analytics so it names no invitation. */
+  path: string;
+  /** Anything else worth knowing, such as the route or the browser. */
+  facts: [string, string][];
+  at: Date;
+};
+
+const timed = new Intl.DateTimeFormat("en-IN", {
+  dateStyle: "medium",
+  timeStyle: "short",
+  timeZone: "Asia/Kolkata",
+});
+
+/** To the people who look after the site, when a page breaks for someone. */
+export function errorAlertEmail(brand: Brand, d: ErrorAlertDetails): Email {
+  const place = d.where === "server" ? "on the server" : "in a visitor's browser";
+  const title = `Something broke ${place}`;
+  const stack = (d.stack ?? "").split("\n").slice(0, 12).join("\n");
+  const details: [string, string][] = [
+    ["Page", d.path],
+    ["When", `${timed.format(d.at)} IST`],
+    ...d.facts,
+  ];
+  const search = d.where === "server" ? "server-error" : "client-error";
+  const lines = [
+    `Vercel → Logs, searching for ${search}, shows every time it happened.`,
+    "This email comes at most once a day for each kind of error, so a fix that works stops it.",
+  ];
+  const why = `You're getting this because you look after ${brand.name}'s site.`;
+  const code = (value: string) =>
+    `<pre style="margin:0 0 14px;padding:12px;white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.5;background:${color.paper};border:1px solid ${color.line};border-radius:8px;color:${color.ink}">${escapeHtml(value)}</pre>`;
+  return {
+    subject: `${brand.name}: ${d.message.slice(0, 80)}`,
+    html: layout(
+      brand,
+      `${d.message.slice(0, 120)} · ${d.path}`,
+      `${heading(title)}${code(d.message)}${rows(details)}${stack ? code(stack) : ""}${lines.map(paragraph).join("")}`,
+      { why },
+    ),
+    text: [
+      title,
+      "",
+      d.message,
+      "",
+      ...details.map(([label, value]) => `${label}: ${value}`),
+      ...(stack ? ["", stack] : []),
+      "",
+      ...lines,
+      textFooter(brand, why),
+    ].join("\n"),
+  };
+}
