@@ -1,7 +1,17 @@
-import { ArrowLeft, Clapperboard, ExternalLink, Pencil, Send, Sparkles, Users } from "lucide-react";
+import {
+  ArrowLeft,
+  Clapperboard,
+  ExternalLink,
+  Images,
+  Pencil,
+  Send,
+  Sparkles,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { cardsText } from "@/i18n/copy/cards";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import { editionsText } from "@/i18n/copy/editions";
 import { editorText } from "@/i18n/copy/editor";
@@ -37,6 +47,7 @@ export async function GuestDashboard({
   openSend?: string;
 }) {
   const copy = (await getText(dashboardText)).dashboardCopy;
+  const { cardsCopy } = await getText(cardsText);
   const { functionCopy } = await getText(editorText);
   const { limitCopy, planCopy } = await getText(editionsText);
   const counts = dashboardCounts(view.guests, view.functions);
@@ -117,6 +128,14 @@ export async function GuestDashboard({
                 >
                   <Clapperboard aria-hidden />
                   {copy.video}
+                </Link>
+              </Button>
+            )}
+            {view.canEdit && (
+              <Button asChild size="sm" variant="secondary">
+                <Link href={`/invites/${view.id}/cards`}>
+                  <Images aria-hidden />
+                  {cardsCopy.openShort}
                 </Link>
               </Button>
             )}

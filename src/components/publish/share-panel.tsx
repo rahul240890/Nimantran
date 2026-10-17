@@ -44,6 +44,8 @@ type SharePanelProps = {
   replies?: ReactNode;
   /** The invitation video (Step 17c). */
   video?: ReactNode;
+  /** The way to the save-the-date and thank-you cards (Step 24). */
+  cards?: ReactNode;
 };
 
 const noSubscribe = () => () => {};
@@ -70,6 +72,7 @@ export function SharePanel({
   qr,
   replies,
   video,
+  cards,
 }: SharePanelProps) {
   const { shareCopy } = useText(publishText);
   const [message, setMessage] = useState(initialMessage);
@@ -246,6 +249,7 @@ export function SharePanel({
           </Card>
 
           {video}
+          {cards}
         </div>
       </div>
 

@@ -7,6 +7,7 @@ import {
   Clock,
   Eye,
   ImageIcon,
+  Images,
   MapPin,
   PartyPopper,
   Pencil,
@@ -35,6 +36,7 @@ import { SecondLanguageSection } from "./second-language";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
+import { cardsText } from "@/i18n/copy/cards";
 import { editorText } from "@/i18n/copy/editor";
 
 function Section({
@@ -271,25 +273,27 @@ export function PreviewStep({
 }
 
 /** Where each button goes: a live invite's video is on its share page, with the link it ends on. */
-function guestHref(id: string, page: "preview" | "video", published: boolean) {
+function guestHref(id: string, page: "preview" | "video" | "cards", published: boolean) {
   return `/invites/${id}/${page === "video" && published ? "share" : page}`;
 }
 
 /**
- * Saves the invite, then opens it full screen exactly as a guest will see it, or as the
- * invitation video (free to watch, with the mark until a package includes it).
+ * Saves the invite, then opens it full screen exactly as a guest will see it, as the
+ * invitation video (free to watch, with the mark until a package includes it), or as its
+ * save-the-date and thank-you cards.
  */
 function SeeAsGuest({ remoteId, published }: { remoteId: string | null; published: boolean }) {
   const { previewCopy } = useText(editorText);
+  const { cardsCopy } = useText(cardsText);
   const router = useRouter();
-  const [busy, setBusy] = useState<"preview" | "video" | null>(null);
-  // Fetch both pages' code and loading screens ahead, so a tap opens them straight away
+  const [busy, setBusy] = useState<"preview" | "video" | "cards" | null>(null);
+  // Fetch the pages' code and loading screens ahead, so a tap opens them straight away
   useEffect(() => {
     if (!remoteId) return;
     router.prefetch(guestHref(remoteId, "preview", published));
     router.prefetch(guestHref(remoteId, "video", published));
   }, [remoteId, published, router]);
-  const open = async (page: "preview" | "video") => {
+  const open = async (page: "preview" | "video" | "cards") => {
     setBusy(page);
     await syncDraft();
     const id = inviteDraft.get().draft.remoteId;
@@ -316,6 +320,17 @@ function SeeAsGuest({ remoteId, published }: { remoteId: string | null; publishe
           onClick={() => void open("video")}
         >
           {previewCopy.watchVideo}
+        </Button>
+        <Button
+          variant="secondary"
+          loading={busy === "cards"}
+          disabled={busy !== null}
+          leadingIcon={<Images aria-hidden />}
+          // A long name in some languages: it wraps on a narrow phone rather than run off
+          className="h-auto min-h-12 max-w-full py-2 text-balance whitespace-normal"
+          onClick={() => void open("cards")}
+        >
+          {cardsCopy.open}
         </Button>
       </div>
     </Card>

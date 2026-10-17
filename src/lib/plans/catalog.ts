@@ -38,6 +38,8 @@ export type Plan = {
   albumDays: number;
   /** Co-hosts besides the owner; null for no limit. */
   cohosts: number | null;
+  /** Save-the-date and thank-you cards to download and share (Step 24). */
+  cards: boolean;
 };
 
 export const PLANS: Record<PlanId, Plan> = {
@@ -48,6 +50,7 @@ export const PLANS: Record<PlanId, Plan> = {
     video: "none",
     albumDays: 0,
     cohosts: 1,
+    cards: false,
   },
   basic: {
     id: "basic",
@@ -56,6 +59,7 @@ export const PLANS: Record<PlanId, Plan> = {
     video: "none",
     albumDays: 0,
     cohosts: 1,
+    cards: false,
   },
   celebration: {
     id: "celebration",
@@ -64,6 +68,7 @@ export const PLANS: Record<PlanId, Plan> = {
     video: "one",
     albumDays: 30,
     cohosts: 3,
+    cards: false,
   },
   grand: {
     id: "grand",
@@ -72,6 +77,7 @@ export const PLANS: Record<PlanId, Plan> = {
     video: "every",
     albumDays: 365,
     cohosts: null,
+    cards: true,
   },
 };
 
