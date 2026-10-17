@@ -1,16 +1,19 @@
 # Emails
 
-The site sends three emails, through [Resend](https://resend.com) from the
+The site sends four emails, through [Resend](https://resend.com) from the
 `shubhinvitations.com` domain. Nothing is sent until `RESEND_API_KEY` is set in Vercel, and
 preview mode never sends.
 
-| Email          | When                                                                       | To                                                                                           |
-| -------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Welcome        | Right after a new account's first sign-in                                  | Google sign-ins (phone sign-ins have no email)                                               |
-| Receipt        | Once a payment is recorded, by the checkout or Razorpay's webhook          | The buyer, with a link to the printable invoice                                              |
-| Draft reminder | Daily job: a draft with no package, untouched for a day, under 10 days old | The invite's owner, once per invite, at most once a week, with a "Stop these reminders" link |
+| Email          | When                                                                                | To                                                                                                                        |
+| -------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Welcome        | Right after a new account's first sign-in                                           | Google sign-ins (phone sign-ins have no email)                                                                            |
+| Receipt        | Once a payment is recorded, by the checkout or Razorpay's webhook                   | The buyer, with a link to the printable invoice                                                                           |
+| Draft reminder | Daily job: a draft with no package, untouched for a day, under 10 days old          | The invite's owner, once per invite, at most once a week, with a "Stop these reminders" link                              |
+| Error alert    | A page breaks on the server, or a browser reports an error that isn't its own noise | `ALERT_EMAIL` (one or more addresses, comma separated), or else every admin's sign-in email; once a day per kind of error |
 
-Every email is claimed in `email_log` (`kind`, `ref`) before it goes, so a webhook retry or a
+Error alerts are kept to once a day per kind of error by Resend's idempotency key (one key per error and day), and each server sends at most 10 an hour; they aren't written to `email_log`. Code: `src/lib/errors/alert.ts`.
+
+Every other email is claimed in `email_log` (`kind`, `ref`) before it goes, so a webhook retry or a
 second checkout callback never sends it twice. A failed send frees the claim so the next
 trigger tries again. Code: `src/lib/email/`. Wording and layout: `src/lib/email/templates.ts`.
 
@@ -31,6 +34,7 @@ trigger tries again. Code: `src/lib/email/`. Wording and layout: `src/lib/email/
    - `EMAIL_FROM` — optional, defaults to `Shubh Invitation <hello@shubhinvitations.com>`
    - `EMAIL_REPLY_TO` — optional, an inbox you read, so replies reach a person
    - `NEXT_PUBLIC_CONTACT_EMAIL` — optional, shown in the footer of every email
+   - `ALERT_EMAIL` — optional, where error alerts go instead of the admins' sign-in emails
 5. **Database.** Run `supabase/migrations/20261015090000_emails.sql` once in Supabase's SQL
    Editor.
 6. **Redeploy** so the new variables apply. The reminder job then runs daily at 10:00 IST

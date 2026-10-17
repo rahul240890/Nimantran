@@ -14,7 +14,7 @@ export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY?.trim())
 export type SendResult = { ok: true; id: string | null } | { ok: false; reason: string };
 
 export async function sendEmail(
-  to: string,
+  to: string | string[],
   email: Email,
   options: { idempotencyKey: string; headers?: Record<string, string> },
 ): Promise<SendResult> {
@@ -32,7 +32,7 @@ export async function sendEmail(
       },
       body: JSON.stringify({
         from: process.env.EMAIL_FROM?.trim() || DEFAULT_FROM,
-        to: [to],
+        to: Array.isArray(to) ? to : [to],
         subject: email.subject,
         html: email.html,
         text: email.text,

@@ -1,8 +1,12 @@
+import { after } from "next/server";
 import { countableUrl } from "@/lib/analytics";
+import { sendAlert } from "@/lib/errors/alert";
 
 /*
- * Receives browser error reports (lib/errors/report.ts) and writes each to the server
- * logs as one line of JSON. Nothing is stored; malformed or oversized reports are dropped.
+ * Receives browser error reports (lib/errors/report.ts), writes each to the server logs as
+ * one line of JSON, and emails the ones that aren't the browser's own noise to whoever
+ * looks after the site (lib/errors/alert.ts). Nothing is stored; malformed or oversized
+ * reports are dropped.
  */
 
 const MAX_BYTES = 4096;
@@ -25,16 +29,31 @@ export async function POST(request: Request) {
   if (!message || !url || !SOURCES.has(String(report.source))) {
     return new Response(null, { status: 400 });
   }
+  const stack = text(report.stack, 2000);
+  const page = countableUrl(url);
+  const agent = request.headers.get("user-agent")?.slice(0, 200);
   console.error(
     "[client-error]",
     JSON.stringify({
       message,
-      stack: text(report.stack, 2000),
+      stack,
       digest: text(report.digest, 100),
-      url: countableUrl(url),
+      url: page,
       source: report.source,
-      agent: request.headers.get("user-agent")?.slice(0, 200),
+      agent,
     }),
+  );
+  after(() =>
+    sendAlert({
+      where: "browser",
+      message,
+      stack,
+      path: new URL(page, "https://example.invalid").pathname,
+      facts: [
+        ["Caught by", String(report.source)],
+        ...(agent ? [["Browser", agent] as [string, string]] : []),
+      ],
+    }).catch(() => false),
   );
   return new Response(null, { status: 204 });
 }
