@@ -57,6 +57,7 @@ import {
 import { CollectionTiles } from "./collection-tiles";
 import { TrendingRow } from "./trending-row";
 import { pagePath } from "@/lib/seo/paths";
+import { useEarlyInput } from "@/lib/use-early-input";
 import type { DesignNames } from "./design-name";
 import { DesignNamesProvider, useDesignNames, useSearchWords } from "./design-names";
 import { CatalogCard, ShelfRow, TraditionTiles, type Covers } from "./shelf-row";
@@ -607,23 +608,19 @@ function AddressedCatalog({ covers }: { covers: Covers }) {
   const params = useSearchParams();
   const pathname = usePathname();
   const filters = useMemo(() => filtersFromParams(new URLSearchParams(params)), [params]);
-  return (
-    <Catalog
-      filters={filters}
-      covers={covers}
-      designsPath={pathname}
-      onChange={(next) => {
-        const url = `${pathname}${filtersToParams(next)}`;
-        // Moving between the rows and a list is a new step Back returns from; a change
-        // within the list replaces it, so Back does not walk through every letter typed
-        if (hasFilters(next) !== hasFilters(filters)) {
-          window.history.pushState(null, "", url);
-        } else {
-          window.history.replaceState(null, "", url);
-        }
-      }}
-    />
-  );
+  const change = (next: DesignFilters) => {
+    const url = `${pathname}${filtersToParams(next)}`;
+    // Moving between the rows and a list is a new step Back returns from; a change
+    // within the list replaces it, so Back does not walk through every letter typed
+    if (hasFilters(next) !== hasFilters(filters)) {
+      window.history.pushState(null, "", url);
+    } else {
+      window.history.replaceState(null, "", url);
+    }
+  };
+  // A search typed into the server's catalogue before this one replaced it still runs
+  useEarlyInput("catalog-search", (query) => change({ ...filters, query }));
+  return <Catalog filters={filters} covers={covers} designsPath={pathname} onChange={change} />;
 }
 
 /**

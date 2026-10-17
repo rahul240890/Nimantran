@@ -20,6 +20,7 @@ import { useSearchWords } from "./design-names";
 import { OccasionTile, PaintedTile } from "./occasion-tile";
 import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import type { UiLocale } from "@/i18n/locales";
+import { useEarlyInput } from "@/lib/use-early-input";
 
 /** The occasions offered as quick searches in the languages written for later. */
 const QUICK: readonly CategoryId[] = [
@@ -73,6 +74,8 @@ export function GallerySearch({
   const { galleryCopy } = useText(galleryText);
   const fromAddress = useAddressQuery();
   const [typed, setQuery] = useState<string | null>(null);
+  // Words typed before the page finished loading are searched once it has
+  useEarlyInput("gallery-search", setQuery);
   const query = typed ?? fromAddress;
   const deferred = useDeferredValue(query);
   const words = useSearchWords(names, query.trim().length > 0);

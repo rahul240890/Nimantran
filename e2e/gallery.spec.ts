@@ -251,4 +251,20 @@ test.describe("the Designs page", () => {
     await search.fill("zzzz");
     await expect(page.getByText("No design matches all of these yet.")).toBeVisible();
   });
+
+  test("words typed before the page has loaded are still searched", async ({ page }) => {
+    // The page's scripts are held back, so the box typed into is the server's
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/_next/static/**/*.js", async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.goto("/designs", { waitUntil: "domcontentloaded" });
+    await page.getByRole("searchbox", { name: "Search designs" }).fill("kayal");
+    release();
+    await expect(page.locator('[data-design="kayal"]')).toBeVisible();
+    await expect(page.locator('[data-design="noor-bagh"]')).toHaveCount(0);
+    await expect(page).toHaveURL(/q=kayal/);
+  });
 });
