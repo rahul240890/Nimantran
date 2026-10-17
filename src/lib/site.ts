@@ -30,6 +30,15 @@ export const site = {
   description:
     "Create beautiful digital, animated and 3D invitations for every celebration, share them on WhatsApp, and collect RSVPs in one tap.",
   url: siteUrl(),
+  /**
+   * The brand's own channels: linked in the site and guest footers and on Contact, and
+   * given to search engines as the Organization's sameAs (docs/BRAND_SEO.md).
+   */
+  social: {
+    instagram: "https://www.instagram.com/shubh.celebration/",
+    whatsapp: "https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o",
+    youtube: "https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw",
+  },
   /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
 } as const;

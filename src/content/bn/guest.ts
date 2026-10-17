@@ -1,5 +1,6 @@
 import type { GuestText } from "@/i18n/copy/guest";
 import { site } from "@/lib/site";
+import { uiStrings } from "./ui";
 
 /*
  * বাংলা: অতিথির পাতা, উত্তর আর ছবির দেওয়াল। English: src/content/publish.ts and
@@ -214,4 +215,5 @@ export const guestText: GuestText = {
     },
   },
   theme: { group: "রঙের থিম", system: "ডিভাইসের মতো", light: "হালকা", dark: "গাঢ়" },
+  social: uiStrings.social,
 };

@@ -1,5 +1,6 @@
 import type { GuestText } from "@/i18n/copy/guest";
 import { site } from "@/lib/site";
+import { uiStrings } from "./ui";
 
 /*
  * ગુજરાતી: મહેમાનનું પાનું, જવાબ અને ફોટો દીવાલ. English: src/content/publish.ts and
@@ -213,4 +214,5 @@ export const guestText: GuestText = {
     },
   },
   theme: { group: "રંગ થીમ", system: "ડિવાઇસ પ્રમાણે", light: "આછી", dark: "ઘેરી" },
+  social: uiStrings.social,
 };

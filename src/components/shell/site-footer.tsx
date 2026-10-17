@@ -1,11 +1,13 @@
 import { Logo } from "@/components/brand/logo";
 import { Mandala } from "@/components/brand/mandala";
+import { SocialLinks } from "@/components/brand/social-links";
 import Link from "next/link";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
 import { legalText } from "@/i18n/copy/legal";
 import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
+import { uiText } from "@/i18n/copy/ui";
 import { homePath, languages, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
@@ -19,6 +21,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { seoCopy } = seoText[locale];
   const { legalCopy } = legalText[locale];
   const { traditionCopy } = editorText[locale];
+  const { social } = uiText[locale].uiStrings;
   const home = homePath(locale);
   const linkClass =
     "inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text";
@@ -44,6 +47,10 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           <Logo className="self-start" />
           <p className="font-display text-lg text-ink-muted">{shell.footer.meaning}</p>
           <p className="max-w-xs text-ink-muted">{shell.footer.tagline}</p>
+          <div className="mt-2 flex flex-col gap-3">
+            <h2 className={headingClass}>{social.heading}</h2>
+            <SocialLinks labels={social} />
+          </div>
         </div>
 
         <nav aria-labelledby="footer-explore">

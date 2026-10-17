@@ -1,5 +1,6 @@
 import type { GuestText } from "@/i18n/copy/guest";
 import { site } from "@/lib/site";
+import { uiStrings } from "./ui";
 
 /*
  * मराठी: पाहुण्यांचे पान, उत्तर आणि फोटो भिंत. English: src/content/publish.ts and
@@ -216,4 +217,5 @@ export const guestText: GuestText = {
     },
   },
   theme: { group: "रंगसंगती", system: "डिव्हाइसप्रमाणे", light: "फिकट", dark: "गडद" },
+  social: uiStrings.social,
 };

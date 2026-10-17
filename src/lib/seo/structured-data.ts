@@ -22,6 +22,8 @@ export function organization(): Thing {
     alternateName: site.nameDevanagari,
     url: absolute("/"),
     logo: absolute("/icon.svg"),
+    // The brand's own profiles, so search engines know they and the site are one brand
+    sameAs: Object.values(site.social),
   };
 }
 

@@ -1,5 +1,6 @@
 import type { uiStrings as en } from "@/lib/ui-strings";
 import type { Translation } from "@/i18n/text";
+import { site } from "@/lib/site";
 
 /* தமிழ்: பொதுவான பொத்தான்கள் மற்றும் தீம் பெயர்கள். English: src/lib/ui-strings.ts. Draft for a native proofreader. */
 
@@ -7,6 +8,12 @@ export const uiStrings: Translation<typeof en> = {
   close: "மூடவும்",
   notifications: "அறிவிப்புகள்",
   theme: { group: "வண்ணத் தீம்", system: "சாதனத்தைப் போல", light: "வெளிர்", dark: "இருண்ட" },
+  social: {
+    heading: `${site.localNames.ta}-ஐப் பின்தொடருங்கள்`,
+    instagram: `Instagram-இல் ${site.localNames.ta}`,
+    whatsapp: `${site.localNames.ta}-இன் WhatsApp சேனல்`,
+    youtube: `YouTube-இல் ${site.localNames.ta}`,
+  },
   invitation: {
     open: "அழைப்பிதழைத் திறக்கவும்",
     close: "அழைப்பிதழை மூடவும்",

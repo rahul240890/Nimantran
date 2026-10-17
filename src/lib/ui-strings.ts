@@ -1,3 +1,5 @@
+import { site } from "@/lib/site";
+
 /**
  * English text for shared UI chrome (close buttons, theme names …). Components take these
  * as props; the Hindi is in src/content/hi/ui.ts.
@@ -6,6 +8,13 @@ export const uiStrings = {
   close: "Close",
   notifications: "Notifications",
   theme: { group: "Colour theme", system: "Match device", light: "Light", dark: "Dark" },
+  /** The brand's own channels (site.social), in the footers and on Contact. */
+  social: {
+    heading: `Follow ${site.shortName}`,
+    instagram: `${site.shortName} on Instagram`,
+    whatsapp: `${site.shortName}'s WhatsApp channel`,
+    youtube: `${site.shortName} on YouTube`,
+  },
   invitation: {
     open: "Open invitation",
     close: "Close invitation",

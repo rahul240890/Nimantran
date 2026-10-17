@@ -1,11 +1,13 @@
 import { Check, Mail, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { SocialLinks } from "@/components/brand/social-links";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { editionsText } from "@/i18n/copy/editions";
 import { galleryText } from "@/i18n/copy/gallery";
 import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
+import { uiText } from "@/i18n/copy/ui";
 import type { UiLocale } from "@/i18n/locales";
 import type { Business } from "@/lib/payments/business-details";
 import { PAID_PLAN_IDS, formatRupees, inviteLimit, packagePrice } from "@/lib/plans/catalog";
@@ -215,6 +217,7 @@ export function ContactPage({
   email: string | null;
 }) {
   const { contactPageCopy: copy } = pagesText[locale];
+  const { social } = uiText[locale].uiStrings;
   const rows = (
     [
       ["legalName", business.legalName],
@@ -287,6 +290,16 @@ export function ContactPage({
             <p className="text-ink-muted">{copy.whatsappNote}</p>
           </section>
         )}
+
+        <section
+          aria-labelledby="social-heading"
+          className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5 shadow-raised sm:p-6"
+        >
+          <h2 id="social-heading" className="font-display text-2xl">
+            {social.heading}
+          </h2>
+          <SocialLinks labels={social} named />
+        </section>
 
         {rows.length > 0 && (
           <section aria-labelledby="business-heading" className="flex flex-col gap-3">

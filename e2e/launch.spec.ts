@@ -132,6 +132,49 @@ test.describe("pages for payments", () => {
     await page.getByRole("link", { name: "Read the refund policy" }).click();
     await expect(page).toHaveURL(/\/refunds$/);
   });
+
+  test("the brand's channels are linked from the footer, Contact and every invitation", async ({
+    page,
+  }) => {
+    const channels = {
+      instagram: "https://www.instagram.com/shubh.celebration/",
+      whatsapp: "https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o",
+      youtube: "https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw",
+    };
+    await page.goto("/");
+    const footer = page.locator("footer");
+    await expect(footer.getByRole("link", { name: "Shubh on Instagram" })).toHaveAttribute(
+      "href",
+      channels.instagram,
+    );
+    for (const [channel, href] of Object.entries(channels)) {
+      const link = footer.locator(`[data-social="${channel}"]`);
+      await expect(link).toHaveAttribute("href", href);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /\bme\b/);
+    }
+    // Search engines are told the profiles are the brand's own
+    const sameAs = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).flatMap((text) =>
+      (JSON.parse(text) as { sameAs?: string[] }[]).flatMap((item) => item.sameAs ?? []),
+    );
+    expect(sameAs).toEqual(expect.arrayContaining(Object.values(channels)));
+
+    await page.goto("/contact");
+    await expect(
+      page
+        .getByRole("region", { name: "Follow Shubh" })
+        .getByRole("link", { name: "Shubh's WhatsApp channel" }),
+    ).toHaveAttribute("href", channels.whatsapp);
+
+    // A guest sees them at the foot of the invitation, in the card's language
+    await page.goto("/sample/rajwada-bagh");
+    await expect(page.locator('footer [data-social="youtube"]')).toHaveAttribute(
+      "href",
+      channels.youtube,
+    );
+  });
 });
 
 test.describe("blog", () => {

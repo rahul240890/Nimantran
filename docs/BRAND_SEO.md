@@ -48,7 +48,8 @@ Only the owner can do these. A web search is not a legal check; the trademark se
 
 - [x] Domain: `shubhinvitations.com` is live on Vercel; set `NEXT_PUBLIC_SITE_URL` to `https://shubhinvitations.com` in Vercel
 - [ ] Trademark search and filing on the IP India registry for "Shubh Invitation" and the icon, classes 9 (software, apps), 35 (online advertising and business services), 42 (software as a service); consider 16 (printed cards) for the print line. "Shubh" alone is a common word, so the full name and the icon are what can be protected
-- [ ] Handles: Instagram, YouTube, Facebook, X, LinkedIn, Pinterest, WhatsApp Business
+- [x] Handles (17 October 2026): Instagram [@shubh.celebration](https://www.instagram.com/shubh.celebration/), the [WhatsApp channel](https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o) and [YouTube](https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw). They are in `site.social` (`src/lib/site.ts`): linked in the site footer, on Contact and at the foot of every guest invitation, and given to Google as the Organization's `sameAs`. Add a new channel there and it appears everywhere.
+- [ ] Handles still to take: Facebook, X, LinkedIn, Pinterest
 - [ ] Google Play developer account and App Store name reservation for "Shubh Invitation" (app name shown under the icon: "Shubh")
 - [ ] Email: hello@, support@, and a sending domain for invites and reminders
 - [ ] Google Search Console and Bing Webmaster Tools verified for the main domain
