@@ -25,7 +25,14 @@ import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
 import { noPages } from "./pages";
 import { defaultType } from "./type";
-import { noOpening, openingGod, openingGods, type OpeningGod } from "@/lib/opening/catalog";
+import {
+  noOpening,
+  openingGod,
+  openingGods,
+  openingStyle,
+  type OpeningGod,
+  type OpeningStyle,
+} from "@/lib/opening/catalog";
 import type {
   DraftTradition,
   EventFunction,
@@ -331,6 +338,21 @@ const godFaith = (draft: InviteDraft) => ({
 export function draftOpeningGods(draft: InviteDraft): readonly OpeningGod[] {
   const { faith, chosen } = godFaith(draft);
   return openingGods(faith, chosen);
+}
+
+/**
+ * The opening the guest sees on this theme, as a Scene or as pages: the host's pick, else
+ * the design's own where it suits the occasion and the family's faith (opening/catalog.ts).
+ */
+export function draftOpeningStyle(
+  draft: InviteDraft,
+  suite: SuiteId,
+  scene: boolean,
+): OpeningStyle {
+  return openingStyle(draft.opening, suite, scene, draft.categoryId, {
+    template: draft.templateId,
+    faith: draftFaith(draft),
+  });
 }
 
 /** The god or symbol over the guest's opening, if the occasion and the faith allow it. */

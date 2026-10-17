@@ -1,8 +1,10 @@
 import type { CategoryId } from "@/lib/categories/catalog";
 import type { StoryId, SuiteId, ThemedId } from "@/lib/suites/catalog";
 import { isStoryId, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
+import type { TemplateId } from "@/lib/templates/ids";
 import { FAITH_SYMBOLS, type Faith } from "@/lib/traditions/faith";
 import { SYMBOL_IDS, type SymbolId } from "@/lib/traditions/schema";
+import { DESIGN_OPENINGS } from "./design-openings";
 
 /*
  * The guest's first screen (Step 12x): a full-height opening the host picks, shown before
@@ -399,6 +401,301 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
 
+/** The openings that suit a wedding, of any faith (HINDU_OPENINGS are kept to Hindu cards). */
+const WEDDING_OPENINGS: readonly OpeningStyle[] = [
+  "rajwada-pol",
+  "noor-darwaza",
+  "haveli-kiwad",
+  "shahi-parda",
+  "bagiya-gate",
+  "deco-gates",
+  "sheesh-mahal",
+  "popup-mahal",
+  "pankhi",
+  "odhni",
+  "kavad-peti",
+  "chhatri-utsav",
+  "moti-seep",
+  "badal-raag",
+  "jugnu-van",
+  "taaramandal",
+  "thar-ki-ret",
+  "sheher-ki-raat",
+  "choodi-chakra",
+  "chhaya-parda",
+  "athangudi-tiles",
+  "bioscope",
+  "chaand-dwar",
+  "ritu-dwar",
+  "raag-dwar",
+  "karghaa-dwar",
+  "navrang-dwar",
+  "rekha-dwar",
+  "bel-khidki",
+  "pankhudi-pat",
+  "gulaab-lifafa",
+  "os-parda",
+  "surkh-dwar",
+  "itr-dibbi",
+  "gulaab-bhaap",
+  "oud-darwaza",
+  "tarkashi-jaali",
+  "aaina-pat",
+  "megh-parda",
+  "pehar-jaali",
+  "lata-phatak",
+  "itr-almari",
+  "rang-parda",
+  "genda-ladi",
+  "kaleen-parda",
+  "kaanch-dhakkan",
+  "jad-jhalar",
+  "deco-dibba",
+  "kitaab-jild",
+  "jhaadi-deewar",
+  "patang-dwar",
+  "kumhar-dwar",
+  "van-dwar",
+  "samundar-parda",
+  "gopuram-kadhavu",
+  "phoolon-ki-deewar",
+  "pushp-varsha",
+  "jal-darpan",
+  "ghat-dwar",
+  "palace",
+  "temple",
+  "mandap",
+  "jharokha",
+  "curtain",
+  "envelope",
+  "phool",
+  "scroll",
+  "peacock",
+  "storybook",
+  "lanterns",
+  "moonlit",
+  "lotus",
+  "rangoli",
+  "diyas",
+];
+
+/**
+ * The openings that suit each occasion, its own first: what a design painted without an
+ * opening of its own is given (design-openings.ts), so the designs don't all open alike
+ * (owner, 2026-10-17). The days around a wedding take the wedding's openings too.
+ */
+export const OCCASION_OPENINGS: Partial<Record<CategoryId, readonly OpeningStyle[]>> = {
+  wedding: WEDDING_OPENINGS,
+  engagement: [
+    "phoolon-ki-deewar",
+    "gulaab-lifafa",
+    "surkh-dwar",
+    "kaanch-dhakkan",
+    "itr-dibbi",
+    "pankhudi-pat",
+    "os-parda",
+    "sheesh-mahal",
+    "bagiya-gate",
+    "popup-mahal",
+    "phool",
+    "moonlit",
+  ],
+  "save-the-date": [
+    "envelope",
+    "gulaab-lifafa",
+    "popup-mahal",
+    "taaramandal",
+    "kitaab-jild",
+    "scroll",
+  ],
+  roka: ["jugnu-van", "phoolon-ki-deewar", "genda-ladi", "ritu-dwar", "chhatri-utsav", "phool"],
+  haldi: ["badal-raag", "genda-ladi", "bel-khidki", "megh-parda", "ritu-dwar", "phool"],
+  mehendi: ["choodi-chakra", "odhni", "pankhi", "bel-khidki", "rang-parda", "aaina-pat", "peacock"],
+  sangeet: [
+    "jugnu-van",
+    "raag-dwar",
+    "shahi-parda",
+    "chhatri-utsav",
+    "chhaya-parda",
+    "navrang-dwar",
+    "truck-darwaza",
+    "bioscope",
+    "curtain",
+    "lanterns",
+    "fireworks",
+  ],
+  reception: [
+    "sheesh-mahal",
+    "shahi-parda",
+    "taaramandal",
+    "tarkashi-jaali",
+    "deco-dibba",
+    "sheher-ki-raat",
+    "curtain",
+    "fireworks",
+  ],
+  anniversary: [
+    "popup-mahal",
+    "shahi-parda",
+    "sheesh-mahal",
+    "moti-seep",
+    "surkh-dwar",
+    "chaand-dwar",
+    "itr-almari",
+    "gulaab-bhaap",
+    "kaanch-dhakkan",
+    "bagiya-gate",
+    "moonlit",
+    "envelope",
+  ],
+  birthday: [
+    "mela-tamboo",
+    "bulbule",
+    "phirki",
+    "chhuk-chhuk",
+    "van-dwar",
+    "gudiya-pat",
+    "gol-darwaza",
+    "jhaadi-deewar",
+    "kitaab-jild",
+    "kosh-jild",
+    "samundar-parda",
+    "shatranj-sandook",
+    "truck-darwaza",
+    "patang-dwar",
+    "kaleen-parda",
+    "pati-pat",
+    "kaanch-ka-gola",
+    "gulaal-bindu",
+    "jugnu-van",
+    "taaramandal",
+    "bioscope",
+    "popup-mahal",
+    "moti-seep",
+    "badal-raag",
+    "deco-gates",
+    "sheher-ki-raat",
+    "balloons",
+    "gift",
+    "storybook",
+    "fireworks",
+  ],
+  "naming-ceremony": ["mela-tamboo", "bulbule", "uday-surya", "phirki", "kosh-jild", "storybook"],
+  "baby-shower": [
+    "bulbule",
+    "phirki",
+    "gol-darwaza",
+    "kosh-jild",
+    "gudiya-pat",
+    "os-parda",
+    "pankhudi-pat",
+    "lata-phatak",
+    "bagiya-gate",
+    "badal-raag",
+    "balloons",
+    "phool",
+  ],
+  party: [
+    "deco-gates",
+    "sheher-ki-raat",
+    "bioscope",
+    "deco-dibba",
+    "shatranj-sandook",
+    "truck-darwaza",
+    "taaramandal",
+    "jugnu-van",
+    "thar-ki-ret",
+    "curtain",
+    "fireworks",
+    "lanterns",
+  ],
+  "farewell-party": ["deco-gates", "sheher-ki-raat", "bioscope", "deco-dibba", "lanterns"],
+  retirement: ["bioscope", "kitaab-jild", "ritu-dwar", "sheher-ki-raat", "taaramandal"],
+  reunion: ["bioscope", "pati-pat", "kitaab-jild", "shatranj-sandook", "sheher-ki-raat"],
+  graduation: ["fireworks", "pati-pat", "kitaab-jild", "yantra-pat", "taaramandal"],
+  launch: ["sheher-ki-raat", "deco-dibba", "yantra-pat", "taaramandal", "deco-gates"],
+  "shop-opening": ["gift", "sheher-ki-raat", "deco-dibba", "deco-gates", "haveli-kiwad"],
+  housewarming: [
+    "haveli-kiwad",
+    "uday-surya",
+    "ritu-dwar",
+    "gol-darwaza",
+    "lata-phatak",
+    "karghaa-dwar",
+    "athangudi-tiles",
+    "bel-khidki",
+    "palace",
+  ],
+  puja: ["rajwada-pol", "gopuram-kadhavu", "jal-darpan", "ghat-dwar", "temple", "lotus", "moonlit"],
+  diwali: ["diyas", "kumhar-dwar", "jal-darpan", "sheesh-mahal", "lanterns", "rangoli"],
+  navratri: ["lanterns", "choodi-chakra", "navrang-dwar", "chhatri-utsav", "odhni", "peacock"],
+  eid: ["noor-darwaza", "chaand-dwar", "tarkashi-jaali", "pehar-jaali", "oud-darwaza", "moonlit"],
+  christmas: ["kaanch-ka-gola", "gol-darwaza", "taaramandal", "lanterns", "gift"],
+  sankranti: ["uday-surya", "patang-dwar", "badal-raag", "rangoli"],
+  janmashtami: ["sanjhi-roshni", "chhaya-parda", "peacock", "jal-darpan"],
+  onam: ["rangoli", "pushp-varsha", "athangudi-tiles", "gopuram-kadhavu"],
+  holi: ["gulaal-bindu", "rang-parda", "navrang-dwar", "badal-raag"],
+  "gudi-padwa": ["rangoli", "uday-surya", "oud-darwaza"],
+  bihu: ["rangoli", "badal-raag", "lata-phatak"],
+  baisakhi: ["lanterns", "phirki", "genda-ladi"],
+  lohri: ["lanterns", "thar-ki-ret", "phirki"],
+  "raksha-bandhan": ["gift", "genda-ladi", "rang-parda"],
+  "karva-chauth": ["odhni", "chaand-dwar", "moonlit"],
+  "ganesh-chaturthi": ["rajwada-pol", "temple", "gopuram-kadhavu", "genda-ladi"],
+  "thread-ceremony": ["rajwada-pol", "gopuram-kadhavu", "ghat-dwar", "temple"],
+  "prayer-meet": ["rajwada-pol", "diyas", "lotus"],
+  annaprashan: ["uday-surya", "bulbule", "kosh-jild"],
+  christening: ["bagiya-gate", "os-parda", "lata-phatak"],
+};
+
+/** Openings onto a Hindu place or rite (a temple, a mandap, a ghat): for a Hindu card only. */
+const HINDU_OPENINGS: readonly OpeningStyle[] = [
+  "gopuram-kadhavu",
+  "phoolon-ki-deewar",
+  "pushp-varsha",
+  "jal-darpan",
+  "ghat-dwar",
+  "sanjhi-roshni",
+  "temple",
+  "mandap",
+  "lotus",
+  "rangoli",
+  "diyas",
+];
+
+/** The days around a wedding, which take its openings too. */
+const WEDDING_DAYS: readonly CategoryId[] = [
+  "engagement",
+  "save-the-date",
+  "roka",
+  "haldi",
+  "mehendi",
+  "sangeet",
+  "reception",
+];
+
+/** Whether an opening suits the occasion and the family's faith. */
+export function openingSuits(style: OpeningStyle, category: CategoryId, faith: Faith): boolean {
+  if (HINDU_OPENINGS.includes(style) && faith !== "hindu") return false;
+  if (OCCASION_OPENINGS[category]?.includes(style)) return true;
+  return WEDDING_DAYS.includes(category) && WEDDING_OPENINGS.includes(style);
+}
+
+/**
+ * A design's own opening, by its id as the gallery names it: the theme for its pages, the
+ * theme and "-scene" for its Scene, "card-" and the card for a 3D card.
+ */
+export function designOpening(
+  suite: SuiteId,
+  scene: boolean,
+  template?: TemplateId,
+): OpeningStyle | null {
+  if (suite === "classic") return (template && DESIGN_OPENINGS[`card-${template}`]) || null;
+  const pages = DESIGN_OPENINGS[suite];
+  const painting = DESIGN_OPENINGS[`${suite}-scene`];
+  return (scene ? (painting ?? pages) : (pages ?? painting)) ?? null;
+}
+
 /** The gods painted for us: the owner's own art from the blessing pages, shown whole. */
 export const PAINTED_GODS = [
   "ganesha",
@@ -433,7 +730,7 @@ export function openingGods(faith: Faith, chosen: boolean): readonly OpeningGod[
 }
 
 export type OpeningChoice = {
-  /** Null follows the design: the cover's doors on a painted theme, else a painted gate. */
+  /** Null follows the design: its own opening (openingStyle). */
   style: OpeningStyle | null;
   /** Null opens without a god or symbol. */
   god: OpeningGod | null;
@@ -519,12 +816,17 @@ const STORY_GATE: Record<StoryId, PaintedGate> = {
   "shatranj-baazi": "shatranj-sandook",
 };
 
-/** The style the guest sees: the host's pick when it fits, else the design's own. */
+/**
+ * The style the guest sees: the host's pick when it fits, else the design's own: its theme's
+ * opening, the gate given to the design when it suits the occasion and the family's faith,
+ * the cover split as doors, or the occasion's own.
+ */
 export function openingStyle(
   choice: Pick<OpeningChoice, "style"> & Partial<OpeningChoice>,
   suite: SuiteId,
   scene: boolean,
   category?: CategoryId,
+  card?: { template?: TemplateId; faith: Faith },
 ): OpeningStyle {
   const offered = openingStyles(suite, scene);
   if (choice.style && offered.includes(choice.style)) return choice.style;
@@ -532,6 +834,8 @@ export function openingStyle(
   if (isThemedOpening(suite)) return suite;
   // A story theme opens with its own gate
   if (isStoryId(suite)) return STORY_GATE[suite];
+  const own = designOpening(suite, scene, card?.template);
+  if (own && card && openingSuits(own, category ?? "wedding", card.faith)) return own;
   if (hasCoverDoors(suite) && !scene) return "doors";
   return (category && OCCASION_OPENING[category]) ?? "rajwada-pol";
 }

@@ -9,12 +9,16 @@ import { OPENING_PACE } from "@/components/guest/opening/opening-pace";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
-import { draftOpeningGod, draftOpeningGods, type InviteDraft } from "@/lib/editor/draft";
+import {
+  draftOpeningGod,
+  draftOpeningGods,
+  draftOpeningStyle,
+  type InviteDraft,
+} from "@/lib/editor/draft";
 import {
   GOD_PAINTINGS,
   OPENING_GROUPS,
   offersGods,
-  openingStyle,
   openingStyles,
   WELCOME_SCENES,
   type OpeningGod,
@@ -59,7 +63,7 @@ export function OpeningPicker({
 }) {
   const { openingCopy } = useText(editorText);
   const still = useReducedMotion();
-  const style = openingStyle(draft.opening, suite, scene, draft.categoryId);
+  const style = draftOpeningStyle(draft, suite, scene);
   const god = draftOpeningGod(draft);
   const gods = draftOpeningGods(draft);
   const beat = useBeat(!still);

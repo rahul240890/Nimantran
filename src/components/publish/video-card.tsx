@@ -29,6 +29,7 @@ import {
   cardLanguages,
   draftCopy,
   draftOpeningGod,
+  draftOpeningStyle,
   draftTemplate,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -69,7 +70,7 @@ import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
 import { readWatermarkLook, withWatermark } from "@/lib/video/watermark";
-import { filmedWelcome, openingStyle, welcomeScene } from "@/lib/opening/catalog";
+import { filmedWelcome, welcomeScene } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "@/components/invitation/type/fonts.css";
@@ -759,7 +760,7 @@ export function useVideoFilm(
       (id) => photoAspect(photos, id),
     );
     const isScene = draftShowsScene(draft) && Boolean(scenePage(suite, scenePhotos.length));
-    const style = openingStyle(draft.opening, suite, isScene, draft.categoryId);
+    const style = draftOpeningStyle(draft, suite, isScene);
     const timeline = preludeTimeline(style);
     if (!timeline) return null;
     return {

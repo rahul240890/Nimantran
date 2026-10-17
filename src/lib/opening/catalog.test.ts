@@ -17,12 +17,15 @@ import {
   THEMED_OPENINGS,
   isPaintedGate,
   noOpening,
+  OCCASION_OPENINGS,
   offersGods,
   openingGod,
   openingStyle,
   openingStyles,
+  openingSuits,
   welcomeKind,
 } from "./catalog";
+import type { CategoryId } from "@/lib/categories/catalog";
 
 describe("openings", () => {
   it("follows the design until the host picks one", () => {
@@ -31,6 +34,53 @@ describe("openings", () => {
     expect(openingStyle(noOpening, "classic", false)).toBe("rajwada-pol");
     expect(openingStyle(noOpening, "rajwada-bagh", true)).toBe("rajwada-pol");
     expect(openingStyle({ style: "lotus", god: null }, "classic", false)).toBe("lotus");
+  });
+
+  it("opens a design at the gate given to it, as pages, as a Scene or as a 3D card", () => {
+    const hindu = { faith: "hindu" } as const;
+    expect(openingStyle(noOpening, "rajwada-bagh", false, "wedding", hindu)).toBe("rajwada-pol");
+    expect(openingStyle(noOpening, "rajwada-bagh", true, "wedding", hindu)).toBe("palace");
+    expect(openingStyle(noOpening, "udaipur-lake", true, "wedding", hindu)).toBe("popup-mahal");
+    expect(
+      openingStyle(noOpening, "classic", false, "wedding", { template: "gopuram", ...hindu }),
+    ).toBe("gopuram-kadhavu");
+    // The host's own pick still wins
+    expect(openingStyle({ style: "lotus", god: null }, "tanjore", false, "wedding", hindu)).toBe(
+      "lotus",
+    );
+  });
+
+  it("keeps a design's gate to the occasions and faiths it suits", () => {
+    // Temple doors open a Hindu wedding, not a Nikah or a family with no religious lines
+    expect(openingStyle(noOpening, "tanjore", false, "wedding", { faith: "hindu" })).toBe(
+      "gopuram-kadhavu",
+    );
+    expect(openingStyle(noOpening, "tanjore", false, "wedding", { faith: "muslim" })).toBe("doors");
+    expect(openingStyle(noOpening, "tanjore", true, "wedding", { faith: "none" })).toBe(
+      "rajwada-pol",
+    );
+    // The days around a wedding take its gates; a birthday takes its own
+    expect(openingStyle(noOpening, "tanjore", false, "sangeet", { faith: "hindu" })).toBe(
+      "gopuram-kadhavu",
+    );
+    expect(
+      openingStyle(noOpening, "classic", false, "birthday", { template: "gopuram", faith: "none" }),
+    ).toBe("mela-tamboo");
+    expect(openingSuits("gopuram-kadhavu", "wedding", "sikh")).toBe(false);
+    expect(openingSuits("noor-darwaza", "wedding", "hindu")).toBe(true);
+    expect(openingSuits("mela-tamboo", "wedding", "hindu")).toBe(false);
+  });
+
+  it("lists only offered openings for each occasion, its own first", () => {
+    for (const [category, styles] of Object.entries(OCCASION_OPENINGS)) {
+      expect(new Set(styles).size, category).toBe(styles.length);
+      for (const style of styles) {
+        expect(OPENING_STYLES, category).toContain(style);
+        expect(["doors", "none"], category).not.toContain(style);
+      }
+      const own = openingStyle(noOpening, "classic", false, category as CategoryId);
+      expect(styles[0], category).toBe(own);
+    }
   });
 
   it("opens each story theme at its own gate, which any card can also pick", () => {
