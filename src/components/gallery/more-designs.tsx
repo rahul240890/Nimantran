@@ -18,12 +18,15 @@ export function MoreDesigns({
   designs,
   category,
   kind,
+  occasion,
   covers,
 }: {
   /** With their names and descriptions in the page's language, from the server. */
   designs: readonly { design: GalleryDesign; name: string; description: string }[];
   category: CategoryId;
   kind: WeddingKind | null;
+  /** The page's occasion, for the pictures' descriptions (DesignCard). */
+  occasion: string;
   /** The 3D cards' covers among them, drawn on the server (see DesignCard's cover). */
   covers: Partial<Record<TemplateId, ReactNode>>;
 }) {
@@ -38,6 +41,7 @@ export function MoreDesigns({
           href={designHref(design, { category, kind })}
           sampleHref={samplePath(design.id, kind ? { kind } : { occasion: category })}
           photos={designPhotos(design, category)}
+          occasion={occasion}
           cover={design.suite === "classic" ? covers[design.template] : undefined}
         />
       </li>

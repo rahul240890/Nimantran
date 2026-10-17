@@ -162,6 +162,11 @@ function DesignGallery({
   kind?: WeddingKind | null;
 }) {
   const formats = [...new Set(designs.map(designFormat))];
+  const { galleryCopy, weddingKindCopy } = galleryText[locale];
+  // The page's occasion, in every picture's description ("Gujarati wedding invitation design")
+  const occasion = kind
+    ? galleryCopy.kindOccasion(weddingKindCopy[kind].name)
+    : CATEGORIES[category].names[locale];
   const first = designs.slice(0, FIRST_DESIGNS);
   const rest = designs.slice(FIRST_DESIGNS);
   const cover = (design: GalleryDesign) => (
@@ -181,6 +186,7 @@ function DesignGallery({
                 href={designHref(design, { category, kind })}
                 sampleHref={samplePath(design.id, kind ? { kind } : { occasion: category })}
                 photos={designPhotos(design, category)}
+                occasion={occasion}
                 priority={index < 4}
                 cover={design.suite === "classic" ? cover(design) : undefined}
               />
@@ -191,6 +197,7 @@ function DesignGallery({
           designs={rest.map((design) => ({ design, ...designWords(design, locale) }))}
           category={category}
           kind={kind}
+          occasion={occasion}
           covers={Object.fromEntries(
             rest
               .filter((design) => design.suite === "classic")

@@ -28,9 +28,11 @@ import { cn } from "@/lib/cn";
 import { funnel } from "@/lib/funnel";
 import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
-import type { GalleryDesign } from "@/lib/gallery/catalog";
+import { CATEGORIES } from "@/lib/categories/catalog";
+import { suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
-import { PAGE_ARTS, SUITES, type PageArt } from "@/lib/suites/catalog";
+import { paintedPages } from "@/lib/gallery/pictures";
+import type { PageArt } from "@/lib/suites/catalog";
 import { ScenePoster, SceneSample } from "./scene-poster";
 import { useTrending } from "./use-trending";
 import { StorySample } from "./story-sample";
@@ -48,6 +50,11 @@ type DesignCardProps = {
   sampleHref?: string;
   /** What photos the design takes (designPhotos), shown under its name. */
   photos: PhotoNeed;
+  /**
+   * What the design is shown for, in the page's language ("Haldi", "Gujarati wedding"),
+   * for its picture's description; the design's own occasion where missing.
+   */
+  occasion?: string;
   priority?: boolean;
   /**
    * A card design's cover, drawn on the server: its art uses trigonometry whose last digits
@@ -61,12 +68,6 @@ type DesignCardProps = {
   compact?: boolean;
 };
 
-/** The pages a design has paintings for, in the order guests see them. */
-export function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
-  const { images } = SUITES[design.suite];
-  return PAGE_ARTS.flatMap((page) => (images[page] ? [{ page, src: images[page]! }] : []));
-}
-
 /**
  * A design in the gallery: its painted cover (or its 3D card), what it is, and two ways
  * on: Preview, which shows every page it has, and Use this design.
@@ -78,12 +79,19 @@ export function DesignCard({
   href,
   sampleHref,
   photos,
+  occasion,
   priority,
   cover,
   compact = false,
 }: DesignCardProps) {
   const { galleryCopy } = useText(galleryText);
   const locale = useLocale();
+  // Search engines read the picture by this, so Google Images can show it for a search
+  const alt = galleryCopy.designImage(
+    name,
+    occasion ?? CATEGORIES[suiteOccasion(design.suite)].names[locale],
+    description,
+  );
   const pages = paintedPages(design);
   const scene = design.format === "scene";
   const moving = isMoving(design.suite);
@@ -120,6 +128,7 @@ export function DesignCard({
           <>
             <ScenePoster
               suite={design.suite}
+              alt={alt}
               priority={priority}
               className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
             />
@@ -132,7 +141,7 @@ export function DesignCard({
           <>
             <Image
               src={pages[0]!.src}
-              alt=""
+              alt={alt}
               fill
               loading={priority ? "eager" : "lazy"}
               sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"

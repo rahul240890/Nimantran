@@ -92,6 +92,11 @@ export const galleryCopy = {
     },
   },
   preview: (name: string) => `Preview ${name}`,
+  /** A design's picture described for search engines and screen readers: name, occasion, scene. */
+  designImage: (name: string, occasion: string, description: string) =>
+    `${name}: ${occasion} invitation design. ${description}`,
+  /** A tradition as an occasion, for a picture's description: "Gujarati wedding". */
+  kindOccasion: (name: string) => `${name} wedding`,
   useDesign: "Use this design",
   packagesHeading: "Packages for this design",
   packageFree: "Free",

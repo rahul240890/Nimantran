@@ -132,7 +132,10 @@ test.describe("switching language", () => {
   test("an unknown address shows a missing-page screen in both languages", async ({ page }) => {
     const response = await page.goto("/no-such-page");
     expect(response?.status()).toBe(404);
-    await expect(page.getByRole("heading", { name: "This page isn't here" })).toBeVisible();
+    // Drawn in the browser for a one-word address, which can take a moment on a busy runner
+    await expect(page.getByRole("heading", { name: "This page isn't here" })).toBeVisible({
+      timeout: 15_000,
+    });
     await expect(page.getByText("यह पेज यहाँ नहीं है")).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);

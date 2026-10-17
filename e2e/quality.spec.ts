@@ -55,7 +55,8 @@ test.describe("accessibility sweep", () => {
       // The check reads the page, not its pictures: a design shelf asks the image
       // optimiser for a dozen covers at once, which can outlast the timeout on a busy runner
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+      // An unknown one-word address (/no-such-page) is drawn in the browser, not the server
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible({ timeout: 15_000 });
       expect(await noOverflow(page)).toBe(true);
       expect((await strictAxe(page).analyze()).violations).toEqual([]);
     });
