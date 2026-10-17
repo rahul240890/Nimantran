@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { designOpening } from "../src/lib/opening/catalog";
 import { sectionLayouts } from "../src/lib/suites/section-layouts";
 import { noOverflow } from "./invite-helpers";
 
@@ -123,8 +124,11 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
     test(`${suite} as One Scene, ${colorScheme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
       await page.goto(`/engine/guest?suite=${suite}&format=scene&photos=2`);
-      // A Scene opens behind the wedding's painted gate too, unless the host chose to go straight in
-      await expect(page.locator("[data-opening]")).toHaveAttribute("data-opening", "rajwada-pol");
+      // A Scene opens at its own gate too, unless the host chose to go straight in
+      await expect(page.locator("[data-opening]")).toHaveAttribute(
+        "data-opening",
+        designOpening(suite, true)!,
+      );
       await page.getByRole("button", { name: "Open the invitation" }).click();
       const scene = page.locator("section[data-scene-mood]");
       await expect(page.getByRole("heading", { level: 1, name: /Arjun/ })).toBeVisible();
