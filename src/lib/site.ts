@@ -16,6 +16,8 @@ export const site = {
   name: "Shubh Invitation",
   /** The app's name and the core brand, for short everyday copy ("Sign in to Shubh"). */
   shortName: "Shubh",
+  /** Shubh's founder, who signs the blog's posts and is named as the Organization's founder. */
+  founder: "Ved RK",
   /** Used on Hindi pages. */
   nameDevanagari: "शुभ इन्विटेशन",
   /** The full brand as each Indian-language page writes it (docs/BRAND_SEO.md). */

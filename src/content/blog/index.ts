@@ -1,9 +1,11 @@
 import { annaprashanInvitationMessage } from "./annaprashan-invitation-message";
 import { anniversaryPartyInvitationMessage } from "./anniversary-party-invitation-message";
 import { babyShowerInvitationMessage } from "./baby-shower-invitation-message";
+import { bestDigitalInvitationWebsitesIndia } from "./best-digital-invitation-websites-india";
 import { birthdayInvitationMessages } from "./birthday-invitation-messages";
 import { biyerCardLekha } from "./bn-biyer-card-lekha";
 import { christmasPartyInvitationMessage } from "./christmas-party-invitation-message";
+import { digitalVsPrintedWeddingCards } from "./digital-vs-printed-wedding-cards";
 import { digitalWeddingInvitationWhatsapp } from "./digital-wedding-invitation-whatsapp";
 import { diwaliPartyInvitationMessage } from "./diwali-party-invitation-message";
 import { engagementInvitationMessage } from "./engagement-invitation-message";
@@ -95,4 +97,6 @@ export const POSTS: readonly BlogPost[] = [
   namingCeremonyInvitationMessage,
   lohriInvitationMessage,
   haldiMehendiSangeetNimantran,
+  bestDigitalInvitationWebsitesIndia,
+  digitalVsPrintedWeddingCards,
 ];

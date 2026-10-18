@@ -27,6 +27,7 @@ export function organization(): Thing {
     logo: absolute("/icon.svg"),
     // The brand's own profiles, so search engines know they and the site are one brand
     sameAs: Object.values(site.social),
+    founder: { "@type": "Person", name: site.founder },
   };
 }
 
@@ -119,7 +120,13 @@ export function blogPosting(post: {
     mainEntityOfPage: absolute(post.path),
     url: absolute(post.path),
     ...(post.image ? { image: absolute(post.image) } : {}),
-    author: { "@type": "Organization", name: site.name, url: absolute("/") },
+    // Signed by the founder, as readers and answer engines look for who wrote a page
+    author: {
+      "@type": "Person",
+      name: site.founder,
+      jobTitle: "Founder",
+      worksFor: { "@id": absolute("/#organization") },
+    },
     publisher: organization(),
   };
 }

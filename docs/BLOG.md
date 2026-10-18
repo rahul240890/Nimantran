@@ -24,6 +24,7 @@ A post is written in one language. A post in another language is a separate file
   - tips;
   - `wording` cards, messages with a **Copy** button;
   - `table`s, with a caption, column headings and rows, for comparisons and timelines (what to send when, digital or printed, which function is which). A wide table scrolls inside its own frame on a phone.
+- A byline: every post is signed by Shubh's founder, Ved RK (`site.founder` in `src/lib/site.ts`), on the page and as the article's author for search engines.
 - A few `faq` questions. They show at the end of the post and go to search engines as FAQ structured data.
 
 Every link in a post must point at a page that exists. A unit test checks this.
@@ -70,9 +71,9 @@ Google's AI Overviews, ChatGPT, Perplexity and Gemini answer many of these searc
 
 Research (3 October 2026): the searches families make around an invitation are for **wording and messages to copy**, by occasion and by language. Google's results for most of these are thin template sites, Canva/Adobe template pages and a few publishers (WeddingWire India for wedding messages, SmartPuja for puja and griha pravesh), so a complete, well-structured post can rank. Exact monthly volumes need Google Search Console after launch or Keyword Planner; the order below is by how often the phrase family appears in Google's suggestions and in competitors' pages, and by how close it is to making an invitation.
 
-Written (45 posts):
+Written (47 posts):
 
-- Wedding: wedding invitation wording; digital invitation on WhatsApp; haldi, mehendi and sangeet messages; wedding invitation video; Indian wedding functions; engagement invitation message; save the date message; reception invitation wording; wedding invitation message for friends; wedding RSVP message; thank you message after wedding; Muslim wedding invitation wording; Gujarati wedding invitation wording (kankotri); when to send wedding invitations (timeline); wedding invitation etiquette; roka and tilak invitation messages.
+- Wedding: wedding invitation wording; digital invitation on WhatsApp; haldi, mehendi and sangeet messages; wedding invitation video; Indian wedding functions; engagement invitation message; save the date message; reception invitation wording; wedding invitation message for friends; wedding RSVP message; thank you message after wedding; Muslim wedding invitation wording; Gujarati wedding invitation wording (kankotri); when to send wedding invitations (timeline); wedding invitation etiquette; roka and tilak invitation messages; best digital invitation websites in India, compared (Shubh disclosed as ours; prices checked 18 October 2026, recheck every quarter); digital vs printed wedding cards, the real cost.
 - Family: birthday invitation messages; 1st birthday invitation message; anniversary party invitation message; baby shower invitation message (godh bharai, seemantham); annaprashan invitation message; naming ceremony invitation message (namkaran, barse, barasala, noolukettu); thread ceremony invitation message; griha pravesh invitation message; retirement party invitation message; shop opening invitation message.
 - Festivals, puja and parties: Diwali party invitation message; Satyanarayan puja invitation message; Ganpati invitation message; garba night invitation message; Christmas party invitation message; New Year party invitation message; Lohri invitation message (baby's and bride's first Lohri).
 - Hindi: शादी कार्ड मैटर; शादी का निमंत्रण WhatsApp संदेश; शादी का कार्ड कितने दिन पहले भेजें (paired with the timeline post); हल्दी, मेहंदी और संगीत निमंत्रण संदेश (paired); सगाई निमंत्रण संदेश; गृह प्रवेश निमंत्रण संदेश; जन्मदिन निमंत्रण संदेश; दिवाली निमंत्रण संदेश; सत्यनारायण कथा निमंत्रण.
@@ -82,8 +83,8 @@ Research (18 October 2026, web results only; no Search Console yet): niche occas
 
 Next, in order:
 
-1. Best digital invitation websites in India, compared: honest, with ₹ prices and "checked on" dates, the criteria, and a line saying Shubh is ours. Ask the lists that rank (Weddingkart, The Curated Knot, Samaro) to include Shubh.
-2. Digital vs printed wedding cards: the real cost in India, with sourced price ranges
+1. Ask the lists that rank for "best invitation app India" (Weddingkart, The Curated Knot, Samaro) to include Shubh.
+2. Recheck the comparison's prices every quarter, and update `updated` when they change.
 3. Vivah muhurat dates for the season with a "send invitations by" date for each, only from a panchang we can cite, since published lists disagree
 4. English versions of the Marathi, Tamil and Bengali wedding posts, paired with them
 5. Anand Karaj invitation wording (following gurdwara guidance on printing Gurbani), and Christian wedding invitation wording for India, before December
