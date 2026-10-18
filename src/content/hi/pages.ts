@@ -106,6 +106,7 @@ export const blogCopy: Translation<typeof en.blogCopy> = {
   published: "प्रकाशित",
   updated: "अपडेट",
   inShort: "संक्षेप में",
+  byline: (name) => `लेखक: ${name}, संस्थापक, शुभ इन्विटेशन`,
   onThisPage: "इस पेज पर",
   faqHeading: "सवाल",
   copy: "कॉपी करें",

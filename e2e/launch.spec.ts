@@ -248,6 +248,16 @@ test.describe("blog", () => {
       (JSON.parse(text) as { abstract?: string }[]).flatMap((item) => item.abstract ?? []),
     );
     expect(abstracts[0]).toContain("4 to 6 weeks");
+    // Signed by the founder, on the page and for search engines
+    await expect(page.getByText("By Ved RK, founder of Shubh Invitation")).toBeVisible();
+    const authors = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).flatMap((text) =>
+      (JSON.parse(text) as { author?: { name?: string } }[]).flatMap((item) =>
+        item.author?.name ? [item.author.name] : [],
+      ),
+    );
+    expect(authors).toContain("Ved RK");
     const table = page.getByRole("region", {
       name: "When to send each part of a wedding invitation",
     });

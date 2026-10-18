@@ -13,6 +13,7 @@ import { occasionTile } from "@/lib/gallery/catalog";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
 import { blogPosting, faqPage, itemList } from "@/lib/seo/structured-data";
+import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 import { Inline } from "./inline";
@@ -31,14 +32,21 @@ function blogCrumbs(locale: UiLocale): Crumb[] {
   ];
 }
 
-function PostMeta({ post, showUpdated = false }: { post: BlogPost; showUpdated?: boolean }) {
+function PostMeta({ post, full = false }: { post: BlogPost; full?: boolean }) {
   const { blogCopy } = pagesText[post.locale];
   const day = (date: string) =>
     format(new Date(`${date}T00:00:00`), "d MMMM yyyy", { locale: dateLocale[post.locale] });
-  // A post brought up to date says when, as readers and search engines both look for it
-  const updated = showUpdated && post.updated > post.published;
+  // On the post itself: who wrote it, and when it was brought up to date, as readers and
+  // search engines both look for them
+  const updated = full && post.updated > post.published;
   return (
     <p className="text-sm text-ink-muted">
+      {full && (
+        <>
+          <span className="font-semibold text-ink">{blogCopy.byline(site.founder)}</span>
+          {" · "}
+        </>
+      )}
       <time dateTime={post.published}>{day(post.published)}</time>
       {updated && (
         <>
@@ -219,7 +227,14 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
           tabIndex={0}
           className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <table aria-labelledby={captionId} className="w-full min-w-[34rem] border-collapse">
+          <table
+            aria-labelledby={captionId}
+            className={cn(
+              "w-full border-collapse",
+              // Four or more columns get room to breathe, and scroll sideways on a phone
+              head.length > 3 ? "min-w-[46rem]" : "min-w-[34rem]",
+            )}
+          >
             <thead>
               <tr>
                 {head.map((cell) => (
@@ -318,7 +333,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           >
             {post.heading}
           </h1>
-          <PostMeta post={post} showUpdated />
+          <PostMeta post={post} full />
           <p className="text-lg text-ink-muted">{post.intro}</p>
           {post.answer && (
             <section

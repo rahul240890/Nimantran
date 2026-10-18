@@ -109,6 +109,7 @@ export const blogCopy = {
   updated: "Updated",
   /** Above the post's question answered in two or three sentences. */
   inShort: "In short",
+  byline: (name: string) => `By ${name}, founder of Shubh Invitation`,
   onThisPage: "On this page",
   faqHeading: "Questions",
   copy: "Copy",

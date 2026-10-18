@@ -108,6 +108,7 @@ export const blogCopy: Translation<typeof en.blogCopy> = {
   published: "வெளியிடப்பட்டது",
   updated: "புதுப்பிக்கப்பட்டது",
   inShort: "சுருக்கமாக",
+  byline: (name) => `எழுதியவர்: ${name}, நிறுவனர், ஷுப் இன்விடேஷன்`,
   onThisPage: "இந்தப் பக்கத்தில்",
   faqHeading: "கேள்விகள்",
   copy: "நகலெடுக்கவும்",
