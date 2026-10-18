@@ -33,7 +33,7 @@ test.describe("finding a design", () => {
     await page.locator('[data-kind="gujarati"]').click();
     await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/);
     const designs = page.locator("[data-design]");
-    await expect(designs).toHaveCount(15);
+    await expect(designs).toHaveCount(18);
     for (const scene of [
       "pithora-ghoda",
       "patola-bandh",
@@ -53,6 +53,9 @@ test.describe("finding a design", () => {
     await expect(page.locator('[data-design="shahi-savari"]')).toBeVisible();
     await expect(page.locator('[data-design="pichwai"]')).toBeVisible();
     await expect(page.locator('[data-design="card-bandhani"]')).toBeVisible();
+    for (const story of ["nathdwara-raat", "hina", "mor-sarovar"]) {
+      await expect(page.locator(`[data-design="${story}"]`)).toBeVisible();
+    }
   });
 
   test("search finds kinds and designs as you type", async ({ page }) => {

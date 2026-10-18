@@ -1273,6 +1273,78 @@ export const openingCopy = {
       name: "Doors drawn in one line",
       description: "Ivory paper doors drawn in one gold line open onto a sunrise over lotuses.",
     },
+    "naqsha-pat": {
+      name: "Inlaid palace doors",
+      description:
+        "Ivory doors inlaid with a gold-line palace swing open onto a lake palace at dusk.",
+    },
+    "kinkhab-parda": {
+      name: "Brocade curtains",
+      description:
+        "Wine brocade curtains woven with gold gather aside onto a candlelit palace hall.",
+    },
+    "taad-patta-dwar": {
+      name: "Palm-leaf screens",
+      description:
+        "Woven palm-leaf screens slide apart onto a villa over a lotus lagoon at sunset.",
+    },
+    "pichwai-pat": {
+      name: "Pichwai curtains",
+      description:
+        "Painted Pichwai cloths of lotuses and cows gather aside onto a moonlit lotus pond.",
+    },
+    "chandi-kiwad": {
+      name: "Silver doors",
+      description:
+        "Embossed silver doors swing open onto a palace on a lake, every window glowing.",
+    },
+    "swarg-kiwad": {
+      name: "Doors in the clouds",
+      description:
+        "White marble doors carved with clouds swing open onto a pavilion floating on golden clouds.",
+    },
+    "firoza-darwaza": {
+      name: "Tiled iwan gate",
+      description:
+        "Walnut doors inlaid with turquoise stars swing open onto a reflecting-pool garden.",
+    },
+    "jharokha-pat": {
+      name: "Stained-glass shutters",
+      description:
+        "Pink shutters set with stained glass swing open onto a palace of windows at sunset.",
+    },
+    "hina-kiwad": {
+      name: "Henna-painted doors",
+      description:
+        "Cream doors drawn over with henna swing open onto an apricot courtyard of marigolds.",
+    },
+    "mor-pankh": {
+      name: "Peacock-feather screens",
+      description:
+        "Screens of peacock feathers slide apart onto a lotus lake with a marble chhatri.",
+    },
+    "jugnu-parda": {
+      name: "Firefly curtain",
+      description:
+        "An indigo curtain lit with fireflies gathers aside onto a moonlit lake of water lilies.",
+    },
+    "sheesh-kiwad": {
+      name: "Mirror-work doors",
+      description: "Doors of sheesh mirror-work swing open onto a durbar hall under chandeliers.",
+    },
+    "sunehri-phatak": {
+      name: "Gold-leaf doors",
+      description: "Gold-leaf doors swing open onto a golden-domed pavilion across a still lake.",
+    },
+    "pattu-thirai": {
+      name: "Silk sari curtains",
+      description:
+        "Kanjeevaram silk curtains gather aside onto a temple tank lit with brass lamps.",
+    },
+    "kagaz-kiwad": {
+      name: "Embossed paper doors",
+      description: "Embossed ivory paper doors with a gold seal open onto a soft blush wash.",
+    },
     "bel-khidki": {
       name: "Bougainvillea shutters",
       description:

@@ -141,7 +141,7 @@ export const DESIGN_OPENINGS: Readonly<Record<string, OpeningStyle>> = {
   "pool-party-scene": "bioscope",
   gubbara: "balloons",
   "card-monogram": "shahi-parda",
-  "kathputli-sangeet-scene": "kavad-peti",
+  "kathputli-sangeet-scene": "chhaya-parda",
   "sunflower-haldi-scene": "phool",
   "sehrabandi-scene": "navrang-dwar",
   "baraat-band-scene": "chhatri-utsav",
