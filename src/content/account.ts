@@ -147,6 +147,7 @@ export const invitesCopy = {
   continueEditing: "Continue",
   share: "Share",
   guests: "Guests",
+  video: "Video",
   cohost: "Co-host",
   step: (label: string) => `Next: ${label.toLowerCase()}`,
   updated: (when: string) => `Edited ${when}`,

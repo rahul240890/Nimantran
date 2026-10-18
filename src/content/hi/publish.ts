@@ -1,5 +1,6 @@
 import type * as en from "../publish";
 import type { Translation } from "@/i18n/text";
+import { SHARE_RULE } from "@/lib/publish/links";
 
 /* हिन्दी: प्रकाशित करना, भेजना, मेहमान का पेज और जवाब। English: src/content/publish.ts. */
 
@@ -43,18 +44,24 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   edit: "निमंत्रण बदलें",
   messageLabel: "संदेश",
   messageHint: "लिंक के साथ जाता है। जैसे चाहें बदलें।",
-  message: (names, occasion, when) =>
+  message: (names, occasion, when, where) =>
     [
-      occasion
-        ? `${names} के ${occasion} में आपको सप्रेम आमंत्रित करते हैं।`
-        : `${names} की ओर से आपको सप्रेम आमंत्रण।`,
-      when,
-      "निमंत्रण खोलिए और बताइए कि आप आ पाएँगे:",
+      "✨ *सप्रेम आमंत्रण* ✨",
+      SHARE_RULE,
+      occasion ? `${occasion} के शुभ अवसर पर` : null,
+      `*${names}*`,
+      when || where ? "" : null,
+      when ? `📅 ${when}` : null,
+      where ? `📍 ${where}` : null,
+      SHARE_RULE,
+      "निमंत्रण खोलिए और बताइए कि आप आ पाएँगे 👇",
     ]
-      .filter(Boolean)
+      .filter((line) => line !== null)
       .join("\n"),
   previewHeading: "WhatsApp में यह ऐसा दिखेगा",
-  previewNote: "WhatsApp आपके संदेश के नीचे यह तस्वीर, शीर्षक और पंक्ति दिखाता है।",
+  previewNote:
+    "WhatsApp आपके लिंक से यह कार्ड बनाता है: निमंत्रण की तस्वीर, शीर्षक, तारीख़ और जगह। भेजने से पहले इसे आने में कुछ सेकंड लग सकते हैं।",
+  previewTime: "अभी",
   qrHeading: "QR कोड",
   qrBody: "मेहमान फ़ोन के कैमरे से स्कैन करते हैं। इसे कार्ड, बैनर या स्वागत बोर्ड पर छापें।",
   qrAlt: (url) => `${url} का QR कोड`,
@@ -239,10 +246,10 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   makePreview: "मुफ़्त झलक बनाएँ",
   preview: "मुफ़्त झलक",
   previewNote:
-    "अपना पूरा वीडियो यहाँ मुफ़्त देखें। इस झलक पर “शुभ इन्विटेशन से बना” का निशान है; सेलिब्रेशन और ग्रैंड पैकेज में यह बिना निशान के डाउनलोड और भेजा जा सकता है।",
+    "अपना पूरा वीडियो यहाँ मुफ़्त देखें, दोबारा बनाएँ या हटाएँ। इस झलक पर “शुभ इन्विटेशन से बना” का निशान है; सेलिब्रेशन या ग्रैंड पैकेज लेने पर इसे बिना निशान के डाउनलोड करें और भेजें।",
   upgrade: "बिना निशान का वीडियो लें",
   draftNote:
-    "यह वीडियो डाउनलोड करने और भेजने के लिए अपना निमंत्रण प्रकाशित करें। वीडियो आपके निमंत्रण के लिंक पर ख़त्म होता है, जो प्रकाशित करने पर मिलता है।",
+    "अभी यह वीडियो शुभ के पते पर ख़त्म होता है। अपना निमंत्रण प्रकाशित करें, फिर वीडियो दोबारा बनाएँ ताकि यह आपके अपने लिंक पर ख़त्म हो।",
   publish: "अपना निमंत्रण प्रकाशित करें",
   which: "कौन-सा वीडियो",
   whole: "पूरा निमंत्रण",
@@ -251,6 +258,15 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   },
   shareText: (names) => `${names}: हमारा निमंत्रण`,
   fileName: (slug) => `${slug}-invitation.mp4`,
+  remove: "वीडियो हटाएँ",
+  removeTitle: "यह वीडियो हटाएँ?",
+  removeBody:
+    "यह इस फ़ोन या कंप्यूटर से हट जाएगा। आपका निमंत्रण जैसा है वैसा रहेगा, और आप वीडियो कभी भी फिर से बना सकते हैं।",
+  removeConfirm: "वीडियो हटाएँ",
+  keep: "रहने दें",
+  removed: "वीडियो हटाया गया",
+  close: "बंद करें",
+  allOptions: "वीडियो के सभी विकल्प",
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {

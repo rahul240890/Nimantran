@@ -17,7 +17,8 @@ import {
   occasionName,
 } from "@/lib/publish/describe";
 import { guestGuide } from "@/lib/publish/event-day";
-import { inviteUrl } from "@/lib/publish/links";
+import { coverUrl, inviteUrl } from "@/lib/publish/links";
+import { site } from "@/lib/site";
 import { requestOrigin } from "@/lib/request-origin";
 import { storyFunctions } from "@/lib/publish/story";
 
@@ -37,12 +38,31 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
   const { draft } = invite;
   const title = guestCopy.metaTitle(inviteNames(draft), occasionName(draft, locale));
   const description = guestCopy.metaDescription(inviteWhen(draft, locale), inviteWhere(draft));
+  // Absolute on the address the link was shared from, so WhatsApp fetches the picture from
+  // the same site as the link, as a small JPEG with its size stated
+  const origin = await requestOrigin();
+  const cover = coverUrl(origin, invite.slug, invite.updatedAt);
+  const image = {
+    url: cover,
+    secureUrl: cover.replace(/^http:/, "https:"),
+    width: 1200,
+    height: 630,
+    type: "image/jpeg",
+    alt: title,
+  };
   return {
     title: { absolute: title },
     description,
     robots,
-    openGraph: { type: "website", title, description, url: `/i/${invite.slug}` },
-    twitter: { card: "summary_large_image", title, description },
+    openGraph: {
+      type: "website",
+      siteName: site.name,
+      title,
+      description,
+      url: inviteUrl(origin, invite.slug),
+      images: [image],
+    },
+    twitter: { card: "summary_large_image", title, description, images: [image.url] },
   };
 }
 

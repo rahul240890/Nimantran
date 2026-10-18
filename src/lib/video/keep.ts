@@ -91,6 +91,16 @@ export function stopKept(key: string) {
   entries.get(key)?.stop?.abort();
 }
 
+/** Deletes the video kept under `key`, from the page and from this browser, stopping one being made. */
+export async function deleteKept(key: string): Promise<void> {
+  const entry = entries.get(key);
+  entry?.stop?.abort();
+  set(key, null);
+  // Never loaded again on this page, even if the saved copy outlives a failed delete
+  loaded.add(key);
+  await remove(key).catch(() => undefined);
+}
+
 /** Loads the video saved under `key` in this browser, once per page load. */
 export async function loadKept(key: string): Promise<void> {
   if (loaded.has(key) || entries.has(key)) return;
@@ -127,6 +137,17 @@ async function save(key: string, blob: Blob, look: string) {
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE, "readwrite");
     tx.objectStore(STORE).put({ blob, look, made: Date.now() } satisfies Saved, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+}
+
+async function remove(key: string) {
+  const db = await open();
+  await new Promise<void>((resolve, reject) => {
+    const tx = db.transaction(STORE, "readwrite");
+    tx.objectStore(STORE).delete(key);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });

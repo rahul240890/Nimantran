@@ -9,11 +9,13 @@ import {
   Share2,
   Sparkles,
   Square,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -48,6 +50,7 @@ import { voiceFaces } from "@/lib/suites/lettering";
 import { loadFonts, loadImages, openingPalette, paletteReader, readFonts } from "@/lib/video/look";
 import { withPrelude } from "@/lib/video/film";
 import {
+  deleteKept,
   fingerprint,
   keptVideo,
   loadKept,
@@ -111,7 +114,7 @@ export function VideoCard(props: VideoCardProps) {
   const { videoCopy } = useText(publishText);
   const { draft, photos, url, slug, names, allowed, testCodecs } = props;
   const published = props.published ?? true;
-  // Downloaded and shared only clean and with the real link; otherwise watched here
+  // Clean and ending on the real link; a paid video not yet live still downloads, and says why
   const clean = allowed && published;
   const marked = !allowed;
   // Grand makes a video of one function too: its own date, time and place
@@ -124,29 +127,31 @@ export function VideoCard(props: VideoCardProps) {
         : props.functions,
     [perFunction, only, props.functions],
   );
-  const { poster, silent, music, setMusic, key, state, stale, percent, make } = useInviteVideo({
-    draft,
-    functions,
-    photos,
-    url,
-    slug,
-    clipUrl: props.clipUrl ?? null,
-    marked,
-    choice: perFunction ? only : ALL,
-    testCodecs,
-  });
+  const { poster, silent, music, setMusic, key, state, stale, percent, make, fileName } =
+    useInviteVideo({
+      draft,
+      functions,
+      photos,
+      url,
+      slug,
+      clipUrl: props.clipUrl ?? null,
+      marked,
+      choice: perFunction ? only : ALL,
+      testCodecs,
+    });
   const canShareFiles = useSyncExternalStore(
     noSubscribe,
     () => typeof navigator !== "undefined" && typeof navigator.canShare === "function",
     () => false,
   );
+  // Only a paid video downloads and shares (owner, 2026-10-15); the free preview is watched here
   const file = useMemo(
     () =>
-      state.step === "ready" && clean
-        ? new File([state.blob], videoCopy.fileName(slug), { type: "video/mp4" })
+      state.step === "ready" && allowed
+        ? new File([state.blob], fileName, { type: "video/mp4" })
         : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.step === "ready" ? state.blob : null, clean, slug, videoCopy],
+    [state.step === "ready" ? state.blob : null, allowed, fileName],
   );
   const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
 
@@ -175,8 +180,8 @@ export function VideoCard(props: VideoCardProps) {
             <video
               src={state.href}
               controls
-              // A preview is watched here; the clean one downloads from the button
-              controlsList={clean ? undefined : "nodownload"}
+              // The free preview is watched here; a paid one downloads from the button
+              controlsList={allowed ? undefined : "nodownload"}
               playsInline
               aria-label={videoCopy.player(names)}
               className="size-full object-cover"
@@ -257,21 +262,22 @@ export function VideoCard(props: VideoCardProps) {
                     {videoCopy.share}
                   </Button>
                 )}
-                {clean && (
+                {allowed && (
                   <Button asChild variant={sharable ? "secondary" : "primary"}>
-                    <a href={state.href} download={videoCopy.fileName(slug)}>
+                    <a href={state.href} download={fileName}>
                       <Download aria-hidden />
                       {videoCopy.download}
                     </a>
                   </Button>
                 )}
                 <Button
-                  variant={stale || !clean ? "secondary" : "ghost"}
+                  variant={stale ? "primary" : "secondary"}
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={() => void make()}
                 >
                   {videoCopy.again}
                 </Button>
+                <RemoveVideo videoKey={key} />
               </div>
             </div>
           ) : (
@@ -404,7 +410,8 @@ function useInviteVideo({
       : (kept ?? { step: "idle" as const });
   const stale = state.step === "ready" && state.look !== made;
   const percent = state.step === "making" ? Math.round(state.done * 100) : 0;
-  return { poster, support, silent, music, setMusic, key, state, stale, percent, make };
+  const fileName = videoCopy.fileName(slug);
+  return { poster, support, silent, music, setMusic, key, state, stale, percent, make, fileName };
 }
 
 /** What the package card's video preview is made from. */
@@ -418,6 +425,8 @@ export type PackageVideoProps = {
   names: string;
   /** Whether the invite's package already has the video: then the preview carries no mark. */
   allowed: boolean;
+  /** The page with every video choice: the video page, or the share page once live. */
+  optionsHref: string;
   testCodecs?: boolean;
 };
 
@@ -435,7 +444,7 @@ export function PackageVideo(props: PackageVideoProps) {
   const player = useRef<FullScreenVideo>(null);
   const marked = !props.allowed;
   const heading = useId();
-  const { poster, state, percent, make, key } = useInviteVideo({
+  const { poster, state, percent, make, key, fileName } = useInviteVideo({
     draft: props.draft,
     functions: props.functions,
     photos: props.photos,
@@ -580,6 +589,14 @@ export function PackageVideo(props: PackageVideoProps) {
               >
                 {upgradeCopy.video.fullScreenShort}
               </Button>
+              {props.allowed && (
+                <Button asChild size="sm" variant="secondary">
+                  <a href={state.href} download={fileName}>
+                    <Download aria-hidden />
+                    {videoCopy.download}
+                  </a>
+                </Button>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
@@ -588,6 +605,7 @@ export function PackageVideo(props: PackageVideoProps) {
               >
                 {videoCopy.again}
               </Button>
+              <RemoveVideo videoKey={key} size="sm" />
             </>
           ) : (
             <Button
@@ -601,12 +619,57 @@ export function PackageVideo(props: PackageVideoProps) {
           )}
         </div>
       )}
+      <Link
+        href={props.optionsHref}
+        className="inline-flex min-h-11 items-center gap-1.5 self-start rounded-md text-sm font-semibold text-accent-text underline-offset-4 hover:underline focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+      >
+        <Clapperboard aria-hidden className="size-4" />
+        {videoCopy.allOptions}
+      </Link>
     </section>
   );
 }
 
 /**
- * Why a video isn't to download yet, and the way to the clean one: a package for a preview
+ * Deletes a made video from this browser, after asking. The invitation itself stays; the
+ * video can be made again at any time.
+ */
+function RemoveVideo({ videoKey, size }: { videoKey: string; size?: "sm" }) {
+  const { videoCopy } = useText(publishText);
+  const [open, setOpen] = useState(false);
+  const remove = async () => {
+    await deleteKept(videoKey);
+    setOpen(false);
+    toast({ title: videoCopy.removed, tone: "success" });
+  };
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="ghost" size={size} leadingIcon={<Trash2 aria-hidden />}>
+          {videoCopy.remove}
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        title={videoCopy.removeTitle}
+        description={videoCopy.removeBody}
+        closeLabel={videoCopy.close}
+        footer={
+          <>
+            <DialogClose asChild>
+              <Button variant="secondary">{videoCopy.keep}</Button>
+            </DialogClose>
+            <Button variant="danger" onClick={() => void remove()}>
+              {videoCopy.removeConfirm}
+            </Button>
+          </>
+        }
+      />
+    </Dialog>
+  );
+}
+
+/**
+ * Why a video isn't clean yet, and the way to the clean one: a package for a preview
  * with the mark, or publishing for an invite not yet live.
  */
 function Unlock({

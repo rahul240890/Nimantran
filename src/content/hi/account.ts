@@ -143,6 +143,7 @@ export const invitesCopy: Translation<typeof en.invitesCopy> = {
   continueEditing: "जारी रखें",
   share: "भेजें",
   guests: "मेहमान",
+  video: "वीडियो",
   cohost: "सह-मेज़बान",
   step: (label) => `अगला: ${label}`,
   updated: (when) => `${when} बदला गया`,

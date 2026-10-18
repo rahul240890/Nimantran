@@ -2,6 +2,7 @@
 
 import {
   ArrowLeft,
+  CheckCheck,
   Copy,
   Download,
   ExternalLink,
@@ -31,8 +32,8 @@ type SharePanelProps = {
   slug: string;
   url: string;
   names: string;
-  occasion: string;
-  when: string;
+  /** The link preview as WhatsApp draws it from the guest page's tags. */
+  linkPreview: { title: string; description: string; image: string };
   message: string;
   /** The QR code as an SVG string, drawn in currentColor. */
   qr: string;
@@ -59,8 +60,7 @@ export function SharePanel({
   slug,
   url,
   names,
-  occasion,
-  when,
+  linkPreview,
   message: initialMessage,
   qr,
   replies,
@@ -138,8 +138,8 @@ export function SharePanel({
               <Textarea
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
-                rows={4}
-                maxLength={600}
+                rows={10}
+                maxLength={800}
               />
             </Field>
 
@@ -185,25 +185,40 @@ export function SharePanel({
             <h2 id="share-preview" className="font-semibold">
               {shareCopy.previewHeading}
             </h2>
-            {/* A message bubble with the link preview WhatsApp builds from the page */}
+            {/* The message as WhatsApp sends it: the link's card on top, then the words */}
             <div className="rounded-lg border border-line bg-surface-2/60 p-3 sm:p-4">
-              <div className="ms-auto max-w-sm overflow-hidden rounded-lg rounded-se-sm border border-success/25 bg-success/10 shadow-raised">
-                {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
-                <img
-                  src={`/i/${slug}/cover`}
-                  alt=""
-                  width={1200}
-                  height={630}
-                  className="aspect-[1200/630] w-full bg-surface-2 object-cover"
-                />
-                <div className="flex flex-col gap-0.5 bg-surface/70 px-3 py-2">
-                  <p className="text-sm font-semibold break-words">
-                    {names} · {occasion}
-                  </p>
-                  {when && <p className="text-xs text-ink-muted">{when}</p>}
-                  <p className="truncate text-xs text-ink-muted">{new URL(url).host}</p>
+              <div className="ms-auto flex max-w-sm flex-col gap-1 rounded-lg rounded-se-sm border border-success/25 bg-success/10 p-1 shadow-raised">
+                <div className="overflow-hidden rounded-md border-s-4 border-success/50 bg-surface/80">
+                  {/* eslint-disable-next-line @next/next/no-img-element -- the generated preview image */}
+                  <img
+                    src={linkPreview.image}
+                    alt=""
+                    width={1200}
+                    height={630}
+                    className="aspect-[1200/630] w-full bg-surface-2 object-cover"
+                  />
+                  <div className="flex flex-col gap-0.5 px-3 py-2">
+                    <p className="line-clamp-2 text-sm font-semibold break-words">
+                      {linkPreview.title}
+                    </p>
+                    {linkPreview.description && (
+                      <p className="line-clamp-2 text-xs break-words text-ink-muted">
+                        {linkPreview.description}
+                      </p>
+                    )}
+                    <p className="truncate text-xs text-ink-faint">{new URL(url).host}</p>
+                  </div>
                 </div>
-                <p className="px-3 py-2 text-sm break-words whitespace-pre-line">{full}</p>
+                <p
+                  data-testid="share-preview-text"
+                  className="px-2 pt-1 text-sm break-words whitespace-pre-line"
+                >
+                  <WhatsAppText text={full} />
+                </p>
+                <p className="flex items-center justify-end gap-1 px-2 pb-0.5 text-[0.7rem] text-ink-muted">
+                  {shareCopy.previewTime}
+                  <CheckCheck aria-hidden className="size-3.5 text-accent-text" />
+                </p>
               </div>
             </div>
             <p className="text-sm text-ink-muted">{shareCopy.previewNote}</p>
@@ -237,13 +252,41 @@ export function SharePanel({
             </div>
           </Card>
 
-          {video}
+          {video && (
+            <div id="video" className="scroll-mt-24">
+              {video}
+            </div>
+          )}
         </div>
       </div>
 
       <StopSharing inviteId={inviteId} />
     </div>
   );
+}
+
+/**
+ * A message as WhatsApp shows it: *words in stars* bold, _underscores_ italic, links in
+ * colour. Only the marks WhatsApp itself reads, so the preview matches what guests get.
+ */
+function WhatsAppText({ text }: { text: string }) {
+  const parts = text.split(/(https?:\/\/\S+|\*[^*\n]+\*|_[^_\n]+_)/g);
+  return parts.map((part, index) => {
+    if (/^https?:\/\//.test(part)) {
+      return (
+        <span key={index} className="break-all text-accent-text underline">
+          {part}
+        </span>
+      );
+    }
+    if (part.length > 2 && part.startsWith("*") && part.endsWith("*")) {
+      return <strong key={index}>{part.slice(1, -1)}</strong>;
+    }
+    if (part.length > 2 && part.startsWith("_") && part.endsWith("_")) {
+      return <em key={index}>{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
 }
 
 function StopSharing({ inviteId }: { inviteId: string }) {

@@ -1,3 +1,4 @@
+import { SHARE_RULE } from "@/lib/publish/links";
 import { site } from "@/lib/site";
 
 /* Publishing, sharing and the guest page (Step 9). English copy, shaped for next-intl. */
@@ -42,16 +43,25 @@ export const shareCopy = {
   edit: "Edit invite",
   messageLabel: "Message",
   messageHint: "Sent with the link. Change it however you like.",
-  message: (names: string, occasion: string, when: string) =>
+  /** WhatsApp's own layout: *bold* lines, a rule above and below the details, the link last. */
+  message: (names: string, occasion: string, when: string, where: string) =>
     [
-      `You're warmly invited to ${occasion ? `the ${occasion.toLowerCase()} of ` : ""}${names}.`,
-      when,
-      "Open your invitation and let us know if you can come:",
+      "✨ *You're warmly invited* ✨",
+      SHARE_RULE,
+      occasion ? `To the ${occasion.toLowerCase()} of` : null,
+      `*${names}*`,
+      when || where ? "" : null,
+      when ? `📅 ${when}` : null,
+      where ? `📍 ${where}` : null,
+      SHARE_RULE,
+      "Open your invitation and let us know if you can come 👇",
     ]
-      .filter(Boolean)
+      .filter((line) => line !== null)
       .join("\n"),
   previewHeading: "How it looks in WhatsApp",
-  previewNote: "WhatsApp shows this picture, title and line under your message.",
+  previewNote:
+    "WhatsApp draws this card from your link: the invitation's picture, its title and the date and place. It can take a few seconds to appear before you press send.",
+  previewTime: "Now",
   qrHeading: "QR code",
   qrBody:
     "Guests scan it with their phone camera. Print it on a card, a banner or the welcome board.",
@@ -240,10 +250,10 @@ export const videoCopy = {
   makePreview: "Make a free preview",
   preview: "Free preview",
   previewNote:
-    "Watch your whole video here for free. This preview carries a “Made with Shubh” mark; the Celebration and Grand packages download and share it clean.",
+    "Watch your whole video here for free, make it again or delete it. This preview carries a “Made with Shubh” mark; download and share it clean once your invitation has the Celebration or Grand package.",
   upgrade: "Get the clean video",
   draftNote:
-    "Publish your invitation to download and share this video. It ends with your invitation's link, which you get when you publish.",
+    "For now this video ends on Shubh's address. Publish your invitation, then make the video again so it ends with your own link.",
   publish: "Publish your invitation",
   which: "Which video",
   whole: "The whole invitation",
@@ -252,6 +262,15 @@ export const videoCopy = {
   },
   shareText: (names: string) => `${names}: our invitation`,
   fileName: (slug: string) => `${slug}-invitation.mp4`,
+  remove: "Delete video",
+  removeTitle: "Delete this video?",
+  removeBody:
+    "It's removed from this phone or computer. Your invitation stays as it is, and you can make the video again at any time.",
+  removeConfirm: "Delete video",
+  keep: "Keep it",
+  removed: "Video deleted",
+  close: "Close",
+  allOptions: "All video options",
 } as const;
 
 export const hostPreviewCopy = {

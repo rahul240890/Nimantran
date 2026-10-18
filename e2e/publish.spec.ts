@@ -70,6 +70,7 @@ test.describe("publish and share", () => {
     const href = new URL((await whatsapp.getAttribute("href"))!);
     expect(href.origin).toBe("https://wa.me");
     expect(href.searchParams.get("text")).toContain(link);
+    expect(href.searchParams.get("text")).toContain("*Aarav & Meera*");
     await expect(page.getByRole("img", { name: /QR code for/ }).locator("svg")).toBeVisible();
     // The WhatsApp preview on this page loads the real picture
     const bubble = page.getByRole("region", { name: "How it looks in WhatsApp" }).locator("img");
@@ -99,13 +100,18 @@ test.describe("publish and share", () => {
     await expect(guest.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
     await expect(guest.locator('meta[property="og:image"]')).toHaveAttribute(
       "content",
-      /opengraph-image/,
+      /^https?:\/\/[^/]+\/i\/aarav-weds-meera-\d+\/cover\?v=/,
     );
-    // The preview WhatsApp shows is a real image
+    await expect(guest.locator('meta[property="og:image:type"]')).toHaveAttribute(
+      "content",
+      "image/jpeg",
+    );
+    // The preview WhatsApp shows is a real image, light enough for WhatsApp to draw
     const image = await guest.locator('meta[property="og:image"]').getAttribute("content");
-    const preview = await page.request.get(new URL(image!).pathname);
+    const preview = await page.request.get(new URL(image!).pathname + new URL(image!).search);
     expect(preview.ok()).toBe(true);
-    expect(preview.headers()["content-type"]).toBe("image/png");
+    expect(preview.headers()["content-type"]).toBe("image/jpeg");
+    expect((await preview.body()).length).toBeLessThan(300_000);
     const haldi = guest.getByRole("article", { name: "Haldi" });
     await expect(haldi.getByText("Wednesday, 14 October 2026")).toBeVisible();
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();

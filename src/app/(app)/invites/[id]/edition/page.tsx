@@ -87,6 +87,7 @@ export default async function EditionPage({
     slug: draft.slug ?? `draft-${id.slice(0, 8)}`,
     names: inviteNames(draft),
     allowed: !active || PLANS[current.plan].video !== "none",
+    optionsHref: draft.slug ? `/invites/${id}/share#video` : `/invites/${id}/video`,
     testCodecs: authMode() === "preview",
   };
   const design = designTier(pricing, draftDesignId(draft));

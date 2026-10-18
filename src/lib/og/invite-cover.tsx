@@ -1,3 +1,4 @@
+import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
@@ -10,13 +11,13 @@ import { draftSuite } from "@/lib/publish/story";
 import { suitePreview } from "@/lib/suites/catalog";
 import { site } from "@/lib/site";
 
-export const alt = "The invitation's cover";
 export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
 
-/** The picture WhatsApp and other apps show under the link: the family's card, in its colours. */
-export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = await params;
+/**
+ * The picture WhatsApp and other apps show with the link: the family's card, in its colours.
+ * Drawn as a PNG; /i/<slug>/cover serves it as a small JPEG.
+ */
+export async function inviteCover(slug: string): Promise<ImageResponse> {
   const [invite, tokens, fonts] = await Promise.all([
     findPublishedInvite(slug),
     lightTokens(),
@@ -96,6 +97,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       </div>
 
       {painting ? (
+        // eslint-disable-next-line @next/next/no-img-element -- drawn into the picture by next/og
         <img
           src={painting}
           alt=""

@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { inviteUrl, mapsUrl, personalUrl, whatsappShareUrl, whatsappToUrl } from "./links";
+import {
+  coverUrl,
+  inviteUrl,
+  mapsUrl,
+  personalUrl,
+  whatsappShareUrl,
+  whatsappToUrl,
+} from "./links";
 
 describe("links", () => {
   it("prefills WhatsApp with the whole message", () => {
@@ -26,5 +33,13 @@ describe("links", () => {
     expect(url.searchParams.get("text")).toBe("Hello");
     expect(new URL(whatsappToUrl(null, "Hi")).pathname).toBe("/");
     expect(personalUrl("https://x.in/i/a", "abc")).toBe("https://x.in/i/a?g=abc");
+  });
+
+  it("names the preview picture with the invite's last change", () => {
+    const at = "2026-10-15T10:00:00.000Z";
+    const url = coverUrl("https://x.in", "a", at);
+    expect(url).toBe(`https://x.in/i/a/cover?v=${Date.parse(at).toString(36)}`);
+    expect(coverUrl("https://x.in", "a", "not a date")).toBe("https://x.in/i/a/cover");
+    expect(coverUrl("https://x.in", "a")).toBe("https://x.in/i/a/cover");
   });
 });

@@ -24,10 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /*
- * The invitation video before publishing (owner, 2026-10-14): any host makes it and watches
- * it here, free, with the mark across it when the package doesn't include the video. It
- * downloads once the invite is live, from the share page, since its last card carries the
- * link. A live invite goes straight to the share page.
+ * The invitation video before publishing (owner, 2026-10-14): any host makes it here, free,
+ * with the mark across it when the package doesn't include the video, and can download,
+ * make again or delete it (owner, 2026-10-15). Until the invite is live it ends on the
+ * site's address; a live invite goes straight to the share page's video.
  */
 export default async function InviteVideoPage({ params }: PageProps<"/invites/[id]/video">) {
   const { id } = await params;
@@ -37,7 +37,7 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
   const store = inviteStore();
   const draft = await store?.get(account, id);
   if (!store || !draft) notFound();
-  if (draft.slug) redirect(`/invites/${id}/share`);
+  if (draft.slug) redirect(`/invites/${id}/share#video`);
 
   const [urls, active, edition, locale, origin, { videoCopy }] = await Promise.all([
     store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),

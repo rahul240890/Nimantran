@@ -109,7 +109,7 @@ export const upgradeCopy = {
   videoFirstLink: "Watch your video",
   video: {
     title: "WhatsApp video included",
-    body: "Make a free preview of your invitation video right here, then watch it full screen.",
+    body: "Make a free preview of your invitation video right here, then watch it full screen or make it again. It downloads once this package is yours.",
     make: "Make video preview",
     ready: "Your preview is ready",
     fullScreen: "Watch the video full screen",

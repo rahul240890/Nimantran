@@ -272,7 +272,7 @@ export function PreviewStep({
 
 /** Where each button goes: a live invite's video is on its share page, with the link it ends on. */
 function guestHref(id: string, page: "preview" | "video", published: boolean) {
-  return `/invites/${id}/${page === "video" && published ? "share" : page}`;
+  return page === "video" && published ? `/invites/${id}/share#video` : `/invites/${id}/${page}`;
 }
 
 /**

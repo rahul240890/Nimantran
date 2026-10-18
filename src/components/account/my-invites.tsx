@@ -4,6 +4,7 @@ import { formatDistanceToNow, format, parseISO } from "date-fns";
 import {
   ArrowRight,
   CalendarDays,
+  Clapperboard,
   CloudAlert,
   FilePlus2,
   HardDrive,
@@ -377,6 +378,20 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                             {invitesCopy.guests}
                           </Link>
                         </Button>
+                        {invite.role === "owner" && (
+                          <Button asChild size="sm" variant="secondary">
+                            <Link
+                              href={
+                                invite.status === "published"
+                                  ? `/invites/${invite.id}/share#video`
+                                  : `/invites/${invite.id}/video`
+                              }
+                            >
+                              <Clapperboard aria-hidden />
+                              {invitesCopy.video}
+                            </Link>
+                          </Button>
+                        )}
                         {invite.status === "published" && (
                           <Button asChild size="sm">
                             <Link href={`/invites/${invite.id}/share`}>
