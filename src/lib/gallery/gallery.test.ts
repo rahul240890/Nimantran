@@ -49,6 +49,8 @@ describe("gallery catalog", () => {
         "nathdwara-raat",
         "hina",
         "mor-sarovar",
+        "kaanch-chitra",
+        "rogan",
         "card-bandhani",
       ].sort(),
     );

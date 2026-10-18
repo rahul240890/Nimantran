@@ -1345,6 +1345,56 @@ export const openingCopy = {
       name: "Embossed paper doors",
       description: "Embossed ivory paper doors with a gold seal open onto a soft blush wash.",
     },
+    "peetal-kiwad": {
+      name: "Bronze doors",
+      description:
+        "Doors cast in Dhokra bronze swing open onto a courtyard of lamps round a bronze tree of life.",
+    },
+    "kaanch-pat": {
+      name: "Painted glass screens",
+      description:
+        "Glass panels painted with parrots and a peacock slide apart onto a jewel-bright palace garden.",
+    },
+    "thinnai-kadhavu": {
+      name: "Carved teak doors",
+      description:
+        "Carved Burma-teak doors with brass studs swing open onto the mansion's sunlit courtyard.",
+    },
+    "meena-pat": {
+      name: "Enamelled gold screens",
+      description:
+        "Gold panels enamelled with parrots and a flowering tree slide apart onto a Jaipur palace garden.",
+    },
+    "rogan-parda": {
+      name: "Rogan curtains",
+      description:
+        "Maroon curtains painted in rogan gather aside onto a Kutchi courtyard at golden hour.",
+    },
+    "makhmal-parda": {
+      name: "Velvet curtains",
+      description:
+        "Black velvet curtains embroidered with roses gather aside onto a candlelit room of flowers.",
+    },
+    "sama-dwar": {
+      name: "Pastel doors",
+      description:
+        "Mint doors with pastel panels swing open onto a symmetrical courtyard and a long reflecting pool.",
+    },
+    "dilli-phatak": {
+      name: "Haveli doors",
+      description:
+        "Old turquoise haveli doors with iron spikes swing open onto a courtyard strung with lights and marigolds.",
+    },
+    "nakkashi-pat": {
+      name: "Silver repoussé screens",
+      description:
+        "Silver panels raised with peacocks and parrots slide apart onto a moonlit marble garden.",
+    },
+    "gagan-parda": {
+      name: "Balloon-silk curtains",
+      description:
+        "Painted balloon silk gathers aside onto a sunrise sky full of hot-air balloons over a lake palace.",
+    },
     "bel-khidki": {
       name: "Bougainvillea shutters",
       description:
