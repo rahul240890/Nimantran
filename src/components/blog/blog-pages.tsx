@@ -227,7 +227,14 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
           tabIndex={0}
           className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
-          <table aria-labelledby={captionId} className="w-full min-w-[34rem] border-collapse">
+          <table
+            aria-labelledby={captionId}
+            className={cn(
+              "w-full border-collapse",
+              // Four or more columns get room to breathe, and scroll sideways on a phone
+              head.length > 3 ? "min-w-[46rem]" : "min-w-[34rem]",
+            )}
+          >
             <thead>
               <tr>
                 {head.map((cell) => (
