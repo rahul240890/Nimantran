@@ -62,6 +62,21 @@ export const designNames = {
     navrang: "Navrang",
     "nadi-safar": "Nadi Safar",
     "ek-rekha": "Ek Rekha",
+    "mahal-yatra": "Mahal Yatra",
+    kinkhab: "Kinkhab",
+    "saanjh-kinara": "Saanjh Kinara",
+    "nathdwara-raat": "Nathdwara Raat",
+    "chandni-mahal": "Chandni Mahal",
+    "aakash-mahal": "Aakash Mahal",
+    "firoza-bagh": "Firoza Bagh",
+    "gulabi-nagar": "Gulabi Nagar",
+    hina: "Hina",
+    "mor-sarovar": "Mor Sarovar",
+    kumudini: "Kumudini",
+    darbar: "Darbar",
+    "sunehri-sarovar": "Sunehri Sarovar",
+    pattu: "Pattu",
+    "sona-rekha": "Sona Rekha",
     "kagzi-phool": "Kagzi Phool",
     nilofar: "Nilofar",
     "sona-gulaab": "Sona Gulaab",
@@ -434,6 +449,33 @@ export const designNames = {
     "nadi-safar":
       "A leaf boat carrying a marigold from a glacier spring, past the ghats, to the sea.",
     "ek-rekha": "One golden line on ivory paper that draws the whole world, page by page.",
+    "mahal-yatra":
+      "A journey through India's palaces, a different one on every page, in a watercolour sketchbook.",
+    kinkhab: "Banarasi brocade come to life: every page a scene woven in gold zari on wine silk.",
+    "saanjh-kinara":
+      "A destination wedding on a tropical shore, one resort from sunrise to moonrise.",
+    "nathdwara-raat":
+      "A Pichwai at night: the Sharad Purnima moon, lotus ponds and cows in gold on indigo and maroon.",
+    "chandni-mahal":
+      "A palace by night, every terrace lit with diyas and sky lanterns rising over still water.",
+    "aakash-mahal":
+      "A palace in the clouds: white marble, chandeliers in the open sky and cascades of blush roses.",
+    "firoza-bagh":
+      "Turquoise-tiled pavilions, fountains and white roses in a royal Persian garden.",
+    "gulabi-nagar":
+      "The Pink City in pastel: honeycomb palaces, bougainvillea, peach blossom and kites.",
+    hina: "Henna art everywhere: every arch, wall and sky drawn over with fine mehndi patterns.",
+    "mor-sarovar":
+      "A peacock lake at dawn: marble chhatris, lotuses and peacocks in mint, teal and gold.",
+    kumudini: "White water lilies opening under the full moon, with fireflies and silver lanterns.",
+    darbar:
+      "Inside the palace: durbar halls, mirror rooms and chandeliers, a different royal room on every page.",
+    "sunehri-sarovar":
+      "A golden-hour lake with a golden-domed pavilion, marble walkways and phulkari.",
+    pattu:
+      "Kanjeevaram silk in magenta and emerald, with temple-gold zari, jasmine and brass lamps.",
+    "sona-rekha":
+      "Ivory cotton paper, single-line gold-foil drawings and plenty of quiet white space.",
     "kagzi-phool":
       "Magenta and coral bougainvillea spilling over whitewashed walls, sunny and joyful.",
     nilofar: "Blue water lilies on a still pond, in indigo and lilac watercolour.",
