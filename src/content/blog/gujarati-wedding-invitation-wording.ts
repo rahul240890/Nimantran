@@ -10,6 +10,8 @@ export const gujaratiWeddingInvitationWording: BlogPost = {
   heading: "Gujarati wedding invitation wording: kankotri matter in Gujarati and English",
   intro:
     "A Gujarati kankotri has its own warm rhythm: Shri Ganesh at the top, a bhavbharyu amantran to the whole family, every prasang from Ganesh sthapana to hast melap, and a playful tahuko from the children at the end. Here are 25 lines in Gujarati script, with the English meaning, to copy as they are or change for your family.",
+  answer:
+    "A kankotri is the Gujarati wedding invitation. It starts with Shri Ganesh, invites the whole family with a bhavbharyu amantran, and lists every prasang, from Ganesh sthapana to the jaan and hast melap, with dates and times. It ends with the family elders as nimantrak and a tahuko line from the children, often in Gujarati and English.",
   published: "2026-10-03",
   updated: "2026-10-17",
   occasion: "wedding",

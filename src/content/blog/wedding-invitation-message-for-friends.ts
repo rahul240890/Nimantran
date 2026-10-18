@@ -9,6 +9,8 @@ export const weddingInvitationMessageForFriends: BlogPost = {
   heading: "Wedding invitation message for friends and colleagues: 23 to copy",
   intro:
     "Your parents invite the relatives; your friends should hear it from you. A message in your own words, with a little of your friendship in it, gets a faster reply than a forwarded card. Here are 23 wedding invitation messages for best friends, college groups, office colleagues and your boss, including funny ones, that you can send with your invitation link on WhatsApp.",
+  answer:
+    "A wedding invitation message for friends should come from you, not your parents, and sound like you: warm, a little personal and short. Give the dates and the functions they must not miss, such as the sangeet, add the invitation link, and ask them to reply so you can count them in.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

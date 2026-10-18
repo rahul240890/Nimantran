@@ -10,6 +10,8 @@ export const satyanarayanPujaInvitationMessage: BlogPost = {
   heading: "Satyanarayan puja invitation messages: 22 ideas to copy",
   intro:
     "A Satyanarayan puja is how many families say thank you: after a wedding, in a new home, for a new job, or simply on a Purnima. Here are messages to invite relatives and friends to the puja and katha, from formal card wording to short WhatsApp texts.",
+  answer:
+    "A Satyanarayan puja invitation asks guests to join the katha and take prasad, with the date, the puja time and the address. Families hold it after a wedding, in a new home, for a new job or on Purnima, so the reason can open the message. Mention the prasad or meal time so guests know how long to stay.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "puja",

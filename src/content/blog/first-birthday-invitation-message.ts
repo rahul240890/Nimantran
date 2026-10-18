@@ -9,6 +9,8 @@ export const firstBirthdayInvitationMessage: BlogPost = {
   heading: "1st birthday invitation messages: 28 lines from the baby, the parents and the family",
   intro:
     "A baby's first birthday is as much a thank-you to everyone who helped through the first year as it is a party. Here are first birthday invitation messages written as if the baby is inviting, warm wording from parents, traditional lines with the elders' blessings, themed party lines and short texts to send on WhatsApp. Copy any of them and change the names.",
+  answer:
+    "A first birthday invitation is often written as if from the baby, inviting guests to celebrate turning one, with the date, time and venue. Many families add a thank-you to everyone who helped through the first year. Give the time of the cake cutting and ask guests to reply so you can plan the food.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "birthday",

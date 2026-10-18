@@ -106,6 +106,8 @@ export const blogCopy: Translation<typeof en.blogCopy> = {
   otherLanguageLang: "en",
   minutes: (count) => `${count} நிமிட வாசிப்பு`,
   published: "வெளியிடப்பட்டது",
+  updated: "புதுப்பிக்கப்பட்டது",
+  inShort: "சுருக்கமாக",
   onThisPage: "இந்தப் பக்கத்தில்",
   faqHeading: "கேள்விகள்",
   copy: "நகலெடுக்கவும்",

@@ -11,6 +11,9 @@ type Thing = Record<string, unknown>;
 
 export const absolute = (path: string) => new URL(path, site.url).toString();
 
+/** A post's [link](/path) and **bold** marks, kept as their words in plain text. */
+const INLINE_MARKS = /\[([^\]]+)\]\([^)\s]+\)|\*\*([^*]+)\*\*/g;
+
 const inLanguage = (locale: UiLocale) => intlLocale[locale];
 
 export function organization(): Thing {
@@ -96,6 +99,7 @@ export function itemList(items: readonly { name: string; path: string }[]): Thin
 export function blogPosting(post: {
   heading: string;
   description: string;
+  answer?: string;
   published: string;
   updated: string;
   path: string;
@@ -107,6 +111,8 @@ export function blogPosting(post: {
     "@type": "BlogPosting",
     headline: post.heading,
     description: post.description,
+    // The question answered in a few sentences, which answer engines quote
+    ...(post.answer ? { abstract: post.answer.replace(INLINE_MARKS, "$1$2") } : {}),
     datePublished: post.published,
     dateModified: post.updated,
     inLanguage: inLanguage(post.locale),

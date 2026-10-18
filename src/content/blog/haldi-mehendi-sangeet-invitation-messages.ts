@@ -3,12 +3,15 @@ import type { BlogPost } from "./types";
 export const haldiMehendiSangeetMessages: BlogPost = {
   slug: "haldi-mehendi-sangeet-invitation-messages",
   locale: "en",
+  pair: "haldi-mehendi-sangeet",
   title: "Haldi, mehendi and sangeet invitation messages",
   description:
     "Fun and traditional invitation messages for haldi, mehendi and sangeet, with dress code lines and short WhatsApp texts you can copy.",
   heading: "Haldi, mehendi and sangeet invitation messages",
   intro:
     "The functions before the wedding are where the fun is, and their invitations can be playful in a way the main card can't. Here are messages for each one, from traditional to cheeky, with dress code lines and short texts for WhatsApp.",
+  answer:
+    "Haldi, mehendi and sangeet invitations can be more playful than the main wedding card. Give each function its own line with the date, time and venue, and add a dress code: yellow for the haldi, bright colours for the mehendi and festive wear for the sangeet. One invitation link can carry all three.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "haldi",

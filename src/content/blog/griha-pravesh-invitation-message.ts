@@ -10,6 +10,8 @@ export const grihaPraveshInvitationMessage: BlogPost = {
   heading: "Griha pravesh invitation message: 30 housewarming messages to copy",
   intro:
     "A new home is a blessing you want to share, first with the gods and then with family and friends. Here are 30 griha pravesh invitation messages in English and Hinglish, lines for the puja and havan timings, wording for a new flat, and simple advice on when to send the invitation.",
+  answer:
+    "A griha pravesh invitation asks family and friends to bless your new home. Give the new address, the date, the muhurat for the puja and the time of the meal. Most families start with an invocation such as Shri Ganeshaya Namah, and add a map link, since guests have not been to the house before.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "housewarming",

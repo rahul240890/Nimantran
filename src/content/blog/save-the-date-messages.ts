@@ -9,6 +9,8 @@ export const saveTheDateMessages: BlogPost = {
   heading: "Save the date message: 24 ideas for your wedding",
   intro:
     "A save the date tells guests to keep the day free before the full invitation is ready. It matters most for guests who must book leave, trains or flights. Here are 24 save the date messages to copy, from classic and family wording to fun and destination ones, and a simple guide to when to send them.",
+  answer:
+    "A save the date asks guests to keep your wedding day free before the full invitation is ready, so it needs only your names, the date and the city. Send it three to four months ahead for guests travelling within India, four to six months for a destination wedding, and six months or more for guests from abroad.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "save-the-date",

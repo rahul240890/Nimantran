@@ -9,6 +9,8 @@ export const weddingRsvpMessage: BlogPost = {
   heading: "Wedding RSVP message: 25 lines, reminders and a guest count that works",
   intro:
     "Every Indian wedding has the same worry: how many people are actually coming? A clear RSVP line and one or two gentle reminders answer it without offending anyone. Here are lines for the card, WhatsApp messages and reminders to copy, and a simple way to count guests for each function.",
+  answer:
+    "A wedding RSVP line asks guests to confirm by a date, usually two to three weeks before the wedding or whenever your caterer needs numbers, and how many will come. Send one gentle reminder about ten days before the first function. On Shubh, guests reply to each function in one tap, adults and children counted.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

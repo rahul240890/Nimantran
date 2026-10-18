@@ -9,6 +9,8 @@ export const digitalWeddingInvitationWhatsapp: BlogPost = {
   heading: "How to make a digital wedding invitation and send it on WhatsApp",
   intro:
     "Most Indian families now share wedding invitations on WhatsApp. Done well, a digital invitation feels as special as a printed card, and it does what paper can't: show the venue on a map, take replies for each function and update itself when plans change. Here is how to do it, step by step.",
+  answer:
+    "To invite on WhatsApp, make a digital invitation with your names, every function, the dates and venues, publish it as one link, and send that link with a short personal message. Send it 4 to 6 weeks before the first function. On Shubh, guests open it in the browser without an app and reply in one tap.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

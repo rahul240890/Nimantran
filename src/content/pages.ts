@@ -106,6 +106,9 @@ export const blogCopy = {
   otherLanguageLang: "hi",
   minutes: (count: number) => `${count} min read`,
   published: "Published",
+  updated: "Updated",
+  /** Above the post's question answered in two or three sentences. */
+  inShort: "In short",
   onThisPage: "On this page",
   faqHeading: "Questions",
   copy: "Copy",

@@ -9,6 +9,8 @@ export const annaprashanInvitationMessage: BlogPost = {
   heading: "Annaprashan invitation messages for your baby's first rice ceremony",
   intro:
     "Annaprashan, the first time a baby is fed rice, is one of the sweetest family ceremonies, usually held when the baby is around six months old. Here are annaprashan invitation messages you can copy: traditional ones for elders, cute ones in the baby's voice, wording for a Bengali mukhe bhaat and a Malayali choroonu, and short texts for WhatsApp.",
+  answer:
+    "An annaprashan invitation tells guests the baby is having their first rice ceremony and asks for their blessings. Give the baby's name, the date, the muhurat or time and the place, usually home or a temple. Bengali families call it mukhe bhaat and Malayali families choroonu, so use the name your family knows.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "annaprashan",

@@ -9,6 +9,8 @@ export const indianWeddingFunctions: BlogPost = {
   heading: "Indian wedding functions, in order",
   intro:
     "An Indian wedding is not one event but a series of them, often over three to five days. The names and order change from family to family and region to region, but most weddings include some version of the functions below. Use this list to plan your days and your invitation.",
+  answer:
+    "A typical Indian wedding runs over three to five days: the roka or engagement, then the haldi, mehendi and sangeet, then the wedding itself with the baraat and pheras, then the vidaai and the reception. Names and order change by region and community, so Gujarati, Tamil and Bengali weddings each have their own.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

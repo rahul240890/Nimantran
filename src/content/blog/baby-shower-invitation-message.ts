@@ -9,6 +9,8 @@ export const babyShowerInvitationMessage: BlogPost = {
   heading: "Baby shower invitation messages, from godh bharai to valaikappu",
   intro:
     "Across India, families bless a mother-to-be in the last months of her pregnancy, and every region has its own name and way of doing it. Here are baby shower invitation messages you can copy: modern ones for friends, traditional ones for elders, and wording for a godh bharai, seemantham, valaikappu or dohale jevan, with a short guide to what each name means.",
+  answer:
+    "A baby shower invitation in India asks guests to bless the mother-to-be, using the family's own name for the ceremony: godh bharai in the north, seemantham or valaikappu in the south, dohale jevan in Maharashtra. Give her name, the date, time and place, and say if the ceremony is for women only, as many families keep it.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "baby-shower",

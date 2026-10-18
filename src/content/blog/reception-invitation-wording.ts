@@ -9,6 +9,8 @@ export const receptionInvitationWording: BlogPost = {
   heading: "Reception invitation wording: 26 messages for the wedding reception",
   intro:
     "The reception is often the biggest guest list of the whole wedding: colleagues, neighbours, business friends and relatives who could not travel for the pheras. Here are 26 reception invitation messages to copy, from formal card matter to short WhatsApp texts, including wording for a reception held after a small or court wedding.",
+  answer:
+    "A reception invitation names the newly married couple, invites guests to celebrate with them and gives the date, time and venue, usually an evening dinner. It often goes to the biggest guest list, with colleagues and neighbours, so keep it clear and formal and add an RSVP line for the caterer's count.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "reception",

@@ -14,6 +14,7 @@ A post is written in one language. A post in another language is a separate file
 
 - A `title` of at most 48 characters, used for the browser tab and search results (the site name is added after it). A `description` of at most 155 characters. Unit tests check both.
 - The keywords it is written for, in `keywords`. They are not shown.
+- An `answer`: the post's main question answered in two or three sentences, 25 to 70 words (a unit test checks). It shows first, under **In short**, and goes to search engines as the article's abstract. Write it so it stands alone when an answer engine quotes it: no "here", "below" or "this post".
 - An `occasion`. The post ends with "Make your … invitation", which goes to the editor for that occasion and to its designs page.
 - A body built from these blocks:
   - paragraphs, which may carry `[a link](/path)` and `**bold**` words;
@@ -21,7 +22,8 @@ A post is written in one language. A post in another language is a separate file
   - `h3` headings;
   - lists, ordered or not;
   - tips;
-  - `wording` cards, messages with a **Copy** button.
+  - `wording` cards, messages with a **Copy** button;
+  - `table`s, with a caption, column headings and rows, for comparisons and timelines (what to send when, digital or printed, which function is which). A wide table scrolls inside its own frame on a phone.
 - A few `faq` questions. They show at the end of the post and go to search engines as FAQ structured data.
 
 Every link in a post must point at a page that exists. A unit test checks this.
@@ -52,28 +54,45 @@ The post is written in a light markup shown under the box: `## Section`, `### Sm
 - Internal links: every post links to its occasion's designs page and to two or three related posts. "More to read" under a post shows the posts it links to, then posts that link to it, then the same occasion. Each occasion's designs page (`/invitations/<occasion>`) lists that occasion's posts under "Wording ideas".
 - A post in an Indian language is written for that language's searchers (keywords in its own script and the romanised spellings people type, such as "kankotri lakhan"), not translated word for word. Very few sites write these well, so they are the easiest posts to rank.
 
+## Answer engines (AEO and GEO)
+
+Google's AI Overviews, ChatGPT, Perplexity and Gemini answer many of these searches themselves and name the pages they took the answer from. A post is more likely to be quoted when:
+
+- it answers the question in its first lines (`answer`), in the words people search;
+- each section is a question or a plain label, with the answer in its first sentence;
+- it has the facts people repeat, such as timings, counts and costs, in a `table` or a list;
+- its FAQ covers the follow-up questions, each answer complete on its own;
+- it shows when it was last updated: change `updated` when the facts change, and the post shows "Updated" beside the date.
+
+`/llms.txt` lists what Shubh is, its main pages, occasions, traditions and every post, for AI assistants that read it. It is a small extra, not a ranking tool: Google does not use it and studies so far show no clear effect. It is built from the site's own words and posts, so it costs nothing to keep.
+
 ## Keywords
 
 Research (3 October 2026): the searches families make around an invitation are for **wording and messages to copy**, by occasion and by language. Google's results for most of these are thin template sites, Canva/Adobe template pages and a few publishers (WeddingWire India for wedding messages, SmartPuja for puja and griha pravesh), so a complete, well-structured post can rank. Exact monthly volumes need Google Search Console after launch or Keyword Planner; the order below is by how often the phrase family appears in Google's suggestions and in competitors' pages, and by how close it is to making an invitation.
 
-Written (36 posts):
+Written (45 posts):
 
-- Wedding: wedding invitation wording; digital invitation on WhatsApp; haldi, mehendi and sangeet messages; wedding invitation video; Indian wedding functions; engagement invitation message; save the date message; reception invitation wording; wedding invitation message for friends; wedding RSVP message; thank you message after wedding; Muslim wedding invitation wording; Gujarati wedding invitation wording (kankotri).
-- Family: birthday invitation messages; 1st birthday invitation message; anniversary party invitation message; baby shower invitation message (godh bharai, seemantham); annaprashan invitation message; thread ceremony invitation message; griha pravesh invitation message; retirement party invitation message; shop opening invitation message.
-- Festivals and puja: Diwali party invitation message; Satyanarayan puja invitation message; Ganpati invitation message; garba night invitation message.
-- Hindi: शादी कार्ड मैटर; शादी का निमंत्रण WhatsApp संदेश; सगाई निमंत्रण संदेश; गृह प्रवेश निमंत्रण संदेश; जन्मदिन निमंत्रण संदेश; दिवाली निमंत्रण संदेश; सत्यनारायण कथा निमंत्रण.
+- Wedding: wedding invitation wording; digital invitation on WhatsApp; haldi, mehendi and sangeet messages; wedding invitation video; Indian wedding functions; engagement invitation message; save the date message; reception invitation wording; wedding invitation message for friends; wedding RSVP message; thank you message after wedding; Muslim wedding invitation wording; Gujarati wedding invitation wording (kankotri); when to send wedding invitations (timeline); wedding invitation etiquette; roka and tilak invitation messages.
+- Family: birthday invitation messages; 1st birthday invitation message; anniversary party invitation message; baby shower invitation message (godh bharai, seemantham); annaprashan invitation message; naming ceremony invitation message (namkaran, barse, barasala, noolukettu); thread ceremony invitation message; griha pravesh invitation message; retirement party invitation message; shop opening invitation message.
+- Festivals, puja and parties: Diwali party invitation message; Satyanarayan puja invitation message; Ganpati invitation message; garba night invitation message; Christmas party invitation message; New Year party invitation message; Lohri invitation message (baby's and bride's first Lohri).
+- Hindi: शादी कार्ड मैटर; शादी का निमंत्रण WhatsApp संदेश; शादी का कार्ड कितने दिन पहले भेजें (paired with the timeline post); हल्दी, मेहंदी और संगीत निमंत्रण संदेश (paired); सगाई निमंत्रण संदेश; गृह प्रवेश निमंत्रण संदेश; जन्मदिन निमंत्रण संदेश; दिवाली निमंत्रण संदेश; सत्यनारायण कथा निमंत्रण.
 - In their own languages (17 October 2026): કંકોતરી લખાણ (Gujarati, paired with the English Gujarati wording post); लग्नपत्रिका मजकूर (Marathi); திருமண அழைப்பிதழ் வாசகம் (Tamil); বিয়ের কার্ডের লেখা (Bengali).
+
+Research (18 October 2026, web results only; no Search Console yet): niche occasions have almost no copyable wording, mostly template galleries; the closest content rival (Invifest) gives about four messages a page and Hindi only in Roman letters; the "best digital invitation website" lists that answer engines cite are vendors' own lists, and Shubh is in none of them; timing advice online is old (2019) and disagrees. Google's guidance for its AI features: no special schema or AI text file is needed; original, useful, up-to-date content is what counts. AI assistants cite newer pages than Google's normal results do, so keep `updated` honest and refresh seasonal posts every year.
 
 Next, in order:
 
-1. English versions of the Marathi, Tamil and Bengali posts (Marathi lagna patrika wording, Tamil wedding invitation wording, Bengali wedding card wording), paired with them
-2. More in their own languages: Gujarati ટહુકો and સીમંત (godh bharai) wording; Marathi साखरपुडा and बारसे invitations; Tamil வளைகாப்பு and புதுமனை புகுவிழா invitations; Bengali অন্নপ্রাশন and গৃহপ্রবেশ invitations
-3. Punjabi wedding (Anand Karaj) invitation wording
-4. Mundan ceremony invitation (needs a mundan occasion first)
-5. Naming ceremony (namkaran) invitation (needs a naming ceremony occasion first)
-6. Hindi: सगाई, हल्दी, मेहंदी के निमंत्रण संदेश; गणेश स्थापना निमंत्रण; मुंडन निमंत्रण
-7. Eid party invitation message
-8. Lohri and Makar Sankranti invitation messages, before January
-9. Christmas party invitation message, before December
+1. Best digital invitation websites in India, compared: honest, with ₹ prices and "checked on" dates, the criteria, and a line saying Shubh is ours. Ask the lists that rank (Weddingkart, The Curated Knot, Samaro) to include Shubh.
+2. Digital vs printed wedding cards: the real cost in India, with sourced price ranges
+3. Vivah muhurat dates for the season with a "send invitations by" date for each, only from a panchang we can cite, since published lists disagree
+4. English versions of the Marathi, Tamil and Bengali wedding posts, paired with them
+5. Anand Karaj invitation wording (following gurdwara guidance on printing Gurbani), and Christian wedding invitation wording for India, before December
+6. Bhaat (mayra) nyota, mundan (needs a mundan occasion first), kitty party, shashtipoorthi (60th birthday) invitations
+7. Makar Sankranti, Pongal, Uttarayan and Haldi-Kumkum invitations, with a Marathi हळदी कुंकू post, by early December
+8. School annual day and Republic Day function invitations, by early December
+9. Iftar and Eid Milan invitations (Ramadan from about 8 February 2027), and Holi party invitations (22 March 2027)
+10. More in their own languages: Gujarati સીમંત, Marathi साखरपुडा and बारसे, Tamil வளைகாப்பு, Bengali অন্নপ্রাশন
+
+Original numbers make posts worth citing: once there is enough use, publish anonymised figures from the product (days from sending to replies, functions per wedding, languages chosen).
 
 Festival posts should go live 4 to 6 weeks before the festival, so search engines have found them in time.
