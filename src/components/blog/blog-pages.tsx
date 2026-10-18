@@ -202,55 +202,61 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
   }
   if ("table" in block) {
     const { caption, head, rows } = block.table;
-    // Wide tables scroll inside their own frame on a phone; the frame takes focus so the
-    // keyboard can scroll it too
+    const captionId = `table-${index}`;
+    // Wide tables scroll inside their own frame on a phone, under a caption that stays in
+    // view; the frame takes focus so the keyboard can scroll it too
     return (
-      <div
-        role="region"
-        aria-label={caption}
-        tabIndex={0}
-        className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-      >
-        <table className="w-full min-w-[34rem] border-collapse text-start">
-          <caption className="px-4 pt-4 pb-2 text-start font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-            {caption}
-          </caption>
-          <thead>
-            <tr>
-              {head.map((cell) => (
-                <th
-                  key={cell}
-                  scope="col"
-                  className="border-y border-line bg-surface-2 px-4 py-3 text-start font-semibold"
-                >
-                  {cell}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, r) => (
-              <tr key={r} className="border-b border-line last:border-b-0">
-                {row.map((cell, c) =>
-                  c === 0 ? (
-                    <th
-                      key={c}
-                      scope="row"
-                      className="px-4 py-3 text-start align-top font-semibold"
-                    >
-                      <Inline text={cell} />
-                    </th>
-                  ) : (
-                    <td key={c} className="px-4 py-3 align-top text-ink-muted">
-                      <Inline text={cell} />
-                    </td>
-                  ),
-                )}
+      <figure className="flex flex-col gap-2">
+        <figcaption
+          id={captionId}
+          className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+        >
+          {caption}
+        </figcaption>
+        <div
+          role="region"
+          aria-labelledby={captionId}
+          tabIndex={0}
+          className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <table aria-labelledby={captionId} className="w-full min-w-[34rem] border-collapse">
+            <thead>
+              <tr>
+                {head.map((cell) => (
+                  <th
+                    key={cell}
+                    scope="col"
+                    className="border-b border-line bg-surface-2 px-4 py-3 text-start font-semibold"
+                  >
+                    {cell}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {rows.map((row, r) => (
+                <tr key={r} className="border-b border-line last:border-b-0">
+                  {row.map((cell, c) =>
+                    c === 0 ? (
+                      <th
+                        key={c}
+                        scope="row"
+                        className="px-4 py-3 text-start align-top font-semibold"
+                      >
+                        <Inline text={cell} />
+                      </th>
+                    ) : (
+                      <td key={c} className="px-4 py-3 align-top text-ink-muted">
+                        <Inline text={cell} />
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </figure>
     );
   }
   return (
@@ -315,7 +321,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           <PostMeta post={post} showUpdated />
           <p className="text-lg text-ink-muted">{post.intro}</p>
           {post.answer && (
-            <aside
+            <section
               aria-labelledby="in-short"
               className="rounded-lg border border-marigold/60 bg-surface-2 px-5 py-4"
             >
@@ -328,7 +334,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
               <p className="mt-2 text-lg">
                 <Inline text={post.answer} />
               </p>
-            </aside>
+            </section>
           )}
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size

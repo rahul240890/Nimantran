@@ -36,7 +36,7 @@ export async function GET() {
   const lines = [
     `# ${site.name}`,
     "",
-    `> ${site.description} ${homeMeta.description}`,
+    `> ${site.description}`,
     "",
     `${site.name} (${site.shortName} for short) is made in India for Indian weddings and every family celebration. Hosts pick a painted design, add their names, functions and venues, and send one link on WhatsApp. Guests open it in the browser with no app, see every function with directions, and reply in one tap; the host sees replies in a guest list.`,
     "",
