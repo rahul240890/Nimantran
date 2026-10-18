@@ -77,6 +77,16 @@ export const designNames = {
     "sunehri-sarovar": "Sunehri Sarovar",
     pattu: "Pattu",
     "sona-rekha": "Sona Rekha",
+    dhokra: "Dhokra",
+    "kaanch-chitra": "Kaanch Chitra",
+    "chettinad-veedu": "Chettinad Veedu",
+    meenakari: "Meenakari",
+    rogan: "Rogan",
+    "shab-e-gul": "Shab-e-Gul",
+    sama: "Sama",
+    "purani-dilli": "Purani Dilli",
+    "chandi-nakkashi": "Chandi Nakkashi",
+    "gagan-safar": "Gagan Safar",
     "kagzi-phool": "Kagzi Phool",
     nilofar: "Nilofar",
     "sona-gulaab": "Sona Gulaab",
@@ -476,6 +486,25 @@ export const designNames = {
       "Kanjeevaram silk in magenta and emerald, with temple-gold zari, jasmine and brass lamps.",
     "sona-rekha":
       "Ivory cotton paper, single-line gold-foil drawings and plenty of quiet white space.",
+    dhokra:
+      "Bell-metal Dhokra art: every page a scene cast in warm bronze, glowing against dark clay.",
+    "kaanch-chitra":
+      "Reverse-glass painting: jewel colours and gold foil glowing behind glass, every page a framed glass picture.",
+    "chettinad-veedu":
+      "A Chettinad mansion, room by room: Athangudi tiles, Burma-teak pillars, egg-plaster walls and brass.",
+    meenakari:
+      "Jaipur meenakari enamel: every page a jewel-bright enamelled plaque set in gold, like a royal jewellery box.",
+    rogan:
+      "Kutch rogan painting: every page a mirror-symmetric tree of life drawn in raised oil paint on dark cloth.",
+    "shab-e-gul":
+      "Dark, moody still-life florals like an old master oil painting: velvet black, lush roses and candlelight.",
+    sama: "Perfect symmetry in pastel: India's gates, stepwells and palaces drawn dead-centre, like a film still.",
+    "purani-dilli":
+      "Old Delhi in gouache: haveli lanes, rooftop kites, bangle shops and a sandstone fort, for a big Delhi wedding.",
+    "chandi-nakkashi":
+      "Hammered silver repoussé: every page a scene raised in silver relief on deep teal velvet.",
+    "gagan-safar":
+      "Hot-air balloons over Rajasthan: forts, lakes and dunes seen from the sky, from a sunrise haldi to a night of glowing balloons.",
     "kagzi-phool":
       "Magenta and coral bougainvillea spilling over whitewashed walls, sunny and joyful.",
     nilofar: "Blue water lilies on a still pond, in indigo and lilac watercolour.",
