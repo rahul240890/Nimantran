@@ -1,0 +1,4 @@
+node_modules
+out
+# Filled from the site by npm run setup
+public
