@@ -699,7 +699,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   "chettinad-veedu": {
     cover: [12, 62, 6, 6],
-    family: [22, 52, 20, 20],
+    family: [20, 44, 10, 22],
     haldi: [12, 59, 6, 6],
     mehendi: [15, 48, 20, 19],
     sangeet: [52, 12, 6, 6],
@@ -710,7 +710,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   meenakari: {
     cover: [36, 34, 16, 16],
-    family: [12, 60, 6, 6],
+    family: [10, 52, 6, 6],
     haldi: [32, 32, 12, 12],
     mehendi: [26, 24, 19, 19],
     sangeet: [32, 32, 12, 12],
@@ -721,7 +721,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   rogan: {
     cover: [32, 32, 12, 12],
-    family: [12, 61, 6, 6],
+    family: [10, 59, 6, 6],
     haldi: [38, 23, 18, 18],
     mehendi: [26, 33, 6, 6],
     sangeet: [32, 32, 12, 12],
@@ -732,7 +732,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   "shab-e-gul": {
     cover: [12, 60, 9, 6],
-    family: [12, 62, 6, 6],
+    family: [10, 58, 6, 6],
     haldi: [12, 59, 6, 6],
     mehendi: [36, 37, 20, 19],
     sangeet: [14, 58, 14, 14],
@@ -765,7 +765,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   "chandi-nakkashi": {
     cover: [21, 45, 20, 20],
-    family: [12, 61, 12, 6],
+    family: [10, 54, 10, 10],
     haldi: [21, 31, 16, 15],
     mehendi: [32, 32, 12, 12],
     sangeet: [14, 58, 14, 14],
@@ -776,7 +776,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   "gagan-safar": {
     cover: [32, 34, 6, 6],
-    family: [12, 59, 6, 6],
+    family: [10, 54, 6, 6],
     haldi: [12, 63, 6, 6],
     mehendi: [14, 58, 14, 14],
     sangeet: [14, 58, 14, 14],
