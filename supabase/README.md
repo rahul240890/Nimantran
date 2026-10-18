@@ -61,6 +61,11 @@ database keeps every invite. Applied so far after the first setup:
 - `20261017090000_reply_limits.sql` — spam protection for guest replies: `reply_senders` and
   a new `submit_rsvp()` that lets one network add at most 10 new guests to an invite an hour
   and 30 a day. Replies keep working before it runs, just without the limit.
+- `20261018090000_publish_through_the_site.sql` — only the site publishes: a host's own
+  connection can no longer mark an invite published, or change a live invite's design,
+  occasion, theme or card languages, straight through the database, so nobody skips the
+  package check. The site does both with `SUPABASE_SERVICE_ROLE_KEY` after checking. Safe to
+  run any time after the code is live.
 
 ## Setting up a project
 

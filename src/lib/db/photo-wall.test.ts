@@ -65,7 +65,8 @@ beforeAll(async () => {
 describe("the photo wall", () => {
   it("only takes photos for a published invitation", async () => {
     await expect(add("service")).rejects.toThrow(/invitation not found/);
-    await t.as(priya, () =>
+    // The server publishes, after checking the package
+    await t.as("service", () =>
       q("update events set status = 'published', published_at = now() where id = $1", [event]),
     );
     const [row] = await add("service", { token: guestToken });

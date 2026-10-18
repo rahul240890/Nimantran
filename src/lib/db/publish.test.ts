@@ -55,7 +55,7 @@ beforeAll(async () => {
 describe("publishing", () => {
   it("needs a link", async () => {
     await expect(
-      t.as(priya, () => q("update events set status = 'published' where id = $1", [event])),
+      t.as("service", () => q("update events set status = 'published' where id = $1", [event])),
     ).rejects.toThrow(/events_published_slug/);
   });
 
@@ -67,8 +67,28 @@ describe("publishing", () => {
     expect(await t.as(null, () => q("select name from storage.objects"))).toEqual([]);
   });
 
+  it("leaves publishing to the server, after its package check", async () => {
+    await expect(
+      t.as(priya, () =>
+        q(
+          "update events set status = 'published', slug = 'aarav-weds-meera', published_at = now() where id = $1",
+          [event],
+        ),
+      ),
+    ).rejects.toThrow(/published through the site/);
+    await expect(
+      t.as(priya, () =>
+        q(
+          `insert into events (category_id, template_id, status, slug)
+           values ('wedding', 'marigold', 'published', 'sneaky-live-link')`,
+        ),
+      ),
+    ).rejects.toThrow(/published through the site/);
+    expect(await published("aarav-weds-meera")).toBeNull();
+  });
+
   it("gives guests the card, functions in order and photos once published", async () => {
-    await t.as(priya, () =>
+    await t.as("service", () =>
       q("update events set status = 'published', published_at = now() where id = $1", [event]),
     );
     const invite = await published("aarav-weds-meera");
@@ -108,6 +128,27 @@ describe("publishing", () => {
     await expect(
       t.as(stranger, () => q("update events set slug = 'aarav-weds-meera' where id = $1", [other])),
     ).rejects.toThrow(/unique|duplicate/);
+  });
+
+  it("lets hosts edit a live invite's words but not its design", async () => {
+    await t.as(priya, () =>
+      q(`update events set content = '{"first": "Aarav", "second": "Meera Devi"}' where id = $1`, [
+        event,
+      ]),
+    );
+    expect((await published("aarav-weds-meera"))?.content.second).toBe("Meera Devi");
+    for (const change of [
+      "template_id = 'rose'",
+      "languages = '{en,hi}'",
+      `religious = '{"suite": "rajwada-bagh"}'`,
+      "slug = 'another-link'",
+    ]) {
+      await expect(
+        t.as(priya, () => q(`update events set ${change} where id = $1`, [event])),
+      ).rejects.toThrow(/through the site/);
+    }
+    await t.as("service", () => q("update events set template_id = 'rose' where id = $1", [event]));
+    expect((await published("aarav-weds-meera"))?.id).toBe(event);
   });
 
   it("closes the link again when the invite goes back to a draft", async () => {

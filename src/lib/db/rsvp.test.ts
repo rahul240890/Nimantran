@@ -79,7 +79,8 @@ describe("guest replies", () => {
     await expect(submit([{ function_id: wedding, status: "attending" }])).rejects.toThrow(
       /invitation not found/,
     );
-    await t.as(priya, () =>
+    // The server publishes, after checking the package
+    await t.as("service", () =>
       q("update events set status = 'published', published_at = now() where id = $1", [event]),
     );
   });
