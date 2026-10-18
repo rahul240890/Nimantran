@@ -7,6 +7,7 @@ import type { RsvpQuestionId } from "@/lib/categories/schema";
 import { draftQuestions, type InviteDraft } from "@/lib/editor/draft";
 import { clipPath, type MusicClip } from "@/lib/editor/music-clip";
 import { supabaseServer } from "@/lib/supabase/server";
+import { supabaseService } from "@/lib/supabase/service";
 import { wallFilePaths } from "./photo-wall";
 import { previewDb, previewEdits, previewHosts, previewPhotoUrl } from "./preview-db";
 import {
@@ -90,6 +91,42 @@ type Joined = EventRow & {
   rsvp_questions?: { preset: string | null }[];
 };
 
+type Supabase = NonNullable<Awaited<ReturnType<typeof supabaseServer>>>;
+
+/**
+ * Writes a live invite's design columns with the server's key, for a host who edits it, so
+ * the host's own save that follows changes none of them. Nothing to do for a draft.
+ */
+async function writeLiveDesign(
+  supabase: Supabase,
+  id: string,
+  event: ReturnType<typeof draftToRows>["event"],
+): Promise<boolean> {
+  const { data: current } = await supabase
+    .from("events")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
+  if (current?.status !== "published") return true;
+  const service = supabaseService();
+  // Without the server's key the host's own save carries the design, as before
+  if (!service) return true;
+  const { data: canEdit } = await supabase.rpc("can_edit_event", { target: id });
+  if (canEdit !== true) return true;
+  const { error } = await service
+    .from("events")
+    .update({
+      template_id: event.template_id,
+      category_id: event.category_id,
+      tradition_id: event.tradition_id,
+      religious: event.religious,
+      languages: event.languages,
+    })
+    .eq("id", id)
+    .eq("status", "published");
+  return !error;
+}
+
 const supabaseStore: InviteStore = {
   async list(account) {
     const supabase = await supabaseServer();
@@ -131,6 +168,11 @@ const supabaseStore: InviteStore = {
     const supabase = await supabaseServer();
     if (!supabase) return { ok: false };
     const { event, functions } = draftToRows(draft);
+    // A live invite's design is the server's to write (saveInvite has checked its package
+    // first): the database refuses it from the host's own connection
+    if (draft.remoteId && !(await writeLiveDesign(supabase, draft.remoteId, event))) {
+      return { ok: false };
+    }
     const saved = draft.remoteId
       ? await supabase
           .from("events")
@@ -347,9 +389,13 @@ const supabaseStore: InviteStore = {
       .eq("id", id)
       .maybeSingle();
     if (!current) return { ok: false, reason: "missing" };
+    // Publishing is the server's, after publishInvite's package check: the database refuses
+    // it from the host's own connection. So the host must be one who edits the invite
+    const { data: canEdit } = await supabase.rpc("can_edit_event", { target: id });
+    if (canEdit !== true) return { ok: false, reason: "missing" };
     // Once shared, a link never changes, so links already sent keep working
     const keep = current.published_at && current.slug ? (current.slug as string) : slug;
-    const { data, error } = await supabase
+    const { data, error } = await (supabaseService() ?? supabase)
       .from("events")
       .update({
         status: "published",

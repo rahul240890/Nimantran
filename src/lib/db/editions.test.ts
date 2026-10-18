@@ -25,11 +25,15 @@ beforeAll(async () => {
   await q("insert into admins (user_id, role) values ($1, 'owner')", [owner]);
   event = await t.as(host, async () => {
     const [row] = await q<{ id: string }>(
-      `insert into events (category_id, template_id, content, status, slug)
-       values ('wedding', 'marigold', '{"first":"Aarav"}', 'published', 'aarav-weds-meera') returning id`,
+      `insert into events (category_id, template_id, content, slug)
+       values ('wedding', 'marigold', '{"first":"Aarav"}', 'aarav-weds-meera') returning id`,
     );
     return row!.id;
   });
+  // The server publishes it
+  await t.as("service", () =>
+    q("update events set status = 'published', published_at = now() where id = $1", [event]),
+  );
 }, 30_000);
 
 describe("admins", () => {
