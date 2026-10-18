@@ -28,6 +28,27 @@ describe("blog posts", () => {
     }
   });
 
+  it("answer their question first, short enough for an answer engine to quote", () => {
+    for (const post of POSTS) {
+      expect(post.answer, post.slug).toBeTruthy();
+      const words = post.answer!.split(/\s+/).length;
+      expect(words, post.slug).toBeGreaterThanOrEqual(25);
+      expect(words, post.slug).toBeLessThanOrEqual(70);
+    }
+  });
+
+  it("give tables a caption and rows as wide as their headings", () => {
+    for (const post of POSTS) {
+      for (const block of post.body) {
+        if (typeof block === "string" || !("table" in block)) continue;
+        expect(block.table.caption, post.slug).toBeTruthy();
+        for (const row of block.table.rows) {
+          expect(row.length, post.slug).toBe(block.table.head.length);
+        }
+      }
+    }
+  });
+
   it("give each section heading its own anchor", () => {
     for (const post of POSTS) {
       const ids = post.body.flatMap((block) =>

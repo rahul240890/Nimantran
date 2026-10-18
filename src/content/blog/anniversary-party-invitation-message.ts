@@ -9,6 +9,8 @@ export const anniversaryPartyInvitationMessage: BlogPost = {
   heading: "Anniversary party invitation message: 24 messages for every milestone",
   intro:
     "An anniversary party is a thank-you to everyone who has been part of a marriage. Here are 24 invitation messages: for a 25th silver jubilee, a 50th golden anniversary, a party the children throw for their parents, a couple's own celebration, and short texts to send on WhatsApp.",
+  answer:
+    "An anniversary party invitation names the couple and the milestone, such as a 25th silver or 50th golden anniversary, with the date, time and venue. Children hosting for their parents usually invite in their own names. Keep the tone warm and grateful, and say if it is a surprise so no guest spoils it.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "anniversary",

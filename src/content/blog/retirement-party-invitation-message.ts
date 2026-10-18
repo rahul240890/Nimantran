@@ -9,6 +9,8 @@ export const retirementPartyInvitationMessage: BlogPost = {
   heading: "Retirement party invitation message: 23 ways to invite",
   intro:
     "Thirty or forty years of work deserve a proper thank-you. Whether the family is hosting a dinner for Papa or the office is saying goodbye to a much-loved colleague, here are 23 retirement invitation messages: formal, warm, light-hearted and short enough for WhatsApp.",
+  answer:
+    "A retirement party invitation names the person retiring, their years of service and the organisation, and invites guests to a dinner or farewell with the date, time and venue. Families write it warmly; offices keep it formal. Say whether it is a surprise, and whether guests may bring a message or memory to share.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "retirement",

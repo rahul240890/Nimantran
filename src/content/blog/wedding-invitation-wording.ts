@@ -9,6 +9,8 @@ export const weddingInvitationWording: BlogPost = {
   heading: "Wedding invitation wording: 30 messages to copy",
   intro:
     "The right words make guests feel personally called, whether they are your grandmother's sister or your college friends. Here is how an Indian wedding invitation is put together, and 30 messages you can copy as they are or change to sound like your family.",
+  answer:
+    "Indian wedding invitation wording follows an order: an invocation such as Shri Ganeshaya Namah, the hosts (parents or grandparents) inviting guests, the couple's names, each function with its date, time and venue, and an RSVP line. Formal wording suits relatives; a shorter, personal message suits friends.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

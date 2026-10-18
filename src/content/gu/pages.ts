@@ -104,6 +104,8 @@ export const blogCopy: Translation<typeof en.blogCopy> = {
   otherLanguageLang: "en",
   minutes: (count) => `${count} મિનિટનું વાંચન`,
   published: "પ્રકાશિત",
+  updated: "અપડેટ",
+  inShort: "ટૂંકમાં",
   onThisPage: "આ પાના પર",
   faqHeading: "સવાલ",
   copy: "કૉપી કરો",

@@ -9,6 +9,8 @@ export const muslimWeddingInvitationWording: BlogPost = {
   heading: "Muslim wedding invitation wording: nikah, walima and shaadi card lines",
   intro:
     "A Muslim wedding invitation usually opens with Bismillah, names the families with respect and invites guests to the nikah and the walima, often with a mehendi or manjha before. Here are 28 lines to copy, in English and in Urdu written in Latin script, with notes on what each part means.",
+  answer:
+    "A Muslim wedding invitation usually opens with Bismillah, names the bride and groom with their parents, and invites guests to the nikah and the walima, often with a mehendi or manjha before. Give each function's date, time and venue, and write it with respect, in English, Urdu or both.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

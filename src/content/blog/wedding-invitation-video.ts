@@ -9,6 +9,8 @@ export const weddingInvitationVideo: BlogPost = {
   heading: "How to make a wedding invitation video for WhatsApp Status and Reels",
   intro:
     "Video invitations have become part of the Indian wedding: a short vertical film of the card, the couple's names and each function, set to music, posted on WhatsApp Status and Instagram. Studios charge ₹2,000 to ₹6,000 for one. Here is what makes a good one, and how to make yours from your invitation in a few minutes.",
+  answer:
+    "A wedding invitation video is a short vertical film of the card, the couple's names and each function, set to music, for WhatsApp Status and Instagram Reels, usually 30 to 60 seconds long. On Shubh the video is made from your invitation itself and comes with the Celebration and Grand packages.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

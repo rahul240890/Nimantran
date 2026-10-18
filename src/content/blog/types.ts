@@ -9,13 +9,21 @@ import type { CategoryId } from "@/lib/categories/catalog";
 /** Messages a reader can copy as they are, such as invitation wording. */
 export type Wording = { label?: string; text: string; lang?: string };
 
+/** A small comparison table: what it compares, the column headings and the rows. */
+export type Table = {
+  caption: string;
+  head: readonly string[];
+  rows: readonly (readonly string[])[];
+};
+
 export type PostBlock =
   | string
   | { h2: string; id: string }
   | { h3: string }
   | { list: readonly string[]; ordered?: boolean }
   | { wording: readonly Wording[] }
-  | { tip: string };
+  | { tip: string }
+  | { table: Table };
 
 export type BlogPost = {
   /** The address: /blog/<slug>, or /hi/blog/<slug> for a Hindi post. */
@@ -29,6 +37,11 @@ export type BlogPost = {
   description: string;
   heading: string;
   intro: string;
+  /**
+   * The post's main question answered in two or three sentences (40 to 60 words): shown
+   * first, under "In short", and given to search and answer engines as the abstract.
+   */
+  answer?: string;
   /** YYYY-MM-DD. */
   published: string;
   updated: string;

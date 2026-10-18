@@ -9,6 +9,8 @@ export const weddingThankYouMessages: BlogPost = {
   heading: "Thank you message after wedding: 27 ideas for guests, relatives and gifts",
   intro:
     "The wedding is over, the house is still full of marigolds, and there are a hundred people to thank. A short, warm message on WhatsApp is how most Indian families do it now. Here are 27 thank-you messages to copy: for guests who came, for gifts and shagun, for elders, friends and the people who worked behind the scenes.",
+  answer:
+    "A thank-you message after the wedding thanks guests for coming, for their blessings and for any gift, and is ideally sent within two weeks, at most a month. A short, warm WhatsApp message suits most guests; send a more personal note to elders, close relatives and everyone who helped.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "wedding",

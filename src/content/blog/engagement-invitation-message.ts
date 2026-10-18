@@ -10,6 +10,8 @@ export const engagementInvitationMessage: BlogPost = {
   heading: "Engagement invitation message: 28 lines for the ring ceremony",
   intro:
     "The engagement is the first time both families celebrate together in front of everyone, so the invitation sets the tone for the whole wedding season. Here are 28 engagement invitation messages: formal lines from the parents, warm ones from the couple, roka and sagai wording, and short texts to send on WhatsApp.",
+  answer:
+    "An engagement invitation announces the couple's names and the ring ceremony, sagai or roka, with the date, time and venue. Formal invitations come from both families or the parents; friends get a shorter, personal message. Add an RSVP line so you know how many guests to expect.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "engagement",

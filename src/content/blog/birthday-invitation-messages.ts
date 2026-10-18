@@ -10,6 +10,8 @@ export const birthdayInvitationMessages: BlogPost = {
   heading: "Birthday invitation messages for every age",
   intro:
     "A birthday invitation sets the mood before the party starts. Here are messages for a baby's first birthday, kids' parties, milestone birthdays for parents and grandparents, and surprise parties, plus short texts to send with the invitation on WhatsApp.",
+  answer:
+    "A good birthday invitation says whose birthday it is and which one, then the date, time and place, and anything guests should know, such as a theme. Write it from the child for a kids' party and from the family for a milestone like a 60th or 75th, and ask guests to reply so you can plan the food.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "birthday",

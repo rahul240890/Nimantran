@@ -39,9 +39,11 @@ export function readingMinutes(post: BlogPost): number {
             ? block.wording.map((item) => item.text).join(" ")
             : "tip" in block
               ? block.tip
-              : "h2" in block
-                ? block.h2
-                : block.h3,
+              : "table" in block
+                ? [...block.table.head, ...block.table.rows.flat()].join(" ")
+                : "h2" in block
+                  ? block.h2
+                  : block.h3,
     )
     .join(" ");
   const words = text.split(/\s+/).filter(Boolean).length;
@@ -51,7 +53,7 @@ export function readingMinutes(post: BlogPost): number {
 /** A [link](/path) or **bold** words inside a post's text. */
 export const INLINE_TOKEN = /\[([^\]]+)\]\(([^)\s]+)\)|\*\*([^*]+)\*\*/g;
 
-/** Every link a post carries, in its paragraphs, lists, tips and answers. */
+/** Every link a post carries, in its answer, paragraphs, lists, tips and tables. */
 export function postLinks(post: BlogPost): string[] {
   const texts = post.body.flatMap((block) =>
     typeof block === "string"
@@ -60,8 +62,11 @@ export function postLinks(post: BlogPost): string[] {
         ? block.list
         : "tip" in block
           ? [block.tip]
-          : [],
+          : "table" in block
+            ? block.table.rows.flat()
+            : [],
   );
+  if (post.answer) texts.unshift(post.answer);
   return texts.flatMap((text) =>
     [...text.matchAll(INLINE_TOKEN)].flatMap((match) => (match[2] ? [match[2]] : [])),
   );

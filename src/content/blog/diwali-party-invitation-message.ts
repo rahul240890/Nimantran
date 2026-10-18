@@ -10,6 +10,8 @@ export const diwaliPartyInvitationMessage: BlogPost = {
   heading: "Diwali party invitation messages: 30 ideas to copy",
   intro:
     "Diwali is the one time of year when every home wants guests. Whether you are calling family for Lakshmi puja, friends for a card party or your team for an office celebration, here are 30 messages you can copy as they are or change to sound like you.",
+  answer:
+    "A Diwali party invitation names the occasion, whether Lakshmi puja, a Diwali milan, a card party or an office celebration, and gives the date, time and place with a festive greeting. Mention the dress code or food if it matters, and send it early, since everyone has several Diwali plans.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "diwali",

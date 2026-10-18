@@ -9,6 +9,8 @@ export const shopOpeningInvitationMessage: BlogPost = {
   heading: "Shop opening invitation message: 25 messages for a new shop, office or business",
   intro:
     "Opening a shop or office is the start of something you have worked hard for, and the first people through the door matter: family for the blessings, and customers, suppliers and neighbours for the business. Here are 25 invitation messages for a shop, showroom, clinic, restaurant or office opening, plus lines for the puja and ribbon cutting.",
+  answer:
+    "A shop opening invitation names the business, invites guests to the opening or udghatan, and gives the date, the muhurat or time and the full address with a map link. Families invite elders for blessings; businesses invite customers, often with an opening offer. Mention the puja time and any refreshments.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "shop-opening",

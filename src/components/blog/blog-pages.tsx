@@ -31,14 +31,23 @@ function blogCrumbs(locale: UiLocale): Crumb[] {
   ];
 }
 
-function PostMeta({ post }: { post: BlogPost }) {
+function PostMeta({ post, showUpdated = false }: { post: BlogPost; showUpdated?: boolean }) {
   const { blogCopy } = pagesText[post.locale];
-  const date = format(new Date(`${post.published}T00:00:00`), "d MMMM yyyy", {
-    locale: dateLocale[post.locale],
-  });
+  const day = (date: string) =>
+    format(new Date(`${date}T00:00:00`), "d MMMM yyyy", { locale: dateLocale[post.locale] });
+  // A post brought up to date says when, as readers and search engines both look for it
+  const updated = showUpdated && post.updated > post.published;
   return (
     <p className="text-sm text-ink-muted">
-      <time dateTime={post.published}>{date}</time> · {blogCopy.minutes(readingMinutes(post))}
+      <time dateTime={post.published}>{day(post.published)}</time>
+      {updated && (
+        <>
+          {" · "}
+          {blogCopy.updated} <time dateTime={post.updated}>{day(post.updated)}</time>
+        </>
+      )}
+      {" · "}
+      {blogCopy.minutes(readingMinutes(post))}
     </p>
   );
 }
@@ -191,6 +200,65 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
       </aside>
     );
   }
+  if ("table" in block) {
+    const { caption, head, rows } = block.table;
+    const captionId = `table-${index}`;
+    // Wide tables scroll inside their own frame on a phone, under a caption that stays in
+    // view; the frame takes focus so the keyboard can scroll it too
+    return (
+      <figure className="flex flex-col gap-2">
+        <figcaption
+          id={captionId}
+          className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+        >
+          {caption}
+        </figcaption>
+        <div
+          role="region"
+          aria-labelledby={captionId}
+          tabIndex={0}
+          className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <table aria-labelledby={captionId} className="w-full min-w-[34rem] border-collapse">
+            <thead>
+              <tr>
+                {head.map((cell) => (
+                  <th
+                    key={cell}
+                    scope="col"
+                    className="border-b border-line bg-surface-2 px-4 py-3 text-start font-semibold"
+                  >
+                    {cell}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row, r) => (
+                <tr key={r} className="border-b border-line last:border-b-0">
+                  {row.map((cell, c) =>
+                    c === 0 ? (
+                      <th
+                        key={c}
+                        scope="row"
+                        className="px-4 py-3 text-start align-top font-semibold"
+                      >
+                        <Inline text={cell} />
+                      </th>
+                    ) : (
+                      <td key={c} className="px-4 py-3 align-top text-ink-muted">
+                        <Inline text={cell} />
+                      </td>
+                    ),
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </figure>
+    );
+  }
   return (
     <ul className="flex flex-col gap-4">
       {block.wording.map((item, position) => (
@@ -250,8 +318,24 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           >
             {post.heading}
           </h1>
-          <PostMeta post={post} />
+          <PostMeta post={post} showUpdated />
           <p className="text-lg text-ink-muted">{post.intro}</p>
+          {post.answer && (
+            <section
+              aria-labelledby="in-short"
+              className="rounded-lg border border-marigold/60 bg-surface-2 px-5 py-4"
+            >
+              <h2
+                id="in-short"
+                className="font-label text-xs tracking-[0.2em] text-accent-text uppercase"
+              >
+                {blogCopy.inShort}
+              </h2>
+              <p className="mt-2 text-lg">
+                <Inline text={post.answer} />
+              </p>
+            </section>
+          )}
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
             <img

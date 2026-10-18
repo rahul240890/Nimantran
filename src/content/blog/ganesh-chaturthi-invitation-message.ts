@@ -9,6 +9,8 @@ export const ganeshChaturthiInvitationMessage: BlogPost = {
   heading: "Ganpati invitation messages for darshan, aarti and visarjan",
   intro:
     "When Bappa comes home, the doors stay open for everyone. Here are messages to invite family, neighbours and friends for Ganpati sthapana, darshan, aarti and visarjan, from traditional wording to quick WhatsApp texts. Copy them as they are or make them sound like your family.",
+  answer:
+    "A Ganpati invitation tells guests that Bappa has come home and invites them for darshan, aarti and prasad, with the address and the days the idol will stay. Give the aarti times and the visarjan date so guests can choose when to come. Ganpati Bappa Morya at the top sets the mood.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "ganesh-chaturthi",

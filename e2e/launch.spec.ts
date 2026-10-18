@@ -235,6 +235,37 @@ test.describe("blog", () => {
     expect(await noOverflow(page)).toBe(true);
   });
 
+  test("a post answers its question first, and its table scrolls in its own frame", async ({
+    page,
+  }) => {
+    await page.goto("/blog/when-to-send-wedding-invitations");
+    const answer = page.getByRole("region", { name: "In short" });
+    await expect(answer).toContainText("4 to 6 weeks before the first function");
+    // Answer engines get the same answer as the article's abstract
+    const abstracts = (
+      await page.locator('script[type="application/ld+json"]').allTextContents()
+    ).flatMap((text) =>
+      (JSON.parse(text) as { abstract?: string }[]).flatMap((item) => item.abstract ?? []),
+    );
+    expect(abstracts[0]).toContain("4 to 6 weeks");
+    const table = page.getByRole("region", {
+      name: "When to send each part of a wedding invitation",
+    });
+    await expect(table.getByRole("rowheader", { name: "Save the date" })).toBeAttached();
+    await table.focus();
+    await expect(table).toBeFocused();
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
+  test("llms.txt describes the site and lists the posts", async ({ request }) => {
+    const text = await (await request.get("/llms.txt")).text();
+    expect(text).toMatch(/^# Shubh Invitation/);
+    expect(text).toContain("/blog/when-to-send-wedding-invitations");
+    expect(text).toContain("/hi/blog/shadi-card-kab-bhejein");
+    expect(text).toContain("/invitations/wedding");
+  });
+
   test("the sitemap lists every post", async ({ request }) => {
     const sitemap = await (await request.get("/sitemap.xml")).text();
     expect(sitemap).toContain("/blog/indian-wedding-functions");

@@ -9,6 +9,8 @@ export const navratriGarbaInvitationMessage: BlogPost = {
   heading: "Garba night invitation messages for Navratri",
   intro:
     "Nine nights of music, colour and dancing start with one message. Here are invitations for garba and dandiya nights at home, in your society or at the office, for Mata ki chowki and kanya pujan, plus short texts for WhatsApp.",
+  answer:
+    "A garba night invitation gives the night or nights, the time, the venue, whether home, society or office, and the dress code, usually chaniya choli and kediyu. Say whether dandiya sticks are provided, mention food or aarti, and send it early, since Navratri brings nine nights of plans.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "navratri",

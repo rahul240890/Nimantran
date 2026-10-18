@@ -9,6 +9,8 @@ export const threadCeremonyInvitationMessage: BlogPost = {
   heading: "Thread ceremony invitation messages: upanayanam, janeu, munja and more",
   intro:
     "The sacred thread ceremony, upanayana, is a proud day for a family, and its name changes from region to region. Here are thread ceremony invitation messages you can copy: traditional wording for elders, lines for an upanayanam, a janeu sanskar and a Marathi munja, short WhatsApp texts, and a guide to the regional names.",
+  answer:
+    "A thread ceremony invitation names the boy and the ceremony as your family calls it, such as upanayanam, janeu, munja or poonal, and invites guests to bless him, with the date, the muhurat and the venue. It usually opens with an invocation and comes from the parents and grandparents.",
   published: "2026-10-03",
   updated: "2026-10-03",
   occasion: "thread-ceremony",
