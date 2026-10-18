@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The marketing videos are their own Remotion project (marketing/videos/README.md)
+    "marketing/**",
   ]),
 ]);
 
