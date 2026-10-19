@@ -66,6 +66,9 @@ database keeps every invite. Applied so far after the first setup:
   occasion, theme or card languages, straight through the database, so nobody skips the
   package check. The site does both with `SUPABASE_SERVICE_ROLE_KEY` after checking. Safe to
   run any time after the code is live.
+- `20261019090000_site_visits.sql` — visitor counts for the admin's Visitors page:
+  `site_visits`, `visit_salts`, `record_visit()` and `visit_summary()`. Counting starts on the
+  live site once it runs; before that the page says so and nothing breaks.
 
 ## Setting up a project
 

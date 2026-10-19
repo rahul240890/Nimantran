@@ -6,6 +6,7 @@ import "@fontsource-variable/karla/wght-italic.css";
 import "@fontsource-variable/noto-sans-devanagari";
 import { Providers } from "@/components/providers";
 import { SiteAnalytics } from "@/components/shell/site-analytics";
+import { VisitCounter } from "@/components/shell/visit-counter";
 import type { UiLocale } from "@/i18n/locales";
 import type { Pricing } from "@/lib/plans/design-tiers";
 import type { SampleWords } from "@/lib/sample/words";
@@ -44,7 +45,13 @@ export function RootFrame({
           {children}
         </Providers>
         {/* Counted only on the live site, where Analytics is switched on (docs/LAUNCH.md) */}
-        {process.env.VERCEL_ENV === "production" && <SiteAnalytics />}
+        {process.env.VERCEL_ENV === "production" && (
+          <>
+            <SiteAnalytics />
+            {/* Our own counts, for the admin's Visitors page (lib/visits.ts) */}
+            <VisitCounter />
+          </>
+        )}
       </body>
     </html>
   );
