@@ -69,6 +69,10 @@ database keeps every invite. Applied so far after the first setup:
 - `20261019090000_site_visits.sql` — visitor counts for the admin's Visitors page:
   `site_visits`, `visit_salts`, `record_visit()` and `visit_summary()`. Counting starts on the
   live site once it runs; before that the page says so and nothing breaks.
+- `20261019120000_offers.sql` — offers: new `coupons` columns for the offers page (description,
+  terms), who may use an offer (everyone, a first booking, returning hosts), the designs it
+  covers, uses per account, and whether the offers page and home page show it. Existing
+  coupons keep working before and after it runs; saving a new offer asks for it first.
 
 ## Setting up a project
 

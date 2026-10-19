@@ -69,6 +69,47 @@ describe("coupons", () => {
   });
 });
 
+describe("offers", () => {
+  it("keep their words, people and designs tidy", async () => {
+    await t.as(owner, () =>
+      q(
+        `insert into coupons (code, percent_off, label, description, terms, audience, design_tiers,
+           design_ids, per_user_limit, show_on_site, featured)
+         values ('FIRST10', 10, 'First booking offer', '10% off', 'Once per account.',
+           'first-order', '{royal}', '{kayal-scene}', 1, true, true)`,
+      ),
+    );
+    const [row] = await q<{ audience: string; featured: boolean }>(
+      "select audience, featured from coupons where code = 'FIRST10'",
+    );
+    expect(row).toEqual({ audience: "first-order", featured: true });
+    // Old coupons keep working as before
+    const [old] = await q<{ audience: string; show_on_site: boolean }>(
+      "select audience, show_on_site from coupons where code = 'DIWALI25'",
+    );
+    expect(old).toEqual({ audience: "everyone", show_on_site: false });
+
+    const bad = [
+      "insert into coupons (code, percent_off, audience) values ('BADWHO', 10, 'friends')",
+      "insert into coupons (code, percent_off, design_tiers) values ('BADTIER', 10, '{gold}')",
+      "insert into coupons (code, percent_off, featured) values ('BADHOME', 10, true)",
+      "insert into coupons (code, percent_off, per_user_limit) values ('BADUSES', 10, 0)",
+    ];
+    for (const sql of bad) {
+      await expect(t.as(owner, () => q(sql))).rejects.toThrow(/check constraint/);
+    }
+  });
+
+  it("are changed only by admins", async () => {
+    await t.as(host, () => q("update coupons set percent_off = 90 where code = 'FIRST10'"));
+    await t.as(owner, () => q("update coupons set terms = 'Changed.' where code = 'FIRST10'"));
+    const [row] = await q<{ percent_off: number; terms: string }>(
+      "select percent_off, terms from coupons where code = 'FIRST10'",
+    );
+    expect(row).toEqual({ percent_off: 10, terms: "Changed." });
+  });
+});
+
 describe("invoice numbers", () => {
   it("run in order each financial year and never change", async () => {
     const march = await order("2027-03-31T19:00:00Z", "order_a"); // 00:30 on 1 April in India
