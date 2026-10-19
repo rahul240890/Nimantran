@@ -134,7 +134,7 @@ const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
 /** Visit counts arrive with 20261002170000_guest_opens.sql; until it runs the list reads without them. */
 const OPEN_COLUMNS = ", last_opened_at, open_count";
-/** When each guest was sent their invitation; arrives with 20261019090000_guest_sending_and_list_reading.sql. */
+/** When each guest was sent their invitation; arrives with 20261019100000_guest_sending_and_list_reading.sql. */
 const SENT_COLUMNS = ", sent_at";
 const SEND_COLUMNS = "id, channel, purpose, function_id, send_at, status";
 const REPLY_COLUMNS =

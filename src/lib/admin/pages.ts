@@ -10,6 +10,7 @@ export type AdminPageIcon =
   | "orders"
   | "coupons"
   | "invites"
+  | "visitors"
   | "blog"
   | "ai"
   | "business";
@@ -58,6 +59,12 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Invites",
     description: "Every invite and its edition, newest first.",
     icon: "invites",
+  },
+  {
+    href: "/admin/visitors",
+    label: "Visitors",
+    description: "How many people visit, signed in or not, and where they come from.",
+    icon: "visitors",
   },
   {
     href: "/admin/blog",

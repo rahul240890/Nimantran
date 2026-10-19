@@ -64,7 +64,7 @@ export const privacy: LegalDoc = {
         {
           list: [
             "Your email address and occasion if you join the waitlist.",
-            "Anonymous visit counts, such as which pages are viewed and from which kind of device, and counts of steps such as opening a design, starting a payment or publishing. These never include the address of an invitation, a name or anything you type, so they cannot tell whose invitation you opened.",
+            "Visit counts, such as which pages are viewed, from which country and kind of device, and which site sent you, and counts of steps such as opening a design, starting a payment or publishing. These never include the address of an invitation, a name or anything you type, so they cannot tell whose invitation you opened. If you are signed in, the pages you view are linked to your account so we can count how many hosts use the site.",
             "Technical details when something breaks, such as the page, browser and error message, so we can fix it.",
           ],
         },
@@ -123,7 +123,7 @@ export const privacy: LegalDoc = {
       id: "how-long",
       heading: "How long we keep it",
       body: [
-        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubh Invitation opens to you. Technical error details are kept for at most 30 days. To stop spam replies, we keep a scrambled code for the network each new reply came from, which can't be turned back into an address, for two days.",
+        "Invitations, guest lists and replies stay until the host deletes them or their account. Waitlist entries stay until you ask us to remove them or Shubh Invitation opens to you. Technical error details are kept for at most 30 days. Visit counts are kept for at most 13 months; your network address is turned into a code that changes every day and is never stored. To stop spam replies, we keep a scrambled code for the network each new reply came from, which can't be turned back into an address, for two days.",
       ],
     },
     {
