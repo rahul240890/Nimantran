@@ -61,12 +61,14 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       waiting: "इंतज़ार",
       seen: "खोला, जवाब नहीं",
       "not-opened": "नहीं खोला",
+      "not-sent": "अभी नहीं भेजा",
     },
     functionLabel: "उत्सव",
     allFunctions: "सभी उत्सव",
     showing: (shown, total) =>
       shown === total ? `${n(total)} मेहमान` : `${total} में से ${shown} मेहमान`,
     add: "मेहमान जोड़ें",
+    sendMany: "कई लोगों को भेजें",
     export: "CSV डाउनलोड करें",
     remind: "याद दिलाएँ",
     empty: {
@@ -104,6 +106,12 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     sendInvite: "निमंत्रण भेजें",
     sendReminder: "याद दिलाएँ",
     copyLink: "निजी लिंक कॉपी करें",
+    copyLinkFor: (name) => `${name} का निजी लिंक कॉपी करें`,
+    editFor: (name) => `${name} को बदलें`,
+    sendAgain: "फिर भेजें",
+    sent: (when) => `${when} भेजा`,
+    delivered: "निमंत्रण मिल गया",
+    notSent: "अभी नहीं भेजा",
     edit: "मेहमान बदलें",
     remove: "मेहमान हटाएँ",
     linkCopied: "निजी लिंक कॉपी हो गया",
@@ -158,6 +166,90 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       "इस निमंत्रण के पैकेज के सारे इनवाइट लग चुके हैं। और मेहमान जोड़ने के लिए बड़ा पैकेज चुनें।",
   },
 
+  sendMany: {
+    title: "निमंत्रण भेजें",
+    description:
+      "हर मेहमान को उसका अपना लिंक मिलता है, जिसके पहले पेज पर उसका नाम होता है। भेजें दबाएँ, WhatsApp में भेजें, वापस आएँ, और अगला मेहमान तैयार मिलेगा।",
+    who: "किसे भेजें",
+    audiences: {
+      "not-sent": (count) => `जिन्हें अभी नहीं भेजा (${n(count)})`,
+      waiting: (count) => `जिन्होंने जवाब नहीं दिया (${n(count)})`,
+      all: (count) => `सभी (${n(count)})`,
+    },
+    audienceHints: {
+      "not-sent": "जिन मेहमानों को अभी निमंत्रण नहीं मिला।",
+      waiting: "जिन्हें भेज चुके हैं वे भी, याद दिलाने के लिए।",
+      all: "सूची के सभी मेहमान।",
+    },
+    group: "समूह",
+    allGroups: "सभी समूह",
+    batch: "एक बार में कितने",
+    batchSize: (size) => (size ? String(size) : "सभी"),
+    message: "संदेश",
+    messageHint: "{name} की जगह हर मेहमान का नाम आएगा। आख़िर में उनका निजी लिंक जुड़ जाता है।",
+    start: (count) => (count ? `${n(count)} मेहमानों से शुरू करें` : "भेजना शुरू करें"),
+    nobody: "इन विकल्पों में भेजने के लिए कोई नहीं है।",
+    progress: (done, total) => `${n(total)} में से ${n(done)} भेजे`,
+    next: "अगला",
+    sendTo: (name) => `${name} को भेजें`,
+    noPhone: "नंबर नहीं है: WhatsApp पूछेगा किसे भेजना है",
+    skip: "छोड़ें",
+    send: "भेजें",
+    sent: "भेजा",
+    copy: "कॉपी",
+    copied: "संदेश कॉपी हो गया",
+    list: (count) => `यह बैच (${n(count)})`,
+    copyAll: "सभी लिंक कॉपी करें",
+    copyAllHint:
+      "हर नाम के साथ उसका निजी लिंक कॉपी होता है, ताकि आपकी ओर से भेजने वाले को भेज सकें।",
+    allCopied: "लिंक कॉपी हो गए",
+    finished: (count) => (count ? `हो गया: ${n(count)} निमंत्रण भेजे।` : "हो गया।"),
+    more: (count) => `अगले भेजें (${n(count)} बाकी)`,
+    back: "विकल्प बदलें",
+    done: "हो गया",
+  },
+
+  aiImport: {
+    heading: "मेरी सूची पढ़ें",
+    badge: "AI",
+    body: "अपनी हाथ से लिखी सूची, डायरी या छपी शीट की फ़ोटो लें, किसी भी भाषा में, या Word, Excel या नोट्स फ़ाइल चुनें। हम उसे मेहमानों में बदल देते हैं, जिन्हें आप जाँचकर बदल सकते हैं।",
+    bodyPdf:
+      "अपनी हाथ से लिखी सूची, डायरी या छपी शीट की फ़ोटो लें, किसी भी भाषा में, या PDF, Word, Excel या नोट्स फ़ाइल चुनें। हम उसे मेहमानों में बदल देते हैं, जिन्हें आप जाँचकर बदल सकते हैं।",
+    camera: "फ़ोटो लें",
+    files: "फ़ोटो या फ़ाइल चुनें",
+    english: "नाम अंग्रेज़ी अक्षरों में लिखें",
+    englishHint: "बंद रखें तो हर नाम उसी लिपि में रहेगा जिसमें लिखा था।",
+    left: (left, allowed) =>
+      allowed === 1
+        ? left
+          ? "आज़माने के लिए 1 पेज मुफ़्त।"
+          : "आपका मुफ़्त पेज इस्तेमाल हो गया।"
+        : `${n(allowed)} में से ${n(left)} पेज बाकी।`,
+    privacy: "फ़ोटो पढ़कर हटा दी जाती हैं; सिर्फ़ आपके जोड़े मेहमान रखे जाते हैं।",
+    reading: (page, total) =>
+      total > 1 ? `${n(total)} में से पेज ${n(page)} पढ़ रहे हैं…` : "आपकी सूची पढ़ रहे हैं…",
+    usedUp: (allowed) =>
+      allowed === 1
+        ? "आपका मुफ़्त पेज इस्तेमाल हो गया। ग्रैंड में आपकी सूचियों के 30 पेज तक पढ़े जाते हैं।"
+        : `इस निमंत्रण के सभी ${n(allowed)} पेज इस्तेमाल हो गए।`,
+    upgrade: "ग्रैंड के साथ और पढ़ें",
+    source: (count) => (count > 1 ? `${n(count)} पेज` : "आपकी सूची"),
+    pageNotes: "देखने लायक पेज",
+    pageName: (page, name) => `पेज ${n(page)} (${name}):`,
+    nothingFound: "कोई नाम नहीं मिला। सूची की साफ़ फ़ोटो लेकर देखें।",
+    photoAlt: "पेज, जैसा आपने फ़ोटो लिया",
+    outcomes: {
+      blurred: "बहुत धुंधली है। अच्छी रोशनी में, फ़ोन स्थिर रखकर फिर लें।",
+      dark: "बहुत अंधेरी है। दिन की रोशनी में या लैंप के पास फिर लें।",
+      cut: "पेज का कुछ हिस्सा कट गया है। पूरा पेज फ़्रेम में रखकर फिर लें।",
+      "not-a-list": "इसमें मेहमानों की सूची नहीं मिली।",
+      unsupported: "इस तरह की फ़ाइल हम नहीं पढ़ सकते। इसकी फ़ोटो लें।",
+      "too-big": "फ़ाइल बहुत बड़ी है। एक बार में कम पेज भेजें, या फ़ोटो लें।",
+      "used-up": "नहीं पढ़ा: इस निमंत्रण के पेज ख़त्म हो गए।",
+      failed: "यह नहीं पढ़ पाए। अपना कनेक्शन देखकर फिर कोशिश करें।",
+    },
+  },
+
   importer: {
     intro:
       "फ़ोन के कॉन्टैक्ट, Excel या CSV शीट, या कॉन्टैक्ट फ़ाइल से मेहमान लाइए। हर एक को उसका अपना निजी लिंक मिलता है।",
@@ -177,6 +269,8 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     another: "दूसरी चुनें",
     nameColumn: "नाम वाला कॉलम",
     phoneColumn: "नंबर वाला कॉलम",
+    groupColumn: "समूह वाला कॉलम",
+    partyColumn: "लोगों की संख्या वाला कॉलम",
     noColumn: "कोई नहीं",
     firstAndLast: (first, last) => `${first} + ${last}`,
     column: (label) => `कॉलम ${label}`,
@@ -193,6 +287,25 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     partial: (done, total) =>
       `${n(total)} में से ${n(done)} मेहमान जुड़े। कनेक्शन देखकर बाक़ी फिर जोड़ें।`,
     nothingPicked: "जोड़ने के लिए कम से कम एक मेहमान चुनें",
+    toCheck: (count) =>
+      count === 1
+        ? "1 मेहमान को एक बार देख लें। वह सबसे ऊपर है।"
+        : `${n(count)} मेहमानों को एक बार देख लें। वे सबसे ऊपर हैं।`,
+    flags: {
+      noName: "नाम लिखें",
+      phone: "यह नंबर जाँचें",
+      unsure: "पढ़ने में मुश्किल, जाँच लें",
+    },
+    edited: "बदला गया",
+    editRow: (name) => `${name} को बदलें`,
+    editName: "नाम",
+    editPhone: "WhatsApp नंबर",
+    editGroup: "समूह",
+    editParty: "लोग",
+    editDone: "हो गया",
+    editCancel: "रद्द करें",
+    seePage: (page) => `पेज ${page} देखें`,
+    groupHint: "उन मेहमानों के लिए जिनका अभी कोई समूह नहीं है।",
   },
 
   opens: {

@@ -61,12 +61,14 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       waiting: "অপেক্ষায়",
       seen: "খুলেছেন, উত্তর নেই",
       "not-opened": "খোলেননি",
+      "not-sent": "এখনও পাঠানো হয়নি",
     },
     functionLabel: "অনুষ্ঠান",
     allFunctions: "সব অনুষ্ঠান",
     showing: (shown, total) =>
       shown === total ? `${n(total)} জন অতিথি` : `${total} জনের মধ্যে ${shown} জন অতিথি`,
     add: "অতিথি যোগ করুন",
+    sendMany: "অনেককে পাঠান",
     export: "CSV ডাউনলোড করুন",
     remind: "মনে করিয়ে দিন",
     empty: {
@@ -104,6 +106,12 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     sendInvite: "নিমন্ত্রণ পাঠান",
     sendReminder: "রিমাইন্ডার পাঠান",
     copyLink: "ব্যক্তিগত লিংক কপি করুন",
+    copyLinkFor: (name) => `${name}-এর ব্যক্তিগত লিংক কপি করুন`,
+    editFor: (name) => `${name} বদলান`,
+    sendAgain: "আবার পাঠান",
+    sent: (when) => `${when} পাঠানো হয়েছে`,
+    delivered: "নিমন্ত্রণ পেয়েছেন",
+    notSent: "এখনও পাঠানো হয়নি",
     edit: "অতিথির তথ্য বদলান",
     remove: "অতিথি সরান",
     linkCopied: "ব্যক্তিগত লিংক কপি হয়েছে",
@@ -158,6 +166,91 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       "এই নিমন্ত্রণের প্যাকেজের সব নিমন্ত্রণ ব্যবহার হয়ে গেছে। আরও অতিথি যোগ করতে বড় প্যাকেজ বেছে নিন।",
   },
 
+  sendMany: {
+    title: "নিমন্ত্রণ পাঠান",
+    description:
+      "প্রত্যেক অতিথি পান নিজের লিংক, প্রথম পাতায় তাঁর নাম সহ। পাঠান চাপুন, WhatsApp-এ পাঠান, ফিরে আসুন, পরের অতিথি তৈরি থাকবেন।",
+    who: "কাকে পাঠাবেন",
+    audiences: {
+      "not-sent": (count) => `এখনও পাঠানো হয়নি (${n(count)})`,
+      waiting: (count) => `উত্তর দেননি (${n(count)})`,
+      all: (count) => `সবাই (${n(count)})`,
+    },
+    audienceHints: {
+      "not-sent": "যে অতিথিরা এখনও নিমন্ত্রণ পাননি।",
+      waiting: "যাঁদের পাঠিয়েছেন তাঁরাও, মনে করিয়ে দিতে।",
+      all: "তালিকার সব অতিথি।",
+    },
+    group: "দল",
+    allGroups: "সব দল",
+    batch: "একবারে কতজন",
+    batchSize: (size) => (size ? String(size) : "সবাই"),
+    message: "বার্তা",
+    messageHint: "{name}-এর জায়গায় প্রত্যেক অতিথির নাম বসবে। শেষে তাঁর ব্যক্তিগত লিংক যোগ হয়।",
+    start: (count) => (count ? `${n(count)} জন অতিথি দিয়ে শুরু করুন` : "পাঠানো শুরু করুন"),
+    nobody: "এই বাছাইয়ে পাঠানোর মতো কেউ নেই।",
+    progress: (done, total) => `${n(total)}-এর মধ্যে ${n(done)} পাঠানো হয়েছে`,
+    next: "পরের জন",
+    sendTo: (name) => `${name}-কে পাঠান`,
+    noPhone: "নম্বর নেই: কাকে পাঠাবেন WhatsApp জিজ্ঞেস করবে",
+    skip: "বাদ দিন",
+    send: "পাঠান",
+    sent: "পাঠানো হয়েছে",
+    copy: "কপি",
+    copied: "বার্তা কপি হয়েছে",
+    list: (count) => `এই দফা (${n(count)})`,
+    copyAll: "সব লিংক কপি করুন",
+    copyAllHint:
+      "প্রত্যেক নামের সঙ্গে তাঁর ব্যক্তিগত লিংক কপি হয়, যিনি আপনার হয়ে পাঠাবেন তাঁকে দেওয়ার জন্য।",
+    allCopied: "লিংক কপি হয়েছে",
+    finished: (count) =>
+      count ? `হয়ে গেছে: ${n(count)}টি নিমন্ত্রণ পাঠানো হয়েছে।` : "হয়ে গেছে।",
+    more: (count) => `পরেরগুলো পাঠান (${n(count)} বাকি)`,
+    back: "বাছাই বদলান",
+    done: "হয়ে গেছে",
+  },
+
+  aiImport: {
+    heading: "আমার তালিকা পড়ুন",
+    badge: "AI",
+    body: "হাতে লেখা তালিকা, ডায়েরি বা ছাপা কাগজের ছবি তুলুন, যে কোনো ভাষায়, অথবা Word, Excel বা নোটস ফাইল বেছে নিন। আমরা সেটি থেকে অতিথি বানিয়ে দিই, যা আপনি দেখে বদলাতে পারেন।",
+    bodyPdf:
+      "হাতে লেখা তালিকা, ডায়েরি বা ছাপা কাগজের ছবি তুলুন, যে কোনো ভাষায়, অথবা PDF, Word, Excel বা নোটস ফাইল বেছে নিন। আমরা সেটি থেকে অতিথি বানিয়ে দিই, যা আপনি দেখে বদলাতে পারেন।",
+    camera: "ছবি তুলুন",
+    files: "ছবি বা ফাইল বেছে নিন",
+    english: "নাম ইংরেজি অক্ষরে লিখুন",
+    englishHint: "বন্ধ রাখলে প্রতিটি নাম যে লিপিতে লেখা ছিল সেই লিপিতেই থাকবে।",
+    left: (left, allowed) =>
+      allowed === 1
+        ? left
+          ? "চেষ্টা করার জন্য 1টি পাতা বিনামূল্যে।"
+          : "আপনার বিনামূল্যের পাতা ব্যবহার হয়ে গেছে।"
+        : `${n(allowed)}টির মধ্যে ${n(left)}টি পাতা বাকি।`,
+    privacy: "ছবি পড়ার পর মুছে ফেলা হয়; শুধু আপনার যোগ করা অতিথিরা থাকেন।",
+    reading: (page, total) =>
+      total > 1 ? `${n(total)}টির মধ্যে পাতা ${n(page)} পড়া হচ্ছে…` : "আপনার তালিকা পড়া হচ্ছে…",
+    usedUp: (allowed) =>
+      allowed === 1
+        ? "আপনার বিনামূল্যের পাতা ব্যবহার হয়ে গেছে। গ্র্যান্ডে আপনার তালিকার 30টি পাতা পর্যন্ত পড়া যায়।"
+        : `এই নিমন্ত্রণের সব ${n(allowed)}টি পাতা ব্যবহার হয়ে গেছে।`,
+    upgrade: "গ্র্যান্ডে আরও পড়ুন",
+    source: (count) => (count > 1 ? `${n(count)}টি পাতা` : "আপনার তালিকা"),
+    pageNotes: "যে পাতাগুলো দেখতে হবে",
+    pageName: (page, name) => `পাতা ${n(page)} (${name}):`,
+    nothingFound: "কোনো নাম পাওয়া যায়নি। তালিকার পরিষ্কার ছবি তুলে দেখুন।",
+    photoAlt: "আপনার তোলা পাতার ছবি",
+    outcomes: {
+      blurred: "খুব ঝাপসা। ভালো আলোয়, ফোন স্থির রেখে আবার তুলুন।",
+      dark: "খুব অন্ধকার। দিনের আলোয় বা আলোর কাছে আবার তুলুন।",
+      cut: "পাতার কিছুটা কেটে গেছে। পুরো পাতা ফ্রেমে রেখে আবার তুলুন।",
+      "not-a-list": "এতে অতিথির তালিকা পাওয়া যায়নি।",
+      unsupported: "এই ধরনের ফাইল আমরা পড়তে পারি না। এর ছবি তুলুন।",
+      "too-big": "ফাইলটি খুব বড়। একবারে কম পাতা পাঠান, বা ছবি তুলুন।",
+      "used-up": "পড়া হয়নি: এই নিমন্ত্রণের পাতা শেষ।",
+      failed: "এটি পড়া গেল না। সংযোগ দেখে আবার চেষ্টা করুন।",
+    },
+  },
+
   importer: {
     intro:
       "ফোনের কন্ট্যাক্ট, Excel বা CSV শিট, অথবা কন্ট্যাক্ট ফাইল থেকে অতিথিদের আনুন। প্রত্যেকে নিজের ব্যক্তিগত লিংক পাবেন।",
@@ -177,6 +270,8 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     another: "অন্য একটি বেছে নিন",
     nameColumn: "নামের কলাম",
     phoneColumn: "নম্বরের কলাম",
+    groupColumn: "দলের কলাম",
+    partyColumn: "লোকসংখ্যার কলাম",
     noColumn: "কোনোটি নয়",
     firstAndLast: (first, last) => `${first} + ${last}`,
     column: (label) => `কলাম ${label}`,
@@ -193,6 +288,25 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     partial: (done, total) =>
       `${n(total)} জনের মধ্যে ${n(done)} জন অতিথি যোগ হয়েছে। ইন্টারনেট দেখে বাকিদের আবার যোগ করুন।`,
     nothingPicked: "যোগ করতে অন্তত একজন অতিথিকে টিক দিন",
+    toCheck: (count) =>
+      count === 1
+        ? "1 জন অতিথিকে একবার দেখে নিন। তিনি সবার ওপরে আছেন।"
+        : `${n(count)} জন অতিথিকে একবার দেখে নিন। তাঁরা সবার ওপরে আছেন।`,
+    flags: {
+      noName: "নাম লিখুন",
+      phone: "এই নম্বরটি দেখে নিন",
+      unsure: "পড়া কঠিন, দেখে নিন",
+    },
+    edited: "বদলানো হয়েছে",
+    editRow: (name) => `${name} বদলান`,
+    editName: "নাম",
+    editPhone: "WhatsApp নম্বর",
+    editGroup: "দল",
+    editParty: "লোক",
+    editDone: "হয়ে গেছে",
+    editCancel: "বাতিল",
+    seePage: (page) => `পাতা ${page} দেখুন`,
+    groupHint: "যে অতিথিদের এখনও কোনো দল নেই তাঁদের জন্য।",
   },
 
   opens: {

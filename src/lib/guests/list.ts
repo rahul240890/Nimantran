@@ -33,6 +33,8 @@ export type HostGuest = {
   /** Latest visit, and how many visits (each counted once per half hour). */
   lastOpenedAt: string | null;
   openCount: number;
+  /** When a host last sent them their invitation from WhatsApp. */
+  sentAt: string | null;
   remindedAt: string | null;
   createdAt: string;
   replies: GuestReplyRow[];
@@ -69,6 +71,7 @@ export const GUEST_FILTERS = [
   "waiting",
   "seen",
   "not-opened",
+  "not-sent",
 ] as const;
 export type GuestFilter = (typeof GUEST_FILTERS)[number];
 
@@ -80,9 +83,56 @@ export function hasOpened(guest: Pick<HostGuest, "openedAt" | "replies">): boole
 export function matchesFilter(guest: HostGuest, filter: GuestFilter): boolean {
   if (filter === "all") return true;
   if (filter === "not-opened") return !hasOpened(guest);
+  if (filter === "not-sent") return !wasSent(guest);
   // Opened their personal link but not replied: the people a nudge helps most
   if (filter === "seen") return Boolean(guest.openedAt) && guest.replies.length === 0;
   return guestState(guest) === filter;
+}
+
+/**
+ * Whether the guest has had their invitation: a host sent it, or they opened their link,
+ * replied or found the invite themselves (so a list from before sending was tracked counts).
+ */
+export function wasSent(
+  guest: Pick<HostGuest, "sentAt" | "openedAt" | "replies" | "remindedAt" | "selfAdded">,
+): boolean {
+  return Boolean(guest.sentAt || guest.remindedAt || guest.selfAdded) || hasOpened(guest);
+}
+
+export const SEND_AUDIENCES = ["not-sent", "waiting", "all"] as const;
+export type SendAudience = (typeof SEND_AUDIENCES)[number];
+
+/** Batch sizes offered for sending one tap at a time. */
+export const SEND_BATCHES = [50, 100, 0] as const;
+
+/**
+ * The guests "Send to many" works through: who it's for, optionally one group, in the
+ * order they were added (an imported list goes out in its own order), at most `batch`
+ * of them (0 for all). Guests who added themselves already have the invite.
+ */
+export function sendQueue(
+  guests: HostGuest[],
+  options: { audience: SendAudience; group?: string | null; batch: number },
+): HostGuest[] {
+  const queue = guests
+    .filter((guest) => !guest.selfAdded)
+    .filter((guest) =>
+      options.audience === "not-sent"
+        ? !wasSent(guest)
+        : options.audience === "waiting"
+          ? guest.replies.length === 0
+          : true,
+    )
+    .filter((guest) => !options.group || guest.group === options.group)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.name.localeCompare(b.name));
+  return options.batch > 0 ? queue.slice(0, options.batch) : queue;
+}
+
+/** The groups on the list, for choosing who to send to. */
+export function guestGroups(guests: HostGuest[]): string[] {
+  return [...new Set(guests.map((guest) => guest.group).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, "en", { sensitivity: "base" }),
+  );
 }
 
 /** Who opened their personal link most recently, newest first. */
@@ -271,6 +321,8 @@ export type PastedGuest = {
   phone: string | null;
   partySize: number;
   error: "name" | "phone" | null;
+  /** The number as written, when it isn't one we recognise. */
+  badPhone?: string;
 };
 
 /**
@@ -278,12 +330,12 @@ export type PastedGuest = {
  * "Sharma uncle, 98765 43210", "Meera Iyer +91 98765 00000 (4)", or just a name.
  * A number in brackets or after "x" is how many people the invitation is for.
  */
-export function parseGuestList(text: string): PastedGuest[] {
+export function parseGuestList(text: string, limit: number = GUEST_RULES.paste): PastedGuest[] {
   return text
     .split(/\r?\n/)
     .map((raw, index) => ({ raw: raw.trim(), line: index + 1 }))
     .filter(({ raw }) => raw.length > 0)
-    .slice(0, GUEST_RULES.paste)
+    .slice(0, limit)
     .map(({ raw, line }): PastedGuest => {
       let rest = raw.replace(/^(?:[-*•]|\d+[.)])\s+/, "");
       let partySize = 1;
@@ -295,10 +347,14 @@ export function parseGuestList(text: string): PastedGuest[] {
       const phoneMatch = /(\+?[\d][\d\s().-]{7,}\d)\s*$/.exec(rest);
       let phone: string | null = null;
       let error: PastedGuest["error"] = null;
+      let badPhone: string | undefined;
       if (phoneMatch) {
         const parsed = normalizePhone(phoneMatch[1]!);
         if ("phone" in parsed) phone = parsed.phone;
-        else error = "phone";
+        else {
+          error = "phone";
+          badPhone = phoneMatch[1]!.trim();
+        }
         rest = rest.slice(0, phoneMatch.index);
       }
       const name = rest
@@ -306,6 +362,6 @@ export function parseGuestList(text: string): PastedGuest[] {
         .trim()
         .slice(0, GUEST_RULES.name);
       if (!name) error = "name";
-      return { line, name, phone, partySize, error };
+      return { line, name, phone, partySize, error, ...(badPhone ? { badPhone } : {}) };
     });
 }

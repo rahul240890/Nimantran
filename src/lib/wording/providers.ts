@@ -62,7 +62,10 @@ export function chatRequest(
   system: string,
   prompt: string,
   shape: string = WORDING_SHAPE,
+  /** Photos as data URLs, and a steadier answer for reading rather than writing. */
+  extra: { images?: string[]; temperature?: number } = {},
 ) {
+  const images = extra.images ?? [];
   if (config.provider === "anthropic") throw new Error("Anthropic uses its own SDK");
   return {
     url: `${BASE_URLS[config.provider]}/chat/completions`,
@@ -79,10 +82,18 @@ export function chatRequest(
             role: "system",
             content: `${system}\n\nAnswer with only a JSON object, no other text, in this shape: ${shape}`,
           },
-          { role: "user", content: prompt },
+          {
+            role: "user",
+            content: images.length
+              ? [
+                  ...images.map((url) => ({ type: "image_url", image_url: { url } })),
+                  { type: "text", text: prompt },
+                ]
+              : prompt,
+          },
         ],
         response_format: { type: "json_object" },
-        temperature: 0.7,
+        temperature: extra.temperature ?? 0.7,
       }),
     } satisfies RequestInit,
   };

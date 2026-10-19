@@ -62,12 +62,14 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       waiting: "प्रतीक्षेत",
       seen: "उघडले, उत्तर नाही",
       "not-opened": "उघडले नाही",
+      "not-sent": "अजून पाठवले नाही",
     },
     functionLabel: "सोहळा",
     allFunctions: "सर्व सोहळे",
     showing: (shown, total) =>
       shown === total ? guestCount(total) : `${total} पैकी ${shown} पाहुणे`,
     add: "पाहुणे जोडा",
+    sendMany: "अनेकांना पाठवा",
     export: "CSV डाउनलोड करा",
     remind: "आठवण करून द्या",
     empty: {
@@ -105,6 +107,12 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     sendInvite: "निमंत्रण पाठवा",
     sendReminder: "रिमाइंडर पाठवा",
     copyLink: "वैयक्तिक लिंक कॉपी करा",
+    copyLinkFor: (name) => `${name} यांची वैयक्तिक लिंक कॉपी करा`,
+    editFor: (name) => `${name} बदला`,
+    sendAgain: "पुन्हा पाठवा",
+    sent: (when) => `${when} पाठवले`,
+    delivered: "निमंत्रण मिळाले",
+    notSent: "अजून पाठवले नाही",
     edit: "पाहुण्याची माहिती बदला",
     remove: "पाहुणा काढा",
     linkCopied: "वैयक्तिक लिंक कॉपी झाली",
@@ -159,6 +167,91 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       "या निमंत्रणाच्या पॅकेजमधील सर्व निमंत्रणे वापरून झाली आहेत. आणखी पाहुणे जोडण्यासाठी मोठे पॅकेज निवडा.",
   },
 
+  sendMany: {
+    title: "निमंत्रणे पाठवा",
+    description:
+      "प्रत्येक पाहुण्याला त्यांची स्वतःची लिंक मिळते, पहिल्या पानावर त्यांच्या नावासह. पाठवा दाबा, WhatsApp मध्ये पाठवा, परत या, पुढचा पाहुणा तयार असेल.",
+    who: "कोणाला पाठवायचे",
+    audiences: {
+      "not-sent": (count) => `अजून पाठवले नाही (${n(count)})`,
+      waiting: (count) => `उत्तर दिले नाही (${n(count)})`,
+      all: (count) => `सर्वजण (${n(count)})`,
+    },
+    audienceHints: {
+      "not-sent": "ज्या पाहुण्यांना अजून निमंत्रण मिळाले नाही.",
+      waiting: "ज्यांना पाठवले आहे तेही, आठवण म्हणून.",
+      all: "यादीतील सर्व पाहुणे.",
+    },
+    group: "गट",
+    allGroups: "सर्व गट",
+    batch: "एका वेळी किती",
+    batchSize: (size) => (size ? String(size) : "सर्व"),
+    message: "संदेश",
+    messageHint:
+      "{name} च्या जागी प्रत्येक पाहुण्याचे नाव येते. शेवटी त्यांची वैयक्तिक लिंक जोडली जाते.",
+    start: (count) => (count ? `${guestCount(count)} पासून सुरू करा` : "पाठवायला सुरू करा"),
+    nobody: "या निवडीत पाठवण्यासाठी कोणी नाही.",
+    progress: (done, total) => `${n(total)} पैकी ${n(done)} पाठवले`,
+    next: "पुढचे",
+    sendTo: (name) => `${name} यांना पाठवा`,
+    noPhone: "नंबर नाही: कोणाला पाठवायचे ते WhatsApp विचारेल",
+    skip: "वगळा",
+    send: "पाठवा",
+    sent: "पाठवले",
+    copy: "कॉपी",
+    copied: "संदेश कॉपी झाला",
+    list: (count) => `हा गट (${n(count)})`,
+    copyAll: "सर्व लिंक कॉपी करा",
+    copyAllHint:
+      "प्रत्येक नावासोबत त्यांची वैयक्तिक लिंक कॉपी होते, तुमच्यासाठी पाठवणाऱ्याला पुढे पाठवण्यासाठी.",
+    allCopied: "लिंक कॉपी झाल्या",
+    finished: (count) => (count ? `झाले: ${n(count)} निमंत्रणे पाठवली.` : "झाले."),
+    more: (count) => `पुढचे पाठवा (${n(count)} बाकी)`,
+    back: "निवड बदला",
+    done: "झाले",
+  },
+
+  aiImport: {
+    heading: "माझी यादी वाचा",
+    badge: "AI",
+    body: "तुमची हाताने लिहिलेली यादी, डायरी किंवा छापील कागदाचा फोटो घ्या, कोणत्याही भाषेत, किंवा Word, Excel किंवा नोट्स फाइल निवडा. आम्ही त्यातून पाहुणे बनवतो, जे तुम्ही तपासून बदलू शकता.",
+    bodyPdf:
+      "तुमची हाताने लिहिलेली यादी, डायरी किंवा छापील कागदाचा फोटो घ्या, कोणत्याही भाषेत, किंवा PDF, Word, Excel किंवा नोट्स फाइल निवडा. आम्ही त्यातून पाहुणे बनवतो, जे तुम्ही तपासून बदलू शकता.",
+    camera: "फोटो घ्या",
+    files: "फोटो किंवा फाइल निवडा",
+    english: "नावे इंग्रजी अक्षरांत लिहा",
+    englishHint: "बंद ठेवल्यास प्रत्येक नाव ज्या लिपीत लिहिले होते त्यातच राहते.",
+    left: (left, allowed) =>
+      allowed === 1
+        ? left
+          ? "वापरून पाहण्यासाठी 1 पान मोफत."
+          : "तुमचे मोफत पान वापरले गेले."
+        : `${n(allowed)} पैकी ${n(left)} पाने बाकी.`,
+    privacy: "फोटो वाचून काढून टाकले जातात; फक्त तुम्ही जोडलेले पाहुणे ठेवले जातात.",
+    reading: (page, total) =>
+      total > 1 ? `${n(total)} पैकी पान ${n(page)} वाचत आहोत…` : "तुमची यादी वाचत आहोत…",
+    usedUp: (allowed) =>
+      allowed === 1
+        ? "तुमचे मोफत पान वापरले गेले. ग्रँडमध्ये तुमच्या याद्यांची 30 पाने वाचली जातात."
+        : `या निमंत्रणाची सर्व ${n(allowed)} पाने वापरली गेली.`,
+    upgrade: "ग्रँडसह आणखी वाचा",
+    source: (count) => (count > 1 ? `${n(count)} पाने` : "तुमची यादी"),
+    pageNotes: "तपासायची पाने",
+    pageName: (page, name) => `पान ${n(page)} (${name}):`,
+    nothingFound: "एकही नाव सापडले नाही. यादीचा स्पष्ट फोटो घेऊन पाहा.",
+    photoAlt: "तुम्ही फोटो काढलेले पान",
+    outcomes: {
+      blurred: "खूप धूसर आहे. चांगल्या उजेडात, फोन स्थिर धरून पुन्हा घ्या.",
+      dark: "खूप अंधार आहे. दिवसाच्या उजेडात किंवा दिव्याजवळ पुन्हा घ्या.",
+      cut: "पानाचा काही भाग कापला गेला आहे. संपूर्ण पान फ्रेममध्ये घेऊन पुन्हा घ्या.",
+      "not-a-list": "यात पाहुण्यांची यादी सापडली नाही.",
+      unsupported: "अशी फाइल आम्ही वाचू शकत नाही. तिचा फोटो घ्या.",
+      "too-big": "फाइल खूप मोठी आहे. एका वेळी कमी पाने पाठवा, किंवा फोटो घ्या.",
+      "used-up": "वाचले नाही: या निमंत्रणाची पाने संपली.",
+      failed: "हे वाचता आले नाही. कनेक्शन तपासून पुन्हा प्रयत्न करा.",
+    },
+  },
+
   importer: {
     intro:
       "फोनमधील कॉन्टॅक्ट, Excel किंवा CSV शीट, किंवा कॉन्टॅक्ट फाइलमधून पाहुणे आणा. प्रत्येकाला स्वतःची वैयक्तिक लिंक मिळते.",
@@ -179,6 +272,8 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     another: "दुसरी निवडा",
     nameColumn: "नावाचा कॉलम",
     phoneColumn: "नंबरचा कॉलम",
+    groupColumn: "गटाचा कॉलम",
+    partyColumn: "लोकांच्या संख्येचा कॉलम",
     noColumn: "काहीही नाही",
     firstAndLast: (first, last) => `${first} + ${last}`,
     column: (label) => `कॉलम ${label}`,
@@ -198,6 +293,25 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     partial: (done, total) =>
       `${n(total)} पैकी ${n(done)} पाहुणे जोडले. इंटरनेट तपासा आणि उरलेले पुन्हा जोडा.`,
     nothingPicked: "जोडण्यासाठी किमान एका पाहुण्यावर खूण करा",
+    toCheck: (count) =>
+      count === 1
+        ? "1 पाहुण्याकडे एकदा पाहा. ते सर्वात वर आहेत."
+        : `${n(count)} पाहुण्यांकडे एकदा पाहा. ते सर्वात वर आहेत.`,
+    flags: {
+      noName: "नाव लिहा",
+      phone: "हा नंबर तपासा",
+      unsure: "वाचायला कठीण, तपासा",
+    },
+    edited: "बदलले",
+    editRow: (name) => `${name} बदला`,
+    editName: "नाव",
+    editPhone: "WhatsApp नंबर",
+    editGroup: "गट",
+    editParty: "लोक",
+    editDone: "झाले",
+    editCancel: "रद्द करा",
+    seePage: (page) => `पान ${page} पाहा`,
+    groupHint: "ज्या पाहुण्यांचा अजून गट नाही त्यांच्यासाठी.",
   },
 
   opens: {

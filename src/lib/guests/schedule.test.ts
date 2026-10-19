@@ -23,6 +23,7 @@ const guest = (id: string, extra: Partial<HostGuest> = {}): HostGuest => ({
   openedAt: null,
   lastOpenedAt: null,
   openCount: 0,
+  sentAt: null,
   remindedAt: null,
   createdAt: "2026-10-01T00:00:00.000Z",
   replies: [],

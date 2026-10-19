@@ -87,6 +87,54 @@ test.describe("host dashboard", () => {
     await expect(page.getByText("1 of 3 guests")).toBeVisible();
     await page.getByRole("button", { name: "Clear search" }).click();
 
+    // Every guest has Send, copy and edit in reach, on phones too
+    const sharma = list.getByRole("listitem").filter({ hasText: /^Sharma uncle/ });
+    await expect(
+      sharma.getByRole("link", { name: "Send invitation to Sharma uncle on WhatsApp" }),
+    ).toBeVisible();
+    await expect(sharma.getByRole("button", { name: "Edit Sharma uncle" })).toBeVisible();
+    await expect(sharma).toContainText("Not sent yet");
+    await expect(page.getByRole("button", { name: /^Not sent yet/ })).toContainText("2");
+
+    // Sending to many: the next guest is ready after each one
+    await page.context().route(/wa\.me|whatsapp\.com/, (route) => route.abort());
+    await page.getByRole("button", { name: "Send to many" }).click();
+    const many = page.getByRole("dialog", { name: "Send invitations" });
+    await expect(many.getByRole("radio", { name: /Not sent yet \(2\)/ })).toBeChecked();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await many.getByRole("button", { name: "Start with 2 guests" }).click();
+    const [popup] = await Promise.all([
+      page.waitForEvent("popup"),
+      many.getByRole("link", { name: /^Send to / }).click(),
+    ]);
+    await popup.close();
+    await expect(many.getByText("1 of 2 sent")).toBeVisible();
+    expect(await noOverflow(page)).toBe(true);
+    await many.getByRole("button", { name: "Done" }).click();
+    await expect(page.getByRole("button", { name: /^Not sent yet/ })).toContainText("1");
+
+    // A notepad list, fixed in the review before adding
+    await page.getByRole("button", { name: "Add guests" }).first().click();
+    await dialog.getByRole("tab", { name: "Import" }).click();
+    await dialog.locator('input[type="file"][accept^=".xlsx"]').setInputFiles({
+      name: "list.txt",
+      mimeType: "text/plain",
+      buffer: Buffer.from("Mama ji 98250 12345 (3)\nPinky ❤️ 98250 00000\n"),
+    });
+    await dialog.getByRole("button", { name: "Edit Pinky ❤️" }).click();
+    await dialog.getByRole("textbox", { name: "Name" }).fill("Pinky Mehta");
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(dialog.getByTestId("import-rows")).toContainText("Pinky Mehta");
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await dialog.getByRole("button", { name: "Add 2 guests" }).click();
+    // exact: the toast region also announces it, with "Notifications" in front
+    await expect(
+      page.getByText("2 guests added, each with a personal link", { exact: true }),
+    ).toBeVisible();
+    await expect(list.getByRole("listitem").filter({ hasText: /^Mama ji/ })).toContainText(
+      "3 people",
+    );
+
     // The spreadsheet has everyone with their replies
     const [download] = await Promise.all([
       page.waitForEvent("download"),
@@ -99,12 +147,14 @@ test.describe("host dashboard", () => {
 
     // Reminders go to those still waiting
     const reminders = page.getByRole("region", { name: "Reminders" });
-    await expect(reminders).toContainText("2 guests haven't replied yet");
+    await expect(reminders).toContainText("4 guests haven't replied yet");
     await reminders.getByRole("button", { name: "Send reminders" }).click();
     const remindDialog = page.getByRole("dialog", { name: /Remind guests/ });
     await expect(
       remindDialog.getByRole("link", { name: "Remind Sharma uncle on WhatsApp" }),
     ).toHaveAttribute("href", /wa\.me\/919876543210/);
+    // A slow runner can reach this before the page's title is back; axe needs it
+    await expect(page).toHaveTitle(/\S/);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await remindDialog.getByRole("button", { name: "Done" }).click();
 
@@ -200,7 +250,7 @@ test.describe("host dashboard", () => {
     await page.getByRole("button", { name: "Add guests" }).first().click();
     await dialog.getByRole("tab", { name: "Import" }).click();
     await expect(dialog.getByRole("button", { name: "Choose a file" })).toBeVisible();
-    await dialog.locator('input[type="file"]').setInputFiles({
+    await dialog.locator('input[type="file"][accept^=".xlsx"]').setInputFiles({
       name: "guests.csv",
       mimeType: "text/csv",
       buffer: Buffer.from(
