@@ -127,7 +127,10 @@ test.describe("host dashboard", () => {
     await expect(dialog.getByTestId("import-rows")).toContainText("Pinky Mehta");
     expect((await axe(page).analyze()).violations).toEqual([]);
     await dialog.getByRole("button", { name: "Add 2 guests" }).click();
-    await expect(page.getByText("2 guests added, each with a personal link")).toBeVisible();
+    // exact: the toast region also announces it, with "Notifications" in front
+    await expect(
+      page.getByText("2 guests added, each with a personal link", { exact: true }),
+    ).toBeVisible();
     await expect(list.getByRole("listitem").filter({ hasText: /^Mama ji/ })).toContainText(
       "3 people",
     );
@@ -150,6 +153,8 @@ test.describe("host dashboard", () => {
     await expect(
       remindDialog.getByRole("link", { name: "Remind Sharma uncle on WhatsApp" }),
     ).toHaveAttribute("href", /wa\.me\/919876543210/);
+    // A slow runner can reach this before the page's title is back; axe needs it
+    await expect(page).toHaveTitle(/\S/);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await remindDialog.getByRole("button", { name: "Done" }).click();
 
