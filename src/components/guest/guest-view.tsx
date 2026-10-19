@@ -13,7 +13,12 @@ import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FunctionFacts } from "@/components/guest/function-facts";
-import { FamilyWords, pairedSide, type FamilyBlock } from "@/components/guest/family-words";
+import {
+  FamilyWords,
+  pairedSide,
+  useNamesFit,
+  type FamilyBlock,
+} from "@/components/guest/family-words";
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
@@ -575,6 +580,7 @@ export function GuestView({
 /** The family's labelled wording (blessings, parents, hosts, whom to call), when written. */
 function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang: string }) {
   const { guestCopy } = useGuestText();
+  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
   if (family.length === 0) return null;
   return (
     <section
@@ -587,7 +593,7 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
           {guestCopy.family}
         </h2>
         {/* Both sides' parents side by side, the blessings above and the hosts below them */}
-        <dl lang={lang} className="grid w-full gap-5 sm:grid-cols-2">
+        <dl ref={names} lang={lang} className="grid w-full gap-5 sm:grid-cols-2">
           {family.map((block) => (
             <div
               key={block.id}

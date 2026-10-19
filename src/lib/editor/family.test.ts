@@ -171,9 +171,13 @@ describe("the family page", () => {
     expect(keepPeople("Smt. Asha & Shri Vijay Shah")).toBe(
       "Smt.\u00a0Asha &\u00a0Shri\u00a0Vijay\u00a0Shah",
     );
-    // A very long name keeps only its title with the first word
+    // A long name stays whole too: the page sets its words smaller instead
     expect(keepPeople("Smt. Asha & Shri Rajendra Prasad Venkataraman Sharma")).toBe(
-      "Smt.\u00a0Asha &\u00a0Shri\u00a0Rajendra Prasad Venkataraman Sharma",
+      "Smt.\u00a0Asha &\u00a0Shri\u00a0Rajendra\u00a0Prasad\u00a0Venkataraman\u00a0Sharma",
+    );
+    // Only a very long one keeps just its title with the first word
+    expect(keepPeople("Smt. Asha & Shri Rajendra Prasad Venkataraman Subramaniam Sharma")).toBe(
+      "Smt.\u00a0Asha &\u00a0Shri\u00a0Rajendra Prasad Venkataraman Subramaniam Sharma",
     );
   });
 });

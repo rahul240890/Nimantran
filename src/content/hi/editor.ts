@@ -919,6 +919,7 @@ export const studioCopy: Translation<typeof en.studioCopy> = {
     couple: "फ़ोटो",
     family: "परिवार",
     "family-more": "परिवार, आगे",
+    "family-end": "परिवार, अंत में",
     invite: "निमंत्रण",
     reply: "जवाब",
   },

@@ -1003,6 +1003,7 @@ export const studioCopy: Translation<typeof en.studioCopy> = {
     couple: "புகைப்படம்",
     family: "குடும்பம்",
     "family-more": "குடும்பம், தொடர்ச்சி",
+    "family-end": "குடும்பம், நிறைவு",
     invite: "அழைப்பிதழ்",
     reply: "பதில்",
   },
