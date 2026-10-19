@@ -492,7 +492,12 @@ export function GuestList({ view }: { view: DashboardView }) {
                 </div>
               )}
             </div>
-            <div role="group" aria-label={copy.list.filterLabel} className="flex flex-wrap gap-2">
+            <div
+              role="group"
+              aria-label={copy.list.filterLabel}
+              // One row that scrolls sideways on a phone, so the guests stay near the top
+              className="flex gap-2 max-sm:overflow-x-auto max-sm:p-1 sm:flex-wrap"
+            >
               {GUEST_FILTERS.map((item) => {
                 const count = view.guests.filter((guest) => matchesFilter(guest, item)).length;
                 const active = filter === item;
@@ -503,7 +508,7 @@ export function GuestList({ view }: { view: DashboardView }) {
                     aria-pressed={active}
                     onClick={() => setFilter(item)}
                     className={cn(
-                      "inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-semibold transition-colors",
+                      "inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full border px-4 text-sm font-semibold whitespace-nowrap transition-colors",
                       active
                         ? "border-marigold bg-marigold/15 text-ink"
                         : "border-line bg-surface text-ink-muted hover:border-line-strong hover:text-ink",

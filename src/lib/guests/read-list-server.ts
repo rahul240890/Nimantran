@@ -2,7 +2,7 @@ import "server-only";
 import { askJson, readsAttachment, type AiAttachment } from "@/lib/ai/ask";
 import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
-import { editionsActive, invitePlan } from "@/lib/payments/editions";
+import { invitePlan } from "@/lib/payments/editions";
 import { PLANS } from "@/lib/plans/catalog";
 import { supabaseService } from "@/lib/supabase/service";
 import { aiConfig } from "@/lib/wording/providers";
@@ -17,8 +17,7 @@ import {
 
 /*
  * Reading one page of a guest list with AI, for one invite. Pages count against the
- * invite's package (one free page on every package, 30 on Grand, all of them while
- * payments are off), counted in the database before the model is asked, so a slow answer
+ * invite's package (one free page on every package, 30 on Grand), counted in the database before the model is asked, so a slow answer
  * can't be asked for twice for free. The photo or file is read and then dropped: nothing
  * of it is stored, only the guests the host adds.
  */
@@ -46,12 +45,14 @@ async function takePages(eventId: string, pages: number, allowed: number): Promi
   return typeof data === "number" ? data : null;
 }
 
-/** Pages the invite may have read in all. */
+/**
+ * Pages the invite may have read in all, from the package it has paid for (or an admin
+ * gave). Unlike the other package features this stays limited while checkout is off,
+ * because every page is a paid AI call (owner, 2026-10-19).
+ */
 async function allowedPages(account: Account, eventId: string): Promise<number | null> {
   const edition = await invitePlan(account, eventId);
-  if (!edition) return null;
-  const all = PLANS.grand.listPages;
-  return (await editionsActive()) ? PLANS[edition.plan].listPages : all;
+  return edition ? PLANS[edition.plan].listPages : null;
 }
 
 /** Whether reading lists is set up at all, and what it reads. */

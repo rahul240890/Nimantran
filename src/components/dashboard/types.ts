@@ -29,9 +29,10 @@ export type DashboardView = {
   inviteLimit: number | null;
   /**
    * Reading guest lists with AI: what it reads and how many pages the invite has left;
-   * null when no AI that reads photos is set up on the server.
+   * whether Grand can be bought now (checkout on), for the link to more pages; null when no
+   * AI that reads photos is set up on the server.
    */
-  listReading: { pdf: boolean; left: number; allowed: number } | null;
+  listReading: { pdf: boolean; buy: boolean; left: number; allowed: number } | null;
   /** Planned invitations and reminders (scheduled sending). */
   schedules: ScheduledSend[];
   /** The server's clock when the page was made, so "due now" renders the same in the browser. */

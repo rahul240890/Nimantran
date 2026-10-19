@@ -47,11 +47,15 @@ import {
 import { GUEST_BATCH, GUEST_RULES, type HostFunction, type HostGuest } from "@/lib/guests/list";
 import { MAX_READ_PAGES, type PageProblem, type ReadResult } from "@/lib/guests/read-list";
 import { readDocx, readXlsx } from "@/lib/guests/xlsx";
+import { PLANS } from "@/lib/plans/catalog";
 import { cn } from "@/lib/cn";
 import { useText } from "@/i18n/client";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import type { DashboardView } from "./types";
 import { FunctionPicker, toStored } from "./guest-fields";
+
+/** Pages Grand reads: the package to suggest while an invite has fewer. */
+const GRAND_PAGES = PLANS.grand.listPages;
 
 /*
  * Importing guests: from the phone's contacts (Android Chrome's contact picker), from an
@@ -651,7 +655,7 @@ export function GuestImport({
             ) : outOfPages ? (
               <div className="flex flex-col gap-2">
                 <p className="text-sm font-semibold">{ai.usedUp(reading.allowed)}</p>
-                {reading.allowed < 30 && (
+                {reading.buy && reading.allowed < GRAND_PAGES && (
                   <Button asChild size="sm" className="self-start">
                     <Link href={`/invites/${inviteId}/edition?plan=grand`}>{ai.upgrade}</Link>
                   </Button>
@@ -687,6 +691,14 @@ export function GuestImport({
                 <p className="text-xs text-ink-muted">
                   {ai.left(pagesLeft, reading.allowed)} {ai.privacy}
                 </p>
+                {reading.buy && reading.allowed < GRAND_PAGES && (
+                  <Link
+                    href={`/invites/${inviteId}/edition?plan=grand`}
+                    className="inline-flex min-h-11 items-center self-start text-sm font-semibold text-accent-text underline underline-offset-4"
+                  >
+                    {ai.upgrade}
+                  </Link>
+                )}
               </>
             )}
           </section>

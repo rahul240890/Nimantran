@@ -200,7 +200,7 @@ export const pricing = {
     points: [
       "Basic: your design, with no watermark",
       "Celebration: the invitation video, and more invites",
-      "Grand: unlimited invites, and a video for every function",
+      "Grand: unlimited invites, a video for every function, and AI that reads your guest list",
     ],
   },
   note: "One payment per invitation, all taxes included. Never a subscription. Every package covers every function.",

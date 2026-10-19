@@ -245,7 +245,7 @@ test.describe("host dashboard", () => {
     await page.getByRole("button", { name: "Add guests" }).first().click();
     await dialog.getByRole("tab", { name: "Import" }).click();
     await expect(dialog.getByRole("button", { name: "Choose a file" })).toBeVisible();
-    await dialog.locator('input[type="file"]').setInputFiles({
+    await dialog.locator('input[type="file"][accept^=".xlsx"]').setInputFiles({
       name: "guests.csv",
       mimeType: "text/csv",
       buffer: Buffer.from(

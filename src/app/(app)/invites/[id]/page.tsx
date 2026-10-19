@@ -34,7 +34,8 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
   if (!data) notFound();
 
   const origin = await requestOrigin();
-  const edition = (await editionsActive()) ? await invitePlan(account, id) : null;
+  const buying = await editionsActive();
+  const edition = buying ? await invitePlan(account, id) : null;
   const plan = edition?.plan ?? null;
   const reading = listReading();
   const pages = reading ? await listPagesLeft(account, id).catch(() => null) : null;
@@ -60,7 +61,7 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
             plan,
             cohostLimit: plan ? cohostLimit(plan) : null,
             inviteLimit: plan ? inviteLimit(plan, await getPricing()) : null,
-            listReading: reading && pages ? { pdf: reading.pdf, ...pages } : null,
+            listReading: reading && pages ? { pdf: reading.pdf, buy: buying, ...pages } : null,
             schedules: data.schedules,
             now: new Date().toISOString(),
           }}
