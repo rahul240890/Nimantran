@@ -2,7 +2,7 @@ import { galleryText } from "@/i18n/copy/gallery";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import type { Category } from "@/lib/categories/schema";
-import { newDraft, withGalleryChoice, type InviteDraft } from "@/lib/editor/draft";
+import { draftFaith, newDraft, withGalleryChoice, type InviteDraft } from "@/lib/editor/draft";
 import { WEDDING_KIND_ENTRIES, suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import { designPhotos } from "@/lib/gallery/photos";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -12,11 +12,13 @@ import type { SuiteId } from "@/lib/suites/catalog";
 import type { Faith } from "@/lib/traditions/faith";
 import { SAMPLE_DAYS, SAMPLE_OCCASION_DAY, type SampleFunction } from "./days";
 import { SCENE_PHOTOS, at } from "./drafts";
+import { sampleFamily } from "./families";
 
 /*
  * A design's public sample (/sample/<design>): the invitation exactly as a guest would get
- * it, made with the gallery's "Use this design" choice and filled with made-up names, days
- * and places in the visitor's language. Nothing about it is saved or sent.
+ * it, made with the gallery's "Use this design" choice and filled with made-up names, days,
+ * places and family (parents, blessings, hosts) in the visitor's language. Nothing about it
+ * is saved or sent.
  */
 
 export type SampleInvite = { draft: InviteDraft; photos: PublicPhoto[]; category: CategoryId };
@@ -99,10 +101,14 @@ export function sampleInvite(design: GalleryDesign, locale: UiLocale): SampleInv
   ) as InviteDraft["functions"];
 
   const count = photoCount(design, category);
+  // The family page every design has, filled as a host would fill the editor's family section
+  const { family, wording } = sampleFamily(design.id, category, draftFaith(base), language);
   const draft: InviteDraft = {
     ...base,
     step: "preview",
     languages: [language],
+    tradition: { ...base.tradition, wording },
+    family,
     content: {
       first: one ? sample.one : names.first,
       second: one ? "" : names.second,
