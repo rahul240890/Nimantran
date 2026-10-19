@@ -9,6 +9,7 @@ import {
   ReceiptText,
   Sparkles,
   TicketPercent,
+  Users,
   WalletCards,
   type LucideIcon,
 } from "lucide-react";
@@ -24,6 +25,7 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   orders: ReceiptText,
   coupons: TicketPercent,
   invites: Mails,
+  visitors: Users,
   blog: Newspaper,
   ai: Sparkles,
   business: Building2,
