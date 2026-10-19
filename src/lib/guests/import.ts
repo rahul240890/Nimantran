@@ -1,5 +1,5 @@
 import { normalizePhone } from "@/lib/auth/phone";
-import { GUEST_RULES, type HostGuest } from "./list";
+import { GUEST_RULES, parseGuestList, type HostGuest } from "./list";
 
 /*
  * Importing a guest list: from the phone's contacts, an Excel or CSV sheet, or a vCard
@@ -12,10 +12,24 @@ import { GUEST_RULES, type HostGuest } from "./list";
 /** More than a paste: a family's whole phone book or the caterer's sheet. */
 export const IMPORT_LIMIT = 2000;
 
-export type ImportSource = { name: string; phones: string[]; group?: string; partySize?: number };
+export type ImportSource = {
+  name: string;
+  phones: string[];
+  group?: string;
+  partySize?: number;
+  /** Read by AI: the parts it wasn't sure of, for the host to check. */
+  unsure?: ("name" | "phone")[];
+  /** Read by AI: the page (1 = first photo or file) the guest was on. */
+  page?: number;
+};
+
+/** A host's change to one imported guest, by the guest's place in the sources. */
+export type ImportEdit = { name: string; phone: string; group: string; partySize: number };
 
 export type ImportRow = {
   key: number;
+  /** Where the guest is in the sources, which edits are keyed by. */
+  source: number;
   name: string;
   phone: string | null;
   group: string;
@@ -24,7 +38,18 @@ export type ImportRow = {
   error: "name" | "phone" | null;
   /** The number (or, with no number, the name) is on the list already, or earlier in the import. */
   duplicate: boolean;
+  /** The number as written, when it isn't one we recognise, for the host to fix. */
+  rawPhone: string | null;
+  /** Read by AI and not sure of the name or number. */
+  unsure: boolean;
+  page: number | null;
+  /** The host changed it in the review. */
+  edited: boolean;
 };
+
+/** Whether the host should look at a row before adding it. */
+export const needsCheck = (row: ImportRow) =>
+  Boolean(row.error) || row.duplicate || (row.unsure && !row.edited);
 
 const fold = (value: string) =>
   value
@@ -51,15 +76,29 @@ function firstPhone(values: string[]): { phone: string | null; bad: boolean } {
 }
 
 /** Rows ready to show the host: cleaned, numbers checked, duplicates marked. */
-export function toImportRows(sources: ImportSource[], existing: HostGuest[]): ImportRow[] {
+export function toImportRows(
+  sources: ImportSource[],
+  existing: HostGuest[],
+  edits: ReadonlyMap<number, ImportEdit> = new Map(),
+): ImportRow[] {
   const phones = new Set(existing.flatMap((guest) => (guest.phone ? [guest.phone] : [])));
   const names = new Set(existing.filter((guest) => !guest.phone).map((guest) => fold(guest.name)));
   const rows: ImportRow[] = [];
-  for (const source of sources) {
+  for (const [index, original] of sources.entries()) {
     if (rows.length >= IMPORT_LIMIT) break;
+    const edit = edits.get(index);
+    const source: ImportSource = edit
+      ? {
+          ...original,
+          name: edit.name,
+          phones: [edit.phone],
+          group: edit.group,
+          partySize: edit.partySize,
+        }
+      : original;
     const name = source.name.replace(/\s+/g, " ").trim().slice(0, GUEST_RULES.name);
     const { phone, bad } = firstPhone(source.phones);
-    if (!name && !phone && !bad) continue;
+    if (!edit && !name && !phone && !bad) continue;
     const duplicate = phone ? phones.has(phone) : Boolean(name) && names.has(fold(name));
     if (phone) phones.add(phone);
     else if (name) names.add(fold(name));
@@ -69,12 +108,18 @@ export function toImportRows(sources: ImportSource[], existing: HostGuest[]): Im
     );
     rows.push({
       key: rows.length,
+      source: index,
       name,
       phone,
       group: (source.group ?? "").trim().slice(0, GUEST_RULES.group),
       partySize: Number.isFinite(partySize) ? partySize : 1,
       error: !name ? "name" : bad && !phone ? "phone" : null,
       duplicate,
+      rawPhone:
+        bad && !phone ? (source.phones.find((value) => value.trim())?.trim() ?? null) : null,
+      unsure: Boolean(source.unsure?.length),
+      page: source.page ?? null,
+      edited: Boolean(edit),
     });
   }
   return rows;
@@ -215,6 +260,17 @@ export function sheetSources(rows: string[][], columns: Columns): ImportSource[]
 export function columnLabel(rows: string[][], columns: Columns, index: number): string {
   const heading = columns.header ? (rows[0]?.[index] ?? "").trim() : "";
   return heading || String.fromCharCode(65 + (index % 26)).repeat(Math.floor(index / 26) + 1);
+}
+
+/* ---------- Notes and text files ---------- */
+
+/** A notepad list, read like a pasted one: "Sharma uncle, 98765 43210 (4)" per line. */
+export function textSources(text: string): ImportSource[] {
+  return parseGuestList(text.replace(/^\uFEFF/, ""), IMPORT_LIMIT).map((guest) => ({
+    name: guest.name,
+    phones: guest.phone ? [guest.phone] : guest.badPhone ? [guest.badPhone] : [],
+    partySize: guest.partySize,
+  }));
 }
 
 /* ---------- vCard (.vcf) ---------- */

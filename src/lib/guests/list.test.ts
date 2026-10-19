@@ -24,6 +24,7 @@ const guest = (over: Partial<HostGuest> = {}): HostGuest => ({
   openedAt: null,
   lastOpenedAt: null,
   openCount: 0,
+  sentAt: null,
   remindedAt: null,
   createdAt: "2026-09-26T00:00:00Z",
   replies: [],

@@ -46,6 +46,7 @@ export const planCopy = {
       "Everything in Celebration",
       "WhatsApp video of your invitation, and one for every function",
       "Save the date and thank-you cards in your design",
+      "AI reads your handwritten or printed guest list into the guest list",
       "Guest photo wall for a year",
       "As many co-hosts as you like",
       "Priority help from our team",

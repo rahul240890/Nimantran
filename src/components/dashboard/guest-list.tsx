@@ -3,6 +3,7 @@
 import { format } from "date-fns";
 import {
   BellRing,
+  Check,
   CircleCheck,
   CircleHelp,
   CircleX,
@@ -15,6 +16,7 @@ import {
   MoreVertical,
   Pencil,
   Search,
+  Send,
   Trash2,
   UserPlus,
   Users,
@@ -22,7 +24,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDeferredValue, useMemo, useState, useTransition } from "react";
-import { markReminded, removeGuests } from "@/actions/guests";
+import { markReminded, markSent, removeGuests } from "@/actions/guests";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
@@ -47,12 +49,14 @@ import {
   matchesFilter,
   peopleIn,
   sortGuests,
+  wasSent,
   type GuestFilter,
   type HostGuest,
 } from "@/lib/guests/list";
 import { personalUrl, whatsappToUrl } from "@/lib/publish/links";
 import { withLink } from "@/lib/publish/message";
 import { GuestFormDialog } from "./guest-form";
+import { SendMany } from "./send-many";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale, timeAgo } from "@/i18n/dates";
@@ -108,17 +112,27 @@ function GuestRow({
   const router = useRouter();
   const waiting = guest.replies.length === 0;
   const opened = Boolean(guest.openedAt) || !waiting;
-  const kind = waiting && (guest.openedAt || guest.remindedAt) ? "reminder" : "invite";
+  const sent = wasSent(guest);
+  const kind =
+    waiting && (guest.openedAt || guest.remindedAt || guest.sentAt) ? "reminder" : "invite";
   const ago = (when: string) => timeAgo(when, locale);
 
   const send = () => {
-    if (kind === "reminder") {
-      void markReminded(view.id, [guest.id]).then((ok) => ok && router.refresh());
-    }
+    const mark = kind === "reminder" ? markReminded : markSent;
+    void mark(view.id, [guest.id]).then((ok) => ok && router.refresh());
+  };
+
+  const copyLink = async () => {
+    const ok = await copyText(personalUrl(view.url!, guest.token));
+    toast(
+      ok
+        ? { title: copy.guest.linkCopied, tone: "success" }
+        : { title: copy.guest.copyFailed, tone: "error" },
+    );
   };
 
   return (
-    <li className="flex gap-3 py-4 first:pt-1 sm:gap-4">
+    <li className="flex flex-col gap-3 py-4 first:pt-1 sm:flex-row sm:gap-4">
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <span className="font-semibold break-words">{guest.name}</span>
@@ -171,6 +185,20 @@ function GuestRow({
                 : copy.guest.notOpened}
           </span>
           {guest.phone && <span className="tabular-nums">{formatPhone(guest.phone)}</span>}
+          {view.url && !guest.selfAdded && (
+            <span className={cn("inline-flex items-center gap-1.5", !sent && "text-warning")}>
+              {sent ? (
+                <Check aria-hidden className="size-4" />
+              ) : (
+                <Clock aria-hidden className="size-4" />
+              )}
+              {guest.sentAt
+                ? copy.guest.sent(ago(guest.sentAt))
+                : sent
+                  ? copy.guest.delivered
+                  : copy.guest.notSent}
+            </span>
+          )}
           {guest.remindedAt && waiting && (
             <span className="inline-flex items-center gap-1.5">
               <BellRing aria-hidden className="size-4" />
@@ -183,13 +211,13 @@ function GuestRow({
           <q className="text-sm break-words text-ink-muted italic">{guest.message}</q>
         )}
       </div>
-      <div className="flex shrink-0 items-start gap-1">
+      <div className="flex items-center gap-1 sm:shrink-0 sm:items-start">
         {view.url && (
           <Button
             asChild
             size="sm"
-            variant={kind === "reminder" ? "secondary" : "ghost"}
-            className="max-sm:hidden"
+            variant={!sent ? "primary" : kind === "reminder" ? "secondary" : "ghost"}
+            className="max-sm:flex-1"
           >
             <a
               href={whatsappToUrl(guest.phone, guestMessage(copy.messages, view, guest, kind))}
@@ -203,10 +231,30 @@ function GuestRow({
               }
             >
               <MessageCircle aria-hidden />
-              {kind === "reminder" ? copy.list.remind : copy.guest.send}
+              {kind === "reminder"
+                ? copy.list.remind
+                : sent
+                  ? copy.guest.sendAgain
+                  : copy.guest.send}
             </a>
           </Button>
         )}
+        {view.url && (
+          <IconButton
+            variant="ghost"
+            size="sm"
+            label={copy.guest.copyLinkFor(guest.name)}
+            icon={<Copy aria-hidden />}
+            onClick={() => void copyLink()}
+          />
+        )}
+        <IconButton
+          variant="ghost"
+          size="sm"
+          label={copy.guest.editFor(guest.name)}
+          icon={<Pencil aria-hidden />}
+          onClick={onEdit}
+        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <IconButton
@@ -227,6 +275,9 @@ function GuestRow({
                     )}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() =>
+                      void markSent(view.id, [guest.id]).then((ok) => ok && router.refresh())
+                    }
                   >
                     <MessageCircle aria-hidden className="absolute start-3 size-4.5" />
                     {copy.guest.sendInvite}
@@ -250,16 +301,7 @@ function GuestRow({
                     </a>
                   </DropdownMenuItem>
                 )}
-                <DropdownMenuItem
-                  onSelect={async () => {
-                    const ok = await copyText(personalUrl(view.url!, guest.token));
-                    toast(
-                      ok
-                        ? { title: copy.guest.linkCopied, tone: "success" }
-                        : { title: copy.guest.copyFailed, tone: "error" },
-                    );
-                  }}
-                >
+                <DropdownMenuItem onSelect={() => void copyLink()}>
                   <Copy aria-hidden className="absolute start-3 size-4.5" />
                   {copy.guest.copyLink}
                 </DropdownMenuItem>
@@ -337,6 +379,7 @@ export function GuestList({ view }: { view: DashboardView }) {
   const [filter, setFilter] = useState<GuestFilter>("all");
   const [functionId, setFunctionId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  const [sending, setSending] = useState(false);
   const [editing, setEditing] = useState<HostGuest | null>(null);
   const [removing, setRemoving] = useState<HostGuest | null>(null);
   const deferredQuery = useDeferredValue(query);
@@ -364,6 +407,15 @@ export function GuestList({ view }: { view: DashboardView }) {
           {copy.list.heading}
         </h2>
         <div className="flex flex-wrap gap-2">
+          {total > 0 && view.url && (
+            <Button
+              size="sm"
+              leadingIcon={<Send aria-hidden className="rtl:-scale-x-100" />}
+              onClick={() => setSending(true)}
+            >
+              {copy.list.sendMany}
+            </Button>
+          )}
           {total > 0 && (
             <Button asChild variant="secondary" size="sm">
               <a href={`/invites/${view.id}/guests.csv`} download>
@@ -372,7 +424,12 @@ export function GuestList({ view }: { view: DashboardView }) {
               </a>
             </Button>
           )}
-          <Button size="sm" leadingIcon={<UserPlus aria-hidden />} onClick={() => setAdding(true)}>
+          <Button
+            size="sm"
+            variant={total > 0 && view.url ? "secondary" : "primary"}
+            leadingIcon={<UserPlus aria-hidden />}
+            onClick={() => setAdding(true)}
+          >
             {copy.list.add}
           </Button>
         </div>
@@ -504,6 +561,7 @@ export function GuestList({ view }: { view: DashboardView }) {
             inviteId={view.id}
             functions={view.functions}
             guests={view.guests}
+            reading={view.listReading}
             onDone={() => setAdding(false)}
           />
         )}
@@ -519,6 +577,9 @@ export function GuestList({ view }: { view: DashboardView }) {
             onDone={() => setEditing(null)}
           />
         )}
+      </Dialog>
+      <Dialog open={sending} onOpenChange={setSending}>
+        {sending && <SendMany view={view} onDone={() => setSending(false)} />}
       </Dialog>
       <RemoveGuest view={view} guest={removing} onClose={() => setRemoving(null)} />
     </section>

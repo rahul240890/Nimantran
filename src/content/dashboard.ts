@@ -60,12 +60,14 @@ export const dashboardCopy = {
       waiting: "Waiting",
       seen: "Opened, no reply",
       "not-opened": "Not opened",
+      "not-sent": "Not sent yet",
     },
     functionLabel: "Celebration",
     allFunctions: "All celebrations",
     showing: (shown: number, total: number) =>
       shown === total ? plural(total, "guest", "guests") : `${shown} of ${total} guests`,
     add: "Add guests",
+    sendMany: "Send to many",
     export: "Download CSV",
     remind: "Remind",
     empty: {
@@ -103,6 +105,12 @@ export const dashboardCopy = {
     sendInvite: "Send invitation",
     sendReminder: "Send reminder",
     copyLink: "Copy personal link",
+    copyLinkFor: (name: string) => `Copy ${name}'s personal link`,
+    editFor: (name: string) => `Edit ${name}`,
+    sendAgain: "Send again",
+    sent: (when: string) => `Sent ${when}`,
+    delivered: "Has the invitation",
+    notSent: "Not sent yet",
     edit: "Edit guest",
     remove: "Remove guest",
     linkCopied: "Personal link copied",
@@ -157,6 +165,51 @@ export const dashboardCopy = {
       "This invite has used all the invites in its package. Choose a bigger package to add more guests.",
   },
 
+  sendMany: {
+    title: "Send invitations",
+    description:
+      "Each guest gets their own link, with their name on the first page. Tap Send, send it in WhatsApp, come back, and the next guest is ready.",
+    who: "Send to",
+    audiences: {
+      "not-sent": (count: number) => `Not sent yet (${count})`,
+      waiting: (count: number) => `Haven't replied (${count})`,
+      all: (count: number) => `Everyone (${count})`,
+    },
+    audienceHints: {
+      "not-sent": "Guests who haven't had their invitation.",
+      waiting: "Includes people you've sent to, as a reminder.",
+      all: "Every guest on the list.",
+    },
+    group: "Group",
+    allGroups: "All groups",
+    batch: "How many at a time",
+    batchSize: (size: number) => (size ? String(size) : "All"),
+    message: "Message",
+    messageHint: "{name} becomes each guest's name. Their personal link is added at the end.",
+    start: (count: number) =>
+      count ? `Start with ${plural(count, "guest", "guests")}` : "Start sending",
+    nobody: "Nobody to send to with these choices.",
+    progress: (done: number, total: number) => `${done} of ${total} sent`,
+    next: "Next",
+    sendTo: (name: string) => `Send to ${name}`,
+    noPhone: "No number: WhatsApp will ask who to send to",
+    skip: "Skip",
+    send: "Send",
+    sent: "Sent",
+    copy: "Copy",
+    copied: "Message copied",
+    list: (count: number) => `This batch (${count})`,
+    copyAll: "Copy all links",
+    copyAllHint:
+      "Copies each name with their personal link, to forward to someone who sends for you.",
+    allCopied: "Links copied",
+    finished: (count: number) =>
+      count ? `Done: ${plural(count, "invitation", "invitations")} sent.` : "Done.",
+    more: (count: number) => `Send the next ones (${count} left)`,
+    back: "Change choices",
+    done: "Done",
+  },
+
   importer: {
     intro:
       "Bring guests in from your phone's contacts, an Excel or CSV sheet, or a contacts file. Each one gets their own personal link.",
@@ -176,6 +229,8 @@ export const dashboardCopy = {
     another: "Choose another",
     nameColumn: "Name column",
     phoneColumn: "Number column",
+    groupColumn: "Group column",
+    partyColumn: "People column",
     noColumn: "None",
     firstAndLast: (first: string, last: string) => `${first} + ${last}`,
     column: (label: string) => `Column ${label}`,
@@ -193,6 +248,64 @@ export const dashboardCopy = {
     partial: (done: number, total: number) =>
       `${done} of ${total} guests added. Check your connection and add the rest again.`,
     nothingPicked: "Tick at least one guest to add",
+    toCheck: (count: number) =>
+      `${plural(count, "guest needs", "guests need")} a look. They're at the top.`,
+    flags: {
+      noName: "Add a name",
+      phone: "Check this number",
+      unsure: "Hard to read, check it",
+    },
+    edited: "Edited",
+    editRow: (name: string) => `Edit ${name}`,
+    editName: "Name",
+    editPhone: "WhatsApp number",
+    editGroup: "Group",
+    editParty: "People",
+    editDone: "Done",
+    editCancel: "Cancel",
+    seePage: (page: number) => `See page ${page}`,
+    groupHint: "For guests who don't have a group yet.",
+  },
+
+  aiImport: {
+    heading: "Read my list",
+    badge: "AI",
+    body: "Take a photo of your handwritten list, diary or printed sheet, in any language, or choose a Word, Excel or notes file. We turn it into guests you can check and edit.",
+    bodyPdf:
+      "Take a photo of your handwritten list, diary or printed sheet, in any language, or choose a PDF, Word, Excel or notes file. We turn it into guests you can check and edit.",
+    camera: "Take a photo",
+    files: "Choose photos or files",
+    english: "Write names in English letters",
+    englishHint: "Off keeps each name in the script it was written in.",
+    left: (left: number, allowed: number) =>
+      allowed === 1
+        ? left
+          ? "1 free page to try."
+          : "Your free page is used."
+        : `${left} of ${allowed} pages left.`,
+    privacy: "Photos are read and then deleted; only the guests you add are kept.",
+    reading: (page: number, total: number) =>
+      total > 1 ? `Reading page ${page} of ${total}…` : "Reading your list…",
+    usedUp: (allowed: number) =>
+      allowed === 1
+        ? "You've used your free page. Grand reads up to 30 pages of your lists."
+        : `This invite has used all ${allowed} pages.`,
+    upgrade: "Read more with Grand",
+    source: (count: number) => (count > 1 ? `${count} pages` : "your list"),
+    pageNotes: "Pages to check",
+    pageName: (page: number, name: string) => `Page ${page} (${name}):`,
+    nothingFound: "We couldn't find any names. Try a clearer photo of the list.",
+    photoAlt: "The page as you photographed it",
+    outcomes: {
+      blurred: "Too blurred to read. Take it again in good light, held steady.",
+      dark: "Too dark to read. Take it again in daylight or near a lamp.",
+      cut: "Part of the page is cut off. Take it again with the whole page in the frame.",
+      "not-a-list": "We couldn't find a guest list in this one.",
+      unsupported: "We can't read this kind of file. Take a photo of it instead.",
+      "too-big": "This file is too big. Send fewer pages at a time, or take photos instead.",
+      "used-up": "Not read: no pages left on this invite.",
+      failed: "Couldn't read this one. Check your connection and try again.",
+    },
   },
 
   opens: {

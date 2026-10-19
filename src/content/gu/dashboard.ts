@@ -61,12 +61,14 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       waiting: "બાકી",
       seen: "ખોલ્યું, જવાબ નહીં",
       "not-opened": "ખોલ્યું નથી",
+      "not-sent": "હજી મોકલ્યું નથી",
     },
     functionLabel: "પ્રસંગ",
     allFunctions: "બધા પ્રસંગો",
     showing: (shown, total) =>
       shown === total ? `${n(total)} મહેમાન` : `${total} માંથી ${shown} મહેમાન`,
     add: "મહેમાન ઉમેરો",
+    sendMany: "ઘણાંને મોકલો",
     export: "CSV ડાઉનલોડ કરો",
     remind: "યાદ અપાવો",
     empty: {
@@ -104,6 +106,12 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     sendInvite: "આમંત્રણ મોકલો",
     sendReminder: "રિમાઇન્ડર મોકલો",
     copyLink: "અંગત લિંક કૉપી કરો",
+    copyLinkFor: (name) => `${name}ની અંગત લિંક કૉપી કરો`,
+    editFor: (name) => `${name} બદલો`,
+    sendAgain: "ફરી મોકલો",
+    sent: (when) => `${when} મોકલ્યું`,
+    delivered: "આમંત્રણ મળી ગયું",
+    notSent: "હજી મોકલ્યું નથી",
     edit: "મહેમાનની વિગત બદલો",
     remove: "મહેમાન કાઢો",
     linkCopied: "અંગત લિંક કૉપી થઈ ગઈ",
@@ -158,6 +166,89 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
       "આ આમંત્રણના પૅકેજનાં બધાં આમંત્રણ વપરાઈ ગયાં છે. વધુ મહેમાન ઉમેરવા મોટું પૅકેજ પસંદ કરો.",
   },
 
+  sendMany: {
+    title: "આમંત્રણ મોકલો",
+    description:
+      "દરેક મહેમાનને પોતાની લિંક મળે છે, પહેલા પાના પર તેમના નામ સાથે. મોકલો દબાવો, WhatsAppમાં મોકલો, પાછા આવો, અને આગળના મહેમાન તૈયાર હશે.",
+    who: "કોને મોકલવું",
+    audiences: {
+      "not-sent": (count) => `હજી મોકલ્યું નથી (${n(count)})`,
+      waiting: (count) => `જવાબ નથી આપ્યો (${n(count)})`,
+      all: (count) => `બધા (${n(count)})`,
+    },
+    audienceHints: {
+      "not-sent": "જે મહેમાનોને હજી આમંત્રણ નથી મળ્યું.",
+      waiting: "જેમને મોકલી દીધું છે તેઓ પણ, યાદ અપાવવા.",
+      all: "યાદીના બધા મહેમાન.",
+    },
+    group: "જૂથ",
+    allGroups: "બધાં જૂથ",
+    batch: "એક વારમાં કેટલા",
+    batchSize: (size) => (size ? String(size) : "બધા"),
+    message: "સંદેશ",
+    messageHint: "{name}ની જગ્યાએ દરેક મહેમાનનું નામ આવે છે. છેલ્લે તેમની અંગત લિંક ઉમેરાય છે.",
+    start: (count) => (count ? `${n(count)} મહેમાનથી શરૂ કરો` : "મોકલવાનું શરૂ કરો"),
+    nobody: "આ પસંદગીમાં મોકલવા માટે કોઈ નથી.",
+    progress: (done, total) => `${n(total)}માંથી ${n(done)} મોકલ્યા`,
+    next: "આગળ",
+    sendTo: (name) => `${name}ને મોકલો`,
+    noPhone: "નંબર નથી: કોને મોકલવું એ WhatsApp પૂછશે",
+    skip: "છોડો",
+    send: "મોકલો",
+    sent: "મોકલ્યું",
+    copy: "કૉપી",
+    copied: "સંદેશ કૉપી થયો",
+    list: (count) => `આ જથ્થો (${n(count)})`,
+    copyAll: "બધી લિંક કૉપી કરો",
+    copyAllHint: "દરેક નામ સાથે તેમની અંગત લિંક કૉપી થાય છે, તમારા વતી મોકલનારને આપવા માટે.",
+    allCopied: "લિંક કૉપી થઈ",
+    finished: (count) => (count ? `થઈ ગયું: ${n(count)} આમંત્રણ મોકલ્યાં.` : "થઈ ગયું."),
+    more: (count) => `આગળના મોકલો (${n(count)} બાકી)`,
+    back: "પસંદગી બદલો",
+    done: "થઈ ગયું",
+  },
+
+  aiImport: {
+    heading: "મારી યાદી વાંચો",
+    badge: "AI",
+    body: "તમારી હાથે લખેલી યાદી, ડાયરી કે છાપેલા કાગળનો ફોટો લો, કોઈ પણ ભાષામાં, અથવા Word, Excel કે નોટ્સ ફાઇલ પસંદ કરો. અમે તેમાંથી મહેમાન બનાવીએ છીએ, જેમને તમે તપાસીને બદલી શકો.",
+    bodyPdf:
+      "તમારી હાથે લખેલી યાદી, ડાયરી કે છાપેલા કાગળનો ફોટો લો, કોઈ પણ ભાષામાં, અથવા PDF, Word, Excel કે નોટ્સ ફાઇલ પસંદ કરો. અમે તેમાંથી મહેમાન બનાવીએ છીએ, જેમને તમે તપાસીને બદલી શકો.",
+    camera: "ફોટો લો",
+    files: "ફોટો કે ફાઇલ પસંદ કરો",
+    english: "નામ અંગ્રેજી અક્ષરોમાં લખો",
+    englishHint: "બંધ રાખો તો દરેક નામ જે લિપિમાં લખ્યું હતું તેમાં જ રહે છે.",
+    left: (left, allowed) =>
+      allowed === 1
+        ? left
+          ? "અજમાવવા માટે 1 પાનું મફત."
+          : "તમારું મફત પાનું વપરાઈ ગયું."
+        : `${n(allowed)}માંથી ${n(left)} પાનાં બાકી.`,
+    privacy: "ફોટો વાંચીને કાઢી નાખવામાં આવે છે; ફક્ત તમે ઉમેરેલા મહેમાન રહે છે.",
+    reading: (page, total) =>
+      total > 1 ? `${n(total)}માંથી પાનું ${n(page)} વાંચીએ છીએ…` : "તમારી યાદી વાંચીએ છીએ…",
+    usedUp: (allowed) =>
+      allowed === 1
+        ? "તમારું મફત પાનું વપરાઈ ગયું. ગ્રૅન્ડમાં તમારી યાદીનાં 30 પાનાં સુધી વંચાય છે."
+        : `આ આમંત્રણનાં બધાં ${n(allowed)} પાનાં વપરાઈ ગયાં.`,
+    upgrade: "ગ્રૅન્ડ સાથે વધુ વાંચો",
+    source: (count) => (count > 1 ? `${n(count)} પાનાં` : "તમારી યાદી"),
+    pageNotes: "તપાસવાનાં પાનાં",
+    pageName: (page, name) => `પાનું ${n(page)} (${name}):`,
+    nothingFound: "કોઈ નામ ન મળ્યું. યાદીનો સ્પષ્ટ ફોટો લઈ જુઓ.",
+    photoAlt: "તમે ફોટો લીધું તે પાનું",
+    outcomes: {
+      blurred: "બહુ ઝાંખું છે. સારા પ્રકાશમાં, ફોન સ્થિર રાખીને ફરી લો.",
+      dark: "બહુ અંધારું છે. દિવસના પ્રકાશમાં કે લૅમ્પ પાસે ફરી લો.",
+      cut: "પાનાનો થોડો ભાગ કપાઈ ગયો છે. આખું પાનું ફ્રેમમાં રાખીને ફરી લો.",
+      "not-a-list": "આમાં મહેમાનોની યાદી ન મળી.",
+      unsupported: "આવી ફાઇલ અમે વાંચી શકતા નથી. તેનો ફોટો લો.",
+      "too-big": "ફાઇલ બહુ મોટી છે. એક વારમાં ઓછાં પાનાં મોકલો, અથવા ફોટો લો.",
+      "used-up": "વાંચ્યું નહીં: આ આમંત્રણનાં પાનાં પૂરાં થઈ ગયાં.",
+      failed: "આ વાંચી ન શકાયું. કનેક્શન તપાસીને ફરી પ્રયત્ન કરો.",
+    },
+  },
+
   importer: {
     intro:
       "ફોનના કૉન્ટૅક્ટ, Excel કે CSV શીટ, અથવા કૉન્ટૅક્ટ ફાઇલમાંથી મહેમાનો લાવો. દરેકને પોતાની અંગત લિંક મળે છે.",
@@ -177,6 +268,8 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     another: "બીજી પસંદ કરો",
     nameColumn: "નામની કૉલમ",
     phoneColumn: "નંબરની કૉલમ",
+    groupColumn: "જૂથની કૉલમ",
+    partyColumn: "લોકોની સંખ્યાની કૉલમ",
     noColumn: "કોઈ નહીં",
     firstAndLast: (first, last) => `${first} + ${last}`,
     column: (label) => `કૉલમ ${label}`,
@@ -193,6 +286,25 @@ export const dashboardCopy: Translation<typeof en.dashboardCopy> = {
     partial: (done, total) =>
       `${n(total)} માંથી ${n(done)} મહેમાન ઉમેરાયા. ઇન્ટરનેટ તપાસીને બાકીના ફરી ઉમેરો.`,
     nothingPicked: "ઉમેરવા માટે ઓછામાં ઓછા એક મહેમાન પર ટિક કરો",
+    toCheck: (count) =>
+      count === 1
+        ? "1 મહેમાનને એક વાર જોઈ લો. તે સૌથી ઉપર છે."
+        : `${n(count)} મહેમાનોને એક વાર જોઈ લો. તેઓ સૌથી ઉપર છે.`,
+    flags: {
+      noName: "નામ લખો",
+      phone: "આ નંબર તપાસો",
+      unsure: "વાંચવામાં મુશ્કેલ, તપાસી લો",
+    },
+    edited: "બદલ્યું",
+    editRow: (name) => `${name} બદલો`,
+    editName: "નામ",
+    editPhone: "WhatsApp નંબર",
+    editGroup: "જૂથ",
+    editParty: "લોકો",
+    editDone: "થઈ ગયું",
+    editCancel: "રદ કરો",
+    seePage: (page) => `પાનું ${page} જુઓ`,
+    groupHint: "જે મહેમાનોનું હજી કોઈ જૂથ નથી તેમના માટે.",
   },
 
   opens: {

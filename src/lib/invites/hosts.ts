@@ -109,6 +109,7 @@ type HostStore = {
   updateGuest(account: Account, id: string, guestId: string, patch: GuestPatch): Promise<boolean>;
   removeGuests(account: Account, id: string, guestIds: string[]): Promise<boolean>;
   markReminded(account: Account, id: string, guestIds: string[]): Promise<boolean>;
+  markSent(account: Account, id: string, guestIds: string[]): Promise<boolean>;
   scheduleSend(account: Account, id: string, send: NewSend): Promise<string | null>;
   closeSend(
     account: Account,
@@ -133,6 +134,8 @@ const GUEST_COLUMNS =
   "id, name, phone, group_name, party_size, token, function_ids, self_added, opened_at, reminded_at, created_at";
 /** Visit counts arrive with 20261002170000_guest_opens.sql; until it runs the list reads without them. */
 const OPEN_COLUMNS = ", last_opened_at, open_count";
+/** When each guest was sent their invitation; arrives with 20261019090000_guest_sending_and_list_reading.sql. */
+const SENT_COLUMNS = ", sent_at";
 const SEND_COLUMNS = "id, channel, purpose, function_id, send_at, status";
 const REPLY_COLUMNS =
   "guest_id, function_id, status, adults, children, message, answers, responded_at";
@@ -197,6 +200,7 @@ type GuestRow = {
   opened_at: string | null;
   last_opened_at?: string | null;
   open_count?: number;
+  sent_at?: string | null;
   reminded_at: string | null;
   created_at: string;
 };
@@ -239,7 +243,8 @@ const supabaseStore: HostStore = {
         )
         .eq("id", id)
         .maybeSingle();
-    let { data, error } = await read(GUEST_COLUMNS + OPEN_COLUMNS);
+    let { data, error } = await read(GUEST_COLUMNS + OPEN_COLUMNS + SENT_COLUMNS);
+    if (error) ({ data, error } = await read(GUEST_COLUMNS + OPEN_COLUMNS));
     if (error) ({ data, error } = await read(GUEST_COLUMNS));
     if (error || !data) return null;
     const row = data as unknown as EventRow & {
@@ -309,6 +314,7 @@ const supabaseStore: HostStore = {
             openedAt: guest.opened_at,
             lastOpenedAt: guest.last_opened_at ?? guest.opened_at,
             openCount: guest.open_count ?? (guest.opened_at ? 1 : 0),
+            sentAt: guest.sent_at ?? null,
             remindedAt: guest.reminded_at,
             createdAt: guest.created_at,
           },
@@ -377,6 +383,17 @@ const supabaseStore: HostStore = {
     const { error } = await supabase
       .from("guests")
       .update({ reminded_at: new Date().toISOString() })
+      .eq("event_id", id)
+      .in("id", guestIds);
+    return !error;
+  },
+
+  async markSent(_account, id, guestIds) {
+    const supabase = await supabaseServer();
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from("guests")
+      .update({ sent_at: new Date().toISOString() })
       .eq("event_id", id)
       .in("id", guestIds);
     return !error;
@@ -551,6 +568,7 @@ function previewGuestView(guest: PreviewGuest): HostGuest {
       openedAt: guest.openedAt ?? null,
       lastOpenedAt: guest.lastOpenedAt ?? guest.openedAt ?? null,
       openCount: guest.openCount ?? (guest.openedAt ? 1 : 0),
+      sentAt: guest.sentAt ?? null,
       remindedAt: guest.remindedAt ?? null,
       createdAt: guest.createdAt ?? new Date(0).toISOString(),
     },
@@ -659,6 +677,14 @@ const previewStore: HostStore = {
     const now = new Date().toISOString();
     for (const guest of guestsOf(id)) {
       if (guestIds.includes(guest.id ?? guest.token)) guest.remindedAt = now;
+    }
+    return true;
+  },
+  async markSent(account, id, guestIds) {
+    if (!hosted(account, id)) return false;
+    const now = new Date().toISOString();
+    for (const guest of guestsOf(id)) {
+      if (guestIds.includes(guest.id ?? guest.token)) guest.sentAt = now;
     }
     return true;
   },

@@ -66,6 +66,10 @@ database keeps every invite. Applied so far after the first setup:
   occasion, theme or card languages, straight through the database, so nobody skips the
   package check. The site does both with `SUPABASE_SERVICE_ROLE_KEY` after checking. Safe to
   run any time after the code is live.
+- `20261019090000_guest_sending_and_list_reading.sql` — sending from the guest list and reading
+  guest lists with AI: `guests.sent_at` (who has been sent their invitation, for "Send to
+  many"), and `list_readings` with `use_list_pages()` counting the pages AI reads per invite.
+  Before it runs nobody shows as sent and reading lists is refused; everything else works.
 
 ## Setting up a project
 

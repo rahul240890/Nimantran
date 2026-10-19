@@ -5,6 +5,7 @@ import { AccountShell } from "@/components/account/account-shell";
 import { GuestDashboard } from "@/components/dashboard/guest-dashboard";
 import { PageTransition } from "@/components/motion/page-transition";
 import { getAccount } from "@/lib/auth/server";
+import { listPagesLeft, listReading } from "@/lib/guests/read-list-server";
 import { hostStore } from "@/lib/invites/hosts";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { cohostLimit, inviteLimit } from "@/lib/plans/catalog";
@@ -35,6 +36,8 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
   const origin = await requestOrigin();
   const edition = (await editionsActive()) ? await invitePlan(account, id) : null;
   const plan = edition?.plan ?? null;
+  const reading = listReading();
+  const pages = reading ? await listPagesLeft(account, id).catch(() => null) : null;
   return (
     <PageTransition>
       <AccountShell>
@@ -57,6 +60,7 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
             plan,
             cohostLimit: plan ? cohostLimit(plan) : null,
             inviteLimit: plan ? inviteLimit(plan, await getPricing()) : null,
+            listReading: reading && pages ? { pdf: reading.pdf, ...pages } : null,
             schedules: data.schedules,
             now: new Date().toISOString(),
           }}

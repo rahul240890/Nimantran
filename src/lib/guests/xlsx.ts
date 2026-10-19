@@ -160,3 +160,24 @@ export async function readXlsx(data: ArrayBuffer | Uint8Array): Promise<string[]
   }
   return rows;
 }
+
+/**
+ * The text of a Word document (.docx), one paragraph per line and table cells split by
+ * tabs, for reading a guest list typed in Word. Same zip reading as Excel above.
+ */
+export async function readDocx(data: ArrayBuffer | Uint8Array): Promise<string> {
+  const bytes = data instanceof Uint8Array ? data : new Uint8Array(data);
+  const entry = zipEntries(bytes).find((item) => item.name === "word/document.xml");
+  if (!entry) throw new Error("not a Word document");
+  const xml = await readEntry(bytes, entry);
+  const lines: string[] = [];
+  for (const paragraph of xml.matchAll(/<w:p\b[^>]*?(?:\/>|>([\s\S]*?)<\/w:p>)/g)) {
+    const body = (paragraph[1] ?? "").replace(/<w:tab\/>/g, "<w:t>\t</w:t>");
+    lines.push(textOf(body));
+  }
+  // A table row's cells are paragraphs of their own; good enough for a list to be read by AI
+  return lines
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
