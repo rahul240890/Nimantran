@@ -127,6 +127,375 @@
   border-bottom: 1px solid color-mix(in oklab, var(--guest-gilt) 45%, transparent);
 }
 
+/*
+ * Each celebration's box (event-box.tsx, event-boxes.ts). The box's wrapper carries its
+ * name in data-box; the article inside is still the theme's cloth card, reshaped here.
+ * Boxes cut by a mask or a clip throw their shadow from the wrapper instead.
+ */
+.guest-box {
+  isolation: isolate;
+}
+.guest-box:is([data-box="cusped"], [data-box="mandap"], [data-box="petal"], [data-box="tag"]) {
+  margin-top: 3rem;
+}
+.guest-box:is([data-box="ticket"], [data-box="stamp"], [data-box="tag"], [data-box="scallop"]) {
+  filter: drop-shadow(0 18px 20px rgb(0 0 0 / 0.32));
+}
+.guest-themed
+  .guest-box:is([data-box="ticket"], [data-box="stamp"], [data-box="tag"], [data-box="scallop"])
+  > .guest-card {
+  box-shadow: none;
+}
+
+/* The roofs above a box, and the corner flourishes */
+.guest-roof {
+  overflow: visible;
+}
+.guest-roof-fill {
+  fill: var(--guest-cloth);
+}
+.guest-roof-line {
+  fill: none;
+  stroke: var(--guest-gilt);
+  stroke-width: 1.5px;
+}
+.guest-corner path {
+  fill: none;
+  stroke: var(--guest-gilt);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.guest-corner .guest-corner-thin {
+  stroke-width: 1;
+  opacity: 0.7;
+}
+.guest-corner .guest-corner-gem {
+  fill: var(--guest-jewel);
+  stroke-width: 1;
+}
+.guest-tag-string path {
+  fill: none;
+  stroke: var(--guest-jewel);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+
+/* The headings: a date seal, a stub, a ribbon, a large number */
+.guest-seal {
+  display: grid;
+  place-content: center;
+  width: 4.5rem;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+  border-radius: 50%;
+  line-height: 1;
+  text-align: center;
+  color: var(--card-ivory);
+  background: color-mix(in oklab, var(--guest-jewel) 55%, black);
+  box-shadow:
+    0 0 0 3px var(--guest-cloth),
+    0 0 0 4.5px var(--guest-gilt),
+    0 10px 18px -8px rgb(0 0 0 / 0.45);
+}
+.guest-stub {
+  border-inline-end: 2px dashed color-mix(in oklab, var(--guest-gilt) 75%, transparent);
+}
+.guest-box-ribbon {
+  margin-inline: -2rem;
+  padding: 0.6rem 2.25rem;
+  color: var(--card-ivory);
+  background: color-mix(in oklab, var(--guest-jewel) 55%, black);
+  clip-path: polygon(0 0, 100% 0, calc(100% - 0.9rem) 50%, 100% 100%, 0 100%, 0.9rem 50%);
+}
+.guest-box-number {
+  font-size: 3.75rem;
+  color: color-mix(in oklab, var(--guest-jewel) 70%, transparent);
+  -webkit-text-stroke: 1px var(--guest-gilt);
+}
+
+/* A jharokha: an arched window, its date seal at the crown */
+.guest-themed .guest-box[data-box="jharokha"] {
+  margin-top: 2.5rem;
+}
+.guest-themed .guest-box[data-box="jharokha"] > .guest-card {
+  border-radius: 50% 50% 1rem 1rem / 6rem 6rem 1rem 1rem;
+  padding-top: 3.25rem;
+}
+.guest-themed .guest-box[data-box="jharokha"] > .guest-card::before {
+  content: "";
+  position: absolute;
+  inset: 0.7rem;
+  border-radius: 50% 50% 0.5rem 0.5rem / 5.3rem 5.3rem 0.5rem 0.5rem;
+  border: 1px dashed color-mix(in oklab, var(--guest-gilt) 75%, transparent);
+  pointer-events: none;
+}
+.guest-themed .guest-box[data-box="jharokha"] .guest-seal {
+  position: absolute;
+  top: -2.25rem;
+  left: 50%;
+  translate: -50% 0;
+}
+
+/* A Mughal arch, a mandap and a lotus: square shoulders under their roofs */
+.guest-themed .guest-box:is([data-box="cusped"], [data-box="mandap"]) > .guest-card {
+  border-radius: 0.35rem;
+}
+.guest-themed .guest-box[data-box="petal"] > .guest-card {
+  border-radius: 0.35rem 0.35rem 2.5rem 2.5rem;
+  background: var(--guest-cloth);
+  box-shadow:
+    inset 0 0 0 1px var(--guest-gilt),
+    inset 0 0 0 5px var(--guest-cloth),
+    inset 0 0 0 6px color-mix(in oklab, var(--guest-gilt) 70%, transparent),
+    0 28px 50px -26px rgb(0 0 0 / 0.5);
+  padding-bottom: 2.25rem;
+}
+
+/* Gilt corners round one fine line */
+.guest-themed .guest-box[data-box="corners"] > .guest-card {
+  border-radius: 0.25rem;
+  padding: 2rem 1.5rem;
+  box-shadow:
+    inset 0 0 0 0.55rem var(--guest-cloth),
+    inset 0 0 0 calc(0.55rem + 1px) var(--guest-gilt),
+    0 28px 50px -26px rgb(0 0 0 / 0.5);
+}
+@media (min-width: 40rem) {
+  .guest-themed .guest-box[data-box="corners"] > .guest-card {
+    padding: 2.5rem 2.25rem;
+  }
+  .guest-box-ribbon {
+    margin-inline: -2.75rem;
+  }
+}
+
+/* A scroll between two rods, shaded where it curls */
+.guest-themed .guest-box[data-box="scroll"] > .guest-card {
+  border-radius: 0.2rem;
+  padding-block: 2.5rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--guest-gilt) 22%, var(--guest-cloth)),
+    var(--guest-cloth) 1.75rem calc(100% - 1.75rem),
+    color-mix(in oklab, var(--guest-gilt) 22%, var(--guest-cloth))
+  );
+  box-shadow:
+    inset 1px 0 0 color-mix(in oklab, var(--guest-gilt) 60%, transparent),
+    inset -1px 0 0 color-mix(in oklab, var(--guest-gilt) 60%, transparent),
+    0 28px 50px -26px rgb(0 0 0 / 0.5);
+}
+.guest-box[data-box="scroll"]::before,
+.guest-box[data-box="scroll"]::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset-inline: -0.6rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 0.6rem 50%, var(--guest-jewel) 0 0.42rem, transparent 0.45rem),
+    radial-gradient(
+      circle at calc(100% - 0.6rem) 50%,
+      var(--guest-jewel) 0 0.42rem,
+      transparent 0.45rem
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--guest-gilt) 65%, white),
+      var(--guest-gilt) 45%,
+      color-mix(in oklab, var(--guest-gilt) 65%, black)
+    );
+  box-shadow: 0 5px 8px -4px rgb(0 0 0 / 0.45);
+}
+.guest-box[data-box="scroll"]::before {
+  top: -0.6rem;
+}
+.guest-box[data-box="scroll"]::after {
+  bottom: -0.6rem;
+}
+
+/* Under a toran: pennants in jewel and gilt hung from a cord */
+.guest-themed .guest-box[data-box="toran"] > .guest-card {
+  border-radius: 0.5rem;
+  padding-top: 2.75rem;
+}
+.guest-themed .guest-box[data-box="toran"] > .guest-card::before,
+.guest-themed .guest-box[data-box="toran"] > .guest-card::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.6rem;
+  pointer-events: none;
+}
+.guest-themed .guest-box[data-box="toran"] > .guest-card::before {
+  top: 0.6rem;
+  height: 1.3rem;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--guest-jewel) 0 1.4rem,
+    var(--guest-gilt) 1.4rem 2.8rem
+  );
+  mask: conic-gradient(from 152deg at 50% 0, black 56deg, transparent 0) 0 0 / 1.4rem 100% repeat-x;
+}
+.guest-themed .guest-box[data-box="toran"] > .guest-card::after {
+  top: 0.5rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--guest-gilt);
+}
+
+/* A ticket: the stub torn from its counterfoil along the dots */
+.guest-themed .guest-box[data-box="ticket"] > .guest-card {
+  gap: 0;
+  padding: 0;
+  background: none;
+}
+.guest-ticket-top,
+.guest-ticket-bottom {
+  background: var(--guest-cloth);
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--guest-gilt) 70%, transparent);
+}
+.guest-ticket-top {
+  border-radius: 1rem 1rem 0 0;
+  background: color-mix(in oklab, var(--guest-jewel) 12%, var(--guest-cloth));
+  border-bottom: 2px dashed color-mix(in oklab, var(--guest-gilt) 75%, transparent);
+  mask:
+    radial-gradient(circle at 0 100%, transparent 0.75rem, black 0.78rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 100%, transparent 0.75rem, black 0.78rem) right / 51% 100%
+      no-repeat;
+}
+.guest-ticket-bottom {
+  border-radius: 0 0 1rem 1rem;
+  mask:
+    radial-gradient(circle at 0 0, transparent 0.75rem, black 0.78rem) left / 51% 100% no-repeat,
+    radial-gradient(circle at 100% 0, transparent 0.75rem, black 0.78rem) right / 51% 100% no-repeat;
+}
+
+/* A postage stamp: perforated edges, a frame inside and a postmark with the date */
+.guest-box[data-box="stamp"] {
+  rotate: -0.6deg;
+}
+.guest-themed .guest-box[data-box="stamp"] > .guest-card {
+  border-radius: 0;
+  padding: 2rem 1.75rem;
+  mask:
+    linear-gradient(black 0 0) center / calc(100% - 0.7rem) calc(100% - 0.7rem) no-repeat,
+    radial-gradient(circle at 50% 50%, transparent 0.32rem, black 0.34rem) -0.45rem -0.45rem /
+      0.9rem 0.9rem round;
+}
+.guest-themed .guest-box[data-box="stamp"] > .guest-card::before {
+  content: "";
+  position: absolute;
+  inset: 0.9rem;
+  border: 1px solid color-mix(in oklab, var(--guest-gilt) 75%, transparent);
+  pointer-events: none;
+}
+.guest-themed .guest-box[data-box="stamp"] .guest-seal {
+  position: absolute;
+  top: 1.25rem;
+  inset-inline-end: 1.25rem;
+  rotate: -12deg;
+  /* The postmark's ink is the card's accent words, so the date reads on every cloth */
+  color: var(--accent-text);
+  background: none;
+  box-shadow:
+    inset 0 0 0 2px var(--accent-text),
+    inset 0 0 0 5px var(--guest-cloth),
+    inset 0 0 0 6px var(--accent-text);
+}
+
+/* A gift tag: corners cut, a hole at the top and the string through it */
+.guest-themed .guest-box[data-box="tag"] > .guest-card {
+  border-radius: 0 0 0.75rem 0.75rem;
+  padding-top: 3.25rem;
+  background: linear-gradient(
+    color-mix(in oklab, var(--guest-jewel) 14%, var(--guest-cloth)) 0 2.75rem,
+    var(--guest-cloth) 0
+  );
+  clip-path: polygon(1.75rem 0, calc(100% - 1.75rem) 0, 100% 1.75rem, 100% 100%, 0 100%, 0 1.75rem);
+  mask: radial-gradient(circle at 50% 1.4rem, transparent 0.45rem, black 0.48rem);
+}
+.guest-themed .guest-box[data-box="tag"] > .guest-card::before {
+  content: "";
+  position: absolute;
+  top: calc(1.4rem - 0.7rem);
+  left: 50%;
+  translate: -50% 0;
+  width: 1.4rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid var(--guest-gilt);
+  pointer-events: none;
+}
+
+/* Lace: scallops round the edge and a stitched line inside */
+.guest-themed .guest-box[data-box="scallop"] > .guest-card {
+  border-radius: 0;
+  padding-block: 2rem;
+  background: var(--guest-cloth);
+}
+.guest-themed .guest-box[data-box="scallop"] > .guest-card::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -0.55rem;
+  background: radial-gradient(
+      circle,
+      var(--guest-cloth) 0 0.5rem,
+      var(--guest-gilt) 0.5rem 0.58rem,
+      transparent 0.6rem
+    )
+    0 0 / 1.1rem 1.1rem round;
+  pointer-events: none;
+}
+.guest-themed .guest-box[data-box="scallop"] > .guest-card::after {
+  content: "";
+  position: absolute;
+  inset: 0.7rem;
+  border: 1.5px dashed color-mix(in oklab, var(--guest-gilt) 75%, transparent);
+  border-radius: 0.3rem;
+  pointer-events: none;
+}
+
+/*
+ * Every celebration on one thread through the day: on phones the thread runs down the
+ * start edge, a bead with the hour's painting at each box; wider, it runs down the middle
+ * with the boxes on alternate sides and each one's day and time across from it.
+ */
+.guest-line {
+  position: relative;
+}
+.guest-line::before {
+  content: "";
+  position: absolute;
+  inset-block: 1.5rem;
+  inset-inline-start: calc(1.5rem - 1px);
+  width: 2px;
+  background: linear-gradient(
+    var(--guest-gilt),
+    var(--guest-gilt) 85%,
+    color-mix(in oklab, var(--guest-gilt) 20%, transparent)
+  );
+}
+.guest-line-bead {
+  width: 3rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--guest-jewel);
+  box-shadow:
+    0 0 0 3px var(--guest-cloth),
+    0 0 0 4.5px var(--guest-gilt),
+    0 10px 18px -8px rgb(0 0 0 / 0.45);
+}
+@media (min-width: 48rem) {
+  .guest-line::before {
+    inset-inline-start: calc(50% - 1px);
+  }
+  .guest-line-bead {
+    width: 5.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .guest-polaroid {
     transition: none;

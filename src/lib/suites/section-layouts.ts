@@ -13,8 +13,11 @@ export const SECTION_LAYOUTS = {
   date: ["medallion", "calendar", "ticket"],
   /** The day's plan above the celebrations: cards, a timeline, or tiles. */
   plan: ["cards", "timeline", "tiles"],
-  /** Each celebration's hour: painting beside the card, the card over the painting, or sides that alternate. */
-  hours: ["split", "overlay", "zigzag"],
+  /**
+   * Each celebration's hour: painting beside the card, the card over the painting, sides
+   * that alternate, or every celebration strung on one thread through the day.
+   */
+  hours: ["split", "overlay", "zigzag", "timeline"],
   /** The photos at dusk: a film to scroll, polaroids on a table, or a mosaic. */
   photos: ["film", "polaroids", "mosaic"],
   /** The family: cards, one scroll with ornaments between, or ribbons. */
@@ -25,7 +28,7 @@ export type SectionPart = keyof typeof SECTION_LAYOUTS;
 export type SectionLayouts = { [P in SectionPart]: (typeof SECTION_LAYOUTS)[P][number] };
 
 /** A small, stable hash: the same theme always gets the same page, on server and client. */
-function hash(text: string): number {
+export function hash(text: string): number {
   let h = 2166136261;
   for (let i = 0; i < text.length; i++) {
     h ^= text.charCodeAt(i);

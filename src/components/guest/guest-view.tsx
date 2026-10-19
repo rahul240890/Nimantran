@@ -404,6 +404,9 @@ export function GuestView({
                   copy={copy}
                   lang={language}
                   functions={details}
+                  days={Object.fromEntries(
+                    details.map((fn) => [fn.kind, draft.functions[fn.kind].date]),
+                  )}
                   main={
                     mainKind && mainDate
                       ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
