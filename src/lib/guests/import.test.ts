@@ -2,9 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   contactSources,
   detectColumns,
+  needsCheck,
   parseCsv,
   parseVcard,
   sheetSources,
+  textSources,
   toImportRows,
 } from "./import";
 import type { HostGuest } from "./list";
@@ -21,6 +23,7 @@ const existing = (over: Partial<HostGuest>): HostGuest => ({
   openedAt: null,
   lastOpenedAt: null,
   openCount: 0,
+  sentAt: null,
   remindedAt: null,
   createdAt: "2026-09-26T00:00:00Z",
   replies: [],
@@ -61,12 +64,17 @@ describe("working out the columns", () => {
     expect(fromSheet(rows)).toEqual([
       {
         key: 0,
+        source: 0,
         name: "Sharma uncle",
         phone: "+919876543210",
         group: "Bride",
         partySize: 4,
         error: null,
         duplicate: false,
+        rawPhone: null,
+        unsure: false,
+        page: null,
+        edited: false,
       },
     ]);
   });
@@ -186,5 +194,59 @@ describe("contacts", () => {
       { name: "Rohan", phones: ["+91 98765 43210"] },
       { name: "", phones: ["9876500000"] },
     ]);
+  });
+});
+
+describe("notes files", () => {
+  it("reads a notepad list like a pasted one, past the paste limit", () => {
+    const text = "Sharma uncle, 98765 43210 (4)\nDadi\n" + "Guest\n".repeat(400);
+    const rows = toImportRows(textSources(text), []);
+    expect(rows[0]).toMatchObject({ name: "Sharma uncle", phone: "+919876543210", partySize: 4 });
+    expect(rows[1]).toMatchObject({ name: "Dadi", phone: null });
+    expect(rows.length).toBe(402);
+  });
+
+  it("keeps a number it can't read, so the row asks for a look", () => {
+    const [row] = toImportRows(textSources("Meera 123456789"), []);
+    expect(row).toMatchObject({ name: "Meera", phone: null, error: "phone" });
+    expect(needsCheck(row!)).toBe(true);
+  });
+});
+
+describe("editing during the review", () => {
+  const sources = [
+    { name: "Pinky ❤️", phones: ["98765 43210"] },
+    { name: "", phones: ["98765 00000"] },
+  ];
+
+  it("applies the host's changes by the guest's place, and clears the flags they fix", () => {
+    const edits = new Map([
+      [1, { name: "Meera Iyer", phone: "98765 00000", group: "Office", partySize: 2 }],
+    ]);
+    const rows = toImportRows(sources, [], edits);
+    expect(rows[1]).toMatchObject({
+      source: 1,
+      name: "Meera Iyer",
+      group: "Office",
+      partySize: 2,
+      error: null,
+      edited: true,
+    });
+    expect(rows[0]).toMatchObject({ source: 0, edited: false });
+  });
+
+  it("flags guests AI wasn't sure of until the host edits them", () => {
+    const unsure = [
+      { name: "Ramesh", phones: ["98765 4321?"], unsure: ["phone" as const], page: 2 },
+    ];
+    const [row] = toImportRows(unsure, []);
+    expect(row).toMatchObject({ unsure: true, page: 2, error: "phone", rawPhone: "98765 4321?" });
+    expect(needsCheck(row!)).toBe(true);
+    const [fixed] = toImportRows(
+      unsure,
+      [],
+      new Map([[0, { name: "Ramesh", phone: "98765 43219", group: "", partySize: 1 }]]),
+    );
+    expect(needsCheck(fixed!)).toBe(false);
   });
 });

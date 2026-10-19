@@ -76,6 +76,7 @@ export type PreviewGuest = {
   openedAt?: string | null;
   lastOpenedAt?: string | null;
   openCount?: number;
+  sentAt?: string | null;
   remindedAt?: string | null;
   createdAt?: string;
 };

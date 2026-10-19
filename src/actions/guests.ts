@@ -85,6 +85,14 @@ export async function markReminded(inviteId: string, ids: unknown): Promise<bool
   return ctx.store.markReminded(ctx.account, inviteId, parsed.data).catch(() => false);
 }
 
+/** Records that invitations went out, after the host sends them from their own WhatsApp. */
+export async function markSent(inviteId: string, ids: unknown): Promise<boolean> {
+  const parsed = guestIds.safeParse(ids);
+  const ctx = await context(inviteId);
+  if (!ctx || !parsed.success) return false;
+  return ctx.store.markSent(ctx.account, inviteId, parsed.data).catch(() => false);
+}
+
 const sendSchema = z.object({
   purpose: z.enum(SEND_PURPOSES),
   functionId: z.string().min(1).max(80).nullable(),

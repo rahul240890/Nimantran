@@ -18,6 +18,7 @@ import { useText } from "@/i18n/client";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import { FunctionPicker, toStored } from "./guest-fields";
 import { GuestImport } from "./guest-import";
+import type { DashboardView } from "./types";
 
 function PartySize({ value, onChange }: { value: number; onChange: (value: number) => void }) {
   const copy = useText(dashboardText).dashboardCopy.form;
@@ -275,6 +276,7 @@ export function GuestFormDialog({
   functions,
   guests,
   guest,
+  reading = null,
   onDone,
 }: {
   inviteId: string;
@@ -282,11 +284,17 @@ export function GuestFormDialog({
   /** Everyone on the list already, so an import can skip them. */
   guests: HostGuest[];
   guest?: HostGuest;
+  /** Reading guest lists with AI, when the server has it. */
+  reading?: DashboardView["listReading"];
   onDone: () => void;
 }) {
   const copy = useText(dashboardText).dashboardCopy.form;
   return (
-    <DialogContent title={guest ? copy.editTitle : copy.addTitle} closeLabel={copy.close}>
+    <DialogContent
+      title={guest ? copy.editTitle : copy.addTitle}
+      closeLabel={copy.close}
+      className={guest ? undefined : "sm:max-w-2xl"}
+    >
       {guest ? (
         <SingleGuest inviteId={inviteId} functions={functions} guest={guest} onDone={onDone} />
       ) : (
@@ -304,6 +312,7 @@ export function GuestFormDialog({
               inviteId={inviteId}
               functions={functions}
               guests={guests}
+              reading={reading}
               onDone={onDone}
             />
           </TabsContent>

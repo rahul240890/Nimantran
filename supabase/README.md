@@ -69,6 +69,10 @@ database keeps every invite. Applied so far after the first setup:
 - `20261019090000_site_visits.sql` — visitor counts for the admin's Visitors page:
   `site_visits`, `visit_salts`, `record_visit()` and `visit_summary()`. Counting starts on the
   live site once it runs; before that the page says so and nothing breaks.
+- `20261019100000_guest_sending_and_list_reading.sql` — sending from the guest list and reading
+  guest lists with AI: `guests.sent_at` (who has been sent their invitation, for "Send to
+  many"), and `list_readings` with `use_list_pages()` counting the pages AI reads per invite.
+  Before it runs nobody shows as sent and reading lists is refused; everything else works.
 
 ## Setting up a project
 
