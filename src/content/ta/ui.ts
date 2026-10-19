@@ -36,6 +36,7 @@ export const uiStrings: Translation<typeof en> = {
       textBox: "எழுத்துகளுக்குப் பின் பெட்டி",
       more: "விவரங்களைப் பார்க்கவும்",
       calendarShort: "நாள்காட்டி",
+      loading: "பக்கம் திறக்கிறது",
     },
     tour: {
       label: "அழைப்பிதழ் தானாக நகர்கிறது",

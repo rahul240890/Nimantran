@@ -579,6 +579,7 @@ function Celebrations({
                     src={image}
                     alt=""
                     fill
+                    unoptimized
                     sizes="100vw"
                     className="object-cover object-[50%_40%]"
                   />
@@ -602,6 +603,7 @@ function Celebrations({
                       src={image}
                       alt=""
                       fill
+                      unoptimized
                       sizes="(min-width: 48rem) 20rem, 68vw"
                       className="object-cover object-[50%_40%]"
                     />

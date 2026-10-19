@@ -1,4 +1,5 @@
 import type { CategoryId } from "@/lib/categories/catalog";
+import { tintIndex } from "@/lib/initials";
 import type { StoryId, SuiteId, ThemedId } from "@/lib/suites/catalog";
 import { isStoryId, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 import type { TemplateId } from "@/lib/templates/ids";
@@ -500,6 +501,27 @@ const OCCASION_OPENING: Partial<Record<CategoryId, OpeningStyle>> = {
   "karva-chauth": "odhni",
 };
 export type OpeningStyle = (typeof OPENING_STYLES)[number];
+
+/**
+ * How the names sit on the opening's first screen (owner, 2026-10-19: one cream plate on
+ * every opening hid the gate or painting behind it, and every design looked alike). None is
+ * a box: the names come big in the welcome and on the pages, so here they only say whose
+ * invitation it is.
+ * - print: on the art where the plate was, in ivory with a soft glow (the drawn openings)
+ * - foot: one line over the ground, above the countdown, the painting left whole
+ * - seal: the initials in a small gilt ring at the foot, the names small under it
+ * - quiet: not shown; the painting alone, and the names are read out to screen readers
+ * Paintings mix them, by the opening, so designs side by side don't greet alike.
+ */
+export type OpeningNames = "print" | "foot" | "seal" | "quiet";
+
+export function openingNames(style: OpeningStyle): OpeningNames {
+  const pick = (looks: readonly OpeningNames[]) => looks[tintIndex(style, looks.length)]!;
+  if (isPaintedGate(style)) return pick(["foot", "quiet"]);
+  if (isFreshOpening(style)) return pick(["seal", "foot"]);
+  if (isThemedOpening(style)) return pick(["foot", "seal", "quiet"]);
+  return "print";
+}
 
 /** The openings that suit a wedding, of any faith (HINDU_OPENINGS are kept to Hindu cards). */
 const WEDDING_OPENINGS: readonly OpeningStyle[] = [

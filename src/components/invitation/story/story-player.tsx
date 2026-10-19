@@ -5,6 +5,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  LoaderCircle,
   MailCheck,
   Navigation,
   Pause,
@@ -30,6 +31,7 @@ import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
+import { usePaintingReady, warmPaintings } from "@/lib/paintings";
 import { useCalendarLink } from "@/lib/publish/calendar-link";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type StoryBeat } from "@/lib/engine/story";
@@ -85,6 +87,8 @@ export type StoryLabels = {
   textBox: string;
   /** The last page's way on to the details below, when the page carries on there. */
   more: string;
+  /** Said while a page's painting is still on its way. */
+  loading: string;
 };
 
 type StoryPlayerProps = {
@@ -223,7 +227,9 @@ export function StoryPlayer({
   const [held, setHeld] = useState(false);
   const beat = beats[index];
   const last = index >= beats.length - 1;
-  const running = !still && !paused && !hidden && !held;
+  // A page comes in once its painting is there, so its words never show on an empty page
+  const painted = usePaintingReady(beat ? pageImage(suiteId, beat) : undefined);
+  const running = !still && !paused && !hidden && !held && painted;
 
   const go = useCallback(
     (to: number, at: { x: number; y: number } | null = null) =>
@@ -276,12 +282,7 @@ export function StoryPlayer({
   // Fetch the next page's painting ahead, so it is ready when the page turns
   const upcoming = beats[index + 1];
   const nextImage = upcoming ? pageImage(suiteId, upcoming) : undefined;
-  useEffect(() => {
-    if (!nextImage) return;
-    const image = new Image();
-    image.decoding = "async";
-    image.src = nextImage;
-  }, [nextImage]);
+  useEffect(() => warmPaintings([nextImage]), [nextImage]);
 
   useEffect(() => {
     const onVisibility = () => setHidden(document.visibilityState === "hidden");
@@ -432,7 +433,16 @@ export function StoryPlayer({
           else next(at);
         }}
       >
-        {pages.map((i) => {
+        {!painted && (
+          <span
+            role="status"
+            aria-label={labels.loading}
+            className="absolute inset-0 grid place-items-center text-card-ivory/80"
+          >
+            <LoaderCircle aria-hidden className="size-8 animate-spin motion-still:animate-none" />
+          </span>
+        )}
+        {(painted ? pages : pages.filter((i) => i !== index)).map((i) => {
           const b = beats[i]!;
           const current = i === index;
           return (

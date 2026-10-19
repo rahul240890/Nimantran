@@ -216,6 +216,7 @@ export const guestText: GuestText = {
       textBox: "எழுத்துகளுக்குப் பின் பெட்டி",
       more: "விவரங்களைப் பார்க்க",
       calendarShort: "நாள்காட்டி",
+      loading: "பக்கம் திறக்கிறது",
     },
     tour: {
       label: "அழைப்பிதழ் தானாக நகர்கிறது",

@@ -6928,22 +6928,43 @@ html:has(.guest-snap) {
   background: var(--open-deep);
 }
 
-/* Words: a cream cartouche with a gilt double rule, so names read on any art */
-.opening-plate {
-  background:
-    radial-gradient(
-      ellipse at 50% 0%,
-      color-mix(in oklab, var(--open-light) 35%, transparent),
-      transparent 70%
-    ),
-    var(--open-plate);
-  border-radius: 50% 50% 1rem 1rem / 2.6rem 2.6rem 1rem 1rem;
+/*
+ * The names on the opening (opening/catalog.ts openingNames): never a box over the painting.
+ * Ivory lettering lifted by a soft shadow and a gilt glow; printed on the art, a dark haze
+ * with no edge sits behind them so they read over any painting.
+ */
+.opening-print,
+.opening-foot,
+.opening-seal {
+  text-shadow:
+    0 0.05em 0.12em color-mix(in oklab, var(--night) 75%, transparent),
+    0 0 0.6em color-mix(in oklab, var(--night) 50%, transparent),
+    0 0 1.4em color-mix(in oklab, var(--open-gilt) 30%, transparent);
+}
+.opening-print::before {
+  content: "";
+  position: absolute;
+  inset: -22% -20%;
+  z-index: -1;
+  background: radial-gradient(
+    closest-side,
+    color-mix(in oklab, var(--night) 55%, transparent),
+    color-mix(in oklab, var(--night) 25%, transparent) 60%,
+    transparent
+  );
+}
+.opening-joiner {
+  color: var(--open-gilt-bright);
+}
+/* Initials in a thin gilt ring, over the ground at the foot */
+.opening-seal {
+  background: color-mix(in oklab, var(--night) 45%, transparent);
+  border: 1px solid var(--open-gilt-bright);
   box-shadow:
-    0 0 0 0.3rem var(--open-plate),
-    0 0 0 0.45rem var(--open-gilt),
-    0 1.2rem 2.4rem var(--open-shadow);
-  outline: 1px solid color-mix(in oklab, var(--open-gilt) 70%, transparent);
-  outline-offset: -0.7rem;
+    inset 0 0 0 0.25rem color-mix(in oklab, var(--night) 35%, transparent),
+    inset 0 0 0 calc(0.25rem + 1px) color-mix(in oklab, var(--open-gilt) 70%, transparent),
+    0 0.4rem 1.2rem var(--open-shadow);
+  backdrop-filter: blur(6px);
 }
 .opening-fade {
   transition: opacity 500ms ease;
@@ -8520,12 +8541,6 @@ html:has(.guest-snap) {
   }
 }
 
-/* The names on the opening itself: a soft gilt glow so they read from across a room */
-.opening-names {
-  text-shadow:
-    0 0.04em 0 color-mix(in oklab, var(--open-gilt) 55%, transparent),
-    0 0.08em 0.35em color-mix(in oklab, var(--open-gilt) 30%, transparent);
-}
 .opening-rule {
   width: min(36cqw, 10rem);
   height: 0.6rem;
@@ -8681,32 +8696,6 @@ html:has(.guest-snap) {
 }
 .opening-stage[data-open="true"] .gate-mote {
   visibility: hidden;
-}
-/* The words split with the doors (opening.tsx) */
-.gate-plate-half {
-  visibility: hidden;
-}
-.opening-stage[data-open="true"] .gate-plate-whole {
-  visibility: hidden;
-}
-.opening-stage[data-open="true"] .gate-plate-half {
-  visibility: visible;
-  opacity: 0;
-  transition:
-    translate 1300ms cubic-bezier(0.6, 0, 0.25, 1) 250ms,
-    opacity 900ms ease 500ms;
-}
-.gate-plate-half[data-side="left"] {
-  clip-path: inset(-20% 50% -20% -20%);
-}
-.gate-plate-half[data-side="right"] {
-  clip-path: inset(-20% -20% -20% 50%);
-}
-.opening-stage[data-open="true"] .gate-plate-half[data-side="left"] {
-  translate: -45cqw 0;
-}
-.opening-stage[data-open="true"] .gate-plate-half[data-side="right"] {
-  translate: 45cqw 0;
 }
 @keyframes gate-breathe {
   from {

@@ -27,6 +27,13 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   headers: async () => [
     { source: "/:path*", headers: SECURITY_HEADERS },
+    // The paintings keep their names when redrawn, so a day's cache, refreshed quietly after
+    ...["/suites/:path*", "/openings/:path*"].map((source) => ({
+      source,
+      headers: [
+        { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
+      ],
+    })),
     // The host's preview plays the guest page inside a phone on its own page (wide screens)
     {
       source: "/invites/:id/preview",

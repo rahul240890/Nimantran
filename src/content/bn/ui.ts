@@ -39,6 +39,7 @@ export const uiStrings: Translation<typeof en> = {
       textBox: "লেখার পেছনে বাক্স",
       more: "বিস্তারিত দেখুন",
       calendarShort: "ক্যালেন্ডার",
+      loading: "পাতা খুলছে",
     },
     tour: {
       label: "আমন্ত্রণ নিজে থেকেই এগোচ্ছে",
