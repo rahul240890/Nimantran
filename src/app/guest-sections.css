@@ -394,13 +394,13 @@
   top: 1.25rem;
   inset-inline-end: 1.25rem;
   rotate: -12deg;
-  color: var(--guest-jewel);
+  /* The postmark's ink is the card's accent words, so the date reads on every cloth */
+  color: var(--accent-text);
   background: none;
   box-shadow:
-    inset 0 0 0 2px var(--guest-jewel),
+    inset 0 0 0 2px var(--accent-text),
     inset 0 0 0 5px var(--guest-cloth),
-    inset 0 0 0 6px var(--guest-jewel);
-  opacity: 0.85;
+    inset 0 0 0 6px var(--accent-text);
 }
 
 /* A gift tag: corners cut, a hole at the top and the string through it */

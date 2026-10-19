@@ -705,7 +705,7 @@ function Timeline({
                   <span className="font-display text-xl leading-tight text-ink md:text-2xl">
                     {fn.date}
                   </span>
-                  {fn.time && <span className="text-sm text-ink-muted">{fn.time}</span>}
+                  {fn.time && <span className="text-sm text-ink">{fn.time}</span>}
                 </p>
               )}
               {image && (
