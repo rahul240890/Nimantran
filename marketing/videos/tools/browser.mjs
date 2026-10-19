@@ -1,0 +1,5 @@
+import { existsSync } from "node:fs";
+
+// Cloud sessions have a headless Chromium already; elsewhere Remotion downloads its own
+const HEADLESS = "/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell";
+export const browserExecutable = existsSync(HEADLESS) ? HEADLESS : undefined;

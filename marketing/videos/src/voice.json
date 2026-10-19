@@ -1,0 +1,358 @@
+{
+  "maa": {
+    "en": [
+      {
+        "file": "voice/maa-en-0.wav",
+        "text": "Mom wanted to invite every single relative. Personally.",
+        "seconds": 3.563
+      },
+      {
+        "file": "voice/maa-en-1.wav",
+        "text": "Three hundred printed cards? Weeks of visits?",
+        "seconds": 2.748
+      },
+      {
+        "file": "voice/maa-en-2.wav",
+        "text": "So she sent one link on WhatsApp.",
+        "seconds": 1.79
+      },
+      {
+        "file": "voice/maa-en-3.wav",
+        "text": "It opens like a palace gate, with every function inside.",
+        "seconds": 3.248
+      },
+      {
+        "file": "voice/maa-en-4.wav",
+        "text": "Even Grandma replied in one tap.",
+        "seconds": 2.093
+      },
+      {
+        "file": "voice/maa-en-5.wav",
+        "text": "Make your wedding invitation on Shoobh. Start free.",
+        "seconds": 2.807
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/maa-hi-0.wav",
+        "text": "मम्मी हर रिश्तेदार को खुद बुलाना चाहती थीं।",
+        "seconds": 2.968
+      },
+      {
+        "file": "voice/maa-hi-1.wav",
+        "text": "तीन सौ कार्ड छपवाना? हफ़्तों घर घर जाना?",
+        "seconds": 2.959
+      },
+      {
+        "file": "voice/maa-hi-2.wav",
+        "text": "तो उन्होंने वॉट्सऐप पर बस एक लिंक भेजा।",
+        "seconds": 2.56
+      },
+      {
+        "file": "voice/maa-hi-3.wav",
+        "text": "जो महल के दरवाज़े की तरह खुलता है, हर रस्म अंदर।",
+        "seconds": 3.433
+      },
+      {
+        "file": "voice/maa-hi-4.wav",
+        "text": "दादी ने भी एक टैप में जवाब दे दिया।",
+        "seconds": 2.511
+      },
+      {
+        "file": "voice/maa-hi-5.wav",
+        "text": "अपना शादी का निमंत्रण, शुभ पर बनाइए। मुफ़्त में शुरू करें।",
+        "seconds": 3.79
+      }
+    ]
+  },
+  "gate": {
+    "en": [
+      {
+        "file": "voice/gate-en-0.wav",
+        "text": "This is not a wedding card.",
+        "seconds": 1.498
+      },
+      {
+        "file": "voice/gate-en-1.wav",
+        "text": "It's a palace gate, and your guests open it.",
+        "seconds": 2.363
+      },
+      {
+        "file": "voice/gate-en-2.wav",
+        "text": "Every function gets its own painted page, with music.",
+        "seconds": 3.242
+      },
+      {
+        "file": "voice/gate-en-3.wav",
+        "text": "Guests reply in one tap. No app needed.",
+        "seconds": 2.582
+      },
+      {
+        "file": "voice/gate-en-4.wav",
+        "text": "Shoobh Invitation. Make yours free.",
+        "seconds": 2.135
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/gate-hi-0.wav",
+        "text": "ये कोई साधारण निमंत्रण नहीं है।",
+        "seconds": 2.189
+      },
+      {
+        "file": "voice/gate-hi-1.wav",
+        "text": "ये एक महल का दरवाज़ा है, जिसे मेहमान खोलते हैं।",
+        "seconds": 3.353
+      },
+      {
+        "file": "voice/gate-hi-2.wav",
+        "text": "हर रस्म का अपना सुंदर पेज, संगीत के साथ।",
+        "seconds": 3.09
+      },
+      {
+        "file": "voice/gate-hi-3.wav",
+        "text": "मेहमान एक टैप में जवाब देते हैं। कोई ऐप नहीं।",
+        "seconds": 2.837
+      },
+      {
+        "file": "voice/gate-hi-4.wav",
+        "text": "शुभ इन्विटेशन। मुफ़्त में बनाइए।",
+        "seconds": 2.081
+      }
+    ]
+  },
+  "sangeet": {
+    "en": [
+      {
+        "file": "voice/sangeet-en-0.wav",
+        "text": "When the invitation looks this good,",
+        "seconds": 1.772
+      },
+      {
+        "file": "voice/sangeet-en-1.wav",
+        "text": "everyone in the group actually opens it.",
+        "seconds": 2.208
+      },
+      {
+        "file": "voice/sangeet-en-2.wav",
+        "text": "Haldi, mehendi, sangeet. Each one gets its own page.",
+        "seconds": 3.392
+      },
+      {
+        "file": "voice/sangeet-en-3.wav",
+        "text": "And every guest replies for each function, in one tap.",
+        "seconds": 3.093
+      },
+      {
+        "file": "voice/sangeet-en-4.wav",
+        "text": "Shoobh Invitation. Make yours today.",
+        "seconds": 2.269
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/sangeet-hi-0.wav",
+        "text": "जब निमंत्रण इतना सुंदर हो,",
+        "seconds": 1.982
+      },
+      {
+        "file": "voice/sangeet-hi-1.wav",
+        "text": "तो ग्रुप में हर कोई उसे खोलता है।",
+        "seconds": 2.007
+      },
+      {
+        "file": "voice/sangeet-hi-2.wav",
+        "text": "हल्दी, मेहंदी, संगीत। हर रस्म का अपना पेज।",
+        "seconds": 3.088
+      },
+      {
+        "file": "voice/sangeet-hi-3.wav",
+        "text": "और हर मेहमान, हर रस्म के लिए, एक टैप में जवाब देता है।",
+        "seconds": 3.781
+      },
+      {
+        "file": "voice/sangeet-hi-4.wav",
+        "text": "शुभ इन्विटेशन। आज ही बनाइए।",
+        "seconds": 2.08
+      }
+    ]
+  },
+  "price": {
+    "en": [
+      {
+        "file": "voice/price-en-0.wav",
+        "text": "Three hundred printed wedding cards can cost twenty-five thousand rupees or more.",
+        "seconds": 4.553
+      },
+      {
+        "file": "voice/price-en-1.wav",
+        "text": "Plus weeks of delivering them.",
+        "seconds": 1.485
+      },
+      {
+        "file": "voice/price-en-2.wav",
+        "text": "On Shoobh, you can start free. Paid designs from four hundred ninety-nine rupees, paid once.",
+        "seconds": 5.736
+      },
+      {
+        "file": "voice/price-en-3.wav",
+        "text": "One link. Every guest. The same day.",
+        "seconds": 2.26
+      },
+      {
+        "file": "voice/price-en-4.wav",
+        "text": "Make yours now.",
+        "seconds": 0.982
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/price-hi-0.wav",
+        "text": "तीन सौ छपे हुए निमंत्रण पत्र, पच्चीस हज़ार रुपये या उससे भी ज़्यादा।",
+        "seconds": 4.664
+      },
+      {
+        "file": "voice/price-hi-1.wav",
+        "text": "ऊपर से हफ़्तों तक बाँटने की भागदौड़।",
+        "seconds": 2.495
+      },
+      {
+        "file": "voice/price-hi-2.wav",
+        "text": "शुभ पर शुरुआत मुफ़्त। पेड डिज़ाइन सिर्फ़ चार सौ निन्यानवे रुपये से, बस एक बार।",
+        "seconds": 5.195
+      },
+      {
+        "file": "voice/price-hi-3.wav",
+        "text": "एक लिंक। हर मेहमान। उसी दिन।",
+        "seconds": 1.887
+      },
+      {
+        "file": "voice/price-hi-4.wav",
+        "text": "अभी बनाइए।",
+        "seconds": 1.057
+      }
+    ]
+  },
+  "pov": {
+    "en": [
+      {
+        "file": "voice/pov-en-0.wav",
+        "text": "P O V. You're the bride.",
+        "seconds": 1.619
+      },
+      {
+        "file": "voice/pov-en-1.wav",
+        "text": "And all your invitations went out in one evening.",
+        "seconds": 2.549
+      },
+      {
+        "file": "voice/pov-en-2.wav",
+        "text": "One link. A gate that opens. Every function inside.",
+        "seconds": 3.357
+      },
+      {
+        "file": "voice/pov-en-3.wav",
+        "text": "Shoobh Invitation. Try it free.",
+        "seconds": 1.91
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/pov-hi-0.wav",
+        "text": "पी ओ वी। आप दुल्हन हैं।",
+        "seconds": 1.56
+      },
+      {
+        "file": "voice/pov-hi-1.wav",
+        "text": "और आपके सारे निमंत्रण, एक ही शाम में चले गए।",
+        "seconds": 2.962
+      },
+      {
+        "file": "voice/pov-hi-2.wav",
+        "text": "एक लिंक। खुलता हुआ दरवाज़ा। हर रस्म अंदर।",
+        "seconds": 2.839
+      },
+      {
+        "file": "voice/pov-hi-3.wav",
+        "text": "शुभ इन्विटेशन। मुफ़्त में आज़माइए।",
+        "seconds": 2.274
+      }
+    ]
+  },
+  "explainer": {
+    "en": [
+      {
+        "file": "voice/explainer-en-0.wav",
+        "text": "Planning a wedding? Here's the easiest way to invite everyone.",
+        "seconds": 3.509
+      },
+      {
+        "file": "voice/explainer-en-1.wav",
+        "text": "Pick a hand-painted design, from Raajasthaani palaces to Tanjore gold.",
+        "seconds": 4.563
+      },
+      {
+        "file": "voice/explainer-en-2.wav",
+        "text": "Add your names, functions and venues, in Hindi, English, or your own language.",
+        "seconds": 4.292
+      },
+      {
+        "file": "voice/explainer-en-3.wav",
+        "text": "Then send one link on WhatsApp.",
+        "seconds": 1.723
+      },
+      {
+        "file": "voice/explainer-en-4.wav",
+        "text": "Guests open a gate, see every function with directions, and reply in one tap.",
+        "seconds": 4.663
+      },
+      {
+        "file": "voice/explainer-en-5.wav",
+        "text": "And you see every reply in one guest list.",
+        "seconds": 2.302
+      },
+      {
+        "file": "voice/explainer-en-6.wav",
+        "text": "Shoobh Invitation. Start free at shoobh invitations dot com.",
+        "seconds": 3.647
+      }
+    ],
+    "hi": [
+      {
+        "file": "voice/explainer-hi-0.wav",
+        "text": "शादी की तैयारी चल रही है? सबको बुलाने का सबसे आसान तरीका।",
+        "seconds": 4.457
+      },
+      {
+        "file": "voice/explainer-hi-1.wav",
+        "text": "हाथ से पेंट किए डिज़ाइन चुनिए, राजस्थानी महल से तंजौर के सोने तक।",
+        "seconds": 4.641
+      },
+      {
+        "file": "voice/explainer-hi-2.wav",
+        "text": "नाम, रस्में और जगह लिखिए, हिंदी, अंग्रेज़ी या अपनी भाषा में।",
+        "seconds": 3.892
+      },
+      {
+        "file": "voice/explainer-hi-3.wav",
+        "text": "फिर वॉट्सऐप पर बस एक लिंक भेजिए।",
+        "seconds": 2.312
+      },
+      {
+        "file": "voice/explainer-hi-4.wav",
+        "text": "मेहमान दरवाज़ा खोलते हैं, हर रस्म और रास्ता देखते हैं, और एक टैप में जवाब देते हैं।",
+        "seconds": 5.788
+      },
+      {
+        "file": "voice/explainer-hi-5.wav",
+        "text": "और हर जवाब आपको एक ही गेस्ट लिस्ट में दिखता है।",
+        "seconds": 3.143
+      },
+      {
+        "file": "voice/explainer-hi-6.wav",
+        "text": "शुभ इन्विटेशन। मुफ़्त में शुरू करें, शुभ इन्विटेशन्स डॉट कॉम पर।",
+        "seconds": 4.148
+      }
+    ]
+  }
+}

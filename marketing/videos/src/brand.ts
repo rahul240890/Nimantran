@@ -34,6 +34,8 @@ export const color = {
   whatsapp: "#25d366",
   whatsappChat: "#efeae2",
   whatsappBubble: "#d9fdd3",
+  whatsappBar: "#075e54",
+  whatsappTick: "#53bdeb",
 } as const;
 
 /** The site's three faces, with Devanagari fallbacks so Hindi sets as well as English. */

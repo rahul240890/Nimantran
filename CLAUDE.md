@@ -3,6 +3,7 @@
 # Shubh Invitation project notes
 
 - The product is named **Shubh Invitation**, **Shubh** for short (decided 2026-09-27; `site.name` and `site.shortName`). Step 8b renamed everything users see from Shubhdwar; the repository name, database and browser storage keys keep the older names. Brand and SEO rules: `docs/BRAND_SEO.md`.
+- Paid ads (Meta, Google, YouTube): plan, creatives and rules in `docs/ADS.md`; the videos and images are made in `marketing/videos`.
 
 - Roadmap and current step: `docs/PLAN.md`. Work one step at a time.
 - What to build: `docs/PRODUCT.md` (features, categories), `docs/PRICING.md` (personal and business plans, entitlements), `docs/TRADITIONS.md` (regional and religious packs, sacred art rules), `docs/MOTION.md` (regional animation), `docs/PAYMENTS.md` (shagun and commission; never hold customer money), `docs/MEMORIES.md`, `docs/COMPETITORS.md`.

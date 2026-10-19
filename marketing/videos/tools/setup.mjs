@@ -41,6 +41,8 @@ for (const id of COVERS) {
 for (const id of GATES)
   cpSync(from("public/openings/gates", id), `public/gates/${id}`, { recursive: true });
 cpSync(from("public/brand"), "public/brand", { recursive: true });
+// The ads' AI-generated photos live in this folder, not the site
+cpSync("assets/ads", "public/ads", { recursive: true });
 mkdirSync("public/fonts", { recursive: true });
 for (const file of FONTS) cpSync(from("node_modules", file), `public/fonts/${path.basename(file)}`);
 
