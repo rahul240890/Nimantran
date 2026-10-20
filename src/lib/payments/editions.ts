@@ -20,7 +20,7 @@ import {
 import { receiptAfterPayment } from "@/lib/email/notify";
 import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { higherTier, isDesignTier, type DesignTier } from "@/lib/plans/design-tiers";
-import { cleanCouponCode, priceFor } from "@/lib/plans/offers";
+import { cleanCouponCode, priceFor, type Buyer } from "@/lib/plans/offers";
 import { getPricing } from "@/lib/plans/pricing";
 import { supabasePublic } from "@/lib/supabase/public";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -301,6 +301,34 @@ export async function showsWatermark(slug: string, eventId: string): Promise<boo
 
 /* ---------- Checkout ---------- */
 
+/**
+ * A host's packages bought so far, refunded ones included, and the coupons they used: what
+ * offers for a first booking, for returning hosts or once per account check. Throws when
+ * the database can't say, so such an offer is never given on a guess.
+ */
+export async function buyerHistory(account: Account): Promise<Buyer> {
+  let orders: { couponId: string | null }[];
+  if (isPreview()) {
+    orders = [...preview.orders.values()].filter(
+      (order) =>
+        order.userId === account.id && (order.status === "paid" || order.status === "refunded"),
+    );
+  } else {
+    const service = supabaseService();
+    if (!service) throw new Error("No database");
+    const { data, error } = await service
+      .from("orders")
+      .select("coupon_id")
+      .eq("user_id", account.id)
+      .in("status", ["paid", "refunded"]);
+    if (error) throw error;
+    orders = (data ?? []).map((row: { coupon_id: string | null }) => ({ couponId: row.coupon_id }));
+  }
+  const uses: Record<string, number> = {};
+  for (const { couponId } of orders) if (couponId) uses[couponId] = (uses[couponId] ?? 0) + 1;
+  return { paidOrders: orders.length, uses };
+}
+
 export type StartedCheckout =
   | {
       ok: true;
@@ -325,11 +353,14 @@ export async function startCheckout(
 ): Promise<StartedCheckout> {
   const provider = checkoutProvider();
   if (!provider || !(await checkoutSwitchedOn())) return { ok: false, reason: "off" };
-  const [had, owner, pricing, chosen] = await Promise.all([
+  const [had, owner, pricing, chosen, coupons, buyer] = await Promise.all([
     invitePlan(account, eventId),
     ownsInvite(account, eventId),
     getPricing(),
     inviteDesign(account, eventId, wantedDesign),
+    checkoutCoupons(),
+    // Without the host's history, offers kept to some people simply don't apply
+    buyerHistory(account).catch(() => null),
   ]);
   if (!had || !owner || !chosen) return { ok: false, reason: "not-found" };
   // Priced on what the invite has on this design: nothing, when its package is for another
@@ -339,10 +370,11 @@ export async function startCheckout(
     current,
     planId,
     design,
-    await checkoutCoupons(),
+    coupons,
     code ? cleanCouponCode(code) : null,
     new Date(),
     pricing,
+    { buyer, designId: chosen.id },
   );
   if (!price) return { ok: false, reason: "already" };
   const { amountPaise } = price;

@@ -79,6 +79,11 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               </a>
             </li>
             <li>
+              <Link href={pagePath({ kind: "offers" }, locale)} className={linkClass}>
+                {pagesText[locale].offersCopy.crumb}
+              </Link>
+            </li>
+            <li>
               <Link href={pagePath({ kind: "blog" }, locale)} className={linkClass}>
                 {pagesText[locale].blogCopy.crumb}
               </Link>

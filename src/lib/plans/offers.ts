@@ -4,8 +4,13 @@ import type { DesignTier, Pricing } from "./design-tiers";
 /*
  * Coupons and festival offers (Step 17). A coupon takes a percentage or a fixed amount off
  * one or more packages; a festival offer is a coupon that applies by itself between its
- * dates. The server prices every checkout with these, never the browser.
+ * dates. An offer can be kept to some designs, to a first booking or to people who have
+ * booked before, and to a number of uses per account, and can show on the offers page and
+ * the home page. The server prices every checkout with these, never the browser.
  */
+
+export const AUDIENCES = ["everyone", "first-order", "returning"] as const;
+export type Audience = (typeof AUDIENCES)[number];
 
 export type Coupon = {
   id: string;
@@ -21,21 +26,78 @@ export type Coupon = {
   maxUses: number | null;
   usedCount: number;
   active: boolean;
+  /** One line for the offers page. */
+  description: string;
+  terms: string;
+  audience: Audience;
+  /** Design tiers and named designs it covers; both empty means every design. */
+  designTiers: DesignTier[];
+  designIds: string[];
+  /** Times one account may use it; null for no limit. */
+  perUserLimit: number | null;
+  /** Shown on the offers page, and on the home page too when featured. */
+  showOnSite: boolean;
+  featured: boolean;
 };
+
+/** What checkout knows of the person paying: their bookings so far and coupons used. */
+export type Buyer = {
+  /** Packages they have bought, refunded ones included. */
+  paidOrders: number;
+  /** Times they have used each coupon, by its id. */
+  uses: Record<string, number>;
+};
+
+/** Who is buying, and the design: what an offer kept to some people or designs needs. */
+export type Fit = { buyer?: Buyer | null; designId?: string | null };
 
 export const COUPON_CODE = /^[A-Z0-9]{3,20}$/;
 
 /** "diwali 25" → "DIWALI25". */
 export const cleanCouponCode = (value: string) => value.toUpperCase().replace(/[^A-Z0-9]/g, "");
 
-export type CouponProblem = "inactive" | "not-started" | "ended" | "used-up" | "wrong-plan";
+export type CouponProblem =
+  | "inactive"
+  | "not-started"
+  | "ended"
+  | "used-up"
+  | "first-order"
+  | "returning"
+  | "used-by-you"
+  | "wrong-design"
+  | "wrong-plan";
 
-/** Why a coupon can't be used for a package now, or null when it can. */
-export function couponProblem(coupon: Coupon, planId: PaidPlanId, now: Date): CouponProblem | null {
+/** Whether an offer covers a design, by its tier or by name. */
+export function coversDesign(coupon: Coupon, tier: DesignTier, designId: string | null): boolean {
+  if (coupon.designTiers.length === 0 && coupon.designIds.length === 0) return true;
+  return (
+    coupon.designTiers.includes(tier) || (designId !== null && coupon.designIds.includes(designId))
+  );
+}
+
+/**
+ * Why a coupon can't be used for a package now, or null when it can: on a design, when the
+ * tier is given, and by the person buying, when `fit` says who. An offer kept to a first
+ * booking or to people who have booked before never applies when the buyer isn't known.
+ */
+export function couponProblem(
+  coupon: Coupon,
+  planId: PaidPlanId,
+  now: Date,
+  tier?: DesignTier,
+  fit: Fit = {},
+): CouponProblem | null {
   if (!coupon.active) return "inactive";
   if (coupon.startsAt && now < new Date(coupon.startsAt)) return "not-started";
   if (coupon.endsAt && now >= new Date(coupon.endsAt)) return "ended";
   if (coupon.maxUses !== null && coupon.usedCount >= coupon.maxUses) return "used-up";
+  const { buyer = null, designId = null } = fit;
+  if (coupon.audience === "first-order" && (!buyer || buyer.paidOrders > 0)) return "first-order";
+  if (coupon.audience === "returning" && (!buyer || buyer.paidOrders === 0)) return "returning";
+  if (coupon.perUserLimit !== null && (buyer?.uses[coupon.id] ?? 0) >= coupon.perUserLimit) {
+    return "used-by-you";
+  }
+  if (tier && !coversDesign(coupon, tier, designId)) return "wrong-design";
   if (coupon.planIds.length > 0 && !coupon.planIds.includes(planId)) return "wrong-plan";
   return null;
 }
@@ -71,10 +133,11 @@ export function priceFor(
   code: string | null,
   now: Date,
   pricing?: Pick<Pricing, "designs" | "packages">,
+  fit: Fit = {},
 ): Price | null {
   const listPaise = upgradePricePaise(current, to, design, pricing);
   if (listPaise === null) return null;
-  const usable = coupons.filter((coupon) => couponProblem(coupon, to, now) === null);
+  const usable = coupons.filter((coupon) => couponProblem(coupon, to, now, design, fit) === null);
   const typed = code ? usable.find((coupon) => coupon.code === code) : undefined;
   const candidates = typed ? [typed] : usable.filter((coupon) => coupon.autoApply);
   let best: Coupon | null = null;
@@ -101,10 +164,11 @@ export function pricesFor(
   code: string | null,
   now: Date,
   pricing?: Pick<Pricing, "designs" | "packages">,
+  fit: Fit = {},
 ): Partial<Record<PaidPlanId, Price>> {
   const prices: Partial<Record<PaidPlanId, Price>> = {};
   for (const id of PAID_PLAN_IDS) {
-    const price = priceFor(current, id, design, coupons, code, now, pricing);
+    const price = priceFor(current, id, design, coupons, code, now, pricing, fit);
     if (price) prices[id] = price;
   }
   return prices;
@@ -117,12 +181,32 @@ export function codeProblem(
   coupons: readonly Coupon[],
   code: string,
   now: Date,
+  fit: Fit = {},
 ): CouponProblem | "unknown" | null {
   const coupon = coupons.find((item) => item.code === code);
   if (!coupon) return "unknown";
   const problems = PAID_PLAN_IDS.filter(
     (id) => upgradePricePaise(current, id, design) !== null,
-  ).map((id) => couponProblem(coupon, id, now));
+  ).map((id) => couponProblem(coupon, id, now, design, fit));
   if (problems.includes(null)) return null;
   return problems.find((problem) => problem !== "wrong-plan") ?? problems[0] ?? "wrong-plan";
+}
+
+/**
+ * The codes on the offers page this buyer could type for this invite now, for the
+ * checkout's "Offers for you". Festival offers aren't listed: they apply by themselves.
+ */
+export function offersFor(
+  current: Edition,
+  design: DesignTier,
+  coupons: readonly Coupon[],
+  now: Date,
+  fit: Fit,
+): Coupon[] {
+  return coupons.filter(
+    (coupon) =>
+      coupon.showOnSite &&
+      !coupon.autoApply &&
+      codeProblem(current, design, [coupon], coupon.code, now, fit) === null,
+  );
 }

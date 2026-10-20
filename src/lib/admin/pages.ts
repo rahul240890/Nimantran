@@ -50,8 +50,8 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
   },
   {
     href: "/admin/coupons",
-    label: "Coupons",
-    description: "Coupon codes and festival offers.",
+    label: "Offers",
+    description: "Offers and coupon codes, the offers page and the home page's offers.",
     icon: "coupons",
   },
   {

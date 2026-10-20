@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getAccount } from "@/lib/auth/server";
 import { checkoutCoupons } from "@/lib/payments/coupons";
 import {
+  buyerHistory,
   confirmCheckout,
   editionsActive,
   inviteDesign,
@@ -93,15 +94,19 @@ export async function tryCoupon(input: unknown): Promise<CouponCheck> {
   if (!had || !chosen || !typed) return { ok: false, reason: "unknown" };
   const current = editionFor(had, chosen.id);
   const design = chosen.tier;
-  const coupons = await checkoutCoupons().catch(() => []);
+  const [coupons, buyer] = await Promise.all([
+    checkoutCoupons().catch(() => []),
+    buyerHistory(account).catch(() => null),
+  ]);
   const now = new Date();
-  const problem = codeProblem(current, design, coupons, typed, now);
+  const fit = { buyer, designId: chosen.id };
+  const problem = codeProblem(current, design, coupons, typed, now, fit);
   if (problem) return { ok: false, reason: problem };
   const pricing = await getPricing();
   return {
     ok: true,
     code: typed,
-    prices: pricesFor(current, design, coupons, typed, now, pricing),
+    prices: pricesFor(current, design, coupons, typed, now, pricing, fit),
   };
 }
 
@@ -131,11 +136,18 @@ export async function inviteEdition(
   ]);
   if (!had || !chosen) return null;
   const edition = editionFor(had, chosen.id);
-  const [coupons, pricing] = await Promise.all([checkoutCoupons(), getPricing()]);
+  const [coupons, pricing, buyer] = await Promise.all([
+    checkoutCoupons(),
+    getPricing(),
+    buyerHistory(account).catch(() => null),
+  ]);
   return {
     edition,
     paid: had,
-    prices: pricesFor(edition, chosen.tier, coupons, null, new Date(), pricing),
+    prices: pricesFor(edition, chosen.tier, coupons, null, new Date(), pricing, {
+      buyer,
+      designId: chosen.id,
+    }),
   };
 }
 

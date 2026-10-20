@@ -124,3 +124,59 @@ export const blogCopy = {
   sampleDesigns: (occasion: string) => `${occasion} designs to open as a guest`,
   morePosts: "More to read",
 } as const;
+
+/** The offers page (/offers) and the offers band on the home page. */
+export const offersCopy = {
+  title: "Offers and coupon codes",
+  description:
+    "Festival offers and coupon codes for Shubh Invitation packages: what each takes off, who can use it, the designs it covers and until when.",
+  crumb: "Offers",
+  eyebrow: "Offers",
+  heading: "Offers on your invitation",
+  intro:
+    "Copy a code and type it when you choose a package for your invitation. A festival offer needs no code: it applies by itself at checkout.",
+  emptyTitle: "No offers running right now",
+  emptyBody:
+    "Making and sharing an invitation is always free. Offers for festivals and the wedding season show up here.",
+  homeEyebrow: "Offers",
+  homeTitle: "Offers running now",
+  homeIntro: "Take money off your invitation's package while these last.",
+  homeAll: "See every offer",
+  percentOff: (percent: number) => `${percent}% off`,
+  amountOff: (amount: string) => `${amount} off`,
+  code: "Code",
+  copyCode: "Copy code",
+  copied: "Code copied",
+  copyFailed: "Couldn't copy. Select the code and copy it yourself.",
+  festival: "Festival offer",
+  noCode: "No code needed: it applies by itself at checkout.",
+  validTill: (date: string) => `Valid till ${date}`,
+  startsOn: (date: string) => `From ${date}`,
+  noEnd: "No end date",
+  audience: {
+    everyone: "For everyone",
+    "first-order": "For your first booking",
+    returning: "For hosts who have booked before",
+  },
+  onPackages: (names: string) => `On ${names}`,
+  everyPackage: "On every package",
+  onDesigns: (names: string) => `For ${names}`,
+  everyDesign: "On every design",
+  tierDesigns: (tier: string) => `${tier} designs`,
+  perHost: (times: number) =>
+    times === 1 ? "Once per account" : `Up to ${times} times per account`,
+  terms: "Terms and conditions",
+  howHeading: "How offers work",
+  how: [
+    "Choose a design and make your invitation, then open Packages and type the code under the prices.",
+    "The price on each package changes to show what the code takes off before you pay.",
+    "One offer per payment: a code you type takes the place of any festival offer running.",
+    "Offers come off the package price, taxes included, and at least ₹1 is always left to pay.",
+    "We may end or change an offer early. A payment already made keeps its price.",
+  ],
+  start: "Choose a design",
+  and: (items: readonly string[]) =>
+    items.length < 2
+      ? (items[0] ?? "")
+      : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`,
+} as const;
