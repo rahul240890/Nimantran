@@ -1,6 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { designOpening } from "../src/lib/opening/catalog";
+import { guestCopy } from "../src/content/publish";
+import { guestCopy as hiGuestCopy } from "../src/content/hi/publish";
+import { blessings } from "../src/lib/suites/blessings";
 import { sectionLayouts } from "../src/lib/suites/section-layouts";
 import { noOverflow } from "./invite-helpers";
 
@@ -85,11 +88,16 @@ for (const suite of THEMES) {
           layouts.family,
         );
 
-        await page.getByRole("button", { name: "Shower flowers on the couple" }).click();
-        await expect(page.getByText("Your flowers are on their way")).toBeVisible();
+        // The theme's own ways of giving flowers and light (blessings.ts)
+        const ways = blessings(suite);
+        const flowers = guestCopy.themed.flowers[ways.flowers];
+        await page.getByRole("button", { name: flowers.give }).click();
+        await expect(page.getByText(flowers.given)).toBeVisible();
 
-        const lamps = page.getByRole("button", { name: /Light the|Switch on the lights/ });
+        const light = guestCopy.themed.lights[ways.lamp];
+        const lamps = page.getByRole("button", { name: light.give, exact: true });
         await lamps.click();
+        await expect(page.getByText(light.given)).toBeVisible();
         await expect(lamps).toHaveAttribute("aria-pressed", "true");
         await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
 
@@ -114,8 +122,13 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
     await expect(themed.getByText(english, { exact: false })).toHaveCount(0);
   }
   // The buttons around the card speak the card's language too
-  await expect(page.getByRole("button", { name: "जोड़े पर फूल बरसाएँ" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Shower flowers on the couple" })).toHaveCount(0);
+  const way = blessings("rajwada-bagh").flowers;
+  await expect(
+    page.getByRole("button", { name: hiGuestCopy.themed.flowers[way].give }),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: guestCopy.themed.flowers[way].give })).toHaveCount(
+    0,
+  );
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 

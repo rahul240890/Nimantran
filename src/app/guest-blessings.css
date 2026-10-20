@@ -1,0 +1,500 @@
+/*
+ * The blessings on the themed guest page (blessings.ts): the flowers a guest gives after
+ * the welcome (flower-blessing.tsx) and the light they give at night (lamp-blessing.tsx).
+ *
+ * Every piece is drawn where it ends up. `.bl-in` pieces move in from an offset, `.bl-arc`
+ * ones are thrown there, and `.bl-out`, `.bl-burst` and `.bl-sail` ones leave and are gone,
+ * so with motion off the drawing simply shows its end: the leaving pieces never show and
+ * the rest stand still where they land. A piece's own numbers are custom properties that
+ * don't pass to the pieces inside it: --bx and --by (an offset), --br (a turn), --bs (a
+ * scale), --bd (a delay), --bt (a length), --bo (the point it turns about) and --bh (how
+ * far a sky lantern rises).
+ */
+
+@property --bx {
+  syntax: "*";
+  inherits: false;
+}
+@property --by {
+  syntax: "*";
+  inherits: false;
+}
+@property --br {
+  syntax: "*";
+  inherits: false;
+}
+@property --bs {
+  syntax: "*";
+  inherits: false;
+}
+@property --bd {
+  syntax: "*";
+  inherits: false;
+}
+@property --bt {
+  syntax: "*";
+  inherits: false;
+}
+@property --bo {
+  syntax: "*";
+  inherits: false;
+}
+@property --bh {
+  syntax: "*";
+  inherits: false;
+}
+
+.bl-stage {
+  overflow: visible;
+}
+/* Only what moves turns about its own box; a drawn transform keeps the SVG's own origin */
+:is(.bl-stage, .guest-lamps [data-way])
+  :is(
+    .bl-in,
+    .bl-out,
+    .bl-arc,
+    .bl-burst,
+    .bl-sail,
+    .bl-ripple,
+    .bl-sway,
+    .bl-bob,
+    .bl-breathe,
+    .bl-spin,
+    .bl-wiggle,
+    .bl-shimmer,
+    .bl-flap,
+    .bl-wave,
+    .bl-beat,
+    .bl-orbit,
+    .bl-tip,
+    .bl-kick,
+    .bl-shake,
+    .bl-sway-lit,
+    .bl-swing,
+    .bl-drift,
+    .bl-wander,
+    .bl-jar-lid
+  ) {
+  transform-box: fill-box;
+  transform-origin: var(--bo, 50% 50%);
+}
+.bl-stage .bl-orbit {
+  transform-origin: 50% 50%;
+}
+
+/* With motion off, what leaves never shows */
+.bl-out,
+.bl-burst,
+.bl-sail,
+.bl-ripple {
+  display: none;
+}
+
+/* ------------------------------------------------------------ the lights */
+
+.bl-paper-lit,
+.bl-ray,
+.bl-speck {
+  opacity: 0;
+}
+[data-lit] .bl-paper-lit {
+  opacity: 0.45;
+}
+[data-lit] .bl-ray {
+  opacity: 0.55;
+}
+[data-lit] .bl-speck {
+  opacity: 0.85;
+}
+.bl-rise {
+  translate: 0 var(--bh, 0);
+}
+[data-lit] .bl-rise {
+  translate: 0 0;
+}
+.bl-fly {
+  translate: var(--bx, 0) var(--by, 0);
+}
+[data-lit] .bl-fly {
+  translate: 0 0;
+}
+.bl-firefly {
+  opacity: 0.35;
+}
+[data-lit] .bl-firefly {
+  opacity: 1;
+}
+[data-lit] .bl-jar-lid {
+  translate: -34px -26px;
+  rotate: -32deg;
+}
+.bl-hole {
+  transition: fill 600ms ease;
+}
+[data-lit] .bl-hole {
+  fill: var(--flower-lamp);
+}
+.bl-spark {
+  opacity: 0;
+}
+[data-lit] .bl-spark {
+  opacity: 1;
+}
+.guest-lamps [data-way="jaali"] .bl-turn {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+.guest-lamps [data-way="sparklers"] .bl-spark {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion="reduce"]) {
+    /* ------------------------------------------------------ the flowers */
+    .bl-in {
+      animation: bl-in var(--bt, 900ms) cubic-bezier(0.2, 0.8, 0.2, 1) var(--bd, 0ms) backwards;
+    }
+    .bl-out {
+      display: inline;
+      animation: bl-out var(--bt, 1400ms) cubic-bezier(0.4, 0.1, 0.6, 1) var(--bd, 0ms) both;
+    }
+    .bl-arc {
+      animation: bl-arc var(--bt, 1100ms) cubic-bezier(0.3, 0.2, 0.4, 1) var(--bd, 0ms) backwards;
+    }
+    .bl-burst {
+      display: inline;
+      animation: bl-burst var(--bt, 2200ms) cubic-bezier(0.15, 0.7, 0.4, 1) var(--bd, 0ms) both;
+    }
+    .bl-sail {
+      display: inline;
+      animation: bl-sail var(--bt, 6500ms) linear var(--bd, 0ms) both;
+    }
+    .bl-ripple {
+      display: inline;
+      animation: bl-ripple 1500ms ease-out var(--bd, 0ms) both;
+    }
+    .bl-sway {
+      transform-origin: var(--bo, 50% 0%);
+      animation: bl-sway 3.4s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-bob {
+      animation: bl-bob 2.8s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-breathe {
+      animation: bl-breathe 2.6s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-spin {
+      animation: bl-spin 48s linear var(--bd, 0ms) infinite;
+    }
+    .bl-wiggle {
+      animation: bl-wiggle 3.2s ease-in-out infinite;
+    }
+    .bl-shimmer {
+      animation: bl-shimmer 2.4s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-flap {
+      animation: bl-flap 200ms ease-in-out infinite alternate;
+    }
+    .bl-wave {
+      animation: bl-wave 1.1s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-beat {
+      animation: bl-beat 1.6s ease-in-out var(--bd, 0ms) infinite;
+    }
+    .bl-orbit {
+      animation: bl-orbit 2.3s cubic-bezier(0.5, 0, 0.3, 1) both;
+    }
+    .bl-tip {
+      animation: bl-tip 1.7s cubic-bezier(0.3, 0.1, 0.3, 1);
+    }
+    .bl-kick {
+      animation: bl-kick 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .bl-shake {
+      animation: bl-shake 900ms ease-in-out;
+    }
+
+    /* ------------------------------------------------------- the lights */
+    .bl-paper-lit,
+    .bl-ray,
+    .bl-speck,
+    .bl-firefly {
+      transition: opacity 700ms ease calc(var(--i, 0) * 160ms);
+    }
+    .bl-rise {
+      transition: translate 3.4s cubic-bezier(0.3, 0.6, 0.3, 1) calc(var(--i, 0) * 260ms);
+    }
+    .bl-fly {
+      transition: translate 2.6s cubic-bezier(0.3, 0.6, 0.3, 1) calc(var(--i, 0) * 120ms);
+    }
+    .bl-jar-lid {
+      transition:
+        translate 700ms ease,
+        rotate 700ms ease;
+    }
+    [data-lit] .bl-sway-lit {
+      transform-origin: 50% 0%;
+      animation: bl-sway 3.8s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    .bl-swing {
+      transform-origin: var(--bo, 50% 0%);
+      animation: bl-swing 4.6s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    [data-lit] .bl-drift {
+      animation: bl-drift 6s ease-in-out var(--bd, 0ms) infinite alternate;
+    }
+    [data-lit] .bl-ray {
+      animation: guest-breathe 1.8s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -0.45s);
+    }
+    [data-lit] .bl-wander {
+      animation: bl-wander 7s ease-in-out var(--bd, 0ms) infinite;
+    }
+    [data-lit] .bl-firefly {
+      animation: bl-blink 1.6s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -0.3s);
+    }
+    [data-lit] .bl-turn {
+      animation: bl-spin 70s linear infinite;
+    }
+    [data-lit] .bl-speck {
+      animation: guest-twinkle 1.8s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -0.35s);
+    }
+    [data-lit] .bl-spark {
+      animation: bl-spark 900ms ease-out var(--bd, 0ms) infinite;
+    }
+    [data-lit] .bl-crystal {
+      animation: bl-blink 1.4s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -0.4s);
+    }
+  }
+}
+
+@keyframes bl-in {
+  from {
+    opacity: 0;
+    translate: var(--bx, 0) var(--by, 0);
+    rotate: var(--br, 0deg);
+    scale: var(--bs, 1);
+  }
+}
+@keyframes bl-out {
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: var(--bx, 0) var(--by, 0);
+    rotate: var(--br, 0deg);
+    scale: var(--bs, 1);
+  }
+}
+@keyframes bl-arc {
+  from {
+    opacity: 0;
+    translate: var(--bx, 0) var(--by, 0);
+    rotate: var(--br, 0deg);
+  }
+  12% {
+    opacity: 1;
+  }
+  50% {
+    translate: calc(var(--bx, 0px) * 0.45) calc(var(--by, 0px) * 0.45 - 90px);
+  }
+}
+@keyframes bl-burst {
+  from {
+    opacity: 1;
+    translate: var(--bx, 0) var(--by, 0);
+    scale: 0.3;
+  }
+  35% {
+    translate: 0 0;
+    scale: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: 0 70px;
+    rotate: var(--br, 0deg);
+  }
+}
+@keyframes bl-sail {
+  from {
+    opacity: 0;
+    translate: 0 0;
+  }
+  8%,
+  90% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    translate: var(--bx, 0) 0;
+  }
+}
+@keyframes bl-ripple {
+  from {
+    opacity: 0.9;
+    scale: 0.3;
+  }
+  to {
+    opacity: 0;
+    scale: 3;
+  }
+}
+@keyframes bl-sway {
+  from {
+    rotate: -3deg;
+  }
+  to {
+    rotate: 3deg;
+  }
+}
+@keyframes bl-swing {
+  from {
+    rotate: -2deg;
+  }
+  to {
+    rotate: 2deg;
+  }
+}
+@keyframes bl-bob {
+  to {
+    translate: 0 -4px;
+  }
+}
+@keyframes bl-breathe {
+  to {
+    scale: 1.03;
+  }
+}
+@keyframes bl-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes bl-wiggle {
+  0%,
+  70%,
+  100% {
+    rotate: 0deg;
+  }
+  78% {
+    rotate: -5deg;
+  }
+  86% {
+    rotate: 5deg;
+  }
+  94% {
+    rotate: -2deg;
+  }
+}
+@keyframes bl-shimmer {
+  from {
+    opacity: 0.3;
+    translate: -6px 0;
+  }
+  to {
+    translate: 6px 0;
+  }
+}
+@keyframes bl-flap {
+  to {
+    scale: 0.35 1;
+  }
+}
+@keyframes bl-wave {
+  from {
+    translate: -12px 0;
+  }
+  to {
+    translate: 12px 0;
+  }
+}
+@keyframes bl-beat {
+  0%,
+  60%,
+  100% {
+    scale: 1;
+  }
+  15% {
+    scale: 1.07;
+  }
+  30% {
+    scale: 1;
+  }
+  45% {
+    scale: 1.05;
+  }
+}
+@keyframes bl-orbit {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 540deg;
+  }
+}
+@keyframes bl-tip {
+  25%,
+  60% {
+    rotate: 32deg;
+  }
+}
+@keyframes bl-kick {
+  12% {
+    translate: -10px 10px;
+    rotate: -6deg;
+  }
+}
+@keyframes bl-shake {
+  15%,
+  45%,
+  75% {
+    translate: -6px 0;
+  }
+  30%,
+  60%,
+  90% {
+    translate: 6px 0;
+  }
+}
+@keyframes bl-drift {
+  to {
+    translate: 22px 0;
+  }
+}
+@keyframes bl-wander {
+  25% {
+    translate: 8px -6px;
+  }
+  50% {
+    translate: -4px -12px;
+  }
+  75% {
+    translate: -9px 3px;
+  }
+}
+@keyframes bl-blink {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes bl-spark {
+  from {
+    opacity: 1;
+    scale: 0.4;
+  }
+  to {
+    opacity: 0;
+    scale: 1.15;
+  }
+}
