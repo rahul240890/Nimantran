@@ -89,7 +89,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "या डिझाइनसाठी पॅकेज",
   packageFree: "मोफत",
   comparePackages: "पॅकेजची तुलना करा",
-  seeSample: "पाहुण्यासारखे उघडा",
+  seeSample: "पाहुणे बनून लाइव्ह पाहा",
   sampleLabel: "नमुना निमंत्रण",
   sampleNote: "नावे, तारखा आणि ठिकाणे काल्पनिक आहेत",
   showAll: (count: number) => `सर्व ${count} डिझाइन दाखवा`,
@@ -122,6 +122,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   previous: "मागील पान",
   next: "पुढील पान",
   pageOf: (index: number, total: number) => `${total} पैकी पान ${index}`,
+  playPages: "पाने आपोआप चालवा",
+  pausePages: "पाने थांबवा",
   breadcrumb: "निमंत्रणे",
   kindMeta: (name: string) => ({
     title: `${name} लग्नाची निमंत्रणे`,

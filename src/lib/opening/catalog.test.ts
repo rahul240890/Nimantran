@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { STORY_IDS, THEMED_IDS } from "@/lib/suites/catalog";
+import { STORY_IDS, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 import {
   WELCOME_KINDS,
   WELCOME_POOLS,
@@ -86,11 +86,18 @@ describe("openings", () => {
   it("opens each story theme at its own gate, which any card can also pick", () => {
     for (const story of STORY_IDS) {
       const gate = openingStyle(noOpening, story, false);
+      // From template 26 a template opens with a fresh opening of its own, onto its centre
+      if (SUITES[story].centre) {
+        expect(isFreshOpening(gate), story).toBe(true);
+        expect(existsSync(join(process.cwd(), "public/suites", story, "centre.webp"))).toBe(true);
+        continue;
+      }
       expect(isPaintedGate(gate), story).toBe(true);
       expect(existsSync(join(process.cwd(), "public/openings/gates", gate, "hole.webp"))).toBe(
         true,
       );
     }
+    expect(openingStyle(noOpening, "hashiya", false)).toBe("chadar");
     expect(openingStyle(noOpening, "navrang", false)).toBe("navrang-dwar");
     expect(openingStyle({ style: "lotus", god: null }, "navrang", false)).toBe("lotus");
     expect(new Set(STORY_IDS.map((id) => openingStyle(noOpening, id, false))).size).toBe(
@@ -143,7 +150,7 @@ describe("openings", () => {
   });
 
   it("offers every fresh opening on any theme, for pages and Scenes alike", () => {
-    expect(FRESH_OPENINGS).toHaveLength(25);
+    expect(FRESH_OPENINGS).toHaveLength(40);
     for (const id of FRESH_OPENINGS) {
       expect(openingStyles("classic", false)).toContain(id);
       expect(openingStyles("rajwada-bagh", true)).toContain(id);

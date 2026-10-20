@@ -89,7 +89,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "इस डिज़ाइन के पैकेज",
   packageFree: "मुफ़्त",
   comparePackages: "पैकेज की तुलना करें",
-  seeSample: "मेहमान की तरह खोलें",
+  seeSample: "मेहमान बनकर लाइव देखें",
   sampleLabel: "नमूना निमंत्रण",
   sampleNote: "नाम, तारीख़ें और जगहें काल्पनिक हैं",
   showAll: (count: number) => `सभी ${count} डिज़ाइन दिखाएँ`,
@@ -122,6 +122,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   previous: "पिछला पन्ना",
   next: "अगला पन्ना",
   pageOf: (index: number, total: number) => `${total} में से पन्ना ${index}`,
+  playPages: "पन्ने अपने आप चलाएँ",
+  pausePages: "पन्ने रोकें",
   breadcrumb: "निमंत्रण",
   kindMeta: (name: string) => ({
     title: `${name} शादी के निमंत्रण`,

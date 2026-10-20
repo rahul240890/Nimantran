@@ -46,7 +46,7 @@ export const seoCopy: Translation<typeof en.seoCopy> = {
   suitsHeading: "யாருக்கு ஏற்றது",
   raga: "இசை",
   useDesign: "இந்த வடிவமைப்பைப் பயன்படுத்தவும்",
-  seeSample: "விருந்தினராகத் திறந்து பார்க்கவும்",
+  seeSample: "விருந்தினராக நேரலையில் பாருங்கள்",
   allDesigns: "அனைத்து வடிவமைப்புகளும்",
   footerInvitations: "அழைப்பிதழ்கள்",
   footerMore: "வடிவமைப்புகளும் மரபுகளும்",

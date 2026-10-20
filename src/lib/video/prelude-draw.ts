@@ -15,6 +15,7 @@ import {
   GOD_PAINTINGS,
   PAINTED_GATES,
   THEMED_OPENINGS,
+  freshBeyond,
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
@@ -139,15 +140,26 @@ export const FRESH_LAYERS: Record<FreshOpening, readonly FreshLayer[]> = {
     { name: "hills", move: "sink", delay: 0.6 },
     { name: "train", move: "train" },
   ],
+  chadar: [{ name: "veil", move: "sink" }, FRONT_SPLIT],
+  parwaaz: [{ name: "silk", move: "lift", delay: 0.4 }, FRONT_EDGE],
+  bhanwar: [{ name: "marble", move: "spin" }, FRONT_SPLIT],
+  "jaali-patta": [{ name: "leaf", move: "sink" }, FRONT_SPLIT],
+  "lapet-khule": [{ name: "rosette", move: "spin" }, FRONT_EDGE],
+  taar: [{ name: "panel", move: "louvre" }, FRONT_EDGE],
+  pratibimb: [{ name: "reflection", move: "sink" }, FRONT_SPLIT],
+  mohur: [{ name: "coin", move: "zoom" }, FRONT_EDGE],
+  gathbandhan: [{ name: "dupatta", move: "lift", delay: 0.3 }, FRONT_EDGE],
+  phuljhadi: [{ name: "lacquer", move: "zoom" }, FRONT_SPLIT],
+  semal: [{ name: "pods", move: "soft" }, FRONT_EDGE],
+  thappa: [{ name: "cloth", move: "lift", delay: 0.5 }, FRONT_EDGE],
+  gumbad: [{ name: "dome", move: "zoom" }, FRONT_EDGE],
+  ghadi: [{ name: "watch", move: "zoom", delay: 0.3 }, FRONT_EDGE],
+  hindolo: [{ name: "swing", move: "lift", delay: 0.2 }, FRONT_EDGE],
 };
 
 /** Athangudi's floor: five columns of nine tiles, each one of five paintings. */
 const TILE_COLS = 5;
 const TILE_ROWS = 9;
-
-function freshBeyond(id: FreshOpening): string {
-  return `/openings/fresh/${id}/${id === "popup-mahal" ? "sky" : "beyond"}.webp`;
-}
 
 function freshLayerUrls(id: FreshOpening): string[] {
   return FRESH_LAYERS[id].flatMap((layer) =>
@@ -1369,16 +1381,21 @@ const DARK: Record<WelcomeKind, boolean> = {
 /** The welcome, `local` seconds after it began to fade in over the opened opening. */
 function drawWelcome(ctx: Ctx, film: PreludeFilm, local: number) {
   const { kind } = film;
-  const over = isFreshOpening(film.style);
-  const dark = DARK[kind] && !over;
+  // A template's painted centre is already in place behind its opening: the words go
+  // straight onto its empty field
+  const centre = SUITES[film.suite].centre;
+  const over = isFreshOpening(film.style) && !centre;
+  const dark = centre ? Boolean(centre.dark) : DARK[kind] && !over;
   const fade = transition(local, 0.7, 0, ease);
-  ctx.save();
-  ctx.globalAlpha = fade;
-  // It settles in from a touch larger, as welcome-in does
-  scaleAbout(ctx, 1.05 - 0.05 * fade, 0.5, 0.5);
-  drawWelcomeGround(ctx, film, over, dark);
-  drawWelcomeArt(ctx, film, local);
-  ctx.restore();
+  if (!centre) {
+    ctx.save();
+    ctx.globalAlpha = fade;
+    // It settles in from a touch larger, as welcome-in does
+    scaleAbout(ctx, 1.05 - 0.05 * fade, 0.5, 0.5);
+    drawWelcomeGround(ctx, film, over, dark);
+    drawWelcomeArt(ctx, film, local);
+    ctx.restore();
+  }
 
   ctx.save();
   drawWelcomeWords(ctx, film, local, dark);
@@ -1874,10 +1891,16 @@ function drawWelcomeWords(ctx: Ctx, film: PreludeFilm, u: number, dark: boolean)
   const ink = dark ? c.ivory : c.ink;
   const soft = dark ? withAlpha(c.ivory, 0.82) : c.inkMuted;
   const accent = dark ? c.giltBright : c.accentText;
-  const pad = kind === "letter" ? 14 * CQW : 8 * CQW;
+  // On a painted centre the words keep inside its empty field
+  const centre = SUITES[film.suite].centre;
+  const pad = centre
+    ? (Math.max(centre.field[2], centre.field[3]) + 4) * CQW
+    : kind === "letter"
+      ? 14 * CQW
+      : 8 * CQW;
   const maxW = PAGE_W - pad * 2;
   const gap = 2 * CQH;
-  const scale = film.type.scale;
+  const scale = film.type.scale * (centre ? 0.8 : 1);
   const nameSize = Math.min(13 * CQW, 8 * CQH, 4.6 * REM) * scale;
   const joiner = joinerOf(copy);
   const line = copy.line.trim();

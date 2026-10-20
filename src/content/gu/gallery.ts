@@ -88,7 +88,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "આ ડિઝાઇન માટે પૅકેજ",
   packageFree: "મફત",
   comparePackages: "પૅકેજની સરખામણી કરો",
-  seeSample: "મહેમાનની જેમ ખોલો",
+  seeSample: "મહેમાન બનીને લાઇવ જુઓ",
   sampleLabel: "નમૂનાનું આમંત્રણ",
   sampleNote: "નામ, તારીખો અને સ્થળો કાલ્પનિક છે",
   showAll: (count: number) => `બધી ${count} ડિઝાઇન બતાવો`,
@@ -121,6 +121,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   previous: "પાછલું પાનું",
   next: "આગલું પાનું",
   pageOf: (index: number, total: number) => `${total} માંથી પાનું ${index}`,
+  playPages: "પાનાં આપમેળે ચલાવો",
+  pausePages: "પાનાં રોકો",
   breadcrumb: "આમંત્રણ",
   kindMeta: (name: string) => ({
     title: `${name} લગ્નનાં આમંત્રણ`,

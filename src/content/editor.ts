@@ -1625,6 +1625,81 @@ export const openingCopy = {
       name: "Toy train",
       description: "A little steam train puffs past, and the steam clears onto a party station.",
     },
+    chadar: {
+      name: "Water veil",
+      description:
+        "A sheet of water falls over a marble wall of lamp niches, then stops and thins away from the top.",
+    },
+    parwaaz: {
+      name: "Embroidered birds",
+      description:
+        "Silk embroidered with resting birds: the birds lift off and fly, and the silk floats up after them.",
+    },
+    bhanwar: {
+      name: "Marbled whirlpool",
+      description:
+        "A sheet of Deccani marbled paper swirls like a whirlpool and drains away into the middle.",
+    },
+    "jaali-patta": {
+      name: "Skeleton leaf",
+      description:
+        "Light runs up the veins of a great lace-like leaf, then it turns and flutters down.",
+    },
+    "lapet-khule": {
+      name: "Quilled rosette",
+      description:
+        "A rosette of rolled paper coils spins, the rings spring loose and the curls bounce away.",
+    },
+    taar: {
+      name: "Veena strings",
+      description:
+        "A carved sandalwood panel strung like a veena: the strings shimmer as if plucked, then the panel parts strip by strip.",
+    },
+    pratibimb: {
+      name: "Lake reflection",
+      description:
+        "The invitation opens on a reflection in a lotus lake; a ripple runs out and the view lifts out of the water.",
+    },
+    mohur: {
+      name: "Silver coin",
+      description:
+        "A great embroidered silver coin spins on its edge, flips, and you pass right through it.",
+    },
+    gathbandhan: {
+      name: "Tied dupattas",
+      description:
+        "Two leheriya dupattas sweep in, tie a knot in the middle and rise away together like a banner.",
+    },
+    phuljhadi: {
+      name: "Sparkler ring",
+      description:
+        "A sparkler draws a ring of golden light round the names, and the black lacquer opens like an iris.",
+    },
+    semal: {
+      name: "Silk-cotton floss",
+      description:
+        "The pods of a silk-cotton tree split and white floss bursts out, swirling away on the breeze.",
+    },
+    thappa: {
+      name: "Block print",
+      description:
+        "A carved wooden block stamps prints across a cotton sheet; each print opens a window, then the sheet lifts away.",
+    },
+    gumbad: {
+      name: "Painted dome",
+      description:
+        "You look up into a painted dome; its sky opening widens like an iris and petals pour down.",
+    },
+    ghadi: {
+      name: "Pocket watch",
+      description:
+        "An antique pocket watch: its hands sweep round to the hour, a soft chime, and you pass into its face.",
+    },
+    hindolo: {
+      name: "Painted swing",
+      description:
+        "A painted Sankheda swing sways, then sweeps high toward you and up out of sight.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",

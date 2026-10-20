@@ -102,7 +102,7 @@ export const galleryCopy = {
   packageFree: "Free",
   comparePackages: "Compare the packages",
   /** The design's public sample: the whole invitation as a guest gets it. */
-  seeSample: "Open it as a guest",
+  seeSample: "See it live as a guest",
   sampleLabel: "Sample invitation",
   sampleNote: "The names, dates and places are made up",
   /** Over a sample: Previous and Next walk on to other designs, Choose this design opens the editor. */
@@ -138,6 +138,9 @@ export const galleryCopy = {
   previous: "Previous page",
   next: "Next page",
   pageOf: (index: number, total: number) => `Page ${index} of ${total}`,
+  /** The preview turns its pages by itself until the guest steps through them. */
+  playPages: "Play the pages",
+  pausePages: "Pause the pages",
   breadcrumb: "Invitations",
   kindMeta: (name: string) => ({
     title: `${name} wedding invitations`,

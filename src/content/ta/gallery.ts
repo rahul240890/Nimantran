@@ -94,7 +94,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "இந்த டிசைனுக்கான பேக்கேஜ்கள்",
   packageFree: "இலவசம்",
   comparePackages: "பேக்கேஜ்களை ஒப்பிடுங்கள்",
-  seeSample: "விருந்தினராகத் திறந்து பாருங்கள்",
+  seeSample: "விருந்தினராக நேரலையில் பாருங்கள்",
   sampleLabel: "மாதிரி அழைப்பிதழ்",
   sampleNote: "பெயர்கள், தேதிகள் மற்றும் இடங்கள் கற்பனையானவை",
   showAll: (count: number) => `அனைத்து ${count} டிசைன்களையும் காட்டவும்`,
@@ -128,6 +128,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   previous: "முந்தைய பக்கம்",
   next: "அடுத்த பக்கம்",
   pageOf: (index: number, total: number) => `${total} இல் பக்கம் ${index}`,
+  playPages: "பக்கங்களைத் தானாக ஓட்டு",
+  pausePages: "பக்கங்களை நிறுத்து",
   breadcrumb: "அழைப்பிதழ்கள்",
   kindMeta: (name: string) => ({
     title: `${name} திருமண அழைப்பிதழ்கள்`,
