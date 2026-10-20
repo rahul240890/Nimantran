@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import type { FreshOpening } from "@/lib/opening/catalog";
+import { freshBeyond, type FreshOpening } from "@/lib/opening/catalog";
 import "@/app/fresh-openings.css";
 
 /*
@@ -21,9 +21,7 @@ const range = (count: number) => Array.from({ length: count }, (_, i) => i);
 const vars = (style: Record<string, string | number>) => style as CSSProperties;
 
 /** Which painting fills the wide screen round the frame: the place revealed. */
-export function freshBackdrop(id: FreshOpening): string {
-  return `/openings/fresh/${id}/${id === "popup-mahal" ? "sky" : "beyond"}.webp`;
-}
+export const freshBackdrop = freshBeyond;
 
 function imageProps({ id, sample }: Ctx, name: string, size: "full" | "small" = "full") {
   const sizes =
@@ -35,7 +33,7 @@ function imageProps({ id, sample }: Ctx, name: string, size: "full" | "small" = 
         ? "12rem"
         : "(min-width: 40rem) 32rem, 100vw";
   return {
-    src: `/openings/fresh/${id}/${name}.webp`,
+    src: name === "beyond" ? freshBeyond(id) : `/openings/fresh/${id}/${name}.webp`,
     fill: true,
     sizes,
     // The guest's first screen loads its big layers at once; an editor tile waits its turn
@@ -170,6 +168,8 @@ function Floats({ ctx, items, name = "piece" }: { ctx: Ctx; items: Float[]; name
   );
 }
 
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
 /** A spray of burst pieces from round the middle, in a stable scatter. */
 function burst(pieces: readonly number[], count: number, size = 7, delay = 150): Float[] {
   return range(count).map((i) => {
@@ -177,8 +177,9 @@ function burst(pieces: readonly number[], count: number, size = 7, delay = 150):
     const reach = 10 + ((i * 37) % 22);
     return {
       piece: pieces[i % pieces.length] ?? 0,
-      x: 50 + Math.cos(angle) * reach - size / 2,
-      y: 45 + Math.sin(angle) * reach * 0.6,
+      // Rounded so the server's and the browser's sums match when the page hydrates
+      x: round2(50 + Math.cos(angle) * reach - size / 2),
+      y: round2(45 + Math.sin(angle) * reach * 0.6),
       size: size * (0.75 + ((i * 53) % 50) / 100),
       mode: "burst",
       delay: delay + ((i * 71) % 400),
@@ -204,7 +205,7 @@ function ring(count: number, rx: number, ry: number, cy = 44) {
   return range(count).map((i) => {
     const a = (i / count) * Math.PI * 2 + (i % 3) * 0.21;
     const wobble = 1 + ((i * 17) % 20) / 100 - 0.1;
-    return { x: 50 + Math.cos(a) * rx * wobble, y: cy + Math.sin(a) * ry * wobble };
+    return { x: round2(50 + Math.cos(a) * rx * wobble), y: round2(cy + Math.sin(a) * ry * wobble) };
   });
 }
 
@@ -249,6 +250,13 @@ const FLAPS = {
   bottom: "polygon(0% 87%, 52% 46%, 100% 86%, 100% 100%, 0% 100%)",
   left: "polygon(0% 0%, 52% 46%, 0% 87%)",
 } as const;
+/**
+ * The quilled rosette's rings round its middle (50%, 39.2%): its white heart, the pink
+ * flower, the ring of leaves and beads and the outer scallops, in % of the outer radius
+ * (430 of 768 px), and the rosette's bounding square.
+ */
+const ROSETTE_BANDS = [21, 57, 78, 100] as const;
+const ROSETTE_BOX: Box = [-6, 7.7, 112, 63];
 /** The tiles laid five across, nine down, each a square. */
 const TILE_ROWS = 9;
 const TILE_COLS = 5;
@@ -861,6 +869,130 @@ function Art({ ctx }: { ctx: Ctx }): ReactNode {
             ))}
           <FrontSplit ctx={ctx} />
           <Floats ctx={ctx} items={burst([0, 1, 2, 3, 4, 5], 12, 7, 300)} />
+        </>
+      );
+    case "chadar":
+      return (
+        <>
+          {beyond}
+          <div className="fo-chadar absolute inset-0">
+            <Paint ctx={ctx} name="veil" className="fo-chadar-lamps" />
+            <span className="fo-chadar-shimmer absolute inset-0" />
+          </div>
+          <FrontSplit ctx={ctx} />
+          <Floats
+            ctx={ctx}
+            items={[...fall([1, 2, 4], 4, 4.5, 13000), ...burst([0, 0, 1, 2, 3, 4, 5], 20, 6, 500)]}
+          />
+        </>
+      );
+    case "parwaaz":
+      return (
+        <>
+          {beyond}
+          <div className="absolute inset-0 [perspective:150cqw]">
+            <Paint ctx={ctx} name="silk" className="fo-veil fo-silk" />
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          {/* The birds rest on the silk while the guest waits, then take off before it */}
+          {!ctx.sample &&
+            [
+              { piece: 0, x: 8, y: 40, size: 30, dx: -60, dy: -70 },
+              { piece: 1, x: 58, y: 22, size: 28, dx: 70, dy: -60 },
+              { piece: 2, x: 62, y: 60, size: 18, dx: 60, dy: -40 },
+              { piece: 3, x: 14, y: 66, size: 32, dx: -50, dy: -90 },
+            ].map((bird, i) => (
+              <span
+                key={i}
+                className="fo-bird absolute aspect-square"
+                style={vars({
+                  left: `${bird.x}%`,
+                  top: `${bird.y}%`,
+                  width: `${bird.size}%`,
+                  "--i": i,
+                  "--fx": `${bird.dx}cqw`,
+                  "--fy": `${bird.dy}cqh`,
+                })}
+              >
+                <Image
+                  alt=""
+                  {...imageProps(ctx, `piece-${bird.piece}`, "small")}
+                  className="object-contain"
+                />
+              </span>
+            ))}
+          <Floats ctx={ctx} items={[...fall([5], 3, 5, 14000), ...burst([4, 5, 2], 12, 6, 700)]} />
+        </>
+      );
+    case "bhanwar":
+      return (
+        <>
+          {beyond}
+          <div className="fo-whirl absolute inset-0">
+            <Paint ctx={ctx} name="marble" className="fo-whirl-spin" />
+          </div>
+          <FrontSplit ctx={ctx} />
+          <Floats
+            ctx={ctx}
+            items={[
+              { piece: 4, x: 14, y: 70, size: 9, mode: "bob", duration: 6000 },
+              { piece: 0, x: 78, y: 14, size: 4, mode: "bob", delay: -2500 },
+              ...burst([0, 1, 2, 3, 5], 16, 6, 900),
+            ]}
+          />
+        </>
+      );
+    case "jaali-patta":
+      return (
+        <>
+          {beyond}
+          <div className="fo-leaf absolute inset-0">
+            <div className="fo-leaf-sway absolute inset-0">
+              <Paint ctx={ctx} name="leaf" />
+              {/* Light runs up the veins, only where the leaf is */}
+              <span
+                className="fo-veins absolute inset-0"
+                style={{
+                  maskImage: "url(/openings/fresh/jaali-patta/leaf.webp)",
+                  maskSize: "cover",
+                  maskPosition: "center",
+                }}
+              />
+            </div>
+          </div>
+          <FrontSplit ctx={ctx} />
+          <Floats
+            ctx={ctx}
+            items={[...fall([0, 1, 2], 5, 5, 14000), ...burst([0, 1, 3, 4, 5], 14, 6, 900)]}
+          />
+        </>
+      );
+    case "lapet-khule":
+      return (
+        <>
+          {beyond}
+          <Paint ctx={ctx} name="rosette" className="fo-rosette-ground" />
+          <div className="absolute inset-0">
+            {range(4).map((i) => (
+              <Cut
+                key={i}
+                ctx={ctx}
+                name="rosette"
+                box={ROSETTE_BOX}
+                className={cn("fo-coil", i % 2 && "fo-reverse")}
+                style={vars({
+                  "--i": i,
+                  "--r0": `${i ? ROSETTE_BANDS[i - 1] : 0}%`,
+                  "--r1": `${ROSETTE_BANDS[i]}%`,
+                })}
+              />
+            ))}
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[...fall([0, 3, 5], 4, 4.5, 13000), ...burst([0, 1, 2, 3, 4, 5], 22, 6.5, 400)]}
+          />
         </>
       );
     case "chhuk-chhuk":

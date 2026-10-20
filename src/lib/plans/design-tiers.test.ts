@@ -18,6 +18,9 @@ describe("design tiers", () => {
     expect(defaultTier("deepotsav")).toBe("royal");
     // The storybook themes with their own gates are Stories too, at ₹799
     expect(defaultTier("chaand-kalayein")).toBe("royal");
+    // The templates with a painted centre are Signature, at ₹1,099
+    expect(defaultTier("hashiya")).toBe("signature");
+    expect(defaultTier("lapet")).toBe("signature");
     expect(tierPricePaise(DEFAULT_PRICING, "premium")).toBe(49_900);
     expect(tierPricePaise(DEFAULT_PRICING, "royal")).toBe(79_900);
   });
@@ -59,8 +62,8 @@ describe("design tiers", () => {
     expect(old.tiers).toEqual({ "card-marigold": "royal" });
   });
 
-  it("price Signature at ₹799 unless the admin changes it", () => {
-    expect(tierPricePaise(DEFAULT_PRICING, "signature")).toBe(79_900);
+  it("price Signature at ₹1,099 unless the admin changes it", () => {
+    expect(tierPricePaise(DEFAULT_PRICING, "signature")).toBe(1_09_900);
     // Settings saved before Signature existed keep their prices and gain Signature's default
     const saved = parsePricing({
       designs: { premium: 59_900, royal: 69_900 },
@@ -68,7 +71,7 @@ describe("design tiers", () => {
       invites: { basic: 40, celebration: 400 },
       tiers: {},
     });
-    expect(saved.designs).toEqual({ premium: 59_900, royal: 69_900, signature: 79_900 });
+    expect(saved.designs).toEqual({ premium: 59_900, royal: 69_900, signature: 1_09_900 });
   });
 
   it("need Royal dearer than Premium, Grand above Celebration and more invites in Celebration", () => {

@@ -77,6 +77,11 @@ export const designNames = {
     "sunehri-sarovar": "Sunehri Sarovar",
     pattu: "Pattu",
     "sona-rekha": "Sona Rekha",
+    hashiya: "Hashiya",
+    gara: "Gara",
+    abri: "Abri",
+    "neel-chhaap": "Neel Chhaap",
+    lapet: "Lapet",
     dhokra: "Dhokra",
     "kaanch-chitra": "Kaanch Chitra",
     "chettinad-veedu": "Chettinad Veedu",
@@ -486,6 +491,14 @@ export const designNames = {
       "Kanjeevaram silk in magenta and emerald, with temple-gold zari, jasmine and brass lamps.",
     "sona-rekha":
       "Ivory cotton paper, single-line gold-foil drawings and plenty of quiet white space.",
+    hashiya:
+      "A Mughal illuminated album: every page a royal leaf, a gold-flowered margin round wide burnished ivory paper.",
+    gara: "Parsi gara embroidery: cranes, peonies, willows and little bridges stitched in silk thread on lustrous silk.",
+    abri: "Deccani marbled paper and Golconda miniatures: lilac, ultramarine and rose swirls round calm pale fields.",
+    "neel-chhaap":
+      "A cyanotype sun-print: white ferns, lace and flowers on deep Prussian blue, with soft prints of palaces and gardens.",
+    lapet:
+      "Paper quilling: flowers, birds, palaces and lanterns rolled from pastel paper strips on ivory card.",
     dhokra:
       "Bell-metal Dhokra art: every page a scene cast in warm bronze, glowing against dark clay.",
     "kaanch-chitra":

@@ -28,6 +28,7 @@ const STORY_THEMES = (
   "panchatantra,patang-udaan,diya-ki-kahani,resham-katha,navrang,nadi-safar,ek-rekha," +
   "mahal-yatra,kinkhab,saanjh-kinara,nathdwara-raat,chandni-mahal,aakash-mahal,firoza-bagh,gulabi-nagar," +
   "hina,mor-sarovar,kumudini,darbar,sunehri-sarovar,pattu,sona-rekha," +
+  "hashiya,gara,abri,neel-chhaap,lapet," +
   "dhokra,kaanch-chitra,chettinad-veedu,meenakari,rogan,shab-e-gul,sama,purani-dilli," +
   "chandi-nakkashi,gagan-safar," +
   "kagzi-phool,nilofar,sona-gulaab,shabnam,surkh-gulaab," +

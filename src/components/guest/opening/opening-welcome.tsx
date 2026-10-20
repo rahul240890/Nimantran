@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { keepDate } from "@/lib/suites/lettering";
@@ -316,6 +317,16 @@ const ART: Record<WelcomeScene, () => ReactNode> = {
 /** Scenes with a horizon low down lift the words above it. */
 const LIFTED: readonly WelcomeScene[] = ["lamps", "sunrise", "ghat", "waves", "peacock"];
 
+/**
+ * A template's own painted centre (templates 26 on): its picture, and the empty field in
+ * it for the words, [top, bottom, left, right] in % of the painting.
+ */
+export type WelcomeCentre = {
+  src: string;
+  field: readonly [number, number, number, number];
+  dark?: boolean;
+};
+
 export function OpeningWelcome({
   scene,
   copy,
@@ -326,6 +337,7 @@ export function OpeningWelcome({
   skip,
   seconds,
   over = false,
+  centre,
   onSkip,
 }: {
   scene: WelcomeScene;
@@ -339,12 +351,17 @@ export function OpeningWelcome({
   seconds: number;
   /** Over a painting the guest should still see round the names (the fresh openings). */
   over?: boolean;
+  /**
+   * The template's painted centre, in place of the scene: the picture its opening revealed,
+   * with the words in its empty field.
+   */
+  centre?: WelcomeCentre;
   onSkip: () => void;
 }) {
   const words = CARD_GREETING_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   // Over a painting the words sit on a veil of card stock, so they are always ink
-  const dark = darkWelcome(scene) && !over;
+  const dark = centre ? Boolean(centre.dark) : darkWelcome(scene) && !over;
   const Art = ART[scene];
   const button = useRef<HTMLButtonElement>(null);
   useEffect(() => button.current?.focus({ preventScroll: true }), []);
@@ -356,84 +373,99 @@ export function OpeningWelcome({
     <div
       lang={lang}
       data-testid="opening-welcome"
-      data-welcome={scene}
-      data-over={over ? "art" : undefined}
+      data-welcome={centre ? "centre" : scene}
+      data-over={over && !centre ? "art" : undefined}
       data-tone={dark ? "dark" : "light"}
       onClick={onSkip}
       className="opening-welcome absolute inset-0 z-40 overflow-hidden"
     >
       <div aria-hidden className="absolute inset-0">
-        <Art />
-      </div>
-      <div
-        className={cn(
-          "relative flex h-full flex-col items-center justify-center gap-[2cqh] text-center",
-          scene === "letter" ? "px-[14cqw]" : "px-[8cqw]",
-          LIFTED.includes(scene) && "pb-[14cqh]",
-          scene === "royal" && "pt-[8cqh]",
-        )}
-      >
-        {eyebrow && (
-          <p
-            className="welcome-rise welcome-accent max-w-[34ch] text-[clamp(0.95rem,4.6cqw,1.45rem)] text-balance"
-            style={{ ...script, ...rise(350) }}
-          >
-            {eyebrow}
-          </p>
-        )}
-        <p className="welcome-names flex flex-col items-center break-words" style={names}>
-          <span
-            className="welcome-name text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]"
-            style={rise(550)}
-          >
-            {copy.first}
-          </span>
-          {joiner && (
-            <>
-              <span
-                className="welcome-joiner welcome-accent text-[clamp(1.2rem,min(7cqw,4.5cqh),2.4rem)]"
-                style={rise(900)}
-              >
-                {joiner}
-              </span>
-              <span
-                className="welcome-name text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]"
-                style={rise(1050)}
-              >
-                {copy.second}
-              </span>
-            </>
-          )}
-        </p>
-        <span aria-hidden className="welcome-rule" style={rise(1350)} />
-        {line && (
-          <p
-            className="welcome-rise welcome-soft max-w-[32ch] text-[clamp(0.85rem,3.8cqw,1.15rem)] text-balance"
-            style={rise(1550)}
-          >
-            {line}
-          </p>
-        )}
-        {(copy.date || venue) && (
-          <div className="welcome-rise flex flex-col items-center gap-1" style={rise(1800)}>
-            {copy.date && (
-              <p
-                className={cn(
-                  "welcome-date rounded-2xl px-[4cqw] py-[0.8cqh] text-[clamp(0.75rem,3.2cqw,1rem)] text-balance [font-variant-numeric:lining-nums]",
-                  lang === "en" && "font-label tracking-[0.18em] uppercase",
-                )}
-              >
-                {keepDate(copy.date)}
-              </p>
-            )}
-            {venue && (
-              <p className="welcome-soft text-[clamp(0.8rem,3.4cqw,1.05rem)] text-balance">
-                {venue}
-              </p>
-            )}
+        {centre ? (
+          // Placed as the opening's own layers are, so the picture it revealed stays put
+          <div className="welcome-centre absolute top-1/2 left-1/2">
+            <Image
+              src={centre.src}
+              alt=""
+              fill
+              sizes="(min-width: 40rem) 32rem, 100vw"
+              className="object-cover"
+            />
           </div>
+        ) : (
+          <Art />
         )}
       </div>
+      <Field centre={centre}>
+        <div
+          className={cn(
+            "relative flex h-full flex-col items-center justify-center gap-[2cqh] text-center",
+            centre ? "px-[5cqw]" : scene === "letter" ? "px-[14cqw]" : "px-[8cqw]",
+            !centre && LIFTED.includes(scene) && "pb-[14cqh]",
+            !centre && scene === "royal" && "pt-[8cqh]",
+          )}
+        >
+          {eyebrow && (
+            <p
+              className="welcome-rise welcome-accent max-w-[34ch] text-[clamp(0.95rem,4.6cqw,1.45rem)] text-balance"
+              style={{ ...script, ...rise(350) }}
+            >
+              {eyebrow}
+            </p>
+          )}
+          <p className="welcome-names flex flex-col items-center break-words" style={names}>
+            <span
+              className="welcome-name text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]"
+              style={rise(550)}
+            >
+              {copy.first}
+            </span>
+            {joiner && (
+              <>
+                <span
+                  className="welcome-joiner welcome-accent text-[clamp(1.2rem,min(7cqw,4.5cqh),2.4rem)]"
+                  style={rise(900)}
+                >
+                  {joiner}
+                </span>
+                <span
+                  className="welcome-name text-[clamp(2.2rem,min(13cqw,8cqh),4.6rem)]"
+                  style={rise(1050)}
+                >
+                  {copy.second}
+                </span>
+              </>
+            )}
+          </p>
+          <span aria-hidden className="welcome-rule" style={rise(1350)} />
+          {line && (
+            <p
+              className="welcome-rise welcome-soft max-w-[32ch] text-[clamp(0.85rem,3.8cqw,1.15rem)] text-balance"
+              style={rise(1550)}
+            >
+              {line}
+            </p>
+          )}
+          {(copy.date || venue) && (
+            <div className="welcome-rise flex flex-col items-center gap-1" style={rise(1800)}>
+              {copy.date && (
+                <p
+                  className={cn(
+                    "welcome-date rounded-2xl px-[4cqw] py-[0.8cqh] text-[clamp(0.75rem,3.2cqw,1rem)] text-balance [font-variant-numeric:lining-nums]",
+                    lang === "en" && "font-label tracking-[0.18em] uppercase",
+                  )}
+                >
+                  {keepDate(copy.date)}
+                </p>
+              )}
+              {venue && (
+                <p className="welcome-soft text-[clamp(0.8rem,3.4cqw,1.05rem)] text-balance">
+                  {venue}
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      </Field>
       <span
         aria-hidden
         className="welcome-progress absolute inset-x-0 bottom-0 h-[3px] origin-left"
@@ -450,6 +482,25 @@ export function OpeningWelcome({
       >
         {skip}
       </button>
+    </div>
+  );
+}
+
+/**
+ * The words' room: the whole screen, or a painted centre's empty field, measured on the
+ * painting as it is placed on the screen and sized in its own container units.
+ */
+function Field({ centre, children }: { centre?: WelcomeCentre; children: ReactNode }) {
+  if (!centre) return children;
+  const [top, bottom, left, right] = centre.field;
+  return (
+    <div className="welcome-centre pointer-events-none absolute top-1/2 left-1/2">
+      <div
+        className="[container-type:size] absolute"
+        style={{ top: `${top}%`, bottom: `${bottom}%`, left: `${left}%`, right: `${right}%` }}
+      >
+        {children}
+      </div>
     </div>
   );
 }

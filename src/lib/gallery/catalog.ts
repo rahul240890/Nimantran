@@ -455,6 +455,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "hashiya",
       "meenakari",
       "purani-dilli",
       "mahal-yatra",
@@ -732,6 +733,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "hashiya",
+      "abri",
       "shab-e-gul",
       "purani-dilli",
       "firoza-bagh",
@@ -766,6 +769,11 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "gara",
+      "abri",
+      "neel-chhaap",
+      "lapet",
+      "hashiya",
       "dhokra",
       "rogan",
       "shab-e-gul",

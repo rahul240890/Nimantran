@@ -92,7 +92,7 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "এই ডিজাইনের প্যাকেজ",
   packageFree: "বিনামূল্যে",
   comparePackages: "প্যাকেজগুলো তুলনা করুন",
-  seeSample: "অতিথির মতো খুলে দেখুন",
+  seeSample: "অতিথি হয়ে লাইভ দেখুন",
   sampleLabel: "নমুনা নিমন্ত্রণপত্র",
   sampleNote: "নাম, তারিখ আর জায়গা সবই কাল্পনিক",
   showAll: (count: number) => `সব ${count}টি ডিজাইন দেখান`,
@@ -125,6 +125,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   previous: "আগের পাতা",
   next: "পরের পাতা",
   pageOf: (index: number, total: number) => `${total}টি পাতার মধ্যে ${index} নম্বর`,
+  playPages: "পাতাগুলো নিজে থেকে চালান",
+  pausePages: "পাতাগুলো থামান",
   breadcrumb: "নিমন্ত্রণপত্র",
   kindMeta: (name: string) => ({
     title: `${name} বিয়ের নিমন্ত্রণপত্র`,

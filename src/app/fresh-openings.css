@@ -1335,6 +1335,170 @@
   opacity: 0;
 }
 
+/* chadar (Hashiya): light shimmers down the falling water and the lamps flicker; opened,
+   the flow stops and the veil thins away from the top down, splashing drops and petals */
+@property --fo-wipe {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -12%;
+}
+.fo-chadar {
+  mask-image: linear-gradient(180deg, transparent var(--fo-wipe), #000 calc(var(--fo-wipe) + 12%));
+  transition: --fo-wipe 2000ms cubic-bezier(0.45, 0, 0.35, 1) 250ms;
+}
+.opening-stage[data-open="true"] .fo-chadar {
+  --fo-wipe: 100%;
+}
+.fo-chadar-lamps {
+  animation: fo-flicker 2.6s ease-in-out infinite alternate;
+}
+.fo-chadar-shimmer {
+  background: repeating-linear-gradient(
+      180deg,
+      transparent 0 9%,
+      color-mix(in oklab, var(--card-ivory) 22%, transparent) 11%,
+      transparent 14% 24%
+    )
+    0 0 / 100% 200%;
+  mix-blend-mode: screen;
+  animation: fo-pour 2.4s linear infinite;
+}
+.opening-stage[data-open="true"] .fo-chadar-shimmer {
+  animation-play-state: paused;
+}
+@keyframes fo-flicker {
+  from {
+    filter: brightness(0.96);
+  }
+  to {
+    filter: brightness(1.06) saturate(1.05);
+  }
+}
+@keyframes fo-pour {
+  to {
+    background-position: 0 100%;
+  }
+}
+
+/* parwaaz (Gara): the birds rest on the embroidered silk, rising and settling; opened,
+   they take off first and the silk floats up after them */
+.fo-silk {
+  transition-delay: 650ms, 650ms, 650ms, 1900ms;
+}
+.fo-bird {
+  animation: fo-bob 4.5s ease-in-out calc(var(--i) * -1.1s) infinite alternate;
+  transition:
+    translate 1500ms cubic-bezier(0.5, 0, 0.6, 1) calc(var(--i) * 120ms),
+    scale 1500ms ease calc(var(--i) * 120ms),
+    opacity 600ms ease calc(1000ms + var(--i) * 120ms);
+}
+.opening-stage[data-open="true"] .fo-bird {
+  translate: var(--fx) var(--fy);
+  scale: 1.5;
+  opacity: 0;
+}
+
+/* bhanwar (Abri): the marbled paper turns slowly; opened, it whirls into the middle and
+   drains away like a whirlpool */
+.fo-whirl {
+  clip-path: circle(120% at 50% 44%);
+  transition: clip-path 2100ms cubic-bezier(0.55, 0, 0.45, 1) 200ms;
+}
+.opening-stage[data-open="true"] .fo-whirl {
+  clip-path: circle(0% at 50% 44%);
+}
+.fo-whirl-spin {
+  scale: 1.25;
+  transform-origin: 50% 44%;
+  animation: fo-rock 6s ease-in-out infinite alternate;
+  transition:
+    rotate 2300ms cubic-bezier(0.5, 0, 0.4, 1) 150ms,
+    scale 2300ms ease 150ms;
+}
+.opening-stage[data-open="true"] .fo-whirl-spin {
+  rotate: 1.25turn;
+  scale: 0.6;
+  animation-play-state: paused;
+}
+
+/* jaali-patta (Neel Chhaap): light runs up the leaf's veins and it sways on its stem;
+   opened, it turns over and flutters down like an autumn leaf */
+.fo-leaf-sway {
+  transform-origin: 50% 98%;
+  animation: fo-rock 4s ease-in-out infinite alternate;
+}
+.fo-veins {
+  background: linear-gradient(
+      0deg,
+      transparent 30%,
+      color-mix(in oklab, var(--card-ivory) 70%, transparent) 46%,
+      transparent 62%
+    )
+    0 0 / 100% 300%;
+  mix-blend-mode: screen;
+  animation: fo-veins 3.2s ease-in-out infinite;
+}
+@keyframes fo-veins {
+  from {
+    background-position: 0 0%;
+  }
+  to {
+    background-position: 0 100%;
+  }
+}
+.opening-stage[data-open="true"] .fo-leaf {
+  animation: fo-leaf-fall 2300ms cubic-bezier(0.45, 0, 0.6, 1) 150ms both;
+}
+@keyframes fo-leaf-fall {
+  0% {
+    transform: perspective(160cqw);
+    opacity: 1;
+  }
+  30% {
+    transform: perspective(160cqw) translate(-6%, 8%) rotate(-14deg) rotateY(50deg) scale(0.85);
+  }
+  60% {
+    transform: perspective(160cqw) translate(10%, 42%) rotate(18deg) rotateY(160deg) scale(0.65);
+    opacity: 1;
+  }
+  100% {
+    transform: perspective(160cqw) translate(-4%, 110%) rotate(-24deg) rotateY(250deg) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* lapet-khule (Lapet): the rosette's rings turn, each its own way; opened, they spring
+   loose one after another and bounce away, and the quilled ground falls back */
+.fo-coil {
+  mask-image: radial-gradient(
+    closest-side,
+    transparent calc(var(--r0) - 0.4%),
+    #000 var(--r0),
+    #000 calc(var(--r1) - 0.4%),
+    transparent var(--r1)
+  );
+  animation: fo-spin calc(30s + var(--i) * 12s) linear infinite;
+  transition:
+    scale 1400ms cubic-bezier(0.34, 1.5, 0.5, 1) calc(100ms + var(--i) * 140ms),
+    opacity 700ms ease calc(900ms + var(--i) * 140ms);
+}
+.fo-coil.fo-reverse {
+  animation-direction: reverse;
+}
+.opening-stage[data-open="true"] .fo-coil {
+  scale: calc(1.5 + var(--i) * 0.35);
+  opacity: 0;
+}
+.fo-rosette-ground {
+  transition:
+    opacity 900ms ease 900ms,
+    scale 1600ms ease 400ms;
+}
+.opening-stage[data-open="true"] .fo-rosette-ground {
+  scale: 1.2;
+  opacity: 0;
+}
+
 /* The welcome over a fresh opening lets the place revealed show round the names */
 .opening-welcome[data-over="art"] {
   background: radial-gradient(

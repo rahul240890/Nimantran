@@ -308,7 +308,7 @@ export const DESIGN_OPENINGS: Readonly<Record<string, OpeningStyle>> = {
   rooftop: "deco-gates",
   "card-gopuram": "gopuram-kadhavu",
   "launch-stage-scene": "yantra-pat",
-  "origami-saaras-scene": "pankhudi-pat",
+  "origami-saaras-scene": "parwaaz",
   "ganesh-utsav-scene": "rajwada-pol",
   "nimbu-amalfi-scene": "bel-khidki",
   "durga-pujo-scene": "peacock",

@@ -1625,6 +1625,31 @@ export const openingCopy = {
       name: "Toy train",
       description: "A little steam train puffs past, and the steam clears onto a party station.",
     },
+    chadar: {
+      name: "Water veil",
+      description:
+        "A sheet of water falls over a marble wall of lamp niches, then stops and thins away from the top.",
+    },
+    parwaaz: {
+      name: "Embroidered birds",
+      description:
+        "Silk embroidered with resting birds: the birds lift off and fly, and the silk floats up after them.",
+    },
+    bhanwar: {
+      name: "Marbled whirlpool",
+      description:
+        "A sheet of Deccani marbled paper swirls like a whirlpool and drains away into the middle.",
+    },
+    "jaali-patta": {
+      name: "Skeleton leaf",
+      description:
+        "Light runs up the veins of a great lace-like leaf, then it turns and flutters down.",
+    },
+    "lapet-khule": {
+      name: "Quilled rosette",
+      description:
+        "A rosette of rolled paper coils spins, the rings spring loose and the curls bounce away.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",

@@ -358,6 +358,11 @@ export type SceneThemeId = (typeof SCENE_THEME_IDS)[number];
  * a gate of its own and a page for photos. Painted to suit every occasion, not only weddings.
  */
 export const STORY_IDS = [
+  "hashiya",
+  "gara",
+  "abri",
+  "neel-chhaap",
+  "lapet",
   "dhokra",
   "kaanch-chitra",
   "chettinad-veedu",
@@ -562,6 +567,13 @@ export type Suite = {
   guest?: GuestLookChoice;
   /** How its words are lettered (lettering.ts); missing is regal, the palaces' serif. */
   voice?: Voice;
+  /**
+   * A painted centre (templates 26 on, shubhdwar/new-15-template-prompts.md): the picture
+   * at /suites/<id>/centre.webp that the opening reveals, round an empty field for the
+   * names, the line and the date, in place of the drawn welcome. The field is in % of the
+   * painting, [top, bottom, left, right]; dark when it is deep in colour, for ivory words.
+   */
+  centre?: { field: readonly [number, number, number, number]; dark?: true };
 };
 
 const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
@@ -2327,6 +2339,176 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "light",
       reply: "light",
     },
+  },
+  // A Mughal illuminated album: gold-flowered margins round burnished ivory paper
+  hashiya: {
+    id: "hashiya",
+    art: "bagh",
+    turn: "book",
+    faiths: ["all"],
+    template: "emerald",
+    traditions: [],
+    guest: {
+      style: "palace",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "diyas",
+      pattern: "jaali",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/hashiya/cover.webp",
+      family: "/suites/hashiya/family.webp",
+      haldi: "/suites/hashiya/haldi.webp",
+      mehendi: "/suites/hashiya/mehendi.webp",
+      sangeet: "/suites/hashiya/sangeet.webp",
+      baraat: "/suites/hashiya/baraat.webp",
+      wedding: "/suites/hashiya/wedding.webp",
+      reception: "/suites/hashiya/reception.webp",
+      reply: "/suites/hashiya/reply.webp",
+    },
+    tones: {
+      reply: "light",
+    },
+    centre: { field: [24, 24, 25, 25] },
+  },
+  // Parsi gara embroidery: cranes, peonies and willows stitched on silk
+  gara: {
+    id: "gara",
+    art: "kayal",
+    turn: "fade",
+    faiths: ["all"],
+    template: "rose",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "lanterns",
+      pattern: "jaali",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/gara/cover.webp",
+      family: "/suites/gara/family.webp",
+      haldi: "/suites/gara/haldi.webp",
+      mehendi: "/suites/gara/mehendi.webp",
+      sangeet: "/suites/gara/sangeet.webp",
+      baraat: "/suites/gara/baraat.webp",
+      wedding: "/suites/gara/wedding.webp",
+      reception: "/suites/gara/reception.webp",
+      reply: "/suites/gara/reply.webp",
+    },
+    tones: {
+      cover: "dark",
+      wedding: "dark",
+    },
+    centre: { field: [23, 25, 14, 14] },
+  },
+  // Deccani marbled paper and Golconda miniatures: lilac and rose swirls round pale fields
+  abri: {
+    id: "abri",
+    art: "bagh",
+    turn: "sweep",
+    faiths: ["all"],
+    template: "paithani",
+    traditions: [],
+    guest: {
+      style: "palace",
+      flower: "rose",
+      secondFlower: "jasmine",
+      lamp: "lanterns",
+      pattern: "jaali",
+    },
+    voice: "regal",
+    images: {
+      cover: "/suites/abri/cover.webp",
+      family: "/suites/abri/family.webp",
+      haldi: "/suites/abri/haldi.webp",
+      mehendi: "/suites/abri/mehendi.webp",
+      sangeet: "/suites/abri/sangeet.webp",
+      baraat: "/suites/abri/baraat.webp",
+      wedding: "/suites/abri/wedding.webp",
+      reception: "/suites/abri/reception.webp",
+      reply: "/suites/abri/reply.webp",
+    },
+    tones: {
+      sangeet: "light",
+      reception: "light",
+      reply: "light",
+    },
+    centre: { field: [30, 27, 18, 18] },
+  },
+  // A cyanotype sun-print: white ferns, lace and palaces on Prussian blue
+  "neel-chhaap": {
+    id: "neel-chhaap",
+    art: "kayal",
+    turn: "fade",
+    faiths: ["all"],
+    template: "monogram",
+    traditions: [],
+    guest: {
+      style: "garden",
+      flower: "jasmine",
+      secondFlower: "lotus",
+      lamp: "fairy",
+      pattern: "burst",
+    },
+    voice: "modern",
+    images: {
+      cover: "/suites/neel-chhaap/cover.webp",
+      family: "/suites/neel-chhaap/family.webp",
+      haldi: "/suites/neel-chhaap/haldi.webp",
+      mehendi: "/suites/neel-chhaap/mehendi.webp",
+      sangeet: "/suites/neel-chhaap/sangeet.webp",
+      baraat: "/suites/neel-chhaap/baraat.webp",
+      wedding: "/suites/neel-chhaap/wedding.webp",
+      reception: "/suites/neel-chhaap/reception.webp",
+      reply: "/suites/neel-chhaap/reply.webp",
+    },
+    tones: {
+      cover: "dark",
+      family: "dark",
+      haldi: "dark",
+      mehendi: "dark",
+      baraat: "dark",
+      wedding: "dark",
+    },
+    centre: { field: [29, 32, 17, 17], dark: true },
+  },
+  // Paper quilling: pastel paper coils rolled into flowers, birds and palaces on ivory card
+  lapet: {
+    id: "lapet",
+    art: "bagh",
+    turn: "push",
+    faiths: ["all"],
+    template: "marigold",
+    traditions: [],
+    guest: {
+      style: "party",
+      flower: "rose",
+      secondFlower: "marigold",
+      lamp: "fairy",
+      pattern: "rangoli",
+    },
+    voice: "playful",
+    images: {
+      cover: "/suites/lapet/cover.webp",
+      family: "/suites/lapet/family.webp",
+      haldi: "/suites/lapet/haldi.webp",
+      mehendi: "/suites/lapet/mehendi.webp",
+      sangeet: "/suites/lapet/sangeet.webp",
+      baraat: "/suites/lapet/baraat.webp",
+      wedding: "/suites/lapet/wedding.webp",
+      reception: "/suites/lapet/reception.webp",
+      reply: "/suites/lapet/reply.webp",
+    },
+    tones: {
+      sangeet: "light",
+      reception: "light",
+      reply: "light",
+    },
+    centre: { field: [27, 32, 18, 18] },
   },
   // Dhokra bell-metal casting, warm bronze glowing on dark clay
   dhokra: {
