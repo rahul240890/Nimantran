@@ -5,6 +5,8 @@ import { TestAi } from "@/components/admin/ai-controls";
 import { SettingRow } from "@/components/admin/setting-row";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/admin/access";
+import { listReading } from "@/lib/guests/read-list-server";
+import { PLANS } from "@/lib/plans/catalog";
 import { AI_PROVIDERS, aiConfig } from "@/lib/wording/providers";
 
 export const metadata: Metadata = { title: "AI" };
@@ -34,13 +36,14 @@ export default async function AiPage() {
     Boolean(named) && !(AI_PROVIDERS as readonly string[]).includes(named!.toLowerCase());
   const set = (label = "Set") => ({ tone: "success" as const, label });
   const missing = { tone: "warning" as const, label: "Not set" };
+  const reads = listReading();
 
   return (
     <>
       <AdminHeading
         eyebrow="Settings"
         title="AI"
-        intro="One AI writes the wording on hosts' cards (Write with AI in the editor) and first drafts of blog posts. Its key lives in Vercel's environment variables, never in the database; this page only shows the last four characters."
+        intro="One AI writes the wording on hosts' cards (Write with AI in the editor) and first drafts of blog posts, and reads hosts' handwritten or printed guest lists into their guest list (Import guests). Its key lives in Vercel's environment variables, never in the database; this page only shows the last four characters."
       />
       <div className="flex flex-col gap-6">
         <Card>
@@ -82,6 +85,20 @@ export default async function AiPage() {
                   process.env.AI_MODEL?.trim()
                     ? set()
                     : { tone: "neutral" as const, label: config ? "Default" : "Not set" }
+                }
+              />
+              <SettingRow
+                name="Reads guest lists"
+                where={`Photos of handwritten lists, and files. ${PLANS.free.listPages} page free on every invite, ${PLANS.grand.listPages} on Grand. DeepSeek can't read photos.`}
+                value={
+                  reads ? (reads.pdf ? "Photos, PDFs and files" : "Photos and files") : undefined
+                }
+                state={
+                  reads
+                    ? set("On")
+                    : config
+                      ? { tone: "warning" as const, label: "Needs a provider that reads photos" }
+                      : missing
                 }
               />
             </div>

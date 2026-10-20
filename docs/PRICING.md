@@ -43,6 +43,7 @@ Every design has a price the master admin sets (**Admin, Designs**): Free, Premi
 | Guest photo wall                      | —                       | —                          | 30 days                   | 1 year            |
 | Co-hosts                              | 1                       | 1                          | 3                         | Unlimited         |
 | Save-the-date and thank-you cards     | Preview with the mark   | Preview with the mark      | Preview with the mark     | Yes               |
+| AI reads guest lists (photos, files)  | 1 page to try           | 1 page to try              | 1 page to try             | 30 pages          |
 
 Rules:
 
@@ -57,6 +58,7 @@ Rules:
 - **Video preview for everyone** (owner, 2026-10-14): any host makes the invitation video and watches it free, from the editor's last step (`/invites/<id>/video`), the invite's dashboard, the share page or the Celebration card. Without Celebration or Grand on its design it carries a "Made with Shubh" mark across the middle and can't be downloaded or shared; with them it downloads clean once the invite is live, since its last card carries the link.
 - **Video controls** (owner, 2026-10-16): once made, before or after paying, the host watches it full screen, makes it again or deletes it from the device. Download shows from the start: locked, it leads to the package (or to publishing) that unlocks it.
 - **Save-the-date and thank-you cards in Grand** (2026-10-17): every host makes both pictures in their design (`/invites/<id>/cards`) and sees them with the “Made with Shubh” mark across; Grand downloads and shares them clean, before or after publishing (a save the date goes out before the invitation). While payments are off, everyone gets them clean.
+- **AI reads guest lists in Grand** (owner, 2026-10-19): the host photographs a handwritten list, diary or printed sheet, or chooses a PDF, Word, Excel or notes file, and AI turns it into guests for the usual import review, where rows it was unsure of come first and any row can be edited. Every package reads one page free so hosts see their own names come out; Grand reads 30 pages per invite. Unlike the other features, this stays limited while checkout is off, since every page is a paid AI call; an admin can give an invite Grand (Admin, Orders). Photos are read and dropped, never stored. Code: `src/lib/guests/read-list.ts`.
 - Not in any package yet, because they are not built: PDF and printable QR.
 
 ## 3. Personal: Family Plus (yearly)

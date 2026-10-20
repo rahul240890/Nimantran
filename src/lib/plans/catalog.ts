@@ -40,11 +40,17 @@ export type Plan = {
   cohosts: number | null;
   /** Save-the-date and thank-you cards to download and share (Step 24). */
   cards: boolean;
+  /** Pages of a guest list (photos or files) AI reads into the guest list, per invite. */
+  listPages: number;
 };
+
+/** Every package can try reading one page of a guest list with AI. */
+export const FREE_LIST_PAGES = 1;
 
 export const PLANS: Record<PlanId, Plan> = {
   free: {
     id: "free",
+    listPages: FREE_LIST_PAGES,
     watermark: true,
     languages: 1,
     video: "none",
@@ -54,6 +60,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   basic: {
     id: "basic",
+    listPages: FREE_LIST_PAGES,
     watermark: false,
     languages: 1,
     video: "none",
@@ -63,6 +70,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   celebration: {
     id: "celebration",
+    listPages: FREE_LIST_PAGES,
     watermark: false,
     languages: 2,
     video: "one",
@@ -72,6 +80,7 @@ export const PLANS: Record<PlanId, Plan> = {
   },
   grand: {
     id: "grand",
+    listPages: 30,
     watermark: false,
     languages: 2,
     video: "every",

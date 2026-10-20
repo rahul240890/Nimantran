@@ -4,8 +4,8 @@ import { format, parseISO } from "date-fns";
 import { CalendarPlus, Flower2 } from "lucide-react";
 import Image from "next/image";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
-import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
+import type { FunctionId } from "@/lib/events/functions";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
@@ -14,11 +14,13 @@ import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo"
 import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
+import { eventBox, type EventBox as Box } from "@/lib/suites/event-boxes";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
+import { EventBox } from "./event-box";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
 import {
   Balloons,
@@ -59,6 +61,7 @@ export function ThemedDetails({
   copy,
   lang,
   functions,
+  days,
   main,
   photo,
   photos,
@@ -75,6 +78,8 @@ export function ThemedDetails({
   /** The card's language: the page's own words follow it, like the pages above. */
   lang: CardLanguage;
   functions: readonly GuestFunction[];
+  /** Each celebration's date (YYYY-MM-DD), for the date seals and stubs on its box. */
+  days: Readonly<Partial<Record<FunctionId, string>>>;
   /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
   main: { date: string; venue: string } | null;
   /** The photo the welcome shows: the couple's, from the design's own frame. */
@@ -117,8 +122,10 @@ export function ThemedDetails({
         look={look}
         lang={lang}
         functions={functions}
+        days={days}
         allIcsUrl={allIcsUrl}
         layouts={layouts}
+        box={eventBox(suite, look.style)}
       />
       {(photos.length > 0 || family.length > 0) && (
         <Dusk
@@ -471,20 +478,27 @@ function Celebrations({
   look,
   lang,
   functions,
+  days,
   allIcsUrl,
   layouts,
+  box,
 }: {
   suite: SuiteId;
   look: GuestLook;
   lang: CardLanguage;
   functions: readonly GuestFunction[];
+  days: Readonly<Partial<Record<FunctionId, string>>>;
   allIcsUrl: string | null;
   layouts: SectionLayouts;
+  /** The theme's box for each celebration's details (event-boxes.ts). */
+  box: Box;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
   const plan = layouts.plan;
+  // On a timeline the thread itself is the day's plan, so the list above it is left out
+  const line = layouts.hours === "timeline";
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
       <div
@@ -502,7 +516,7 @@ function Celebrations({
           label={cardWords.eventsLabel}
           title={cardWords.celebrations}
         />
-        {functions.length > 1 && (
+        {functions.length > 1 && !line && (
           <Reveal
             className={cn("mx-auto mt-8 w-full", plan === "tiles" ? "max-w-2xl" : "max-w-md")}
           >
@@ -545,6 +559,16 @@ function Celebrations({
             </ol>
           </Reveal>
         )}
+        {line && (
+          <Timeline
+            look={look}
+            box={box}
+            images={images}
+            lang={lang}
+            functions={functions}
+            days={days}
+          />
+        )}
         {allIcsUrl && (
           <div className="mt-6 flex justify-center">
             <Button asChild variant="secondary" className="rounded-full">
@@ -556,80 +580,160 @@ function Celebrations({
           </div>
         )}
       </div>
-      <ol data-layout={layouts.hours}>
-        {functions.map((fn, index) => {
-          const { art, mood } = pageLook(fn.kind);
-          const image = images[art] ?? images.cover;
-          const headingId = `fn-${fn.kind}`;
-          const overlay = layouts.hours === "overlay" && Boolean(image);
-          // Zigzag: every other hour sets its painting on the far side
-          const flipped = layouts.hours === "zigzag" && index % 2 === 1;
-          return (
-            <li
-              key={fn.kind}
-              data-mood={mood}
-              data-tour="8"
-              className="guest-sky guest-hour relative isolate flex min-h-svh flex-col justify-center px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
-            >
-              <Divider look={look} />
-              {overlay && image && (
-                // The hour's painting fills the screen, the card held over it
-                <div aria-hidden className="guest-hour-backdrop absolute inset-0 -z-10">
-                  <Image
-                    src={image}
-                    alt=""
-                    fill
-                    sizes="100vw"
-                    className="object-cover object-[50%_40%]"
-                  />
-                </div>
-              )}
-              <Reveal
-                className={cn(
-                  "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
-                  overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
-                )}
+      {!line && (
+        <ol data-layout={layouts.hours}>
+          {functions.map((fn, index) => {
+            const { art, mood } = pageLook(fn.kind);
+            const image = images[art] ?? images.cover;
+            const headingId = `fn-${fn.kind}`;
+            const overlay = layouts.hours === "overlay" && Boolean(image);
+            // Zigzag: every other hour sets its painting on the far side
+            const flipped = layouts.hours === "zigzag" && index % 2 === 1;
+            return (
+              <li
+                key={fn.kind}
+                data-mood={mood}
+                data-tour="8"
+                className="guest-sky guest-hour relative isolate flex min-h-svh flex-col justify-center px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
               >
-                {image && !overlay && (
-                  <Framed
-                    look={look}
-                    className={cn(
-                      "guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]",
-                      flipped && "md:order-2",
-                    )}
-                  >
+                <Divider look={look} />
+                {overlay && image && (
+                  // The hour's painting fills the screen, the card held over it
+                  <div aria-hidden className="guest-hour-backdrop absolute inset-0 -z-10">
                     <Image
                       src={image}
                       alt=""
                       fill
-                      sizes="(min-width: 48rem) 20rem, 68vw"
+                      sizes="100vw"
                       className="object-cover object-[50%_40%]"
                     />
-                  </Framed>
+                  </div>
                 )}
-                <article
-                  aria-labelledby={headingId}
-                  className="guest-card flex flex-col gap-4 p-5 sm:p-7"
+                <Reveal
+                  className={cn(
+                    "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
+                    overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
+                  )}
                 >
-                  <h3
-                    id={headingId}
-                    className="flex flex-col font-display text-[1.9rem] leading-tight text-ink"
-                  >
-                    {fn.name}
-                    {fn.localName && (
-                      <span lang={fn.localName.lang} className="font-sans text-lg text-accent-text">
-                        {fn.localName.text}
-                      </span>
-                    )}
-                  </h3>
-                  <FunctionFacts fn={fn} />
-                </article>
-              </Reveal>
-            </li>
-          );
-        })}
-      </ol>
+                  {image && !overlay && (
+                    <Framed
+                      look={look}
+                      className={cn(
+                        "guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]",
+                        flipped && "md:order-2",
+                      )}
+                    >
+                      <Image
+                        src={image}
+                        alt=""
+                        fill
+                        sizes="(min-width: 48rem) 20rem, 68vw"
+                        className="object-cover object-[50%_40%]"
+                      />
+                    </Framed>
+                  )}
+                  <EventBox
+                    box={box}
+                    fn={fn}
+                    day={days[fn.kind] ?? ""}
+                    index={index}
+                    count={functions.length}
+                    lang={lang}
+                    headingId={headingId}
+                  />
+                </Reveal>
+              </li>
+            );
+          })}
+        </ol>
+      )}
     </section>
+  );
+}
+
+/**
+ * Every celebration on one thread through the day (guest-sections.css): a bead with the
+ * hour's painting at each box, and on wider screens the day and time across the thread.
+ */
+function Timeline({
+  look,
+  box,
+  images,
+  lang,
+  functions,
+  days,
+}: {
+  look: GuestLook;
+  box: Box;
+  images: (typeof SUITES)[SuiteId]["images"];
+  lang: CardLanguage;
+  functions: readonly GuestFunction[];
+  days: Readonly<Partial<Record<FunctionId, string>>>;
+}) {
+  return (
+    <ol
+      lang={lang}
+      data-layout="timeline"
+      className="guest-line mx-auto mt-10 flex w-full max-w-5xl flex-col gap-12 sm:gap-16"
+    >
+      {functions.map((fn, index) => {
+        const { art, mood } = pageLook(fn.kind);
+        const image = images[art] ?? images.cover;
+        // Wider screens set every other box on the far side of the thread
+        const far = index % 2 === 1;
+        return (
+          <li
+            key={fn.kind}
+            data-mood={mood}
+            className="guest-hour relative grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-x-4 gap-y-3 md:grid-cols-[minmax(0,1fr)_5.5rem_minmax(0,1fr)] md:gap-x-8"
+          >
+            <span
+              aria-hidden
+              className="guest-line-bead relative col-start-1 row-start-1 md:col-start-2 md:mt-6"
+            >
+              {image && <Image src={image} alt="" fill sizes="5.5rem" className="object-cover" />}
+            </span>
+            {/* Across the thread: the day and time, and wider, the hour's painting under them */}
+            <div
+              className={cn(
+                "col-start-2 row-start-1 flex flex-col gap-6 md:row-start-1 md:mt-6",
+                far ? "md:col-start-1 md:items-end md:text-end" : "md:col-start-3",
+              )}
+            >
+              {(fn.date || fn.time) && (
+                <p className="flex min-h-12 flex-col justify-center md:min-h-22">
+                  <span className="font-display text-xl leading-tight text-ink md:text-2xl">
+                    {fn.date}
+                  </span>
+                  {fn.time && <span className="text-sm text-ink">{fn.time}</span>}
+                </p>
+              )}
+              {image && (
+                <Framed look={look} className="hidden w-[min(100%,12rem)] md:block">
+                  <Image src={image} alt="" fill sizes="12rem" className="object-cover" />
+                </Framed>
+              )}
+            </div>
+            <Reveal
+              className={cn(
+                "col-span-2 col-start-1 row-start-2 md:col-span-1 md:row-start-1",
+                far ? "md:col-start-3" : "md:col-start-1",
+              )}
+            >
+              <EventBox
+                box={box}
+                fn={fn}
+                day={days[fn.kind] ?? ""}
+                index={index}
+                count={functions.length}
+                lang={lang}
+                headingId={`fn-${fn.kind}`}
+              />
+            </Reveal>
+          </li>
+        );
+      })}
+    </ol>
   );
 }
 
