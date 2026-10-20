@@ -973,6 +973,7 @@ export const studioCopy = {
     couple: "Photo",
     family: "Family",
     "family-more": "Family, more",
+    "family-end": "Family, last",
     invite: "Invitation",
     reply: "Reply",
   },

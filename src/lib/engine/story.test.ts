@@ -6,12 +6,15 @@ import { uiStrings } from "@/lib/ui-strings";
 import {
   BEAT_MIN,
   FUNCTION_BEAT_MIN,
+  familyPages,
   isFunctionBeat,
   STORY_MAX_SECONDS,
   STORY_SCENES,
   beatAt,
   beatSeconds,
+  keepPeople,
   lineDelay,
+  splitPeople,
   storyBeats,
   storyLength,
   type StoryFunction,
@@ -275,5 +278,49 @@ describe("event pages", () => {
     const first = beats[0]!.seconds;
     expect(beatAt(beats, first + 0.01).index).toBe(1);
     expect(beatAt(beats, storyLength(beats) + 1).done).toBe(true);
+  });
+});
+
+describe("people's names on a family page", () => {
+  it("splits at the word each language joins two people with", () => {
+    expect(splitPeople("Smt. Sunita & Shri Ramesh Sharma")).toEqual([
+      { joiner: "", person: "Smt. Sunita" },
+      { joiner: "&", person: "Shri Ramesh Sharma" },
+    ]);
+    expect(splitPeople("श्रीमती सुनीता एवं श्री रमेश शर्मा").map((p) => p.joiner)).toEqual([
+      "",
+      "एवं",
+    ]);
+    expect(splitPeople("শ্রীমতী সুনীতা ও শ্রী রমেশ বসু").map((p) => p.joiner)).toEqual(["", "ও"]);
+    expect(splitPeople("શ્રીમતી સુનીતાબેન તથા શ્રી રમેશભાઈ પટેલ")).toHaveLength(2);
+    expect(splitPeople("सौ. सुनीता व श्री. रमेश देशपांडे")).toHaveLength(2);
+    expect(splitPeople("Smt. Shanti Devi Agarwal")).toEqual([
+      { joiner: "", person: "Smt. Shanti Devi Agarwal" },
+    ]);
+  });
+
+  it("keeps each person's name whole, breaking only between people", () => {
+    const kept = keepPeople("Sardarni Harpreet Kaur & Sardar Kulwant Singh Sandhu");
+    expect(kept.split(" ")).toEqual(["Sardarni Harpreet Kaur", "& Sardar Kulwant Singh Sandhu"]);
+    expect(keepPeople("श्रीमती कविता एवं श्री अनिल मेहता").split(" ")).toHaveLength(2);
+  });
+});
+
+describe("a long family's pages", () => {
+  it("gives the blessings a page of their own when both sides would crowd them", () => {
+    // Blessings, both sides' parents, a line in memory, hosts and the little ones
+    expect(familyPages([3, 5, 5, 2, 3, 2], [false, true, true, false, false, false])).toEqual([
+      [0, 1],
+      [1, 3],
+      [3, 6],
+    ]);
+  });
+
+  it("keeps two pages when the first isn't crowded", () => {
+    expect(familyPages([2, 4, 4, 2], [false, true, true, false])).toEqual([
+      [0, 3],
+      [3, 4],
+    ]);
+    expect(familyPages([4, 4], [true, true])).toEqual([[0, 2]]);
   });
 });

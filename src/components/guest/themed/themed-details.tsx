@@ -9,7 +9,12 @@ import type { FunctionId } from "@/lib/events/functions";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
-import { FamilyWords, pairedSide, type FamilyBlock } from "@/components/guest/family-words";
+import {
+  FamilyWords,
+  pairedSide,
+  useNamesFit,
+  type FamilyBlock,
+} from "@/components/guest/family-words";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
@@ -758,6 +763,7 @@ function Dusk({
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
+  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
   return (
     <div data-mood="dusk" className="guest-sky relative isolate pb-16">
       <Divider look={look} />
@@ -861,6 +867,7 @@ function Dusk({
           />
           <Reveal className="mx-auto mt-10 w-full max-w-4xl">
             <dl
+              ref={names}
               lang={familyLang}
               className={cn(
                 "guest-stagger",

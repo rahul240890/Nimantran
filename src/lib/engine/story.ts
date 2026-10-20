@@ -101,6 +101,8 @@ export type StoryInput = {
 
 /** One labelled block of the family's wording: "आशीर्वाद" over the grandparents' names. */
 export type FamilyLine = {
+  /** Which block it is ("first", "blessingsFrom", "memory"…), where known. */
+  id?: string;
   title: string;
   text: string;
   lang?: string;
@@ -163,21 +165,52 @@ export function lineDelay(index: number): number {
 }
 
 /**
- * Parents' names as they should break: between the two people, before the "&", never
+ * The words that join two people in a family's line, as each language writes them: "&",
+ * "एवं", "और", "व", "તથા", "અને", "ও". A plain "and" or "மற்றும்" more often joins two
+ * families ("The Joshi and Vyas families"), which read best as one line.
+ */
+const PEOPLE_JOINER = /\s+(&|एवं|और|व|तथा|અને|તથા|ও)\s+/;
+
+/** Longer than this, one line with no "&" in it is a phrase ("The Joshi and Vyas families"). */
+const ONE_NAME_MAX = 30;
+
+/** Whether a line is people's names, to keep whole, rather than a phrase that may wrap. */
+export function isPeople(names: string): boolean {
+  return splitPeople(names).length > 1 || names.trim().length <= ONE_NAME_MAX;
+}
+
+/** The people in a line of names, each with the word joining them to the one before. */
+export function splitPeople(names: string): { joiner: string; person: string }[] {
+  const parts = names.trim().split(PEOPLE_JOINER);
+  const people = [{ joiner: "", person: parts[0] ?? "" }];
+  for (let i = 1; i + 1 < parts.length; i += 2) {
+    people.push({ joiner: parts[i]!, person: parts[i + 1]! });
+  }
+  return people;
+}
+
+/** One person's name longer than this may break inside, past its title and first name. */
+const WHOLE_NAME_MAX = 44;
+
+/**
+ * Names as they should break: between two people, before the "&" (or "एवं", "ও"…), never
  * inside one person's name, so a narrow page reads "Smt. Meenakshi / & Shri Rajendra
- * Prasad Sharma".
+ * Prasad Sharma" and the page's fit shrinks the words rather than split a name.
  */
 export function keepPeople(names: string): string {
   // A very long name keeps only its title with the first word ("& Shri Rajendra …")
   const whole = (part: string) =>
-    part.length <= 34
+    part.length <= WHOLE_NAME_MAX
       ? part.replace(/ /g, "\u00a0")
       : part.replace(/^(\S+) (\S+) /, "$1\u00a0$2\u00a0");
-  return names
-    .split(/\s+&\s+/)
-    .map((person, i) => whole(i === 0 ? person : `& ${person}`))
+  if (!isPeople(names)) return names;
+  return splitPeople(names)
+    .map(({ joiner, person }) => whole(joiner ? `${joiner} ${person}` : person))
     .join(" ");
 }
+
+/** The family blocks that hold people's names, kept whole like the parents': blessings, memory, hosts. */
+export const NAME_BLOCKS: readonly string[] = ["blessingsFrom", "memory", "requesters"];
 
 /**
  * Where a family's blocks (given as line counts) break onto a second page, if they do: where
@@ -202,6 +235,42 @@ export function familySplit(counts: readonly number[], sides: readonly boolean[]
     }
   }
   return best;
+}
+
+/** The family's pages after its first: the rest of a long family, then the hosts. */
+const MORE_FAMILY_PAGES = ["family-more", "family-end"] as const;
+
+/**
+ * The family's blocks (given as weighed lines) as pages, each a [start, end) range: one
+ * page, or two split as `familySplit` says. When blessings and both sides' parents would
+ * still crowd the first page well past what it holds, the blessings take a page of their
+ * own, both sides the next, and the hosts the last, so no page sets the names tiny.
+ */
+export function familyPages(
+  counts: readonly number[],
+  sides: readonly boolean[] = [],
+): [number, number][] {
+  const end = counts.length;
+  const half = familySplit(counts, sides);
+  const sum = (from: number, to: number) => counts.slice(from, to).reduce((a, n) => a + n, 0);
+  const firstSide = sides.indexOf(true);
+  const afterSides = sides.lastIndexOf(true) + 1;
+  if (
+    firstSide > 0 &&
+    half === afterSides &&
+    sum(0, half) > FAMILY_LINES_PER_PAGE * 1.5 &&
+    sum(firstSide, afterSides) <= FAMILY_LINES_PER_PAGE * 1.5
+  ) {
+    return [[0, firstSide] as [number, number], [firstSide, afterSides] as [number, number]].concat(
+      afterSides < end ? [[afterSides, end]] : [],
+    );
+  }
+  return half < end
+    ? [
+        [0, half],
+        [half, end],
+      ]
+    : [[0, end]];
 }
 
 const line = (text: string, style: LineStyle, lang?: string): StoryLine[] =>
@@ -274,17 +343,26 @@ export function storyBeats({
           ...line(block.parts.tail, "small", block.lang),
           ...line(block.parts.place, "small", block.lang),
         ]
-      : line(block.text, "body", block.lang)),
+      : line(
+          NAME_BLOCKS.includes(block.id ?? "") ? keepPeople(block.text) : block.text,
+          "body",
+          block.lang,
+        )),
   ];
   const lines = (blocks: readonly FamilyLine[]) => blocks.flatMap(blockLines);
-  // A long family (blessings, both sides' parents, hosts…) shares two pages, split where
-  // the two hold the most even number of lines, with both sides' parents on one page
-  const half = familySplit(
-    family.map((block) => blockLines(block).length),
+  // Two people's names usually take a line each on a phone, so they weigh two lines
+  const weight = (block: FamilyLine) =>
+    blockLines(block).length +
+    (splitPeople(block.parts?.names ?? (NAME_BLOCKS.includes(block.id ?? "") ? block.text : ""))
+      .length > 1
+      ? 1
+      : 0);
+  const pages = familyPages(
+    family.map(weight),
     family.map((block) => Boolean(block.parts)),
-  );
-  const blessings = [...line(copy.families, "small"), ...lines(family.slice(0, half))];
-  const more = lines(family.slice(half));
+  ).map((range) => lines(family.slice(...range)));
+  const blessings = [...line(copy.families, "small"), ...(pages[0] ?? [])];
+  const more = pages.slice(1);
   const invite = [
     ...line(copy.line, "body"),
     ...(single || !copy.date ? [] : [...line(w.saveTheDate, "label"), ...line(copy.date, "date")]),
@@ -293,11 +371,11 @@ export function storyBeats({
   // A family's own blessings fill a page, so the invitation and the day turn to the next
   if (family.length > 0 && invite.length > 0) {
     beats.push(beat("family", "family", blessings));
-    if (more.length > 0) beats.push(beat("family-more", "family", more));
+    more.forEach((page, i) => beats.push(beat(MORE_FAMILY_PAGES[i]!, "family", page)));
     beats.push(beat("invite", "family", invite));
   } else if (family.length > 0) {
     beats.push(beat("family", "family", blessings));
-    if (more.length > 0) beats.push(beat("family-more", "family", more));
+    more.forEach((page, i) => beats.push(beat(MORE_FAMILY_PAGES[i]!, "family", page)));
   } else if (blessings.length + invite.length > 0) {
     beats.push(beat("family", "family", [...blessings, ...invite]));
   }
