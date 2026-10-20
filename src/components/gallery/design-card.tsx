@@ -363,7 +363,7 @@ export function DesignPreview({
             if (event.key === "ArrowLeft") go(index + (rtl ? 1 : -1));
           }}
           aria-describedby={undefined}
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto text-card-ivory outline-none data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in lg:flex-row lg:items-center lg:justify-center lg:gap-14 lg:overflow-hidden lg:px-10"
+          className="fixed inset-0 z-50 flex [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--color-card-ivory)_22%,transparent)_transparent] flex-col overflow-y-auto overscroll-contain text-card-ivory outline-none data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in lg:flex-row lg:items-start lg:justify-center lg:gap-16 lg:px-10"
         >
           <DialogPrimitive.Close
             aria-label={galleryCopy.close}
@@ -372,8 +372,8 @@ export function DesignPreview({
             <X aria-hidden className="size-5" />
           </DialogPrimitive.Close>
 
-          {/* The page, shaped like a phone screen */}
-          <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:p-0">
+          {/* The page, shaped like a phone screen; on a computer it stays in view while the details scroll */}
+          <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:sticky lg:top-0 lg:h-dvh lg:justify-center lg:p-0 lg:py-6">
             <div
               onPointerDown={(event) => {
                 swipe.current = total > 1 ? event.clientX : null;
@@ -386,7 +386,7 @@ export function DesignPreview({
                 go(index + (back ? -1 : 1));
               }}
               className={cn(
-                "relative aspect-[9/16] max-w-[calc(100vw-2rem)] touch-pan-y overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(84dvh,52rem)]",
+                "relative aspect-[9/16] max-w-[calc(100vw-2rem)] touch-pan-y overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(calc(100dvh-7.5rem),52rem)]",
                 // A Scene keeps its controls under the painting, so it takes more height
                 scene ? "h-[min(76dvh,52rem)]" : "h-[min(68dvh,52rem)]",
               )}
@@ -464,7 +464,7 @@ export function DesignPreview({
           </div>
 
           {/* What it is, every page as a thumbnail, and the way into the editor */}
-          <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:max-h-dvh lg:overflow-y-auto lg:px-1 lg:py-10">
+          <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:min-h-dvh lg:max-w-[30rem] lg:justify-center lg:self-start lg:px-0 lg:py-12">
             <div className="flex flex-col gap-2">
               {badge ?? <TierBadge designId={design.id} className="self-start" />}
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
@@ -511,7 +511,7 @@ export function DesignPreview({
             {total > 1 && (
               <ul
                 aria-label={galleryCopy.pagesLabel}
-                className="grid grid-cols-5 gap-2 sm:grid-cols-9 lg:grid-cols-5"
+                className="grid grid-cols-5 gap-2 sm:grid-cols-9 sm:gap-1.5"
               >
                 {pages.map((page, i) => (
                   <li key={page.page}>
