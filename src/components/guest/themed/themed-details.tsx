@@ -18,6 +18,7 @@ import {
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import { blessings, type FlowerBlessing, type LampBlessing } from "@/lib/suites/blessings";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { eventBox, type EventBox as Box } from "@/lib/suites/event-boxes";
 import type { GuestLook } from "@/lib/suites/guest-look";
@@ -26,19 +27,13 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { EventBox } from "./event-box";
+import { FlowerStage } from "./flower-blessing";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
-import {
-  Balloons,
-  Bunting,
-  Festoon,
-  FloorArt,
-  Houseboat,
-  Lamps,
-  PalaceSkyline,
-  Palm,
-} from "./scenery";
+import { LampStage } from "./lamp-blessing";
+import { Balloons, Bunting, Festoon, FloorArt, Houseboat, PalaceSkyline, Palm } from "./scenery";
 import { useInView, useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
+import "@/app/guest-blessings.css";
 
 const noSubscribe = () => () => {};
 /** True in the browser once hydrated: sections wait to play their entrance only there. */
@@ -53,10 +48,10 @@ type Music = { playing: boolean; toggle: () => void };
 
 /**
  * The guest page below a painted theme's pages (Step 12q). Scrolling down, the guest lives
- * through the day in the theme's own colours: a dawn welcome under a garland, where they
- * can shower the couple with flowers; the date drawn in a floor pattern by day; each
- * celebration in its own hour; photos and family at dusk; and at night, lamps to light
- * before the reply. Palace themes hang torans over arches and a skyline; garden themes
+ * through the day in the theme's own colours: a dawn welcome under a garland, then
+ * flowers to give the family in the theme's own way; the date drawn in a floor pattern by
+ * day; each celebration in its own hour; photos and family at dusk; and at night, a light
+ * to give before the reply (each theme's two ways are in blessings.ts). Palace themes hang torans over arches and a skyline; garden themes
  * sit by the water with palms, a houseboat and a brass lamp. Every choice comes from the
  * theme's `GuestLook`, so a new theme gets all of this by naming a style.
  */
@@ -102,8 +97,9 @@ export function ThemedDetails({
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
   const [burst, setBurst] = useState(0);
   const flowers = [look.flower, look.secondFlower] as const;
-  // Each theme lays its parts out its own way (section-layouts.ts)
+  // Each theme lays its parts out its own way (section-layouts.ts), and gives its own way
   const layouts = sectionLayouts(suite);
+  const ways = blessings(suite);
 
   return (
     <div
@@ -113,13 +109,14 @@ export function ThemedDetails({
       className="guest-themed relative isolate overflow-clip"
     >
       <FlowerDefs />
-      <Welcome
-        copy={copy}
-        lang={lang}
+      <Welcome copy={copy} lang={lang} look={look} photo={photo} />
+      <GiveFlowers
+        way={ways.flowers}
         look={look}
-        photo={photo}
-        onShower={() => setBurst((was) => was + 1)}
-        showered={burst > 0}
+        lang={lang}
+        onGive={() => {
+          if (ways.flowers === "shower") setBurst((was) => was + 1);
+        }}
       />
       {main && <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />}
       <Celebrations
@@ -143,7 +140,7 @@ export function ThemedDetails({
           layouts={layouts}
         />
       )}
-      <Night copy={copy} lang={lang} look={look} reply={reply} />
+      <Night copy={copy} lang={lang} look={look} way={ways.lamp} reply={reply} />
       {onScreen && <FloatingMusic music={music} />}
       <PetalShower flowers={flowers} burst={burst} />
     </div>
@@ -245,18 +242,13 @@ function Welcome({
   lang,
   look,
   photo,
-  onShower,
-  showered,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   photo: GuestPhoto | undefined;
-  onShower: () => void;
-  showered: boolean;
 }) {
   const { guestCopy } = useGuestText();
-  const words = guestCopy.themed;
   const cardWords = CARD_THEMED_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   const welcome = [copy.families, copy.line].filter((text) => text.trim());
@@ -312,15 +304,6 @@ function Welcome({
               {copy.date}
             </p>
           )}
-          <div className="flex flex-col items-center gap-2 lg:items-start">
-            <Button onClick={onShower} size="lg" className="max-w-full rounded-full">
-              <Flower2 aria-hidden />
-              {words.shower}
-            </Button>
-            <p aria-live="polite" className="min-h-6 text-sm text-ink-muted">
-              {showered ? words.showered : ""}
-            </p>
-          </div>
         </Reveal>
 
         {photo && (
@@ -917,19 +900,82 @@ function Dusk({
 }
 
 /** Night: lamps the guest lights for the couple, the blessing, and the reply. */
+/**
+ * The flowers the guest gives after the welcome, in this theme's own way (blessings.ts):
+ * a drawing that moves each time they give, and words that thank them.
+ */
+function GiveFlowers({
+  way,
+  look,
+  lang,
+  onGive,
+}: {
+  way: FlowerBlessing;
+  look: GuestLook;
+  lang: CardLanguage;
+  onGive: () => void;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.themed;
+  const gift = words.flowers[way];
+  const [given, setGiven] = useState(0);
+  return (
+    <section
+      aria-labelledby="guest-flowers"
+      data-mood="dawn"
+      data-tour="8"
+      className="guest-sky relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+    >
+      <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
+      <Reveal className="guest-stagger mx-auto flex w-full max-w-3xl flex-col items-center gap-5 text-center sm:gap-6">
+        <Heading
+          id="guest-flowers"
+          lang={lang}
+          label={words.flowersLabel}
+          title={words.flowersTitle}
+        />
+        <FlowerStage
+          way={way}
+          flower={look.flower}
+          second={look.secondFlower}
+          given={given}
+          className="bl-stage w-full max-w-[34rem]"
+        />
+        <Button
+          onClick={() => {
+            setGiven((was) => was + 1);
+            onGive();
+          }}
+          size="lg"
+          className="max-w-full rounded-full"
+        >
+          <Flower2 aria-hidden />
+          {gift.give}
+        </Button>
+        <p aria-live="polite" className="-mt-2 min-h-6 text-sm text-balance text-ink-muted">
+          {given > 0 ? gift.given : ""}
+        </p>
+      </Reveal>
+    </section>
+  );
+}
+
 function Night({
   copy,
   lang,
   look,
+  way,
   reply,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
+  way: LampBlessing;
   reply: ReactNode;
 }) {
   const { guestCopy, rsvpCopy } = useGuestText();
   const words = guestCopy.themed;
+  const light = words.lights[way];
   const cardWords = CARD_THEMED_WORDS[lang];
   const [lit, setLit] = useState(false);
   return (
@@ -954,7 +1000,7 @@ function Night({
             </p>
           )}
           <div className="guest-lamps flex w-full justify-center">
-            <Lamps lamp={look.lamp} flower={look.flower} />
+            <LampStage way={way} flower={look.flower} />
           </div>
           <Button
             variant={lit ? "secondary" : "primary"}
@@ -963,10 +1009,10 @@ function Night({
             aria-pressed={lit}
             className="rounded-full"
           >
-            {words.lamps[look.lamp]}
+            {light.give}
           </Button>
-          <p aria-live="polite" className="min-h-6 text-sm text-ink-muted">
-            {lit ? words.lit : ""}
+          <p aria-live="polite" className="min-h-6 text-sm text-balance text-ink-muted">
+            {lit ? light.given : ""}
           </p>
         </Reveal>
       </section>

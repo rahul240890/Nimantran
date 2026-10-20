@@ -281,7 +281,17 @@ function Pookalam() {
 /* ---------------------------------------------------------------- the lamps */
 
 /** A flame with its halo; lit or not is set by the lamps' data-lit. */
-function Flame({ x, y, size, index }: { x: number; y: number; size: number; index: number }) {
+export function Flame({
+  x,
+  y,
+  size,
+  index,
+}: {
+  x: number;
+  y: number;
+  size: number;
+  index: number;
+}) {
   return (
     <g className="guest-flame-wrap" style={{ "--i": index } as CSSProperties}>
       <circle
@@ -300,7 +310,7 @@ function Flame({ x, y, size, index }: { x: number; y: number; size: number; inde
   );
 }
 
-function LampDefs() {
+export function LampDefs() {
   return (
     <defs>
       <radialGradient id="guest-halo">
