@@ -145,6 +145,16 @@ export const FRESH_LAYERS: Record<FreshOpening, readonly FreshLayer[]> = {
   bhanwar: [{ name: "marble", move: "spin" }, FRONT_SPLIT],
   "jaali-patta": [{ name: "leaf", move: "sink" }, FRONT_SPLIT],
   "lapet-khule": [{ name: "rosette", move: "spin" }, FRONT_EDGE],
+  taar: [{ name: "panel", move: "louvre" }, FRONT_EDGE],
+  pratibimb: [{ name: "reflection", move: "sink" }, FRONT_SPLIT],
+  mohur: [{ name: "coin", move: "zoom" }, FRONT_EDGE],
+  gathbandhan: [{ name: "dupatta", move: "lift", delay: 0.3 }, FRONT_EDGE],
+  phuljhadi: [{ name: "lacquer", move: "zoom" }, FRONT_SPLIT],
+  semal: [{ name: "pods", move: "soft" }, FRONT_EDGE],
+  thappa: [{ name: "cloth", move: "lift", delay: 0.5 }, FRONT_EDGE],
+  gumbad: [{ name: "dome", move: "zoom" }, FRONT_EDGE],
+  ghadi: [{ name: "watch", move: "zoom", delay: 0.3 }, FRONT_EDGE],
+  hindolo: [{ name: "swing", move: "lift", delay: 0.2 }, FRONT_EDGE],
 };
 
 /** Athangudi's floor: five columns of nine tiles, each one of five paintings. */

@@ -257,6 +257,38 @@ const FLAPS = {
  */
 const ROSETTE_BANDS = [21, 57, 78, 100] as const;
 const ROSETTE_BOX: Box = [-6, 7.7, 112, 63];
+/** The lacquer's ring of flowers round the names, and the painted dome's sky opening. */
+const PHULJHADI_RING = { x: 50, y: 40 } as const;
+/** The pocket watch's dial (centre in % of the canvas), and its hands as cut. */
+const WATCH_HANDS = [
+  {
+    piece: 0,
+    width: 9.1,
+    top: 38.1,
+    ratio: "91 / 220",
+    turn: 300,
+    to: 720,
+    className: "fo-hand-long",
+  },
+  {
+    piece: 1,
+    width: 4.3,
+    top: 41.2,
+    ratio: "59 / 220",
+    turn: 60,
+    to: 360,
+    className: "fo-hand-short",
+  },
+] as const;
+/** Where the printing block stamps its windows on the cloth, two across and three down. */
+const THAPPA_WINDOWS = [
+  [30, 26],
+  [70, 26],
+  [50, 45],
+  [30, 64],
+  [70, 64],
+  [50, 82],
+] as const;
 /** The tiles laid five across, nine down, each a square. */
 const TILE_ROWS = 9;
 const TILE_COLS = 5;
@@ -992,6 +1024,282 @@ function Art({ ctx }: { ctx: Ctx }): ReactNode {
           <Floats
             ctx={ctx}
             items={[...fall([0, 3, 5], 4, 4.5, 13000), ...burst([0, 1, 2, 3, 4, 5], 22, 6.5, 400)]}
+          />
+        </>
+      );
+    case "taar":
+      return (
+        <>
+          {beyond}
+          <div className="absolute inset-0">
+            {range(8).map((i) => (
+              <Cut
+                key={i}
+                ctx={ctx}
+                name="panel"
+                box={[i * 12.5, 0, 12.5, 100]}
+                className="fo-taar-strip"
+                style={vars({ "--i": Math.abs(i - 3.5), "--dir": i % 2 ? 1 : -1 })}
+              />
+            ))}
+          </div>
+          {/* The veena's strings, shimmering as if plucked */}
+          {range(7).map((i) => (
+            <span
+              key={i}
+              className="fo-string absolute top-0 bottom-0"
+              style={vars({ left: `${12.5 * (i + 1)}%`, "--i": i })}
+            />
+          ))}
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[...fall([0, 1, 2], 5, 5, 13000), ...burst([0, 1, 2, 3, 4], 16, 6, 700)]}
+          />
+        </>
+      );
+    case "pratibimb":
+      return (
+        <>
+          {beyond}
+          <Paint ctx={ctx} name="reflection" className="fo-reflection" />
+          <div className="fo-ripples absolute" style={{ left: "50%", top: "58%" }}>
+            {range(4).map((i) => (
+              <span key={i} className="fo-ripple" style={vars({ "--i": i })} />
+            ))}
+            {range(6).map((i) => (
+              <span key={`b${i}`} className="fo-ripple fo-ripple-big" style={vars({ "--i": i })} />
+            ))}
+          </div>
+          <FrontSplit ctx={ctx} />
+          <Floats
+            ctx={ctx}
+            items={[
+              { piece: 2, x: -14, y: 18, size: 14, mode: "cross", duration: 17000 },
+              { piece: 1, x: 22, y: 76, size: 9, mode: "bob", duration: 7000 },
+              ...fall([0], 3, 5, 14000),
+              ...burst([0, 1, 4, 5], 14, 6, 800),
+            ]}
+          />
+        </>
+      );
+    case "mohur":
+      return (
+        <>
+          {beyond}
+          <div className="fo-coin absolute inset-0">
+            <Paint ctx={ctx} name="coin" className="fo-coin-spin" />
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[...fall([1, 3, 5], 4, 4.5, 12000), ...burst([0, 1, 2, 3, 4, 5], 22, 6.5, 900)]}
+          />
+        </>
+      );
+    case "gathbandhan":
+      return (
+        <>
+          {beyond}
+          <div className="fo-tie absolute inset-0">
+            <SoftSplit ctx={ctx} name="dupatta" className="fo-tie-half" />
+            {/* The knot the two dupattas tie in the middle */}
+            {!ctx.sample && (
+              <span
+                className="fo-knot absolute aspect-square"
+                style={{ left: "32%", top: "34%", width: "36%" }}
+              >
+                <Image alt="" {...imageProps(ctx, "piece-0", "small")} className="object-contain" />
+              </span>
+            )}
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[...fall([2, 3], 5, 5, 13000), ...burst([1, 2, 3, 4, 5], 16, 6, 1300)]}
+          />
+        </>
+      );
+    case "phuljhadi":
+      return (
+        <>
+          {beyond}
+          <div className="fo-iris fo-iris-lacquer absolute inset-0">
+            <Paint ctx={ctx} name="lacquer" />
+          </div>
+          {/* The sparkler drawing its ring of light round the names */}
+          <div
+            className="fo-spark-ring absolute aspect-square"
+            style={{
+              left: `${PHULJHADI_RING.x - 37.5}%`,
+              top: `${PHULJHADI_RING.y - 21.1}%`,
+              width: "75%",
+            }}
+          >
+            <span className="fo-spark-trail absolute inset-0 rounded-full" />
+            <span className="fo-spark-turn absolute inset-0">
+              {!ctx.sample && (
+                <span className="fo-spark absolute aspect-square">
+                  <Image
+                    alt=""
+                    {...imageProps(ctx, "piece-1", "small")}
+                    className="object-contain"
+                  />
+                </span>
+              )}
+            </span>
+          </div>
+          <FrontSplit ctx={ctx} />
+          <Floats
+            ctx={ctx}
+            items={[...fall([2], 3, 4, 14000), ...burst([0, 1, 2, 3, 4, 5], 20, 6, 1100)]}
+          />
+        </>
+      );
+    case "semal":
+      return (
+        <>
+          {beyond}
+          <Paint ctx={ctx} name="pods" className="fo-pods" />
+          <Paint ctx={ctx} name="front" className="fo-front-blow" />
+          <Floats
+            ctx={ctx}
+            items={[
+              ...fall([0, 1], 6, 7, 15000),
+              { piece: 0, x: 30, y: 30, size: 10, mode: "bob", duration: 6500 },
+              { piece: 0, x: 62, y: 52, size: 8, mode: "bob", delay: -3000, duration: 7000 },
+              ...burst([0, 1, 0, 1, 2, 3, 4, 5], 30, 9, 200),
+            ]}
+          />
+        </>
+      );
+    case "thappa":
+      return (
+        <>
+          {beyond}
+          <div className="fo-cloth absolute inset-0">
+            <Paint ctx={ctx} name="cloth" />
+            {/* Each print opens a window onto the scene beyond */}
+            {THAPPA_WINDOWS.map(([x, y], i) => (
+              <Cut
+                key={i}
+                ctx={ctx}
+                name="beyond"
+                box={[x - 16, y - 9, 32, 18]}
+                className="fo-print"
+                style={vars({
+                  "--i": i,
+                  maskImage: "url(/openings/fresh/thappa/piece-4.webp)",
+                  maskSize: "contain",
+                  maskPosition: "center",
+                  maskRepeat: "no-repeat",
+                })}
+              />
+            ))}
+            {!ctx.sample &&
+              THAPPA_WINDOWS.map(([x, y], i) => (
+                <span
+                  key={i}
+                  className="fo-block absolute aspect-square"
+                  style={vars({ left: `${x - 11}%`, top: `${y - 6.2}%`, width: "22%", "--i": i })}
+                >
+                  <Image
+                    alt=""
+                    {...imageProps(ctx, "piece-1", "small")}
+                    className="object-contain"
+                  />
+                </span>
+              ))}
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          {!ctx.sample && (
+            <span
+              className="fo-block-wait absolute aspect-square"
+              style={{ left: "38%", top: "36%", width: "24%" }}
+            >
+              <Image alt="" {...imageProps(ctx, "piece-0", "small")} className="object-contain" />
+            </span>
+          )}
+          <Floats ctx={ctx} items={burst([4, 5, 1], 12, 6, 1500)} />
+        </>
+      );
+    case "gumbad":
+      return (
+        <>
+          {beyond}
+          <div className="fo-iris fo-iris-dome absolute inset-0">
+            <Paint ctx={ctx} name="dome" className="fo-dome" />
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[
+              ...fall([0, 1, 4], 5, 5, 14000),
+              { piece: 2, x: 20, y: 6, size: 5, mode: "bob", duration: 5000 },
+              { piece: 2, x: 75, y: 8, size: 4, mode: "bob", delay: -2000, duration: 5500 },
+              ...burst([0, 1, 0, 1, 3, 5], 24, 6, 500),
+            ]}
+          />
+        </>
+      );
+    case "ghadi":
+      return (
+        <>
+          {beyond}
+          <div className="fo-watch absolute inset-0">
+            <Paint ctx={ctx} name="watch" />
+            {WATCH_HANDS.map((hand) => (
+              <span
+                key={hand.piece}
+                className={cn("fo-hand absolute", hand.className)}
+                style={vars({
+                  left: `${50 - hand.width / 2}%`,
+                  top: `${hand.top}%`,
+                  width: `${hand.width}%`,
+                  aspectRatio: hand.ratio,
+                  "--turn": `${hand.turn}deg`,
+                  "--to": `${hand.to}deg`,
+                })}
+              >
+                <Image
+                  alt=""
+                  {...imageProps(ctx, `piece-${hand.piece}`, "small")}
+                  className="object-contain"
+                />
+              </span>
+            ))}
+            <span
+              className="fo-hand-cap absolute"
+              style={{ left: "47%", top: "48.1%", width: "6%", aspectRatio: "72 / 97" }}
+            >
+              <Image alt="" {...imageProps(ctx, "piece-2", "small")} className="object-contain" />
+            </span>
+            <span className="fo-chime absolute rounded-full" />
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[
+              { piece: 5, x: 10, y: 74, size: 10, mode: "bob", duration: 8000 },
+              { piece: 3, x: 76, y: 12, size: 9, mode: "bob", delay: -3000, duration: 7000 },
+              ...burst([4, 5, 4, 3], 12, 7, 1300),
+            ]}
+          />
+        </>
+      );
+    case "hindolo":
+      return (
+        <>
+          {beyond}
+          <div className="fo-swing absolute inset-0">
+            <div className="fo-swing-sway absolute inset-0">
+              <Paint ctx={ctx} name="swing" />
+            </div>
+          </div>
+          <Paint ctx={ctx} name="front" className="fo-front" />
+          <Floats
+            ctx={ctx}
+            items={[...fall([1, 5], 5, 5, 12000), ...burst([0, 1, 2, 3, 4, 5], 20, 6.5, 900)]}
           />
         </>
       );

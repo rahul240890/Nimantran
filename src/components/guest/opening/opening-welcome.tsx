@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { keepDate } from "@/lib/suites/lettering";
 import { darkWelcome, type WelcomeScene } from "@/lib/opening/catalog";
@@ -398,7 +398,8 @@ export function OpeningWelcome({
       <Field centre={centre}>
         <div
           className={cn(
-            "relative flex h-full flex-col items-center justify-center gap-[2cqh] text-center",
+            "relative flex flex-col items-center justify-center gap-[2cqh] text-center",
+            centre ? "w-full origin-center" : "h-full",
             centre ? "px-[5cqw]" : scene === "letter" ? "px-[14cqw]" : "px-[8cqw]",
             !centre && LIFTED.includes(scene) && "pb-[14cqh]",
             !centre && scene === "royal" && "pt-[8cqh]",
@@ -492,11 +493,45 @@ export function OpeningWelcome({
  */
 function Field({ centre, children }: { centre?: WelcomeCentre; children: ReactNode }) {
   if (!centre) return children;
-  const [top, bottom, left, right] = centre.field;
+  return <CentreField field={centre.field}>{children}</CentreField>;
+}
+
+/**
+ * A painted centre's field. The words keep their sizes but shrink together, never past the
+ * field, when a longer language or a short phone leaves too little room for them.
+ */
+function CentreField({
+  field: [top, bottom, left, right],
+  children,
+}: {
+  field: WelcomeCentre["field"];
+  children: ReactNode;
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const room = box.current;
+    const words = room?.firstElementChild;
+    if (!room || !(words instanceof HTMLElement)) return;
+    const fit = () => {
+      const height = words.offsetHeight;
+      const scale = height > room.clientHeight ? room.clientHeight / height : 1;
+      words.style.scale = scale < 1 ? String(Math.floor(scale * 1000) / 1000) : "";
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(room);
+    observer.observe(words);
+    document.fonts?.addEventListener("loadingdone", fit);
+    return () => {
+      observer.disconnect();
+      document.fonts?.removeEventListener("loadingdone", fit);
+    };
+  }, []);
   return (
     <div className="welcome-centre pointer-events-none absolute top-1/2 left-1/2">
       <div
-        className="[container-type:size] absolute"
+        ref={box}
+        className="[container-type:size] absolute flex items-center justify-center"
         style={{ top: `${top}%`, bottom: `${bottom}%`, left: `${left}%`, right: `${right}%` }}
       >
         {children}

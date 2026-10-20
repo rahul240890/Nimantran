@@ -111,7 +111,7 @@ export const DESIGN_OPENINGS: Readonly<Record<string, OpeningStyle>> = {
   kaagaz: "noor-darwaza",
   "kantha-silai-scene": "rang-parda",
   "amrit-utsav-scene": "chhuk-chhuk",
-  "aam-bagiya-scene": "lata-phatak",
+  "aam-bagiya-scene": "van-dwar",
   "card-scroll": "scroll",
   "tholu-bommalata-scene": "chhaya-parda",
   "chikankari-awadh-scene": "pehar-jaali",

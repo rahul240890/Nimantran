@@ -21,6 +21,7 @@ describe("design tiers", () => {
     // The templates with a painted centre are Signature, at ₹1,099
     expect(defaultTier("hashiya")).toBe("signature");
     expect(defaultTier("lapet")).toBe("signature");
+    expect(defaultTier("sankheda")).toBe("signature");
     expect(tierPricePaise(DEFAULT_PRICING, "premium")).toBe(49_900);
     expect(tierPricePaise(DEFAULT_PRICING, "royal")).toBe(79_900);
   });

@@ -150,7 +150,7 @@ describe("openings", () => {
   });
 
   it("offers every fresh opening on any theme, for pages and Scenes alike", () => {
-    expect(FRESH_OPENINGS).toHaveLength(30);
+    expect(FRESH_OPENINGS).toHaveLength(40);
     for (const id of FRESH_OPENINGS) {
       expect(openingStyles("classic", false)).toContain(id);
       expect(openingStyles("rajwada-bagh", true)).toContain(id);

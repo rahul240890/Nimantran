@@ -1499,6 +1499,417 @@
   opacity: 0;
 }
 
+/* Still mode lands the leaf's fall at once too */
+.opening-stage[data-open="true"] .fo-leaf {
+  opacity: 0;
+}
+
+/* Two openings open an iris in their painting: the hole grows from a point (--fo-iris) */
+@property --fo-iris {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+.fo-iris {
+  transition: --fo-iris 1600ms cubic-bezier(0.55, 0, 0.35, 1) 650ms;
+}
+.fo-iris-lacquer {
+  mask-image: radial-gradient(
+    circle at 50% 40%,
+    transparent var(--fo-iris),
+    #000 calc(var(--fo-iris) + 1.5%)
+  );
+}
+.fo-iris-dome {
+  mask-image: radial-gradient(
+    circle at 53% 43%,
+    transparent var(--fo-iris),
+    #000 calc(var(--fo-iris) + 3%)
+  );
+  transition-delay: 300ms;
+}
+.opening-stage[data-open="true"] .fo-iris {
+  --fo-iris: 115%;
+}
+
+/* taar (Chandan): the veena strings shimmer and a strum runs across them; opened, they ring
+   and fade, and the sandalwood panel parts strip by strip, up and down by turns */
+.fo-taar-strip {
+  transition:
+    translate 1100ms cubic-bezier(0.6, 0, 0.35, 1) calc(300ms + var(--i) * 110ms),
+    opacity 500ms ease calc(900ms + var(--i) * 110ms);
+}
+.opening-stage[data-open="true"] .fo-taar-strip {
+  translate: 0 calc(var(--dir) * 105%);
+  opacity: 0;
+}
+.fo-string {
+  width: 0.35cqw;
+  translate: -50% 0;
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklab, var(--open-gilt-bright) 85%, transparent) 12% 88%,
+      transparent
+    ),
+    linear-gradient(
+        180deg,
+        transparent 30%,
+        color-mix(in oklab, var(--card-ivory) 90%, transparent) 50%,
+        transparent 70%
+      )
+      0 0 / 100% 300%;
+  box-shadow: 0 0 1.2cqw color-mix(in oklab, var(--open-gilt-bright) 55%, transparent);
+  opacity: 0.75;
+  animation:
+    fo-strum 3.6s ease-out calc(var(--i) * 0.09s) infinite,
+    fo-string-glint 2.8s linear calc(var(--i) * -0.4s) infinite;
+  transition: opacity 400ms ease 450ms;
+}
+.opening-stage[data-open="true"] .fo-string {
+  opacity: 0;
+  animation: fo-strum-fast 120ms linear infinite alternate;
+}
+@keyframes fo-strum {
+  0%,
+  16%,
+  100% {
+    transform: none;
+  }
+  2%,
+  6%,
+  10% {
+    transform: translateX(0.3cqw);
+  }
+  4%,
+  8%,
+  12% {
+    transform: translateX(-0.3cqw);
+  }
+}
+@keyframes fo-strum-fast {
+  from {
+    transform: translateX(-0.4cqw);
+  }
+  to {
+    transform: translateX(0.4cqw);
+  }
+}
+@keyframes fo-string-glint {
+  to {
+    background-position:
+      0 0,
+      0 100%;
+  }
+}
+
+/* pratibimb (Bundi Chitra): rings spread on the lotus lake; opened, a great ripple runs out
+   and the reflected view lifts up out of the water onto the palace */
+.fo-reflection {
+  transition:
+    translate 1700ms cubic-bezier(0.5, 0, 0.3, 1) 650ms,
+    filter 1200ms ease 650ms,
+    opacity 600ms ease 1750ms;
+}
+.opening-stage[data-open="true"] .fo-reflection {
+  translate: 0 -100%;
+  filter: blur(0.6cqw) brightness(1.15);
+  opacity: 0;
+}
+
+/* mohur (Banjara): the embroidered coin spins on its edge; opened, it flips and the guest
+   passes through it */
+.fo-coin {
+  perspective: 160cqw;
+  transform-origin: 50% 35%;
+  transition:
+    scale 1700ms cubic-bezier(0.6, 0, 0.4, 1) 450ms,
+    opacity 600ms ease 1500ms;
+}
+.opening-stage[data-open="true"] .fo-coin {
+  scale: 7;
+  opacity: 0;
+}
+.fo-coin-spin {
+  transform-origin: 50% 35%;
+  animation: fo-coin 5.5s ease-in-out infinite;
+}
+.opening-stage[data-open="true"] .fo-coin-spin {
+  animation: fo-coin-flip 1100ms cubic-bezier(0.4, 0, 0.6, 1) both;
+}
+@keyframes fo-coin {
+  0%,
+  35% {
+    transform: rotateY(0);
+  }
+  65%,
+  100% {
+    transform: rotateY(1turn);
+  }
+}
+@keyframes fo-coin-flip {
+  to {
+    transform: rotateY(1.5turn);
+  }
+}
+
+/* gathbandhan (Leheriya): the two dupattas ripple; opened, they sweep in, tie a knot in the
+   middle and rise away together like a banner */
+.fo-tie {
+  transition:
+    translate 1300ms cubic-bezier(0.5, 0, 0.6, 1) 1250ms,
+    opacity 500ms ease 2000ms;
+}
+.opening-stage[data-open="true"] .fo-tie {
+  translate: 0 -115%;
+  opacity: 0;
+}
+.fo-tie-half {
+  animation: fo-cloth 4.5s ease-in-out infinite alternate;
+  transition: translate 850ms cubic-bezier(0.55, 0, 0.3, 1) 100ms;
+}
+.opening-stage[data-open="true"] .fo-tie-half {
+  translate: 9% 0;
+  animation-play-state: paused;
+}
+.opening-stage[data-open="true"] .fo-tie-half.fo-soft-r {
+  translate: -9% 0;
+}
+.fo-knot {
+  scale: 0;
+  opacity: 0;
+  transition:
+    scale 650ms cubic-bezier(0.3, 1.6, 0.5, 1) 750ms,
+    opacity 200ms ease 750ms;
+}
+.opening-stage[data-open="true"] .fo-knot {
+  scale: 1;
+  opacity: 1;
+}
+
+/* phuljhadi (Nirmal): a sparkler draws a ring of light round the names; opened, the ring
+   flares and the black lacquer opens like an iris from the middle */
+@property --fo-arc {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+.fo-spark-trail {
+  border: 0.45cqw solid color-mix(in oklab, var(--open-gilt-bright) 90%, transparent);
+  box-shadow:
+    0 0 2cqw color-mix(in oklab, var(--open-gilt-bright) 70%, transparent),
+    inset 0 0 2cqw color-mix(in oklab, var(--open-gilt-bright) 50%, transparent);
+  mask-image: conic-gradient(#000 var(--fo-arc), transparent var(--fo-arc));
+  animation: fo-arc 4.2s linear infinite;
+  transition:
+    scale 900ms ease 250ms,
+    opacity 700ms ease 650ms,
+    filter 300ms ease;
+}
+.opening-stage[data-open="true"] .fo-spark-trail {
+  --fo-arc: 360deg;
+  animation: none;
+  filter: brightness(1.8);
+  scale: 1.25;
+  opacity: 0;
+}
+.fo-spark-turn {
+  animation: fo-spin 4.2s linear infinite;
+}
+.fo-spark {
+  left: 50%;
+  top: 0;
+  width: 11%;
+  translate: -50% -50%;
+  filter: drop-shadow(0 0 1.5cqw var(--open-gilt-bright));
+  animation: fo-twinkle 180ms ease-in-out infinite alternate;
+  transition: opacity 300ms ease 150ms;
+}
+.opening-stage[data-open="true"] .fo-spark {
+  opacity: 0;
+}
+@keyframes fo-arc {
+  0% {
+    --fo-arc: 0deg;
+    opacity: 1;
+  }
+  85% {
+    --fo-arc: 360deg;
+    opacity: 1;
+  }
+  100% {
+    --fo-arc: 360deg;
+    opacity: 0;
+  }
+}
+
+/* semal (Shola): floss drifts off the silk-cotton pods; opened, the pods split and a burst
+   of white floss swirls the whole painting away on the breeze */
+.fo-pods {
+  animation: fo-rock 6s ease-in-out infinite alternate;
+  transition:
+    translate 1800ms cubic-bezier(0.5, 0, 0.7, 1) 350ms,
+    filter 1400ms ease 350ms,
+    opacity 900ms ease 1150ms;
+}
+.opening-stage[data-open="true"] .fo-pods {
+  translate: 35% -8%;
+  filter: blur(1cqw) brightness(1.3);
+  opacity: 0;
+  animation-play-state: paused;
+}
+
+/* thappa (Dabu): a printing block hovers over the cotton; opened, it stamps a print at a
+   time, each print a window onto the scene, then the sheet lifts away */
+.fo-block-wait {
+  animation: fo-bob 4s ease-in-out infinite alternate;
+  transition: opacity 250ms ease;
+}
+.opening-stage[data-open="true"] .fo-block-wait {
+  opacity: 0;
+}
+.fo-print {
+  scale: 1.25;
+  opacity: 0;
+  transition:
+    scale 380ms cubic-bezier(0.3, 1.4, 0.5, 1) calc(360ms + var(--i) * 170ms),
+    opacity 120ms ease calc(360ms + var(--i) * 170ms);
+}
+.opening-stage[data-open="true"] .fo-print {
+  scale: 1;
+  opacity: 1;
+}
+.fo-block {
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-block {
+  animation: fo-stamp 520ms ease calc(130ms + var(--i) * 170ms) both;
+}
+@keyframes fo-stamp {
+  0% {
+    opacity: 0;
+    transform: translateY(-8%) scale(1.6);
+  }
+  45% {
+    opacity: 1;
+    transform: none;
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10%) scale(1.3);
+  }
+}
+.fo-cloth {
+  transform-origin: 50% 0;
+  transition:
+    translate 1150ms cubic-bezier(0.55, 0, 0.4, 1) 1650ms,
+    rotate 1150ms ease 1650ms,
+    opacity 400ms ease 2400ms;
+}
+.opening-stage[data-open="true"] .fo-cloth {
+  translate: 0 -112%;
+  rotate: -4deg;
+  opacity: 0;
+}
+
+/* gumbad (Aasmaani): the painted dome turns slowly overhead; opened, its sky opening widens
+   like an iris as the guest rises into it, and petals pour down */
+.fo-dome {
+  transform-origin: 53% 43%;
+  scale: 1.2;
+  animation: fo-spin 160s linear infinite;
+  transition: scale 2400ms cubic-bezier(0.5, 0, 0.3, 1) 200ms;
+}
+.opening-stage[data-open="true"] .fo-dome {
+  scale: 1.7;
+}
+
+/* ghadi (Tasveer Khana): the pocket watch swings on its chain; opened, its hands sweep round
+   to the hour, a chime rings out and the guest passes into its face */
+.fo-watch {
+  transform-origin: 50% 49.5%;
+  animation: fo-rock 4s ease-in-out infinite alternate;
+  transition:
+    scale 1500ms cubic-bezier(0.6, 0, 0.4, 1) 1300ms,
+    opacity 500ms ease 2150ms;
+}
+.opening-stage[data-open="true"] .fo-watch {
+  scale: 6;
+  opacity: 0;
+  animation-play-state: paused;
+}
+.fo-hand {
+  transform-origin: 50% 92%;
+  rotate: var(--turn);
+  transition:
+    rotate 1150ms cubic-bezier(0.5, 0, 0.25, 1) 100ms,
+    opacity 300ms ease 1300ms;
+}
+.opening-stage[data-open="true"] .fo-hand {
+  rotate: var(--to);
+  opacity: 0;
+}
+/* The hands' cap fades with them, so only the face is passed into */
+.fo-hand-cap {
+  transition: opacity 300ms ease 1300ms;
+}
+.opening-stage[data-open="true"] .fo-hand-cap {
+  opacity: 0;
+}
+.fo-chime {
+  left: 24%;
+  top: 34.9%;
+  width: 52%;
+  aspect-ratio: 1;
+  border: 0.6cqw solid color-mix(in oklab, var(--open-gilt-bright) 80%, transparent);
+  box-shadow: 0 0 3cqw color-mix(in oklab, var(--open-gilt-bright) 60%, transparent);
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .fo-chime {
+  animation: fo-chime 900ms ease-out 1150ms both;
+}
+@keyframes fo-chime {
+  from {
+    opacity: 0.95;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* hindolo (Sankheda): the painted swing sways on its chains; opened, it draws back, then
+   sweeps high toward the guest and up out of sight */
+.fo-swing {
+  transform-origin: 50% -20%;
+  transform: perspective(120cqw) rotateX(0);
+  transition:
+    transform 1700ms cubic-bezier(0.55, -0.35, 0.35, 1) 150ms,
+    opacity 600ms ease 1350ms;
+}
+.opening-stage[data-open="true"] .fo-swing {
+  transform: perspective(120cqw) rotateX(-75deg) translateY(-35%) scale(1.3);
+  opacity: 0;
+}
+.fo-swing-sway {
+  transform-origin: 50% -15%;
+  animation: fo-swing-sway 3.2s ease-in-out infinite alternate;
+}
+@keyframes fo-swing-sway {
+  from {
+    rotate: -2.5deg;
+  }
+  to {
+    rotate: 2.5deg;
+  }
+}
+
 /* The welcome over a fresh opening lets the place revealed show round the names */
 .opening-welcome[data-over="art"] {
   background: radial-gradient(

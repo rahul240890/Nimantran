@@ -82,6 +82,16 @@ export const designNames = {
     abri: "Abri",
     "neel-chhaap": "Neel Chhaap",
     lapet: "Lapet",
+    chandan: "Chandan",
+    "bundi-chitra": "Bundi Chitra",
+    banjara: "Banjara",
+    leheriya: "Leheriya",
+    nirmal: "Nirmal",
+    shola: "Shola",
+    dabu: "Dabu",
+    aasmaani: "Aasmaani",
+    "tasveer-khana": "Tasveer Khana",
+    sankheda: "Sankheda",
     dhokra: "Dhokra",
     "kaanch-chitra": "Kaanch Chitra",
     "chettinad-veedu": "Chettinad Veedu",
@@ -499,6 +509,25 @@ export const designNames = {
       "A cyanotype sun-print: white ferns, lace and flowers on deep Prussian blue, with soft prints of palaces and gardens.",
     lapet:
       "Paper quilling: flowers, birds, palaces and lanterns rolled from pastel paper strips on ivory card.",
+    chandan:
+      "Mysuru sandalwood carving: jasmine, parrots and elephants in honey-gold relief, with fresh jasmine and lamplight.",
+    "bundi-chitra":
+      "Bundi palace murals: turquoise walls, lotus lakes, monsoon gardens, peacocks and hill palaces in flat bright colour.",
+    banjara:
+      "Banjara embroidery: bold stitches, mirrors, cowries, silver coins and wool pompoms on deep indigo cloth.",
+    leheriya:
+      "Rajasthani leheriya: waves of rani pink, saffron and turquoise flowing round sunny havelis, swings and kites.",
+    nirmal:
+      "Nirmal lacquer painting from Telangana: gold leaf and soft colours shimmering on glossy black.",
+    shola:
+      "Bengal sholapith: snow-white carved pith flowers, frills and birds glowing on deep alta red and dusk blue.",
+    dabu: "Dabu block print: white and sky-blue motifs pressed by hand on deep indigo cotton, with fine crackle lines.",
+    aasmaani:
+      "A palace ballroom's painted sky ceiling: soft clouds framed by gilded stucco, crystal chandeliers and blush roses.",
+    "tasveer-khana":
+      "Hand-tinted antique postcards of old India: sepia softly coloured by hand on deckled cream card with gold foil.",
+    sankheda:
+      "Gujarat's Sankheda lacquer: glossy maroon wood painted with gold and silver flowers, in a sunny courtyard.",
     dhokra:
       "Bell-metal Dhokra art: every page a scene cast in warm bronze, glowing against dark clay.",
     "kaanch-chitra":
