@@ -22,6 +22,7 @@ import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { PreviewOffers } from "@/components/offers/preview-offers";
 import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
@@ -508,6 +509,8 @@ export function DesignPreview({
                   </Link>
                 </div>
               ))}
+            {/* Offers running now that cover it, with their codes, beside the ways on */}
+            {!badge && <PreviewOffers designId={design.id} />}
             {total > 1 && (
               <ul
                 aria-label={galleryCopy.pagesLabel}

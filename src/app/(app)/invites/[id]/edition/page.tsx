@@ -41,8 +41,8 @@ import {
   planShortfalls,
 } from "@/lib/plans/catalog";
 import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
-import { offersFor, pricesFor } from "@/lib/plans/offers";
-import { offerValue } from "@/components/offers/offers";
+import { offerArtImage, offersFor, pricesFor } from "@/lib/plans/offers";
+import { offerValue } from "@/components/offers/offer-value";
 import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
@@ -134,6 +134,7 @@ export default async function EditionPage({
     code: coupon.code,
     label: coupon.label,
     value: offerValue(coupon, locale),
+    image: offerArtImage(coupon.art),
   }));
   const paidName = (id: string | null) => {
     const found = id ? designById(id) : null;

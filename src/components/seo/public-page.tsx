@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
+import { OfferBar } from "@/components/offers/offer-bar";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -40,6 +41,7 @@ export function PublicShell({
   const { seoCopy } = seoText[locale];
   return (
     <div className="relative isolate flex min-h-dvh flex-col">
+      <OfferBar />
       <SiteHeader menu={siteMenu(locale)} />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
         <nav

@@ -375,6 +375,7 @@ test.describe("coupons, invoices and refunds", () => {
     await admin
       .getByRole("textbox", { name: /^Terms and conditions/ })
       .fill("Valid once per invitation.");
+    await admin.getByRole("radio", { name: "Wedding" }).check();
     await admin.getByRole("button", { name: "Make offer" }).click();
     await expect(admin.getByText(`${code} is ready`).first()).toBeVisible();
     await expect(admin.getByText(code, { exact: true })).toBeVisible();
@@ -385,6 +386,12 @@ test.describe("coupons, invoices and refunds", () => {
     await expect(offer).toHaveAccessibleName("Test festival offer");
     await expect(offer.getByText(code, { exact: true })).toBeVisible();
     await expect(offer.getByText("20% off")).toBeVisible();
+    await expect(offer.locator('img[src*="wedding"]')).toHaveCount(1);
+    // The bar over every public page carries an offer running now
+    await expect(admin.locator("[data-offer-bar]")).toBeVisible();
+    // Saving an offer leaves the prebuilt pages standing
+    expect((await admin.goto("/invitations/haldi"))?.status()).toBe(200);
+    await admin.goto("/offers");
     await offer.getByText("Terms and conditions").click();
     await expect(offer.getByText("Valid once per invitation.")).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);

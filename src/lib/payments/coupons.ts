@@ -5,7 +5,13 @@ import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { isPaidPlanId, type PaidPlanId } from "@/lib/plans/catalog";
 import { isDesignTier, type DesignTier } from "@/lib/plans/design-tiers";
-import { AUDIENCES, type Audience, type Coupon } from "@/lib/plans/offers";
+import {
+  AUDIENCES,
+  isOfferArt,
+  type Audience,
+  type Coupon,
+  type OfferArt,
+} from "@/lib/plans/offers";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
 
@@ -39,11 +45,13 @@ type CouponRow = {
   per_user_limit?: number | null;
   show_on_site?: boolean | null;
   featured?: boolean | null;
+  art?: string | null;
 };
 
 const BASE_COLUMNS =
   "id, code, label, percent_off, amount_off_paise, plan_ids, auto_apply, starts_at, ends_at, max_uses, used_count, active";
-const COLUMNS = `${BASE_COLUMNS}, description, terms, audience, design_tiers, design_ids, per_user_limit, show_on_site, featured`;
+const OFFER_COLUMNS = `${BASE_COLUMNS}, description, terms, audience, design_tiers, design_ids, per_user_limit, show_on_site, featured`;
+const COLUMNS = `${OFFER_COLUMNS}, art`;
 
 /** Postgres's "no such column": the offers migration hasn't run yet. */
 const missingColumn = (error: { code?: string } | null) => error?.code === "42703";
@@ -72,6 +80,7 @@ function fromRow(row: CouponRow): Coupon {
     perUserLimit: row.per_user_limit ?? null,
     showOnSite: row.show_on_site ?? false,
     featured: row.featured ?? false,
+    art: isOfferArt(row.art) ? row.art : "festival",
   };
 }
 
@@ -86,6 +95,7 @@ export async function checkoutCoupons(): Promise<Coupon[]> {
   if (!service) return [];
   const read = (columns: string) => service.from("coupons").select(columns).eq("active", true);
   let { data, error } = await read(COLUMNS);
+  if (missingColumn(error)) ({ data, error } = await read(OFFER_COLUMNS));
   if (missingColumn(error)) ({ data, error } = await read(BASE_COLUMNS));
   return ((data ?? []) as unknown as CouponRow[]).map(fromRow);
 }
@@ -98,6 +108,7 @@ export async function allCoupons(): Promise<Coupon[]> {
   const read = (columns: string) =>
     supabase.from("coupons").select(columns).order("created_at", { ascending: false });
   let { data, error } = await read(COLUMNS);
+  if (missingColumn(error)) ({ data, error } = await read(OFFER_COLUMNS));
   if (missingColumn(error)) ({ data, error } = await read(BASE_COLUMNS));
   return ((data ?? []) as unknown as CouponRow[]).map(fromRow);
 }
@@ -121,6 +132,7 @@ export type SiteOffer = Pick<
   | "endsAt"
   | "perUserLimit"
   | "featured"
+  | "art"
 >;
 
 const toSiteOffer = (coupon: Coupon): SiteOffer => ({
@@ -140,6 +152,7 @@ const toSiteOffer = (coupon: Coupon): SiteOffer => ({
   endsAt: coupon.endsAt,
   perUserLimit: coupon.perUserLimit,
   featured: coupon.featured,
+  art: coupon.art,
 });
 
 const shownOffers = unstable_cache(
@@ -150,7 +163,7 @@ const shownOffers = unstable_cache(
       .filter((coupon) => coupon.maxUses === null || coupon.usedCount < coupon.maxUses)
       .map(toSiteOffer);
   },
-  ["offers", "2026-10-19"],
+  ["offers", "2026-10-21"],
   // An offer that starts or ends shows or goes within a few minutes
   { tags: [OFFERS_TAG], revalidate: 300 },
 );
@@ -188,6 +201,7 @@ export type NewCoupon = {
   perUserLimit: number | null;
   showOnSite: boolean;
   featured: boolean;
+  art: OfferArt;
 };
 
 const toRow = (input: NewCoupon) => ({
@@ -207,6 +221,7 @@ const toRow = (input: NewCoupon) => ({
   per_user_limit: input.perUserLimit,
   show_on_site: input.showOnSite,
   featured: input.featured,
+  art: input.art,
 });
 
 export type CouponSaveResult =

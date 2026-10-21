@@ -77,6 +77,8 @@ database keeps every invite. Applied so far after the first setup:
   terms), who may use an offer (everyone, a first booking, returning hosts), the designs it
   covers, uses per account, and whether the offers page and home page show it. Existing
   coupons keep working before and after it runs; saving a new offer asks for it first.
+- `20261021120000_offer_art.sql` — offer pictures: an `art` column on `coupons` naming the
+  painted occasion tile an offer shows. Offers show the festival painting until it runs.
 
 ## Setting up a project
 

@@ -5,6 +5,7 @@ import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
 import { HomeOffers } from "@/components/offers/offers";
+import { OfferBar } from "@/components/offers/offer-bar";
 import { HomeDesigns, HomeKinds, HomeOccasions } from "./home-gallery";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -20,6 +21,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
   return (
     <PageTransition>
       <div className="relative isolate flex min-h-dvh flex-col">
+        <OfferBar />
         <SiteHeader menu={siteMenu(locale)} />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale}>
