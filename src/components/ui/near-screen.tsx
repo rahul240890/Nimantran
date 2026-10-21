@@ -6,10 +6,10 @@ import { lazy, Suspense, useEffect, type ComponentType } from "react";
 const AHEAD = "800px 0px";
 
 /**
- * A client component whose script waits until its part of the page nears the screen, the
- * visitor first taps or types, or the page has loaded and gone quiet. The server still draws
- * it, so the page looks the same from the first paint; only its taps and movement wait. A long
- * page's lower parts then stay off the first screen's downloads.
+ * A client component whose script waits until its part of the page nears the screen or the
+ * visitor first taps or types. The server still draws it, so the page looks the same from the
+ * first paint; only its taps and movement wait. A long page's lower parts then stay off the
+ * first screen's downloads.
  * `anchor` is the id of an element the server draws around it. A tap inside it before its
  * script arrives is held and made again once the part is awake, so no tap is lost.
  * Like any part behind a Suspense boundary, React sends a large one at the end of the page
@@ -42,7 +42,10 @@ export function nearScreen<P extends object>(
   return NearScreen;
 }
 
-/** Settles once the anchor is near the screen, or `soon()` settles; at once on the server or when it isn't drawn yet. */
+/**
+ * Settles once the anchor is near the screen or the visitor first touches the page; at once on
+ * the server or when the anchor isn't drawn yet.
+ */
 function near(anchor: string): Promise<void> {
   if (typeof window === "undefined" || typeof IntersectionObserver === "undefined") {
     return Promise.resolve();
@@ -62,32 +65,26 @@ function near(anchor: string): Promise<void> {
       resolve();
     }
     observer.observe(element);
-    void soon().then(done);
+    void firstTouch().then(done);
   });
 }
 
-let quiet: Promise<void> | undefined;
+let touched: Promise<void> | undefined;
 
 /**
- * Settles on the visitor's first tap, key or focus, or once the page has loaded and gone
- * quiet. Waiting longer would leave a link inside the site waiting on a sleeping part.
+ * Settles on the visitor's first tap, key or focus. A link within the page re-renders it, and
+ * would otherwise wait on a part still asleep below.
  */
-function soon(): Promise<void> {
-  quiet ??= new Promise((resolve) => {
+function firstTouch(): Promise<void> {
+  touched ??= new Promise((resolve) => {
     const events = ["pointerdown", "keydown", "focusin"] as const;
     function done() {
       for (const name of events) window.removeEventListener(name, done, true);
       resolve();
     }
     for (const name of events) window.addEventListener(name, done, { capture: true });
-    const idle = () =>
-      "requestIdleCallback" in window
-        ? requestIdleCallback(done, { timeout: 2000 })
-        : setTimeout(done, 200);
-    if (document.readyState === "complete") idle();
-    else window.addEventListener("load", idle, { once: true });
   });
-  return quiet;
+  return touched;
 }
 
 /**
