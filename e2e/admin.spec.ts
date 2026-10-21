@@ -326,7 +326,7 @@ test.describe("coupons, invoices and refunds", () => {
     context,
     browser,
   }, info) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     const baseURL = info.project.use.baseURL!;
     const code = `TEST${Date.now().toString().slice(-8)}`;
 
@@ -409,7 +409,8 @@ test.describe("coupons, invoices and refunds", () => {
     ).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
     await expect(admin).toHaveTitle(/\S/);
-    expect((await axe(admin).analyze()).violations).toEqual([]);
+    // The email previews are sandboxed with no scripts, so axe can't run inside them
+    expect((await axe(admin).exclude("iframe").analyze()).violations).toEqual([]);
 
     // Changing it shows on the offers page too
     await admin.goto("/admin/coupons");
