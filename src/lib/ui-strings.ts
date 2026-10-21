@@ -37,6 +37,7 @@ export const uiStrings = {
       textBox: "Box behind the words",
       more: "See the details",
       calendarShort: "Calendar",
+      loading: "Loading the page",
     },
     tour: {
       label: "The invitation, moving on by itself",

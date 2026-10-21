@@ -545,6 +545,7 @@ function CoverDoors({ cover }: { cover: string }) {
               src={cover}
               alt=""
               fill
+              unoptimized
               priority
               sizes="(min-width: 40rem) 32rem, 100vw"
               className="object-cover"
@@ -678,6 +679,7 @@ export function GodCrest({ god, label }: { god: OpeningGod; label?: string }) {
             src={painting.src}
             alt={label ?? ""}
             fill
+            unoptimized
             sizes="(min-width: 40rem) 18rem, 60vw"
             className="object-contain"
           />

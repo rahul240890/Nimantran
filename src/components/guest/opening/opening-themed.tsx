@@ -68,7 +68,10 @@ export function ThemedOpeningArt({
   const move = THEMED_OPENINGS[opening];
   const cover = `/openings/themed/${opening}.webp`;
   const sizes = sample ? "12rem" : "(min-width: 40rem) 32rem, 100vw";
-  const load = sample ? ({ loading: "lazy" } as const) : ({ priority: true } as const);
+  // Already cut to size, so straight from the site's files rather than through the resizer
+  const load = sample
+    ? ({ loading: "lazy", unoptimized: true } as const)
+    : ({ priority: true, unoptimized: true } as const);
   const all = parts(move);
   const cols = Math.max(...all.map((part) => part.col)) + 1;
   const rows = Math.max(...all.map((part) => part.row)) + 1;

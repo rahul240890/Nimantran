@@ -36,6 +36,7 @@ export const uiStrings: Translation<typeof en> = {
       textBox: "શબ્દો પાછળ ચોકઠું",
       more: "વિગતો જુઓ",
       calendarShort: "કૅલેન્ડર",
+      loading: "પાનું ખૂલી રહ્યું છે",
     },
     tour: {
       label: "આમંત્રણ આપમેળે આગળ વધી રહ્યું છે",

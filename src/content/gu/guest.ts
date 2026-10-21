@@ -252,6 +252,7 @@ export const guestText: GuestText = {
       textBox: "શબ્દો પાછળ ચોકઠું",
       more: "વિગતો જુઓ",
       calendarShort: "કૅલેન્ડર",
+      loading: "પાનું ખૂલી રહ્યું છે",
     },
     tour: {
       label: "આમંત્રણ આપમેળે આગળ વધે છે",

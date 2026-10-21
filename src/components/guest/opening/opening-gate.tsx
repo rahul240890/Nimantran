@@ -18,7 +18,10 @@ export function PaintedGateArt({ gate, sample = false }: { gate: PaintedGate; sa
   // A small editor tile needs small files; the guest's first screen loads at once
   const sizes = sample ? "12rem" : "(min-width: 40rem) 32rem, 100vw";
   const doorSizes = sample ? "6rem" : "(min-width: 40rem) 12rem, 40vw";
-  const load = sample ? ({ loading: "lazy" } as const) : ({ priority: true } as const);
+  // Already cut to size, so straight from the site's files rather than through the resizer
+  const load = sample
+    ? ({ loading: "lazy", unoptimized: true } as const)
+    : ({ priority: true, unoptimized: true } as const);
   return (
     <div aria-hidden data-move={move} className="gate absolute inset-0 overflow-hidden">
       <div className="gate-canvas absolute top-1/2 left-1/2">

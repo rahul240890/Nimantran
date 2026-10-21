@@ -16,11 +16,14 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  openingNames,
   welcomeScene,
   type OpeningGod,
   type OpeningStyle,
   type WelcomeScene,
 } from "@/lib/opening/catalog";
+import { firstGrapheme } from "@/lib/initials";
+import { warmPaintings } from "@/lib/paintings";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
@@ -252,10 +255,15 @@ export function Opening({
   const ready = useOpeningReady(stage, `${suite}/${style}`);
   const open = asked && settled && (ready || still);
   const waiting = asked && !open;
+  // Once the opening's own paintings are in, the pages' paintings load while the guest is
+  // still on it, so the pages come in whole the moment it opens
+  const pageBeats = after.kind === "pages" ? after.beats : null;
+  useEffect(() => {
+    if (ready && pageBeats) warmPaintings(pageBeats.map((beat) => pageImage(suite, beat)));
+  }, [ready, pageBeats, suite]);
   useOpeningPace(stage, open, still);
   const theme = SUITES[suite];
   const cover = theme.images.cover;
-  const painted = style === "doors" && Boolean(cover);
   const gate = isPaintedGate(style);
   const fresh = isFreshOpening(style);
   const themed = isThemedOpening(style);
@@ -333,17 +341,9 @@ export function Opening({
       void filling.then(settle);
       window.setTimeout(settle, SETTLE_CAP_MS);
     }
-    // The first pages' paintings load while the opening plays, so no page comes in empty
+    // Any page painting not yet on its way starts now, so no page comes in empty
     const next = latest.current;
-    if (next.kind === "pages") {
-      for (const beat of next.beats.slice(0, 2)) {
-        const src = pageImage(suite, beat);
-        if (!src) continue;
-        const image = new window.Image();
-        image.decoding = "async";
-        image.src = src;
-      }
-    }
+    if (next.kind === "pages") warmPaintings(next.beats.map((beat) => pageImage(suite, beat)));
     // The music swells in with the opening (it fades up over its first seconds)
     if (musicOnOpen && !music.playing && !musicMuted()) void music.play();
   };
@@ -378,60 +378,27 @@ export function Opening({
     if (replay > 0) enterLatest.current();
   }, [replay]);
 
-  const plate = (half?: "left" | "right") => {
-    const Names = half ? "p" : "h1";
-    return (
+  // The names, never on a box over the painting: how they sit depends on the opening
+  const namesLook = openingNames(style);
+  const nameFace: CSSProperties = {
+    ...face("names", type.names),
+    ...(type.bold ? { fontWeight: 700 } : {}),
+    fontStyle: type.italic ? "italic" : undefined,
+  };
+  const spoken = joiner ? `${copy.first} ${joiner} ${copy.second}` : copy.first;
+  const names =
+    namesLook === "print" ? (
       <div
         lang={lang}
-        aria-hidden={half ? true : undefined}
-        data-side={half}
-        data-tone={painted ? "light" : undefined}
-        className={cn(
-          // On a painted gate the plate splits with the doors (globals.css), so it doesn't fade
-          half ? "gate-plate-half absolute inset-0" : "relative",
-          gate ? !half && "gate-plate-whole" : "opening-fade",
-          "isolate flex max-h-full flex-col items-center gap-[1.2cqh] text-center text-card-ink",
-          painted
-            ? "story-print w-full px-[3cqw]"
-            : gate || fresh
-              ? // Smaller on a painted gate or fresh opening, so the painting shows round it
-                "opening-plate w-auto max-w-[min(68cqw,24rem)] px-[5cqw] py-[1.6cqh]"
-              : "opening-plate w-auto max-w-[min(80cqw,30rem)] px-[7cqw] py-[2.2cqh]",
-        )}
+        className="opening-fade opening-print relative isolate flex max-h-full max-w-[min(84cqw,30rem)] flex-col items-center gap-[1.2cqh] text-center text-card-ivory"
       >
-        {painted && (
-          <span
-            aria-hidden
-            className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
-          />
-        )}
-        {copy.blessing && (
-          <p
-            className="text-[clamp(0.85rem,4.2cqw,1.5rem)] text-card-accent-text"
-            style={face("script", type.words)}
-          >
-            {copy.blessing}
-          </p>
-        )}
-        <Names
-          id={half ? undefined : "guest-names"}
-          className={cn(
-            "flex flex-col items-center break-words text-card-ink",
-            !painted && "opening-names",
-          )}
-          style={{
-            ...face("names", type.names),
-            ...(type.bold ? { fontWeight: 700 } : {}),
-            fontStyle: type.italic ? "italic" : undefined,
-            color: type.colour,
-          }}
-        >
+        <h1 id="guest-names" className="flex flex-col items-center break-words" style={nameFace}>
           <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
             {copy.first}
           </span>{" "}
           {joiner && (
             <>
-              <span className="text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))] text-card-accent-text">
+              <span className="opening-joiner text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))]">
                 {joiner}
               </span>{" "}
               <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
@@ -439,19 +406,75 @@ export function Opening({
               </span>
             </>
           )}
-        </Names>
-        {!painted && copy.date && <span aria-hidden className="opening-rule" />}
+        </h1>
+        {copy.date && (
+          <>
+            <span aria-hidden className="opening-rule" />
+            <p
+              className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ivory/90 [font-variant-numeric:lining-nums]"
+              style={face("body", type.words)}
+            >
+              {copy.date}
+            </p>
+          </>
+        )}
+      </div>
+    ) : namesLook === "foot" ? (
+      <div lang={lang} className="opening-foot flex max-w-full flex-col items-center text-center">
+        <h1
+          id="guest-names"
+          className="max-w-[22ch] text-[length:calc(clamp(1.5rem,min(8cqw,4.6cqh),2.4rem)*var(--story-scale,1))] leading-tight break-words text-card-ivory"
+          style={nameFace}
+        >
+          {copy.first}
+          {joiner && (
+            <>
+              {" "}
+              <span className="opening-joiner text-[0.62em]">{joiner}</span> {copy.second}
+            </>
+          )}
+        </h1>
         {copy.date && (
           <p
-            className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ink-muted [font-variant-numeric:lining-nums]"
+            className="mt-1 text-[clamp(0.8rem,3.4cqw,1rem)] text-card-ivory/85 [font-variant-numeric:lining-nums]"
             style={face("body", type.words)}
           >
             {copy.date}
           </p>
         )}
       </div>
+    ) : namesLook === "seal" ? (
+      <div lang={lang} className="flex max-w-full flex-col items-center gap-2 text-center">
+        <span
+          aria-hidden
+          className="opening-seal grid size-[clamp(3.75rem,17cqw,5rem)] place-items-center rounded-full text-card-ivory"
+          style={nameFace}
+        >
+          <span className="flex items-baseline gap-[0.12em] text-[clamp(1.35rem,6.5cqw,1.9rem)] leading-none">
+            {firstGrapheme(copy.first.trim())}
+            {joiner && (
+              <>
+                <span className="opening-joiner text-[0.55em]">&amp;</span>
+                {firstGrapheme(copy.second.trim())}
+              </>
+            )}
+          </span>
+        </span>
+        <h1
+          id="guest-names"
+          className={cn(
+            "max-w-[28ch] text-sm break-words text-card-ivory/90",
+            lang === "en" && "font-label tracking-[0.2em] uppercase",
+          )}
+        >
+          {spoken}
+        </h1>
+      </div>
+    ) : (
+      <h1 id="guest-names" lang={lang} className="sr-only">
+        {spoken}
+      </h1>
     );
-  };
 
   return (
     <section
@@ -480,6 +503,7 @@ export function Opening({
             }
             alt=""
             fill
+            unoptimized
             sizes="100vw"
             className="scale-110 object-cover blur-2xl"
           />
@@ -524,23 +548,16 @@ export function Opening({
           </div>
           <div aria-hidden className="flex-none" style={{ height: `${layout.gap}%` }} />
 
-          {/* The names, on a plate (drawn styles) or printed on the painting (its own doors) */}
+          {/* The middle is the painting's own; only a drawn opening has the names here */}
           <div className="relative flex min-h-0 flex-1 items-center justify-center px-[7cqw]">
             {style === "lotus" && <LotusBloom />}
-            {gate ? (
-              <div className="relative flex max-h-full">
-                {plate()}
-                {plate("left")}
-                {plate("right")}
-              </div>
-            ) : (
-              plate()
-            )}
+            {namesLook === "print" && names}
           </div>
 
           {/* The countdown and the way in, over the ground */}
           <div className="opening-fade flex flex-none flex-col items-center gap-3 bg-linear-to-t from-night/90 via-night/65 to-transparent px-4 pt-10 pb-[max(1rem,env(safe-area-inset-bottom))] [@media(min-height:700px)]:gap-4">
             {guest && <GuestGreeting name={guest} lang={lang} />}
+            {namesLook !== "print" && names}
             {main && (
               <Countdown
                 target={main.at}

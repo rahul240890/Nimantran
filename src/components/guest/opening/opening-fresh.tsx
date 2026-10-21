@@ -35,6 +35,8 @@ function imageProps({ id, sample }: Ctx, name: string, size: "full" | "small" = 
   return {
     src: name === "beyond" ? freshBeyond(id) : `/openings/fresh/${id}/${name}.webp`,
     fill: true,
+    // Already cut to size: straight from the site's files, not through the image resizer
+    unoptimized: true,
     sizes,
     // The guest's first screen loads its big layers at once; an editor tile waits its turn
     ...(sample || size === "small" ? { loading: "lazy" as const } : { priority: true }),

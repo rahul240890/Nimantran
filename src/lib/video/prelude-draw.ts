@@ -1269,7 +1269,7 @@ function drawPlate(ctx: Ctx, film: PreludeFilm, top: number, seconds: number) {
   void seconds;
 }
 
-/** An arch-topped cartouche, as .opening-plate's border-radius draws it. */
+/** An arch-topped cartouche, the shape of the name plate the opening once had. */
 function platePath(ctx: Ctx, x: number, y: number, w: number, h: number) {
   const top = Math.min(2.6 * REM, h / 3);
   const r = Math.min(REM, h / 4);

@@ -314,13 +314,11 @@ test.describe("publish and share", () => {
     // An English-speaking guest sees the English card first
     await expect(toggle.getByRole("radio", { name: "English" })).toBeChecked();
     await expect(door.getByRole("heading", { level: 1 })).toContainText("Aarav");
-    // A gate's names plate is drawn whole, then as the two halves that split with its doors
-    const plate = (text: string) => door.getByText(text).first();
-    await expect(plate("Shri Ganeshaya Namah")).toBeVisible();
+    // The opening shows only the names, lightly, with no plate over the gate; the blessing
+    // waits for the pages
+    await expect(door.getByText("Shri Ganeshaya Namah")).toHaveCount(0);
     await toggle.getByRole("radio", { name: "ગુજરાતી" }).click();
     await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
-    await expect(plate("॥ શ્રી ગણેશાય નમઃ ॥")).toBeVisible();
-    await expect(plate("ગુરુવાર, 15 ઓક્ટોબર 2026")).toBeVisible();
     // The countdown and the buttons around the card speak the card's language too
     await expect(door.getByText("દિવસ", { exact: true })).toBeVisible();
     await expect(guest.getByRole("radiogroup", { name: "કાર્ડની ભાષા" })).toBeVisible();

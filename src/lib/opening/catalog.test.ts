@@ -9,6 +9,7 @@ import {
   darkWelcome,
   filmedWelcome,
   welcomeScene,
+  openingNames,
   FRESH_OPENINGS,
   OPENING_GROUPS,
   OPENING_STYLES,
@@ -204,5 +205,14 @@ describe("the welcome after the opening", () => {
     for (const scene of WELCOME_SCENES) expect(WELCOME_KINDS).toContain(filmedWelcome(scene));
     expect(darkWelcome("fireflies")).toBe(true);
     expect(darkWelcome("sunrise")).toBe(false);
+  });
+});
+
+describe("openingNames", () => {
+  it("prints the names on the drawn openings and mixes the painted ones", () => {
+    expect(openingNames("temple")).toBe("print");
+    expect(openingNames("lotus")).toBe("print");
+    const looks = new Set(OPENING_STYLES.map(openingNames));
+    expect([...looks].sort()).toEqual(["foot", "print", "quiet", "seal"]);
   });
 });
