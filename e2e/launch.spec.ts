@@ -157,7 +157,7 @@ test.describe("pages for payments", () => {
     const sameAs = (
       await page.locator('script[type="application/ld+json"]').allTextContents()
     ).flatMap((text) =>
-      (JSON.parse(text) as { sameAs?: string[] }[]).flatMap((item) => item.sameAs ?? []),
+      ([JSON.parse(text)].flat() as { sameAs?: string[] }[]).flatMap((item) => item.sameAs ?? []),
     );
     expect(sameAs).toEqual(expect.arrayContaining(Object.values(channels)));
 
@@ -196,7 +196,7 @@ test.describe("blog", () => {
     const types = (
       await page.locator('script[type="application/ld+json"]').allTextContents()
     ).flatMap((text) =>
-      (JSON.parse(text) as Record<string, unknown>[]).map((item) => item["@type"]),
+      ([JSON.parse(text)].flat() as Record<string, unknown>[]).map((item) => item["@type"]),
     );
     expect(types).toEqual(expect.arrayContaining(["BlogPosting", "FAQPage", "BreadcrumbList"]));
 
@@ -245,7 +245,7 @@ test.describe("blog", () => {
     const abstracts = (
       await page.locator('script[type="application/ld+json"]').allTextContents()
     ).flatMap((text) =>
-      (JSON.parse(text) as { abstract?: string }[]).flatMap((item) => item.abstract ?? []),
+      ([JSON.parse(text)].flat() as { abstract?: string }[]).flatMap((item) => item.abstract ?? []),
     );
     expect(abstracts[0]).toContain("4 to 6 weeks");
     // Signed by the founder, on the page and for search engines
@@ -253,7 +253,7 @@ test.describe("blog", () => {
     const authors = (
       await page.locator('script[type="application/ld+json"]').allTextContents()
     ).flatMap((text) =>
-      (JSON.parse(text) as { author?: { name?: string } }[]).flatMap((item) =>
+      ([JSON.parse(text)].flat() as { author?: { name?: string } }[]).flatMap((item) =>
         item.author?.name ? [item.author.name] : [],
       ),
     );
