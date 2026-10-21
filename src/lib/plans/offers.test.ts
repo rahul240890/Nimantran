@@ -1,5 +1,8 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  OFFER_ARTS,
   cleanCouponCode,
   codeProblem,
   couponDiscount,
@@ -35,6 +38,16 @@ const coupon = (over: Partial<Coupon> = {}): Coupon => ({
   featured: false,
   art: "festival",
   ...over,
+});
+
+describe("offer pictures", () => {
+  it("has the painting and its email JPEG for every choice", () => {
+    for (const art of OFFER_ARTS) {
+      for (const file of [`${art}.webp`, `${art}-email.jpg`]) {
+        expect(existsSync(join(process.cwd(), "public", "occasions", file))).toBe(true);
+      }
+    }
+  });
 });
 
 describe("coupons", () => {

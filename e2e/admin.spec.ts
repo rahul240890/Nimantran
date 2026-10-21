@@ -326,7 +326,7 @@ test.describe("coupons, invoices and refunds", () => {
     context,
     browser,
   }, info) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     const baseURL = info.project.use.baseURL!;
     const code = `TEST${Date.now().toString().slice(-8)}`;
 
@@ -396,6 +396,21 @@ test.describe("coupons, invoices and refunds", () => {
     await expect(offer.getByText("Valid once per invitation.")).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
     expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    // Admin, Emails draws the new-account emails with the offer in them
+    await admin.goto("/admin/emails");
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Emails");
+    const welcome = admin.frameLocator('iframe[title="Welcome email"]');
+    await expect(welcome.getByText(code, { exact: true })).toBeVisible();
+    await expect(
+      admin
+        .frameLocator('iframe[title="New designs and offers email"]')
+        .getByText(code, { exact: true }),
+    ).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    await expect(admin).toHaveTitle(/\S/);
+    // The email previews are sandboxed with no scripts, so axe can't run inside them
+    expect((await axe(admin).exclude("iframe").analyze()).violations).toEqual([]);
 
     // Changing it shows on the offers page too
     await admin.goto("/admin/coupons");

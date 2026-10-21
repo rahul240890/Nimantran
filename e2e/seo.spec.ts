@@ -107,8 +107,10 @@ test.describe("moving around", () => {
     await page.goto("/traditions/gujarati");
     await page.getByRole("link", { name: "Create your invitation" }).click();
     await expect(page).toHaveURL(/\/create/);
+    // The editor draws on the client and can take a while on a busy test machine
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Pick the design your guests will open",
+      { timeout: 15_000 },
     );
     // The cards behind the pages show once Card colours is the design
     await page.getByRole("radio", { name: /^Card colours/ }).click();

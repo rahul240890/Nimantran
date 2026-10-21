@@ -79,6 +79,8 @@ database keeps every invite. Applied so far after the first setup:
   coupons keep working before and after it runs; saving a new offer asks for it first.
 - `20261021120000_offer_art.sql` — offer pictures: an `art` column on `coupons` naming the
   painted occasion tile an offer shows. Offers show the festival painting until it runs.
+- `20261021130000_discover_email.sql` — lets `email_log` record the new-designs email
+  (`discover`). Until it runs that email can't be logged, so it isn't sent.
 
 ## Setting up a project
 

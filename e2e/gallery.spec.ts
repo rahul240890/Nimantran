@@ -137,8 +137,11 @@ test.describe("the Designs page", () => {
     const folkArt = page.locator('[data-shelf="collection-folk-art"]');
     // Rows far down draw their designs as they come near
     await expect(folkArt.locator("[data-design]")).toHaveCount(0);
-    await folkArt.scrollIntoViewIfNeeded();
-    await expect(folkArt.locator("[data-design]")).toHaveCount(10);
+    // The row can be redrawn while the page settles, so scroll again until it fills
+    await expect(async () => {
+      await folkArt.scrollIntoViewIfNeeded({ timeout: 2_000 });
+      await expect(folkArt.locator("[data-design]")).toHaveCount(10, { timeout: 2_000 });
+    }).toPass();
     await folkArt
       .getByRole("link", { name: /^View all \d+ designs: Folk Art Collection$/ })
       .first()
