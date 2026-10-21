@@ -3,6 +3,7 @@
 import {
   Building2,
   LayoutDashboard,
+  Mail,
   Mails,
   Newspaper,
   Palette,
@@ -29,6 +30,7 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   blog: Newspaper,
   ai: Sparkles,
   business: Building2,
+  emails: Mail,
 };
 
 /** The admin's menu: a column beside the page on wide screens, a scrolling row on phones. */

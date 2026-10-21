@@ -2,7 +2,12 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
 import { getAdmin } from "@/lib/admin/access";
+import { discoverFor, welcomeFor } from "@/lib/email/notify";
+import { emailConfigured, sendEmail } from "@/lib/email/send";
+import { stopUrl } from "@/lib/email/stop-link";
+import { site } from "@/lib/site";
 import { businessSchema, saveBusiness } from "@/lib/payments/business";
 import { UI_LOCALES } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
@@ -249,4 +254,34 @@ export async function saveTrending(input: unknown): Promise<boolean | null> {
   revalidateTag(TRENDING_TAG, { expire: 0 });
   revalidatePath("/admin/designs");
   return true;
+}
+
+export type TestEmailResult = "sent" | "invalid" | "not-configured" | "failed";
+
+/** Sends the welcome and the new-designs email, as a new account gets them, to one address. */
+export async function sendTestEmails(to: unknown): Promise<TestEmailResult | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const address = z
+    .email()
+    .max(200)
+    .safeParse(typeof to === "string" ? to.trim() : to);
+  if (!address.success) return "invalid";
+  if (!emailConfigured()) return "not-configured";
+  const { account } = admin;
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  const emails = [
+    await welcomeFor(account.id, account.name),
+    await discoverFor(account.id, account.name, null, stopUrl(site.url, secret, account.id)),
+  ];
+  const results = await Promise.all(
+    emails.map((email) =>
+      sendEmail(
+        address.data,
+        { ...email, subject: `[Test] ${email.subject}` },
+        { idempotencyKey: `test-${randomUUID()}` },
+      ),
+    ),
+  );
+  return results.every((result) => result.ok) ? "sent" : "failed";
 }

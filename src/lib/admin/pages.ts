@@ -13,7 +13,8 @@ export type AdminPageIcon =
   | "visitors"
   | "blog"
   | "ai"
-  | "business";
+  | "business"
+  | "emails";
 
 export type AdminPage = {
   href: `/admin${string}`;
@@ -53,6 +54,12 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Offers",
     description: "Offers and coupon codes, the offers page and the home page's offers.",
     icon: "coupons",
+  },
+  {
+    href: "/admin/emails",
+    label: "Emails",
+    description: "The welcome and new-designs emails, with a test send.",
+    icon: "emails",
   },
   {
     href: "/admin/invites",

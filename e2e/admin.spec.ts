@@ -397,6 +397,20 @@ test.describe("coupons, invoices and refunds", () => {
     expect(await noOverflow(admin)).toBe(true);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
+    // Admin, Emails draws the new-account emails with the offer in them
+    await admin.goto("/admin/emails");
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Emails");
+    const welcome = admin.frameLocator('iframe[title="Welcome email"]');
+    await expect(welcome.getByText(code, { exact: true })).toBeVisible();
+    await expect(
+      admin
+        .frameLocator('iframe[title="New designs and offers email"]')
+        .getByText(code, { exact: true }),
+    ).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    await expect(admin).toHaveTitle(/\S/);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+
     // Changing it shows on the offers page too
     await admin.goto("/admin/coupons");
     await admin.getByRole("button", { name: `Edit ${code}` }).click();
