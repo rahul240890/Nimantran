@@ -14,7 +14,7 @@ import { ThemeMenu, ThemeToggle } from "@/components/ui/theme-toggle";
 import { useLocale, useText } from "@/i18n/client";
 import { homePath } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
-import { landingText } from "@/i18n/copy/landing";
+import { shellText } from "@/i18n/copy/shell";
 import { uiText } from "@/i18n/copy/ui";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -80,7 +80,7 @@ function MobilePanel({ panel, onPick }: { panel: MenuPanel; onPick: () => void }
 }
 
 function MobileMenu({ menu }: { menu: SiteMenu }) {
-  const { nav, shell } = useText(landingText);
+  const { nav, shell } = useText(shellText);
   const { uiStrings } = useText(uiText);
   const [open, setOpen] = useState(false);
   const pending = useRef<string | null>(null);
@@ -288,7 +288,7 @@ function DesktopPanel({ panel }: { panel: MenuPanel }) {
  * screen, and expand in place in the phone menu.
  */
 export function SiteHeader({ menu }: { menu: SiteMenu }) {
-  const { nav, shell } = useText(landingText);
+  const { nav, shell } = useText(shellText);
   const { uiStrings } = useText(uiText);
   const active = useActiveSection(useMemo(() => nav.map((item) => item.id), [nav]));
   const [scrolled, setScrolled] = useState(false);

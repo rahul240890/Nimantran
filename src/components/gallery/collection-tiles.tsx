@@ -28,7 +28,7 @@ export function CollectionTiles({
   covers: Covers;
   designsPath: string;
 }) {
-  const { collectionCopy, catalogCopy } = useText(galleryText);
+  const { collectionCopy, catalogCopy, shelfCopy } = useText(galleryText);
   const counts = new Map<string, number>();
   for (const entry of entries)
     counts.set(entry.collection, (counts.get(entry.collection) ?? 0) + 1);
@@ -54,6 +54,7 @@ export function CollectionTiles({
               {collectionCopy.groups[group]}
             </h3>
             <ScrollRow
+              labels={shelfCopy}
               className={cn(
                 "relative -mx-4 flex snap-x scroll-px-4 gap-3 overflow-x-auto px-4 pb-2 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:gap-4 lg:overflow-visible lg:px-0",
                 ids.length > 8 ? "lg:grid-cols-5" : "lg:grid-cols-4",

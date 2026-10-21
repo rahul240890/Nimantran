@@ -33,14 +33,17 @@ export function AccordionItem({
 }: AccordionItemProps) {
   const Heading = `h${headingLevel}` as const;
   return (
-    <AccordionPrimitive.Item className={cn("group/item", className)} {...props}>
+    <AccordionPrimitive.Item className={className} {...props}>
       <AccordionPrimitive.Header asChild>
         <Heading className="flex">
           <AccordionPrimitive.Trigger
             className={cn(
               "group flex min-h-14 flex-1 cursor-pointer items-center justify-between gap-4 px-5 py-4 text-start font-semibold text-ink transition-colors sm:px-6",
               "hover:text-accent-text focus-visible:outline-offset-[-3px]",
-              "group-first/item:rounded-t-lg group-last/item:data-[state=closed]:rounded-b-lg",
+              // The first and last items' corners, read through the item (item > heading > button).
+              // Not group-first/item: its "any element under a first child" rule makes the browser
+              // restyle the whole page whenever an element is added at the end of it
+              "[:first-child>*>&]:rounded-t-lg [:last-child>*>&]:data-[state=closed]:rounded-b-lg",
             )}
           >
             <span className="min-w-0 text-pretty">{title}</span>

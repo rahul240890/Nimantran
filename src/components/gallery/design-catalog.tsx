@@ -259,7 +259,10 @@ function Browse({
         >
           {shelfCopy.occasionsHeading}
         </h2>
-        <ScrollRow className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
+        <ScrollRow
+          labels={shelfCopy}
+          className="relative -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0"
+        >
           {CHIP_OCCASIONS.map((id) => (
             <li key={id} className="shrink-0">
               <Link

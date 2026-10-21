@@ -3,17 +3,7 @@ import type { Translation } from "@/i18n/text";
 
 /* বাংলা: সাইন ইন, প্রোফাইল আর আমার নিমন্ত্রণ। English: src/content/account.ts. Draft for a native proofreader. */
 
-export const accountMenu: Translation<typeof en.accountMenu> = {
-  signIn: "সাইন ইন",
-  menuLabel: (name) => (name ? `অ্যাকাউন্ট: ${name}` : "অ্যাকাউন্ট"),
-  yourAccount: "আপনার অ্যাকাউন্ট",
-  invites: "আমার নিমন্ত্রণ",
-  profile: "প্রোফাইল",
-  payments: "পেমেন্ট",
-  newInvite: "নতুন নিমন্ত্রণ",
-  signOut: "সাইন আউট",
-  signedOut: "সাইন আউট হয়েছে",
-};
+export { accountMenu } from "./account-menu";
 
 export const signInCopy: Translation<typeof en.signInCopy> = {
   metaTitle: "সাইন ইন",

@@ -4,14 +4,11 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { useText } from "@/i18n/client";
-import { landingText } from "@/i18n/copy/landing";
 import { cn } from "@/lib/cn";
-import { textArea } from "@/lib/suites/areas";
-import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import type { TextArea } from "@/lib/suites/areas";
+import type { SuiteId } from "@/lib/suites/catalog";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { DECK_SUITES } from "./deck-suites";
 
 const noSubscribe = () => () => {};
 
@@ -21,20 +18,40 @@ const MAX_DOTS = 7;
 /** How long each theme leads the deck before the next comes forward. */
 const TURN_MS = 4500;
 
+/** One theme in the deck, looked up on the server so the themes' catalogue stays off the page's scripts. */
+export type DeckCard = {
+  suite: SuiteId;
+  /** The theme's name in the page's language. */
+  name: string;
+  cover: string;
+  /** Where the names print on the cover. */
+  area: TextArea;
+  /** Its dot's name: "Show Rajwada Bagh". */
+  show: string;
+};
+
+/** The deck's words, from the landing copy on the server. */
+export type DeckCopy = {
+  /** The couple's names and the date printed on the front card. */
+  card: { families: string; first: string; joiner: string; second: string; date: string };
+  deckLabel: string;
+  previousTheme: string;
+  nextTheme: string;
+};
+
 /**
  * The first screen's picture: the painted themes fanned like a hand of cards, the one in
  * front printed with a couple's names the way guests see it. The deck turns by itself
  * (never in still mode, and it pauses while the pointer or focus is on it); the theme
  * names under it bring any one forward.
  */
-export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
-  const { hero, homeGallery } = useText(landingText);
+export function HeroDeck({ cards, copy }: { cards: readonly DeckCard[]; copy: DeckCopy }) {
   const still = useReducedMotion();
   // Below the sm breakpoint the dots are too small to tap, so they leave the tab order
   const phone = useMediaQuery("(width < 40rem)");
   const [current, setCurrent] = useState(0);
   const [held, setHeld] = useState(false);
-  const total = DECK_SUITES.length;
+  const total = cards.length;
   // Marks when the deck answers taps, for tests that wait for the page to come alive
   const live = useSyncExternalStore(
     noSubscribe,
@@ -48,12 +65,12 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
     return () => clearInterval(timer);
   }, [still, held, total]);
 
-  const front = DECK_SUITES[current]!;
+  const front = cards[current]!;
   // The dots' window keeps the front theme near its middle
   const dots = Math.min(MAX_DOTS, total);
   const first = Math.min(Math.max(current - Math.floor(dots / 2), 0), total - dots);
-  const windowed = DECK_SUITES.slice(first, first + dots);
-  const area = textArea(front, "cover");
+  const windowed = cards.slice(first, first + dots);
+  const { area } = front;
 
   return (
     <div
@@ -66,7 +83,7 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
     >
       <div
         role="img"
-        aria-label={`${homeGallery.deckLabel}: ${names[front]}`}
+        aria-label={`${copy.deckLabel}: ${front.name}`}
         className="relative isolate aspect-[4/5] w-full max-w-[26rem] sm:max-w-[30rem]"
       >
         <div
@@ -77,7 +94,7 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
               "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 34%, transparent), color-mix(in srgb, var(--rose) 10%, transparent) 60%, transparent)",
           }}
         />
-        {DECK_SUITES.map((suite, index) => {
+        {cards.map(({ suite, cover }, index) => {
           // Where this card sits in the fan: 0 in front, then alternating to either side
           let offset = index - current;
           if (offset > total / 2) offset -= total;
@@ -105,12 +122,13 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
               }}
             >
               <Image
-                src={SUITES[suite].images.cover!}
+                src={cover}
                 alt=""
                 fill
                 // The card in front is fetched at once; the ones fanned behind it in turn
                 loading={away === 0 ? "eager" : "lazy"}
-                sizes="(min-width: 64rem) 17rem, 55vw"
+                // A card is about 0.65 of the deck's width: 60vw on a phone, 19.5rem from sm up
+                sizes="(min-width: 40rem) 19.5rem, 60vw"
                 className="object-cover"
               />
               {offset === 0 && (
@@ -125,19 +143,19 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
                   }}
                 >
                   <span className="font-label text-[0.55rem] tracking-[0.3em] text-card-gold-text uppercase sm:text-[0.62rem]">
-                    {hero.card.families}
+                    {copy.card.families}
                   </span>
                   <span className="font-display text-[1.9rem] leading-none sm:text-[2.2rem]">
-                    {hero.card.first}
+                    {copy.card.first}
                   </span>
                   <span className="font-display text-lg leading-none text-card-accent-text">
-                    {hero.card.joiner}
+                    {copy.card.joiner}
                   </span>
                   <span className="font-display text-[1.9rem] leading-none sm:text-[2.2rem]">
-                    {hero.card.second}
+                    {copy.card.second}
                   </span>
                   <span className="mt-1 font-label text-[0.6rem] tracking-[0.2em] text-card-ink-muted uppercase sm:text-[0.68rem]">
-                    {homeGallery.coverDate}
+                    {copy.card.date}
                   </span>
                 </div>
               )}
@@ -154,13 +172,13 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
       */}
       <div className="flex max-w-full items-center justify-center gap-1">
         <DeckArrow
-          label={homeGallery.previousTheme}
+          label={copy.previousTheme}
           onClick={() => setCurrent((index) => (index - 1 + total) % total)}
         >
           <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
         </DeckArrow>
-        <ul aria-label={homeGallery.deckLabel} className="flex items-center sm:gap-0.5">
-          {windowed.map((suite, slot) => {
+        <ul aria-label={copy.deckLabel} className="flex items-center sm:gap-0.5">
+          {windowed.map(({ suite, show }, slot) => {
             const index = first + slot;
             // An end dot with more themes beyond it
             const edge = (slot === 0 && first > 0) || (slot === dots - 1 && first + dots < total);
@@ -169,7 +187,7 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
                 <button
                   type="button"
                   aria-pressed={index === current}
-                  aria-label={homeGallery.showTheme(names[suite])}
+                  aria-label={show}
                   onClick={() => setCurrent(index)}
                   className="group grid h-11 w-4 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-ring max-sm:pointer-events-none max-sm:w-6 sm:w-11"
                   tabIndex={phone ? -1 : undefined}
@@ -191,7 +209,7 @@ export function HeroDeck({ names }: { names: Record<SuiteId, string> }) {
           })}
         </ul>
         <DeckArrow
-          label={homeGallery.nextTheme}
+          label={copy.nextTheme}
           onClick={() => setCurrent((index) => (index + 1) % total)}
         >
           <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />

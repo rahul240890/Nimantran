@@ -3,17 +3,7 @@ import type { Translation } from "@/i18n/text";
 
 /* தமிழ்: உள்நுழைவு, சுயவிவரம் மற்றும் என் அழைப்பிதழ்கள். English: src/content/account.ts. Draft for a native proofreader. */
 
-export const accountMenu: Translation<typeof en.accountMenu> = {
-  signIn: "உள்நுழைக",
-  menuLabel: (name) => (name ? `கணக்கு: ${name}` : "கணக்கு"),
-  yourAccount: "உங்கள் கணக்கு",
-  invites: "என் அழைப்பிதழ்கள்",
-  profile: "சுயவிவரம்",
-  payments: "கட்டணங்கள்",
-  newInvite: "புதிய அழைப்பிதழ்",
-  signOut: "வெளியேறு",
-  signedOut: "வெளியேறிவிட்டீர்கள்",
-};
+export { accountMenu } from "./account-menu";
 
 export const signInCopy: Translation<typeof en.signInCopy> = {
   metaTitle: "உள்நுழைக",
