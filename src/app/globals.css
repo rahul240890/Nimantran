@@ -4950,6 +4950,100 @@
   }
 }
 
+/*
+ * An offer ticket: a round notch cut out of each side at --notch-y (or the top and bottom at
+ * --notch-x for a sideways ticket), so the page shows through like a torn-off stub.
+ */
+@utility offer-ticket {
+  --notch: 0.8rem;
+  mask:
+    radial-gradient(circle var(--notch) at 0 var(--notch-y, 50%), transparent 98%, black) 0 0 / 51%
+      100% no-repeat,
+    radial-gradient(circle var(--notch) at 100% var(--notch-y, 50%), transparent 98%, black) 100%
+      0 / 51% 100% no-repeat;
+}
+@utility offer-ticket-x {
+  --notch: 0.7rem;
+  mask:
+    radial-gradient(circle var(--notch) at var(--notch-x, 50%) 0, transparent 98%, black) 0 0 / 100%
+      51% no-repeat,
+    radial-gradient(circle var(--notch) at var(--notch-x, 50%) 100%, transparent 98%, black) 0
+      100% / 100% 51% no-repeat;
+  &:dir(rtl) {
+    mask:
+      radial-gradient(
+          circle var(--notch) at calc(100% - var(--notch-x, 50%)) 0,
+          transparent 98%,
+          black
+        )
+        0 0 / 100% 51% no-repeat,
+      radial-gradient(
+          circle var(--notch) at calc(100% - var(--notch-x, 50%)) 100%,
+          transparent 98%,
+          black
+        )
+        0 100% / 100% 51% no-repeat;
+  }
+}
+
+/* A band of light that sweeps across an offer now and then. Off in still mode. */
+@utility offer-shine {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in srgb, var(--gold-glint) 55%, transparent) 50%,
+      transparent 65%
+    );
+    transform: translateX(-120%);
+    animation: offer-shine 5.5s var(--ease-in-soft) infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      display: none;
+    }
+  }
+  &:where([data-motion="reduce"] *)::after {
+    display: none;
+  }
+}
+@keyframes offer-shine {
+  0%,
+  62% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+/* The offer's sparkles twinkle in turn */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: scale(0.7) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(20deg);
+  }
+}
+@utility animate-twinkle {
+  animation: twinkle 2.6s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+  &:where([data-motion="reduce"] *) {
+    animation: none;
+  }
+}
+
 /* Page transitions (React ViewTransition): the old page fades, the new one rises in */
 ::view-transition {
   pointer-events: none;

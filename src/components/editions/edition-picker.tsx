@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, Globe, LockOpen, ShieldCheck, Sparkles, TicketPercent, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -112,7 +113,7 @@ export type EditionPickerProps = {
 };
 
 /** An offer the host could apply: its code, title and what it takes off. */
-export type OfferChoice = { code: string; label: string; value: string };
+export type OfferChoice = { code: string; label: string; value: string; image: string };
 
 type Pending = { plan: PaidPlanId; stage: "opening" | "checking" } | null;
 type PreviewPay = { plan: PaidPlanId; orderId: string; amountPaise: number } | null;
@@ -545,10 +546,30 @@ function CouponForm({
             {offers.map((offer) => (
               <li
                 key={offer.code}
-                className="flex flex-col gap-3 rounded-lg border border-dashed border-marigold-edge bg-marigold/10 p-4"
+                data-offer-choice={offer.code}
+                className="group flex flex-col overflow-hidden rounded-lg border border-dashed border-marigold-edge bg-marigold/10"
               >
-                <div className="flex flex-col gap-0.5">
-                  <p className="font-display text-xl leading-tight">{offer.value}</p>
+                <div className="offer-shine relative isolate h-24 overflow-hidden bg-night">
+                  <Image
+                    src={offer.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 20rem, (min-width: 640px) 50vw, 100vw"
+                    className="-z-10 object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 -z-10 bg-linear-to-t from-night/90 via-night/40 to-transparent"
+                  />
+                  <Sparkles
+                    aria-hidden
+                    className="absolute end-3 top-3 size-4 animate-twinkle text-card-gold"
+                  />
+                  <p className="absolute inset-x-0 bottom-0 p-3 font-display text-2xl leading-none text-card-ivory">
+                    {offer.value}
+                  </p>
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-4 pb-3">
                   {offer.label && <p className="text-sm text-ink-muted">{offer.label}</p>}
                   <p translate="no" className="font-mono text-sm font-semibold tracking-[0.12em]">
                     {offer.code}
@@ -557,7 +578,7 @@ function CouponForm({
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="self-start"
+                  className="mx-4 mb-4 self-start"
                   loading={busy === offer.code}
                   disabled={busy !== null && busy !== offer.code}
                   onClick={() => void apply(offer.code)}

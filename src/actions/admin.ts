@@ -26,7 +26,7 @@ import { PAID_PLAN_IDS } from "@/lib/plans/catalog";
 import { allDesignIds, defaultTier } from "@/lib/plans/design-defaults";
 import { DESIGN_TIERS, pricesInOrder } from "@/lib/plans/design-tiers";
 import { pricingSchema } from "@/lib/plans/pricing-schema";
-import { AUDIENCES, COUPON_CODE, cleanCouponCode } from "@/lib/plans/offers";
+import { AUDIENCES, COUPON_CODE, OFFER_ARTS, cleanCouponCode } from "@/lib/plans/offers";
 import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";
 import { TRENDING_TAG, saveTrendingPins } from "@/lib/gallery/trending-store";
@@ -88,6 +88,7 @@ const couponSchema = z
     autoApply: z.boolean(),
     showOnSite: z.boolean(),
     featured: z.boolean(),
+    art: z.enum(OFFER_ARTS),
     // Dates as the admin picks them, in India's time
     startsOn: z.union([z.literal(""), z.iso.date()]),
     endsOn: z.union([z.literal(""), z.iso.date()]),
@@ -130,6 +131,7 @@ function couponFrom(data: z.output<typeof couponSchema>): NewCoupon {
     autoApply: data.autoApply,
     showOnSite: data.showOnSite,
     featured: data.showOnSite && data.featured,
+    art: data.art,
     startsAt: data.startsOn ? istDay(data.startsOn, false) : null,
     endsAt: data.endsOn ? istDay(data.endsOn, true) : null,
     maxUses: data.maxUses === "" ? null : data.maxUses,

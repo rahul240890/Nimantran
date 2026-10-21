@@ -18,7 +18,14 @@ import { CharacterCount, Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/toast";
 import { PAID_PLAN_IDS, type PaidPlanId } from "@/lib/plans/catalog";
 import { DESIGN_TIERS, type DesignTier } from "@/lib/plans/design-tiers";
-import { cleanCouponCode, type Audience, type Coupon } from "@/lib/plans/offers";
+import {
+  OFFER_ARTS,
+  cleanCouponCode,
+  offerArtImage,
+  type Audience,
+  type Coupon,
+  type OfferArt,
+} from "@/lib/plans/offers";
 import { AUDIENCE_NAMES } from "./audience-names";
 
 const FIELD_ERRORS: Record<string, string> = {
@@ -29,6 +36,21 @@ const FIELD_ERRORS: Record<string, string> = {
   maxUses: "Leave empty for no limit, or a whole number.",
   perUserLimit: "Leave empty for no limit, or a whole number.",
   designIds: "One of the designs no longer exists. Take it off and save again.",
+};
+
+const ART_NAMES: Record<OfferArt, string> = {
+  festival: "Festival lamps",
+  wedding: "Wedding",
+  engagement: "Engagement",
+  haldi: "Haldi",
+  mehendi: "Mehendi",
+  sangeet: "Sangeet",
+  anniversary: "Anniversary",
+  birthday: "Birthday",
+  baby: "Baby",
+  housewarming: "Housewarming",
+  party: "Party",
+  business: "Business",
 };
 
 const TIER_NAMES: Record<DesignTier, string> = {
@@ -85,6 +107,7 @@ export function CouponForm({
   const [autoApply, setAutoApply] = useState(coupon?.autoApply ?? false);
   const [showOnSite, setShowOnSite] = useState(coupon?.showOnSite ?? true);
   const [featured, setFeatured] = useState(coupon?.featured ?? false);
+  const [art, setArt] = useState<OfferArt>(coupon?.art ?? "festival");
   const [startsOn, setStartsOn] = useState<Date | undefined>(pickerDay(coupon?.startsAt ?? null));
   const [endsOn, setEndsOn] = useState<Date | undefined>(pickerDay(coupon?.endsAt ?? null));
   const [maxUses, setMaxUses] = useState(coupon?.maxUses ? String(coupon.maxUses) : "");
@@ -107,6 +130,7 @@ export function CouponForm({
     setAutoApply(false);
     setShowOnSite(true);
     setFeatured(false);
+    setArt("festival");
     setStartsOn(undefined);
     setEndsOn(undefined);
     setMaxUses("");
@@ -137,6 +161,7 @@ export function CouponForm({
           autoApply,
           showOnSite,
           featured,
+          art,
           startsOn: day(startsOn),
           endsOn: day(endsOn),
           maxUses: maxUses.trim(),
@@ -352,6 +377,37 @@ export function CouponForm({
           placeholder={"Valid once per invitation.\nCan't be combined with other offers."}
         />
       </Field>
+
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-2 font-semibold">Picture</legend>
+        <p className="-mt-1 text-sm text-ink-muted">Shown on the offer on the site.</p>
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+          {OFFER_ARTS.map((name) => (
+            <label key={name} className="group relative cursor-pointer">
+              <input
+                type="radio"
+                name="offer-art"
+                value={name}
+                checked={art === name}
+                onChange={() => setArt(name)}
+                className="peer absolute inset-0 z-10 size-full cursor-pointer appearance-none opacity-0"
+              />
+              <span className="block overflow-hidden rounded-md border-2 border-line transition-colors group-hover:border-line-strong peer-checked:border-marigold peer-checked:group-hover:border-marigold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-ring">
+                {/* eslint-disable-next-line @next/next/no-img-element -- small admin thumbnails */}
+                <img
+                  src={offerArtImage(name)}
+                  alt=""
+                  loading="lazy"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </span>
+              <span className="mt-1 block text-center text-xs text-ink-muted peer-checked:font-semibold peer-checked:text-ink">
+                {ART_NAMES[name]}
+              </span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
       <div className="flex flex-col gap-1">
         <Switch

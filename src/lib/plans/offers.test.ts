@@ -33,6 +33,7 @@ const coupon = (over: Partial<Coupon> = {}): Coupon => ({
   perUserLimit: null,
   showOnSite: false,
   featured: false,
+  art: "festival",
   ...over,
 });
 

@@ -12,6 +12,28 @@ import type { DesignTier, Pricing } from "./design-tiers";
 export const AUDIENCES = ["everyone", "first-order", "returning"] as const;
 export type Audience = (typeof AUDIENCES)[number];
 
+/** Painted occasion tiles (public/occasions) an offer can show; the festival one by default. */
+export const OFFER_ARTS = [
+  "festival",
+  "wedding",
+  "engagement",
+  "haldi",
+  "mehendi",
+  "sangeet",
+  "anniversary",
+  "birthday",
+  "baby",
+  "housewarming",
+  "party",
+  "business",
+] as const;
+export type OfferArt = (typeof OFFER_ARTS)[number];
+
+export const isOfferArt = (value: unknown): value is OfferArt =>
+  OFFER_ARTS.includes(value as OfferArt);
+
+export const offerArtImage = (art: OfferArt) => `/occasions/${art}.webp`;
+
 export type Coupon = {
   id: string;
   code: string;
@@ -38,6 +60,8 @@ export type Coupon = {
   /** Shown on the offers page, and on the home page too when featured. */
   showOnSite: boolean;
   featured: boolean;
+  /** The painting it shows on the site. */
+  art: OfferArt;
 };
 
 /** What checkout knows of the person paying: their bookings so far and coupons used. */
