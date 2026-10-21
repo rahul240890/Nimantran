@@ -185,7 +185,14 @@ export class MusicPlayer {
     }
 
     const ctx = this.ctx;
-    await ctx.resume();
+    try {
+      await ctx.resume();
+    } catch (error) {
+      // Put away (and closed) while it woke: nothing more to play
+      if (this.ctx !== ctx) return;
+      throw error;
+    }
+    if (this.ctx !== ctx) return;
     this.playing = true;
     const now = ctx.currentTime;
     this.master!.gain.cancelScheduledValues(now);
@@ -233,7 +240,9 @@ export class MusicPlayer {
     const ctx = this.ctx;
     window.setTimeout(
       () => {
-        if (!this.playing) void ctx.suspend();
+        // The page may have put the player away (and closed its context) while it faded
+        if (this.playing || this.ctx !== ctx || ctx.state !== "running") return;
+        ctx.suspend().catch(() => undefined);
       },
       fade * 1000 + 100,
     );
@@ -245,7 +254,7 @@ export class MusicPlayer {
     window.clearInterval(this.timer);
     this.playing = false;
     this.dropClip();
-    void this.ctx?.close();
+    if (this.ctx && this.ctx.state !== "closed") this.ctx.close().catch(() => undefined);
     this.ctx = null;
     this.buffers.clear();
   }
