@@ -21,8 +21,9 @@ export function HomePage({ locale }: { locale: UiLocale }) {
   return (
     <PageTransition>
       <div className="relative isolate flex min-h-dvh flex-col">
-        <OfferBar />
         <SiteHeader menu={siteMenu(locale)} />
+        {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
+        <OfferBar />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale}>
             <HomeOccasions locale={locale} />

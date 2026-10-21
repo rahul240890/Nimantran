@@ -41,8 +41,9 @@ export function PublicShell({
   const { seoCopy } = seoText[locale];
   return (
     <div className="relative isolate flex min-h-dvh flex-col">
-      <OfferBar />
       <SiteHeader menu={siteMenu(locale)} />
+      {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
+      <OfferBar />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
         <nav
           aria-label={seoCopy.breadcrumbs}
