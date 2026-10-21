@@ -2,8 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { useText } from "@/i18n/client";
-import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
@@ -15,6 +13,9 @@ type RowState = {
   at: number;
   shown: number;
 };
+
+/** The arrows' names in the page's language (shelfCopy in the gallery's copy). */
+export type RowLabels = { back: string; next: string };
 
 export type ScrollRowHandle = {
   /** Attaches the handle to its list, as the list's ref. */
@@ -86,8 +87,15 @@ export function useScrollRow(): ScrollRowHandle {
  * screen, where a phone swipes instead. Each dims when there is nothing more that way, and
  * the pair goes when everything already shows.
  */
-export function RowArrows({ row, className }: { row: ScrollRowHandle; className?: string }) {
-  const { shelfCopy } = useText(galleryText);
+export function RowArrows({
+  row,
+  labels,
+  className,
+}: {
+  row: ScrollRowHandle;
+  labels: RowLabels;
+  className?: string;
+}) {
   const { back, next } = row.state;
   if (!back && !next) return null;
   const button =
@@ -101,7 +109,7 @@ export function RowArrows({ row, className }: { row: ScrollRowHandle; className?
     >
       <button
         type="button"
-        aria-label={shelfCopy.back}
+        aria-label={labels.back}
         disabled={!back}
         onClick={() => row.scroll(-1)}
         className={button}
@@ -111,7 +119,7 @@ export function RowArrows({ row, className }: { row: ScrollRowHandle; className?
       <span aria-hidden className="h-5 w-px bg-line" />
       <button
         type="button"
-        aria-label={shelfCopy.next}
+        aria-label={labels.next}
         disabled={!next}
         onClick={() => row.scroll(1)}
         className={button}
@@ -131,6 +139,7 @@ export function RowArrows({ row, className }: { row: ScrollRowHandle; className?
 export function ScrollRow({
   className,
   children,
+  labels,
   label,
   row: given,
   track = false,
@@ -138,6 +147,8 @@ export function ScrollRow({
   /** The list's own classes: its flex or grid, gaps, and where it stops scrolling. */
   className?: string;
   children: ReactNode;
+  /** The arrows' names, passed in so the gallery's copy in every language stays off pages that only need these two. */
+  labels: RowLabels;
   /** Names the list for screen readers when the heading above does not. */
   label?: string;
   /** The row's handle, when its arrows sit in the heading; the arrows then stay off its edges. */
@@ -145,7 +156,6 @@ export function ScrollRow({
   /** Shows the progress line under the row while it scrolls. */
   track?: boolean;
 }) {
-  const { shelfCopy } = useText(galleryText);
   const own = useScrollRow();
   const { attach, state, scroll } = given ?? own;
   const { back, next, at, shown } = state;
@@ -167,7 +177,7 @@ export function ScrollRow({
       {!given && back && (
         <button
           type="button"
-          aria-label={shelfCopy.back}
+          aria-label={labels.back}
           onClick={() => scroll(-1)}
           className={cn(arrow, "start-2")}
         >
@@ -177,7 +187,7 @@ export function ScrollRow({
       {!given && next && (
         <button
           type="button"
-          aria-label={shelfCopy.next}
+          aria-label={labels.next}
           onClick={() => scroll(1)}
           className={cn(arrow, "end-2")}
         >

@@ -350,6 +350,8 @@ test.describe("coupons, invoices and refunds", () => {
     await admin.getByRole("button", { name: "Save details" }).click();
     await expect(admin.getByText("Business details saved").first()).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
+    // Saving refreshes the page, which puts its title back a moment later
+    await expect(admin).toHaveTitle(/\S/);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
     // The contact page shows the business, and a chat on WhatsApp with its number

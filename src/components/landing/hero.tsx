@@ -8,7 +8,8 @@ import type { UiLocale } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
 import { DEMO_PATH } from "@/lib/sample/paths";
 import { designNamesText } from "@/i18n/copy/design-names";
-import type { SuiteId } from "@/lib/suites/catalog";
+import { textArea } from "@/lib/suites/areas";
+import { SUITES } from "@/lib/suites/catalog";
 import { DECK_SUITES } from "./deck-suites";
 import { HeroDeck } from "./hero-deck";
 
@@ -122,13 +123,30 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           </div>
         </div>
         <div className="order-3 min-w-0 lg:order-2">
-          {/* The deck's theme names only go to the browser, not every design's */}
+          {/* Only the deck's own themes go to the browser, not the whole catalogue */}
           <HeroDeck
-            names={
-              Object.fromEntries(
-                DECK_SUITES.map((suite) => [suite, designNamesText[locale].names[suite]]),
-              ) as Record<SuiteId, string>
-            }
+            cards={DECK_SUITES.map((suite) => {
+              const name = designNamesText[locale].names[suite];
+              return {
+                suite,
+                name,
+                cover: SUITES[suite].images.cover!,
+                area: textArea(suite, "cover"),
+                show: homeGallery.showTheme(name),
+              };
+            })}
+            copy={{
+              card: {
+                families: hero.card.families,
+                first: hero.card.first,
+                joiner: hero.card.joiner,
+                second: hero.card.second,
+                date: homeGallery.coverDate,
+              },
+              deckLabel: homeGallery.deckLabel,
+              previousTheme: homeGallery.previousTheme,
+              nextTheme: homeGallery.nextTheme,
+            }}
           />
         </div>
         {children && <div className="order-2 min-w-0 lg:order-3 lg:col-span-2">{children}</div>}

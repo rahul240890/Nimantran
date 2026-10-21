@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast, toastAfterNavigation } from "@/components/ui/toast";
-import { accountText } from "@/i18n/copy/account";
+import { accountMenuText } from "@/i18n/copy/account-menu";
 import { useText } from "@/i18n/client";
 import { cn } from "@/lib/cn";
 import { PersonAvatar } from "./person-avatar";
@@ -28,7 +28,7 @@ const iconClass = "absolute start-3 size-4.5 text-ink-muted";
  * Profile, Payments, Sign out. Works on static pages because it reads the account hint cookie.
  */
 export function AccountMenu({ className, compact }: { className?: string; compact?: boolean }) {
-  const { accountMenu } = useText(accountText);
+  const { accountMenu } = useText(accountMenuText);
   const hint = useAccountHint();
   const pathname = usePathname();
   const router = useRouter();

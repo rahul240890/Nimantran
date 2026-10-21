@@ -4,17 +4,8 @@ import type { AuthFailure } from "@/lib/auth/account";
  * English copy for sign-in, the profile and My invites. Moves into next-intl in Step 12.
  */
 
-export const accountMenu = {
-  signIn: "Sign in",
-  menuLabel: (name: string) => (name ? `Account: ${name}` : "Account"),
-  yourAccount: "Your account",
-  invites: "My invites",
-  profile: "Profile",
-  payments: "Payments",
-  newInvite: "New invite",
-  signOut: "Sign out",
-  signedOut: "Signed out",
-} as const;
+// The header's account menu has a module of its own, so every page ships only its words
+export { accountMenu } from "./account-menu";
 
 export const signInCopy = {
   metaTitle: "Sign in",
