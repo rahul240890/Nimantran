@@ -578,15 +578,21 @@ function Catalog({
   covers,
   designsPath,
   onChange,
+  live,
 }: {
   filters: DesignFilters;
   covers: Covers;
   designsPath: string;
   onChange: (next: DesignFilters) => void;
+  /** The catalogue that reads the address, which takes over from the one the server drew. */
+  live?: boolean;
 }) {
   const entries = useMemo(() => designCatalog(), []);
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-8">
+    <div
+      data-catalog-live={live || undefined}
+      className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-8"
+    >
       {/* One search box for the rows and the list, so typing the first letter keeps focus */}
       <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">
         <SearchBox value={filters.query} onChange={(query) => onChange({ ...filters, query })} />
@@ -623,7 +629,9 @@ function AddressedCatalog({ covers }: { covers: Covers }) {
   };
   // A search typed into the server's catalogue before this one replaced it still runs
   useEarlyInput("catalog-search", (query) => change({ ...filters, query }));
-  return <Catalog filters={filters} covers={covers} designsPath={pathname} onChange={change} />;
+  return (
+    <Catalog filters={filters} covers={covers} designsPath={pathname} onChange={change} live />
+  );
 }
 
 /**
