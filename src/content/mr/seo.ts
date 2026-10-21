@@ -43,7 +43,7 @@ export const seoCopy: Translation<typeof en.seoCopy> = {
   suitsHeading: "कोणासाठी",
   raga: "संगीत",
   useDesign: "हे डिझाइन वापरा",
-  seeSample: "पाहुणा म्हणून उघडा",
+  seeSample: "पाहुणे बनून लाइव्ह पाहा",
   allDesigns: "सर्व डिझाइन",
   footerInvitations: "निमंत्रणे",
   footerMore: "डिझाइन आणि परंपरा",

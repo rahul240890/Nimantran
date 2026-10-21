@@ -11,7 +11,6 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
-import { ScenePoster } from "@/components/gallery/scene-poster";
 import { Button } from "@/components/ui/button";
 import { ScrollRow } from "@/components/ui/scroll-row";
 import { designNamesText } from "@/i18n/copy/design-names";
@@ -25,7 +24,7 @@ import type { DesignFormat } from "@/lib/gallery/filters";
 import { shelfHref } from "@/lib/gallery/shelves";
 import { pagePath } from "@/lib/seo/paths";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
-import { HomeShelves } from "./home-shelves";
+import { HomeShelvesLater, ScenePosterLater } from "./home-later";
 
 /** The occasions in the strip under the first screen, the wedding's functions first. */
 const STRIP_OCCASIONS = [
@@ -82,6 +81,7 @@ function Heading({
  */
 export function HomeOccasions({ locale }: { locale: UiLocale }) {
   const { homeGallery } = landingText[locale];
+  const { shelfCopy } = galleryText[locale];
   const occasions = STRIP_OCCASIONS.flatMap((id) => {
     const occasion = OCCASIONS.find((item) => item.category === id);
     const image =
@@ -113,7 +113,10 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
             <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />
           </Link>
         </div>
-        <ScrollRow className="grid snap-x scroll-px-3 auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-1 gap-y-2 overflow-x-auto px-3 pb-1 sm:auto-cols-[6.5rem] sm:px-4 lg:grid-flow-row lg:grid-cols-7 lg:grid-rows-none lg:overflow-visible">
+        <ScrollRow
+          labels={{ back: shelfCopy.back, next: shelfCopy.next }}
+          className="grid snap-x scroll-px-3 auto-cols-[5.5rem] grid-flow-col grid-rows-2 gap-x-1 gap-y-2 overflow-x-auto px-3 pb-1 sm:auto-cols-[6.5rem] sm:px-4 lg:grid-flow-row lg:grid-cols-7 lg:grid-rows-none lg:overflow-visible"
+        >
           {occasions.map(({ id, name, image }, index) => (
             <li key={id} data-occasion={id} className="snap-start">
               <Link href={pagePath({ kind: "occasion", id }, locale)} className={tile}>
@@ -124,7 +127,7 @@ export function HomeOccasions({ locale }: { locale: UiLocale }) {
                     fill
                     // Small, and below the first screen on a phone: no need to jump the queue
                     loading={index < 7 ? "eager" : "lazy"}
-                    sizes="5rem"
+                    sizes="(min-width: 40rem) 5rem, 4.5rem"
                     className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-110 motion-still:transition-none motion-still:group-hover:scale-100"
                   />
                 </span>
@@ -174,7 +177,7 @@ export function HomeDesigns({ locale }: { locale: UiLocale }) {
           title={homeGallery.designsTitle}
           intro={homeGallery.designsIntro}
         />
-        <HomeShelves
+        <HomeShelvesLater
           designsPath={designsPath}
           covers={covers(locale)}
           names={designNamesText[locale]}
@@ -229,7 +232,7 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
         />
       ),
     },
-    { format: "scene", picture: <ScenePoster suite="kayal" /> },
+    { format: "scene", picture: <ScenePosterLater suite="kayal" /> },
     {
       format: "card",
       picture: (

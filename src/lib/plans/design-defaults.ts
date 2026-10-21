@@ -1,16 +1,19 @@
 import type { InviteDraft } from "@/lib/editor/draft";
 import { allDesigns } from "@/lib/gallery/catalog";
-import { SUITE_IDS, isSceneTheme, suiteFor } from "@/lib/suites/catalog";
+import { SUITES, SUITE_IDS, isSceneTheme, isSuiteId, suiteFor } from "@/lib/suites/catalog";
 import { hasScene } from "@/lib/suites/scene";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { DEFAULT_PRICING, type DesignTier, type Pricing } from "./design-tiers";
 
 /**
  * A design's tier before the admin changes it (owner, 2026-10-12): 3D cards are free, every
- * Scene and moving scene is Premium (₹499) and every Story is Royal (₹799).
+ * Scene and moving scene is Premium (₹499) and every Story is Royal (₹799). The templates
+ * with a painted centre and an opening of their own (26 on) are Signature, ₹1,099 (owner,
+ * 2026-10-20).
  */
 export function defaultTier(designId: string): DesignTier {
   if (designId.startsWith("card-")) return "free";
+  if (isSuiteId(designId) && SUITES[designId].centre) return "signature";
   return designId.endsWith("-scene") ? "premium" : "royal";
 }
 

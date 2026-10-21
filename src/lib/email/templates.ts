@@ -4,7 +4,8 @@ import { formatRupees } from "@/lib/plans/catalog";
 /*
  * The emails the site sends, as subject, HTML and plain text. Email apps ignore stylesheets
  * and CSS variables, so the colours are written out here: the light theme's paper, surface,
- * line, ink, ink-muted, marigold and accent-text from src/app/globals.css. Keep them in step.
+ * line, ink, ink-muted, marigold, accent-text and success from src/app/globals.css. Keep them
+ * in step.
  */
 
 const color = {
@@ -15,6 +16,9 @@ const color = {
   inkMuted: "#6b5864",
   marigold: "#f0a431",
   accentText: "#9a4c08",
+  success: "#1a6f45",
+  /** A warm white for offer tickets, between paper and surface. */
+  ticket: "#fffaf1",
 } as const;
 
 export type Email = { subject: string; html: string; text: string };
@@ -64,13 +68,13 @@ function layout(
   brand: Brand,
   preheader: string,
   body: string,
-  footer: { why: string; stopUrl?: string },
+  footer: { why: string; stopUrl?: string; stopLabel?: string },
 ): string {
   const contact = brand.contactEmail
     ? ` Questions? Write to <a href="mailto:${escapeHtml(brand.contactEmail)}" style="color:${color.accentText}">${escapeHtml(brand.contactEmail)}</a>.`
     : "";
   const stop = footer.stopUrl
-    ? `<br><a href="${escapeHtml(footer.stopUrl)}" style="color:${color.accentText}">Stop these reminders</a>`
+    ? `<br><a href="${escapeHtml(footer.stopUrl)}" style="color:${color.accentText}">${escapeHtml(footer.stopLabel ?? "Stop these reminders")}</a>`
     : "";
   return `<!doctype html>
 <html lang="en">
@@ -101,39 +105,175 @@ function heading(text: string): string {
   return `<h1 style="margin:0 0 16px;font-family:'Rozha One',Georgia,serif;font-weight:400;font-size:26px;line-height:1.25;color:${color.ink}">${escapeHtml(text)}</h1>`;
 }
 
-const textFooter = (brand: Brand, why: string, stopUrl?: string) =>
+const textFooter = (brand: Brand, why: string, stopUrl?: string, stopLabel?: string) =>
   [
     "",
     "--",
     why,
     brand.contactEmail ? `Questions? Write to ${brand.contactEmail}.` : "",
-    stopUrl ? `Stop these reminders: ${stopUrl}` : "",
+    stopUrl ? `${stopLabel ?? "Stop these reminders"}: ${stopUrl}` : "",
   ]
     .filter(Boolean)
     .join("\n");
 
+/* ---------- Offers and designs ---------- */
+
+/** An offer as an email shows it: its painting, what it takes off, and its code. */
+export type EmailOffer = {
+  title: string;
+  /** "20% off". */
+  value: string;
+  description: string;
+  /** Null for a festival offer, which needs no code. */
+  code: string | null;
+  /** "Valid till 11 Nov 2026 · For everyone". */
+  note: string;
+  /** The painting, as an absolute address to a JPEG. */
+  image: string;
+};
+
+/** A design as an email shows it: its cover and where it opens. */
+export type EmailDesign = { name: string; image: string; href: string };
+
+function label(text: string): string {
+  return `<p style="margin:26px 0 12px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:${color.accentText};font-weight:700">${escapeHtml(text)}</p>`;
+}
+
+/** Each offer as a ticket: the painting on top, a dashed tear, then the offer and its code. */
+function offerTickets(brand: Brand, offers: EmailOffer[]): string {
+  const page = link(brand, "/offers");
+  return offers
+    .map((offer) => {
+      const code = offer.code
+        ? `<p style="margin:12px 0 0"><span style="display:inline-block;padding:7px 14px;border:2px dashed ${color.marigold};border-radius:8px;background:${color.paper};font-family:'Courier New',monospace;font-size:19px;font-weight:700;letter-spacing:3px;color:${color.ink}">${escapeHtml(offer.code)}</span></p>`
+        : `<p style="margin:12px 0 0;font-size:14px;font-weight:700;color:${color.success}">No code needed: it applies by itself at checkout.</p>`;
+      return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 16px;border:1px solid ${color.line};border-radius:14px;background:${color.ticket};border-collapse:separate">
+<tr><td style="padding:0;line-height:0"><a href="${escapeHtml(page)}"><img src="${escapeHtml(offer.image)}" width="510" alt="" style="display:block;width:100%;max-width:510px;height:auto;border:0;border-radius:13px 13px 0 0"></a></td></tr>
+<tr><td style="padding:16px 18px 18px;border-top:2px dashed ${color.line}">
+<p style="margin:0;font-family:'Rozha One',Georgia,serif;font-size:32px;line-height:1.1;color:${color.accentText}">${escapeHtml(offer.value)}</p>
+<p style="margin:4px 0 0;font-size:17px;font-weight:700;color:${color.ink}">${escapeHtml(offer.title)}</p>
+${offer.description ? `<p style="margin:6px 0 0;font-size:15px;line-height:1.5;color:${color.inkMuted}">${escapeHtml(offer.description)}</p>` : ""}
+${code}
+<p style="margin:10px 0 0;font-size:13px;color:${color.inkMuted}">${escapeHtml(offer.note)}</p>
+</td></tr>
+</table>`;
+    })
+    .join("");
+}
+
+/** Designs three to a row, each its cover over its name. */
+function designGrid(designs: EmailDesign[]): string {
+  const rowsOf = [];
+  for (let i = 0; i < designs.length; i += 3) rowsOf.push(designs.slice(i, i + 3));
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 4px">${rowsOf
+    .map(
+      (row) =>
+        `<tr>${[0, 1, 2]
+          .map((i) => {
+            const design = row[i];
+            if (!design) return `<td width="33%" style="padding:0 4px 14px"></td>`;
+            return `<td width="33%" valign="top" style="padding:0 4px 14px"><a href="${escapeHtml(design.href)}" style="text-decoration:none;color:${color.ink}"><img src="${escapeHtml(design.image)}" width="160" alt="" style="display:block;width:100%;max-width:160px;height:auto;border:0;border-radius:10px"><span style="display:block;margin-top:8px;font-size:14px;font-weight:700;line-height:1.3">${escapeHtml(design.name)}</span></a></td>`;
+          })
+          .join("")}</tr>`,
+    )
+    .join("")}</table>`;
+}
+
+const offerLines = (offers: EmailOffer[]) =>
+  offers.flatMap((offer) => [
+    `${offer.value}: ${offer.title}${offer.code ? `. Code ${offer.code}` : ". No code needed"}`,
+    `  ${offer.note}`,
+  ]);
+
 /* ---------- Welcome ---------- */
 
-export function welcomeEmail(brand: Brand, name: string): Email {
+export function welcomeEmail(
+  brand: Brand,
+  name: string,
+  extras: { offers?: EmailOffer[]; designs?: EmailDesign[] } = {},
+): Email {
   const start = link(brand, "/create");
+  const offers = extras.offers ?? [];
+  const designs = extras.designs ?? [];
   const lines = [
     `Thank you for joining ${brand.name}. Your invitations live in your account, so you can start one now and finish it whenever you like.`,
     "Pick a design, add the names, family and each function, then share your link on WhatsApp. Guests open it on any phone and reply in one tap, and you see every reply on your guest list.",
   ];
+  const first = offers.find((offer) => offer.code);
+  const preheader = first
+    ? `Start free, and take ${first.value} with ${first.code} when you choose a package.`
+    : "Start your first invitation and share it on WhatsApp.";
+  const why = `You're getting this because you just made an account on ${brand.name}.`;
   return {
     subject: `Welcome to ${brand.name}`,
     html: layout(
       brand,
-      "Start your first invitation and share it on WhatsApp.",
-      `${heading(`Welcome to ${brand.name}`)}${paragraph(greeting(name))}${lines.map(paragraph).join("")}${button(start, "Start an invitation")}`,
-      { why: `You're getting this because you just made an account on ${brand.name}.` },
+      preheader,
+      `${heading(`Welcome to ${brand.name}`)}${paragraph(greeting(name))}${lines.map(paragraph).join("")}${button(start, "Start an invitation")}${
+        offers.length
+          ? `${label("Offers for you")}${paragraph("Copy a code and type it when you choose a package for your invitation.")}${offerTickets(brand, offers)}`
+          : ""
+      }${designs.length ? `${label("Designs to start with")}${designGrid(designs)}` : ""}`,
+      { why },
     ),
     text: [
       greeting(name),
       "",
       ...lines.flatMap((line) => [line, ""]),
       `Start an invitation: ${start}`,
-      textFooter(brand, `You're getting this because you just made an account on ${brand.name}.`),
+      ...(offers.length ? ["", "Offers for you:", ...offerLines(offers)] : []),
+      ...(designs.length
+        ? ["", "Designs to start with:", ...designs.map((d) => `${d.name}: ${d.href}`)]
+        : []),
+      textFooter(brand, why),
+    ].join("\n"),
+  };
+}
+
+/* ---------- New designs and offers ---------- */
+
+export type DiscoverDetails = {
+  name: string;
+  offers: EmailOffer[];
+  designs: EmailDesign[];
+  stopUrl: string;
+};
+
+/** A few days after joining: new painted designs, picked for each person, and the offers running. */
+export function discoverEmail(brand: Brand, d: DiscoverDetails): Email {
+  const gallery = link(brand, "/invitations");
+  const first = d.offers.find((offer) => offer.code);
+  const subject = first
+    ? `New designs for your invitation, and ${first.value} with ${first.code}`
+    : "New designs for your invitation";
+  const intro =
+    "We've just painted new designs: each opens like a storybook, page by page, with music and a reply button for your guests. Here are a few we picked for you.";
+  const why = `You're getting this because you made an account on ${brand.name}. We send this once.`;
+  const stopLabel = "Stop these emails";
+  return {
+    subject,
+    html: layout(
+      brand,
+      first
+        ? `Fresh painted designs, plus ${first.code} for ${first.value}.`
+        : "Fresh painted designs for your invitation.",
+      `${heading("New designs, picked for you")}${paragraph(greeting(d.name))}${paragraph(intro)}${designGrid(d.designs)}${button(gallery, "See every design")}${
+        d.offers.length
+          ? `${label("Offers running now")}${offerTickets(brand, d.offers)}${button(link(brand, "/offers"), "See every offer")}`
+          : ""
+      }`,
+      { why, stopUrl: d.stopUrl, stopLabel },
+    ),
+    text: [
+      greeting(d.name),
+      "",
+      intro,
+      "",
+      ...d.designs.map((design) => `${design.name}: ${design.href}`),
+      "",
+      `See every design: ${gallery}`,
+      ...(d.offers.length ? ["", "Offers running now:", ...offerLines(d.offers)] : []),
+      textFooter(brand, why, d.stopUrl, stopLabel),
     ].join("\n"),
   };
 }

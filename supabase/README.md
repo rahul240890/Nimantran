@@ -73,6 +73,14 @@ database keeps every invite. Applied so far after the first setup:
   guest lists with AI: `guests.sent_at` (who has been sent their invitation, for "Send to
   many"), and `list_readings` with `use_list_pages()` counting the pages AI reads per invite.
   Before it runs nobody shows as sent and reading lists is refused; everything else works.
+- `20261019120000_offers.sql` — offers: new `coupons` columns for the offers page (description,
+  terms), who may use an offer (everyone, a first booking, returning hosts), the designs it
+  covers, uses per account, and whether the offers page and home page show it. Existing
+  coupons keep working before and after it runs; saving a new offer asks for it first.
+- `20261021120000_offer_art.sql` — offer pictures: an `art` column on `coupons` naming the
+  painted occasion tile an offer shows. Offers show the festival painting until it runs.
+- `20261021130000_discover_email.sql` — lets `email_log` record the new-designs email
+  (`discover`). Until it runs that email can't be logged, so it isn't sent.
 
 ## Setting up a project
 

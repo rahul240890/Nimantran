@@ -21,7 +21,13 @@ import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
-import { editionsActive, inviteReceipts, invitePlan, ownsInvite } from "@/lib/payments/editions";
+import {
+  buyerHistory,
+  editionsActive,
+  inviteReceipts,
+  invitePlan,
+  ownsInvite,
+} from "@/lib/payments/editions";
 import { razorpayKeys } from "@/lib/payments/razorpay";
 import { checkoutCoupons } from "@/lib/payments/coupons";
 import { designWords } from "@/components/gallery/design-words";
@@ -35,7 +41,8 @@ import {
   planShortfalls,
 } from "@/lib/plans/catalog";
 import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
-import { pricesFor } from "@/lib/plans/offers";
+import { offerArtImage, offersFor, pricesFor } from "@/lib/plans/offers";
+import { offerValue } from "@/components/offers/offer-value";
 import { getPricing } from "@/lib/plans/pricing";
 import { inviteNames } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
@@ -87,6 +94,7 @@ export default async function EditionPage({
     pricing,
     urls,
     origin,
+    buyer,
   ] = await Promise.all([
     editionsActive(),
     inviteReceipts(account, id),
@@ -96,6 +104,8 @@ export default async function EditionPage({
     getPricing(),
     store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
     requestOrigin(),
+    // Without the host's history, offers kept to some people simply don't apply
+    buyerHistory(account).catch(() => null),
   ]);
   // The video preview on the Celebration card, made as the video page makes it: with the
   // mark until the package has the video, and ending on the site until the invite is live
@@ -117,6 +127,15 @@ export default async function EditionPage({
     testCodecs: authMode() === "preview",
   };
   const design = designTier(pricing, designId);
+  const now = new Date();
+  const fit = { buyer, designId };
+  // Codes on the offers page this host could use here, to apply in one tap
+  const offers = offersFor(current, design, coupons, now, fit).map((coupon) => ({
+    code: coupon.code,
+    label: coupon.label,
+    value: offerValue(coupon, locale),
+    image: offerArtImage(coupon.art),
+  }));
   const paidName = (id: string | null) => {
     const found = id ? designById(id) : null;
     return found ? designWords(found, locale).name : null;
@@ -237,7 +256,8 @@ export default async function EditionPage({
             canPay={owner}
             testMode={razorpayKeys()?.mode === "test"}
             prefill={{ name: account.name, email: account.email, phone: account.phone }}
-            prices={pricesFor(current, design, coupons, null, new Date(), pricing)}
+            prices={pricesFor(current, design, coupons, null, now, pricing, fit)}
+            offers={offers}
             pricing={pricing}
             publishHref={ready ? publishHref : null}
             video={video}

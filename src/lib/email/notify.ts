@@ -9,7 +9,9 @@ import { site } from "@/lib/site";
 import { supabaseService } from "@/lib/supabase/service";
 import { emailConfigured, sendEmail } from "./send";
 import { stopUrl } from "./stop-link";
+import { emailDesigns, emailOffers } from "./extras";
 import {
+  discoverEmail,
   draftReminderEmail,
   receiptEmail,
   welcomeEmail,
@@ -18,14 +20,15 @@ import {
 } from "./templates";
 
 /*
- * When the site emails people: a welcome after their first sign-in, a receipt once a
- * payment is recorded, and one reminder for an invite left as a draft (see
- * src/app/(app)/api/cron/draft-reminders). Each email is claimed in email_log before it
+ * When the site emails people: a welcome after their first sign-in (with the offers they
+ * can use), a receipt once a payment is recorded, one reminder for an invite left as a
+ * draft, and once, a few days after joining, new designs picked for them with the offers
+ * running (the last two from the daily job, src/app/(app)/api/cron/draft-reminders). Each email is claimed in email_log before it
  * goes, so a second webhook or a retried job never sends it twice. Off until
  * RESEND_API_KEY is set, and never in preview mode.
  */
 
-type Kind = "welcome" | "receipt" | "draft_reminder";
+type Kind = "welcome" | "receipt" | "draft_reminder" | "discover";
 
 const brand = (): Brand => ({
   name: site.name,
@@ -100,7 +103,31 @@ export function welcomeAfterSignIn(user: User) {
   const created = Date.parse(user.created_at);
   if (!Number.isFinite(created) || Date.now() - created > NEW_ACCOUNT_MS) return;
   const email = user.email;
-  later(() => sendOnce("welcome", user.id, user.id, email, welcomeEmail(brand(), nameOf(user))));
+  later(async () =>
+    sendOnce("welcome", user.id, user.id, email, await welcomeFor(user.id, nameOf(user))),
+  );
+}
+
+/** The welcome with the offers a first booking can use and a few designs to start with. */
+export async function welcomeFor(seed: string, name: string): Promise<Email> {
+  const offers = await emailOffers(site.url, false).catch(() => []);
+  return welcomeEmail(brand(), name, { offers, designs: emailDesigns(site.url, seed, 3) });
+}
+
+/** The new-designs email for one person; bought says whether they have paid for a package. */
+export async function discoverFor(
+  seed: string,
+  name: string,
+  bought: boolean | null,
+  stopUrl: string,
+): Promise<Email> {
+  const offers = await emailOffers(site.url, bought).catch(() => []);
+  return discoverEmail(brand(), {
+    name,
+    offers,
+    designs: emailDesigns(site.url, seed, 6),
+    stopUrl,
+  });
 }
 
 /* ---------- Receipt ---------- */
@@ -224,6 +251,58 @@ export async function sendDraftReminders(now = new Date()): Promise<ReminderRun>
     if (ok) sent += 1;
   }
   return { checked: unpaid.length, sent };
+}
+
+/* ---------- New designs and offers ---------- */
+
+/** Sent this long after someone joins… */
+const DISCOVER_AFTER_MS = 3 * 24 * 60 * 60 * 1000;
+/** …and not to accounts older than this, which joined before these emails began. */
+const DISCOVER_MAX_AGE_MS = 21 * 24 * 60 * 60 * 1000;
+
+/** The daily job: once per account, three days after joining, new designs and the offers. */
+export async function sendDiscoverEmails(now = new Date()): Promise<ReminderRun> {
+  const db = service();
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!db || !secret) return { skipped: "not-configured" };
+
+  const users: User[] = [];
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await db.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error) return { checked: 0, sent: 0 };
+    users.push(...data.users);
+    if (data.users.length < 1000) break;
+  }
+  const due = users.filter((user) => {
+    const age = now.getTime() - Date.parse(user.created_at);
+    return Boolean(user.email) && age >= DISCOVER_AFTER_MS && age <= DISCOVER_MAX_AGE_MS;
+  });
+  const ids = due.map((user) => user.id);
+  if (!ids.length) return { checked: 0, sent: 0 };
+
+  const [{ data: sentBefore }, { data: stopped }, { data: paid }] = await Promise.all([
+    db.from("email_log").select("ref").eq("kind", "discover").in("ref", ids),
+    db.from("email_opt_outs").select("user_id").in("user_id", ids),
+    db.from("orders").select("user_id").in("user_id", ids).in("status", ["paid", "refunded"]),
+  ]);
+  const skip = new Set([
+    ...(sentBefore ?? []).map((row) => row.ref as string),
+    ...(stopped ?? []).map((row) => row.user_id as string),
+  ]);
+  const bought = new Set((paid ?? []).map((row) => row.user_id as string));
+
+  let sent = 0;
+  for (const user of due.filter((entry) => !skip.has(entry.id)).slice(0, BATCH)) {
+    const stop = stopUrl(site.url, secret, user.id);
+    const email = await discoverFor(user.id, nameOf(user), bought.has(user.id), stop);
+    const oneClick = stop.replace("/emails/stop?", "/api/emails/stop?");
+    const ok = await sendOnce("discover", user.id, user.id, user.email!, email, {
+      "List-Unsubscribe": `<${oneClick}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    });
+    if (ok) sent += 1;
+  }
+  return { checked: due.length, sent };
 }
 
 /* ---------- Stopping reminders ---------- */

@@ -455,6 +455,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "hashiya",
       "meenakari",
       "purani-dilli",
       "mahal-yatra",
@@ -521,6 +522,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "sankheda",
       "kaanch-chitra",
       "rogan",
       "nathdwara-raat",
@@ -555,6 +557,10 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "bundi-chitra",
+      "leheriya",
+      "banjara",
+      "dabu",
       "meenakari",
       "chandi-nakkashi",
       "gagan-safar",
@@ -621,6 +627,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "shola",
       "dhokra",
       "kumudini",
       "howrah-tareekh",
@@ -656,6 +663,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "chandan",
+      "nirmal",
       "kaanch-chitra",
       "chettinad-veedu",
       "chandi-nakkashi",
@@ -732,6 +741,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "hashiya",
+      "abri",
       "shab-e-gul",
       "purani-dilli",
       "firoza-bagh",
@@ -766,6 +777,16 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "aasmaani",
+      "tasveer-khana",
+      "leheriya",
+      "banjara",
+      "dabu",
+      "gara",
+      "abri",
+      "neel-chhaap",
+      "lapet",
+      "hashiya",
       "dhokra",
       "rogan",
       "shab-e-gul",

@@ -21,6 +21,7 @@ export type PublicPage =
   | { kind: "wedding-kind"; id: WeddingKind }
   | { kind: "tradition"; id: TraditionId }
   | { kind: "pricing" }
+  | { kind: "offers" }
   | { kind: "blog" }
   | { kind: "contact" }
   | { kind: "refunds" }
@@ -46,6 +47,8 @@ function basePath(page: PublicPage): string {
       return `/traditions/${page.id}`;
     case "pricing":
       return "/pricing";
+    case "offers":
+      return "/offers";
     case "blog":
       return "/blog";
     case "contact":
@@ -77,6 +80,7 @@ export function publicPages(): PublicPage[] {
     ...WEDDING_KINDS.map((id) => ({ kind: "wedding-kind" as const, id })),
     ...TRADITION_IDS.map((id) => ({ kind: "tradition" as const, id })),
     { kind: "pricing" },
+    { kind: "offers" },
     { kind: "blog" },
     { kind: "contact" },
     { kind: "refunds" },
@@ -97,7 +101,7 @@ export function pageAlternates(page: PublicPage, locale: UiLocale): Metadata["al
 }
 
 const LOCALIZED =
-  /^\/(designs|invitations|traditions|pricing|blog|contact|refunds|privacy|terms)(\/|$)/;
+  /^\/(designs|invitations|traditions|pricing|offers|blog|contact|refunds|privacy|terms)(\/|$)/;
 
 /**
  * The same page in another language, for the language menu: public pages carry their

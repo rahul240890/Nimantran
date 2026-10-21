@@ -46,6 +46,10 @@ const nextConfig: NextConfig = {
       ],
     },
   ],
+  images: {
+    // 480 sits between 384 and 640, so a phone's hero cards (about 430px wide) aren't sent at 640
+    imageSizes: [32, 48, 64, 96, 128, 256, 384, 480],
+  },
   // The site has several root layouts, so unmatched addresses need their own page
   experimental: { globalNotFound: true },
   // Link-preview images read these at request time (src/lib/og/assets.ts)

@@ -1,6 +1,7 @@
 import { format } from "date-fns";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { OfferStrip } from "@/components/offers/offer-strip";
 import { Block, PublicShell, type Crumb } from "@/components/seo/public-page";
 import { Button } from "@/components/ui/button";
 import type { BlogPost, PostBlock } from "@/content/blog/types";
@@ -158,6 +159,7 @@ export function BlogIndexPage({
           </p>
         )}
       </section>
+      <OfferStrip className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 lg:px-8" />
       <Block id="posts" heading={blogCopy.postsHeading} className="pt-6 sm:pt-8">
         <PostCards posts={posts} headingLevel="h3" />
       </Block>
@@ -439,6 +441,8 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           </div>
         </section>
       </article>
+
+      <OfferStrip className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8" />
 
       {more.length > 0 && (
         <Block id="more-posts" heading={blogCopy.morePosts} className="pt-0 sm:pt-0">

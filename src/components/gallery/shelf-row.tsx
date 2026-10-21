@@ -135,11 +135,12 @@ export function ShelfRow({
               />
             </Link>
           )}
-          <RowArrows row={row} />
+          <RowArrows row={row} labels={shelfCopy} />
         </div>
       </div>
       <ScrollRow
         row={row}
+        labels={shelfCopy}
         track
         className="relative -mx-4 flex snap-x snap-mandatory scroll-px-4 gap-3 overflow-x-auto overscroll-x-contain px-4 pt-1 pb-2 sm:-mx-6 sm:scroll-px-6 sm:gap-4 sm:px-6 lg:mx-0 lg:scroll-px-0 lg:gap-5 lg:px-0"
       >
@@ -216,7 +217,10 @@ export function TraditionTiles({
         {shelfCopy.traditionsHeading}
       </Heading>
       {/* A strip of round paintings, as shops head a catalogue with its main kinds */}
-      <ScrollRow className="relative -mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0">
+      <ScrollRow
+        labels={shelfCopy}
+        className="relative -mx-4 flex snap-x scroll-px-4 gap-2 overflow-x-auto px-4 sm:-mx-6 sm:scroll-px-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-9 lg:overflow-visible lg:px-0"
+      >
         {WEDDING_KINDS.map((kind, index) => {
           const entry = WEDDING_KIND_ENTRIES[kind];
           return (

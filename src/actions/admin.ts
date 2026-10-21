@@ -2,11 +2,22 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
+import { randomUUID } from "node:crypto";
 import { getAdmin } from "@/lib/admin/access";
+import { discoverFor, welcomeFor } from "@/lib/email/notify";
+import { emailConfigured, sendEmail } from "@/lib/email/send";
+import { stopUrl } from "@/lib/email/stop-link";
+import { site } from "@/lib/site";
 import { businessSchema, saveBusiness } from "@/lib/payments/business";
 import { UI_LOCALES } from "@/i18n/locales";
 import { pagePath } from "@/lib/seo/paths";
-import { createCoupon, setCouponActive } from "@/lib/payments/coupons";
+import {
+  OFFERS_TAG,
+  createCoupon,
+  setCouponActive,
+  updateCoupon,
+  type NewCoupon,
+} from "@/lib/payments/coupons";
 import {
   checkoutProvider,
   grantPlan,
@@ -18,9 +29,9 @@ import {
 import { checkConnection, type ConnectionCheck } from "@/lib/payments/razorpay";
 import { PAID_PLAN_IDS } from "@/lib/plans/catalog";
 import { allDesignIds, defaultTier } from "@/lib/plans/design-defaults";
-import { pricesInOrder } from "@/lib/plans/design-tiers";
+import { DESIGN_TIERS, pricesInOrder } from "@/lib/plans/design-tiers";
 import { pricingSchema } from "@/lib/plans/pricing-schema";
-import { COUPON_CODE, cleanCouponCode } from "@/lib/plans/offers";
+import { AUDIENCES, COUPON_CODE, OFFER_ARTS, cleanCouponCode } from "@/lib/plans/offers";
 import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";
 import { TRENDING_TAG, saveTrendingPins } from "@/lib/gallery/trending-store";
@@ -67,15 +78,27 @@ const rupees = z.coerce.number().positive().max(100_000);
 const couponSchema = z
   .object({
     code: z.string().transform(cleanCouponCode).pipe(z.string().regex(COUPON_CODE)),
-    label: z.string().trim().max(60),
+    label: z.string().trim().max(80),
+    description: z.string().trim().max(200),
+    terms: z.string().trim().max(2000),
     kind: z.enum(["percent", "amount"]),
     value: z.coerce.number().positive(),
     planIds: z.array(z.enum(PAID_PLAN_IDS)).max(3),
+    designTiers: z.array(z.enum(DESIGN_TIERS)).max(DESIGN_TIERS.length),
+    designIds: z
+      .array(z.string())
+      .max(300)
+      .refine((ids) => ids.every((id) => allDesignIds().includes(id))),
+    audience: z.enum(AUDIENCES),
     autoApply: z.boolean(),
+    showOnSite: z.boolean(),
+    featured: z.boolean(),
+    art: z.enum(OFFER_ARTS),
     // Dates as the admin picks them, in India's time
     startsOn: z.union([z.literal(""), z.iso.date()]),
     endsOn: z.union([z.literal(""), z.iso.date()]),
     maxUses: z.union([z.literal(""), z.coerce.number().int().positive().max(1_000_000)]),
+    perUserLimit: z.union([z.literal(""), z.coerce.number().int().positive().max(1_000)]),
   })
   .refine((input) => input.kind !== "percent" || (input.value >= 1 && input.value <= 90), {
     path: ["value"],
@@ -85,15 +108,47 @@ const couponSchema = z
   })
   .refine((input) => !input.startsOn || !input.endsOn || input.endsOn >= input.startsOn, {
     path: ["endsOn"],
-  });
+  })
+  // The offers page needs a title to show
+  .refine((input) => !input.showOnSite || input.label.length > 0, { path: ["label"] });
 
 export type CouponInput = z.input<typeof couponSchema>;
 export type AddCouponResult =
-  { ok: true } | { ok: false; reason: "invalid" | "taken" | "failed"; field?: string };
+  | { ok: true }
+  | { ok: false; reason: "invalid" | "taken" | "failed" | "not-migrated"; field?: string };
 
 /** India's midnight at the start of a day, or the end of it. */
 const istDay = (day: string, end: boolean) =>
   new Date(`${day}T${end ? "23:59:59.999" : "00:00:00"}+05:30`).toISOString();
+
+function couponFrom(data: z.output<typeof couponSchema>): NewCoupon {
+  return {
+    code: data.code,
+    label: data.label,
+    description: data.description,
+    terms: data.terms,
+    percentOff: data.kind === "percent" ? Math.round(data.value) : null,
+    amountOffPaise: data.kind === "amount" ? Math.round(data.value * 100) : null,
+    planIds: data.planIds,
+    designTiers: data.designTiers,
+    designIds: [...new Set(data.designIds)],
+    audience: data.audience,
+    autoApply: data.autoApply,
+    showOnSite: data.showOnSite,
+    featured: data.showOnSite && data.featured,
+    art: data.art,
+    startsAt: data.startsOn ? istDay(data.startsOn, false) : null,
+    endsAt: data.endsOn ? istDay(data.endsOn, true) : null,
+    maxUses: data.maxUses === "" ? null : data.maxUses,
+    perUserLimit: data.perUserLimit === "" ? null : data.perUserLimit,
+  };
+}
+
+/** The offers page and the home page show offers, so a change clears them too. */
+function offersChanged() {
+  revalidatePath("/admin/coupons");
+  revalidateTag(OFFERS_TAG, { expire: 0 });
+}
 
 export async function addCoupon(input: unknown): Promise<AddCouponResult | null> {
   const admin = await getAdmin();
@@ -102,22 +157,22 @@ export async function addCoupon(input: unknown): Promise<AddCouponResult | null>
   if (!parsed.success) {
     return { ok: false, reason: "invalid", field: String(parsed.error.issues[0]?.path[0] ?? "") };
   }
-  const data = parsed.data;
-  const result = await createCoupon(
-    {
-      code: data.code,
-      label: data.label,
-      percentOff: data.kind === "percent" ? Math.round(data.value) : null,
-      amountOffPaise: data.kind === "amount" ? Math.round(data.value * 100) : null,
-      planIds: data.planIds,
-      autoApply: data.autoApply,
-      startsAt: data.startsOn ? istDay(data.startsOn, false) : null,
-      endsAt: data.endsOn ? istDay(data.endsOn, true) : null,
-      maxUses: data.maxUses === "" ? null : data.maxUses,
-    },
-    admin.account,
-  );
-  if (result.ok) revalidatePath("/admin/coupons");
+  const result = await createCoupon(couponFrom(parsed.data), admin.account);
+  if (result.ok) offersChanged();
+  return result;
+}
+
+/** Saves changes to an offer; its code stays as it was. */
+export async function editCoupon(id: unknown, input: unknown): Promise<AddCouponResult | null> {
+  if (!(await getAdmin())) return null;
+  const parsedId = z.uuid().safeParse(id);
+  const parsed = couponSchema.safeParse(input);
+  if (!parsedId.success) return { ok: false, reason: "failed" };
+  if (!parsed.success) {
+    return { ok: false, reason: "invalid", field: String(parsed.error.issues[0]?.path[0] ?? "") };
+  }
+  const result = await updateCoupon(parsedId.data, couponFrom(parsed.data));
+  if (result.ok) offersChanged();
   return result;
 }
 
@@ -126,7 +181,7 @@ export async function switchCoupon(id: unknown, active: unknown): Promise<boolea
   const parsedId = z.uuid().safeParse(id);
   if (!parsedId.success || typeof active !== "boolean") return false;
   const done = await setCouponActive(parsedId.data, active);
-  if (done) revalidatePath("/admin/coupons");
+  if (done) offersChanged();
   return done;
 }
 
@@ -199,4 +254,34 @@ export async function saveTrending(input: unknown): Promise<boolean | null> {
   revalidateTag(TRENDING_TAG, { expire: 0 });
   revalidatePath("/admin/designs");
   return true;
+}
+
+export type TestEmailResult = "sent" | "invalid" | "not-configured" | "failed";
+
+/** Sends the welcome and the new-designs email, as a new account gets them, to one address. */
+export async function sendTestEmails(to: unknown): Promise<TestEmailResult | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const address = z
+    .email()
+    .max(200)
+    .safeParse(typeof to === "string" ? to.trim() : to);
+  if (!address.success) return "invalid";
+  if (!emailConfigured()) return "not-configured";
+  const { account } = admin;
+  const secret = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  const emails = [
+    await welcomeFor(account.id, account.name),
+    await discoverFor(account.id, account.name, null, stopUrl(site.url, secret, account.id)),
+  ];
+  const results = await Promise.all(
+    emails.map((email) =>
+      sendEmail(
+        address.data,
+        { ...email, subject: `[Test] ${email.subject}` },
+        { idempotencyKey: `test-${randomUUID()}` },
+      ),
+    ),
+  );
+  return results.every((result) => result.ok) ? "sent" : "failed";
 }

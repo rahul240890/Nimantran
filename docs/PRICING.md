@@ -26,7 +26,7 @@ Principles:
 
 ## 2. Personal: packages per invite (decided 2026-10-09)
 
-Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹799) or Signature (default ₹799). Until the admin changes a design, 3D cards are Free, every Scene and moving scene is Premium (₹499) and every Story is Royal (₹799) (owner, 2026-10-12). Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
+Every design has a price the master admin sets (**Admin, Designs**): Free, Premium (default ₹499), Royal (default ₹799) or Signature (default ₹1,099). Until the admin changes a design, 3D cards are Free, every Scene and moving scene is Premium (₹499) and every Story is Royal (₹799) (owner, 2026-10-12); the templates with a painted centre and an opening of their own (26 on: Hashiya, Gara, Abri, Neel Chhaap, Lapet) are Signature at ₹1,099 (owner, 2026-10-20). A Signature price already saved in Admin, Designs wins over the default: `supabase-update-signature-price.sql` in the project files sets it to ₹1,099. Each invite then picks one of three packages, priced on its design. The admin sets the design prices, the two package add-ons and the invite counts; the defaults are below. Code: `src/lib/plans/catalog.ts` and `src/lib/plans/design-tiers.ts`.
 
 |                                       | Free                    | Basic                      | Celebration (most chosen) | Grand             |
 | ------------------------------------- | ----------------------- | -------------------------- | ------------------------- | ----------------- |

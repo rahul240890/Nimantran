@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Globe, LockOpen, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { Check, Globe, LockOpen, ShieldCheck, Sparkles, TicketPercent, Users } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -25,7 +26,8 @@ import {
   type PlanId,
 } from "@/lib/plans/catalog";
 import type { DesignTier, Pricing } from "@/lib/plans/design-tiers";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
+import { pagePath } from "@/lib/seo/paths";
 import { editionsText } from "@/i18n/copy/editions";
 import { funnel } from "@/lib/funnel";
 
@@ -106,7 +108,12 @@ export type EditionPickerProps = {
   publishHref: string | null;
   /** The invitation video to preview on the Celebration card, made right there. */
   video?: PackageVideoProps | null;
+  /** Codes from the offers page this host can use here, to apply in one tap. */
+  offers?: readonly OfferChoice[];
 };
+
+/** An offer the host could apply: its code, title and what it takes off. */
+export type OfferChoice = { code: string; label: string; value: string; image: string };
 
 type Pending = { plan: PaidPlanId; stage: "opening" | "checking" } | null;
 type PreviewPay = { plan: PaidPlanId; orderId: string; amountPaise: number } | null;
@@ -126,6 +133,7 @@ export function EditionPicker({
   pricing,
   publishHref,
   video = null,
+  offers = [],
 }: EditionPickerProps) {
   const { upgradeCopy, planCopy, invitesCount, invitesNote } = useText(editionsText);
   const router = useRouter();
@@ -420,6 +428,7 @@ export function EditionPicker({
           designId={designId}
           applied={coupon?.code ?? null}
           onApply={setCoupon}
+          offers={offers}
         />
       )}
       <p role="status" aria-live="polite" className="sr-only">
@@ -471,22 +480,43 @@ export function EditionPicker({
   );
 }
 
-/** "Have a coupon?": tries the code on the server and shows the new prices. */
+/**
+ * "Have a coupon?": tries the code on the server and shows the new prices. Offers from the
+ * offers page that fit this invite sit above it, each applied in one tap.
+ */
 function CouponForm({
   inviteId,
   designId,
   applied,
   onApply,
+  offers,
 }: {
   inviteId: string;
   designId: string;
   applied: string | null;
   onApply: (coupon: { code: string; prices: Partial<Record<PaidPlanId, Price>> } | null) => void;
+  offers: readonly OfferChoice[];
 }) {
   const { upgradeCopy } = useText(editionsText);
+  const locale = useLocale();
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const apply = async (typed: string) => {
+    if (!typed.trim() || busy) return;
+    setBusy(typed);
+    setError(null);
+    const result = await tryCoupon({ inviteId, code: typed, design: designId }).catch(() => null);
+    setBusy(null);
+    if (result?.ok) {
+      onApply({ code: result.code, prices: result.prices });
+      toast({ title: upgradeCopy.couponApplied(result.code), tone: "success" });
+    } else {
+      setCode(typed);
+      setError(upgradeCopy.couponProblem[result?.reason ?? "unknown"]);
+    }
+  };
 
   if (applied) {
     return (
@@ -502,40 +532,102 @@ function CouponForm({
   }
 
   return (
-    <form
-      noValidate
-      className="flex max-w-md flex-col gap-3 sm:flex-row sm:items-start"
-      onSubmit={async (event) => {
-        event.preventDefault();
-        if (!code.trim() || busy) return;
-        setBusy(true);
-        setError(null);
-        const result = await tryCoupon({ inviteId, code, design: designId }).catch(() => null);
-        setBusy(false);
-        if (result?.ok) {
-          onApply({ code: result.code, prices: result.prices });
-          toast({ title: upgradeCopy.couponApplied(result.code), tone: "success" });
-        } else {
-          setError(upgradeCopy.couponProblem[result?.reason ?? "unknown"]);
-        }
-      }}
-    >
-      <Field label={upgradeCopy.couponLabel} error={error ?? undefined} className="flex-1">
-        <Input
-          value={code}
-          onChange={(event) => {
-            setError(null);
-            setCode(event.target.value.toUpperCase());
-          }}
-          autoCapitalize="characters"
-          autoComplete="off"
-          spellCheck={false}
-          maxLength={30}
-        />
-      </Field>
-      <Button type="submit" variant="secondary" loading={busy} className="sm:mt-8">
-        {upgradeCopy.couponApply}
-      </Button>
-    </form>
+    <div className="flex flex-col gap-5">
+      {offers.length > 0 && (
+        <section aria-labelledby="offers-for-you" className="flex flex-col gap-3">
+          <h2
+            id="offers-for-you"
+            className="flex items-center gap-2 font-label text-xs tracking-[0.2em] text-accent-text uppercase"
+          >
+            <TicketPercent aria-hidden className="size-4" />
+            {upgradeCopy.offersForYou}
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {offers.map((offer) => (
+              <li
+                key={offer.code}
+                data-offer-choice={offer.code}
+                className="group flex flex-col overflow-hidden rounded-lg border border-dashed border-marigold-edge bg-marigold/10"
+              >
+                <div className="offer-shine relative isolate h-24 overflow-hidden bg-night">
+                  <Image
+                    src={offer.image}
+                    alt=""
+                    fill
+                    sizes="(min-width: 1024px) 20rem, (min-width: 640px) 50vw, 100vw"
+                    className="-z-10 object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 -z-10 bg-linear-to-t from-night/90 via-night/40 to-transparent"
+                  />
+                  <Sparkles
+                    aria-hidden
+                    className="absolute end-3 top-3 size-4 animate-twinkle text-card-gold"
+                  />
+                  <p className="absolute inset-x-0 bottom-0 p-3 font-display text-2xl leading-none text-card-ivory">
+                    {offer.value}
+                  </p>
+                </div>
+                <div className="flex flex-1 flex-col gap-1 p-4 pb-3">
+                  {offer.label && <p className="text-sm text-ink-muted">{offer.label}</p>}
+                  <p translate="no" className="font-mono text-sm font-semibold tracking-[0.12em]">
+                    {offer.code}
+                  </p>
+                </div>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="mx-4 mb-4 self-start"
+                  loading={busy === offer.code}
+                  disabled={busy !== null && busy !== offer.code}
+                  onClick={() => void apply(offer.code)}
+                >
+                  {upgradeCopy.useOffer(offer.code)}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+      <form
+        noValidate
+        className="flex max-w-md flex-col gap-3 sm:flex-row sm:items-start"
+        onSubmit={(event) => {
+          event.preventDefault();
+          void apply(code);
+        }}
+      >
+        <Field label={upgradeCopy.couponLabel} error={error ?? undefined} className="flex-1">
+          <Input
+            value={code}
+            onChange={(event) => {
+              setError(null);
+              setCode(event.target.value.toUpperCase());
+            }}
+            autoCapitalize="characters"
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={30}
+          />
+        </Field>
+        <Button
+          type="submit"
+          variant="secondary"
+          loading={busy !== null && busy === code}
+          className="sm:mt-8"
+        >
+          {upgradeCopy.couponApply}
+        </Button>
+      </form>
+      <p className="-mt-2 text-sm">
+        <Link
+          href={pagePath({ kind: "offers" }, locale)}
+          className="inline-flex min-h-11 items-center font-semibold text-accent-text underline-offset-4 hover:underline"
+        >
+          {upgradeCopy.offersLink}
+        </Link>
+      </p>
+    </div>
   );
 }

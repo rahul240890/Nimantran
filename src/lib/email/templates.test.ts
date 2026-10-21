@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { stopToken, stopTokenValid, stopUrl } from "./stop-link";
 import {
+  discoverEmail,
   draftReminderEmail,
   escapeHtml,
   receiptEmail,
   welcomeEmail,
   type Brand,
+  type EmailDesign,
+  type EmailOffer,
 } from "./templates";
 
 const brand: Brand = {
@@ -30,6 +33,21 @@ const receipt = {
   taxInvoice: false,
 };
 
+const offer: EmailOffer = {
+  title: "Diwali offer",
+  value: "20% off",
+  description: "Light up your Diwali invitation.",
+  code: "DIWALI26",
+  note: "Valid till 11 Nov 2026 · For everyone · On every package",
+  image: "https://shubhinvitations.com/occasions/festival-email.jpg",
+};
+
+const design: EmailDesign = {
+  name: "Aasmaani",
+  image: "https://shubhinvitations.com/suites/aasmaani/preview.jpg",
+  href: "https://shubhinvitations.com/create?suite=aasmaani",
+};
+
 describe("emails", () => {
   it("escapes what people typed", () => {
     expect(escapeHtml(`<b>"A" & 'B'</b>`)).toBe(
@@ -45,6 +63,36 @@ describe("emails", () => {
     expect(email.text).toContain("Namaste Meera,");
     expect(email.html).toContain("https://shubhinvitations.com/create");
     expect(welcomeEmail(brand, "").text).toContain("Namaste,");
+  });
+
+  it("shows the offers and designs a new account can use in the welcome", () => {
+    const email = welcomeEmail(brand, "Meera", {
+      offers: [offer, { ...offer, title: "Festival", code: null }],
+      designs: [design],
+    });
+    expect(email.html).toContain("DIWALI26");
+    expect(email.html).toContain("festival-email.jpg");
+    expect(email.html).toContain("No code needed");
+    expect(email.html).toContain("suites/aasmaani/preview.jpg");
+    expect(email.text).toContain("20% off: Diwali offer. Code DIWALI26");
+    expect(email.text).toContain("Aasmaani: https://shubhinvitations.com/create?suite=aasmaani");
+    expect(welcomeEmail(brand, "Meera").html).not.toContain("Offers for you");
+  });
+
+  it("sends new designs with the offers, and a way out", () => {
+    const email = discoverEmail(brand, {
+      name: "Meera",
+      offers: [offer],
+      designs: [design, design, design, design],
+      stopUrl: "https://shubhinvitations.com/emails/stop?u=x&t=y",
+    });
+    expect(email.subject).toBe("New designs for your invitation, and 20% off with DIWALI26");
+    expect(email.html).toContain("Stop these emails");
+    expect(email.html.match(/preview\.jpg/g)).toHaveLength(4);
+    expect(email.text).toContain("Stop these emails: https://shubhinvitations.com/emails/stop");
+    expect(
+      discoverEmail(brand, { ...email, name: "", offers: [], designs: [], stopUrl: "x" }).subject,
+    ).toBe("New designs for your invitation");
   });
 
   it("puts the amount, discount and invoice number on a receipt", () => {

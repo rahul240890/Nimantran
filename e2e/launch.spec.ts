@@ -200,7 +200,7 @@ test.describe("blog", () => {
     );
     expect(types).toEqual(expect.arrayContaining(["BlogPosting", "FAQPage", "BreadcrumbList"]));
 
-    await page.getByRole("button", { name: "Copy" }).first().click();
+    await page.getByRole("button", { name: "Copy", exact: true }).first().click();
     await expect(page.getByText("Copied").first()).toBeVisible();
     expect(await page.evaluate(() => navigator.clipboard.readText())).toContain("Ramesh Sharma");
     expect(await noOverflow(page)).toBe(true);

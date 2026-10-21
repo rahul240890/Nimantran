@@ -603,6 +603,12 @@ export function Opening({
         {welcome && (
           <OpeningWelcome
             scene={welcomeScene({ welcome: welcomeChoice }, style, pick)}
+            // A template's own painted centre, unless the host picked a scene of their own
+            centre={
+              theme.centre && !welcomeChoice
+                ? { src: `/suites/${suite}/centre.webp`, ...theme.centre }
+                : undefined
+            }
             seconds={WELCOME_MS / 1000}
             copy={copy}
             lang={lang}

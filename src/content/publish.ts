@@ -141,17 +141,105 @@ export const guestCopy = {
   /** The themed page below the painted pages (Step 12q). */
   themed: {
     invitedTo: "With joy, we invite you to celebrate",
-    shower: "Shower flowers on the couple",
-    showered: "Your flowers are on their way to the couple.",
-    music: { play: "Play the music", pause: "Pause the music" },
-    lamps: {
-      diyas: "Light the diyas",
-      lanterns: "Light the lanterns",
-      nilavilakku: "Light the lamp",
-      fairy: "Switch on the lights",
+    /** The flowers a guest gives after the welcome, one way per theme (blessings.ts). */
+    flowersLabel: "Your blessing",
+    flowersTitle: "Send them your flowers",
+    flowers: {
+      shower: { give: "Shower the flowers", given: "Your flowers are falling all around them." },
+      basket: {
+        give: "Toss a basket of petals",
+        given: "Your petals are scattered at their feet.",
+      },
+      urli: {
+        give: "Float a flower in the urli",
+        given: "Your flower floats in the urli. Add another if you like.",
+      },
+      garland: { give: "Thread a garland", given: "Your garland is ready for them." },
+      lotus: { give: "Open the lotus", given: "The lotus has opened with your blessing." },
+      bouquet: { give: "Send a bouquet", given: "Your bouquet has bloomed for them." },
+      branch: {
+        give: "Make the branch blossom",
+        given: "The branch has blossomed with your wishes.",
+      },
+      rangoli: {
+        give: "Lay a flower rangoli",
+        given: "Your flower rangoli is laid at their door.",
+      },
+      boat: { give: "Send a boat of flowers", given: "Your flowers are sailing down to them." },
+      popper: {
+        give: "Pop the flower popper",
+        given: "Your petals have burst over the celebration.",
+      },
+      gift: { give: "Open a gift of flowers", given: "Your gift of flowers has opened for them." },
+      butterflies: {
+        give: "Send the butterflies",
+        given: "The butterflies are carrying your petals to them.",
+      },
+      heart: {
+        give: "Gather a heart of petals",
+        given: "Your heart of petals is beating for them.",
+      },
+      chadar: {
+        give: "Shake the canopy of flowers",
+        given: "Petals are falling from the canopy for them.",
+      },
+      whirl: {
+        give: "Spin a whirl of petals",
+        given: "Your petals are whirling their way to them.",
+      },
     },
+    music: { play: "Play the music", pause: "Pause the music" },
     lampsLabel: "Light a lamp for the couple",
-    lit: "Thank you. Your lamp is lit for the couple.",
+    /** The light a guest gives at night, one way per theme (blessings.ts). */
+    lights: {
+      diyas: { give: "Light the diyas", given: "Thank you. Your diyas are glowing for them." },
+      lanterns: {
+        give: "Light the lanterns",
+        given: "Thank you. Your lanterns are glowing for them.",
+      },
+      nilavilakku: { give: "Light the lamp", given: "Thank you. Your lamp is lit for them." },
+      fairy: { give: "Switch on the lights", given: "Thank you. The lights are on for them." },
+      river: {
+        give: "Float the diyas",
+        given: "Thank you. Your diyas are floating down the river.",
+      },
+      sky: {
+        give: "Let the sky lanterns go",
+        given: "Thank you. Your lanterns are rising with your wishes.",
+      },
+      spiral: {
+        give: "Light the circle of diyas",
+        given: "Thank you. The circle of diyas is glowing for them.",
+      },
+      stambh: {
+        give: "Light the deepstambh",
+        given: "Thank you. The deepstambh is alight for them.",
+      },
+      akash: {
+        give: "Light the star lantern",
+        given: "Thank you. The star lantern is shining for them.",
+      },
+      candles: {
+        give: "Light the candles",
+        given: "Thank you. Your candles are burning for them.",
+      },
+      fireflies: {
+        give: "Open the jar of fireflies",
+        given: "Thank you. The fireflies are lighting up the night.",
+      },
+      jaali: {
+        give: "Light the jaali lantern",
+        given: "Thank you. The lantern is scattering stars for them.",
+      },
+      sparklers: {
+        give: "Light the sparklers",
+        given: "Thank you. The sparklers are shining for them.",
+      },
+      chandelier: {
+        give: "Light the chandelier",
+        given: "Thank you. The chandelier is lit for them.",
+      },
+    },
     blessingLabel: "With the blessings of our elders",
     eventsLabel: "From morning to night",
     saveDateLabel: "Mark your calendar",

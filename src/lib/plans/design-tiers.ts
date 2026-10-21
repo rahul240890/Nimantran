@@ -12,7 +12,8 @@
 /**
  * Signature began as the moving scenes' tier (owner, 2026-10-09). Since 2026-10-12 the
  * scenes start as Premium (₹499) and the Stories as Royal (₹799); Signature stays for the
- * admin to give any design, no cheaper than Royal.
+ * admin to give any design, no cheaper than Royal. Since 2026-10-20 it is ₹1,099, the
+ * templates with a painted centre (26 on) start there.
  */
 export const DESIGN_TIERS = ["free", "premium", "royal", "signature"] as const;
 export type DesignTier = (typeof DESIGN_TIERS)[number];
@@ -49,7 +50,7 @@ export type Pricing = {
 };
 
 export const DEFAULT_PRICING: Pricing = {
-  designs: { premium: 49_900, royal: 79_900, signature: 79_900 },
+  designs: { premium: 49_900, royal: 79_900, signature: 109_900 },
   packages: { celebration: 40_000, grand: 60_000 },
   invites: { basic: 100, celebration: 500 },
   tiers: {},

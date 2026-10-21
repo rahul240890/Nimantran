@@ -4,6 +4,8 @@ import { Faq } from "./faq";
 import { Hero } from "./hero";
 import { HowItWorks } from "./how-it-works";
 import { Pricing } from "./pricing";
+import { HomeOffers } from "@/components/offers/offers";
+import { OfferBar } from "@/components/offers/offer-bar";
 import { HomeDesigns, HomeKinds, HomeOccasions } from "./home-gallery";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -20,6 +22,8 @@ export function HomePage({ locale }: { locale: UiLocale }) {
     <PageTransition>
       <div className="relative isolate flex min-h-dvh flex-col">
         <SiteHeader menu={siteMenu(locale)} />
+        {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
+        <OfferBar />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale}>
             <HomeOccasions locale={locale} />
@@ -27,6 +31,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
           <HomeDesigns locale={locale} />
           <HomeKinds locale={locale} />
           <HowItWorks locale={locale} />
+          <HomeOffers locale={locale} />
           <Pricing locale={locale} />
           <Faq locale={locale} />
           <Closing locale={locale} />

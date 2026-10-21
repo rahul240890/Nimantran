@@ -50,6 +50,7 @@ describe("gallery catalog", () => {
         "hina",
         "mor-sarovar",
         "kaanch-chitra",
+        "sankheda",
         "rogan",
         "card-bandhani",
       ].sort(),

@@ -61,6 +61,8 @@ function wordsFor(page: PublicPage, locale: UiLocale): Words {
       return seoCopy.traditionPages[page.id];
     case "pricing":
       return pagesText[locale].pricingPageCopy;
+    case "offers":
+      return pagesText[locale].offersCopy;
     case "contact":
       return pagesText[locale].contactPageCopy;
     case "blog":

@@ -1,9 +1,13 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  OFFER_ARTS,
   cleanCouponCode,
   codeProblem,
   couponDiscount,
   couponProblem,
+  offersFor,
   priceFor,
   pricesFor,
   type Coupon,
@@ -24,7 +28,26 @@ const coupon = (over: Partial<Coupon> = {}): Coupon => ({
   maxUses: null,
   usedCount: 0,
   active: true,
+  description: "",
+  terms: "",
+  audience: "everyone",
+  designTiers: [],
+  designIds: [],
+  perUserLimit: null,
+  showOnSite: false,
+  featured: false,
+  art: "festival",
   ...over,
+});
+
+describe("offer pictures", () => {
+  it("has the painting and its email JPEG for every choice", () => {
+    for (const art of OFFER_ARTS) {
+      for (const file of [`${art}.webp`, `${art}-email.jpg`]) {
+        expect(existsSync(join(process.cwd(), "public", "occasions", file))).toBe(true);
+      }
+    }
+  });
 });
 
 describe("coupons", () => {
@@ -43,6 +66,32 @@ describe("coupons", () => {
     expect(couponProblem(coupon({ maxUses: 5, usedCount: 5 }), "grand", now)).toBe("used-up");
     expect(couponProblem(coupon({ planIds: ["celebration"] }), "grand", now)).toBe("wrong-plan");
     expect(couponProblem(coupon(), "grand", now)).toBeNull();
+  });
+
+  it("keep to the people and designs they're for", () => {
+    const first = { paidOrders: 0, uses: {} };
+    const returning = { paidOrders: 2, uses: { c1: 1 } };
+    const forFirst = coupon({ audience: "first-order" });
+    expect(couponProblem(forFirst, "grand", now, "royal", { buyer: first })).toBeNull();
+    expect(couponProblem(forFirst, "grand", now, "royal", { buyer: returning })).toBe(
+      "first-order",
+    );
+    // Nobody known, no offer kept to some people
+    expect(couponProblem(forFirst, "grand", now, "royal")).toBe("first-order");
+    expect(
+      couponProblem(coupon({ audience: "returning" }), "grand", now, "royal", { buyer: first }),
+    ).toBe("returning");
+    expect(
+      couponProblem(coupon({ perUserLimit: 1 }), "grand", now, "royal", { buyer: returning }),
+    ).toBe("used-by-you");
+    expect(
+      couponProblem(coupon({ perUserLimit: 2 }), "grand", now, "royal", { buyer: returning }),
+    ).toBeNull();
+
+    const royal = coupon({ designTiers: ["royal"], designIds: ["kayal-scene"] });
+    expect(couponProblem(royal, "grand", now, "royal")).toBeNull();
+    expect(couponProblem(royal, "grand", now, "premium")).toBe("wrong-design");
+    expect(couponProblem(royal, "grand", now, "premium", { designId: "kayal-scene" })).toBeNull();
   });
 
   it("always leave at least ₹1 to pay", () => {
@@ -101,6 +150,19 @@ describe("prices", () => {
       "grand",
     ]);
     expect(Object.keys(pricesFor(FREE, "free", [], null, now))).toEqual(["celebration", "grand"]);
+  });
+
+  it("list the codes on the offers page a host can use", () => {
+    const fit = { buyer: { paidOrders: 1, uses: {} }, designId: "kayal" };
+    const coupons = [
+      coupon({ id: "a", code: "SHOWN", showOnSite: true }),
+      coupon({ id: "b", code: "HIDDEN" }),
+      coupon({ id: "c", code: "AUTO", showOnSite: true, autoApply: true }),
+      coupon({ id: "d", code: "FIRST", showOnSite: true, audience: "first-order" }),
+    ];
+    expect(offersFor(FREE, "premium", coupons, now, fit).map((item) => item.code)).toEqual([
+      "SHOWN",
+    ]);
   });
 
   it("explain a code that does nothing", () => {

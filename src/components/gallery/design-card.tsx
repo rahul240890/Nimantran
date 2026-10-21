@@ -11,14 +11,18 @@ import {
   Eye,
   Image as ImageIcon,
   Layers,
+  Pause,
+  Play,
+  PlayCircle,
   Rotate3d,
   X,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { PreviewOffers } from "@/components/offers/preview-offers";
 import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
@@ -28,6 +32,7 @@ import { cn } from "@/lib/cn";
 import { funnel } from "@/lib/funnel";
 import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
@@ -273,9 +278,13 @@ export function DesignCard({
   );
 }
 
+/** How long each page stays while the preview turns its pages by itself. */
+const SLIDE_MS = 2500;
+
 /**
- * Every page of a design, full height like the guest's phone: step through them with the
- * arrows, the thumbnails or the arrow keys, then Use this design. Admin, Designs shows it
+ * Every page of a design, full height like the guest's phone. The pages turn by themselves
+ * (not in reduced motion); stepping through them with the arrows, a swipe, the thumbnails
+ * or the arrow keys stops that, and Play starts it again. Then Use this design. Admin, Designs shows it
  * with its own badge and, in place of Use this design, the design's tier.
  */
 export function DesignPreview({
@@ -305,22 +314,43 @@ export function DesignPreview({
   const [index, setIndex] = useState(0);
   // Moved on to another design while open: start on its first page
   const [shownId, setShownId] = useState(design.id);
+  const [playing, setPlaying] = useState(true);
   if (shownId !== design.id) {
     setShownId(design.id);
     setIndex(0);
+    setPlaying(true);
   }
   // A Scene plays itself; a Story steps through its pages
   const scene = design.format === "scene";
   const total = scene ? 0 : pages.length;
   const current = pages[index];
-  const go = (next: number) => setIndex((next + total) % total);
+  // The visitor's own step stops the slideshow, so the page they chose stays
+  const go = (next: number) => {
+    setPlaying(false);
+    setIndex((next + total) % total);
+  };
+  const still = useReducedMotion();
+  const turning = open && playing && !still && total > 1;
+  useEffect(() => {
+    if (!turning) return;
+    // The next painting loads while this one shows, so no page comes in empty
+    const next = pages[(index + 1) % total];
+    if (next) new window.Image().src = next.src;
+    const timer = window.setTimeout(() => setIndex((i) => (i + 1) % total), SLIDE_MS);
+    return () => window.clearTimeout(timer);
+  }, [turning, index, total, pages]);
+  // A swipe across the page steps it, as on the guest's phone
+  const swipe = useRef<number | null>(null);
 
   return (
     <DialogPrimitive.Root
       open={open}
       onOpenChange={(next) => {
         onOpenChange(next);
-        if (next) setIndex(0);
+        if (next) {
+          setIndex(0);
+          setPlaying(true);
+        }
       }}
     >
       <DialogPrimitive.Portal>
@@ -334,7 +364,7 @@ export function DesignPreview({
             if (event.key === "ArrowLeft") go(index + (rtl ? 1 : -1));
           }}
           aria-describedby={undefined}
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto text-card-ivory outline-none data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in lg:flex-row lg:items-center lg:justify-center lg:gap-14 lg:overflow-hidden lg:px-10"
+          className="fixed inset-0 z-50 flex [scrollbar-width:thin] [scrollbar-color:color-mix(in_oklab,var(--color-card-ivory)_22%,transparent)_transparent] flex-col overflow-y-auto overscroll-contain text-card-ivory outline-none data-[state=closed]:animate-pop-out data-[state=open]:animate-pop-in lg:flex-row lg:items-start lg:justify-center lg:gap-16 lg:px-10"
         >
           <DialogPrimitive.Close
             aria-label={galleryCopy.close}
@@ -343,11 +373,21 @@ export function DesignPreview({
             <X aria-hidden className="size-5" />
           </DialogPrimitive.Close>
 
-          {/* The page, shaped like a phone screen */}
-          <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:p-0">
+          {/* The page, shaped like a phone screen; on a computer it stays in view while the details scroll */}
+          <div className="flex shrink-0 flex-col items-center gap-4 px-4 pt-16 lg:sticky lg:top-0 lg:h-dvh lg:justify-center lg:p-0 lg:py-6">
             <div
+              onPointerDown={(event) => {
+                swipe.current = total > 1 ? event.clientX : null;
+              }}
+              onPointerUp={(event) => {
+                const from = swipe.current;
+                swipe.current = null;
+                if (from === null || Math.abs(event.clientX - from) < 40) return;
+                const back = event.clientX > from !== (document.dir === "rtl");
+                go(index + (back ? -1 : 1));
+              }}
               className={cn(
-                "relative aspect-[9/16] max-w-[calc(100vw-2rem)] overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(84dvh,52rem)]",
+                "relative aspect-[9/16] max-w-[calc(100vw-2rem)] touch-pan-y overflow-hidden rounded-[1.75rem] border border-card-ivory/15 bg-night shadow-overlay lg:h-[min(calc(100dvh-7.5rem),52rem)]",
                 // A Scene keeps its controls under the painting, so it takes more height
                 scene ? "h-[min(76dvh,52rem)]" : "h-[min(68dvh,52rem)]",
               )}
@@ -360,6 +400,15 @@ export function DesignPreview({
                 <span className="absolute inset-0 grid place-items-center bg-card-ivory p-[14%]">
                   <TemplateCover id={design.template} locale={locale} />
                 </span>
+              )}
+              {/* How long until the next page, filling along the foot while they turn */}
+              {turning && (
+                <span
+                  key={index}
+                  aria-hidden
+                  className="preview-progress absolute inset-x-0 bottom-0 z-10 h-[3px] origin-left bg-marigold rtl:origin-right"
+                  style={{ animationDuration: `${SLIDE_MS}ms` }}
+                />
               )}
             </div>
             {/* Which page this is, between its arrows, under the page so they never cover the words */}
@@ -377,7 +426,11 @@ export function DesignPreview({
                   <span className="font-label text-xs tracking-[0.2em] uppercase">
                     {galleryCopy.pageNames[current!.page]}
                   </span>
-                  <span aria-live="polite" className="text-xs text-card-ivory/75">
+                  {/* Announced only when the visitor steps, not on every turn by itself */}
+                  <span
+                    aria-live={turning ? "off" : "polite"}
+                    className="text-xs text-card-ivory/75"
+                  >
                     {galleryCopy.pageOf(index + 1, total)}
                   </span>
                 </p>
@@ -389,12 +442,30 @@ export function DesignPreview({
                 >
                   <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
                 </button>
+                {!still && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Playing again from the last page starts over from the first
+                      if (!playing && index === total - 1) setIndex(0);
+                      setPlaying(!playing);
+                    }}
+                    aria-label={playing ? galleryCopy.pausePages : galleryCopy.playPages}
+                    className="grid size-11 cursor-pointer place-items-center rounded-full bg-card-ivory/10 text-card-ivory transition-colors hover:bg-card-ivory/20 focus-visible:outline-2 focus-visible:outline-card-ivory"
+                  >
+                    {playing ? (
+                      <Pause aria-hidden className="size-5" />
+                    ) : (
+                      <Play aria-hidden className="size-5 rtl:rotate-180" />
+                    )}
+                  </button>
+                )}
               </div>
             )}
           </div>
 
           {/* What it is, every page as a thumbnail, and the way into the editor */}
-          <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:px-0 lg:py-0">
+          <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:min-h-dvh lg:max-w-[30rem] lg:justify-center lg:self-start lg:px-0 lg:py-12">
             <div className="flex flex-col gap-2">
               {badge ?? <TierBadge designId={design.id} className="self-start" />}
               <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
@@ -412,16 +483,47 @@ export function DesignPreview({
                 {scene ? galleryCopy.sceneNote : total > 0 ? description : galleryCopy.cardNote}
               </p>
             </div>
+            {/* The ways on come first, so they are never below the fold */}
+            {action ??
+              (href && (
+                <div className="flex flex-col gap-3">
+                  <Button asChild size="lg" fullWidth>
+                    <Link href={href}>
+                      {galleryCopy.useDesign}
+                      <ArrowRight aria-hidden className="rtl:rotate-180" />
+                    </Link>
+                  </Button>
+                  {/* The whole invitation as a guest gets it: opening, music and replies */}
+                  <Link
+                    href={sampleHref ?? samplePath(design.id)}
+                    data-sample-link
+                    className="group/live flex min-h-12 items-center gap-3 rounded-md border border-marigold/60 bg-marigold/10 px-4 py-2.5 text-card-ivory transition-colors hover:bg-marigold/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-ivory"
+                  >
+                    <PlayCircle aria-hidden className="size-6 shrink-0 text-marigold" />
+                    <span className="flex flex-col">
+                      <span className="font-semibold">{galleryCopy.seeSample}</span>
+                      <span className="text-xs text-card-ivory/75">
+                        {galleryCopy.sampleDescription}
+                      </span>
+                    </span>
+                  </Link>
+                </div>
+              ))}
+            {/* Offers running now that cover it, with their codes, beside the ways on */}
+            {!badge && <PreviewOffers designId={design.id} />}
             {total > 1 && (
               <ul
                 aria-label={galleryCopy.pagesLabel}
-                className="grid grid-cols-5 gap-2 sm:grid-cols-9 lg:grid-cols-5"
+                className="grid grid-cols-5 gap-2 sm:grid-cols-9 sm:gap-1.5"
               >
                 {pages.map((page, i) => (
                   <li key={page.page}>
                     <button
                       type="button"
-                      onClick={() => setIndex(i)}
+                      onClick={() => {
+                        setPlaying(false);
+                        setIndex(i);
+                      }}
                       aria-label={galleryCopy.pageNames[page.page]}
                       aria-current={i === index ? "true" : undefined}
                       className={cn(
@@ -439,26 +541,6 @@ export function DesignPreview({
             )}
             {/* Admin, Designs brings its own badge and choice of tier in place of the prices */}
             {!badge && <DesignPackages designId={design.id} />}
-            {action ??
-              (href && (
-                <div className="flex flex-col gap-3">
-                  <Button asChild size="lg" fullWidth>
-                    <Link href={href}>
-                      {galleryCopy.useDesign}
-                      <ArrowRight aria-hidden className="rtl:rotate-180" />
-                    </Link>
-                  </Button>
-                  {/* The whole invitation as a guest gets it: opening, music and replies */}
-                  <Link
-                    href={sampleHref ?? samplePath(design.id)}
-                    data-sample-link
-                    className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-card-ivory/30 px-4 font-semibold text-card-ivory transition-colors hover:bg-card-ivory/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-card-ivory"
-                  >
-                    <Eye aria-hidden className="size-5" />
-                    {galleryCopy.seeSample}
-                  </Link>
-                </div>
-              ))}
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

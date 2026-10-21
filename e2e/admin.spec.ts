@@ -326,7 +326,7 @@ test.describe("coupons, invoices and refunds", () => {
     context,
     browser,
   }, info) => {
-    test.setTimeout(120_000);
+    test.setTimeout(180_000);
     const baseURL = info.project.use.baseURL!;
     const code = `TEST${Date.now().toString().slice(-8)}`;
 
@@ -350,6 +350,8 @@ test.describe("coupons, invoices and refunds", () => {
     await admin.getByRole("button", { name: "Save details" }).click();
     await expect(admin.getByText("Business details saved").first()).toBeVisible();
     expect(await noOverflow(admin)).toBe(true);
+    // Saving refreshes the page, which puts its title back a moment later
+    await expect(admin).toHaveTitle(/\S/);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
     // The contact page shows the business, and a chat on WhatsApp with its number
@@ -363,14 +365,65 @@ test.describe("coupons, invoices and refunds", () => {
 
     await admin
       .getByRole("navigation", { name: "Admin" })
-      .getByRole("link", { name: "Coupons" })
+      .getByRole("link", { name: "Offers" })
       .click();
-    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Coupons");
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Offers");
     await admin.getByRole("textbox", { name: "Code" }).fill(code.toLowerCase());
     await admin.getByRole("textbox", { name: "Percent off" }).fill("20");
-    await admin.getByRole("button", { name: "Make coupon" }).click();
+    // The offers page needs a title for an offer it shows
+    await admin.getByRole("button", { name: "Make offer" }).click();
+    await expect(admin.getByText("An offer on the offers page needs a title.")).toBeVisible();
+    await admin.getByRole("textbox", { name: /^Title/ }).fill("Test festival offer");
+    await admin
+      .getByRole("textbox", { name: /^Terms and conditions/ })
+      .fill("Valid once per invitation.");
+    await admin.getByRole("radio", { name: "Wedding" }).check();
+    await admin.getByRole("button", { name: "Make offer" }).click();
     await expect(admin.getByText(`${code} is ready`).first()).toBeVisible();
     await expect(admin.getByText(code, { exact: true })).toBeVisible();
+
+    // The offers page shows it with its code and terms, for anyone
+    await admin.goto("/offers");
+    const offer = admin.locator(`[data-offer="${code}"]`);
+    await expect(offer).toHaveAccessibleName("Test festival offer");
+    await expect(offer.getByText(code, { exact: true })).toBeVisible();
+    await expect(offer.getByText("20% off")).toBeVisible();
+    await expect(offer.locator('img[src*="wedding"]')).toHaveCount(1);
+    // The bar over every public page carries an offer running now
+    await expect(admin.locator("[data-offer-bar]")).toBeVisible();
+    // Saving an offer leaves the prebuilt pages standing
+    expect((await admin.goto("/invitations/haldi"))?.status()).toBe(200);
+    await admin.goto("/offers");
+    await offer.getByText("Terms and conditions").click();
+    await expect(offer.getByText("Valid once per invitation.")).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    // Admin, Emails draws the new-account emails with the offer in them
+    await admin.goto("/admin/emails");
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Emails");
+    const welcome = admin.frameLocator('iframe[title="Welcome email"]');
+    await expect(welcome.getByText(code, { exact: true })).toBeVisible();
+    await expect(
+      admin
+        .frameLocator('iframe[title="New designs and offers email"]')
+        .getByText(code, { exact: true }),
+    ).toBeVisible();
+    expect(await noOverflow(admin)).toBe(true);
+    await expect(admin).toHaveTitle(/\S/);
+    // The email previews are sandboxed with no scripts, so axe can't run inside them
+    expect((await axe(admin).exclude("iframe").analyze()).violations).toEqual([]);
+
+    // Changing it shows on the offers page too
+    await admin.goto("/admin/coupons");
+    await admin.getByRole("button", { name: `Edit ${code}` }).click();
+    const edit = admin.getByRole("dialog", { name: `Edit ${code}` });
+    await edit.getByRole("textbox", { name: /^Short description/ }).fill("For every design");
+    await edit.getByRole("button", { name: "Save offer" }).click();
+    await expect(admin.getByText(`${code} is saved`).first()).toBeVisible();
+    await admin.goto("/offers");
+    await expect(offer.getByText("For every design")).toBeVisible();
+    await admin.goto("/admin/coupons");
     expect(await noOverflow(admin)).toBe(true);
     // After a client navigation the <title> streams in late
     await expect(admin).toHaveTitle(/\S/);

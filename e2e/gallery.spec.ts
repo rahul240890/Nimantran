@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { axe, noOverflow } from "./invite-helpers";
 
 /* The gallery (Step 12g): occasions, a wedding's kinds, their designs, search and Use this design. */
@@ -33,7 +33,7 @@ test.describe("finding a design", () => {
     await page.locator('[data-kind="gujarati"]').click();
     await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/);
     const designs = page.locator("[data-design]");
-    await expect(designs).toHaveCount(20);
+    await expect(designs).toHaveCount(21);
     for (const scene of [
       "pithora-ghoda",
       "patola-bandh",
@@ -53,7 +53,14 @@ test.describe("finding a design", () => {
     await expect(page.locator('[data-design="shahi-savari"]')).toBeVisible();
     await expect(page.locator('[data-design="pichwai"]')).toBeVisible();
     await expect(page.locator('[data-design="card-bandhani"]')).toBeVisible();
-    for (const story of ["nathdwara-raat", "hina", "mor-sarovar", "kaanch-chitra", "rogan"]) {
+    for (const story of [
+      "nathdwara-raat",
+      "hina",
+      "mor-sarovar",
+      "kaanch-chitra",
+      "rogan",
+      "sankheda",
+    ]) {
       await expect(page.locator(`[data-design="${story}"]`)).toBeVisible();
     }
   });
@@ -122,16 +129,28 @@ test.describe("finding a design", () => {
   });
 });
 
+/**
+ * Opens the Designs page once its catalogue has taken over from the server's drawing, which
+ * it replaces whole: a row or box found before then is gone a moment later.
+ */
+async function openDesigns(page: Page, path = "/designs") {
+  await page.goto(path);
+  await expect(page.locator("[data-catalog-live]")).toBeAttached();
+}
+
 test.describe("the Designs page", () => {
   test.use({ reducedMotion: "reduce" });
 
   test("rows show a few designs each, and View all opens the whole list", async ({ page }) => {
-    await page.goto("/designs");
+    await openDesigns(page);
     const folkArt = page.locator('[data-shelf="collection-folk-art"]');
     // Rows far down draw their designs as they come near
     await expect(folkArt.locator("[data-design]")).toHaveCount(0);
-    await folkArt.scrollIntoViewIfNeeded();
-    await expect(folkArt.locator("[data-design]")).toHaveCount(10);
+    // The row can be redrawn while the page settles, so scroll again until it fills
+    await expect(async () => {
+      await folkArt.scrollIntoViewIfNeeded({ timeout: 2_000 });
+      await expect(folkArt.locator("[data-design]")).toHaveCount(10, { timeout: 2_000 });
+    }).toPass();
     await folkArt
       .getByRole("link", { name: /^View all \d+ designs: Folk Art Collection$/ })
       .first()
@@ -150,7 +169,7 @@ test.describe("the Designs page", () => {
   });
 
   test("collections open as tiles and rows, each listing its own themes", async ({ page }) => {
-    await page.goto("/designs");
+    await openDesigns(page);
     await expect(page.locator("[data-collection]")).toHaveCount(18);
     await expect(page.locator('[data-shelf="collection-storybook"]')).toBeVisible();
     // Trending leads the rows, its designs badged wherever they show
@@ -169,7 +188,7 @@ test.describe("the Designs page", () => {
   test("filters narrow every design, follow the address and open the editor set up", async ({
     page,
   }) => {
-    await page.goto("/designs");
+    await openDesigns(page);
     await page.locator('[data-kind="gujarati"]').getByRole("link").click();
     await expect(page).toHaveURL(/tradition=gujarati/);
     await expect(
@@ -213,7 +232,7 @@ test.describe("the Designs page", () => {
   test("a price and an order narrow and sort the designs, and follow the address", async ({
     page,
   }) => {
-    await page.goto("/designs?occasion=wedding");
+    await openDesigns(page, "/designs?occasion=wedding");
     // The main filters show first; the quick occasions open out to every occasion
     const occasions = page.getByRole("group", { name: "Occasion" });
     await expect(occasions.getByRole("button", { name: "Birthday", exact: true })).toBeVisible();
@@ -246,7 +265,7 @@ test.describe("the Designs page", () => {
   });
 
   test("search finds designs by name, and says so when nothing matches", async ({ page }) => {
-    await page.goto("/designs");
+    await openDesigns(page);
     const search = page.getByRole("searchbox", { name: "Search designs" });
     await search.fill("kayal");
     await expect(page.locator('[data-design="kayal"]')).toBeVisible();

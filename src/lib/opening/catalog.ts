@@ -1,7 +1,7 @@
 import type { CategoryId } from "@/lib/categories/catalog";
 import { tintIndex } from "@/lib/initials";
 import type { StoryId, SuiteId, ThemedId } from "@/lib/suites/catalog";
-import { isStoryId, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
+import { isStoryId, STORY_IDS, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
 import type { TemplateId } from "@/lib/templates/ids";
 import { FAITH_SYMBOLS, type Faith } from "@/lib/traditions/faith";
 import { SYMBOL_IDS, type SymbolId } from "@/lib/traditions/schema";
@@ -342,11 +342,38 @@ export const FRESH_OPENINGS = [
   "phirki",
   "bulbule",
   "chhuk-chhuk",
+  // Templates 26 on (shubhdwar/new-15-template-prompts.md): each its template's own, opening
+  // onto the template's centre picture
+  "chadar",
+  "parwaaz",
+  "bhanwar",
+  "jaali-patta",
+  "lapet-khule",
+  "taar",
+  "pratibimb",
+  "mohur",
+  "gathbandhan",
+  "phuljhadi",
+  "semal",
+  "thappa",
+  "gumbad",
+  "ghadi",
+  "hindolo",
 ] as const;
 export type FreshOpening = (typeof FRESH_OPENINGS)[number];
 
 export function isFreshOpening(style: string): style is FreshOpening {
   return (FRESH_OPENINGS as readonly string[]).includes(style);
+}
+
+/**
+ * The place a fresh opening reveals: its own painting, or, for an opening painted with a
+ * template that has a centre picture, that picture, so the welcome after it is the same one.
+ */
+export function freshBeyond(id: FreshOpening): string {
+  const template = STORY_IDS.find((story) => STORY_GATE[story] === id && SUITES[story].centre);
+  if (template) return `/suites/${template}/centre.webp`;
+  return `/openings/fresh/${id}/${id === "popup-mahal" ? "sky" : "beyond"}.webp`;
 }
 
 /**
@@ -452,6 +479,21 @@ export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyl
       "athangudi-tiles",
       "gulaal-bindu",
       "bioscope",
+      "chadar",
+      "parwaaz",
+      "bhanwar",
+      "jaali-patta",
+      "lapet-khule",
+      "taar",
+      "pratibimb",
+      "mohur",
+      "gathbandhan",
+      "phuljhadi",
+      "semal",
+      "thappa",
+      "gumbad",
+      "ghadi",
+      "hindolo",
     ],
   },
   { id: "play", styles: ["kaanch-ka-gola", "phirki", "bulbule", "chhuk-chhuk"] },
@@ -526,6 +568,21 @@ export function openingNames(style: OpeningStyle): OpeningNames {
 /** The openings that suit a wedding, of any faith (HINDU_OPENINGS are kept to Hindu cards). */
 const WEDDING_OPENINGS: readonly OpeningStyle[] = [
   "rajwada-pol",
+  "chadar",
+  "parwaaz",
+  "bhanwar",
+  "jaali-patta",
+  "lapet-khule",
+  "taar",
+  "pratibimb",
+  "mohur",
+  "gathbandhan",
+  "phuljhadi",
+  "semal",
+  "thappa",
+  "gumbad",
+  "ghadi",
+  "hindolo",
   "noor-darwaza",
   "haveli-kiwad",
   "shahi-parda",
@@ -944,8 +1001,23 @@ export function openingStyles(suite: SuiteId, scene: boolean): readonly OpeningS
   );
 }
 
-/** Each story theme's own gate, painted with its pages. */
-const STORY_GATE: Record<StoryId, PaintedGate> = {
+/** Each story theme's own gate (or, from template 26, its own fresh opening), painted with its pages. */
+const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening> = {
+  hashiya: "chadar",
+  gara: "parwaaz",
+  abri: "bhanwar",
+  "neel-chhaap": "jaali-patta",
+  lapet: "lapet-khule",
+  chandan: "taar",
+  "bundi-chitra": "pratibimb",
+  banjara: "mohur",
+  leheriya: "gathbandhan",
+  nirmal: "phuljhadi",
+  shola: "semal",
+  dabu: "thappa",
+  aasmaani: "gumbad",
+  "tasveer-khana": "ghadi",
+  sankheda: "hindolo",
   "chaand-kalayein": "chaand-dwar",
   "ritu-chakra": "ritu-dwar",
   raagmala: "raag-dwar",
@@ -1174,6 +1246,21 @@ const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   phirki: "party",
   bulbule: "party",
   "chhuk-chhuk": "party",
+  chadar: "lamps",
+  parwaaz: "bloom",
+  bhanwar: "royal",
+  "jaali-patta": "bloom",
+  "lapet-khule": "party",
+  taar: "lamps",
+  pratibimb: "bloom",
+  mohur: "party",
+  gathbandhan: "bloom",
+  phuljhadi: "lamps",
+  semal: "bloom",
+  thappa: "bloom",
+  gumbad: "royal",
+  ghadi: "royal",
+  hindolo: "party",
   "irani-carrom": "party",
   channapatna: "party",
   "kavad-peti": "letter",
