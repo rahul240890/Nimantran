@@ -8,13 +8,14 @@ import { draftCategory, draftTradition, withTradition } from "@/lib/editor/draft
 import { allowsTradition, isTraditionId, rankTraditions } from "@/lib/traditions/catalog";
 import type { StepProps } from "./types";
 import { SymbolChip } from "./sacred-elements";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
 const NONE = "none";
 
 export function TraditionStep({ draft, update }: StepProps) {
   const { traditionCopy } = useText(editorText);
+  const locale = useLocale();
   const visitor = useVisitor();
   const pack = draftTradition(draft);
   if (!allowsTradition(draftCategory(draft))) return null;
@@ -31,8 +32,9 @@ export function TraditionStep({ draft, update }: StepProps) {
         variant="card"
         value={draft.tradition.id ?? NONE}
         onValueChange={(value) =>
-          // A new tradition starts from its own symbol and suggests its own card language
-          update((current) => withTradition(current, isTraditionId(value) ? value : null))
+          // A new tradition starts from its own symbol and suggests its own card language;
+          // one without its own keeps the card in the site's language
+          update((current) => withTradition(current, isTraditionId(value) ? value : null, locale))
         }
         className="grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-3"
       >

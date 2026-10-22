@@ -4,7 +4,7 @@ import { designNames } from "./design-names";
 
 /*
  * English copy for the invite editor (/create). Moves into next-intl in Step 12.
- * Slot names come from slotLabels in templates-review.ts.
+ * Slot names are coupleCopy.slotNames.
  */
 
 export const editor = {
@@ -447,6 +447,19 @@ export const functionFields = {
 
 export const coupleCopy = {
   namesHeading: "Names",
+  /** Each line of the card, as its field is labelled. */
+  slotNames: {
+    doorLeft: "Left door",
+    doorRight: "Right door",
+    blessing: "Blessing",
+    families: "Families",
+    first: "First name",
+    joiner: "Between the names",
+    second: "Second name",
+    line: "Invitation line",
+    date: "Date and time",
+    venue: "Venue",
+  },
   example: (sample: string) => `e.g. ${sample}`,
   joinerHint: "The word between the names, like &, weds or संग.",
   doorsHint: "Two short words painted on the gates.",
@@ -467,7 +480,7 @@ export const coupleCopy = {
 /** The language step: the card's language, asked before anything is written. */
 export const languageCopy = {
   mainHeading: "Card language",
-  mainHint: "The names, wording, function names and dates all follow it.",
+  mainHint: "The names, wording, function names and dates all follow it, and so do these steps.",
   traditionMatch: "your tradition's",
   secondHeading: "Add a second language?",
   secondHint:

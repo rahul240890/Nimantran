@@ -33,6 +33,8 @@ import type { StepProps } from "./types";
 export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { editor, familyCopy, traditionCopy } = useText(editorText);
   const [language] = cardLanguages(draft);
+  // Examples are in the card's language, like the ideas under them; labels in the site's
+  const examples = editorText[language].familyCopy;
   const copy = draftCopy(draft, language);
   const pack = draftTradition(draft);
   const one = draftPeople(draft) === "one";
@@ -78,7 +80,7 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
           <Input
             value={family[key].parents}
             maxLength={FAMILY_MAX}
-            placeholder={familyCopy.parentsExample}
+            placeholder={examples.parentsExample}
             lang={language}
             autoComplete="off"
             onChange={(event) => setSide(key, { parents: event.target.value })}
@@ -88,7 +90,7 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
           <Input
             value={family[key].town}
             maxLength={TOWN_MAX}
-            placeholder={familyCopy.townExample}
+            placeholder={examples.townExample}
             lang={language}
             autoComplete="off"
             onChange={(event) => setSide(key, { town: event.target.value })}
@@ -132,7 +134,7 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
                   <Input
                     value={draft.tradition.wording[id] ?? ""}
                     maxLength={WORDING_MAX}
-                    placeholder={own?.example ?? familyCopy.examples[id]}
+                    placeholder={own?.example ?? examples.examples[id]}
                     lang={language}
                     autoComplete="off"
                     data-wording={id}
@@ -157,7 +159,7 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
             <Input
               value={family.memory}
               maxLength={FAMILY_MAX}
-              placeholder={familyCopy.memoryExample}
+              placeholder={examples.memoryExample}
               lang={language}
               autoComplete="off"
               onChange={(event) =>
@@ -178,6 +180,7 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
 export function ContactsSection({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { familyCopy } = useText(editorText);
   const [language] = cardLanguages(draft);
+  const examples = editorText[language].familyCopy;
   const { family } = draft;
   const setFamily = (change: (current: DraftFamily) => DraftFamily) =>
     update((current) => ({ ...current, family: change(current.family) }));
@@ -200,7 +203,7 @@ export function ContactsSection({ draft, update }: Pick<StepProps, "draft" | "up
               <Input
                 value={contact.name}
                 maxLength={CONTACT_NAME_MAX}
-                placeholder={familyCopy.contactNameExample}
+                placeholder={examples.contactNameExample}
                 lang={language}
                 autoComplete="off"
                 onChange={(event) => setContact(index, { name: event.target.value })}

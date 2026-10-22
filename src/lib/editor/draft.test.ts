@@ -17,8 +17,11 @@ import {
   muhuratName,
   newDraft,
   symbolOptions,
+  traditionLanguage,
   withCategory,
   withGalleryChoice,
+  withSiteLanguage,
+  withTradition as followTradition,
   type InviteDraft,
 } from "./draft";
 import { CATEGORIES } from "@/lib/categories/catalog";
@@ -402,6 +405,36 @@ describe("two-language cards", () => {
     expect(draft.languages).toEqual(["en"]);
     expect(draft.translation).toEqual({});
     expect(parseDraft({ ...complete(), languages: ["en", "en"] })?.languages).toEqual(["en"]);
+  });
+});
+
+describe("the card's language for a new invite", () => {
+  it("starts in the site's language until the host chooses or writes anything", () => {
+    expect(withSiteLanguage(newDraft(), "gu").languages).toEqual(["gu"]);
+    expect(withSiteLanguage(newDraft(), "en").languages).toEqual(["en"]);
+    const draft = newDraft();
+    expect(withSiteLanguage(draft, "xx")).toBe(draft);
+    // Once anything is chosen or written, the card keeps its language
+    const touched = { ...newDraft(), updatedAt: 1 };
+    expect(withSiteLanguage(touched, "gu")).toBe(touched);
+    const named = { ...newDraft(), content: { first: "Aarav" } };
+    expect(withSiteLanguage(named, "gu")).toBe(named);
+    const marathi = followTradition(newDraft(), "marathi");
+    expect(withSiteLanguage(marathi, "gu")).toBe(marathi);
+    const two: InviteDraft = { ...newDraft(), languages: ["hi", "en"] };
+    expect(withSiteLanguage(two, "gu")).toBe(two);
+  });
+
+  it("follows a tradition's own language, else the site's", () => {
+    expect(traditionLanguage("marathi", "gu")).toBe("mr");
+    expect(traditionLanguage(null, "gu")).toBe("gu");
+    expect(traditionLanguage(null)).toBe("en");
+    expect(followTradition(newDraft(), "marathi", "gu").languages).toEqual(["mr"]);
+    const marathi = followTradition(newDraft(), "marathi", "gu");
+    expect(followTradition(marathi, null, "hi").languages).toEqual(["hi"]);
+    const choice = { category: null, tradition: null, suite: "classic", template: null } as const;
+    expect(withGalleryChoice(newDraft(), choice, "bn").languages).toEqual(["bn"]);
+    expect(withGalleryChoice(newDraft(), choice).languages).toEqual(["en"]);
   });
 });
 

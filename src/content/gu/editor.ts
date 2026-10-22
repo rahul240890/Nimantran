@@ -429,6 +429,18 @@ export const functionFields: Translation<typeof en.functionFields> = {
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
   namesHeading: "નામ",
+  slotNames: {
+    doorLeft: "ડાબું દ્વાર",
+    doorRight: "જમણું દ્વાર",
+    blessing: "આશીર્વાદ",
+    families: "પરિવારો",
+    first: "પહેલું નામ",
+    joiner: "નામોની વચ્ચે",
+    second: "બીજું નામ",
+    line: "આમંત્રણની પંક્તિ",
+    date: "તારીખ અને સમય",
+    venue: "સ્થળ",
+  },
   example: (sample) => `જેમ કે ${sample}`,
   joinerHint: "નામો વચ્ચેનો શબ્દ, જેમ કે &, સંગ કે weds.",
   doorsHint: "દ્વાર પર લખેલા બે નાના શબ્દો.",
@@ -448,7 +460,7 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
 
 export const languageCopy: Translation<typeof en.languageCopy> = {
   mainHeading: "કાર્ડની ભાષા",
-  mainHint: "નામ, શબ્દો, પ્રસંગોનાં નામ અને તારીખો બધું આ જ ભાષામાં આવશે.",
+  mainHint: "નામ, શબ્દો, પ્રસંગોનાં નામ અને તારીખો બધું આ જ ભાષામાં આવશે, અને આ બધાં પગલાં પણ.",
   traditionMatch: "તમારી પરંપરાની",
   secondHeading: "બીજી ભાષા પણ ઉમેરવી છે?",
   secondHint:

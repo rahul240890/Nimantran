@@ -430,6 +430,18 @@ export const functionFields: Translation<typeof en.functionFields> = {
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
   namesHeading: "নাম",
+  slotNames: {
+    doorLeft: "বাঁ দিকের দরজা",
+    doorRight: "ডান দিকের দরজা",
+    blessing: "আশীর্বাদ",
+    families: "পরিবার",
+    first: "প্রথম নাম",
+    joiner: "দুই নামের মাঝে",
+    second: "দ্বিতীয় নাম",
+    line: "আমন্ত্রণের লাইন",
+    date: "তারিখ ও সময়",
+    venue: "স্থান",
+  },
   example: (sample) => `যেমন ${sample}`,
   joinerHint: "দুই নামের মাঝের শব্দ, যেমন &, ও বা weds।",
   doorsHint: "দরজায় লেখা দুটি ছোট শব্দ।",
@@ -449,7 +461,7 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
 
 export const languageCopy: Translation<typeof en.languageCopy> = {
   mainHeading: "কার্ডের ভাষা",
-  mainHint: "নাম, লেখা, অনুষ্ঠানের নাম আর তারিখ সবই এই ভাষায় থাকবে।",
+  mainHint: "নাম, লেখা, অনুষ্ঠানের নাম আর তারিখ সবই এই ভাষায় থাকবে, আর এই সব ধাপও।",
   traditionMatch: "আপনার রীতির",
   secondHeading: "দ্বিতীয় একটি ভাষাও যোগ করবেন?",
   secondHint:

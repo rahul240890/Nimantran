@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
+import { useTransition } from "react";
+import { setLocale } from "@/actions/locale";
 import { languageName } from "@/components/invitation/card-language-toggle";
-import { languages as LOCALES } from "@/i18n/locales";
+import { isUiLocale, languages as LOCALES } from "@/i18n/locales";
 import { cardLanguages, traditionLanguage, type CardLanguage } from "@/lib/editor/draft";
 import { CARD_LANGUAGES, isCardLanguage } from "@/lib/templates/card-languages";
 import { cn } from "@/lib/cn";
@@ -32,19 +35,29 @@ const pill = cn(
 
 /**
  * The card's language, at the top of the names: every sample, idea, function name and date
- * follows it. The tradition's own language is marked.
+ * follows it, and so do the editor's own words (owner, 2026-10-23: a Gujarati card left
+ * every label in English). The tradition's own language is marked.
  */
 export function CardLanguagePicker({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { languageCopy } = useText(editorText);
   const locale = useLocale();
+  const router = useRouter();
+  const [, start] = useTransition();
   const [main] = cardLanguages(draft);
   const suggested = draft.tradition.id ? traditionLanguage(draft.tradition.id) : null;
 
-  const setMain = (code: CardLanguage) =>
+  const setMain = (code: CardLanguage) => {
     update((current) => {
       const [, other] = cardLanguages(current);
       return { ...current, languages: other && other !== code ? [code, other] : [code] };
     });
+    // The site turns to the card's language too, as the language menu would
+    if (code !== locale && isUiLocale(code)) {
+      start(async () => {
+        if (await setLocale(code)) router.refresh();
+      });
+    }
+  };
 
   return (
     <section aria-labelledby="card-language-heading" className="flex flex-col gap-2.5">
