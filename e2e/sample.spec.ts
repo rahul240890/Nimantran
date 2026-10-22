@@ -152,3 +152,50 @@ test.describe("live samples", () => {
     expect((await request.get("/sample/no-such-design")).status()).toBe(404);
   });
 });
+
+test.describe("a painting on a slow connection", () => {
+  // Motion on, so the pages turn by themselves
+  test.use({ reducedMotion: "no-preference" });
+
+  test("its page comes in on the blurred copy and waits for the painting before turning", async ({
+    page,
+  }) => {
+    test.slow();
+    // The family page's painting is held back until the test lets it through
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route("**/suites/rajwada-bagh/family.webp", async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.goto("/sample/rajwada-bagh");
+    await page.getByRole("button", { name: "Open the invitation" }).click();
+    const story = page.locator("[data-story-beat]");
+    await expect(story).toHaveAttribute("data-story-beat", "cover", { timeout: 20_000 });
+    await page.keyboard.press("ArrowRight");
+    await expect(story).toHaveAttribute("data-story-beat", "couple");
+    await page.keyboard.press("ArrowRight");
+    await expect(story).toHaveAttribute("data-story-beat", "family");
+
+    // In on its blurred copy, with a spinner saying the painting is coming
+    const family = page.locator('[data-page="family"]');
+    await expect(family.locator('img[src^="data:image/webp"]')).toBeAttached();
+    const loading = page.getByRole("status", { name: "Loading the page" });
+    await expect(loading).toBeVisible();
+    // Its time waits: well past its length, the page is still there
+    const bar = page.locator(".story-progress");
+    const seconds = parseFloat(
+      await bar.evaluate((el) => getComputedStyle(el).getPropertyValue("--story-duration")),
+    );
+    await page.waitForTimeout((seconds + 1) * 1000);
+    await expect(story).toHaveAttribute("data-story-beat", "family");
+
+    // The painting comes in, and the page goes on in its own time
+    release();
+    await expect(loading).toHaveCount(0);
+    await expect(family.locator('img[src$="/suites/rajwada-bagh/family.webp"]')).toBeVisible();
+    await expect(story).not.toHaveAttribute("data-story-beat", "family", {
+      timeout: (seconds + 5) * 1000,
+    });
+  });
+});

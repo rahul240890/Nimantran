@@ -18,6 +18,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -31,7 +32,7 @@ import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { cn } from "@/lib/cn";
-import { usePaintingReady, warmPaintings } from "@/lib/paintings";
+import { usePainting, usePaintingBlur, warmBlurs, warmPaintings } from "@/lib/paintings";
 import { useCalendarLink } from "@/lib/publish/calendar-link";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type StoryBeat } from "@/lib/engine/story";
@@ -227,9 +228,13 @@ export function StoryPlayer({
   const [held, setHeld] = useState(false);
   const beat = beats[index];
   const last = index >= beats.length - 1;
-  // A page comes in once its painting is there, so its words never show on an empty page
-  const painted = usePaintingReady(beat ? pageImage(suiteId, beat) : undefined);
-  const running = !still && !paused && !hidden && !held && painted;
+  // A page comes in once its painting is there (or its blurred copy, on a slow connection), so
+  // its words never show on an empty page; its time runs once the painting itself is in
+  const images = useMemo(() => beats.map((b) => pageImage(suiteId, b)), [beats, suiteId]);
+  const image = images[index];
+  const { ready: painted, loaded: arrived } = usePainting(image);
+  const blur = usePaintingBlur(image);
+  const running = !still && !paused && !hidden && !held && painted && arrived;
 
   const go = useCallback(
     (to: number, at: { x: number; y: number } | null = null) =>
@@ -279,10 +284,10 @@ export function StoryPlayer({
     };
   }, [running, index, seconds, last, next, onFinished, onCarryOn]);
 
-  // Fetch the next page's painting ahead, so it is ready when the page turns
-  const upcoming = beats[index + 1];
-  const nextImage = upcoming ? pageImage(suiteId, upcoming) : undefined;
-  useEffect(() => warmPaintings([nextImage]), [nextImage]);
+  // Every page's blurred copy at once, then the paintings ahead in order, the next first, so
+  // each is ready when its page turns
+  useEffect(() => warmBlurs(images), [images]);
+  useEffect(() => warmPaintings(images.slice(index + 1)), [images, index]);
 
   useEffect(() => {
     const onVisibility = () => setHidden(document.visibilityState === "hidden");
@@ -378,7 +383,8 @@ export function StoryPlayer({
         <div aria-hidden data-mood={look.mood} className="absolute inset-0 hidden md:block">
           <SuiteBackdrop
             suite={suite}
-            image={pageImage(suiteId, beat)}
+            image={image}
+            placeholder={blur}
             className="absolute inset-0 scale-110 opacity-70 blur-2xl"
           />
           <div className="absolute inset-0 bg-scrim/40" />
@@ -440,6 +446,16 @@ export function StoryPlayer({
             className="absolute inset-0 grid place-items-center text-card-ivory/80"
           >
             <LoaderCircle aria-hidden className="size-8 animate-spin motion-still:animate-none" />
+          </span>
+        )}
+        {/* In on its blurred copy: the painting is still coming, and the page's time waits */}
+        {painted && !arrived && (
+          <span
+            role="status"
+            aria-label={labels.loading}
+            className="absolute start-3 top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] z-10 grid size-11 place-items-center rounded-full bg-night/35 text-card-ivory backdrop-blur-sm"
+          >
+            <LoaderCircle aria-hidden className="size-5 animate-spin motion-still:animate-none" />
           </span>
         )}
         {(painted ? pages : pages.filter((i) => i !== index)).map((i) => {
@@ -788,6 +804,8 @@ export function StoryPage({
   const frames = photos.length > 0 ? photoPage(suiteId, photos.length) : null;
   const image = frames?.image ?? suite.images[look.art];
   const painted = themed && Boolean(image);
+  // Its blurred copy shows while the painting is on its way, once the player has fetched it
+  const blur = usePaintingBlur(image);
   // Themes without one hang the photos in plain arches over the page instead
   const arches = photos.length > 0 && !frames;
   // Words print straight onto a painting unless the host asked for the box, here or for all
@@ -904,6 +922,7 @@ export function StoryPage({
         <SuiteBackdrop
           suite={suite}
           image={image}
+          placeholder={blur}
           seconds={still ? undefined : beat.seconds}
           className="absolute inset-0 overflow-hidden"
           contain={whole || lifted}

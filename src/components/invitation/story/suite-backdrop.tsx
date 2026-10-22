@@ -579,6 +579,7 @@ function Kayal({ id }: { id: string }) {
 export function SuiteBackdrop({
   suite,
   image,
+  placeholder,
   seconds,
   lazy = false,
   className,
@@ -589,6 +590,8 @@ export function SuiteBackdrop({
 }: {
   suite: Suite;
   image?: string;
+  /** The painting's tiny blurred copy, shown under it until it is in (lib/paintings.ts). */
+  placeholder?: string;
   /** How long the page stays, for the slow push-in. */
   seconds?: number;
   /** Load the painting only when it scrolls near, for pickers with many themes. */
@@ -615,6 +618,15 @@ export function SuiteBackdrop({
         className="suite-drift absolute inset-0"
         style={seconds ? ({ "--suite-duration": `${seconds + 2}s` } as Vars) : undefined}
       >
+        {placeholder && image && (
+          // eslint-disable-next-line @next/next/no-img-element -- a few hundred bytes, inline
+          <img
+            src={placeholder}
+            alt=""
+            draggable={false}
+            className="pointer-events-none absolute inset-0 size-full scale-110 object-cover blur-xl select-none"
+          />
+        )}
         {contain && image && (
           // eslint-disable-next-line @next/next/no-img-element -- decorative fill round the painting
           <img
