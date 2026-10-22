@@ -299,20 +299,30 @@ export function GuestView({
   }, [playOnOpen]);
   // The sections below the first screen are drawn only as they near it, once each has been
   // drawn whole (with its lettering in, or after a second), so the page keeps its true
-  // length (globals.css). Marked on the page itself, at once, rather than by redrawing it
+  // length (globals.css). Only while the guest is on the first screen: switched on further
+  // down, the page's snapping would carry them past where they are. Marked on the page
+  // itself, at once, rather than by redrawing it
   const pageRoot = useRef<HTMLDivElement>(null);
   useEffect(() => {
     let live = true;
+    const mark = () => {
+      if (!live || window.scrollY >= window.innerHeight / 2) return;
+      pageRoot.current?.setAttribute("data-measured", "");
+      window.removeEventListener("scroll", mark);
+    };
     const second = new Promise((done) => window.setTimeout(done, 1000));
     void Promise.race([document.fonts?.ready, second]).then(() =>
       requestAnimationFrame(() =>
         requestAnimationFrame(() => {
-          if (live) pageRoot.current?.setAttribute("data-measured", "");
+          if (!live) return;
+          window.addEventListener("scroll", mark, { passive: true });
+          mark();
         }),
       ),
     );
     return () => {
       live = false;
+      window.removeEventListener("scroll", mark);
     };
   }, []);
   // From the page below, back to the top and the whole invitation again, music and all
