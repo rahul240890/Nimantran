@@ -1111,9 +1111,17 @@ export const aiCopy = {
 
 /** The guest's first screen (Step 12x): how the invitation opens, and the god above it. */
 export const openingCopy = {
-  heading: "How it opens",
+  heading: "Opening gate (cover screen)",
   intro:
-    "The first thing guests see, full screen, with your names and a countdown. Tap a style to watch it open.",
+    "The first screen guests see when they tap your link: a gate, doors, a curtain or a cover that opens onto your invitation, full screen. Tap one to watch it open. You can change it any time, even after sharing.",
+  filterLabel: "Show by kind",
+  filterAll: "All",
+  summaryBody: "What guests see first, before your invitation opens.",
+  change: "Change opening gate",
+  dialogTitle: "Choose your opening gate",
+  dialogBody:
+    "Your choice saves straight away. The guest preview, the video and your live link all open with it.",
+  done: "Done",
   styles: {
     "jaali-vriksh": {
       name: "Tree-of-life jaali",
@@ -1782,6 +1790,7 @@ export const openingCopy = {
     },
   },
   groups: {
+    own: "Made for your design",
     fresh: "Fresh openings",
     skies: "Skies and nature",
     crafts: "Crafts and colour",

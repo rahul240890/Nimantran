@@ -85,6 +85,7 @@ export default async function InvitePreviewPage({
       fullHref={`/invites/${id}/preview?full=1`}
       back={{ href: `/create?invite=${id}`, label: hostPreviewCopy.back }}
       next={next}
+      gateHref={`/create?invite=${id}&gate=1`}
       published={Boolean(draft.slug)}
       copy={hostPreviewCopy}
     >

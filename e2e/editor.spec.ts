@@ -200,8 +200,21 @@ test.describe("invite editor", () => {
     // The editor shows only the design, never a stand-in card
     await expect(page.getByRole("button", { name: "Card", exact: true })).toHaveCount(0);
 
+    // The opening gate changes from the summary, and the summary shows the new one at once
+    const gate = page.getByRole("region", { name: "Opening gate (cover screen)" });
+    await gate.getByRole("button", { name: "Change opening gate" }).click();
+    const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
+    await dialog.getByRole("button", { name: "Curtains and reveals" }).click();
+    await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(gate).toContainText("Silk curtains");
+
     await page.reload();
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Opening gate (cover screen)" })).toContainText(
+      "Silk curtains",
+    );
 
     await page.getByRole("button", { name: "Start a new invite" }).click();
     await page.getByRole("button", { name: "Clear and start again" }).click();

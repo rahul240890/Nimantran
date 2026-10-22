@@ -35,7 +35,7 @@ import type { CardCopy } from "@/lib/templates/content";
 import { PAGE_H, PAGE_W, SCALE, fillWith, roundRect, withAlpha, wrap, type Fonts } from "./draw";
 import { bezier, clamp01, ease, easeInOut, easeOut, lerp, transition } from "./ease";
 import type { OpeningPalette } from "./look";
-import type { PreludeTimeline } from "./prelude-timeline";
+import { PRELUDE_PACE, type PreludeTimeline } from "./prelude-timeline";
 import { VIDEO_HEIGHT, VIDEO_WIDTH } from "./timeline";
 
 /** What the prelude is drawn from. */
@@ -200,7 +200,8 @@ export function drawPrelude(ctx: Ctx, film: PreludeFilm, seconds: number) {
   ctx.setTransform(SCALE, 0, 0, SCALE, 0, 0);
   ctx.globalAlpha = 1;
   const { open, welcome } = film.timeline;
-  const opened = Math.max(0, seconds - open);
+  // The moves are drawn at their first pace; the clock they read runs slower (PRELUDE_PACE)
+  const opened = Math.max(0, seconds - open) / PRELUDE_PACE;
   ctx.fillStyle = film.colours.deep;
   ctx.fillRect(0, 0, PAGE_W, PAGE_H);
   drawOpening(ctx, film, seconds, opened);

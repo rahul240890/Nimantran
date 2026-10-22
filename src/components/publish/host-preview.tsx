@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Eye, Globe, Maximize2, Send } from "lucide-react";
+import { ArrowLeft, DoorOpen, Eye, Globe, Maximize2, Send } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -38,6 +38,7 @@ export type HostPreviewCopy = {
   phone: string;
   fullScreen: string;
   menu: string;
+  changeGate: string;
 };
 
 /**
@@ -54,6 +55,7 @@ export function HostPreview({
   fullHref,
   back,
   next,
+  gateHref,
   published,
   copy,
   children,
@@ -64,6 +66,8 @@ export function HostPreview({
   fullHref: string;
   back: Action;
   next: Action;
+  /** The editor's summary with the opening gate's dialog open, to change it. */
+  gateHref: string;
   /** The invite is live: the next step is sharing it rather than publishing. */
   published: boolean;
   copy: HostPreviewCopy;
@@ -116,6 +120,12 @@ export function HostPreview({
               </Link>
             </Button>
             <Button asChild variant="ghost">
+              <Link href={gateHref}>
+                <DoorOpen aria-hidden />
+                {copy.changeGate}
+              </Link>
+            </Button>
+            <Button asChild variant="ghost">
               <Link href={fullHref}>
                 <Maximize2 aria-hidden />
                 {copy.fullScreen}
@@ -157,6 +167,12 @@ export function HostPreview({
               <Link href={back.href}>
                 <ArrowLeft aria-hidden className="size-4.5 text-ink-muted rtl:rotate-180" />
                 {back.label}
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild className="ps-3">
+              <Link href={gateHref}>
+                <DoorOpen aria-hidden className="size-4.5 text-ink-muted" />
+                {copy.changeGate}
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

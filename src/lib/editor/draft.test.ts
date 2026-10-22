@@ -6,6 +6,8 @@ import {
   draftCopy,
   draftOpeningGod,
   draftOpeningGods,
+  draftOpeningStyle,
+  draftOwnOpening,
   draftSymbol,
   draftTemplate,
   draftTradition,
@@ -547,5 +549,17 @@ describe("the blessing on a card in another language", () => {
     const english: InviteDraft = { ...newDraft("scroll"), languages: ["en"] };
     const sikh = { ...english, tradition: { ...english.tradition, faith: "sikh" as const } };
     expect(coupleValue(sikh, TEMPLATES.scroll, "blessing")).toBe("Ik Onkar Satgur Prasad");
+  });
+});
+
+describe("the opening gate", () => {
+  it("keeps the design's own gate apart from the host's pick", () => {
+    const draft = newDraft();
+    const own = draftOwnOpening(draft, "classic", false);
+    expect(draftOpeningStyle(draft, "classic", false)).toBe(own);
+    const picked = own === "curtain" ? "fireworks" : "curtain";
+    const changed = { ...draft, opening: { ...draft.opening, style: picked } } as InviteDraft;
+    expect(draftOpeningStyle(changed, "classic", false)).toBe(picked);
+    expect(draftOwnOpening(changed, "classic", false)).toBe(own);
   });
 });

@@ -5,9 +5,10 @@ import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "re
 /**
  * How much slower than its CSS each opening plays (2026-10-12): the owner found the moves
  * too quick, so every door, curtain, petal and painting goes at this calmer pace. The
- * timers that follow the opening (opening.tsx) stretch by the same amount.
+ * timers that follow the opening (opening.tsx) stretch by the same amount. Slowed again
+ * from 1.6 (2026-10-22), still too quick for the owner; the video follows (PRELUDE_PACE).
  */
-export const OPENING_PACE = 1.6;
+export const OPENING_PACE = 2.2;
 
 /** The longest the guest waits for the opening's paintings before it opens anyway. */
 const READY_CAP_MS = 8000;

@@ -73,6 +73,7 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   stopped: "निमंत्रण अब साझा नहीं है",
   stopFailed: "बंद नहीं हो पाया। फिर कोशिश करें।",
   back: "मेरे निमंत्रण",
+  changeGate: "खुलने वाला द्वार बदलें",
 };
 
 export const guestCopy: Translation<typeof en.guestCopy> = {
@@ -329,6 +330,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   },
   shareText: (names) => `${names}: हमारा निमंत्रण`,
   fileName: (slug) => `${slug}-invitation.mp4`,
+  changeGate: "खुलने वाला द्वार बदलें",
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
@@ -343,4 +345,5 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   fullScreen: "पूरी स्क्रीन पर देखें",
   menu: "प्रीव्यू के विकल्प",
   opening: "आपका निमंत्रण खुल रहा है",
+  changeGate: "खुलने वाला द्वार बदलें",
 };

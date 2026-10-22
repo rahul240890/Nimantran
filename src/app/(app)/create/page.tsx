@@ -29,7 +29,7 @@ const inviteId = z.uuid();
 /*
  * The invite editor. Drafts save on this device, and to the account once signed in.
  * ?invite=<id> opens an invite from My invites (with &publish=1, back from choosing its
- * package, its Publish dialog too); ?new=1 starts another, keeping the open one in the
+ * package, its Publish dialog too; with &gate=1, the summary with its opening gate to change); ?new=1 starts another, keeping the open one in the
  * account. ?category=<id> starts a fresh invite for that occasion (roka,
  * engagement, save-the-date…); ?template=<id> starts one with that design, and
  * ?tradition=<id> with that tradition, ?suite=<id> with that page theme (the gallery's
@@ -46,6 +46,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     invite,
     new: fresh,
     publish,
+    gate,
   } = await searchParams;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
@@ -91,6 +92,7 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
         initialInvite={initialInvite}
         missing={Boolean(wanted && !initialInvite)}
         openPublish={Boolean(initialInvite) && publish === "1"}
+        openGate={Boolean(initialInvite) && gate === "1"}
       />
     </PageTransition>
   );

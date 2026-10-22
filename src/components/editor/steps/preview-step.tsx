@@ -32,6 +32,7 @@ import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
 import { photoFailed, usePhotoUrls } from "../use-photo-urls";
+import { GateSummary } from "../gate-chooser";
 import { SecondLanguageSection } from "./second-language";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
@@ -80,12 +81,15 @@ export function PreviewStep({
   onReset,
   signedIn = false,
   keepsInvite = false,
+  openGate = false,
 }: StepProps & {
   onReset: () => void;
   /** Saved to the account as well as this device. */
   signedIn?: boolean;
   /** Starting over keeps this invite in My invites instead of clearing it. */
   keepsInvite?: boolean;
+  /** Arrived to change the opening gate (?gate=1): its dialog opens straight away. */
+  openGate?: boolean;
 }) {
   const locale = useLocale();
   const { editor, extrasCopy, functionCopy, previewCopy, stepCopy } = useText(editorText);
@@ -98,6 +102,7 @@ export function PreviewStep({
   );
   const raga = draftTemplate(draft).music.raga;
   const [confirming, setConfirming] = useState(false);
+  const [gate, setGate] = useState(openGate);
 
   return (
     <div className="flex flex-col gap-6">
@@ -153,6 +158,9 @@ export function PreviewStep({
           <span className="font-display text-lg leading-tight">{category.names[locale]}</span>
         </p>
       </Section>
+
+      {/* The first screen guests see, changeable here without going back to the design */}
+      <GateSummary draft={draft} update={update} open={gate} onOpenChange={setGate} />
 
       {/* The names lead the card, so they get their own check before sharing */}
       <Section title={previewCopy.namesHeading} step="couple" goTo={goTo}>

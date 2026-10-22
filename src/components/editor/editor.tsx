@@ -76,6 +76,8 @@ const WIDE = "(min-width: 64rem)";
  */
 /** Opening the link dialog survives the remount that leaving ?invite= in the address causes. */
 let publishOnArrival = false;
+/** The same for the opening gate's dialog (?gate=1, from the guest preview or the video). */
+let gateOnArrival = false;
 
 const MINI_STEPS = new Set<EditorStep>(["couple", "family", "functions", "words"]);
 
@@ -202,6 +204,7 @@ export function Editor({
   fresh = false,
   missing = false,
   openPublish = false,
+  openGate = false,
 }: {
   initialTemplate: TemplateId | null;
   initialCategory: CategoryId | null;
@@ -223,6 +226,8 @@ export function Editor({
   missing?: boolean;
   /** Back from choosing a package (?publish=1): open the invite's Publish dialog. */
   openPublish?: boolean;
+  /** Change the opening gate (?gate=1): the summary with the gate's dialog open. */
+  openGate?: boolean;
 }) {
   const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
   const { publishCopy } = useText(publishText);
@@ -271,8 +276,10 @@ export function Editor({
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
   const [autoPublish, setAutoPublish] = useState(() => publishOnArrival);
+  const [autoGate, setAutoGate] = useState(() => gateOnArrival);
   useEffect(() => {
     publishOnArrival = false;
+    gateOnArrival = false;
   }, []);
   // The funnel counts a visit to the editor once, and reaching the preview once
   useEffect(() => {
@@ -314,6 +321,10 @@ export function Editor({
           inviteDraft.update((current) => ({ ...current, step: "preview" }), { touch: false });
           publishOnArrival = true;
           setAutoPublish(true);
+        } else if (openGate) {
+          inviteDraft.update((current) => ({ ...current, step: "preview" }), { touch: false });
+          gateOnArrival = true;
+          setAutoGate(true);
         }
       }
       if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
@@ -357,6 +368,7 @@ export function Editor({
     fresh,
     missing,
     openPublish,
+    openGate,
     signedIn,
     initialTemplate,
     initialCategory,
@@ -515,6 +527,7 @@ export function Editor({
           onReset={() => void reset()}
           signedIn={signedIn}
           keepsInvite={keepsInvite}
+          openGate={autoGate}
         />
       )}
     </div>
@@ -567,6 +580,7 @@ export function Editor({
                   <DesignBar
                     draft={draft}
                     onChange={() => goTo("design")}
+                    update={update}
                     className={cn("mb-5", miniShown && "max-lg:pe-[6.5rem]")}
                   />
                 )}

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { SymbolMark } from "@/components/guest/opening/opening-art";
 import { OpeningSample } from "@/components/guest/opening/opening";
 import { OPENING_PACE } from "@/components/guest/opening/opening-pace";
@@ -13,6 +13,7 @@ import {
   draftOpeningGod,
   draftOpeningGods,
   draftOpeningStyle,
+  draftOwnOpening,
   type InviteDraft,
 } from "@/lib/editor/draft";
 import {
@@ -30,9 +31,10 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 const NONE = "none";
 const AUTO = "auto";
+const ALL = "all";
 
 /** True every other beat while the chosen style plays its opening over and over. */
-function useBeat(on: boolean): boolean {
+export function useBeat(on: boolean): boolean {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     if (!on) return;
@@ -46,48 +48,91 @@ function useBeat(on: boolean): boolean {
 }
 
 /**
- * The editor's choice of the guest's first screen (Step 12x): a tile per opening style,
+ * The editor's choice of the guest's first screen (Step 12x), named for hosts as the opening
+ * gate or cover screen: the design's own first, then a tile per opening style by kind,
  * drawn in the chosen theme's colours, the chosen one playing its move, then the god or
- * symbol that sits above it.
+ * symbol that sits above it. In the summary's dialog the dialog carries the heading.
  */
 export function OpeningPicker({
   draft,
   suite,
   scene,
   update,
+  titled = true,
 }: {
   draft: InviteDraft;
   suite: SuiteId;
   scene: boolean;
   update: (change: (draft: InviteDraft) => InviteDraft) => void;
+  /** Shows its own heading and introduction; off where a dialog already gives them. */
+  titled?: boolean;
 }) {
   const { openingCopy } = useText(editorText);
   const still = useReducedMotion();
   const style = draftOpeningStyle(draft, suite, scene);
+  const own = draftOwnOpening(draft, suite, scene);
   const god = draftOpeningGod(draft);
   const gods = draftOpeningGods(draft);
   const beat = useBeat(!still);
   const offered = openingStyles(suite, scene);
+  const [kind, setKind] = useState<string>(ALL);
+  const ids = useId();
+  const headingId = `${ids}-heading`;
   const setOpening = (change: Partial<InviteDraft["opening"]>) =>
     update((current) => ({ ...current, opening: { ...current.opening, ...change } }));
+  // The design's own gate leads in a group of its own; the kinds after it leave it out
+  const groups = [
+    { id: "own", styles: [own] as readonly OpeningStyle[] },
+    ...OPENING_GROUPS.map((group) => ({
+      id: group.id,
+      styles: group.styles.filter((id) => id !== own && offered.includes(id)),
+    })),
+  ].filter((group) => group.styles.length > 0);
+  // The design's own stays above whichever kind is shown
+  const shown = groups.filter((group) => kind === ALL || group.id === "own" || group.id === kind);
 
   return (
-    <section aria-labelledby="opening-heading" className="flex flex-col gap-5">
-      <div className="flex flex-col gap-1.5">
-        <h3 id="opening-heading" className="font-display text-xl leading-tight">
+    <section aria-labelledby={headingId} className="flex flex-col gap-5">
+      <div className={cn("flex flex-col gap-1.5", !titled && "sr-only")}>
+        <h3 id={headingId} className="font-display text-xl leading-tight">
           {openingCopy.heading}
         </h3>
         <p className="max-w-2xl text-ink-muted">{openingCopy.intro}</p>
       </div>
+      {/* So many gates: a row of kinds narrows the list to one at a time (scrolls on phones) */}
+      <div
+        role="group"
+        aria-label={openingCopy.filterLabel}
+        className="-mx-1 flex [scrollbar-width:thin] gap-2 overflow-x-auto px-1 py-1 sm:flex-wrap sm:overflow-visible"
+      >
+        {[ALL, ...groups.filter((group) => group.id !== "own").map((group) => group.id)].map(
+          (id) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={kind === id}
+              onClick={() => setKind(id)}
+              className={cn(
+                "flex min-h-11 shrink-0 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-3.5 text-sm whitespace-nowrap text-ink shadow-raised",
+                "aria-pressed:border-marigold aria-pressed:bg-[color-mix(in_srgb,var(--marigold)_12%,var(--surface))] aria-pressed:shadow-[0_0_0_1px_var(--marigold)]",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+              )}
+            >
+              {id === ALL
+                ? openingCopy.filterAll
+                : openingCopy.groups[id as keyof typeof openingCopy.groups]}
+            </button>
+          ),
+        )}
+      </div>
       <RadioPrimitive.Root
-        aria-labelledby="opening-heading"
+        aria-labelledby={headingId}
         value={style}
         onValueChange={(value) => setOpening({ style: value as OpeningStyle })}
         className="flex flex-col gap-5"
       >
-        {OPENING_GROUPS.map((group) => {
-          const styles = group.styles.filter((id) => offered.includes(id));
-          if (styles.length === 0) return null;
+        {shown.map((group) => {
+          const styles = group.styles;
           return (
             <div key={group.id} role="presentation" className="flex flex-col gap-2.5">
               <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
@@ -95,7 +140,11 @@ export function OpeningPicker({
               </p>
               <div
                 role="presentation"
-                className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4"
+                className={cn(
+                  "grid grid-cols-2 gap-3",
+                  // In the wide dialog, more to a row so more gates show at once
+                  titled ? "sm:grid-cols-3 xl:grid-cols-4" : "sm:grid-cols-4 lg:grid-cols-6",
+                )}
               >
                 {styles.map((id) => {
                   const words = openingCopy.styles[id];

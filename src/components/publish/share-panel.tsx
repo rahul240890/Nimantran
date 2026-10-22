@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Copy,
   Download,
+  DoorOpen,
   ExternalLink,
   Eye,
   Link2Off,
@@ -181,6 +182,12 @@ export function SharePanel({
                 <Link href={`/create?invite=${inviteId}`}>
                   <Pencil aria-hidden />
                   {shareCopy.edit}
+                </Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link href={`/create?invite=${inviteId}&gate=1`}>
+                  <DoorOpen aria-hidden />
+                  {shareCopy.changeGate}
                 </Link>
               </Button>
             </div>

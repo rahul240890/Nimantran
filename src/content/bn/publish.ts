@@ -73,6 +73,7 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   stopped: "নিমন্ত্রণ আর শেয়ার করা নেই",
   stopFailed: "শেয়ার বন্ধ করা গেল না। আবার চেষ্টা করুন।",
   back: "আমার নিমন্ত্রণ",
+  changeGate: "খোলার দরজা বদলান",
 };
 
 export const guestCopy: Translation<typeof en.guestCopy> = {
@@ -314,6 +315,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   },
   shareText: (names) => `${names}: আমাদের নিমন্ত্রণ`,
   fileName: (slug) => `${slug}-invitation.mp4`,
+  changeGate: "খোলার দরজা বদলান",
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
@@ -328,4 +330,5 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   fullScreen: "পুরো স্ক্রিনে দেখুন",
   menu: "প্রিভিউয়ের বিকল্প",
   opening: "আপনার নিমন্ত্রণপত্র খুলছে",
+  changeGate: "খোলার দরজা বদলান",
 };
