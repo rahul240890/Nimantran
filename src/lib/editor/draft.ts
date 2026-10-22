@@ -356,6 +356,11 @@ export function draftOpeningStyle(
   });
 }
 
+/** The opening the design brings when the host hasn't picked one: its theme's or gate's own. */
+export function draftOwnOpening(draft: InviteDraft, suite: SuiteId, scene: boolean): OpeningStyle {
+  return draftOpeningStyle({ ...draft, opening: { ...draft.opening, style: null } }, suite, scene);
+}
+
 /** The god or symbol over the guest's opening, if the occasion and the faith allow it. */
 export function draftOpeningGod(draft: InviteDraft): OpeningGod | null {
   return openingGod(draft.opening, draft.categoryId, godFaith(draft));

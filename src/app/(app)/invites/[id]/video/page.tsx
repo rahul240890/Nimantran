@@ -1,4 +1,4 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, DoorOpen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -66,13 +66,23 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
     <PageTransition>
       <AccountShell>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
-          <Link
-            href={`/create?invite=${id}`}
-            className="-ms-2 inline-flex min-h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
-          >
-            <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
-            {videoCopy.back}
-          </Link>
+          <div className="-ms-2 flex flex-wrap items-center gap-x-4">
+            <Link
+              href={`/create?invite=${id}`}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
+            >
+              <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
+              {videoCopy.back}
+            </Link>
+            {/* The video opens with the gate: changing it here makes the next one with the new */}
+            <Link
+              href={`/create?invite=${id}&gate=1`}
+              className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-accent-text transition-colors hover:text-ink"
+            >
+              <DoorOpen aria-hidden className="size-4" />
+              {videoCopy.changeGate}
+            </Link>
+          </div>
           <VideoCard
             draft={draft}
             functions={storyFunctions(draft, locale)}

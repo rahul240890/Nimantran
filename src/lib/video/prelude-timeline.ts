@@ -13,12 +13,17 @@ import {
 } from "@/lib/opening/catalog";
 import { CROSSFADE } from "./timeline";
 
+/**
+ * How much slower the video's opening moves than they were drawn (2026-10-22): the same
+ * calmer step the guest's link took, from OPENING_PACE 1.6 to 2.2.
+ */
+export const PRELUDE_PACE = 2.2 / 1.6;
 /** The opening holds closed this long, the names on it, before it opens. */
 export const PRELUDE_IDLE = 2.4;
 /** A painted, fresh or themed opening opens over this long, as on the guest's link. */
-export const PRELUDE_OPEN_PAINTED = 2.6;
+export const PRELUDE_OPEN_PAINTED = 2.6 * PRELUDE_PACE;
 /** A drawn opening (doors, curtains, the envelope) opens sooner. */
-export const PRELUDE_OPEN_DRAWN = 1.8;
+export const PRELUDE_OPEN_DRAWN = 1.8 * PRELUDE_PACE;
 /** The welcome with the names stays this long, as WELCOME_MS does on the link. */
 export const PRELUDE_WELCOME = 3.6;
 /** The welcome fades in over the last of the opening's move. */

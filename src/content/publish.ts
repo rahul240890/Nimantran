@@ -73,6 +73,7 @@ export const shareCopy = {
   stopped: "The invitation is no longer shared",
   stopFailed: "Couldn't stop sharing. Try again.",
   back: "My invites",
+  changeGate: "Change the opening gate",
 } as const;
 
 export const guestCopy = {
@@ -362,6 +363,7 @@ export const videoCopy = {
   },
   shareText: (names: string) => `${names}: our invitation`,
   fileName: (slug: string) => `${slug}-invitation.mp4`,
+  changeGate: "Change the opening gate",
 } as const;
 
 export const hostPreviewCopy = {
@@ -376,4 +378,5 @@ export const hostPreviewCopy = {
   fullScreen: "See it full screen",
   menu: "Preview options",
   opening: "Opening your invitation",
+  changeGate: "Change the opening gate",
 } as const;

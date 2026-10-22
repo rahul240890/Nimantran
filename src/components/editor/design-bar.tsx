@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useState } from "react";
 import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
@@ -11,21 +12,26 @@ import type { InviteDraft } from "@/lib/editor/draft";
 import { draftDesignId } from "@/lib/plans/design-defaults";
 import { draftSuite } from "@/lib/publish/story";
 import { SUITES } from "@/lib/suites/catalog";
+import { GateDialog } from "./gate-chooser";
 
 /**
  * Past the design stage, the chosen design sits at the top as one small strip: its cover
- * painting, its name and price (or the package paid for it), and the way back to change it.
+ * painting, its name and price (or the package paid for it), and the way back to change it,
+ * or to change only its opening gate.
  */
 export function DesignBar({
   draft,
   onChange,
+  update,
   className,
 }: {
   draft: InviteDraft;
   onChange: () => void;
+  update: (change: (draft: InviteDraft) => InviteDraft) => void;
   className?: string;
 }) {
-  const { editor, suiteCopy, designCopy } = useText(editorText);
+  const { editor, suiteCopy, designCopy, openingCopy } = useText(editorText);
+  const [gate, setGate] = useState(false);
   const designId = draftDesignId(draft);
   // Once this design is paid for, the strip says so rather than showing its price
   const paidOn = usePaidOn(draft.remoteId ?? null);
@@ -50,15 +56,21 @@ export function DesignBar({
           <span className="truncate font-semibold text-ink">{name}</span>
           <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onChange}
-          className="-my-1.5 -ms-2 text-accent-text"
-        >
-          {editor.changeDesign}
-        </Button>
+        <span className="-my-1.5 -ms-2 flex flex-wrap gap-x-1">
+          <Button variant="ghost" size="sm" onClick={onChange} className="text-accent-text">
+            {editor.changeDesign}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setGate(true)}
+            className="text-accent-text"
+          >
+            {openingCopy.change}
+          </Button>
+        </span>
       </span>
+      <GateDialog draft={draft} update={update} open={gate} onOpenChange={setGate} />
     </div>
   );
 }

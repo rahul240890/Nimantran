@@ -75,6 +75,7 @@ export const shareCopy: Translation<typeof en.shareCopy> = {
   stopped: "அழைப்பிதழ் இனி பகிரப்படவில்லை",
   stopFailed: "பகிர்வதை நிறுத்த முடியவில்லை. மீண்டும் முயலவும்.",
   back: "என் அழைப்பிதழ்கள்",
+  changeGate: "திறக்கும் வாயிலை மாற்றவும்",
 };
 
 export const guestCopy: Translation<typeof en.guestCopy> = {
@@ -381,6 +382,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   },
   shareText: (names) => `${names}: எங்கள் அழைப்பிதழ்`,
   fileName: (slug) => `${slug}-invitation.mp4`,
+  changeGate: "திறக்கும் வாயிலை மாற்றவும்",
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
@@ -395,4 +397,5 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   fullScreen: "முழுத் திரையில் பார்க்கவும்",
   menu: "முன்னோட்ட விருப்பங்கள்",
   opening: "உங்கள் அழைப்பிதழ் திறக்கிறது",
+  changeGate: "திறக்கும் வாயிலை மாற்றவும்",
 };
