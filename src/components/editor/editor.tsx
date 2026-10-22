@@ -31,6 +31,7 @@ import {
   withCategory,
   functionOrder,
   withGalleryChoice,
+  withSiteLanguage,
   withTradition,
   type EditorStep,
   type InviteDraft,
@@ -61,7 +62,7 @@ import { OccasionStep } from "./steps/occasion-step";
 import { PreviewStep } from "./steps/preview-step";
 import { TraditionStep } from "./steps/tradition-step";
 import { forgetPhotoUrl, useDropLostPhotos } from "./use-photo-urls";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { galleryText } from "@/i18n/copy/gallery";
 import { publishText } from "@/i18n/copy/publish";
@@ -247,6 +248,11 @@ export function Editor({
   const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
   const update = inviteDraft.update;
   const router = useRouter();
+  const locale = useLocale();
+  const siteLanguage = useRef(locale);
+  useEffect(() => {
+    siteLanguage.current = locale;
+  });
   const wide = useMediaQuery(WIDE);
   const still = useReducedMotion();
 
@@ -270,6 +276,12 @@ export function Editor({
   );
   const ready = hydrated && !arriving;
   useDropLostPhotos(draft, update, ready);
+  // A new invite is written in the site's language, until the host chooses otherwise
+  useEffect(() => {
+    if (!ready) return;
+    const next = withSiteLanguage(draft, locale);
+    if (next !== draft) update(() => next, { touch: false });
+  }, [ready, draft, locale, update]);
 
   const step = draft.step;
   const index = EDITOR_STEPS.indexOf(step);
@@ -353,10 +365,12 @@ export function Editor({
           signedIn && current.updatedAt !== 0 && !initialInvite && !fresh && !keepsWork
             ? await switchDraft(null, {
                 signedIn,
-                fresh: () => withGalleryChoice(newDraft(), choice),
+                fresh: () => withGalleryChoice(newDraft(), choice, siteLanguage.current),
               })
             : false;
-        if (!switched) update((draft) => withGalleryChoice(draft, choice));
+        if (!switched) {
+          update((draft) => withGalleryChoice(draft, choice, siteLanguage.current));
+        }
         router.replace("/create", { scroll: false });
         return;
       }
@@ -367,7 +381,7 @@ export function Editor({
         if (draft.step === "occasion") next = { ...next, step: "design" };
         // A card picked on its own page is the whole design: its pages take its colours
         if (initialTemplate) next = { ...next, templateId: initialTemplate, suite: "classic" };
-        if (initialTradition) next = withTradition(next, initialTradition);
+        if (initialTradition) next = withTradition(next, initialTradition, siteLanguage.current);
         return next;
       });
     }

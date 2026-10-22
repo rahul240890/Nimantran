@@ -445,6 +445,18 @@ export const functionFields: Translation<typeof en.functionFields> = {
 
 export const coupleCopy: Translation<typeof en.coupleCopy> = {
   namesHeading: "பெயர்கள்",
+  slotNames: {
+    doorLeft: "இடது கதவு",
+    doorRight: "வலது கதவு",
+    blessing: "ஆசீர்வாதம்",
+    families: "குடும்பங்கள்",
+    first: "முதல் பெயர்",
+    joiner: "பெயர்களுக்கு இடையே",
+    second: "இரண்டாம் பெயர்",
+    line: "அழைப்பு வரி",
+    date: "தேதியும் நேரமும்",
+    venue: "இடம்",
+  },
   example: (sample) => `எ.கா. ${sample}`,
   joinerHint: "பெயர்களுக்கு இடையிலான சொல், எ.கா. &, weds அல்லது மற்றும்.",
   doorsHint: "வாயில்களில் வரையப்பட்ட இரண்டு சிறிய சொற்கள்.",
@@ -465,7 +477,8 @@ export const coupleCopy: Translation<typeof en.coupleCopy> = {
 
 export const languageCopy: Translation<typeof en.languageCopy> = {
   mainHeading: "அட்டையின் மொழி",
-  mainHint: "பெயர்கள், வாசகம், நிகழ்ச்சிப் பெயர்கள், தேதிகள் எல்லாம் இந்த மொழியிலேயே வரும்.",
+  mainHint:
+    "பெயர்கள், வாசகம், நிகழ்ச்சிப் பெயர்கள், தேதிகள் எல்லாம் இந்த மொழியிலேயே வரும், இந்தப் படிகளும் அப்படியே.",
   traditionMatch: "உங்கள் மரபின் மொழி",
   secondHeading: "இரண்டாவது மொழியையும் சேர்க்கவா?",
   secondHint:

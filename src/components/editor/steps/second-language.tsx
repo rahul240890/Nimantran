@@ -47,7 +47,14 @@ export function SecondLanguageSection({ draft, update }: Pick<StepProps, "draft"
           label={id === "first" && one ? one.label : undefined}
         />
         {!NAME_SLOTS.includes(id) &&
-          lineIdeas(draft, id, second, value, (next) => setTranslation(id, next))}
+          lineIdeas(
+            draft,
+            id,
+            second,
+            value,
+            (next) => setTranslation(id, next),
+            coupleCopy.slotNames[id],
+          )}
       </div>
     );
   };

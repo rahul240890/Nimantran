@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
-import { slotLabels } from "@/content/templates-review";
 import {
   cardLanguages,
   COUPLE_SLOTS,
@@ -145,7 +144,7 @@ export function SlotField({
   const Control = rule.kind === "long" ? Textarea : Input;
   return (
     <Field
-      label={label ?? slotLabels[id]}
+      label={label ?? coupleCopy.slotNames[id]}
       required={rule.required && !translation}
       optionalLabel={editor.optional}
       hint={translation ? undefined : (hint ?? hints[id])}
@@ -201,17 +200,18 @@ export function useNames(draft: StepProps["draft"]) {
   return { template, one, names, wording };
 }
 
-/** Ready wording for a line in the given language, under its field. */
+/** Ready wording for a line in the given language, under its field (named in the site's). */
 export function lineIdeas(
   draft: StepProps["draft"],
   id: SlotId,
   language: CardLanguage,
   value: string,
   pick: (v: string) => void,
+  field: string,
 ) {
   return (SUGGESTED_SLOTS as readonly string[]).includes(id) ? (
     <Ideas
-      field={slotLabels[id]}
+      field={field}
       ideas={cardSuggestions(
         draft.categoryId,
         language,
@@ -264,7 +264,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
       return (
         <div key={id} className="flex flex-col gap-2.5">
           {slot}
-          {lineIdeas(draft, id, main, value, (next) => set(id, next))}
+          {lineIdeas(draft, id, main, value, (next) => set(id, next), coupleCopy.slotNames[id])}
         </div>
       );
     }
@@ -304,7 +304,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
  * occasion, then how the letters look.
  */
 export function WordsStep({ draft, update, errors }: StepProps) {
-  const { studioCopy } = useText(editorText);
+  const { coupleCopy, studioCopy } = useText(editorText);
   const { template, wording } = useNames(draft);
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
@@ -343,7 +343,14 @@ export function WordsStep({ draft, update, errors }: StepProps) {
                   onChange={(next) => set(id, next)}
                   {...(ownSamples?.[id] ? { example: ownSamples[id] } : {})}
                 />
-                {lineIdeas(draft, id, main, value, (next) => set(id, next))}
+                {lineIdeas(
+                  draft,
+                  id,
+                  main,
+                  value,
+                  (next) => set(id, next),
+                  coupleCopy.slotNames[id],
+                )}
                 {id === "doorLeft" && (
                   <DoorIdeas
                     draft={draft}

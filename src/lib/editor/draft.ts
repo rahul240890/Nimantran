@@ -187,6 +187,8 @@ export function withGalleryChoice(
     /** The faith the gallery's kind of wedding belongs to (a Nikah is Muslim). */
     faith?: Faith | null;
   },
+  /** The site's language, for a design whose tradition has no language of its own. */
+  site: CardLanguage = "en",
 ): InviteDraft {
   // An old or hand-made link can pair a theme with an occasion it isn't painted for
   const category =
@@ -199,7 +201,7 @@ export function withGalleryChoice(
   const languages =
     next.tradition.id === choice.tradition && draft.updatedAt !== 0
       ? next.languages
-      : [traditionLanguage(choice.tradition)];
+      : [traditionLanguage(choice.tradition, site)];
   if (next.tradition.id !== choice.tradition) {
     next = { ...next, tradition: { ...noTradition, id: choice.tradition } };
   }
@@ -217,24 +219,45 @@ export function withGalleryChoice(
   };
 }
 
-/** The card language a tradition is usually written in; English for none. */
-export function traditionLanguage(id: TraditionPack["id"] | null): CardLanguage {
-  const language = id ? TRADITIONS[id].language : "en";
-  return isCardLanguage(language) ? language : "en";
+/**
+ * The card language a tradition is usually written in; for none (or one written in a
+ * language cards don't offer), the fallback: English, or the site's language when given.
+ */
+export function traditionLanguage(
+  id: TraditionPack["id"] | null,
+  fallback: CardLanguage = "en",
+): CardLanguage {
+  const language = id ? TRADITIONS[id].language : fallback;
+  return isCardLanguage(language) ? language : fallback;
 }
 
 /**
  * Follows another tradition, starting from its own symbol and suggesting its own language
  * for the card; the family's wording is kept.
  */
-export function withTradition(draft: InviteDraft, id: TraditionPack["id"] | null): InviteDraft {
+export function withTradition(
+  draft: InviteDraft,
+  id: TraditionPack["id"] | null,
+  site: CardLanguage = "en",
+): InviteDraft {
   if (draft.tradition.id === id) return draft;
   return {
     ...draft,
     // A Hindu pack's wording is Hindu: the faith follows it again
     tradition: { ...draft.tradition, id, symbol: null, faith: id ? null : draft.tradition.faith },
-    languages: [traditionLanguage(id)],
+    languages: [traditionLanguage(id, site)],
   };
+}
+
+/**
+ * A new invite is written in the site's language (owner, 2026-10-23: a Gujarati visitor's
+ * new invites all began in English), until the host picks a tradition or a language, or
+ * writes anything.
+ */
+export function withSiteLanguage(draft: InviteDraft, site: string): InviteDraft {
+  if (!isCardLanguage(site) || draft.updatedAt !== 0 || draft.tradition.id !== null) return draft;
+  if (Object.keys(draft.content).length > 0 || draft.languages.length !== 1) return draft;
+  return draft.languages[0] === site ? draft : { ...draft, languages: [site] };
 }
 
 /**
