@@ -42,6 +42,12 @@ export async function addDesignPhotos(page: Page) {
   }
 }
 
+/** Finds a design in the editor's designs by its name and picks it: its Story, or `kind`. */
+export async function pickDesign(page: Page, name: string, kind = "Story") {
+  await page.getByRole("searchbox", { name: "Search designs" }).fill(name);
+  await page.getByRole("radio", { name: `${name}, ${kind}`, exact: true }).click();
+}
+
 /** Signs in and writes a complete wedding invite with one photo, ending on the preview step. */
 export async function writeInvite(page: Page, number: string, names: [string, string]) {
   // Ten steps, then the packages before publishing: more time than a plain test

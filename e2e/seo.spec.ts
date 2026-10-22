@@ -112,10 +112,13 @@ test.describe("moving around", () => {
       "Pick the design your guests will open",
       { timeout: 15_000 },
     );
-    // The cards behind the pages show once Card colours is the design
-    await page.getByRole("radio", { name: /^Card colours/ }).click();
+    // The 3D cards, by the Kind of invitation filter
+    await page
+      .getByRole("radiogroup", { name: "Kind of invitation" })
+      .getByRole("radio", { name: "3D card" })
+      .click();
     const designs = page
-      .getByRole("radiogroup", { name: "Card paper and colours" })
+      .getByRole("radiogroup", { name: "Designs for your occasion" })
       .getByRole("radio");
     await expect(designs.first()).toHaveAccessibleName(/Bandhani Utsav/);
   });

@@ -74,9 +74,9 @@ export function OpeningPicker({
   return (
     <section aria-labelledby="opening-heading" className="flex flex-col gap-5">
       <div className="flex flex-col gap-1.5">
-        <h3 id="opening-heading" className="font-display text-xl leading-tight">
+        <h2 id="opening-heading" className="font-display text-xl leading-tight">
           {openingCopy.heading}
-        </h3>
+        </h2>
         <p className="max-w-2xl text-ink-muted">{openingCopy.intro}</p>
       </div>
       <RadioPrimitive.Root
@@ -152,9 +152,9 @@ export function OpeningPicker({
       {offersGods(draft.categoryId) && gods.length > 0 && style !== "none" && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h4 id="opening-god-heading" className="font-semibold text-ink">
+            <h3 id="opening-god-heading" className="font-semibold text-ink">
               {openingCopy.godHeading}
-            </h4>
+            </h3>
             <p className="max-w-2xl text-sm text-ink-muted">{openingCopy.godIntro}</p>
           </div>
           <RadioPrimitive.Root
@@ -204,9 +204,9 @@ export function OpeningPicker({
       {style !== "none" && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h4 id="opening-welcome-heading" className="font-semibold text-ink">
+            <h3 id="opening-welcome-heading" className="font-semibold text-ink">
               {openingCopy.welcomeHeading}
-            </h4>
+            </h3>
             <p className="max-w-2xl text-sm text-ink-muted">{openingCopy.welcomeIntro}</p>
           </div>
           <RadioPrimitive.Root
