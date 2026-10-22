@@ -6386,6 +6386,23 @@ html:has(.guest-snap) {
   scroll-snap-align: start;
   scroll-snap-stop: always;
 }
+/*
+ * Each section below the first screen is drawn only as it comes near the screen
+ * (2026-10-22): the owner saw a phone go black for seconds on Open the invitation, while
+ * the browser restyled every section for the full screen and garlands and petals far below
+ * kept repainting out of sight. A themed page's acts (dusk, night) are wrapped the same way,
+ * as their garlands and petals sit outside their sections. The page draws every section
+ * once first (guest-view.tsx sets data-measured after), so each keeps its true height while
+ * out of sight and a link to the reply still lands on it.
+ */
+.guest-snap :is([data-tour], [data-snap]):not(.opening-page, [data-scene-mood]),
+.guest-themed > :is(section, [data-mood]) {
+  contain-intrinsic-block-size: auto 100svh;
+}
+.guest-snap[data-measured] :is([data-tour], [data-snap]):not(.opening-page, [data-scene-mood]),
+.guest-snap[data-measured] .guest-themed > :is(section, [data-mood]) {
+  content-visibility: auto;
+}
 
 @keyframes guest-rise {
   from {

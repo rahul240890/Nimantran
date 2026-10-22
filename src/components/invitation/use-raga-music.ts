@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MusicPlayer } from "@/lib/engine/music-player";
 import type { Template } from "@/lib/templates/schema";
 
@@ -23,6 +23,13 @@ function writeMuted(muted: boolean) {
     // Storage blocked: the choice still holds for this page
   }
 }
+
+/**
+ * How long (seconds) the raga's first notes wait when the tap that starts it also takes the
+ * invitation full screen: the phone redraws the whole page first, and shows black until it
+ * has (music-player.ts).
+ */
+export const FULL_SCREEN_LEAD_S = 1;
 
 /** How loud the music plays on under the page below the pages, of its full volume. */
 const SOFT_LEVEL = 0.4;
@@ -68,19 +75,23 @@ export function useRagaMusic(template: Template) {
     };
   }, [ready]);
 
-  const play = useCallback(async () => {
-    try {
-      if (!player.current) {
-        const { MusicPlayer } = await import("@/lib/engine/music-player");
-        if (!player.current) ready(new MusicPlayer(music));
+  const play = useCallback(
+    async (lead = 0) => {
+      try {
+        if (!player.current) {
+          const { MusicPlayer } = await import("@/lib/engine/music-player");
+          if (!player.current) ready(new MusicPlayer(music));
+        }
+        await player.current!.play(lead);
+        // The whole page redraws for the music's buttons: never ahead of the screen itself
+        startTransition(() => setPlaying(true));
+      } catch {
+        // No Web Audio, or the phone wouldn't allow it yet: the button simply stays off
+        setPlaying(false);
       }
-      await player.current!.play();
-      setPlaying(true);
-    } catch {
-      // No Web Audio, or the phone wouldn't allow it yet: the button simply stays off
-      setPlaying(false);
-    }
-  }, [music, ready]);
+    },
+    [music, ready],
+  );
 
   useEffect(() => {
     player.current?.setTrack(music);
@@ -129,12 +140,12 @@ export function useRagaMusic(template: Template) {
   const soften = useCallback(() => player.current?.setLevel(SOFT_LEVEL), []);
 
   // The guest opens the invitation again: the music starts again from the top, at full
-  // volume, unless they turned it off. Called from their tap
+  // volume, unless they turned it off. Called from their tap, which may take the screen full
   const replay = useCallback(() => {
     player.current?.setLevel(1, 0.6);
     if (musicMuted()) return;
     player.current?.rewind();
-    void play();
+    void play(FULL_SCREEN_LEAD_S);
   }, [play]);
 
   return { playing, play, toggle, rest, soften, replay };
