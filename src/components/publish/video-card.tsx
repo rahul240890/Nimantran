@@ -76,6 +76,8 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "@/components/invitation/type/fonts.css";
 
 type VideoCardProps = {
+  /** The invitation, which keeps the same video before and after it is live. */
+  inviteId: string;
   draft: InviteDraft;
   functions: StoryFunction[];
   photos: PublicPhoto[];
@@ -135,7 +137,20 @@ export function VideoCard(props: VideoCardProps) {
         : props.functions,
     [perFunction, only, props.functions],
   );
-  const { poster, silent, music, setMusic, key, state, stale, percent, make } = useInviteVideo({
+  const {
+    poster,
+    silent,
+    music,
+    setMusic,
+    key,
+    state,
+    stale,
+    unfinished,
+    finishing,
+    percent,
+    make,
+  } = useInviteVideo({
+    inviteId: props.inviteId,
     draft,
     functions,
     photos,
@@ -144,8 +159,13 @@ export function VideoCard(props: VideoCardProps) {
     clipUrl: props.clipUrl ?? null,
     marked,
     choice: perFunction ? only : ALL,
+    finish: clean,
     testCodecs,
   });
+  // The clean video, ending on the invitation's link, downloads and shares; one made before
+  // the invite was live or with the mark is watched here until it is made again
+  const downloadable = clean && !unfinished;
+  const shownMarked = state.step === "ready" ? state.marked : marked;
   const canShareFiles = useSyncExternalStore(
     noSubscribe,
     () => typeof navigator !== "undefined" && typeof navigator.canShare === "function",
@@ -153,11 +173,11 @@ export function VideoCard(props: VideoCardProps) {
   );
   const file = useMemo(
     () =>
-      state.step === "ready" && clean
+      state.step === "ready" && downloadable
         ? new File([state.blob], videoCopy.fileName(slug), { type: "video/mp4" })
         : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [state.step === "ready" ? state.blob : null, clean, slug, videoCopy],
+    [state.step === "ready" ? state.blob : null, downloadable, slug, videoCopy],
   );
   const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
   const player = useRef<FullScreenVideo>(null);
@@ -175,7 +195,12 @@ export function VideoCard(props: VideoCardProps) {
   };
 
   return (
-    <Card id="invitation-video" className="scroll-mt-24 gap-4 p-5 sm:p-6" data-video-card>
+    <Card
+      id="invitation-video"
+      className="scroll-mt-24 gap-4 p-5 sm:p-6"
+      data-video-card
+      data-video-key={key}
+    >
       <div className="flex flex-col gap-1">
         <h2 className="flex items-center gap-2 font-semibold">
           <Clapperboard aria-hidden className="size-5 shrink-0 text-accent-text" />
@@ -192,8 +217,8 @@ export function VideoCard(props: VideoCardProps) {
               src={state.href}
               controls
               // A preview is watched here; the clean one downloads from the button
-              controlsList={clean ? undefined : "nodownload"}
-              disablePictureInPicture={!clean}
+              controlsList={downloadable ? undefined : "nodownload"}
+              disablePictureInPicture={!downloadable}
               playsInline
               aria-label={videoCopy.player(names)}
               // Full screen on a wide screen: the whole upright video, centred like a reel
@@ -209,7 +234,7 @@ export function VideoCard(props: VideoCardProps) {
               className="size-full"
             />
           )}
-          {marked && (
+          {shownMarked && (
             <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-night/65 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.18em] text-card-ivory uppercase">
               {videoCopy.preview}
             </span>
@@ -252,6 +277,7 @@ export function VideoCard(props: VideoCardProps) {
               <p aria-live="polite" className="text-sm text-ink-muted tabular-nums">
                 {videoCopy.making(percent)}
               </p>
+              {finishing && <p className="text-sm text-ink-muted">{videoCopy.finishing}</p>}
               <Button
                 variant="secondary"
                 size="sm"
@@ -268,6 +294,9 @@ export function VideoCard(props: VideoCardProps) {
                 {videoCopy.ready}
               </p>
               {stale && <p className="text-sm text-ink-muted">{videoCopy.changed}</p>}
+              {clean && unfinished && (
+                <p className="text-sm text-ink-muted">{videoCopy.unfinished}</p>
+              )}
               {!clean && (
                 <p className="text-sm text-ink-muted">
                   {marked ? videoCopy.previewNote : videoCopy.draftNote}
@@ -279,7 +308,7 @@ export function VideoCard(props: VideoCardProps) {
                     {videoCopy.share}
                   </Button>
                 )}
-                {clean ? (
+                {downloadable ? (
                   <Button asChild variant={sharable ? "secondary" : "primary"}>
                     <a href={state.href} download={videoCopy.fileName(slug)}>
                       <Download aria-hidden />
@@ -287,6 +316,7 @@ export function VideoCard(props: VideoCardProps) {
                     </a>
                   </Button>
                 ) : (
+                  !clean &&
                   lockedHref && (
                     // Download shows from the start, locked, and leads to what unlocks it
                     <Button asChild>
@@ -305,7 +335,7 @@ export function VideoCard(props: VideoCardProps) {
                   {videoCopy.fullScreen}
                 </Button>
                 <Button
-                  variant={stale ? "secondary" : "ghost"}
+                  variant={clean && unfinished ? "primary" : stale ? "secondary" : "ghost"}
                   leadingIcon={<RotateCcw aria-hidden />}
                   onClick={() => void make()}
                 >
@@ -343,6 +373,8 @@ export function VideoCard(props: VideoCardProps) {
 }
 
 type InviteVideoOptions = {
+  /** The invitation the video is kept under, before and after it is live. */
+  inviteId: string;
   draft: InviteDraft;
   functions: StoryFunction[];
   photos: PublicPhoto[];
@@ -353,8 +385,19 @@ type InviteVideoOptions = {
   marked: boolean;
   /** The whole invitation, or one function's kind. */
   choice?: string;
+  /**
+   * Whether a video made before the invite was live, or with the preview's mark, is finished
+   * by itself: made again with the invitation's link and without the mark, the host's music
+   * choice kept. Only where the clean video downloads.
+   */
+  finish?: boolean;
   testCodecs?: boolean;
 };
+
+/** The parts of an invitation that change as it is edited or published, not its video. */
+function filmed(draft: InviteDraft) {
+  return { ...draft, step: null, updatedAt: 0, remoteId: null, slug: null };
+}
 
 /**
  * Making one invitation video: its poster, whether this browser can make it, the music
@@ -362,6 +405,7 @@ type InviteVideoOptions = {
  * the package card's preview, so a video made in one shows in the other.
  */
 function useInviteVideo({
+  inviteId,
   draft,
   functions,
   photos,
@@ -370,6 +414,7 @@ function useInviteVideo({
   clipUrl,
   marked,
   choice = ALL,
+  finish = false,
   testCodecs,
 }: InviteVideoOptions) {
   const { videoCopy } = useText(publishText);
@@ -379,20 +424,37 @@ function useInviteVideo({
   const silent = support === "silent";
   const poster = useRef<HTMLCanvasElement>(null);
   // The video for this invitation, its theme and choice, kept while making and saved once
-  // made: each theme the host tries keeps its own video, and a new one starts unmade
-  const key = `${slug}:${videoDesign(draft)}:${choice}${marked ? ":preview" : ""}`;
+  // made: each theme the host tries keeps its own video, and a new one starts unmade. The
+  // same one shows on the package card, the video page and, once live, the share page
+  const tail = `${videoDesign(draft)}:${choice}`;
+  const key = `${inviteId}:${tail}`;
   const kept = useSyncExternalStore(
     subscribeVideos,
     () => keptVideo(key),
     () => null,
   );
-  useEffect(() => void loadKept(key), [key]);
+  useEffect(() => {
+    // Where videos were kept before: by the invite's link, or its draft name before it had one
+    const draftSlug = `draft-${inviteId.slice(0, 8)}`;
+    const live = slug !== draftSlug;
+    void loadKept(key, [
+      ...(live
+        ? [
+            { key: `${slug}:${tail}`, url, marked: false },
+            { key: `${slug}:${tail}:preview`, url, marked: true },
+          ]
+        : []),
+      { key: `${draftSlug}:${tail}`, url: live ? null : url, marked: false },
+      { key: `${draftSlug}:${tail}:preview`, url: live ? null : url, marked: true },
+    ]);
+  }, [key, inviteId, slug, tail, url]);
 
   const { template, prepare, look } = useVideoFilm(draft, functions, photos, url);
-  // What this video is made from: when it changes, a kept video is out of date
-  const made = useMemo(
-    () => fingerprint({ draft, functions, photos, url, clipUrl, music: music && !silent }),
-    [draft, functions, photos, url, clipUrl, music, silent],
+  // What this video's pages are made from: when they change, a kept video is out of date.
+  // Photos and music by their ids, as their addresses change from visit to visit
+  const pages = useMemo(
+    () => fingerprint({ draft: filmed(draft), functions, music: music && !silent }),
+    [draft, functions, music, silent],
   );
 
   // The poster: the cover page once its words have risen in
@@ -424,8 +486,15 @@ function useInviteVideo({
     };
   }, [codecs]);
 
-  const make = async () => {
-    const withMusic = music && !silent ? withClip(template, clipUrl).music : null;
+  const make = async (raga = music) => {
+    const playing = raga && !silent;
+    const withMusic = playing ? withClip(template, clipUrl).music : null;
+    const made = {
+      look: fingerprint({ draft: filmed(draft), functions, music: playing }),
+      url,
+      marked,
+      music: playing,
+    };
     try {
       await makeKept(key, made, async (onProgress, signal) => {
         const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
@@ -447,13 +516,46 @@ function useInviteVideo({
     support === "unsupported"
       ? { step: "unsupported" as const }
       : (kept ?? { step: "idle" as const });
-  const stale = state.step === "ready" && state.look !== made;
+  // Made before the invite was live (it ends on the site) or with the preview's mark
+  const unfinished = state.step === "ready" && (state.url !== url || state.marked !== marked);
+  const stale = state.step === "ready" && state.look !== null && state.look !== pages;
   const percent = state.step === "making" ? Math.round(state.done * 100) : 0;
-  return { poster, support, silent, music, setMusic, key, state, stale, percent, make };
+
+  // Where the clean video downloads, one made before is finished by itself, once per visit
+  const [finishing, setFinishing] = useState<string | null>(null);
+  const finished = useRef<string | null>(null);
+  useEffect(() => {
+    if (!finish || support === "checking" || support === "unsupported") return;
+    if (kept?.step !== "ready" || (kept.url === url && kept.marked === marked)) return;
+    if (finished.current === key) return;
+    finished.current = key;
+    setMusic(kept.music);
+    setFinishing(key);
+    void make(kept.music).finally(() => setFinishing(null));
+    // `make` is new each render; this runs when a kept video is found unfinished
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finish, support, kept, key, url, marked]);
+
+  return {
+    poster,
+    support,
+    silent,
+    music,
+    setMusic,
+    key,
+    state,
+    stale,
+    unfinished,
+    finishing: finishing === key,
+    percent,
+    make,
+  };
 }
 
 /** What the package card's video preview is made from. */
 export type PackageVideoProps = {
+  /** The invitation, which keeps the same video before and after it is live. */
+  inviteId: string;
   draft: InviteDraft;
   functions: StoryFunction[];
   photos: PublicPhoto[];
@@ -533,7 +635,9 @@ export function PackageVideo(props: PackageVideoProps) {
   const player = useRef<FullScreenVideo>(null);
   const marked = !props.allowed;
   const heading = useId();
-  const { poster, state, percent, make, key } = useInviteVideo({
+  const clean = props.allowed && Boolean(props.published);
+  const { poster, state, percent, make, key, unfinished, finishing } = useInviteVideo({
+    inviteId: props.inviteId,
     draft: props.draft,
     functions: props.functions,
     photos: props.photos,
@@ -541,8 +645,33 @@ export function PackageVideo(props: PackageVideoProps) {
     slug: props.slug,
     clipUrl: props.clipUrl,
     marked,
+    finish: clean,
     testCodecs: props.testCodecs,
   });
+  // Bought and live: the finished video downloads and shares from here too
+  const downloadable = clean && !unfinished;
+  const canShareFiles = useSyncExternalStore(
+    noSubscribe,
+    () => typeof navigator !== "undefined" && typeof navigator.canShare === "function",
+    () => false,
+  );
+  const file = useMemo(
+    () =>
+      state.step === "ready" && downloadable
+        ? new File([state.blob], videoCopy.fileName(props.slug), { type: "video/mp4" })
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [state.step === "ready" ? state.blob : null, downloadable, props.slug, videoCopy],
+  );
+  const sharable = Boolean(file && canShareFiles && navigator.canShare({ files: [file] }));
+  const share = async () => {
+    if (!file) return;
+    try {
+      await navigator.share({ files: [file], text: videoCopy.shareText(props.names) });
+    } catch {
+      // Closing the share sheet is not an error
+    }
+  };
 
   // Full screen plays from the start with sound and controls; the card's tile goes back to
   // playing quietly when it closes
@@ -565,7 +694,6 @@ export function PackageVideo(props: PackageVideoProps) {
   }, [state.step]);
 
   const fullScreen = () => playFullScreen(player.current);
-  const clean = props.allowed && Boolean(props.published);
 
   return (
     <section
@@ -638,6 +766,7 @@ export function PackageVideo(props: PackageVideoProps) {
               <p aria-live="polite" className="text-xs text-ink-muted tabular-nums">
                 {videoCopy.making(percent)}
               </p>
+              {finishing && <p className="text-xs text-ink-muted">{videoCopy.finishing}</p>}
             </div>
           ) : state.step === "ready" ? (
             <>
@@ -649,6 +778,9 @@ export function PackageVideo(props: PackageVideoProps) {
                   <Lock aria-hidden className="mt-px size-3.5 shrink-0" />
                   {props.allowed ? videoCopy.lockedPublish : videoCopy.lockedPackage}
                 </p>
+              )}
+              {clean && unfinished && (
+                <p className="text-xs text-ink-muted">{videoCopy.unfinished}</p>
               )}
             </>
           ) : null}
@@ -675,7 +807,17 @@ export function PackageVideo(props: PackageVideoProps) {
               >
                 {upgradeCopy.video.fullScreenShort}
               </Button>
-              {clean && (
+              {sharable && (
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  leadingIcon={<Share2 aria-hidden />}
+                  onClick={() => void share()}
+                >
+                  {videoCopy.share}
+                </Button>
+              )}
+              {downloadable && (
                 <Button asChild size="sm" variant="secondary">
                   <a href={state.href} download={videoCopy.fileName(props.slug)}>
                     <Download aria-hidden />
@@ -685,7 +827,7 @@ export function PackageVideo(props: PackageVideoProps) {
               )}
               <Button
                 size="sm"
-                variant="ghost"
+                variant={clean && unfinished ? "secondary" : "ghost"}
                 leadingIcon={<RotateCcw aria-hidden />}
                 onClick={() => void make()}
               >

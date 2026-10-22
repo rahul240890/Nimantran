@@ -78,6 +78,59 @@ test.describe("invitation video", () => {
     }
   });
 
+  test("a video made before publishing is finished on the share page, not asked for again", async ({
+    page,
+  }, info) => {
+    await writeInvite(page, numberFor(info), ["Rohan", "Tara"]);
+    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
+    const card = page.locator("[data-video-card]");
+    const [id, ...tail] = (await card.getAttribute("data-video-key"))!.split(":");
+    // A video made before videos were kept under the invitation: under its draft's name
+    await page.evaluate(
+      async (old) => {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open("shubh-videos", 1);
+          request.onupgradeneeded = () => request.result.createObjectStore("videos");
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        await new Promise<void>((resolve, reject) => {
+          const tx = db.transaction("videos", "readwrite");
+          const blob = new Blob([new Uint8Array(64)], { type: "video/mp4" });
+          tx.objectStore("videos").put({ blob, look: "before", made: Date.now() }, old);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => reject(tx.error);
+        });
+        db.close();
+      },
+      `draft-${id!.slice(0, 8)}:${tail.join(":")}`,
+    );
+
+    // Before publishing it is the host's video, watched here and not yet to download
+    await page.reload();
+    const unsupported = card.getByText("This browser can't make videos.", { exact: false });
+    await expect(card.getByText("Your video is ready").or(unsupported)).toBeVisible();
+    if (await unsupported.isVisible()) return;
+    // Download leads to publishing: the file itself waits for the link
+    await expect(card.locator("a[download]")).toHaveCount(0);
+
+    // Live: the share page finishes it with the invitation's link instead of asking for it
+    await page.getByRole("link", { name: "Back to your invite" }).click();
+    await publish(page, "rohan-video");
+    await expect(card.getByText("Finishing the video you made", { exact: false })).toBeVisible();
+    await expect(card.getByRole("progressbar")).toBeVisible();
+    await expect(card.getByRole("button", { name: "Make video" })).toHaveCount(0);
+    // Stopped, the one made before stays to make again; without the link it doesn't download
+    await card.getByRole("button", { name: "Stop" }).click();
+    await expect(
+      card.getByText("made before your invitation was live", { exact: false }),
+    ).toBeVisible();
+    await expect(card.getByRole("button", { name: "Make it again" })).toBeVisible();
+    await expect(card.locator("a[download]")).toHaveCount(0);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
   test("a host makes the video from the share page", async ({ page }, info) => {
     // Open-source Chromium encodes in software, far slower than a phone's hardware
     test.setTimeout(480_000);

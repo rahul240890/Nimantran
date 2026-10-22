@@ -3,17 +3,29 @@
  * screen, and once made it is saved in this browser (IndexedDB), so it is still there when
  * they come back, even after closing the tab. One video per invitation and choice (the whole
  * invitation, or one function). Nothing leaves the device. Browser only.
+ *
+ * Kept under the invitation itself (owner, 2026-10-22: a video made before publishing was
+ * asked for again on the share page), with what it was made with, so a page can tell a
+ * video made before the invite was live, or before its package, from a finished one.
  */
 
+/** What a made video was made with. */
+export type VideoMade = {
+  /** The invitation's pages, photos and music; null for a video kept before this was. */
+  look: string | null;
+  /** The link its last card shows: the site's before the invite is live, then its own. */
+  url: string | null;
+  /** Whether it carries the free preview's mark. */
+  marked: boolean;
+  /** Whether it plays the raga. */
+  music: boolean;
+};
+
 export type KeptVideo =
-  | { step: "making"; done: number }
-  | {
-      step: "ready";
-      blob: Blob;
-      href: string;
-      /** What the video was made from, to tell when the invitation has changed since. */
-      look: string;
-    };
+  { step: "making"; done: number } | ({ step: "ready"; blob: Blob; href: string } & VideoMade);
+
+/** Where a video was kept before it was kept under its invitation, and what it was made with. */
+export type OlderVideo = { key: string; url: string | null; marked: boolean };
 
 type Entry = { video: KeptVideo; stop?: AbortController };
 
@@ -57,7 +69,7 @@ function set(key: string, entry: Entry | null) {
  */
 export async function makeKept(
   key: string,
-  look: string,
+  made: VideoMade,
   make: (onProgress: (done: number) => void, signal: AbortSignal) => Promise<Blob>,
 ): Promise<void> {
   const previous = entries.get(key)?.video;
@@ -73,8 +85,8 @@ export async function makeKept(
       changed();
     }, stop.signal);
     if (keep) URL.revokeObjectURL(keep.href);
-    set(key, { video: { step: "ready", blob, href: URL.createObjectURL(blob), look } });
-    await save(key, blob, look).catch(() => undefined);
+    set(key, { video: { step: "ready", blob, href: URL.createObjectURL(blob), ...made } });
+    await save(key, blob, made).catch(() => undefined);
   } catch (error) {
     // Back to what was there before, the last video if there was one
     if (entries.get(key)?.stop === stop) {
@@ -102,23 +114,42 @@ export async function removeKept(key: string): Promise<void> {
   await forget(key).catch(() => undefined);
 }
 
-/** Loads the video saved under `key` in this browser, once per page load. */
-export async function loadKept(key: string): Promise<void> {
+/**
+ * Loads the video saved under `key` in this browser, once per page load. Without one there,
+ * a video kept where it used to be (`older`, first found wins) moves to `key`.
+ */
+export async function loadKept(key: string, older: readonly OlderVideo[] = []): Promise<void> {
   if (loaded.has(key) || entries.has(key)) return;
   loaded.add(key);
-  const saved = await read(key).catch(() => null);
-  if (!saved || entries.has(key)) return;
+  let found = await read(key).catch(() => null);
+  let made = found ? madeOf(found) : null;
+  for (const old of found ? [] : older) {
+    const saved = await read(old.key).catch(() => null);
+    if (!saved) continue;
+    found = saved;
+    made = { look: null, url: old.url, marked: old.marked, music: true };
+    await save(key, saved.blob, made).catch(() => undefined);
+    await forget(old.key).catch(() => undefined);
+    break;
+  }
+  if (!found || !made || entries.has(key)) return;
   set(key, {
-    video: {
-      step: "ready",
-      blob: saved.blob,
-      href: URL.createObjectURL(saved.blob),
-      look: saved.look,
-    },
+    video: { step: "ready", blob: found.blob, href: URL.createObjectURL(found.blob), ...made },
   });
 }
 
-type Saved = { blob: Blob; look: string; made: number };
+type Saved = { blob: Blob; look: string | null; made: number } & Partial<Omit<VideoMade, "look">>;
+
+/** What a saved video was made with; one saved before this was kept counts as unknown. */
+function madeOf(saved: Saved): VideoMade {
+  const known = saved.marked !== undefined;
+  return {
+    look: known ? saved.look : null,
+    url: saved.url ?? null,
+    marked: saved.marked ?? false,
+    music: saved.music ?? true,
+  };
+}
 
 function open(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -133,11 +164,11 @@ function open(): Promise<IDBDatabase> {
   });
 }
 
-async function save(key: string, blob: Blob, look: string) {
+async function save(key: string, blob: Blob, made: VideoMade) {
   const db = await open();
   await new Promise<void>((resolve, reject) => {
     const tx = db.transaction(STORE, "readwrite");
-    tx.objectStore(STORE).put({ blob, look, made: Date.now() } satisfies Saved, key);
+    tx.objectStore(STORE).put({ blob, ...made, made: Date.now() } satisfies Saved, key);
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error);
   });

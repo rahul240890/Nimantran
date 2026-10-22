@@ -325,6 +325,9 @@ export const videoCopy = {
   ready: "Your video is ready",
   changed:
     "Your invitation has changed since this video was made. Make it again to include the changes.",
+  finishing: "Finishing the video you made, so it ends on your invitation's link.",
+  unfinished:
+    "This video was made before your invitation was live, so it doesn't end on its link. Make it again, then download or share it.",
   player: (names: string) => `Video invitation for ${names}`,
   share: "Share video",
   download: "Download MP4",
