@@ -1,6 +1,6 @@
 /*
  * The video's first seconds (prelude-timeline.ts): the guest's opening, closed, with the
- * god or symbol and the names on their plate; the opening's own move (the painted gate's
+ * god or symbol and the names as the opening shows them (never on a plate); the opening's own move (the painted gate's
  * doors, a fresh opening's fan or clouds, a themed painting going its own way, drawn doors
  * or curtains); then the welcome with the names, the line and the day, in the opening's
  * own feeling (petals, a lotus, lamps, the moon, confetti or a letter). Drawn from the same
@@ -19,6 +19,7 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  openingNames,
   type FreshOpening,
   type OpeningGod,
   type OpeningStyle,
@@ -27,6 +28,7 @@ import {
   type ThemedOpening,
   type WelcomeKind,
 } from "@/lib/opening/catalog";
+import { firstGrapheme } from "@/lib/initials";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { keepDate, lettering, type TypeRole } from "@/lib/suites/lettering";
 import type { CardCopy } from "@/lib/templates/content";
@@ -209,7 +211,7 @@ export function drawPrelude(ctx: Ctx, film: PreludeFilm, seconds: number) {
     ctx.save();
     ctx.globalAlpha = words;
     const top = drawCrest(ctx, film, seconds);
-    drawPlate(ctx, film, top, seconds);
+    drawNames(ctx, film, top);
     ctx.restore();
   }
 
@@ -1170,117 +1172,184 @@ type Row = {
   label?: boolean;
 };
 
-/** The words on the closed opening: blessing, names and date on a cream plate with gilt rules. */
-function drawPlate(ctx: Ctx, film: PreludeFilm, top: number, seconds: number) {
-  const { copy, colours } = film;
-  const scale = film.type.scale;
-  const maxW = Math.min(68 * CQW, 24 * REM) - 10 * CQW;
-  const rows: Row[] = [];
-  const blessing = copy.blessing.trim();
-  if (blessing)
-    rows.push({
-      text: blessing,
-      font: "script",
-      size: 4.2 * CQW,
-      colour: colours.accentText,
-      gap: 0,
-    });
-  const nameSize = Math.min(11.5 * CQW, 6.6 * CQH, 4.2 * REM) * scale;
-  const nameColour = film.type.colour ?? colours.ink;
-  rows.push({
-    text: copy.first,
-    font: "names",
-    size: nameSize,
-    colour: nameColour,
-    gap: blessing ? 1.2 * CQH : 0,
-  });
-  const joiner = joinerOf(copy);
-  if (joiner) {
-    rows.push({
-      text: joiner,
-      font: "names",
-      size: Math.min(6.5 * CQW, 4.2 * CQH) * scale,
-      colour: colours.accentText,
-      gap: 0,
-    });
-    rows.push({ text: copy.second, font: "names", size: nameSize, colour: nameColour, gap: 0 });
-  }
-  const date = copy.date.trim();
-  if (date)
-    rows.push({
-      text: keepDate(date),
-      font: "body",
-      size: Math.max(13.6, 3.6 * CQW),
-      colour: colours.inkMuted,
-      gap: 2.4 * CQH,
-    });
-
-  const laid = layRows(ctx, film, rows, maxW);
-  const height = laid.reduce((sum, row) => sum + row.gap + row.height, 0);
-  const width = Math.min(maxW, Math.max(...laid.map((row) => row.width))) + 10 * CQW;
-  const padY = 1.6 * CQH + 14;
-  const boxH = height + padY * 2;
-  // Centred in the room under the crest, a little above the middle of what's left
-  const room = PAGE_H * 0.86 - top;
-  const y = top + Math.max(0, (room - boxH) * 0.45);
-  const x = (PAGE_W - width) / 2;
-
+/** The soft shadow that lifts ivory words off any painting, as on the guest's screen. */
+function lifted(ctx: Ctx, draw: () => void) {
   ctx.save();
-  ctx.shadowColor = "rgb(0 0 0 / 0.45)";
-  ctx.shadowBlur = 24;
-  ctx.shadowOffsetY = 12;
-  platePath(ctx, x - 6, y - 6, width + 12, boxH + 12);
-  ctx.fillStyle = colours.plate;
-  ctx.fill();
+  ctx.shadowColor = "rgb(0 0 0 / 0.7)";
+  ctx.shadowBlur = 12;
+  ctx.shadowOffsetY = 1.5;
+  draw();
   ctx.restore();
-  ctx.save();
-  platePath(ctx, x - 6, y - 6, width + 12, boxH + 12);
-  ctx.strokeStyle = colours.gilt;
-  ctx.lineWidth = 2.4;
-  ctx.stroke();
-  platePath(ctx, x, y, width, boxH);
-  const light = ctx.createRadialGradient(PAGE_W / 2, y, 0, PAGE_W / 2, y, boxH * 0.9);
-  light.addColorStop(0, withAlpha(colours.light, 0.35));
-  light.addColorStop(1, withAlpha(colours.light, 0));
-  ctx.fillStyle = light;
-  ctx.fill();
-  platePath(ctx, x + 5, y + 5, width - 10, boxH - 10);
-  ctx.strokeStyle = withAlpha(colours.gilt, 0.7);
-  ctx.lineWidth = 0.8;
-  ctx.stroke();
-  ctx.restore();
-
-  let cursor = y + padY;
-  for (const row of laid) {
-    cursor += row.gap;
-    if (row.rule) {
-      drawFlourish(
-        ctx,
-        PAGE_W / 2,
-        cursor - row.gap / 2,
-        Math.min(width * 0.5, 120),
-        colours.gilt,
-        1,
-      );
-    }
-    drawLines(ctx, row, cursor);
-    cursor += row.height;
-  }
-  void seconds;
 }
 
-/** An arch-topped cartouche, the shape of the name plate the opening once had. */
-function platePath(ctx: Ctx, x: number, y: number, w: number, h: number) {
-  const top = Math.min(2.6 * REM, h / 3);
-  const r = Math.min(REM, h / 4);
+/**
+ * The names on the closed opening, as the guest's first screen shows them (opening/catalog.ts
+ * openingNames): printed on drawn art, one line at the foot, initials in a gilt ring, or not
+ * at all. Never on a plate over the painting (owner, 2026-10-22).
+ */
+function drawNames(ctx: Ctx, film: PreludeFilm, top: number) {
+  const look = openingNames(film.style);
+  if (look === "quiet") return;
+  const { copy, colours } = film;
+  const scale = film.type.scale;
+  const joiner = joinerOf(copy);
+  const date = copy.date.trim();
+  const maxW = Math.min(84 * CQW, 30 * REM);
+
+  if (look === "print") {
+    const nameSize = Math.min(11.5 * CQW, 6.6 * CQH, 4.2 * REM) * scale;
+    const rows: Row[] = [
+      { text: copy.first, font: "names", size: nameSize, colour: colours.ivory, gap: 0 },
+    ];
+    if (joiner) {
+      rows.push({
+        text: joiner,
+        font: "names",
+        size: Math.min(6.5 * CQW, 4.2 * CQH) * scale,
+        colour: colours.giltBright,
+        gap: 0,
+      });
+      rows.push({
+        text: copy.second,
+        font: "names",
+        size: nameSize,
+        colour: colours.ivory,
+        gap: 0,
+      });
+    }
+    if (date)
+      rows.push({
+        text: keepDate(date),
+        font: "body",
+        size: Math.max(13.6, 3.6 * CQW),
+        colour: colours.ivory,
+        gap: 2.4 * CQH,
+      });
+    const laid = layRows(ctx, film, rows, maxW);
+    const height = laid.reduce((sum, row) => sum + row.gap + row.height, 0);
+    const width = Math.max(...laid.map((row) => row.width));
+    const room = PAGE_H * 0.86 - top;
+    const y = top + Math.max(0, (room - height) * 0.45);
+    // A dark haze with no edge behind the words, so they read over any art
+    const cy = y + height / 2;
+    const r = Math.max(width, height) * 0.85;
+    ctx.save();
+    ctx.translate(PAGE_W / 2, cy);
+    ctx.scale(1, (height + 40) / (width + 40));
+    const haze = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+    haze.addColorStop(0, "rgb(0 0 0 / 0.5)");
+    haze.addColorStop(0.6, "rgb(0 0 0 / 0.22)");
+    haze.addColorStop(1, "rgb(0 0 0 / 0)");
+    ctx.fillStyle = haze;
+    ctx.fillRect(-r, -r, r * 2, r * 2);
+    ctx.restore();
+    let cursor = y;
+    for (const row of laid) {
+      cursor += row.gap;
+      if (row.rule)
+        drawFlourish(
+          ctx,
+          PAGE_W / 2,
+          cursor - row.gap / 2,
+          Math.min(width * 0.5, 120),
+          colours.gilt,
+          1,
+        );
+      lifted(ctx, () => drawLines(ctx, row, cursor));
+      cursor += row.height;
+    }
+    return;
+  }
+
+  // The foot looks sit low over the ground, on a soft shade rising from the bottom
+  const shade = ctx.createLinearGradient(0, PAGE_H * 0.62, 0, PAGE_H);
+  shade.addColorStop(0, "rgb(0 0 0 / 0)");
+  shade.addColorStop(1, "rgb(0 0 0 / 0.6)");
+  ctx.fillStyle = shade;
+  ctx.fillRect(0, PAGE_H * 0.62, PAGE_W, PAGE_H * 0.38);
+  const spoken = joiner ? `${copy.first} ${joiner} ${copy.second}` : copy.first;
+
+  if (look === "foot") {
+    const rows: Row[] = [
+      {
+        text: spoken,
+        font: "names",
+        size: Math.min(8 * CQW, 4.6 * CQH, 2.4 * REM) * scale,
+        colour: colours.ivory,
+        gap: 0,
+      },
+    ];
+    if (date)
+      rows.push({
+        text: keepDate(date),
+        font: "body",
+        size: Math.max(13, 3.4 * CQW),
+        colour: colours.ivory,
+        gap: 4,
+      });
+    const laid = layRows(ctx, film, rows, maxW).map((row) => ({ ...row, rule: false }));
+    const height = laid.reduce((sum, row) => sum + row.gap + row.height, 0);
+    // Clear of the free preview's badge at the very foot (watermark.ts)
+    let cursor = PAGE_H * 0.8 - height;
+    for (const row of laid) {
+      cursor += row.gap;
+      const at = cursor;
+      lifted(ctx, () => drawLines(ctx, row, at));
+      cursor += row.height;
+    }
+    return;
+  }
+
+  // seal: the initials in a thin gilt ring, the names small under it
+  const radius = Math.min(17 * CQW, 5 * REM) / 2;
+  const cy = PAGE_H * 0.72;
+  ctx.save();
+  ctx.shadowColor = "rgb(0 0 0 / 0.45)";
+  ctx.shadowBlur = 18;
+  ctx.shadowOffsetY = 6;
   ctx.beginPath();
-  ctx.moveTo(x, y + top);
-  ctx.ellipse(x + w / 2, y + top, w / 2, top, 0, Math.PI, 0);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.closePath();
+  ctx.arc(PAGE_W / 2, cy, radius, 0, Math.PI * 2);
+  ctx.fillStyle = "rgb(0 0 0 / 0.45)";
+  ctx.fill();
+  ctx.restore();
+  ctx.save();
+  ctx.strokeStyle = colours.giltBright;
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(PAGE_W / 2, cy, radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.strokeStyle = withAlpha(colours.gilt, 0.7);
+  ctx.beginPath();
+  ctx.arc(PAGE_W / 2, cy, radius - 4.5, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+  const initials = joiner
+    ? `${firstGrapheme(copy.first.trim())}&${firstGrapheme(copy.second.trim())}`
+    : firstGrapheme(copy.first.trim());
+  const size = Math.min(6.5 * CQW, 1.9 * REM);
+  lifted(ctx, () => {
+    ctx.font = face(film, "names", size);
+    ctx.fillStyle = colours.ivory;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(initials, PAGE_W / 2, cy + size * 0.05, radius * 1.7);
+  });
+  const [label] = layRows(
+    ctx,
+    film,
+    [
+      {
+        text: spoken,
+        font: "body",
+        size: 13,
+        colour: colours.ivory,
+        gap: 0,
+        label: film.lang === "en",
+      },
+    ],
+    maxW,
+  );
+  if (label) lifted(ctx, () => drawLines(ctx, label, cy + radius + 10));
 }
 
 type Laid = {

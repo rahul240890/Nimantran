@@ -9,11 +9,12 @@ import { uiText } from "@/i18n/copy/ui";
 import type { UiLocale } from "@/i18n/locales";
 import { DEFAULT_PRICING, type Pricing } from "@/lib/plans/design-tiers";
 import type { SampleWords } from "@/lib/sample/words";
+import { ArtGuard } from "./art-guard";
 import { SampleWordsProvider } from "./gallery/sample-words";
 
 /**
  * App-wide client providers: the page's language, design tiers and prices, one tooltip
- * delay, one toast stack.
+ * delay, one toast stack, and the guard on the site's art.
  */
 export function Providers({
   locale,
@@ -33,6 +34,7 @@ export function Providers({
       <PricingProvider pricing={pricing}>
         <TooltipProvider delayDuration={400} skipDelayDuration={200}>
           <SampleWordsProvider words={sampleWords}>{children}</SampleWordsProvider>
+          <ArtGuard />
           <Toaster closeLabel={uiStrings.close} regionLabel={uiStrings.notifications} />
         </TooltipProvider>
       </PricingProvider>

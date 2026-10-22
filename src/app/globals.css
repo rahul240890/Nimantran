@@ -4789,6 +4789,15 @@
 }
 
 @layer base {
+  /* The site's art isn't dragged out or saved from a long press (components/art-guard.tsx) */
+  img,
+  video,
+  canvas {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;

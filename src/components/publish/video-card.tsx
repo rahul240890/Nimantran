@@ -69,7 +69,7 @@ import {
 import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
-import { readWatermarkLook, withWatermark } from "@/lib/video/watermark";
+import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
 import { filmedWelcome, welcomeScene } from "@/lib/opening/catalog";
 import { site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -193,6 +193,7 @@ export function VideoCard(props: VideoCardProps) {
               controls
               // A preview is watched here; the clean one downloads from the button
               controlsList={clean ? undefined : "nodownload"}
+              disablePictureInPicture={!clean}
               playsInline
               aria-label={videoCopy.player(names)}
               // Full screen on a wide screen: the whole upright video, centred like a reel
@@ -429,7 +430,7 @@ function useInviteVideo({
       await makeKept(key, made, async (onProgress, signal) => {
         const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
         const film = marked
-          ? withWatermark(ready.film, videoCopy.mark, readWatermarkLook())
+          ? withWatermark(ready.film, videoCopy.mark, await loadWatermarkLook())
           : ready.film;
         return makeVideo(film, withMusic, onProgress, signal, codecs);
       });
@@ -582,6 +583,7 @@ export function PackageVideo(props: PackageVideoProps) {
               autoPlay={!still}
               playsInline
               controlsList="nodownload"
+              disablePictureInPicture
               aria-label={videoCopy.player(props.names)}
               // Full screen on a wide screen: the whole upright video, centred like a reel
               className="size-full object-cover [&:fullscreen]:bg-night [&:fullscreen]:object-contain"
