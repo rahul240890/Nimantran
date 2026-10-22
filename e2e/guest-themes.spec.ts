@@ -250,8 +250,8 @@ test("the welcome before the pages", async ({ page }) => {
     if ((await doorway.getAttribute("data-doorway")) !== "open") await page.clock.runFor(100);
     await expect(doorway).toHaveAttribute("data-doorway", "open", { timeout: 500 });
   }).toPass({ timeout: 30_000 });
-  // At the opening's calmer pace
-  await page.clock.runFor(2500);
+  // At the opening's calmer pace (1500ms x OPENING_PACE 2.2)
+  await page.clock.runFor(3500);
   const welcome = page.getByTestId("opening-welcome");
   await expect(welcome).toBeVisible();
   await expect(welcome).toContainText("Arjun");
