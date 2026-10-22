@@ -506,4 +506,48 @@ test.describe("coupons, invoices and refunds", () => {
     await page.reload();
     await expect(page.getByText("Refunded").first()).toBeVisible();
   });
+
+  test("a 100% off code gives the package with no payment", async ({
+    page,
+    context,
+    browser,
+  }, info) => {
+    test.setTimeout(120_000);
+    const baseURL = info.project.use.baseURL!;
+    const code = `FREE${Date.now().toString().slice(-8)}`;
+    const adminContext = await browser.newContext({ ...info.project.use, baseURL });
+    const admin = await adminContext.newPage();
+    await admin.goto("/sign-in?next=%2Fadmin%2Fcoupons");
+    await signIn(admin, ADMIN);
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Offers");
+    await admin.getByRole("textbox", { name: "Code" }).fill(code);
+    await admin.getByRole("textbox", { name: "Percent off" }).fill("100");
+    await admin.getByRole("switch", { name: "Show on the offers page" }).click();
+    await admin.getByRole("button", { name: "Make offer" }).click();
+    await expect(admin.getByText(`${code} is ready`).first()).toBeVisible();
+
+    await context.addCookies([{ name: "shubh-preview-checkout", value: "on", url: baseURL }]);
+    await writeInvite(page, numberFor(info), ["Rohan", "Tara"]);
+    await page.locator("[data-edition-notice]").getByRole("link", { name: "Get Basic" }).click();
+    await page.getByRole("textbox", { name: "Coupon code" }).fill(code);
+    await page.getByRole("button", { name: "Apply" }).click();
+    await expect(page.getByText(`Coupon ${code} applied`).first()).toBeVisible();
+    const basic = page.getByRole("article", { name: "Basic" });
+    // No payment window: the package is the invite's at once
+    await basic.getByRole("button", { name: "Get it free" }).click();
+    await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    await expect(basic.getByText("Your package")).toBeVisible();
+
+    // The admin sees a ₹0 order, and can take it back without Razorpay
+    await admin.goto("/admin/orders");
+    const row = admin.getByRole("row").filter({ hasText: code });
+    await expect(row.getByText("₹0").first()).toBeVisible();
+    await row.getByRole("button", { name: "Refund" }).click();
+    await admin
+      .getByRole("dialog")
+      .getByRole("button", { name: /^Refund/ })
+      .click();
+    await expect(row.getByText("Refunded")).toBeVisible();
+    await adminContext.close();
+  });
 });

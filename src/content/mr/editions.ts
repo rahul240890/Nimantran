@@ -83,6 +83,8 @@ export const upgradeCopy: Translation<typeof en.upgradeCopy> = {
   addOn: (price) => `डिझाइनवर + ${price}`,
   pay: (price) => `${price} भरा`,
   payDifference: (price) => `${price} मध्ये अपग्रेड करा`,
+  /** The button when an offer covers the whole price. */
+  getFree: "मोफत मिळवा",
   difference: "आपण फक्त फरक भरता.",
   continueFree: "मोफत पुढे चला",
   publishNow: "आपले निमंत्रण प्रकाशित करा",

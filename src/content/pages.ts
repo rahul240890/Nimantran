@@ -178,7 +178,7 @@ export const offersCopy = {
     "Choose a design and make your invitation, then open Packages and type the code under the prices.",
     "The price on each package changes to show what the code takes off before you pay.",
     "One offer per payment: a code you type takes the place of any festival offer running.",
-    "Offers come off the package price, taxes included, and at least ₹1 is always left to pay.",
+    "Offers come off the package price, taxes included. When an offer covers the whole price, the package is yours with no payment.",
     "We may end or change an offer early. A payment already made keeps its price.",
   ],
   start: "Choose a design",

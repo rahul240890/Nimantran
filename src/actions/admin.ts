@@ -100,7 +100,7 @@ const couponSchema = z
     maxUses: z.union([z.literal(""), z.coerce.number().int().positive().max(1_000_000)]),
     perUserLimit: z.union([z.literal(""), z.coerce.number().int().positive().max(1_000)]),
   })
-  .refine((input) => input.kind !== "percent" || (input.value >= 1 && input.value <= 90), {
+  .refine((input) => input.kind !== "percent" || (input.value >= 1 && input.value <= 100), {
     path: ["value"],
   })
   .refine((input) => input.kind !== "amount" || rupees.safeParse(input.value).success, {

@@ -332,7 +332,8 @@ export async function buyerHistory(account: Account): Promise<Buyer> {
 export type StartedCheckout =
   | {
       ok: true;
-      provider: CheckoutProvider;
+      /** "free" when an offer covered the whole price: the order is already paid. */
+      provider: CheckoutProvider | "free";
       /** Razorpay's order id; the checkout pays this order. */
       orderId: string;
       amountPaise: number;
@@ -402,6 +403,51 @@ export async function startCheckout(
     refundedAt: null,
   };
 
+  /** Records the order in the database under the provider's order id. */
+  const insertOrder = async (providerOrderId: string, mode: RazorpayMode) => {
+    const service = supabaseService();
+    if (!service) return false;
+    const row = {
+      event_id: eventId,
+      user_id: account.id,
+      plan_id: planId,
+      from_plan_id: had.plan,
+      design_tier: next.tier,
+      from_design_tier: had.tier,
+      list_price_paise: price.listPaise,
+      discount_paise: price.discountPaise,
+      coupon_id: price.coupon?.id ?? null,
+      amount_paise: amountPaise,
+      provider_order_id: providerOrderId,
+      mode,
+    };
+    let { error } = await service
+      .from("orders")
+      .insert({ ...row, design_id: chosen.id, from_design_id: had.design });
+    if (missingColumn(error)) ({ error } = await service.from("orders").insert(row));
+    return !error;
+  };
+
+  // An offer that covers the whole price: nothing to pay, so no Razorpay order. The order
+  // is recorded and paid at once, with its invoice, like any other.
+  if (amountPaise === 0) {
+    const tag = randomUUID().replace(/-/g, "").slice(0, 14);
+    const orderId = `order_free_${tag}`;
+    if (provider === "preview") {
+      preview.orders.set(orderId, {
+        ...base,
+        id: randomUUID(),
+        providerOrderId: orderId,
+        mode: "preview",
+      });
+    } else if (!(await insertOrder(orderId, razorpayKeys()?.mode ?? "live"))) {
+      return { ok: false, reason: "failed" };
+    }
+    const paid = await fulfilOrder(orderId, `pay_free_${tag}`);
+    if (!paid) return { ok: false, reason: "failed" };
+    return { ok: true, provider: "free", orderId, amountPaise: 0, keyId: null };
+  }
+
   if (provider === "preview") {
     const orderId = `order_preview_${randomUUID().replace(/-/g, "").slice(0, 14)}`;
     preview.orders.set(orderId, {
@@ -414,8 +460,7 @@ export async function startCheckout(
   }
 
   const keys = razorpayKeys();
-  const service = supabaseService();
-  if (!keys || !service) return { ok: false, reason: "failed" };
+  if (!keys || !supabaseService()) return { ok: false, reason: "failed" };
   const order = await createRazorpayOrder(keys, {
     amountPaise,
     receipt: `inv_${eventId.slice(0, 8)}_${Date.now().toString(36)}`,
@@ -429,25 +474,7 @@ export async function startCheckout(
     },
   });
   if (!order || order.amount !== amountPaise) return { ok: false, reason: "failed" };
-  const row = {
-    event_id: eventId,
-    user_id: account.id,
-    plan_id: planId,
-    from_plan_id: had.plan,
-    design_tier: next.tier,
-    from_design_tier: had.tier,
-    list_price_paise: price.listPaise,
-    discount_paise: price.discountPaise,
-    coupon_id: price.coupon?.id ?? null,
-    amount_paise: amountPaise,
-    provider_order_id: order.id,
-    mode: keys.mode,
-  };
-  let { error } = await service
-    .from("orders")
-    .insert({ ...row, design_id: chosen.id, from_design_id: had.design });
-  if (missingColumn(error)) ({ error } = await service.from("orders").insert(row));
-  if (error) return { ok: false, reason: "failed" };
+  if (!(await insertOrder(order.id, keys.mode))) return { ok: false, reason: "failed" };
   return { ok: true, provider, orderId: order.id, amountPaise, keyId: keys.keyId };
 }
 
@@ -894,18 +921,23 @@ export async function refundOrder(orderId: string): Promise<RefundResult> {
   if (order.status !== "paid" || !order.provider_payment_id) {
     return { ok: false, reason: "not-paid" };
   }
-  const keys = razorpayKeys();
-  // Test-mode payments refund only with test keys, live with live
-  if (!keys || keys.mode !== order.mode) return { ok: false, reason: "provider" };
-  const refund = await refundRazorpayPayment(
-    keys,
-    order.provider_payment_id as string,
-    order.amount_paise as number,
-  );
-  if (!refund) return { ok: false, reason: "provider" };
+  // A free order took no money: refunding it only takes the package back
+  let refundId: string | null = null;
+  if (order.amount_paise !== 0) {
+    const keys = razorpayKeys();
+    // Test-mode payments refund only with test keys, live with live
+    if (!keys || keys.mode !== order.mode) return { ok: false, reason: "provider" };
+    const refund = await refundRazorpayPayment(
+      keys,
+      order.provider_payment_id as string,
+      order.amount_paise as number,
+    );
+    if (!refund) return { ok: false, reason: "provider" };
+    refundId = refund.id;
+  }
   const { error } = await service
     .from("orders")
-    .update({ status: "refunded", refund_id: refund.id, refunded_at: now })
+    .update({ status: "refunded", refund_id: refundId, refunded_at: now })
     .eq("id", order.id);
   if (error) return { ok: false, reason: "failed" };
   if (order.event_id) {
