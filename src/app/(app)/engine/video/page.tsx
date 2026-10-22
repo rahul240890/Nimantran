@@ -21,7 +21,8 @@ export const metadata: Metadata = {
  * A review page for the invitation video, not a product screen: frames from the video of a
  * made-up invite in ?suite=<theme> (?lang=hi for a Hindi card). ?format=scene makes a Scene
  * invite, with ?photos=0, 1 or 2 (default 2). ?opening=<style>&god=<god> picks the opening
- * it starts with. ?from=<seconds>&step=<seconds> picks the moments.
+ * it starts with. ?from=<seconds>&step=<seconds> picks the moments. ?mark=1 adds the free
+ * preview's watermark.
  */
 export default async function VideoPreviewPage({ searchParams }: PageProps<"/engine/video">) {
   const {
@@ -33,6 +34,7 @@ export default async function VideoPreviewPage({ searchParams }: PageProps<"/eng
     step,
     opening,
     god,
+    mark,
   } = await searchParams;
   const suite: SuiteId = isSuiteId(asked) ? asked : "rajwada-bagh";
   const locale = await getLocale();
@@ -59,6 +61,7 @@ export default async function VideoPreviewPage({ searchParams }: PageProps<"/eng
         photos={scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS}
         from={Number(from) || 0.4}
         step={Number(step) || 1.5}
+        mark={mark === "1"}
       />
     </main>
   );

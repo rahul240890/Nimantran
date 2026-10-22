@@ -43,7 +43,7 @@ import { loadFonts, loadImages, paletteReader, readFonts } from "@/lib/video/loo
 import { drawSceneFrame, sceneVideoImages } from "@/lib/video/scene-draw";
 import { SCENE_FLY, sceneTimeline } from "@/lib/video/scene-timeline";
 import { LINES_START, type VideoTimeline } from "@/lib/video/timeline";
-import { readWatermarkLook, withWatermark, type WatermarkLook } from "@/lib/video/watermark";
+import { loadWatermarkLook, withWatermark, type WatermarkLook } from "@/lib/video/watermark";
 import "@/components/invitation/type/fonts.css";
 
 type CardMakerProps = {
@@ -397,7 +397,7 @@ function useCardStill(draft: InviteDraft, photos: PublicPhoto[]) {
           fonts,
           palette: paletteReader(suite, template),
           images: await loadImages(urls),
-          mark: readWatermarkLook(),
+          mark: await loadWatermarkLook(),
         };
       })();
       // A failed load tries again next time

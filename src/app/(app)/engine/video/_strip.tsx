@@ -5,6 +5,7 @@ import { useVideoFilm } from "@/components/publish/video-card";
 import type { InviteDraft } from "@/lib/editor/draft";
 import type { StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
+import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
 
 /** Frames every `step` seconds from `from`, after the poster and up to the last frame. */
 export function FilmStrip(props: {
@@ -13,6 +14,8 @@ export function FilmStrip(props: {
   photos: PublicPhoto[];
   from: number;
   step: number;
+  /** Draws the free preview's mark over every frame. */
+  mark?: boolean;
 }) {
   const { prepare, look } = useVideoFilm(
     props.draft,
@@ -26,8 +29,11 @@ export function FilmStrip(props: {
 
   useEffect(() => {
     let live = true;
-    void prepare().then((ready) => {
+    void Promise.all([prepare(), props.mark ? loadWatermarkLook() : null]).then(([made, look]) => {
       if (!live) return;
+      const ready = look
+        ? { ...made, film: withWatermark(made.film, "Made with Shubh", look) }
+        : made;
       const times = [ready.poster];
       for (let at = props.from; at < ready.film.total; at += props.step)
         times.push(Number(at.toFixed(2)));
