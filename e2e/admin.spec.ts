@@ -1,5 +1,13 @@
 import { expect, test } from "@playwright/test";
-import { axe, noOverflow, numberFor, publish, signIn, writeInvite } from "./invite-helpers";
+import {
+  axe,
+  noOverflow,
+  numberFor,
+  pickDesign,
+  publish,
+  signIn,
+  writeInvite,
+} from "./invite-helpers";
 
 /* The master admin and packages (Steps 15 to 17), in preview mode. */
 
@@ -222,7 +230,7 @@ test.describe("packages", () => {
     // Another ₹799 design on the live invite isn't saved: guests keep the paid one
     await page.goto(`/create?invite=${id}&quality=2d`);
     await page.getByRole("button", { name: "Change design" }).first().click();
-    await page.getByRole("radio", { name: /^Kayal/ }).click();
+    await pickDesign(page, "Kayal");
     const held = page.locator("[data-held-back]");
     await expect(held).toBeVisible({ timeout: 20_000 });
     await expect(held).toContainText("Your package is for Rajwada Bagh");
@@ -237,10 +245,13 @@ test.describe("packages", () => {
     // Going back to the paid design saves again
     await held.getByRole("button", { name: "Go back to Rajwada Bagh" }).click();
     await expect(held).toHaveCount(0, { timeout: 20_000 });
-    await expect(page.getByRole("radio", { name: /Rajwada Bagh/ })).toBeChecked();
+    await page.getByRole("searchbox", { name: "Search designs" }).fill("Rajwada Bagh");
+    await expect(
+      page.getByRole("radio", { name: "Rajwada Bagh, Story", exact: true }),
+    ).toBeChecked();
 
     // Or the new design gets its own package, at its full price, and then goes live
-    await page.getByRole("radio", { name: /^Kayal/ }).click();
+    await pickDesign(page, "Kayal");
     await expect(held).toBeVisible({ timeout: 20_000 });
     await held.getByRole("link", { name: "Choose a package" }).click();
     await expect(page).toHaveURL(/\/edition\?plan=basic&design=kayal$/);
@@ -258,12 +269,13 @@ test.describe("packages", () => {
     await expect(page).toHaveURL(/\/create/);
     // This page's clock is held in September while the account's saves are dated today, so
     // the editor reopens on the account's copy; pick the paid-for design again to be sure
-    const kayal = page.getByRole("radio", { name: /^Kayal/ });
+    const search = page.getByRole("searchbox", { name: "Search designs" });
     const change = page.getByRole("button", { name: "Change design" }).first();
     // Wait for the editor to show one or the other before deciding
-    await expect(kayal.or(change)).toBeVisible({ timeout: 20_000 });
-    if (!(await kayal.isVisible())) await change.click();
-    await kayal.click();
+    await expect(search.or(change)).toBeVisible({ timeout: 20_000 });
+    if (!(await search.isVisible())) await change.click();
+    await pickDesign(page, "Kayal");
+    const kayal = page.getByRole("radio", { name: "Kayal, Story", exact: true });
     await expect(kayal).toBeChecked();
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
     await expect

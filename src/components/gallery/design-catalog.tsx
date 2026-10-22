@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useDeferredValue, useId, useMemo, useState, type ReactNode } from "react";
+import { Suspense, useDeferredValue, useId, useMemo, useState } from "react";
 import { usePricing } from "@/components/pricing/pricing-provider";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
@@ -54,6 +54,7 @@ import {
   shelfHref,
   type Shelf,
 } from "@/lib/gallery/shelves";
+import { ChipRow, chipClass } from "./chip-row";
 import { CollectionTiles } from "./collection-tiles";
 import { TrendingRow } from "./trending-row";
 import { pagePath } from "@/lib/seo/paths";
@@ -91,64 +92,6 @@ const FORMAT_ICONS = {
   story: Layers,
   card: Rotate3d,
 } as const;
-
-const chipClass = (pressed: boolean) =>
-  cn(
-    "inline-flex min-h-11 shrink-0 cursor-pointer items-center rounded-full border px-4 text-sm font-semibold whitespace-nowrap transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-    pressed
-      ? "border-transparent bg-ink text-paper"
-      : "border-line bg-surface text-ink-muted hover:border-line-strong hover:text-ink",
-  );
-
-/** A row of choices, one pressed at a time, that scrolls sideways on a phone. */
-function ChipRow<T extends string>({
-  label,
-  allLabel,
-  value,
-  options,
-  onChange,
-  after,
-}: {
-  label: string;
-  allLabel: string;
-  value: T | null;
-  options: readonly { id: T; label: string }[];
-  onChange: (value: T | null) => void;
-  /** A last control in the row, such as More occasions. */
-  after?: ReactNode;
-}) {
-  return (
-    <div className="flex min-w-0 flex-col gap-2">
-      <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">{label}</p>
-      <div
-        role="group"
-        aria-label={label}
-        className="relative -mx-4 scrollbar-none flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0"
-      >
-        <button
-          type="button"
-          aria-pressed={value === null}
-          onClick={() => onChange(null)}
-          className={chipClass(value === null)}
-        >
-          {allLabel}
-        </button>
-        {options.map((option) => (
-          <button
-            key={option.id}
-            type="button"
-            aria-pressed={value === option.id}
-            onClick={() => onChange(value === option.id ? null : option.id)}
-            className={chipClass(value === option.id)}
-          >
-            {option.label}
-          </button>
-        ))}
-        {after}
-      </div>
-    </div>
-  );
-}
 
 /** Every design's searchable words by design id: in every site language once searching. */
 function useSearchText(entries: readonly CatalogEntry[], searching: boolean) {

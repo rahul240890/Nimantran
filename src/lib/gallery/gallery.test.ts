@@ -183,15 +183,24 @@ describe("a design chosen in the gallery", () => {
       suite: "shahi-savari",
       template: "bandhani",
     });
-    // The names come next, with the card in the tradition's own language
+    // Names already in, so the invite shows itself in the new design, every word kept,
+    // with the card in the tradition's own language
     expect(next).toMatchObject({
-      step: "couple",
+      step: "preview",
       suite: "shahi-savari",
       templateId: "bandhani",
       languages: ["gu"],
       content: { first: "Aarav" },
     });
     expect(next.tradition.id).toBe("gujarati");
+    // A new invite asks the names first
+    const fresh = withGalleryChoice(newDraft(), {
+      category: "wedding",
+      tradition: null,
+      suite: "kayal",
+      template: null,
+    });
+    expect(fresh.step).toBe("couple");
   });
 
   it("keeps the chosen languages for another design of the same tradition", () => {
