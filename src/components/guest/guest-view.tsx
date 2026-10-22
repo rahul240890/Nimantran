@@ -2,7 +2,7 @@
 
 import { CalendarPlus, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { SocialLinks } from "@/components/brand/social-links";
 import { cn } from "@/lib/cn";
@@ -25,7 +25,11 @@ import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
-import { musicMuted, useRagaMusic } from "@/components/invitation/use-raga-music";
+import {
+  FULL_SCREEN_LEAD_S,
+  musicMuted,
+  useRagaMusic,
+} from "@/components/invitation/use-raga-music";
 import { useStayAwake } from "@/components/guest/use-stay-awake";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
@@ -273,7 +277,9 @@ export function GuestView({
   const [awake, setAwake] = useState(false);
   useStayAwake(awake);
   // The music starts with the guest's first tap anywhere, the gate's or any other: a phone
-  // plays no sound before one, and the song is then already playing as the gate opens
+  // plays no sound before one, and the song is then already playing as the gate opens. The
+  // tap may also take the invitation full screen, so the raga's first notes wait a moment
+  // and the page's own updates give way while the phone redraws it
   const playOnOpen = draft.music.playOnOpen;
   const latestMusic = useRef(music);
   useEffect(() => {
@@ -283,14 +289,42 @@ export function GuestView({
     const events = ["pointerup", "touchend", "keydown"] as const;
     const first = () => {
       events.forEach((name) => window.removeEventListener(name, first, true));
-      setAwake(true);
+      startTransition(() => setAwake(true));
       if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
-        void latestMusic.current.play();
+        void latestMusic.current.play(FULL_SCREEN_LEAD_S);
       }
     };
     events.forEach((name) => window.addEventListener(name, first, true));
     return () => events.forEach((name) => window.removeEventListener(name, first, true));
   }, [playOnOpen]);
+  // The sections below the first screen are drawn only as they near it, once each has been
+  // drawn whole (with its lettering in, or after a second), so the page keeps its true
+  // length (globals.css). Only while the guest is on the first screen: switched on further
+  // down, the page's snapping would carry them past where they are. Marked on the page
+  // itself, at once, rather than by redrawing it
+  const pageRoot = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let live = true;
+    const mark = () => {
+      if (!live || window.scrollY >= window.innerHeight / 2) return;
+      pageRoot.current?.setAttribute("data-measured", "");
+      window.removeEventListener("scroll", mark);
+    };
+    const second = new Promise((done) => window.setTimeout(done, 1000));
+    void Promise.race([document.fonts?.ready, second]).then(() =>
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => {
+          if (!live) return;
+          window.addEventListener("scroll", mark, { passive: true });
+          mark();
+        }),
+      ),
+    );
+    return () => {
+      live = false;
+      window.removeEventListener("scroll", mark);
+    };
+  }, []);
   // From the page below, back to the top and the whole invitation again, music and all
   const openAgain = () => {
     if (playOnOpen) music.replay();
@@ -318,7 +352,7 @@ export function GuestView({
   return (
     <GuestLanguage language={language}>
       {/* The page turns a whole screen at a time, like the pages above it (globals.css) */}
-      <div lang={language} className="guest-snap flex min-h-dvh flex-col">
+      <div ref={pageRoot} lang={language} className="guest-snap flex min-h-dvh flex-col">
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
           {watermark && <WatermarkLayer />}

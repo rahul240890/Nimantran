@@ -24,8 +24,11 @@ export class MusicPlayer {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
   private bus: GainNode | null = null;
+  private reverb: ConvolverNode | null = null;
   private buffers = new Map<string, AudioBuffer>();
   private timer = 0;
+  /** The wait for a raga's first notes, when it was started with a lead. */
+  private waiting = 0;
   /** The score being played, and the clock time its start fell on. */
   private score: Score | null = null;
   private origin = 0;
@@ -102,11 +105,16 @@ export class MusicPlayer {
     if (resume) void this.play().catch(() => undefined);
   }
 
-  /** Starts or resumes the music. Must be called from a tap or key press. */
-  async play() {
+  /**
+   * Starts or resumes the music. Must be called from a tap or key press. With a lead (in
+   * seconds) the phone's sound is woken at once but the raga's first notes, and the work of
+   * making their sound, come that much later: the tap that opens the invitation also takes
+   * the screen full, and a phone shows black until it has redrawn the page.
+   */
+  async play(lead = 0) {
     if (this.playing) return;
     if (this.starting) return this.starting;
-    this.starting = this.start().finally(() => {
+    this.starting = this.start(lead).finally(() => {
       this.starting = null;
     });
     return this.starting;
@@ -142,7 +150,7 @@ export class MusicPlayer {
     requestAnimationFrame(step);
   }
 
-  private async start() {
+  private async start(lead: number) {
     if (this.music.clip) {
       const clip = this.clipElement();
       this.fades++;
@@ -169,8 +177,8 @@ export class MusicPlayer {
       const tone = ctx.createBiquadFilter();
       tone.type = "lowpass";
       tone.frequency.value = 5200;
+      // The hall's echo is made with the first notes (it takes a moment on a phone)
       const reverb = ctx.createConvolver();
-      reverb.buffer = hall(ctx);
       const wet = ctx.createGain();
       wet.gain.value = 0.32;
       bus.connect(tone);
@@ -182,6 +190,7 @@ export class MusicPlayer {
       this.ctx = ctx;
       this.master = master;
       this.bus = bus;
+      this.reverb = reverb;
     }
 
     const ctx = this.ctx;
@@ -195,12 +204,21 @@ export class MusicPlayer {
     if (this.ctx !== ctx) return;
     this.playing = true;
     const now = ctx.currentTime;
+    const from = this.master!.gain.value;
     this.master!.gain.cancelScheduledValues(now);
-    this.master!.gain.setValueAtTime(this.master!.gain.value, now);
-    this.master!.gain.linearRampToValueAtTime(VOLUME * this.level, now + FADE_IN_S);
-    if (!this.score) this.begin(now);
-    this.schedule();
-    this.timer = window.setInterval(() => this.schedule(), TICK_MS);
+    this.master!.gain.setValueAtTime(from, now);
+    if (lead > 0) this.master!.gain.setValueAtTime(from, now + lead);
+    this.master!.gain.linearRampToValueAtTime(VOLUME * this.level, now + lead + FADE_IN_S);
+    if (!this.score) this.begin(now + lead);
+    const write = () => {
+      this.waiting = 0;
+      if (!this.playing || this.ctx !== ctx) return;
+      if (this.reverb && !this.reverb.buffer) this.reverb.buffer = hall(ctx);
+      this.schedule();
+      this.timer = window.setInterval(() => this.schedule(), TICK_MS);
+    };
+    if (lead > 0) this.waiting = window.setTimeout(write, lead * 1000);
+    else write();
   }
 
   /** Fades out over `fade` seconds and goes quiet. */
@@ -233,6 +251,7 @@ export class MusicPlayer {
     if (!this.ctx || !this.master) return;
     this.playing = false;
     window.clearInterval(this.timer);
+    window.clearTimeout(this.waiting);
     const now = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(now);
     this.master.gain.setValueAtTime(this.master.gain.value, now);
@@ -252,6 +271,7 @@ export class MusicPlayer {
 
   dispose() {
     window.clearInterval(this.timer);
+    window.clearTimeout(this.waiting);
     this.playing = false;
     this.dropClip();
     if (this.ctx && this.ctx.state !== "closed") this.ctx.close().catch(() => undefined);

@@ -6,7 +6,11 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties }
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import { pageImage, StoryPlayer } from "@/components/invitation/story/story-player";
 import { MusicBars } from "@/components/invitation/music-bars";
-import { musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
+import {
+  FULL_SCREEN_LEAD_S,
+  musicMuted,
+  type RagaMusic,
+} from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
@@ -344,8 +348,11 @@ export function Opening({
     // Any page painting not yet on its way starts now, so no page comes in empty
     const next = latest.current;
     if (next.kind === "pages") warmPaintings(next.beats.map((beat) => pageImage(suite, beat)));
-    // The music swells in with the opening (it fades up over its first seconds)
-    if (musicOnOpen && !music.playing && !musicMuted()) void music.play();
+    // The music swells in with the opening (it fades up over its first seconds); going full
+    // screen, its first notes wait until the phone has redrawn the page
+    if (musicOnOpen && !music.playing && !musicMuted()) {
+      void music.play(filling ? FULL_SCREEN_LEAD_S : 0);
+    }
   };
   const leave = (hadFocus: boolean) => {
     returnFocus.current = hadFocus;
