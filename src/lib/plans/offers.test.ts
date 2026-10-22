@@ -94,10 +94,11 @@ describe("coupons", () => {
     expect(couponProblem(royal, "grand", now, "premium", { designId: "kayal-scene" })).toBeNull();
   });
 
-  it("always leave at least ₹1 to pay", () => {
+  it("take at most the whole price off, so a package can be free", () => {
     expect(couponDiscount(coupon(), 49_900)).toBe(12_500);
+    expect(couponDiscount(coupon({ percentOff: 100 }), 49_900)).toBe(49_900);
     expect(couponDiscount(coupon({ percentOff: null, amountOffPaise: 10_00_000 }), 49_900)).toBe(
-      49_800,
+      49_900,
     );
   });
 });

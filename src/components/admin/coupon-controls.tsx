@@ -31,7 +31,7 @@ import { AUDIENCE_NAMES } from "./audience-names";
 const FIELD_ERRORS: Record<string, string> = {
   code: "Use 3 to 20 letters and numbers.",
   label: "An offer on the offers page needs a title.",
-  value: "Percent off is 1 to 90; an amount is in rupees.",
+  value: "Percent off is 1 to 100; an amount is in rupees. 100% off makes the package free.",
   endsOn: "The last day can't be before the first.",
   maxUses: "Leave empty for no limit, or a whole number.",
   perUserLimit: "Leave empty for no limit, or a whole number.",

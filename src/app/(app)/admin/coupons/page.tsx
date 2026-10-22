@@ -72,8 +72,8 @@ export default async function CouponsPage() {
               New offer
             </CardTitle>
             <CardDescription>
-              Hosts always pay at least ₹1. Dates run from the start of the first day to the end of
-              the last, India time.
+              An offer can make a package free, with no payment. Dates run from the start of the
+              first day to the end of the last, India time.
             </CardDescription>
           </CardHeader>
           <CardBody>

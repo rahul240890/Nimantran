@@ -86,6 +86,8 @@ export const upgradeCopy = {
   addOn: (price: string) => `+ ${price} on the design`,
   pay: (price: string) => `Pay ${price}`,
   payDifference: (price: string) => `Upgrade for ${price}`,
+  /** The button when an offer covers the whole price. */
+  getFree: "Get it free",
   difference: "You pay only the difference.",
   continueFree: "Continue free",
   publishNow: "Publish your invite",

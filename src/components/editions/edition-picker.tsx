@@ -156,22 +156,24 @@ export function EditionPicker({
       signature: response.razorpay_signature,
     }).catch(() => ({ ok: false }) as const);
     setPending(null);
-    if (result.ok) {
-      funnel("Payment completed", { plan: result.planId, tier: design });
-      toast({
-        title: upgradeCopy.paid(planCopy[result.planId].name),
-        description: upgradeCopy.paidBody,
-        tone: "success",
-      });
-      // A coupon's prices were for the package before this one: the page's new prices,
-      // with what's now paid marked as yours, take their place
-      setCoupon(null);
-      router.refresh();
-      // The way on (publishing, or putting the design live) shows at the top of the page
-      window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
-    } else {
-      toast({ title: upgradeCopy.failed, tone: "error" });
-    }
+    if (result.ok) paid(result.planId);
+    else toast({ title: upgradeCopy.failed, tone: "error" });
+  };
+
+  /** The package is the invite's now: say so and show the page as it stands. */
+  const paid = (plan: PaidPlanId) => {
+    funnel("Payment completed", { plan, tier: design });
+    toast({
+      title: upgradeCopy.paid(planCopy[plan].name),
+      description: upgradeCopy.paidBody,
+      tone: "success",
+    });
+    // A coupon's prices were for the package before this one: the page's new prices,
+    // with what's now paid marked as yours, take their place
+    setCoupon(null);
+    router.refresh();
+    // The way on (publishing, or putting the design live) shows at the top of the page
+    window.scrollTo({ top: 0, behavior: reducedMotion() ? "auto" : "smooth" });
   };
 
   const buy = async (plan: PaidPlanId) => {
@@ -193,6 +195,12 @@ export function EditionPicker({
       return;
     }
     funnel("Checkout started", { plan, tier: design });
+    // An offer covered the whole price: the server has already given the invite the package
+    if (started.provider === "free") {
+      setPending(null);
+      paid(plan);
+      return;
+    }
     if (started.provider === "preview") {
       setPending(null);
       setPreviewPay({ plan, orderId: started.orderId, amountPaise: started.amountPaise });
@@ -324,7 +332,8 @@ export function EditionPicker({
                 <div className="flex flex-col gap-1.5">
                   <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
                     <span className="font-display text-[2.2rem] leading-none tabular-nums">
-                      {listPaise === 0
+                      {listPaise === 0 ||
+                      (offer && price && !isDifference && price.amountPaise === 0)
                         ? upgradeCopy.free
                         : formatRupees(
                             offer && price && !isDifference ? price.amountPaise : listPaise,
@@ -408,9 +417,11 @@ export function EditionPicker({
                       leadingIcon={<Sparkles aria-hidden />}
                       className="w-full"
                     >
-                      {isDifference
-                        ? upgradeCopy.payDifference(formatRupees(price.amountPaise))
-                        : upgradeCopy.pay(formatRupees(price.amountPaise))}
+                      {price.amountPaise === 0
+                        ? upgradeCopy.getFree
+                        : isDifference
+                          ? upgradeCopy.payDifference(formatRupees(price.amountPaise))
+                          : upgradeCopy.pay(formatRupees(price.amountPaise))}
                     </Button>
                     {isDifference && (
                       <p className="text-center text-xs text-ink-muted">{upgradeCopy.difference}</p>

@@ -126,14 +126,14 @@ export function couponProblem(
   return null;
 }
 
-/** How much a coupon takes off a price, in whole rupees. At least ₹1 is always left to pay. */
+/** How much a coupon takes off a price, in whole rupees: at most the whole price, for free. */
 export function couponDiscount(coupon: Coupon, pricePaise: number): number {
   const off =
     coupon.percentOff !== null
       ? // Whole rupees, so prices stay tidy: 20% off ₹499 is ₹100
         Math.round((pricePaise * coupon.percentOff) / 100 / 100) * 100
       : (coupon.amountOffPaise ?? 0);
-  return Math.max(0, Math.min(off, pricePaise - 100));
+  return Math.max(0, Math.min(off, pricePaise));
 }
 
 export type Price = {
