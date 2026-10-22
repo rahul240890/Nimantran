@@ -30,6 +30,7 @@ import {
   draftFrameSlots,
   framedDesign,
 } from "@/lib/publish/frames";
+import { OpeningPicker } from "../opening-picker";
 import { FramePreview, PhotoAdjust } from "../photo-adjust";
 import {
   ASKABLE_QUESTIONS,
@@ -54,7 +55,7 @@ import { OwnMusic } from "../own-music";
 import { useSongLengths } from "../song-times";
 import { PagePacing } from "../page-pacing";
 import { ContactsSection } from "./family-section";
-import { draftShowsScene } from "@/lib/publish/story";
+import { draftShowsScene, draftSuite } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
@@ -712,6 +713,16 @@ export function MusicStep({ draft, update }: StepProps) {
   return (
     <div className={sections}>
       <Music draft={draft} update={update} />
+      {/* How it opens sits with the music, what guests see and hear first, so the design
+          step is only designs (owner, 2026-10-22) */}
+      <div className="border-t border-line pt-6">
+        <OpeningPicker
+          draft={draft}
+          suite={draftSuite(draft)}
+          scene={draftShowsScene(draft)}
+          update={update}
+        />
+      </div>
       <Questions draft={draft} update={update} />
       <section className="flex flex-col gap-3 border-t border-line pt-6" data-page-target="family">
         <ContactsSection draft={draft} update={update} />

@@ -934,29 +934,10 @@ export const previewCopy = {
 /** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */
 export const suiteCopy = {
   heading: "Designs for your occasion",
-  intro:
-    "After the opening, guests see your names, every function and the reply form in this design. Your tradition's ceremony names, blessing and symbol stay the same in every design.",
-  /** Only for Card colours, whose pages take the chosen card's paper and colours. */
-  cardHeading: "Card paper and colours",
-  cardIntro: "Card colours pages take the paper, colours and raga of the card you pick here.",
-  suggested: "Suits your tradition",
-  pairs: (design: string) => `Also switches the card to ${design}`,
-  preview: "Play the pages",
+  moreDesigns: (count: number) => `Show ${count} more designs`,
   textBox: "Box behind the words",
   textBoxHint:
     "Off, the words sit straight on the painting. On, they sit in a soft card-coloured box. Play the pages to compare; the same switch is on the pages too.",
-  formatHeading: "Kind of invitation",
-  formats: {
-    scene: {
-      name: "Scene",
-      description:
-        "Everything on one painting: your photos, names and every celebration flying in by turn. Quick for guests to take in.",
-    },
-    story: {
-      name: "Story",
-      description: "A full-screen painted page for every celebration, one after another.",
-    },
-  },
   blessingPage: "Open with the blessing page",
   blessingPageHint:
     "This theme opens with a painting of the god and your blessing beneath it, before your names.",

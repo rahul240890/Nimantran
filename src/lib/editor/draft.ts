@@ -212,7 +212,8 @@ export function withGalleryChoice(
     format: choice.format ?? "story",
     templateId: choice.template ?? next.templateId,
     languages,
-    step: "couple",
+    // An invite with its names in shows itself in the new design; a new one asks the names
+    step: next.content.first?.trim() ? "preview" : "couple",
   };
 }
 

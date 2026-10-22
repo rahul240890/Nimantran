@@ -63,6 +63,7 @@ import { TraditionStep } from "./steps/tradition-step";
 import { forgetPhotoUrl, useDropLostPhotos } from "./use-photo-urls";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
+import { galleryText } from "@/i18n/copy/gallery";
 import { publishText } from "@/i18n/copy/publish";
 import { uiText } from "@/i18n/copy/ui";
 import { funnel } from "@/lib/funnel";
@@ -231,6 +232,7 @@ export function Editor({
 }) {
   const { editor, previewCopy, stepCopy: baseSteps, namesCopy, syncCopy } = useText(editorText);
   const { publishCopy } = useText(publishText);
+  const { galleryCopy } = useText(galleryText);
   const { uiStrings } = useText(uiText);
   const { draft, save } = useSyncExternalStore(
     inviteDraft.subscribe,
@@ -275,6 +277,9 @@ export function Editor({
 
   const [page, setPage] = useState(() => stepPage(draft, step));
   const [checking, setChecking] = useState<EditorStep | null>(null);
+  // Change design from a later step goes back there once a design is picked, rather than
+  // through every step again: the host's work is all still in place
+  const [returnTo, setReturnTo] = useState<EditorStep | null>(null);
   const [autoPublish, setAutoPublish] = useState(() => publishOnArrival);
   const [autoGate, setAutoGate] = useState(() => gateOnArrival);
   useEffect(() => {
@@ -329,9 +334,10 @@ export function Editor({
       }
       if (initialInvite || fresh || missing) router.replace("/create", { scroll: false });
       if (initialSuite) {
-        // The gallery's Use this design, straight to the names. Signed in, an invite already
-        // under way stays in My invites and a new one starts; on this device alone, the
-        // choice applies to the open invite and every word typed is kept.
+        // The gallery's Use this design. It applies to the invite under way, every name,
+        // date, photo and word kept (owner, 2026-10-22: hosts had to fill everything in
+        // again). Only an invite already live, or one for another occasion, stays as it is
+        // in My invites while a new one starts with the design.
         const choice = {
           category: initialCategory,
           tradition: initialTradition,
@@ -341,8 +347,10 @@ export function Editor({
           faith: initialFaith,
         };
         const current = inviteDraft.get().draft;
+        const keepsWork =
+          current.slug === null && (!choice.category || choice.category === current.categoryId);
         const switched =
-          signedIn && current.updatedAt !== 0 && !initialInvite && !fresh
+          signedIn && current.updatedAt !== 0 && !initialInvite && !fresh && !keepsWork
             ? await switchDraft(null, {
                 signedIn,
                 fresh: () => withGalleryChoice(newDraft(), choice),
@@ -425,6 +433,7 @@ export function Editor({
     (next: EditorStep) => {
       moved.current = true;
       setChecking(null);
+      if (next !== "design") setReturnTo(null);
       setPage(stepPage(inviteDraft.get().draft, next));
       update((current) => ({ ...current, step: next }));
     },
@@ -446,7 +455,7 @@ export function Editor({
       });
       return;
     }
-    const next = EDITOR_STEPS[index + 1];
+    const next = step === "design" && returnTo ? returnTo : EDITOR_STEPS[index + 1];
     if (next) goTo(next);
   };
 
@@ -579,7 +588,10 @@ export function Editor({
                 {!PICKING.has(step) && (
                   <DesignBar
                     draft={draft}
-                    onChange={() => goTo("design")}
+                    onChange={() => {
+                      setReturnTo(step);
+                      goTo("design");
+                    }}
                     update={update}
                     className={cn("mb-5", miniShown && "max-lg:pe-[6.5rem]")}
                   />
@@ -706,7 +718,9 @@ export function Editor({
                           trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
                           className="max-[359px]:px-4"
                         >
-                          {index === EDITOR_STEPS.length - 2 ? (
+                          {step === "design" && returnTo ? (
+                            galleryCopy.useDesign
+                          ) : index === EDITOR_STEPS.length - 2 ? (
                             <>
                               <span className="sm:hidden">{editor.next}</span>
                               <span className="max-sm:hidden">{editor.toPreview}</span>
