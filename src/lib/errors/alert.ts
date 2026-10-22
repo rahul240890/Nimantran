@@ -23,6 +23,9 @@ const NOISE = [
   /Failed to fetch|Load failed|NetworkError|network (connection|error)|offline/i,
   /ChunkLoadError|Loading (CSS )?chunk|Failed to load chunk|dynamically imported module|Importing a module script failed/i,
   /AbortError|operation was aborted|signal is aborted/i,
+  // A page change's animation that the browser cut short, as when the phone turned or its
+  // address bar hid mid-change: the new page shows at once (React lets these pass too)
+  /Transition was (aborted|skipped)|Skipping view transition|View transition was skipped/i,
   // describeError()'s name for a photo, music or script that didn't load
   /^(error|abort) event on /i,
   /Java object is gone|_AutofillCallbackHandler|instantSearchSDKJSBridge|zaloJSV2/i,
