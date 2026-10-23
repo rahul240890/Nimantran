@@ -1838,6 +1838,7 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     crafts: "கலையும் வண்ணமும்",
     play: "கலகலப்பானவை",
     themed: "தீமின் சொந்தத் திறப்பு",
+    tied: "கட்டிய கதவுகள்",
     painted: "ஓவிய வாயில்கள்",
     doors: "கதவுகளும் வாயில்களும்",
     reveals: "திரைகளும் வெளிப்பாடுகளும்",

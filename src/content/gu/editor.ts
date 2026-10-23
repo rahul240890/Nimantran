@@ -1719,6 +1719,7 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     crafts: "કળા અને રંગ",
     play: "મજાની અને રમતિયાળ",
     themed: "થીમની પોતાની શરૂઆત",
+    tied: "બાંધેલા દ્વાર",
     painted: "ચિત્રિત દ્વાર",
     doors: "બારણાં અને દરવાજા",
     reveals: "પડદા અને ખૂલતી ક્ષણો",

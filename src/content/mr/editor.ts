@@ -1739,6 +1739,7 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     crafts: "कला आणि रंग",
     play: "मजेशीर",
     themed: "थीमची स्वतःची सुरुवात",
+    tied: "बांधलेली दारे",
     painted: "चित्रित द्वारे",
     doors: "दरवाजे आणि द्वारे",
     reveals: "पडदे आणि उलगडणे",

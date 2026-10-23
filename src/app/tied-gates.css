@@ -1,0 +1,190 @@
+/*
+ * Tied gates (opening-tied.tsx): the template's centre picture beyond, two closed doors
+ * filling the screen and the tie on their seam. Opened, the tie comes undone its own way
+ * (data-undo), its pieces burst out, then the doors open (data-move). Everything follows the
+ * stage's data-open; still mode shows the end of each move.
+ */
+.tied {
+  animation: gate-breathe 9s ease-in-out infinite alternate;
+}
+.opening-stage[data-open="true"] .tied {
+  animation-play-state: paused;
+}
+.tied-canvas {
+  width: max(100cqw, calc(100cqh * 768 / 1365));
+  aspect-ratio: 768 / 1365;
+  translate: -50% -50%;
+  transform-origin: 50% 55%;
+  transition: scale 2600ms cubic-bezier(0.45, 0, 0.2, 1) 700ms;
+}
+.opening-stage[data-open="true"] .tied-canvas {
+  scale: 1.08;
+}
+/* The centre picture waits dim behind the doors and lights up as they open */
+.tied-beyond {
+  filter: brightness(0.5) saturate(0.85);
+  transition: filter 1400ms ease 900ms;
+}
+.opening-stage[data-open="true"] .tied-beyond {
+  filter: none;
+}
+
+/* The doors open after the tie is undone */
+.tied-door {
+  backface-visibility: hidden;
+  transition: transform 1500ms cubic-bezier(0.6, 0, 0.25, 1) 750ms;
+}
+.tied-door-left {
+  left: 0;
+  transform-origin: left center;
+}
+.tied-door-right {
+  right: 0;
+  transform-origin: right center;
+}
+.tied-door-shade {
+  background: linear-gradient(90deg, transparent 40%, var(--open-shadow));
+  opacity: 0;
+  transition: opacity 1200ms ease 850ms;
+}
+.tied-door-right .tied-door-shade {
+  scale: -1 1;
+}
+.opening-stage[data-open="true"] .tied-door-shade {
+  opacity: 1;
+}
+.opening-stage[data-open="true"] [data-move="swing"] .tied-door-left {
+  transform: rotateY(100deg);
+}
+.opening-stage[data-open="true"] [data-move="swing"] .tied-door-right {
+  transform: rotateY(-100deg);
+}
+.opening-stage[data-open="true"] [data-move="slide"] .tied-door-left {
+  transform: translateX(-104%);
+}
+.opening-stage[data-open="true"] [data-move="slide"] .tied-door-right {
+  transform: translateX(104%);
+}
+.opening-stage[data-open="true"] [data-move="part"] .tied-door-left {
+  transform: scaleX(0.14) skewY(-1.5deg);
+}
+.opening-stage[data-open="true"] [data-move="part"] .tied-door-right {
+  transform: scaleX(0.14) skewY(1.5deg);
+}
+/* The light down the seam waits for the tie, then flares as the doors part */
+.tied .gate-seam {
+  transition:
+    scale 500ms ease 650ms,
+    opacity 700ms ease 1100ms;
+}
+
+/* The tie: moved from where it is painted to its place on the seam, breathing while it waits */
+.tied-tie {
+  translate: 0 var(--tie-shift);
+  /* Its own middle, where it is painted; the translate carries it to its place */
+  transform-origin: 50% var(--tie-drawn);
+  animation: tied-wait 3.2s ease-in-out infinite alternate;
+  transition:
+    transform 700ms cubic-bezier(0.5, 0, 0.3, 1),
+    opacity 520ms ease 180ms;
+}
+.opening-stage[data-open="true"] .tied-tie {
+  animation: none;
+  opacity: 0;
+}
+/* A bow loosens and slips off both sides */
+.opening-stage[data-open="true"] [data-undo="untie"] .tied-tie {
+  transform: scale(1.35, 0.78);
+}
+/* A brooch, medallion or crystal lifts toward the guest */
+.opening-stage[data-open="true"] [data-undo="lift"] .tied-tie {
+  transform: translateY(-5%) scale(1.3);
+}
+/* A butterfly, a pair of birds or a kite flies off */
+.opening-stage[data-open="true"] [data-undo="fly"] .tied-tie {
+  transform: translate(18%, -38%) rotate(-14deg) scale(0.7);
+  transition:
+    transform 900ms cubic-bezier(0.45, 0, 0.4, 1),
+    opacity 700ms ease 250ms;
+}
+/* A lock, locket, bell or chain drops */
+.opening-stage[data-open="true"] [data-undo="drop"] .tied-tie {
+  transform: translateY(34%) rotate(7deg);
+  transition:
+    transform 800ms cubic-bezier(0.55, 0, 0.9, 0.6),
+    opacity 400ms ease 400ms;
+}
+/* A ball of petals, a bubble or a gem bursts */
+.opening-stage[data-open="true"] [data-undo="burst"] .tied-tie {
+  transform: scale(1.6);
+  transition:
+    transform 420ms cubic-bezier(0.2, 0.7, 0.3, 1),
+    opacity 300ms ease 80ms;
+}
+/* A garland, sash or rope slips down and away */
+.opening-stage[data-open="true"] [data-undo="slip"] .tied-tie {
+  transform: translateY(20%) rotate(-3deg);
+}
+/* A seal cracks in two; each half leaves with its door */
+.tied-tie-left {
+  clip-path: inset(0 50% 0 0);
+}
+.tied-tie-right {
+  clip-path: inset(0 0 0 50%);
+}
+.opening-stage[data-open="true"] [data-undo="crack"] .tied-tie {
+  transition:
+    transform 1100ms cubic-bezier(0.5, 0, 0.3, 1) 150ms,
+    opacity 600ms ease 700ms;
+}
+.opening-stage[data-open="true"] [data-undo="crack"] .tied-tie-left {
+  transform: translateX(-24%) rotate(-7deg);
+}
+.opening-stage[data-open="true"] [data-undo="crack"] .tied-tie-right {
+  transform: translateX(24%) rotate(7deg);
+}
+
+/* The pieces burst out from the tie and drift away */
+.tied-piece {
+  left: 50%;
+  top: var(--tie-at);
+  width: 9cqw;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: center / contain no-repeat;
+  opacity: 0;
+}
+.opening-stage[data-open="true"] .tied-piece {
+  animation: tied-piece 1700ms cubic-bezier(0.2, 0.6, 0.3, 1) calc(160ms + var(--i) * 30ms) both;
+}
+
+@keyframes tied-wait {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.025;
+  }
+}
+@keyframes tied-piece {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0) scale(0.5);
+  }
+  12% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--spin)) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tied,
+  .tied-tie {
+    animation: none;
+  }
+  .tied-piece {
+    display: none;
+  }
+}

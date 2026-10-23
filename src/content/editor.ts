@@ -1790,6 +1790,7 @@ export const openingCopy = {
     crafts: "Crafts and colour",
     play: "Fun and playful",
     themed: "Its own opening",
+    tied: "Tied gates",
     painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",

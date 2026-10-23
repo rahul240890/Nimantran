@@ -1700,6 +1700,7 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     crafts: "শিল্প আর রং",
     play: "মজাদার",
     themed: "থিমের নিজস্ব শুরু",
+    tied: "বাঁধা দরজা",
     painted: "আঁকা দরজা",
     doors: "দরজা আর ফটক",
     reveals: "পর্দা আর উন্মোচন",
