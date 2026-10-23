@@ -69,8 +69,8 @@ test.describe("blog manager", () => {
     await page.goto("/blog");
     await expect(page.getByRole("link", { name: heading })).toBeVisible();
 
-    // A date ahead schedules it: off the blog until then
-    await page.goBack();
+    // A date ahead schedules it: off the blog until then. Straight to the manager: going back
+    // first raced the router's own reload of the post, which cut this navigation short
     await page.goto("/admin/blog");
     await page.getByRole("link", { name: heading, exact: true }).click();
     await page.getByLabel("Publish date").fill("2030-01-01T09:00");
