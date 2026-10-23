@@ -77,13 +77,23 @@ export async function makeKept(
   const stop = new AbortController();
   entries.set(key, { video: { step: "making", done: 0 }, stop });
   changed();
+  // Stopping takes effect at once, even while the raga is still being rendered: the work
+  // underneath ends at its next check, and what it made is thrown away
+  const stopped = new Promise<never>((_, reject) =>
+    stop.signal.addEventListener("abort", () => reject(new DOMException("Stopped", "AbortError")), {
+      once: true,
+    }),
+  );
+  stopped.catch(() => undefined);
   try {
-    const blob = await make((done) => {
+    const making = make((done) => {
       const entry = entries.get(key);
       if (entry?.stop !== stop) return;
       entries.set(key, { video: { step: "making", done }, stop });
       changed();
     }, stop.signal);
+    making.catch(() => undefined);
+    const blob = await Promise.race([making, stopped]);
     if (keep) URL.revokeObjectURL(keep.href);
     set(key, { video: { step: "ready", blob, href: URL.createObjectURL(blob), ...made } });
     await save(key, blob, made).catch(() => undefined);
