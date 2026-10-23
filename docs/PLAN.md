@@ -1,8 +1,8 @@
 # Shubh Invitation — Build Plan
 
-3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), wrapped as Android/iOS apps later.
+3D invitations with RSVP and guest tools. Web first (works from any WhatsApp link), now being wrapped as Android and iOS apps (Phase 2a, the current work).
 
-**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [MOTION.md](MOTION.md) (regional animation) · [PAYMENTS.md](PAYMENTS.md) (shagun, contributions, tickets) · [PRICING.md](PRICING.md) (personal and business plans) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations).
+**Documents:** [PRODUCT.md](PRODUCT.md) (full feature catalogue: categories, formats, templates, languages, editions, pricing, add-ons) · [MEMORIES.md](MEMORIES.md) (3D gifts) · [COMPETITORS.md](COMPETITORS.md) (Paperless Post and the Indian market) · [TRADITIONS.md](TRADITIONS.md) (regional and religious tradition packs) · [BRAND_SEO.md](BRAND_SEO.md) (name, keywords, SEO) · [MOTION.md](MOTION.md) (regional animation) · [PAYMENTS.md](PAYMENTS.md) (shagun, contributions, tickets) · [PRICING.md](PRICING.md) (personal and business plans) · [PLAN_REVIEW.md](PLAN_REVIEW.md) (open recommendations) · [MOBILE_APP.md](MOBILE_APP.md) (Android and iOS apps, store rules).
 
 We build one step at a time. Each step ends with working, reviewed code pushed to GitHub. Nothing moves forward with known UI bugs.
 
@@ -257,6 +257,21 @@ Built as (part 4, blog manager and SEO, 3 October 2026): **Admin, Blog** to writ
 **Step 18.** Referral credits for hosts and guests.
 **Step 18a.** Platform payments with commission, through a licensed provider's split payments (we never hold the money): shagun and group contributions by UPI, card and netbanking; host KYC via linked accounts; fees shown before paying; automatic ledger and receipts; refunds; "verified family" badge, limits and invite reporting against fake money requests.
 
+## Phase 2a — Android and iOS apps (current, from 23 October 2026)
+
+The owner decided on 2026-10-23 that the website is good enough for now and work moves to the apps (Step 33, brought forward from Phase 5). Full plan, store rules, decisions and owner tasks: [MOBILE_APP.md](MOBILE_APP.md). One Capacitor app for hosts and co-hosts that opens the live site, with native sign-in, sharing, contacts, push notifications and store billing; guests keep opening invitations from their WhatsApp link with nothing to install.
+
+**Step 33a.** App shell: Capacitor 8 project, icons and splash, offline screen, builds to Play internal testing and TestFlight.
+**Step 33b.** App mode on the website: the `/app` start screen, bottom tabs, safe areas, website-only parts hidden.
+**Step 33c.** Sign-in in the app: phone codes with SMS autofill, native Google sign-in, Sign in with Apple, a test number for reviewers.
+**Step 33d.** Native share, save to the phone, and phone contacts for guest import on Android and iPhone.
+**Step 33e.** Push notifications: replies, co-hosts, photos, packages and the morning of each function.
+**Step 33f.** Links that open the app (Android App Links, iOS Universal Links) and "Get the app" banners on host pages.
+**Step 33g.** Buying packages through Google Play Billing and Apple's in-app purchase (decision D1 in MOBILE_APP.md).
+**Step 33h.** App quality pass on four real phones.
+**Step 33i.** Store listings, privacy forms, review and launch.
+**Owner task A1.** Developer accounts as the business (D-U-N-S number), Firebase, sign-in keys, store agreements and the final domain (MOBILE_APP.md, section 7). Start now: some take weeks.
+
 ## Phase 2b — Memories (3D gifts)
 
 Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18). Launch target: Star Map before Valentine's Day.
@@ -305,7 +320,7 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 **Step 30.** Stripe and regional pricing; international templates and categories (Western weddings, Nikah, Chinese, quinceañera, bar and bat mitzvah).
 **Step 31.** More languages including Urdu and Arabic (right-to-left).
 **Step 32.** Gift registry with partner stores (affiliate commission), vendor referrals and live-stream page. (Shagun moved earlier to Steps 17b and 18a.)
-**Step 33.** Android and iOS apps with Capacitor; push notifications. Store listings localised in every launch language, following the app store plan in BRAND_SEO.md.
+**Step 33.** Moved to Phase 2a (Android and iOS apps with Capacitor, push notifications and localised store listings; [MOBILE_APP.md](MOBILE_APP.md)).
 
 ---
 
