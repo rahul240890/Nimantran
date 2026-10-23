@@ -115,6 +115,7 @@ export default async function EditionPage({
   });
   const clip = draft.music.clip;
   const video = {
+    inviteId: id,
     draft,
     functions: storyFunctions(draft, locale),
     photos,

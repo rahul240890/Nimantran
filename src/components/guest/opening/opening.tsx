@@ -27,7 +27,7 @@ import {
   type WelcomeScene,
 } from "@/lib/opening/catalog";
 import { firstGrapheme } from "@/lib/initials";
-import { warmPaintings } from "@/lib/paintings";
+import { warmBlurs, warmPaintings } from "@/lib/paintings";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
@@ -265,6 +265,11 @@ export function Opening({
   useEffect(() => {
     if (ready && pageBeats) warmPaintings(pageBeats.map((beat) => pageImage(suite, beat)));
   }, [ready, pageBeats, suite]);
+  // The pages' blurred copies, a few kilobytes, come at once: on a slow connection a page can
+  // come in on its blurred painting while the painting itself is still on its way
+  useEffect(() => {
+    if (pageBeats) warmBlurs(pageBeats.map((beat) => pageImage(suite, beat)));
+  }, [pageBeats, suite]);
   useOpeningPace(stage, open, still);
   const theme = SUITES[suite];
   const cover = theme.images.cover;

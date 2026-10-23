@@ -84,6 +84,7 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
             </Link>
           </div>
           <VideoCard
+            inviteId={id}
             draft={draft}
             functions={storyFunctions(draft, locale)}
             photos={photos}

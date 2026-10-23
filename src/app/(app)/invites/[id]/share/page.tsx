@@ -92,6 +92,7 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           replies={<RepliesCard inviteId={id} summary={await hostReplies(account, id)} />}
           video={
             <VideoCard
+              inviteId={id}
               draft={live}
               functions={storyFunctions(live, locale)}
               photos={published?.photos ?? []}

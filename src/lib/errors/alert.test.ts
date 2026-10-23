@@ -44,6 +44,10 @@ describe("error alerts", () => {
     );
     expect(isNoise(browser("ChunkLoadError: Loading chunk 812 failed."))).toBe(true);
     expect(isNoise(browser("error event on IMG https://cdn.example"))).toBe(true);
+    expect(
+      isNoise(browser("Transition was aborted because of invalid state. Viewport size changed")),
+    ).toBe(true);
+    expect(isNoise(browser("Skipping view transition because viewport size changed."))).toBe(true);
     expect(isNoise(browser("x is not a function", "at chrome-extension://abc/inject.js:1"))).toBe(
       true,
     );
