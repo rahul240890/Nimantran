@@ -1,5 +1,5 @@
 import { weddingKindCopy } from "@/content/gallery";
-import { faq, homeMeta, pricing } from "@/content/landing";
+import { faq, homeMeta } from "@/content/landing";
 import { seoCopy } from "@/content/seo";
 import { UI_LOCALES, type UiLocale } from "@/i18n/locales";
 import { blogPostPath } from "@/lib/blog/posts";
@@ -43,7 +43,7 @@ export async function GET() {
     "## Key facts",
     "",
     ...faq.items.map((item) => `- ${item.q} ${item.a}`),
-    `- How much does it cost? ${pricing.intro} ${pricing.note}`,
+    "- How much does it cost? Make your invite and share it for free. Choose a package when you want more. One payment per invitation, all taxes included. Never a subscription. Every package covers every function.",
     "",
     "## Main pages",
     "",

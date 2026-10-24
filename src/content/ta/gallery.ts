@@ -95,6 +95,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packageFree: "இலவசம்",
   comparePackages: "பேக்கேஜ்களை ஒப்பிடுங்கள்",
   seeSample: "விருந்தினராக நேரலையில் பாருங்கள்",
+  liveDemo: "லைவ் டெமோ",
+  liveDemoLabel: (name) => `லைவ் டெமோ: ${name}`,
   sampleLabel: "மாதிரி அழைப்பிதழ்",
   sampleNote: "பெயர்கள், தேதிகள் மற்றும் இடங்கள் கற்பனையானவை",
   showAll: (count: number) => `அனைத்து ${count} டிசைன்களையும் காட்டவும்`,

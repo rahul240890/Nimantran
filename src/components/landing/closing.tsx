@@ -16,7 +16,7 @@ export function Closing({ locale }: { locale: UiLocale }) {
   return (
     <section
       aria-labelledby="closing-title"
-      className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8"
+      className="mx-auto w-full max-w-site px-4 pb-16 sm:px-6 sm:pb-20 lg:px-8"
     >
       <div className="relative isolate w-full overflow-hidden rounded-3xl bg-night px-6 py-14 text-card-ivory shadow-overlay sm:px-12 sm:py-16 lg:px-16 lg:py-20">
         <div

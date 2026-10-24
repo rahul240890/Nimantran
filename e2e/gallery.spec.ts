@@ -108,7 +108,7 @@ test.describe("finding a design", () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto("/invitations/birthday");
     // A long list shows its first designs; the rest come with Show all
-    await expect(page.locator("[data-design]")).toHaveCount(24);
+    await expect(page.locator("[data-design]")).toHaveCount(30);
     await page.getByRole("button", { name: /^Show all \d+ designs$/ }).click();
     await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
     // Wedding themes stay with weddings

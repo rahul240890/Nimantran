@@ -88,7 +88,7 @@ export function GallerySearch({
 
   return (
     <>
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-site flex-col gap-3 px-4 sm:px-6 lg:px-8">
         <form
           role="search"
           onSubmit={(event) => event.preventDefault()}
@@ -143,7 +143,7 @@ export function GallerySearch({
       {searching ? (
         <section
           aria-label={galleryCopy.results(hits.length)}
-          className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pt-8 pb-16 sm:px-6 lg:px-8"
+          className="mx-auto flex w-full max-w-site flex-col gap-8 px-4 pt-8 pb-16 sm:px-6 lg:px-8"
         >
           {hits.length === 0 && <p className="text-lg text-ink-muted">{galleryCopy.noResults}</p>}
           {places.length > 0 && (

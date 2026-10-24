@@ -43,7 +43,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-surface-2/60">
       <Mandala className="pointer-events-none absolute -end-24 -bottom-32 -z-10 size-96 text-line-strong opacity-40" />
-      <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr] lg:px-8">
+      <div className="mx-auto grid w-full max-w-site gap-10 px-4 pt-14 pb-10 sm:grid-cols-2 sm:px-6 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr] lg:px-8">
         <div className="flex flex-col gap-4">
           <Logo className="self-start" />
           <p className="font-display text-lg text-ink-muted">{shell.footer.meaning}</p>
@@ -72,12 +72,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
                   </a>
                 ) : (
                   <Link
-                    href={
-                      // The footer goes to the full pricing page; the header to the home section
-                      item.id === "pricing"
-                        ? pagePath({ kind: "pricing" }, locale)
-                        : navHref(item.id, locale)
-                    }
+                    href={navHref(item.id, locale)}
                     prefetch={item.id === "sample" ? false : undefined}
                     className={linkClass}
                   >
@@ -160,7 +155,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
         </nav>
       </div>
       <div className="border-t border-line">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+        <div className="mx-auto flex w-full max-w-site flex-col gap-1 px-4 py-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
           <p>
             © 2026 {siteNameIn(locale)}. {shell.footer.rights}
           </p>

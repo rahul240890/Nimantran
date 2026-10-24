@@ -66,7 +66,7 @@ export function GalleryHero({
   return (
     <section
       aria-labelledby="page-title"
-      className="relative isolate mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pt-4 pb-8 sm:px-6 sm:pb-10 lg:px-8"
+      className="relative isolate mx-auto flex w-full max-w-site flex-col gap-4 px-4 pt-4 pb-8 sm:px-6 sm:pb-10 lg:px-8"
     >
       <div
         aria-hidden
@@ -115,7 +115,7 @@ function Shelf({
   return (
     <section
       aria-labelledby={`${id}-heading`}
-      className={cn("mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6 lg:px-8", className)}
+      className={cn("mx-auto w-full max-w-site px-4 pb-14 sm:px-6 lg:px-8", className)}
     >
       <div className="mb-5 flex flex-col gap-1.5">
         <h2 id={`${id}-heading`} className="font-display text-[1.5rem] leading-tight sm:text-3xl">
@@ -148,7 +148,7 @@ function occasionTile(occasion: Occasion, locale: UiLocale, index: number, featu
 }
 
 /** How many of a list's designs the server draws; the rest wait for Show all (MoreDesigns). */
-const FIRST_DESIGNS = 24;
+const FIRST_DESIGNS = 30;
 
 function DesignGallery({
   locale,
@@ -174,7 +174,7 @@ function DesignGallery({
   );
   return (
     <FormatFilter formats={formats} more={rest.length} total={designs.length}>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
         {first.map((design, index) => {
           const { name, description } = designWords(design, locale);
           return (
@@ -212,7 +212,8 @@ function DesignGallery({
 function KindTiles({ locale }: { locale: UiLocale }) {
   const { weddingKindCopy } = galleryText[locale];
   return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+    // Nine kinds: the first takes four cells, so four columns or six end on a full row
+    <ul className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-6">
       {WEDDING_KINDS.map((kind, index) => {
         const entry = WEDDING_KIND_ENTRIES[kind];
         return (

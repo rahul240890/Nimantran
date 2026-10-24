@@ -281,7 +281,7 @@ function Browse({
 }
 
 /** How many matching designs the grid draws before Show all. */
-const FIRST_RESULTS = 48;
+const FIRST_RESULTS = 60;
 
 /** The page with filters chosen: every matching design in a grid, and the filters to change. */
 function Results({
@@ -487,7 +487,7 @@ function Results({
         </div>
       ) : (
         <div className="flex flex-col gap-6">
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 xl:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
             {drawn.map((entry, index) => (
               <li key={entry.design.id} data-format-item={entry.format}>
                 <CatalogCard
@@ -534,7 +534,7 @@ function Catalog({
   return (
     <div
       data-catalog-live={live || undefined}
-      className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-8"
+      className="mx-auto flex w-full max-w-site flex-col gap-8 px-4 pb-16 sm:px-6 lg:px-8"
     >
       {/* One search box for the rows and the list, so typing the first letter keeps focus */}
       <div className="rounded-xl border border-line bg-surface/70 p-4 shadow-raised sm:p-5">

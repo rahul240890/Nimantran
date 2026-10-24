@@ -4953,6 +4953,9 @@
   --text-4xl: 1.875rem;
   --text-5xl: 2.375rem;
   --text-6xl: 2.75rem;
+
+  /* The public site's width (max-w-site): a laptop's screen, so its rows show more designs */
+  --container-site: 90rem;
 }
 
 /* An invitation keeps the type it was designed in, on a guest's page and in every preview */

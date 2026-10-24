@@ -1,8 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-/* The home page's occasion strip: every main occasion as a round painting, each opening its designs. */
-const tiles = (page: Page) => page.locator("#occasions ul").first().getByRole("listitem");
+/* The home page's occasions: four large painted tiles, then a row of smaller links. */
 
 for (const colorScheme of ["light", "dark"] as const) {
   test(`occasions fit the screen and pass an accessibility check, ${colorScheme}`, async ({
@@ -12,7 +11,7 @@ for (const colorScheme of ["light", "dark"] as const) {
     await page.goto("/");
     const section = page.locator("#occasions");
     await section.scrollIntoViewIfNeeded();
-    await expect(tiles(page)).toHaveCount(14);
+    await expect(section.locator("ul").first().getByRole("listitem")).toHaveCount(4);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
       true,
     );
@@ -24,17 +23,24 @@ for (const colorScheme of ["light", "dark"] as const) {
   });
 }
 
-test("the strip starts with the wedding and ends with every occasion", async ({ page }) => {
+test("the four large tiles start with the wedding, and the row ends with every occasion", async ({
+  page,
+}) => {
   await page.goto("/");
-  await expect(tiles(page).first()).toContainText("Wedding");
-  await expect(tiles(page).filter({ hasText: "Birthday" })).toHaveCount(1);
-  await tiles(page).last().getByRole("link").click();
+  const big = page.locator("#occasions ul").first().getByRole("listitem");
+  await expect(big.first()).toContainText("Wedding");
+  await expect(big.filter({ hasText: "Birthday" })).toHaveCount(1);
+  const more = page.getByRole("list", { name: "More occasions" }).getByRole("listitem");
+  await more.last().getByRole("link").click();
   await expect(page).toHaveURL(/\/invitations$/);
 });
 
 test("an occasion opens its own designs", async ({ page }) => {
   await page.goto("/");
-  await tiles(page).filter({ hasText: "Sangeet" }).getByRole("link").click();
+  await page
+    .getByRole("list", { name: "More occasions" })
+    .getByRole("link", { name: "Sangeet" })
+    .click();
   await expect(page).toHaveURL(/\/invitations\/sangeet$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText("Sangeet");
 });

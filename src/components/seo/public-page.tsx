@@ -7,6 +7,7 @@ import { OfferBar } from "@/components/offers/offer-bar";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
+import { siteMenu } from "@/components/shell/site-menu";
 import { Button } from "@/components/ui/button";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
@@ -40,13 +41,13 @@ export function PublicShell({
   const { seoCopy } = seoText[locale];
   return (
     <div className="relative isolate flex min-h-dvh flex-col">
-      <SiteHeader />
+      <SiteHeader menu={siteMenu(locale)} />
       {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
       <OfferBar />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
         <nav
           aria-label={seoCopy.breadcrumbs}
-          className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 lg:px-8"
+          className="mx-auto w-full max-w-site px-4 pt-6 sm:px-6 lg:px-8"
         >
           <ol className="flex flex-wrap items-center gap-x-1 text-sm text-ink-muted">
             {crumbs.map((crumb, index) => {
@@ -106,7 +107,7 @@ export function PageHero({
   return (
     <section
       aria-labelledby="page-title"
-      className="relative isolate mx-auto grid w-full max-w-6xl gap-10 px-4 pt-6 pb-14 sm:px-6 sm:pb-20 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16 lg:px-8"
+      className="relative isolate mx-auto grid w-full max-w-site gap-10 px-4 pt-6 pb-14 sm:px-6 sm:pb-20 lg:grid-cols-[1.15fr_1fr] lg:items-center lg:gap-16 lg:px-8"
     >
       <div
         aria-hidden
@@ -160,7 +161,7 @@ export function FeatureRow({ locale }: { locale: UiLocale }) {
   const { seoCopy } = seoText[locale];
   return (
     <section className="border-y border-line bg-surface-2/50">
-      <ul className="mx-auto grid w-full max-w-6xl gap-6 px-4 py-10 sm:grid-cols-3 sm:px-6 lg:px-8">
+      <ul className="mx-auto grid w-full max-w-site gap-6 px-4 py-10 sm:grid-cols-3 sm:px-6 lg:px-8">
         {seoCopy.features.map((feature, index) => {
           const Icon = FEATURE_ICONS[index]!;
           return (
@@ -197,7 +198,7 @@ export function Block({
   return (
     <section
       aria-labelledby={`${id}-title`}
-      className={cn("mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8", className)}
+      className={cn("mx-auto w-full max-w-site px-4 py-14 sm:px-6 sm:py-20 lg:px-8", className)}
     >
       <div className="flex max-w-2xl flex-col gap-3">
         <h2

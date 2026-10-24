@@ -1,155 +1,111 @@
-import { ArrowRight, Check, Eye, Search } from "lucide-react";
+import { ArrowRight, Check, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
-import { pagePath } from "@/lib/seo/paths";
+import { suiteImage } from "@/lib/gallery/catalog";
 import { DEMO_PATH } from "@/lib/sample/paths";
-import { designNamesText } from "@/i18n/copy/design-names";
-import { textArea } from "@/lib/suites/areas";
-import { SUITES } from "@/lib/suites/catalog";
-import { DECK_SUITES } from "./deck-suites";
-import { HeroDeck } from "./hero-deck";
+import { pagePath } from "@/lib/seo/paths";
+import type { SuiteId } from "@/lib/suites/catalog";
+import { HomeFlow, type FlowCopy } from "./home-flow";
+
+/** The covers on the phone's first screen; the second is the one chosen and filled in. */
+const FLOW_SUITES = [
+  "kayal",
+  "rajwada-bagh",
+  "noor-bagh",
+  "rajbari",
+  "shahi-savari",
+  "peshwai-wada",
+] as const satisfies readonly SuiteId[];
+
+/** The phone's words in the page's language, as plain strings for the browser. */
+function flowCopy(locale: UiLocale): FlowCopy {
+  const { homeFlow } = landingText[locale];
+  // The phone's counts are worked out here: the browser gets only their words
+  const { people, tally, guests, ...words } = homeFlow.phone;
+  const counts = [4, 2, 2];
+  return {
+    heading: homeFlow.heading,
+    pause: homeFlow.pause,
+    play: homeFlow.play,
+    steps: homeFlow.steps.map((step, index) => ({
+      ...step,
+      label: homeFlow.stepOf(index + 1, homeFlow.steps.length),
+    })),
+    phone: {
+      ...words,
+      cardLang: locale === "en" ? "hi" : undefined,
+      guests: guests.map((name, index) => ({ name, people: people(counts[index]!) })),
+      tally: tally(counts.reduce((sum, count) => sum + count, 0)),
+    },
+  };
+}
 
 /**
- * The first screen: what Shubh Invitation is and a search for any occasion or design, so the
- * way in is above the fold on every phone. A fanned deck of the painted themes stands beside
- * it, before a painted doorway that fades into the page behind the words. The occasions
- * (children) come straight after the search on a phone, before the deck, and run under
- * both on a wide screen.
+ * The first screen: what Shubh Invitation is, its two ways in (start free, or open a live
+ * invitation), and a phone beside them that plays the whole journey, from choosing a design
+ * to the guests' replies, so a family sees in a few seconds how it works.
  */
-export function Hero({ locale, children }: { locale: UiLocale; children?: ReactNode }) {
-  const { hero, homeGallery } = landingText[locale];
-  const gallery = pagePath({ kind: "gallery" }, locale);
+export function Hero({ locale }: { locale: UiLocale }) {
+  const { hero, shell } = landingText[locale];
   return (
     <section aria-labelledby="hero-title" className="relative isolate overflow-hidden">
       <div
         aria-hidden
-        className="absolute inset-x-0 top-0 -z-10 h-[26rem] [mask-image:linear-gradient(to_bottom,black_20%,transparent)] lg:inset-y-0 lg:h-auto lg:[mask-image:linear-gradient(to_left,black_40%,transparent_85%),linear-gradient(to_bottom,black_75%,transparent)] lg:[mask-composite:intersect]"
+        className="absolute inset-x-0 top-0 -z-10 h-[26rem] [mask-image:linear-gradient(to_bottom,black_20%,transparent)] xl:inset-y-0 xl:h-auto xl:[mask-image:linear-gradient(to_left,black_30%,transparent_80%),linear-gradient(to_bottom,black_75%,transparent)] xl:[mask-composite:intersect]"
       >
         <Image
           src="/home/doorway.webp"
           alt=""
           fill
-          // The first screen's largest picture: fetched first, ahead of everything below
           loading="eager"
           fetchPriority="high"
           sizes="100vw"
-          className="object-cover object-[78%_center] opacity-20 lg:object-right lg:opacity-60 dark:opacity-15 lg:dark:opacity-35"
+          className="object-cover object-[78%_center] opacity-15 xl:object-right xl:opacity-40 dark:opacity-10 xl:dark:opacity-25"
         />
       </div>
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-8 px-4 pt-8 pb-6 sm:px-6 sm:pt-12 lg:grid-cols-[1fr_1.05fr] lg:gap-x-12 lg:gap-y-10 lg:px-8 lg:pt-10 lg:pb-8">
-        <div className="order-1 flex min-w-0 animate-rise flex-col gap-5 sm:gap-6">
+      <div className="mx-auto grid w-full max-w-site items-center gap-10 px-4 pt-8 pb-12 sm:px-6 sm:pt-12 lg:px-8 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-14 xl:pt-10 xl:pb-14">
+        <div className="flex min-w-0 animate-rise flex-col gap-5 max-xl:mx-auto max-xl:max-w-2xl max-xl:items-center max-xl:text-center sm:gap-6">
           <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
             {hero.eyebrow}
           </p>
           <h1
             id="hero-title"
-            className="font-display text-[2.1rem] leading-[1.04] sm:text-6xl lg:text-[2.95rem]"
+            className="font-display text-[2.2rem] leading-[1.04] sm:text-5xl xl:text-6xl"
           >
             {hero.title}
           </h1>
           <p className="max-w-[34rem] text-lg text-ink-muted sm:text-xl">{hero.body}</p>
-
-          {/* A plain form, so searching works before the page's scripts have loaded */}
-          <form
-            role="search"
-            action={gallery}
-            method="get"
-            className="flex w-full max-w-xl items-center gap-2 rounded-full border border-line-control bg-surface p-1.5 ps-4 shadow-float focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/35 sm:ps-5"
-          >
-            <Search aria-hidden className="size-5 shrink-0 text-ink-muted" />
-            <label htmlFor="home-search" className="sr-only">
-              {homeGallery.searchLabel}
-            </label>
-            <input
-              id="home-search"
-              name="q"
-              type="search"
-              placeholder={homeGallery.searchPlaceholder}
-              autoComplete="off"
-              enterKeyHint="search"
-              className="h-11 min-w-0 flex-1 bg-transparent text-base text-ink outline-none placeholder:text-ink-faint [&::-webkit-search-cancel-button]:hidden"
-            />
-            <Button type="submit" size="sm" className="rounded-full max-[359px]:px-3">
-              {homeGallery.search}
+          <div className="flex flex-wrap gap-3 max-xl:justify-center max-sm:w-full max-sm:max-w-xs max-sm:flex-col">
+            <Button asChild size="lg">
+              <Link href={pagePath({ kind: "gallery" }, locale)} data-hero-start>
+                {shell.createInvite}
+                <ArrowRight aria-hidden className="rtl:rotate-180" />
+              </Link>
             </Button>
-          </form>
-
-          <div className="flex max-w-xl flex-col gap-2.5">
-            <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {hero.popular}
-            </p>
-            <ul className="flex flex-wrap gap-2">
-              {hero.popularSearches.map((word) => (
-                <li key={word}>
-                  <Link
-                    href={`${gallery}?q=${encodeURIComponent(word)}`}
-                    className="inline-flex min-h-11 items-center rounded-full border border-line bg-surface/80 px-4 text-sm font-semibold text-ink transition-colors hover:border-line-strong hover:bg-surface focus-visible:outline-2 focus-visible:outline-ring"
-                  >
-                    {word}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <Button asChild size="lg" variant="secondary">
+              {/* Another demo design each time: the address picks one, so never prefetched */}
+              <Link href={DEMO_PATH} prefetch={false} data-hero-sample>
+                <PlayCircle aria-hidden className="text-accent-text" />
+                {hero.sample}
+              </Link>
+            </Button>
           </div>
-
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 pt-1">
-            <div className="flex flex-wrap gap-3">
-              <Button asChild>
-                {/* Another demo design each time: the address picks one, so never prefetched */}
-                <Link href={DEMO_PATH} prefetch={false} data-hero-sample>
-                  <Eye aria-hidden />
-                  {hero.sample}
-                </Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link href={pagePath({ kind: "designs" }, locale)}>
-                  {hero.primary}
-                  <ArrowRight aria-hidden className="rtl:rotate-180" />
-                </Link>
-              </Button>
-            </div>
-            <ul className="flex flex-wrap gap-x-5 gap-y-2 text-[0.95rem] text-ink-muted">
-              {hero.proof.map((item) => (
-                <li key={item} className="inline-flex items-center gap-2">
-                  <Check aria-hidden className="size-4 text-success" strokeWidth={2.5} />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-ui text-ink-muted max-xl:justify-center">
+            {hero.proof.map((item) => (
+              <li key={item} className="inline-flex items-center gap-2">
+                <Check aria-hidden className="size-4 text-success" strokeWidth={2.5} />
+                {item}
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="order-3 min-w-0 lg:order-2">
-          {/* Only the deck's own themes go to the browser, not the whole catalogue */}
-          <HeroDeck
-            cards={DECK_SUITES.map((suite) => {
-              const name = designNamesText[locale].names[suite];
-              return {
-                suite,
-                name,
-                cover: SUITES[suite].images.cover!,
-                area: textArea(suite, "cover"),
-                show: homeGallery.showTheme(name),
-              };
-            })}
-            copy={{
-              card: {
-                families: hero.card.families,
-                first: hero.card.first,
-                joiner: hero.card.joiner,
-                second: hero.card.second,
-                date: homeGallery.coverDate,
-              },
-              deckLabel: homeGallery.deckLabel,
-              previousTheme: homeGallery.previousTheme,
-              nextTheme: homeGallery.nextTheme,
-            }}
-          />
-        </div>
-        {children && <div className="order-2 min-w-0 lg:order-3 lg:col-span-2">{children}</div>}
+        <HomeFlow
+          copy={flowCopy(locale)}
+          pictures={FLOW_SUITES.map((suite) => suiteImage(suite, "cover") ?? "")}
+        />
       </div>
     </section>
   );

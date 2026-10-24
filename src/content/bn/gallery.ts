@@ -93,6 +93,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packageFree: "বিনামূল্যে",
   comparePackages: "প্যাকেজগুলো তুলনা করুন",
   seeSample: "অতিথি হয়ে লাইভ দেখুন",
+  liveDemo: "লাইভ ডেমো",
+  liveDemoLabel: (name) => `লাইভ ডেমো: ${name}`,
   sampleLabel: "নমুনা নিমন্ত্রণপত্র",
   sampleNote: "নাম, তারিখ আর জায়গা সবই কাল্পনিক",
   showAll: (count: number) => `সব ${count}টি ডিজাইন দেখান`,
