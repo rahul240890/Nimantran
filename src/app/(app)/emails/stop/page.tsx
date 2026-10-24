@@ -37,7 +37,7 @@ export default async function StopRemindersPage({ searchParams }: PageProps<"/em
       <div className="flex w-full max-w-md flex-col items-center gap-5 rounded-lg border border-line bg-surface p-6 text-center shadow-raised sm:p-8">
         <BrandMark className="size-16 text-accent-text" />
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-[2rem] leading-tight text-ink">{title}</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight text-ink">{title}</h1>
           <p className="text-ink-muted">{body}</p>
         </div>
         {!done && !failed ? (

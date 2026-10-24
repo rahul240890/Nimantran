@@ -186,16 +186,32 @@ test.describe("landing page", () => {
     await expect(menu).toBeHidden();
   });
 
-  test("the theme switch in the header applies", async ({ page }) => {
+  test("the theme switch in the footer applies", async ({ page }) => {
     await visit(page);
-    if (isPhone(page)) {
-      await page.getByRole("button", { name: "Open menu" }).click();
-      await page.getByRole("radio", { name: "Dark" }).click();
-    } else {
-      await page.getByRole("button", { name: /^Colour theme/ }).click();
-      await page.getByRole("menuitemradio", { name: "Dark" }).click();
-    }
+    await page.getByRole("contentinfo").getByRole("radio", { name: "Dark" }).click();
     await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  });
+
+  test("the header keeps to five links: wedding designs, all designs, a live invitation, pricing and help", async ({
+    page,
+  }) => {
+    await visit(page);
+    if (isPhone(page)) await page.getByRole("button", { name: "Open menu" }).click();
+    const nav = page.getByRole("navigation", { name: "Main" });
+    await expect(nav.getByRole("link")).toHaveText([
+      "Wedding designs",
+      "All designs",
+      "Live invitation",
+      "Pricing",
+      "Help on WhatsApp",
+    ]);
+    await expect(nav.getByRole("link", { name: "Wedding designs" })).toHaveAttribute(
+      "href",
+      "/invitations/wedding",
+    );
+    const help = nav.getByRole("link", { name: "Help on WhatsApp" });
+    await expect(help).toHaveAttribute("href", "/help/whatsapp");
+    await expect(help).toHaveAttribute("target", "_blank");
   });
 
   test("FAQ answers open and close", async ({ page }) => {

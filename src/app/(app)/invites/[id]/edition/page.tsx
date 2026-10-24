@@ -163,7 +163,7 @@ export default async function EditionPage({
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {upgradeCopy.eyebrow}
               </p>
-              <h1 className="font-display text-[2rem] leading-[1.08] sm:text-[2.6rem]">
+              <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2.15rem]">
                 {upgradeCopy.title}
               </h1>
               <p className="text-ink-muted">{upgradeCopy.intro(inviteNames(draft))}</p>

@@ -41,7 +41,7 @@ export function CollectionTiles({
       className="flex scroll-mt-24 flex-col gap-5 outline-none"
     >
       <div className="flex flex-col gap-1">
-        <h2 id="collections-heading" className="font-display text-2xl sm:text-[1.7rem]">
+        <h2 id="collections-heading" className="font-display text-2xl sm:text-[1.5rem]">
           {collectionCopy.heading}
         </h2>
         <p className="text-sm text-ink-muted">{collectionCopy.intro}</p>

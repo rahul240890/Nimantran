@@ -169,7 +169,7 @@ export function EngineReview({
           <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
             Step 4 · Invitation engine
           </p>
-          <h1 className="font-display text-[2.2rem] leading-[1.05] sm:text-5xl">
+          <h1 className="font-display text-[1.9rem] leading-[1.05] sm:text-5xl">
             The card your guests open
           </h1>
           <p className="max-w-2xl text-lg text-ink-muted">

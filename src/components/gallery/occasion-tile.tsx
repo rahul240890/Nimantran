@@ -140,7 +140,9 @@ export function OccasionTile({
               {otherName.text}
             </span>
           )}
-          <span className="font-display text-xl leading-tight break-words">{name}</span>
+          <span className="font-display text-xl leading-tight break-words hyphens-auto">
+            {name}
+          </span>
           <span className="text-sm text-ink-muted">{tagline}</span>
         </span>
       </div>
@@ -248,7 +250,7 @@ export function PaintedTile({
             className={cn(
               "font-display leading-[1.1] break-words text-ink",
               feature
-                ? "text-[1.75rem] sm:text-[2.2rem]"
+                ? "text-[1.55rem] sm:text-[1.9rem]"
                 : compact
                   ? "text-base sm:text-lg"
                   : "text-[1.2rem] sm:text-[1.35rem]",

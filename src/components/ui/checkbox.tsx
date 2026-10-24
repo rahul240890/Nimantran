@@ -20,7 +20,7 @@ type CheckboxProps = {
   className?: string;
 };
 
-/** A 22px box inside a full-row 44px hit area. Supports a mixed (indeterminate) state. */
+/** A 24px box (WCAG 2.2's smallest target, whatever sits beside it) inside a full-row 44px hit area. Supports a mixed (indeterminate) state. */
 export function Checkbox({
   label,
   description,
@@ -40,9 +40,9 @@ export function Checkbox({
         aria-invalid={invalid || undefined}
         aria-describedby={descriptionId}
         className={cn(
-          "peer relative mt-px grid size-[22px] shrink-0 cursor-pointer place-items-center rounded-[6px] border-2 border-line-control bg-surface text-on-marigold",
+          "peer relative mt-px grid size-6 shrink-0 cursor-pointer place-items-center rounded-[6px] border-2 border-line-control bg-surface text-on-marigold",
           "transition-[background-color,border-color,transform,box-shadow] duration-200 ease-spring",
-          "before:absolute before:-inset-[11px] before:content-['']",
+          "before:absolute before:-inset-[10px] before:content-['']",
           "hover:border-ink-muted active:scale-90",
           "data-[state=checked]:border-marigold data-[state=checked]:bg-marigold data-[state=checked]:shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_1px_0_var(--marigold-edge)]",
           "data-[state=indeterminate]:border-marigold data-[state=indeterminate]:bg-marigold",

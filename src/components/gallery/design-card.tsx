@@ -468,7 +468,7 @@ export function DesignPreview({
           <div className="flex w-full max-w-md flex-col gap-5 self-center px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] lg:min-h-dvh lg:max-w-[30rem] lg:justify-center lg:self-start lg:px-0 lg:py-12">
             <div className="flex flex-col gap-2">
               {badge ?? <TierBadge designId={design.id} className="self-start" />}
-              <DialogPrimitive.Title className="font-display text-[2rem] leading-tight sm:text-[2.4rem]">
+              <DialogPrimitive.Title className="font-display text-[1.75rem] leading-tight sm:text-[2rem]">
                 {name}
               </DialogPrimitive.Title>
               <p className="flex items-center gap-1.5 text-sm text-card-ivory/80">

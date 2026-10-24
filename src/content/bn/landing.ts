@@ -14,58 +14,21 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "designs", label: "ডিজাইন" },
-  { id: "collections", label: "সংগ্রহ" },
-  { id: "weddings", label: "বিয়ে" },
-  { id: "occasions", label: "উপলক্ষ" },
-  { id: "how-it-works", label: "কীভাবে কাজ করে" },
+  { id: "weddings", label: "বিয়ের ডিজাইন" },
+  { id: "designs", label: "সব ডিজাইন" },
+  { id: "sample", label: "নমুনা নিমন্ত্রণপত্র" },
   { id: "pricing", label: "দাম" },
+  { id: "help", label: "হোয়াটসঅ্যাপে সাহায্য" },
 ];
-
-export const menuCopy: Translation<typeof en.menuCopy> = {
-  photos: "আঁকা বা ছবি দিয়ে",
-  kinds: "নিমন্ত্রণের ধরন অনুযায়ী",
-  popular: "জনপ্রিয়",
-  regions: "অঞ্চল অনুযায়ী",
-  communities: "সম্প্রদায় ও ধর্ম অনুযায়ী",
-  looks: "সাজ অনুযায়ী",
-  lookNames: {
-    garden: "বাগান আর ফুল",
-    palace: "রাজপ্রাসাদ",
-    temple: "মন্দির আর আশীর্বাদ",
-    lotus: "পদ্ম",
-    peacock: "ময়ূর",
-    sea: "সমুদ্র আর ব্যাকওয়াটার",
-    night: "রাত আর প্রদীপ",
-    balloon: "বেলুন আর পার্টি",
-    modern: "আধুনিক ও ছিমছাম",
-  },
-  functions: "বিয়ের অনুষ্ঠান",
-  allDesigns: (count: number) => `সব ${count}টি ডিজাইন দেখুন`,
-  allWeddings: "বিয়ের সব ডিজাইন",
-  allOccasions: "সব উপলক্ষ",
-  designsFeature: {
-    title: "আঁকা বা আপনার ছবি দিয়ে",
-    text: "শুধু হাতে আঁকা শিল্প, আপনাদের দুজনের ছবি, বা দুজনের আলাদা ছবি: প্রতিটি ডিজাইনে লেখা থাকে কোনটি, আর তার দাম।",
-  },
-  weddingsFeature: {
-    title: "বিয়ের নিমন্ত্রণপত্র",
-    text: "সব অনুষ্ঠান একটি আঁকা নিমন্ত্রণপত্রে, আপনার রীতিতে লেখা, RSVP-সহ।",
-  },
-  occasionsFeature: {
-    title: "প্রতিটি উৎসব",
-    text: "জন্মদিন, গৃহপ্রবেশ, সাধ, পুজো আর আরও অনেক কিছু, প্রতিটির নিজস্ব ডিজাইন।",
-  },
-};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "মূল অংশে যান",
   primaryNav: "প্রধান",
   openMenu: "মেনু খুলুন",
   menuTitle: "মেনু",
-  createInvite: "নিমন্ত্রণপত্র তৈরি করুন",
+  createInvite: "বিনামূল্যে শুরু করুন",
   faq: "প্রশ্নোত্তর",
-  createInviteShort: "নিমন্ত্রণ বানান",
+  createInviteShort: "বিনামূল্যে শুরু",
   language: {
     label: "ভাষা",
     current: (name) => `ভাষা: ${name}`,
@@ -73,6 +36,7 @@ export const shell: Translation<typeof en.shell> = {
     note: "মারাঠি, গুজরাটি, বাংলা আর তামিল নতুন; মাতৃভাষীরা এগুলো যাচাই করছেন। তেলুগু, কন্নড়, মালয়ালম আর পাঞ্জাবি পরে আসবে।",
   },
   themeHeading: "থিম",
+  helpMessage: "নমস্কার Shubh Invitation, আমার নিমন্ত্রণপত্র বানাতে সাহায্য চাই।",
   footer: {
     tagline: "3D নিমন্ত্রণপত্র, যা অতিথিরা খোলেন, ঘোরান আর রেখে দেন।",
     explore: "ঘুরে দেখুন",

@@ -159,7 +159,7 @@ export function PhotoAlbum({
             <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
               {copy.eyebrow}
             </p>
-            <h1 className="font-display text-[2rem] leading-[1.08] break-words sm:text-[2.6rem]">
+            <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
               {names}
             </h1>
             <p className="max-w-2xl text-ink-muted">{copy.intro}</p>

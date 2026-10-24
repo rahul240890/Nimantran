@@ -141,7 +141,7 @@ export function BlogIndexPage({
         </p>
         <h1
           id="page-title"
-          className="max-w-3xl font-display text-[2.3rem] leading-[1.06] break-words sm:text-[3.4rem]"
+          className="max-w-3xl font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.6rem]"
         >
           {blogCopy.heading}
         </h1>
@@ -331,7 +331,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           </p>
           <h1
             id="page-title"
-            className="font-display text-[2.2rem] leading-[1.08] break-words sm:text-[3.1rem]"
+            className="font-display text-[1.9rem] leading-[1.08] break-words sm:text-[2.45rem]"
           >
             {post.heading}
           </h1>

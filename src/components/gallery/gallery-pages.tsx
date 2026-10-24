@@ -82,7 +82,7 @@ export function GalleryHero({
       </p>
       <h1
         id="page-title"
-        className="font-display text-[2.3rem] leading-[1.06] break-words sm:text-[3.2rem] lg:text-[3.6rem]"
+        className="font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.5rem] lg:text-[2.7rem]"
       >
         {native && (
           <span
@@ -118,7 +118,7 @@ function Shelf({
       className={cn("mx-auto w-full max-w-6xl px-4 pb-14 sm:px-6 lg:px-8", className)}
     >
       <div className="mb-5 flex flex-col gap-1.5">
-        <h2 id={`${id}-heading`} className="font-display text-[1.7rem] leading-tight sm:text-3xl">
+        <h2 id={`${id}-heading`} className="font-display text-[1.5rem] leading-tight sm:text-3xl">
           {heading}
         </h2>
         {intro && <p className="max-w-2xl text-ink-muted">{intro}</p>}

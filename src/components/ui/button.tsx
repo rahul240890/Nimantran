@@ -43,7 +43,7 @@ const variants: Record<ButtonVariant, string> = {
  */
 const sizes: Record<ButtonSize, string> = {
   sm: "h-11 px-4 text-sm [&_svg]:size-4",
-  md: "h-12 px-5 text-base",
+  md: "h-12 px-5 text-ui",
   lg: "min-h-14 px-7 py-2 text-lg text-balance whitespace-normal",
 };
 

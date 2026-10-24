@@ -13,58 +13,21 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "designs", label: "डिझाइन" },
-  { id: "collections", label: "संग्रह" },
-  { id: "weddings", label: "लग्न" },
-  { id: "occasions", label: "प्रसंग" },
-  { id: "how-it-works", label: "हे कसे चालते" },
+  { id: "weddings", label: "लग्नाचे डिझाइन" },
+  { id: "designs", label: "सर्व डिझाइन" },
+  { id: "sample", label: "जिवंत निमंत्रण" },
   { id: "pricing", label: "किंमत" },
+  { id: "help", label: "व्हॉट्सॲपवर मदत" },
 ];
-
-export const menuCopy: Translation<typeof en.menuCopy> = {
-  photos: "चित्रांचे किंवा फोटोसह",
-  kinds: "निमंत्रणाच्या प्रकारानुसार",
-  popular: "लोकप्रिय",
-  regions: "प्रदेशानुसार",
-  communities: "समाज आणि धर्मानुसार",
-  looks: "रूपानुसार",
-  lookNames: {
-    garden: "बाग आणि फुले",
-    palace: "राजेशाही महाल",
-    temple: "मंदिर आणि आशीर्वाद",
-    lotus: "कमळ",
-    peacock: "मोर",
-    sea: "समुद्र आणि बॅकवॉटर",
-    night: "रात्र आणि दिवे",
-    balloon: "फुगे आणि पार्टी",
-    modern: "आधुनिक आणि साधे",
-  },
-  functions: "लग्नाचे सोहळे",
-  allDesigns: (count: number) => `सर्व ${count} डिझाइन पाहा`,
-  allWeddings: "लग्नाची सर्व डिझाइन",
-  allOccasions: "सर्व प्रसंग",
-  designsFeature: {
-    title: "चित्रांचे किंवा आपल्या फोटोसह",
-    text: "फक्त चित्रकला, आपला जोडप्याचा फोटो, किंवा दोघांचा वेगवेगळा फोटो: प्रत्येक डिझाइनवर कोणते ते आणि त्याची किंमत लिहिलेली असते.",
-  },
-  weddingsFeature: {
-    title: "लग्नाची निमंत्रणे",
-    text: "सर्व सोहळे एकाच चित्रित निमंत्रणावर, आपल्या परंपरेनुसार लिहिलेले, RSVP सह.",
-  },
-  occasionsFeature: {
-    title: "प्रत्येक सोहळा",
-    text: "वाढदिवस, गृहप्रवेश, डोहाळे जेवण, पूजा आणि बरेच काही, प्रत्येकाची स्वतःची डिझाइन.",
-  },
-};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "मुख्य मजकुराकडे जा",
   primaryNav: "मुख्य",
   openMenu: "मेनू उघडा",
   menuTitle: "मेनू",
-  createInvite: "आपले निमंत्रण बनवा",
+  createInvite: "मोफत सुरू करा",
   faq: "प्रश्नोत्तरे",
-  createInviteShort: "निमंत्रण बनवा",
+  createInviteShort: "मोफत सुरू करा",
   language: {
     label: "भाषा",
     current: (name) => `भाषा: ${name}`,
@@ -72,6 +35,7 @@ export const shell: Translation<typeof en.shell> = {
     note: "मराठी, गुजराती, बंगाली आणि तमिळ नव्या आहेत; मूळ भाषक त्या तपासत आहेत. तेलुगू, कन्नड, मल्याळम आणि पंजाबी पुढे येतील.",
   },
   themeHeading: "थीम",
+  helpMessage: "नमस्कार Shubh Invitation, मला माझे निमंत्रण बनवण्यासाठी मदत हवी आहे.",
   footer: {
     tagline: "3D निमंत्रणे, जी पाहुणे उघडतात, फिरवतात आणि जपतात.",
     explore: "पाहा",

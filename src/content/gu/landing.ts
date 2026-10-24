@@ -11,58 +11,21 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "designs", label: "ડિઝાઇન" },
-  { id: "collections", label: "સંગ્રહ" },
-  { id: "weddings", label: "લગ્ન" },
-  { id: "occasions", label: "પ્રસંગો" },
-  { id: "how-it-works", label: "કેવી રીતે ચાલે છે" },
+  { id: "weddings", label: "લગ્નની ડિઝાઇન" },
+  { id: "designs", label: "બધી ડિઝાઇન" },
+  { id: "sample", label: "જીવંત આમંત્રણ" },
   { id: "pricing", label: "કિંમત" },
+  { id: "help", label: "વૉટ્સએપ પર મદદ" },
 ];
-
-export const menuCopy: Translation<typeof en.menuCopy> = {
-  photos: "ચિત્રવાળી કે ફોટા સાથે",
-  kinds: "આમંત્રણના પ્રકાર પ્રમાણે",
-  popular: "લોકપ્રિય",
-  regions: "પ્રદેશ પ્રમાણે",
-  communities: "સમાજ અને ધર્મ પ્રમાણે",
-  looks: "દેખાવ પ્રમાણે",
-  lookNames: {
-    garden: "બાગ અને ફૂલ",
-    palace: "શાહી મહેલ",
-    temple: "મંદિર અને આશીર્વાદ",
-    lotus: "કમળ",
-    peacock: "મોર",
-    sea: "દરિયો અને બૅકવૉટર",
-    night: "રાત અને દીવા",
-    balloon: "ફુગ્ગા અને પાર્ટી",
-    modern: "આધુનિક અને સાદી",
-  },
-  functions: "લગ્નના પ્રસંગો",
-  allDesigns: (count: number) => `બધી ${count} ડિઝાઇન જુઓ`,
-  allWeddings: "લગ્નની બધી ડિઝાઇન",
-  allOccasions: "બધા પ્રસંગો",
-  designsFeature: {
-    title: "ચિત્રવાળી કે આપના ફોટા સાથે",
-    text: "ફક્ત ચિત્રકામ, જોડીનો ફોટો, કે આપ બંનેનો અલગ ફોટો: દરેક ડિઝાઇન કહે છે કયું, અને તેની કિંમત.",
-  },
-  weddingsFeature: {
-    title: "લગ્નનાં આમંત્રણ",
-    text: "દરેક પ્રસંગ એક ચિત્રવાળા આમંત્રણ પર, આપની પરંપરા પ્રમાણે લખેલો, જવાબ સાથે.",
-  },
-  occasionsFeature: {
-    title: "દરેક ઉજવણી",
-    text: "જન્મદિવસ, ગૃહપ્રવેશ, સીમંત, પૂજા અને બીજું ઘણું, દરેકની પોતાની ડિઝાઇન સાથે.",
-  },
-};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "મુખ્ય સામગ્રી પર જાઓ",
   primaryNav: "મુખ્ય",
   openMenu: "મેનૂ ખોલો",
   menuTitle: "મેનૂ",
-  createInvite: "આપનું આમંત્રણ બનાવો",
+  createInvite: "મફત શરૂ કરો",
   faq: "સવાલ-જવાબ",
-  createInviteShort: "આમંત્રણ બનાવો",
+  createInviteShort: "મફત શરૂ કરો",
   language: {
     label: "ભાષા",
     current: (name) => `ભાષા: ${name}`,
@@ -70,6 +33,7 @@ export const shell: Translation<typeof en.shell> = {
     note: "મરાઠી, ગુજરાતી, બંગાળી અને તમિલ નવી છે; માતૃભાષીઓ તેને ચકાસી રહ્યા છે. તેલુગુ, કન્નડ, મલયાલમ અને પંજાબી પછી આવશે.",
   },
   themeHeading: "થીમ",
+  helpMessage: "નમસ્તે Shubh Invitation, મારે મારું આમંત્રણ બનાવવામાં મદદ જોઈએ છે.",
   footer: {
     tagline: "3D આમંત્રણ, જે મહેમાનો ખોલે, ફેરવે અને સાચવે.",
     explore: "જુઓ",

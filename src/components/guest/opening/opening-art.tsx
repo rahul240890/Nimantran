@@ -718,7 +718,7 @@ export function SymbolMark({ god }: { god: OpeningGod }) {
       aria-hidden
       className={cn(
         "leading-none whitespace-nowrap text-(--open-medallion-ink,var(--card-gold-text))",
-        symbol.font === "display" ? "font-display" : "font-sans",
+        symbol.font === "display" ? "font-card-display" : "font-sans",
       )}
       style={{ fontSize: `${62 * glyphScale(symbol)}cqh` }}
     >

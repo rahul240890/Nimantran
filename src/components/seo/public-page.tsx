@@ -7,7 +7,6 @@ import { OfferBar } from "@/components/offers/offer-bar";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
-import { siteMenu } from "@/components/shell/site-menu";
 import { Button } from "@/components/ui/button";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
@@ -41,7 +40,7 @@ export function PublicShell({
   const { seoCopy } = seoText[locale];
   return (
     <div className="relative isolate flex min-h-dvh flex-col">
-      <SiteHeader menu={siteMenu(locale)} />
+      <SiteHeader />
       {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
       <OfferBar />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
@@ -124,7 +123,7 @@ export function PageHero({
         </p>
         <h1
           id="page-title"
-          className="font-display text-[2.3rem] leading-[1.06] break-words sm:text-[3.4rem] lg:text-[3.9rem]"
+          className="font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.6rem] lg:text-[2.85rem]"
         >
           {heading}
         </h1>
@@ -203,7 +202,7 @@ export function Block({
       <div className="flex max-w-2xl flex-col gap-3">
         <h2
           id={`${id}-title`}
-          className="font-display text-[1.9rem] leading-tight sm:text-[2.5rem]"
+          className="font-display text-[1.65rem] leading-tight sm:text-[2.1rem]"
         >
           {heading}
         </h2>

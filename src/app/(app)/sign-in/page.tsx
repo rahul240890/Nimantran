@@ -93,7 +93,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 {signInCopy.eyebrow}
               </p>
-              <h1 className="font-display text-[2rem] leading-[1.08] sm:text-[2.4rem]">
+              <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2rem]">
                 {mode === "off"
                   ? signInCopy.off.title
                   : account

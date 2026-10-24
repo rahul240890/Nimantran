@@ -84,6 +84,8 @@ export function HeroDeck({ cards, copy }: { cards: readonly DeckCard[]; copy: De
       <div
         role="img"
         aria-label={`${copy.deckLabel}: ${front.name}`}
+        // Painted invitation cards: their lettering, not the site's (globals.css)
+        data-invitation
         className="relative isolate aspect-[4/5] w-full max-w-[26rem] sm:max-w-[30rem]"
       >
         <div

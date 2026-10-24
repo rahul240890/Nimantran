@@ -1,6 +1,7 @@
 import { Logo } from "@/components/brand/logo";
 import { Mandala } from "@/components/brand/mandala";
 import { SocialLinks } from "@/components/brand/social-links";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 import Link from "next/link";
 import { editorText } from "@/i18n/copy/editor";
 import { landingText } from "@/i18n/copy/landing";
@@ -14,14 +15,14 @@ import { pagePath } from "@/lib/seo/paths";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
 import { siteNameIn } from "@/lib/site";
 import { cn } from "@/lib/cn";
-import { navHref } from "./nav-links";
+import { isHelpLink, navHref } from "./nav-links";
 
 export function SiteFooter({ locale }: { locale: UiLocale }) {
   const { nav, shell } = landingText[locale];
   const { seoCopy } = seoText[locale];
   const { legalCopy } = legalText[locale];
   const { traditionCopy } = editorText[locale];
-  const { social } = uiText[locale].uiStrings;
+  const { social, theme } = uiText[locale].uiStrings;
   const home = homePath(locale);
   const linkClass =
     "inline-flex min-h-11 items-center rounded-md px-2 text-ink transition-colors hover:text-accent-text";
@@ -60,17 +61,29 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
           <ul className="-ms-2 mt-3 flex flex-col">
             {nav.map((item) => (
               <li key={item.id}>
-                <Link
-                  href={
-                    // The footer goes to the full pricing page; the header to the home section
-                    item.id === "pricing"
-                      ? pagePath({ kind: "pricing" }, locale)
-                      : navHref(item.id, locale)
-                  }
-                  className={linkClass}
-                >
-                  {item.label}
-                </Link>
+                {isHelpLink(item.id) ? (
+                  <a
+                    href={navHref(item.id, locale)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={linkClass}
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    href={
+                      // The footer goes to the full pricing page; the header to the home section
+                      item.id === "pricing"
+                        ? pagePath({ kind: "pricing" }, locale)
+                        : navHref(item.id, locale)
+                    }
+                    prefetch={item.id === "sample" ? false : undefined}
+                    className={linkClass}
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </li>
             ))}
             <li>
@@ -122,6 +135,10 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
               </li>
             ))}
           </ul>
+          {/* Light, dark or the device's own: here rather than in the header, which keeps to
+              finding a design (owner, 2026-10-24) */}
+          <h2 className={cn(headingClass, "mt-8")}>{shell.themeHeading}</h2>
+          <ThemeToggle labels={theme} className="mt-3" />
         </div>
 
         <nav

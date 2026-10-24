@@ -10,7 +10,7 @@ export default async function InviteNotFound() {
     <main className="grid min-h-dvh place-items-center px-4 py-16">
       <div className="flex max-w-md flex-col items-center gap-5 text-center">
         <BrandMark className="size-20 text-accent-text" />
-        <h1 className="font-display text-[2rem] leading-tight">{guestCopy.notFoundTitle}</h1>
+        <h1 className="font-display text-[1.75rem] leading-tight">{guestCopy.notFoundTitle}</h1>
         <p className="text-ink-muted">{guestCopy.notFoundBody}</p>
         <Button asChild variant="secondary">
           <Link href="/">{guestCopy.home}</Link>

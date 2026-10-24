@@ -28,7 +28,7 @@ export function ErrorView({
       <div role="alert" className="flex max-w-md flex-col items-center gap-5 text-center">
         <BrandMark className="size-20 text-accent-text" />
         <div className="flex flex-col gap-2">
-          <h1 className="font-display text-[2rem] leading-tight">{copy.title}</h1>
+          <h1 className="font-display text-[1.75rem] leading-tight">{copy.title}</h1>
           <p className="text-ink-muted">{copy.body}</p>
         </div>
         <div className="flex flex-wrap justify-center gap-3">

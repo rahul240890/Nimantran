@@ -525,7 +525,7 @@ export function Editor({
         <h1
           ref={heading}
           tabIndex={-1}
-          className="font-display text-[2rem] leading-[1.08] outline-none sm:text-[2.6rem]"
+          className="font-display text-[1.75rem] leading-[1.08] outline-none sm:text-[2.15rem]"
         >
           {copy.title}
         </h1>

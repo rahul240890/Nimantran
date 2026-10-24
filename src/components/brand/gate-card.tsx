@@ -177,6 +177,7 @@ export function GateCard({
   return (
     <span
       aria-hidden
+      data-invitation
       className={cn(
         "[container-type:inline-size] relative block aspect-[5/4] w-full [transform-style:preserve-3d]",
         className,

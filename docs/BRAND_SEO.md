@@ -33,7 +33,7 @@ Build steps: owner task B1 (secure the name), Step 8b (rename in code), Step 12b
 
 ### Logo and icon
 
-- **Lockup:** SHUBH above a smaller "Invitation", never both at the same weight. SHUBH in Rozha One, uppercase with wide tracking; "Invitation" in Tenor Sans, small, muted. The mark sits to the left (`src/components/brand/logo.tsx`).
+- **Lockup:** SHUBH above a smaller "Invitation", never both at the same weight. SHUBH in Fraunces, uppercase with wide tracking; "Invitation" in Karla, small, muted (both were Rozha One and Tenor Sans until 2026-10-24). The mark sits to the left (`src/components/brand/logo.tsx`).
 - **Mark:** a card rising from an open envelope, an S on the card and a celebration sparkle, in the site's own maroon, ivory and gold. The owner's painted app icon comes in two versions: cream (light theme; maroon S) and night (dark theme; gold S). The browser tab follows the viewer's light or dark setting (`public/brand/icon-light.png`, `icon-dark.png`); `favicon.ico`, the phone home-screen icon (`src/app/apple-icon.png`) and the link-preview badge (`public/brand/shubh-icon.png`) use the cream one. The small vector version for the site header (`src/components/brand/brand-mark.tsx`) follows the theme colours.
 - The site palette, fonts and tokens stay as they are. The mandala remains an ornament in themes and the footer, no longer the brand mark.
 
