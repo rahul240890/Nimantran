@@ -6,6 +6,7 @@
  */
 
 import {
+  isBloomOpening,
   isDepthOpening,
   isFreshOpening,
   isPaintedGate,
@@ -48,6 +49,7 @@ export function paintedOpening(style: OpeningStyle): boolean {
     isPaintedGate(style) ||
     isTiedGate(style) ||
     isDepthOpening(style) ||
+    isBloomOpening(style) ||
     isFreshOpening(style) ||
     isThemedOpening(style)
   );

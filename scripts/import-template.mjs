@@ -5,8 +5,9 @@
  * doors.png, tie.png, pieces.png), with or without the template's folder in front:
  *
  *   node scripts/import-template.mjs <folder> <template> --gate <gate> --key magenta|green
- *     [--tie-size <scale>] [--tie-at <% down>]
- *     [--depth <opening> --depth-key magenta|green] [--layouts cover=band,family=left,...]
+ *     [--tie-size <scale>] [--tie-at <% down>] [--seam <% across>]
+ *     [--depth <opening> --depth-key magenta|green] [--bloom <opening> --bloom-key magenta|green]
+ *     [--layouts cover=band,family=left,...]
  *
  * It writes, all as WebP at the size the site uses (768 x 1365, 9:16):
  * - public/suites/<template>/: the nine pages and the centre; the two photo pages with their
@@ -18,12 +19,17 @@
  *   when there is one
  * - public/openings/depth/<opening>/: front, middle and back (front.png ... back.png), each
  *   with its opening's key colour cut clear
+ * - public/openings/bloom/<opening>/: the outer piece, the inner piece and the heart
+ *   (outer.png, inner.png, heart.png) cut from their key colour and cropped close: the two
+ *   pieces in a box twice as tall as wide, standing on its bottom middle as the ring needs
+ *   them, the heart in a square
  * and prints what the catalog needs: the photo frames and where the names go under them,
  * the calm part of each page for its words, the centre's empty field, how light or dark
  * each calm part is, the doors' seam and the tie's place, and each depth frame's opening.
  * --layouts names where each page keeps its words when it isn't the usual (top, low, band,
- * or from templates 56 on also left, right and window). Check every number by eye on the
- * page before it ships: these are a first measure, not the last word.
+ * from templates 56 on also left, right and window, and from 71 on corners and border, both
+ * measured as a band across the middle). Check every number by eye on the page before it
+ * ships: these are a first measure, not the last word.
  */
 
 import { existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
@@ -67,12 +73,16 @@ const gate = flag("gate");
 const keyName = flag("key") ?? "magenta";
 const depth = flag("depth");
 const depthKey = flag("depth-key") ?? keyName;
+const bloom = flag("bloom");
+const bloomKey = flag("bloom-key") ?? keyName;
 for (const pair of (flag("layouts") ?? "").split(",").filter(Boolean)) {
   const [page, kind] = pair.split("=");
   if (page && kind) CALM[page] = kind;
 }
 const tieSize = Number(flag("tie-size") ?? 1);
 const tieAt = flag("tie-at") === undefined ? null : Number(flag("tie-at"));
+// Where the doors meet, when the painting's own lines would mislead the search for it
+const seamAt = flag("seam") === undefined ? null : Number(flag("seam"));
 const write = !args.includes("--dry");
 if (!source || !template || !existsSync(source)) {
   console.error(
@@ -528,9 +538,9 @@ if (gateDir) {
   const doorsPath = need("doors");
   if (doorsPath) {
     const img = await raw(doorsPath);
-    const at = seam(img);
+    const at = seamAt ?? seam(img);
     report.seam = at;
-    if (Math.abs(at - 50) > 1.5)
+    if (seamAt === null && Math.abs(at - 50) > 1.5)
       report.warnings.push(`doors: the seam is at ${at}%, not the middle; check the cut`);
     const split = Math.round((at / 100) * W);
     if (write) {
@@ -611,6 +621,76 @@ if (depth) {
     const [opening] = holes(cut, 1);
     report.depth[frame] = opening ?? null;
     if (!opening) report.warnings.push(`${frame}: no opening found in the key colour`);
+  }
+}
+
+/**
+ * One bloom piece cut from its key colour at the picture's own size and cropped close, then
+ * set in a clear box of the given shape (width / height): an outer or inner piece stands on
+ * the box's bottom middle, its narrow base where the ring's middle will be, and the heart
+ * sits in the middle of a square.
+ */
+async function bloomPiece(path, key, shape, height) {
+  const { data, info } = await sharp(path)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const cut = await cutKey({ data, width: info.width, height: info.height }, key);
+  const box = solidBox(cut);
+  if (!box) return null;
+  const px = (v, of) => Math.round((v / 100) * of);
+  const [x, y, w, h] = [
+    px(box[0], cut.width),
+    px(box[1], cut.height),
+    Math.min(cut.width - px(box[0], cut.width), px(box[2], cut.width) + 1),
+    Math.min(cut.height - px(box[1], cut.height), px(box[3], cut.height) + 1),
+  ];
+  const piece = await sharp(cut.data, {
+    raw: { width: cut.width, height: cut.height, channels: 4 },
+  })
+    .extract({ left: x, top: y, width: w, height: h })
+    .png()
+    .toBuffer();
+  // The box: the piece as large as it fits, standing on the bottom (the heart in the middle)
+  const boxH = height;
+  const boxW = Math.round(height * shape);
+  const scale = Math.min(boxW / w, boxH / h);
+  const sw = Math.round(w * scale);
+  const sh = Math.round(h * scale);
+  const sized = await sharp(piece).resize({ width: sw, height: sh, fit: "fill" }).toBuffer();
+  const top = shape === 1 ? Math.round((boxH - sh) / 2) : boxH - sh;
+  const out = sharp({
+    create: { width: boxW, height: boxH, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+  })
+    .composite([{ input: sized, left: Math.round((boxW - sw) / 2), top }])
+    .webp({ quality: 84, alphaQuality: 90, effort: 6 });
+  return {
+    out,
+    size: [w, h],
+    fill: [Math.round((sw / boxW) * 100), Math.round((sh / boxH) * 100)],
+  };
+}
+
+if (bloom) {
+  const bloomDir = join("public", "openings", "bloom", bloom);
+  if (write) mkdirSync(bloomDir, { recursive: true });
+  report.bloom = {};
+  for (const [part, shape] of [
+    ["outer", 0.5],
+    ["inner", 0.5],
+    ["heart", 1],
+  ]) {
+    const path = need(part);
+    if (!path) continue;
+    const piece = await bloomPiece(path, KEYS[bloomKey], shape, shape === 1 ? 720 : 1280);
+    if (!piece) {
+      report.warnings.push(`${part}: nothing left once the key colour is cut`);
+      continue;
+    }
+    if (write) await piece.out.toFile(join(bloomDir, `${part}.webp`));
+    // How much of its box the piece fills, width and height in %: a piece much narrower
+    // than half its height leaves gaps in the ring
+    report.bloom[part] = piece.fill;
   }
 }
 

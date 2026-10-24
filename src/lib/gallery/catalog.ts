@@ -455,6 +455,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "yashab",
+      "paan",
       "sikki",
       "kannauj",
       "phoolon-ki-ghati",
@@ -565,6 +567,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "usta-kala",
       "thewa",
       "rekhachitra",
       "bhil-chitra",
@@ -621,6 +624,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
     suites: [
+      "rangmanch",
+      "susegad",
       "vanaspati",
       "paithani",
       "kaanch-chitra",
@@ -641,6 +646,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "japi",
       "loktak",
       "tarakasi",
       "vanaspati",
@@ -739,6 +745,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
     suites: [
+      "paranda",
+      "kashikari",
       "chandigarh",
       "phoolon-ki-ghati",
       "jamawar",
@@ -766,6 +774,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "yashab",
+      "kashikari",
+      "paan",
       "sadaf",
       "kannauj",
       "jamawar",
@@ -805,6 +816,15 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "chaukhane",
+      "saaya",
+      "jingkieng",
+      "rangmanch",
+      "sangemarmar",
+      "susegad",
+      "akeek",
+      "samudra-jyoti",
+      "nazaara",
       "chandigarh",
       "do-rang",
       "rekhachitra",

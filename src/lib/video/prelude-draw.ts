@@ -12,12 +12,17 @@ import { SYMBOLS } from "@/components/invitation/art/symbols";
 import type { PageType } from "@/lib/editor/type";
 import { seededRandom } from "@/lib/engine/particles";
 import {
+  BLOOM_MIDDLE,
   GOD_PAINTINGS,
   PAINTED_GATES,
   THEMED_OPENINGS,
+  bloomBeyond,
+  bloomRings,
+  bloomSpec,
   depthBeyond,
   depthSpec,
   freshBeyond,
+  isBloomOpening,
   isDepthOpening,
   isFreshOpening,
   isPaintedGate,
@@ -26,6 +31,9 @@ import {
   openingNames,
   tiedBeyond,
   tiedSpec,
+  type BloomOpen,
+  type BloomOpening,
+  type BloomWait,
   type DepthOpening,
   type DepthPass,
   type DepthWait,
@@ -203,6 +211,9 @@ export function preludeImages(style: OpeningStyle, suite: SuiteId, god: OpeningG
   } else if (isDepthOpening(style)) {
     const base = `/openings/depth/${style}`;
     urls.push(depthBeyond(style), ...DEPTH_FRAMES.map((n) => `${base}/${n}.webp`));
+  } else if (isBloomOpening(style)) {
+    const base = `/openings/bloom/${style}`;
+    urls.push(bloomBeyond(style), ...["outer", "inner", "heart"].map((n) => `${base}/${n}.webp`));
   }
   const cover = SUITES[suite].images.cover;
   if (cover) urls.push(cover);
@@ -244,6 +255,7 @@ function drawOpening(ctx: Ctx, film: PreludeFilm, seconds: number, opened: numbe
   else if (isThemedOpening(style)) drawThemed(ctx, film, style, seconds, opened);
   else if (isTiedGate(style)) drawTied(ctx, film, style, seconds, opened);
   else if (isDepthOpening(style)) drawDepth(ctx, film, style, seconds, opened);
+  else if (isBloomOpening(style)) drawBloom(ctx, film, style, seconds, opened);
   else drawDrawn(ctx, film, seconds, opened);
 }
 
@@ -740,6 +752,183 @@ function depthPass(ctx: Ctx, pass: DepthPass, p: number, i: number) {
     default:
       grow(3.4);
   }
+}
+
+/* -------------------------------------------------------------------- bloom openings */
+
+const bloomEase = bezier(0.45, 0, 0.3, 1);
+const heartEase = bezier(0.4, 0, 0.6, 1);
+
+/**
+ * A bloom opening, as opening-bloom.tsx and bloom-openings.css draw it: the centre picture
+ * dim beyond one great flower, the outer piece copied round in two rings, the inner piece
+ * in a third and the heart in the middle, waiting in the template's own way; opened, the
+ * heart goes first and the rings open outward one after another, inner first.
+ */
+function drawBloom(ctx: Ctx, film: PreludeFilm, id: BloomOpening, seconds: number, t: number) {
+  const { wait, heart, open, airy } = bloomSpec(id);
+  const beyond = film.images.get(bloomBeyond(id));
+  ctx.save();
+  scaleAbout(ctx, 1.05 - 0.05 * transition(t, 2.4, 0.5, canvasEase), 0.5, 0.5);
+  if (beyond) fillWith(ctx, beyond, 0, 0, PAGE_W, PAGE_H);
+  const dark = airy ? 0 : 1 - transition(t, 1.3, 0.9);
+  if (dark > 0) {
+    ctx.fillStyle = `rgb(0 0 0 / ${0.5 * dark})`;
+    ctx.fillRect(0, 0, PAGE_W, PAGE_H);
+  }
+  ctx.restore();
+
+  const cx = BLOOM_MIDDLE.x * CQW;
+  const cy = BLOOM_MIDDLE.y * CQH;
+  const reach = Math.hypot(Math.max(cx, PAGE_W - cx), Math.max(cy, PAGE_H - cy));
+  const waiting = 1 - clamp01(t / 0.4);
+  ctx.save();
+  // The whole flower's own wait: breathing in steps, or turning very slowly
+  if (wait === "pulse") {
+    const step = Math.floor(seconds / 1.2) % 2;
+    ctx.translate(cx, cy);
+    ctx.scale(1 + 0.03 * step * waiting, 1 + 0.03 * step * waiting);
+    ctx.translate(-cx, -cy);
+  } else if (wait === "turn") rotateAbout(ctx, (seconds / 90) * 360, cx, cy);
+
+  bloomRings(id).forEach((ring) => {
+    const art = film.images.get(`/openings/bloom/${id}/${ring.part}.webp`);
+    if (!art) return;
+    const length = reach * ring.length;
+    const start = 0.38 + ring.order * 0.26;
+    const raw = transition(t, 1.15, start, bloomEase);
+    const p = open === "steps" ? Math.min(1, Math.floor(raw * 5) / 4) : raw;
+    const fade = transition(t, 1.15 * 0.55, start + 1.15 * 0.4);
+    const alpha = open === "steps" ? 1 - Math.min(1, Math.floor(fade * 3) / 2) : 1 - fade;
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.translate(cx, cy);
+    if (open === "spin") ctx.rotate(((70 - ring.order * 50) * p * Math.PI) / 180);
+    for (let i = 0; i < ring.count; i++) {
+      ctx.save();
+      ctx.rotate((((i + ring.offset) * 360) / ring.count) * (Math.PI / 180));
+      if (wait === "sway")
+        ctx.rotate((2.5 * Math.sin(seconds / 1.34 + i * 1.05) * waiting * Math.PI) / 180);
+      bloomOpen(ctx, open, p, length);
+      ctx.drawImage(art, -length / 4, -length, length / 2, length);
+      ctx.restore();
+    }
+    ctx.restore();
+  });
+
+  const art = film.images.get(`/openings/bloom/${id}/heart.webp`);
+  const slow = heart === "rise" || heart === "bounce";
+  const h = transition(t, slow ? 0.9 : 0.7, 0, slow ? bezier(0.5, 0, 0.75, 0.3) : heartEase);
+  const gone = transition(t, slow ? 0.4 : 0.42, slow ? 0.5 : 0.28);
+  if (art && gone < 1) {
+    const size = reach * 0.4;
+    ctx.save();
+    ctx.globalAlpha *= heart === "blink" ? 1 - Math.min(1, Math.floor(gone * 3) / 2) : 1 - gone;
+    ctx.translate(cx, cy);
+    if (heart === "lift") ctx.scale(1 + 0.7 * h, 1 + 0.7 * h);
+    else if (heart === "sink") ctx.scale(1 - 0.8 * h, 1 - 0.8 * h);
+    else if (heart === "turn") {
+      ctx.rotate((200 * h * Math.PI) / 180);
+      ctx.scale(1 + 0.5 * h, 1 + 0.5 * h);
+    } else if (heart === "blink") {
+      const b = Math.floor(h * 3) / 2;
+      ctx.scale(1 + 0.15 * b, 1 + 0.15 * b);
+    } else if (heart === "rise") ctx.translate(0, -0.75 * PAGE_H * h);
+    else if (heart === "bounce") {
+      // A small dip, then up and away
+      const dip = h < 0.25 ? 0.06 * Math.sin((h / 0.25) * Math.PI) : 0;
+      ctx.translate(0, (dip - 0.8 * Math.max(0, (h - 0.15) / 0.85)) * PAGE_H);
+    }
+    ctx.drawImage(art, -size / 2, -size / 2, size, size);
+    ctx.restore();
+  }
+  ctx.restore();
+  bloomLight(ctx, film, wait, seconds, waiting, cx, cy, reach);
+}
+
+/** How one piece opens, `p` of the way, standing on its base at the flower's middle. */
+function bloomOpen(ctx: Ctx, open: BloomOpen, p: number, length: number) {
+  if (p <= 0) return;
+  switch (open) {
+    case "slide":
+      ctx.translate(0, -0.85 * length * p);
+      break;
+    case "fold":
+      // Laid back on its base: seen from the front it shortens toward it
+      ctx.translate(0, -0.2 * length * p);
+      ctx.scale(1, 1 - 0.66 * p);
+      break;
+    case "swing":
+      ctx.rotate((58 * p * Math.PI) / 180);
+      ctx.translate(0, -0.25 * length * p);
+      break;
+    case "spin":
+      ctx.translate(0, -0.5 * length * p);
+      ctx.scale(1 + 0.3 * p, 1 + 0.3 * p);
+      break;
+    case "steps":
+      ctx.translate(0, -0.6 * length * p);
+      ctx.scale(1 + 0.4 * p, 1 + 0.4 * p);
+      break;
+    default:
+      ctx.translate(0, -0.55 * length * p);
+      ctx.scale(1 + 0.45 * p, 1 + 0.45 * p);
+  }
+}
+
+/** The light over the waiting flower: a moving glow, a gleam, a flicker, a wave or a shadow. */
+function bloomLight(
+  ctx: Ctx,
+  film: PreludeFilm,
+  wait: BloomWait,
+  seconds: number,
+  k: number,
+  cx: number,
+  cy: number,
+  reach: number,
+) {
+  if (k <= 0 || wait === "pulse" || wait === "sway" || wait === "turn") return;
+  ctx.save();
+  ctx.globalCompositeOperation = wait === "shade" ? "multiply" : "soft-light";
+  ctx.globalAlpha = k;
+  const light = film.colours.light;
+  if (wait === "gleam") {
+    const at = ((seconds % 5.5) / 5.5 / 0.65) * 2.7 - 1.35;
+    const x = cx - at * PAGE_W;
+    const band = ctx.createLinearGradient(x - 0.25 * PAGE_W, 0, x + 0.25 * PAGE_W, 0.2 * PAGE_H);
+    band.addColorStop(0, "transparent");
+    band.addColorStop(0.5, light);
+    band.addColorStop(1, "transparent");
+    ctx.fillStyle = band;
+  } else if (wait === "wave") {
+    const q = (seconds % 4.8) / 4.8;
+    const r = reach * (0.25 + 1.35 * q);
+    const ring = ctx.createRadialGradient(cx, cy, r * 0.55, cx, cy, r * 0.85);
+    ring.addColorStop(0, "transparent");
+    ring.addColorStop(0.5, light);
+    ring.addColorStop(1, "transparent");
+    ctx.globalAlpha = k * (1 - q);
+    ctx.fillStyle = ring;
+  } else if (wait === "flicker") {
+    const glow = ctx.createRadialGradient(cx, PAGE_H, 0, cx, PAGE_H, PAGE_H * 0.7);
+    glow.addColorStop(0, light);
+    glow.addColorStop(1, "transparent");
+    ctx.globalAlpha =
+      k * (0.75 + 0.25 * Math.abs(Math.sin(seconds * 3.1) * Math.sin(seconds * 1.7)));
+    ctx.fillStyle = glow;
+  } else {
+    // A glow or a shadow drifting slowly across
+    const drift = Math.sin((seconds / (wait === "shade" ? 14 : 9)) * Math.PI);
+    const x = cx + drift * 0.22 * PAGE_W;
+    const y = cy + drift * 0.15 * PAGE_H;
+    const spot = ctx.createRadialGradient(x, y, 0, x, y, reach * 0.55);
+    spot.addColorStop(0, wait === "shade" ? "rgb(0 0 0 / 0.35)" : light);
+    spot.addColorStop(1, "transparent");
+    ctx.fillStyle = spot;
+  }
+  ctx.fillRect(0, 0, PAGE_W, PAGE_H);
+  ctx.restore();
 }
 
 /* ------------------------------------------------------------------- fresh openings */
