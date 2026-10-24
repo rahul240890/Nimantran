@@ -147,6 +147,21 @@ export const designNames = {
     paithani: "Paithani",
     jamawar: "Jamawar",
     "phool-bangla": "Phool Bangla",
+    thewa: "Thewa",
+    sikki: "Sikki",
+    "hase-chittara": "Hase Chittara",
+    chandigarh: "Chandigarh",
+    "do-rang": "Do Rang",
+    rekhachitra: "Rekhachitra",
+    "bhil-chitra": "Bhil Chitra",
+    masala: "Masala",
+    loktak: "Loktak",
+    tarakasi: "Tarakasi",
+    kuruthola: "Kuruthola",
+    sadaf: "Sadaf",
+    aakar: "Aakar",
+    "shwet-shyam": "Shwet Shyam",
+    dhanak: "Dhanak",
     "udaipur-lake": "Udaipur Lake",
     "space-voyage": "Space Voyage",
     "rainbow-unicorn": "Rainbow Unicorn",
@@ -633,6 +648,36 @@ export const designNames = {
       "A Kashmiri jamawar shawl: woven roses, irises and paisleys in claret, emerald and old gold, by Dal Lake.",
     "phool-bangla":
       "A palace built of flowers: arches, domes and pavilions of marigold, jasmine and roses, as Braj builds them.",
+    thewa:
+      "Thewa from Pratapgarh: gold worked as fine as lace and fused onto glowing emerald, ruby and sapphire glass.",
+    sikki:
+      "Mithila's golden sikki grass, coiled and woven into birds, fish, elephants and baskets, with touches of red and green.",
+    "hase-chittara":
+      "Hase Chittara of Karnataka's Malnad: white rice-paste patterns, birds and flowers painted on red-earth walls.",
+    chandigarh:
+      "Chandigarh modernism: bold concrete, primary-colour panels, the rose garden and Sukhna Lake in flat mid-century style.",
+    "do-rang":
+      "A two-ink risograph print: fluorescent pink and bright blue overlapping into violet, with big playful flowers.",
+    rekhachitra:
+      "A travel sketchbook: quick ink lines and loose watercolour of a lake city's havelis, boats and bougainvillea.",
+    "bhil-chitra":
+      "Bhil painting from Madhya Pradesh: trees, birds and animals built from thousands of bright dots.",
+    masala:
+      "Spice-box luxury: saffron, cardamom, star anise and cinnamon arranged like jewels on stone and brass.",
+    loktak:
+      "Manipur's Loktak Lake in layered paper-cut: floating phumdi islands, misty hills and Shirui lilies.",
+    tarakasi:
+      "Cuttack silver filigree: flowers, birds and boats spun from fine silver wire on midnight-blue velvet.",
+    kuruthola:
+      "Kuruthola craft: tender coconut leaves folded into birds, flowers, garlands and arches against deep Kerala colours.",
+    sadaf:
+      "Mother-of-pearl inlay: shimmering pearl flowers, birds and arches set into dark polished rosewood.",
+    aakar:
+      "Indian modernist abstraction: circles, triangles and bands of earthy colour, with sun and water as pure shapes.",
+    "shwet-shyam":
+      "Black-and-white film photography with gold: heritage arches, lilies and candlelight, cinematic and timeless.",
+    dhanak:
+      "An iridescent dreamscape: glossy 3D flowers, pearls and glass with a pastel rainbow shimmer.",
     "udaipur-lake": "Lake Pichola at dusk, with a white marble jharokha for each celebration.",
     "space-voyage": "A porthole among the planets, with a starship plaque for each celebration.",
     "rainbow-unicorn": "Candy clouds and a rainbow, with a unicorn keeping watch.",

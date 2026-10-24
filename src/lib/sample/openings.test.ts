@@ -15,6 +15,7 @@ import { WEDDING_KINDS } from "@/lib/gallery/ids";
 import {
   OPENING_STYLES,
   isThemedOpening,
+  ownOpenings,
   openingSuits,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
@@ -79,7 +80,11 @@ describe("each design's own opening", () => {
   });
 
   it("uses every gate and opening we have", () => {
-    const used = new Set(openings.values());
+    // A template's second opening, offered beside its own (templates 56 on), is its too
+    const used = new Set([
+      ...openings.values(),
+      ...designs.flatMap((design) => ownOpenings(openings.get(design.id)!, design.suite)),
+    ]);
     for (const style of OPENING_STYLES) {
       if (style === "doors" || style === "none") continue;
       expect(used.has(style), style).toBe(true);

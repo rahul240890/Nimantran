@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { STORY_IDS, SUITES, THEMED_IDS } from "@/lib/suites/catalog";
+import { STORY_IDS, SUITES, THEMED_IDS, type SuiteId } from "@/lib/suites/catalog";
 import {
   WELCOME_KINDS,
   WELCOME_POOLS,
@@ -19,6 +19,10 @@ import {
   isPaintedGate,
   isTiedGate,
   TIED_GATES,
+  DEPTH_OPENINGS,
+  depthBeyond,
+  ownOpenings,
+  type DepthOpening,
   tiedBeyond,
   noOpening,
   OCCASION_OPENINGS,
@@ -127,6 +131,24 @@ describe("openings", () => {
       expect(spec.at, gate).toBeGreaterThanOrEqual(38);
       expect(spec.at, gate).toBeLessThanOrEqual(46);
       expect(openingNames(gate as keyof typeof TIED_GATES), gate).toBe("foot");
+    }
+  });
+
+  it("gives each depth opening its three frames, offered beside its template's own gate", () => {
+    for (const id of Object.keys(DEPTH_OPENINGS) as DepthOpening[]) {
+      for (const frame of ["front", "middle", "back"]) {
+        expect(
+          existsSync(join(process.cwd(), "public/openings/depth", id, `${frame}.webp`)),
+          id,
+        ).toBe(true);
+      }
+      const beyond = depthBeyond(id);
+      expect(beyond, id).toMatch(/^\/suites\/[a-z-]+\/centre\.webp$/);
+      const template = beyond.split("/")[2] as SuiteId;
+      // The template opens with its tied gate and offers its depth opening beside it
+      expect(isTiedGate(openingStyle(noOpening, template, false)), id).toBe(true);
+      expect(ownOpenings(openingStyle(noOpening, template, false), template), id).toContain(id);
+      expect(openingNames(id), id).toBe("foot");
     }
   });
 

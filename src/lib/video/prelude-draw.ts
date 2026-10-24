@@ -15,7 +15,10 @@ import {
   GOD_PAINTINGS,
   PAINTED_GATES,
   THEMED_OPENINGS,
+  depthBeyond,
+  depthSpec,
   freshBeyond,
+  isDepthOpening,
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
@@ -23,6 +26,9 @@ import {
   openingNames,
   tiedBeyond,
   tiedSpec,
+  type DepthOpening,
+  type DepthPass,
+  type DepthWait,
   type FreshOpening,
   type OpeningGod,
   type OpeningStyle,
@@ -192,7 +198,11 @@ export function preludeImages(style: OpeningStyle, suite: SuiteId, god: OpeningG
     urls.push(`/suites/${style}/scene.webp`, `/openings/themed/${style}.webp`);
   } else if (isTiedGate(style)) {
     const base = `/openings/tied/${style}`;
-    urls.push(tiedBeyond(style), ...TIED_PARTS.map((n) => `${base}/${n}.webp`));
+    const parts = tiedSpec(style).pieces ? TIED_PARTS : TIED_PARTS.slice(0, 3);
+    urls.push(tiedBeyond(style), ...parts.map((n) => `${base}/${n}.webp`));
+  } else if (isDepthOpening(style)) {
+    const base = `/openings/depth/${style}`;
+    urls.push(depthBeyond(style), ...DEPTH_FRAMES.map((n) => `${base}/${n}.webp`));
   }
   const cover = SUITES[suite].images.cover;
   if (cover) urls.push(cover);
@@ -233,6 +243,7 @@ function drawOpening(ctx: Ctx, film: PreludeFilm, seconds: number, opened: numbe
   else if (isFreshOpening(style)) drawFresh(ctx, film, style, seconds, opened);
   else if (isThemedOpening(style)) drawThemed(ctx, film, style, seconds, opened);
   else if (isTiedGate(style)) drawTied(ctx, film, style, seconds, opened);
+  else if (isDepthOpening(style)) drawDepth(ctx, film, style, seconds, opened);
   else drawDrawn(ctx, film, seconds, opened);
 }
 
@@ -491,7 +502,9 @@ function drawTied(ctx: Ctx, film: PreludeFilm, gate: TiedGate, seconds: number, 
     const art = image(`door-${side}`);
     if (!art) continue;
     const half: Box = { x: side === "left" ? 0 : PAGE_W / 2, y: 0, w: PAGE_W / 2, h: PAGE_H };
-    drawDoor(ctx, art, null, half, side, move === "part" ? "gather" : move, door, film.colours);
+    // Doors swinging out toward the guest are drawn as a swing: at this size the two read alike
+    const drawn = move === "part" ? "gather" : move === "out" ? "swing" : move;
+    drawDoor(ctx, art, null, half, side, drawn, door, film.colours);
   }
   const seam = (0.55 + 0.35 * Math.sin(seconds * 2.4)) * (1 - transition(t, 0.7, 0.65));
   if (seam > 0) drawSeam(ctx, PAGE_W / 2, 0, PAGE_H, film.colours, seam);
@@ -511,6 +524,9 @@ const UNDO: Record<TiedUndo, { move: number; fade: number; fadeDelay: number; de
   slip: { move: 0.7, fade: 0.52, fadeDelay: 0.18 },
   spin: { move: 0.9, fade: 0.6, fadeDelay: 0.3 },
   crack: { move: 1.1, fade: 0.6, fadeDelay: 0.7, delay: 0.15 },
+  turn: { move: 0.6, fade: 0.5, fadeDelay: 0.45 },
+  ring: { move: 0.7, fade: 0.4, fadeDelay: 0.75, delay: 0.48 },
+  roll: { move: 0.9, fade: 0.5, fadeDelay: 0.45 },
 };
 
 /** The tie on the seam, breathing, then undone. */
@@ -522,12 +538,15 @@ function drawTie(ctx: Ctx, tie: CanvasImageSource, gate: TiedGate, seconds: numb
   if (alpha <= 0) return;
   const originY = (at / 100) * PAGE_H;
   const wait = t > 0 ? 1 : 1 + 0.0125 * (1 - Math.cos((seconds / 3.2) * Math.PI));
+  // A bell rings first: a quick shake before it falls
+  const shake = undo === "ring" && t > 0 && t < 0.52 ? Math.sin((t / 0.52) * Math.PI * 3) * 8 : 0;
   const halves = undo === "crack" ? (["left", "right"] as const) : ([null] as const);
   for (const half of halves) {
     ctx.save();
     ctx.globalAlpha *= alpha;
     ctx.translate(PAGE_W / 2, originY);
     ctx.scale(wait, wait);
+    if (shake) ctx.rotate((shake * Math.PI) / 180);
     undoMove(ctx, undo, p, half);
     ctx.translate(-PAGE_W / 2, -originY);
     if (half) {
@@ -571,6 +590,17 @@ function undoMove(ctx: Ctx, undo: TiedUndo, p: number, half: "left" | "right" | 
       ctx.rotate(deg(300 * p));
       ctx.scale(1 - 0.65 * p, 1 - 0.65 * p);
       break;
+    case "turn":
+      ctx.rotate(deg(90 * p));
+      ctx.scale(1 - 0.08 * p, 1 - 0.08 * p);
+      break;
+    case "ring":
+      ctx.translate(0, 0.24 * PAGE_H * p);
+      break;
+    case "roll":
+      ctx.translate(0.7 * PAGE_W * p, 0);
+      ctx.rotate(deg(240 * p));
+      break;
     case "crack": {
       const sign = half === "left" ? -1 : 1;
       ctx.translate(sign * 0.24 * PAGE_W * p, 0);
@@ -610,6 +640,105 @@ function drawTiedPieces(
     ctx.rotate(((((i * 73) % 300) - 150) * e * Math.PI) / 180);
     ctx.drawImage(art, (-width * fit) / 2, (-height * fit) / 2, width * fit, height * fit);
     ctx.restore();
+  }
+}
+
+/* -------------------------------------------------------------------- depth openings */
+
+const DEPTH_FRAMES = ["back", "middle", "front"] as const;
+const passEase = bezier(0.55, 0, 0.75, 0.4);
+
+/**
+ * A depth opening, as opening-depth.tsx and depth-openings.css draw it: the centre picture
+ * dim beyond three frames that drift against each other; opened, the frames go by front
+ * first, each growing out past the edges its own way, onto the centre picture lit up.
+ */
+function drawDepth(ctx: Ctx, film: PreludeFilm, id: DepthOpening, seconds: number, t: number) {
+  const { wait, pass } = depthSpec(id);
+  const beyond = film.images.get(depthBeyond(id));
+  ctx.save();
+  scaleAbout(ctx, 1.04 - 0.04 * transition(t, 2.4, 0.7, canvasEase), 0.5, 0.5);
+  if (beyond) fillWith(ctx, beyond, 0, 0, PAGE_W, PAGE_H);
+  const dark = 1 - transition(t, 1.3, 1.1);
+  if (dark > 0) {
+    ctx.fillStyle = `rgb(0 0 0 / ${0.45 * dark})`;
+    ctx.fillRect(0, 0, PAGE_W, PAGE_H);
+  }
+  ctx.restore();
+  DEPTH_FRAMES.forEach((name, order) => {
+    const art = film.images.get(`/openings/depth/${id}/${name}.webp`);
+    if (!art) return;
+    // Front passes first: 0 front, 1 middle, 2 back
+    const i = DEPTH_FRAMES.length - 1 - order;
+    const walk = pass === "walk";
+    const delay = i * (walk ? 0.48 : 0.42);
+    const p = transition(t, walk ? 1.5 : 1.3, delay, passEase);
+    const alpha = 1 - transition(t, walk ? 0.56 : 0.52, delay + (walk ? 0.9 : 0.76));
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    // Waiting, the nearer frames drift further, on the frames' own slow rhythm
+    const reach = (0.8 + (2 - i) * 1.1) * CQW * (1 - p);
+    const phase = seconds / 3.5 + i * 0.66;
+    ctx.translate(Math.sin(phase) * reach * 0.6, Math.cos(phase * 0.8) * reach * 0.35);
+    depthWait(ctx, wait, seconds, i, 1 - p);
+    depthPass(ctx, pass, p, i);
+    const rest = 1.04 + (2 - i) * 0.025;
+    scaleAbout(ctx, rest, 0.5, 0.5);
+    ctx.drawImage(art, 0, 0, PAGE_W, PAGE_H);
+    ctx.restore();
+  });
+}
+
+/** A frame's own move while it waits, `k` of it (fading out as the guest passes). */
+function depthWait(ctx: Ctx, wait: DepthWait, seconds: number, i: number, k: number) {
+  if (k <= 0) return;
+  const swing = Math.sin(seconds / 2.2 + i * 1.2);
+  if (wait === "spin") {
+    scaleAbout(ctx, 1.06, 0.5, 0.5);
+    rotateAbout(ctx, (i === 1 ? -1 : 1) * 2.5 * swing * k, PAGE_W / 2, PAGE_H / 2);
+  } else if (wait === "sway") {
+    rotateAbout(ctx, 1.2 * swing * k, PAGE_W / 2, -0.2 * PAGE_H);
+  } else if (wait === "slip") {
+    const beat = (seconds + i * 1.1) % 3.4;
+    if (beat > 2.4 && beat < 2.9) ctx.translate(0.7 * CQW * k, -0.3 * CQH * k);
+  }
+}
+
+/** How a frame grows past the edges as the guest passes it, `p` of the way. */
+function depthPass(ctx: Ctx, pass: DepthPass, p: number, i: number) {
+  if (p <= 0) return;
+  const turn = i === 1 ? -1 : 1;
+  const grow = (to: number) => scaleAbout(ctx, 1 + (to - 1) * p, 0.5, 0.5);
+  switch (pass) {
+    case "spin":
+      rotateAbout(ctx, turn * 150 * p, PAGE_W / 2, PAGE_H / 2);
+      grow(3.6);
+      break;
+    case "turn":
+      rotateAbout(ctx, turn * 90 * p, PAGE_W / 2, PAGE_H / 2);
+      grow(3.4);
+      break;
+    case "walk":
+      ctx.translate(0, 0.05 * PAGE_H * p);
+      grow(3.1);
+      break;
+    case "bounce": {
+      // A small step back before it flies past
+      const back = p < 0.25 ? -0.06 * Math.sin((p / 0.25) * Math.PI) : 0;
+      scaleAbout(ctx, 1 + back + 2.4 * Math.max(0, (p - 0.1) / 0.9), 0.5, 0.5);
+      break;
+    }
+    case "tilt":
+      rotateAbout(ctx, -turn * 9 * p, PAGE_W / 2, PAGE_H / 2);
+      grow(3.3);
+      break;
+    case "swing":
+      rotateAbout(ctx, turn * 14 * p, PAGE_W / 2, 0);
+      scaleAbout(ctx, 1 + 2 * p, 0.5, 0);
+      break;
+    default:
+      grow(3.4);
   }
 }
 

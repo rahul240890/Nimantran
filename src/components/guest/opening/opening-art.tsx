@@ -20,21 +20,25 @@ import {
   Storybook,
 } from "./opening-art-more";
 import {
+  DEPTH_OPENINGS,
   FRESH_OPENINGS,
   GOD_PAINTINGS,
   godSymbol,
   THEMED_OPENINGS,
   TIED_GATES,
+  isDepthOpening,
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
   isTiedGate,
+  type DepthOpening,
   type FreshOpening,
   type OpeningGod,
   type OpeningStyle,
   type ThemedOpening,
   type TiedGate,
 } from "@/lib/opening/catalog";
+import { DepthOpeningArt } from "./opening-depth";
 import { FreshOpeningArt } from "./opening-fresh";
 import { PaintedGateArt } from "./opening-gate";
 import { ThemedOpeningArt } from "./opening-themed";
@@ -55,6 +59,9 @@ export const OPENING_LAYOUT: Record<OpeningStyle, { crest: number; gap: number }
   ...(Object.fromEntries(
     Object.keys(TIED_GATES).map((id) => [id, { crest: 22, gap: 0 }]),
   ) as Record<TiedGate, { crest: number; gap: number }>),
+  ...(Object.fromEntries(
+    Object.keys(DEPTH_OPENINGS).map((id) => [id, { crest: 22, gap: 0 }]),
+  ) as Record<DepthOpening, { crest: number; gap: number }>),
   "rajwada-pol": { crest: 22, gap: 0 },
   "gopuram-kadhavu": { crest: 22, gap: 0 },
   "noor-darwaza": { crest: 22, gap: 0 },
@@ -618,6 +625,7 @@ export function OpeningArt({
 }): ReactNode {
   if (isPaintedGate(style)) return <PaintedGateArt gate={style} sample={sample} />;
   if (isTiedGate(style)) return <TiedGateArt gate={style} sample={sample} />;
+  if (isDepthOpening(style)) return <DepthOpeningArt opening={style} sample={sample} />;
   if (isFreshOpening(style)) return <FreshOpeningArt id={style} sample={sample} />;
   if (isThemedOpening(style)) return <ThemedOpeningArt opening={style} sample={sample} />;
   switch (style) {

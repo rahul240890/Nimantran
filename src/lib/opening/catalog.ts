@@ -310,15 +310,30 @@ export function isPaintedGate(style: string): style is PaintedGate {
   return style in PAINTED_GATES;
 }
 
-/** How a tied gate's doors open: swing in, slide apart, or part like curtains. */
-export type TiedMove = "swing" | "slide" | "part";
+/**
+ * How a tied gate's doors open: swing in, swing out toward the guest like cupboard doors,
+ * slide apart, or part like curtains.
+ */
+export type TiedMove = "swing" | "out" | "slide" | "part";
 /**
  * How its tie comes undone: a bow unties and slips off both sides, a brooch or medallion
  * lifts toward the guest, a butterfly or bird flies off, a seal cracks in two, a lock or
  * locket drops, a ball of petals or a bubble bursts, a garland or sash slips away, a
- * rosette spins off.
+ * rosette spins off, a medallion turns a quarter turn and lets go, a bell rings and falls,
+ * a circle rolls away along its line.
  */
-export type TiedUndo = "untie" | "lift" | "fly" | "crack" | "drop" | "burst" | "slip" | "spin";
+export type TiedUndo =
+  | "untie"
+  | "lift"
+  | "fly"
+  | "crack"
+  | "drop"
+  | "burst"
+  | "slip"
+  | "spin"
+  | "turn"
+  | "ring"
+  | "roll";
 
 /**
  * The tied gates (owner's paintings, templates 41 on: docs/TEMPLATE_PROMPTS_41_TO_55.md and
@@ -467,6 +482,127 @@ export const TIED_GATES = {
     pieces: true,
     welcome: "bloom",
   },
+  // Templates 56 to 70 (docs/TEMPLATE_GATES_56_TO_85.md): two pictures each, with no pieces
+  // Thewa: a Thewa locket on a ruby cord
+  "panna-pat": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Sikki: a woven sikki fish on a grass rope
+  "sikki-dwar": {
+    move: "swing",
+    undo: "fly",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
+  // Hase Chittara: two painted birds beak to beak as a latch
+  "hase-bagilu": {
+    move: "swing",
+    undo: "crack",
+    at: 40,
+    pieces: false,
+    welcome: "letter",
+  },
+  // Chandigarh: a brass medallion on a leather strap
+  "kankreet-dwar": {
+    move: "slide",
+    undo: "turn",
+    at: 40,
+    pieces: false,
+    welcome: "letter",
+  },
+  // Do Rang: a giant printed safety pin with a flower charm
+  "chhaap-kiwad": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
+  // Rekhachitra: a brass shop bell on a red cord
+  "purana-darwaza": {
+    move: "swing",
+    undo: "ring",
+    at: 40,
+    pieces: false,
+    welcome: "letter",
+  },
+  // Bhil Chitra: two dotted birds carrying a garland
+  "bindi-kiwad": {
+    move: "swing",
+    undo: "fly",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
+  // Masala: a string of chillies, star anise and cinnamon
+  "masala-almari": {
+    move: "out",
+    undo: "slip",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Loktak: a striped Manipuri sash with a lily
+  "kaagaz-pat": {
+    move: "slide",
+    undo: "fly",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
+  // Tarakasi: a silver filigree ball on a chain
+  "rupa-kiwad": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    pieces: false,
+    welcome: "night",
+  },
+  // Kuruthola: a plaited palm-leaf knot with a hibiscus
+  "ola-vathil": {
+    move: "swing",
+    undo: "untie",
+    at: 40,
+    pieces: false,
+    welcome: "lamps",
+  },
+  // Sadaf: strings of pearls gathered by a pearl rosette
+  "seep-kiwad": {
+    move: "swing",
+    undo: "slip",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Aakar: a red circle on a black line
+  "aakar-pat": {
+    move: "slide",
+    undo: "roll",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
+  // Shwet Shyam: a velvet ribbon holding a lily
+  "shwet-dwar": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: false,
+    welcome: "night",
+  },
+  // Dhanak: a pearl-ringed glass bubble
+  "moti-dwar": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
 } as const satisfies Record<string, TiedSpec>;
 export type TiedGate = keyof typeof TIED_GATES;
 const TIED_IDS = Object.keys(TIED_GATES) as TiedGate[];
@@ -483,6 +619,78 @@ export function tiedSpec(id: TiedGate): TiedSpec {
 export function tiedBeyond(id: TiedGate): string {
   const template = STORY_IDS.find((story) => STORY_GATE[story] === id);
   return template ? `/suites/${template}/centre.webp` : `/openings/tied/${id}/beyond.webp`;
+}
+
+/**
+ * How a depth opening's frames wait: they always drift a little against each other with the
+ * pointer and on their own, and besides: a gleam slides across them (glint), the rings turn
+ * very slowly in opposite directions (spin), the inks slip out of line and back (slip), the
+ * frames flicker like lamps or fairy lights (twinkle), or sway like paper reeds (sway).
+ */
+export type DepthWait = "drift" | "glint" | "spin" | "slip" | "twinkle" | "sway";
+/**
+ * How the guest passes each frame on opening, front first: it grows past the edges (glide),
+ * spinning (spin), turning a quarter turn (turn), as if walked through down a hall (walk),
+ * with a small bounce (bounce), tilting to catch the light (tilt), or swinging away like a
+ * hanging decoration (swing).
+ */
+export type DepthPass = "glide" | "spin" | "turn" | "walk" | "bounce" | "tilt" | "swing";
+export type DepthSpec = { wait: DepthWait; pass: DepthPass; welcome: WelcomeKind };
+
+/*
+ * The depth openings (templates 56 to 70, docs/TEMPLATE_PROMPTS_56_TO_70.md): no doors and
+ * nothing to undo, but three painted frames standing one behind another like a paper
+ * theatre, and the guest flies through them onto the template's centre picture. In
+ * public/openings/depth/<id>/: front, middle and back, each with its opening cut clear by
+ * scripts/import-template.mjs. Each is its template's second choice, after its tied gate.
+ */
+export const DEPTH_OPENINGS = {
+  // Thewa: three cusped arches of glowing glass laced with gold
+  "sona-parat": { wait: "glint", pass: "glide", welcome: "royal" },
+  // Sikki: three coiled rims of golden grass, like looking into a basket
+  mauni: { wait: "spin", pass: "spin", welcome: "bloom" },
+  // Hase Chittara: three diamonds of rice-paste pattern on red earth
+  chowka: { wait: "glint", pass: "turn", welcome: "letter" },
+  // Chandigarh: a concrete wall, a grid of sunshades and a round window
+  khidkiyaan: { wait: "glint", pass: "walk", welcome: "letter" },
+  // Do Rang: a flower, a scallop and a circle printed in two inks
+  "phool-chhaap": { wait: "slip", pass: "bounce", welcome: "party" },
+  // Rekhachitra: three sketched archways down an old lane
+  "gali-gali": { wait: "drift", pass: "walk", welcome: "letter" },
+  // Bhil Chitra: a dotted tree, a ring of birds and a ring of flowers
+  tipki: { wait: "twinkle", pass: "glide", welcome: "bloom" },
+  // Masala: rings of spice, a brass tin's rim and a ring of saffron
+  "masala-dabba": { wait: "drift", pass: "glide", welcome: "royal" },
+  // Loktak: paper-cut hills, a floating ring of grass and a ring of lilies
+  phumdi: { wait: "sway", pass: "glide", welcome: "bloom" },
+  // Tarakasi: three silver filigree ovals on midnight velvet
+  "rupa-jaali": { wait: "glint", pass: "tilt", welcome: "night" },
+  // Kuruthola: an arch of plaited leaves, a ring of leaf flowers, a ring of leaf fish
+  thoranam: { wait: "sway", pass: "swing", welcome: "lamps" },
+  // Sadaf: three Mughal arches of dark wood inlaid with pearl
+  "seep-mehrab": { wait: "glint", pass: "walk", welcome: "royal" },
+  // Aakar: a square, a circle and a triangle cut through three canvases
+  "teen-aakar": { wait: "spin", pass: "turn", welcome: "party" },
+  // Shwet Shyam: three stone arches down a black-and-white colonnade
+  galiyara: { wait: "twinkle", pass: "walk", welcome: "night" },
+  // Dhanak: a pearly arch, a ring of rainbow glass and a ring of pearls
+  chamak: { wait: "glint", pass: "glide", welcome: "party" },
+} as const satisfies Record<string, DepthSpec>;
+export type DepthOpening = keyof typeof DEPTH_OPENINGS;
+const DEPTH_IDS = Object.keys(DEPTH_OPENINGS) as DepthOpening[];
+
+export function isDepthOpening(style: string): style is DepthOpening {
+  return style in DEPTH_OPENINGS;
+}
+
+export function depthSpec(id: DepthOpening): DepthSpec {
+  return (DEPTH_OPENINGS as Record<string, DepthSpec>)[id]!;
+}
+
+/** A depth opening's place beyond: the centre picture of the template it was painted with. */
+export function depthBeyond(id: DepthOpening): string {
+  const template = STORY_IDS.find((story) => STORY_SECOND[story] === id);
+  return template ? `/suites/${template}/centre.webp` : `/openings/depth/${id}/beyond.webp`;
 }
 
 /**
@@ -594,6 +802,7 @@ export function isThemedOpening(style: string): style is ThemedOpening {
 export const OPENING_STYLES = [
   ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
   ...TIED_IDS,
+  ...DEPTH_IDS,
   ...FRESH_OPENINGS,
   ...THEMED_IDS,
   "doors",
@@ -622,6 +831,7 @@ export const OPENING_STYLES = [
 export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
   { id: "themed", styles: THEMED_IDS },
   { id: "tied", styles: TIED_IDS },
+  { id: "depth", styles: DEPTH_IDS },
   {
     id: "fresh",
     styles: [
@@ -739,6 +949,8 @@ export function openingNames(style: OpeningStyle): OpeningNames {
   if (isPaintedGate(style)) return pick(["foot", "quiet"]);
   // The tie sits on the seam below the names, so the names keep to the foot
   if (isTiedGate(style)) return "foot";
+  // The frames' openings meet in the middle, where the centre picture waits
+  if (isDepthOpening(style)) return "foot";
   if (isFreshOpening(style)) return pick(["seal", "foot"]);
   if (isThemedOpening(style)) return pick(["foot", "seal", "quiet"]);
   return "print";
@@ -777,6 +989,36 @@ const WEDDING_OPENINGS: readonly OpeningStyle[] = [
   "raghu-maina",
   "taala-chaabi",
   "phool-gend",
+  "panna-pat",
+  "sikki-dwar",
+  "hase-bagilu",
+  "kankreet-dwar",
+  "chhaap-kiwad",
+  "purana-darwaza",
+  "bindi-kiwad",
+  "masala-almari",
+  "kaagaz-pat",
+  "rupa-kiwad",
+  "ola-vathil",
+  "seep-kiwad",
+  "aakar-pat",
+  "shwet-dwar",
+  "moti-dwar",
+  "sona-parat",
+  "mauni",
+  "chowka",
+  "khidkiyaan",
+  "phool-chhaap",
+  "gali-gali",
+  "tipki",
+  "masala-dabba",
+  "phumdi",
+  "rupa-jaali",
+  "thoranam",
+  "seep-mehrab",
+  "teen-aakar",
+  "galiyara",
+  "chamak",
   "noor-darwaza",
   "haveli-kiwad",
   "shahi-parda",
@@ -1267,6 +1509,21 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
   paithani: "raghu-maina",
   jamawar: "taala-chaabi",
   "phool-bangla": "phool-gend",
+  thewa: "panna-pat",
+  sikki: "sikki-dwar",
+  "hase-chittara": "hase-bagilu",
+  chandigarh: "kankreet-dwar",
+  "do-rang": "chhaap-kiwad",
+  rekhachitra: "purana-darwaza",
+  "bhil-chitra": "bindi-kiwad",
+  masala: "masala-almari",
+  loktak: "kaagaz-pat",
+  tarakasi: "rupa-kiwad",
+  kuruthola: "ola-vathil",
+  sadaf: "seep-kiwad",
+  aakar: "aakar-pat",
+  "shwet-shyam": "shwet-dwar",
+  dhanak: "moti-dwar",
   "sona-gulaab": "gulaab-lifafa",
   shabnam: "os-parda",
   "surkh-gulaab": "surkh-dwar",
@@ -1296,6 +1553,34 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
   "gehra-neela": "samundar-parda",
   "shatranj-baazi": "shatranj-sandook",
 };
+
+/**
+ * A template's second opening, after its own gate: templates 56 to 70 open with a tied gate
+ * and offer their depth opening beside it, both made for the design.
+ */
+const STORY_SECOND: Partial<Record<StoryId, DepthOpening>> = {
+  thewa: "sona-parat",
+  sikki: "mauni",
+  "hase-chittara": "chowka",
+  chandigarh: "khidkiyaan",
+  "do-rang": "phool-chhaap",
+  rekhachitra: "gali-gali",
+  "bhil-chitra": "tipki",
+  masala: "masala-dabba",
+  loktak: "phumdi",
+  tarakasi: "rupa-jaali",
+  kuruthola: "thoranam",
+  sadaf: "seep-mehrab",
+  aakar: "teen-aakar",
+  "shwet-shyam": "galiyara",
+  dhanak: "chamak",
+};
+
+/** The design's own openings: its own first, then any second made with it. */
+export function ownOpenings(own: OpeningStyle, suite: SuiteId): readonly OpeningStyle[] {
+  const second = isStoryId(suite) ? STORY_SECOND[suite] : undefined;
+  return second && second !== own ? [own, second] : [own];
+}
 
 /**
  * The style the guest sees: the host's pick when it fits, else the design's own: its theme's
@@ -1422,6 +1707,10 @@ const FILMED_AS: Record<WelcomeScene, WelcomeKind> = {
 export const filmedWelcome = (scene: WelcomeScene): WelcomeKind => FILMED_AS[scene];
 
 const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
+  ...(Object.fromEntries(DEPTH_IDS.map((id) => [id, depthSpec(id).welcome])) as Record<
+    DepthOpening,
+    WelcomeKind
+  >),
   ...(Object.fromEntries(TIED_IDS.map((id) => [id, tiedSpec(id).welcome])) as Record<
     TiedGate,
     WelcomeKind

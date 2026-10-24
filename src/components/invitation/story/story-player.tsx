@@ -37,7 +37,7 @@ import { useCalendarLink } from "@/lib/publish/calendar-link";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
-import { fitScale } from "@/lib/suites/fit";
+import { FIT_KEEP_NAMES, fitScale } from "@/lib/suites/fit";
 import {
   ROLES,
   keepDate,
@@ -759,6 +759,31 @@ function lineStyle(
 }
 
 /**
+ * A line's words, with each run the story keeps whole (a person's name, joined by
+ * non-breaking spaces in keepPeople) set as a span that stays on one line. A page whose
+ * fit marks it loose lets such a name break after its first three words ("& Shri Rajendra
+ * / Prasad Sharma"), and one marked overflowing lets it break anywhere.
+ */
+function KeptWords({ text }: { text: string }) {
+  if (!text.includes(" ")) return text;
+  return text.split(" ").map((run, i) => {
+    const space = i > 0 ? " " : "";
+    if (!run.includes(" ")) return `${space}${run}`;
+    const words = run.split(" ");
+    const rest = words.slice(3).join(" ");
+    return (
+      <Fragment key={i}>
+        {space}
+        <span className="story-keep">
+          <span className="story-keep-head">{words.slice(0, 3).join(" ")}</span>
+          {rest && ` ${rest}`}
+        </span>
+      </Fragment>
+    );
+  });
+}
+
+/**
  * One full-screen page: its landscape, its function scene, and its words on the plate.
  * The player shows it over the whole screen; the editor shows it inside a phone frame.
  */
@@ -887,7 +912,15 @@ export function StoryPage({
         );
       };
       delete inner.dataset.overflow;
-      const { scale, overflow } = fitScale(fits);
+      delete inner.dataset.loose;
+      let { scale, overflow } = fitScale(fits);
+      // Names kept whole that leave the words too small may break after their first words
+      if (scale < FIT_KEEP_NAMES && inner.querySelector(".story-keep")) {
+        inner.dataset.loose = "true";
+        const loose = fitScale(fits);
+        if (loose.scale > scale || (overflow && !loose.overflow)) ({ scale, overflow } = loose);
+        else delete inner.dataset.loose;
+      }
       inner.style.setProperty("--story-fit", String(scale));
       if (overflow) inner.dataset.overflow = "true";
       overflowed.current?.(overflow);
@@ -1068,7 +1101,7 @@ export function StoryPage({
                   ) : role === "date" ? (
                     keepDate(line.text)
                   ) : (
-                    line.text
+                    <KeptWords text={line.text} />
                   )}
                 </p>
               </Fragment>

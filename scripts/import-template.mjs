@@ -6,6 +6,7 @@
  *
  *   node scripts/import-template.mjs <folder> <template> --gate <gate> --key magenta|green
  *     [--tie-size <scale>] [--tie-at <% down>]
+ *     [--depth <opening> --depth-key magenta|green] [--layouts cover=band,family=left,...]
  *
  * It writes, all as WebP at the size the site uses (768 x 1365, 9:16):
  * - public/suites/<template>/: the nine pages and the centre; the two photo pages with their
@@ -13,11 +14,16 @@
  * - public/openings/tied/<gate>/: door-left and door-right, split at the doors' seam; the
  *   tie with its key colour cut away, at its size and place on the screen (--tie-size, a
  *   scale, and --tie-at, its middle in % down), a ribbon or cord drawn on to both edges
- *   when the painting has it running off them; piece-0 to piece-5 cut from the pieces sheet
+ *   when the painting has it running off them; piece-0 to piece-5 cut from the pieces sheet,
+ *   when there is one
+ * - public/openings/depth/<opening>/: front, middle and back (front.png ... back.png), each
+ *   with its opening's key colour cut clear
  * and prints what the catalog needs: the photo frames and where the names go under them,
  * the calm part of each page for its words, the centre's empty field, how light or dark
- * each calm part is, and the doors' seam and the tie's place. Check every number by eye
- * on the page before it ships: these are a first measure, not the last word.
+ * each calm part is, the doors' seam and the tie's place, and each depth frame's opening.
+ * --layouts names where each page keeps its words when it isn't the usual (top, low, band,
+ * or from templates 56 on also left, right and window). Check every number by eye on the
+ * page before it ships: these are a first measure, not the last word.
  */
 
 import { existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
@@ -59,6 +65,12 @@ const flag = (name) => {
 };
 const gate = flag("gate");
 const keyName = flag("key") ?? "magenta";
+const depth = flag("depth");
+const depthKey = flag("depth-key") ?? keyName;
+for (const pair of (flag("layouts") ?? "").split(",").filter(Boolean)) {
+  const [page, kind] = pair.split("=");
+  if (page && kind) CALM[page] = kind;
+}
 const tieSize = Number(flag("tie-size") ?? 1);
 const tieAt = flag("tie-at") === undefined ? null : Number(flag("tie-at"));
 const write = !args.includes("--dry");
@@ -144,6 +156,60 @@ async function cutKey(img, key, soft = false) {
     cut = { data: out, width: img.width, height: img.height };
   }
   return cut;
+}
+
+/**
+ * Keeps the cut only in the photo greens: the `count` largest clear areas and a few pixels
+ * round them, for their soft edge. Anywhere else the painting goes back to solid, so art
+ * painted in a colour near the key (Thewa's emerald glass) never turns see-through.
+ */
+async function keepPhotoGreens(cut, original, count) {
+  const { data, width, height } = cut;
+  const label = new Int32Array(width * height);
+  const sizes = [0];
+  for (let start = 0; start < width * height; start++) {
+    if (label[start] || data[start * 4 + 3] > 40) continue;
+    const id = sizes.length;
+    let size = 0;
+    const stack = [start];
+    label[start] = id;
+    while (stack.length) {
+      const p = stack.pop();
+      size++;
+      const x = p % width;
+      for (const q of [p - 1, p + 1, p - width, p + width]) {
+        if (q < 0 || q >= width * height || label[q]) continue;
+        if (Math.abs((q % width) - x) > 1) continue;
+        if (data[q * 4 + 3] > 40) continue;
+        label[q] = id;
+        stack.push(q);
+      }
+    }
+    sizes.push(size);
+  }
+  const keep = new Set(
+    sizes
+      .map((size, id) => ({ size, id }))
+      .slice(1)
+      .sort((a, b) => b.size - a.size)
+      .slice(0, count)
+      .map((c) => c.id),
+  );
+  const mask = Buffer.alloc(width * height);
+  for (let p = 0; p < mask.length; p++) if (keep.has(label[p])) mask[p] = 255;
+  // A little room round each green for its feathered edge
+  const grown = await sharp(mask, { raw: { width, height, channels: 1 } })
+    .blur(8)
+    .extractChannel(0)
+    .raw()
+    .toBuffer();
+  const out = Buffer.from(data);
+  for (let p = 0, i = 0; p < width * height; p++, i += 4) {
+    if (grown[p] > 8) continue;
+    original.data.copy(out, i, i, i + 3);
+    out[i + 3] = 255;
+  }
+  return { data: out, width, height };
 }
 
 /** The boxes of clear areas (the cut photo greens), largest first, as % of the picture. */
@@ -288,6 +354,31 @@ function calmArea(d, kind) {
   } else if (kind === "low") {
     [y0, y1] = longestRun(calm, h * 0.72, Math.round(h * 0.35), h - 1);
     y1 = Math.min(y1, Math.round(h * 0.94));
+  } else if (kind === "left" || kind === "right") {
+    // Words down one side, a tall column of art down the other: the calm columns from the
+    // words' edge in, then the calm rows within them
+    const cols = [];
+    for (let x = 0; x < d.w; x++) {
+      let sum = 0;
+      for (let y = Math.round(d.h * 0.12); y < Math.round(d.h * 0.88); y++)
+        sum += d.edge[y * d.w + x];
+      cols.push(sum / (d.h * 0.76));
+    }
+    const sorted = [...cols].sort((a, b) => a - b);
+    const limit =
+      sorted[Math.floor(sorted.length * 0.1)] +
+      (sorted[Math.floor(sorted.length * 0.85)] - sorted[Math.floor(sorted.length * 0.1)]) * 0.4;
+    const from = kind === "left" ? Math.round(d.w * 0.08) : Math.round(d.w * 0.92);
+    let edge = from;
+    const step = kind === "left" ? 1 : -1;
+    while (edge + step >= 0 && edge + step < d.w && cols[edge + step] <= limit) edge += step;
+    const pctW = (v) => Math.round((v / d.w) * 100);
+    const inner = kind === "left" ? 100 - pctW(edge + 1) + 2 : pctW(edge) + 2;
+    const x0 = kind === "left" ? 0.06 : inner / 100;
+    const x1 = kind === "left" ? 1 - inner / 100 : 0.94;
+    [y0, y1] = longestRun(calmRows(d, x0, x1), h * 0.5, Math.round(h * 0.1), Math.round(h * 0.9));
+    const sides = kind === "left" ? [6, inner] : [inner, 6];
+    return [Math.max(6, pct(y0) + 1), Math.max(6, 100 - pct(y1 + 1) + 1), ...sides];
   } else [y0, y1] = longestRun(calm, h * 0.5, Math.round(h * 0.12), Math.round(h * 0.9));
   const [left, right] = sideInsets(d, y0, y1);
   return [Math.max(6, pct(y0) + 1), Math.max(6, 100 - pct(y1 + 1) + 1), left, right];
@@ -421,7 +512,8 @@ for (const [role, count] of [
 ]) {
   const path = need(role);
   if (!path) continue;
-  const cut = await cutKey(await raw(path), KEYS.green, true);
+  const original = await raw(path);
+  const cut = await keepPhotoGreens(await cutKey(original, KEYS.green, true), original, count);
   if (write) await webp(cut, 84).toFile(join(suiteDir, `${role}.webp`));
   const boxes = holes(cut, count);
   if (boxes.length !== count)
@@ -464,7 +556,8 @@ if (gateDir) {
     report.tie = solidBox(cut);
     if (write) await webp(cut, 86).toFile(join(gateDir, "tie.webp"));
   }
-  const piecesPath = need("pieces");
+  // Templates 56 on have no pieces sheet: their ties come undone without pieces
+  const piecesPath = found.get("pieces");
   if (piecesPath) {
     const sheet = await cutKey(await raw(piecesPath), key);
     const cellW = W / 2;
@@ -502,6 +595,22 @@ if (gateDir) {
           .toFile(join(gateDir, `piece-${i}.webp`));
     }
     report.pieces = sizes;
+  }
+}
+
+if (depth) {
+  const depthDir = join("public", "openings", "depth", depth);
+  if (write) mkdirSync(depthDir, { recursive: true });
+  report.depth = {};
+  for (const frame of ["front", "middle", "back"]) {
+    const path = need(frame);
+    if (!path) continue;
+    const cut = await cutKey(await raw(path), KEYS[depthKey]);
+    if (write) await webp(cut, 84).toFile(join(depthDir, `${frame}.webp`));
+    // The frame's opening: the clear area, as % of the picture
+    const [opening] = holes(cut, 1);
+    report.depth[frame] = opening ?? null;
+    if (!opening) report.warnings.push(`${frame}: no opening found in the key colour`);
   }
 }
 

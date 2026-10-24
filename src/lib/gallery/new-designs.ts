@@ -2,9 +2,24 @@ import type { SuiteId } from "@/lib/suites/catalog";
 
 /*
  * The painted Story themes added most recently, newest first, for "new designs" in emails.
- * Add a theme here when it goes live (themes 1 to 55 of October 2026 so far).
+ * Add a theme here when it goes live (themes 1 to 70 of October 2026 so far).
  */
 export const NEW_SUITES: readonly SuiteId[] = [
+  "thewa",
+  "sikki",
+  "hase-chittara",
+  "chandigarh",
+  "do-rang",
+  "rekhachitra",
+  "bhil-chitra",
+  "masala",
+  "loktak",
+  "tarakasi",
+  "kuruthola",
+  "sadaf",
+  "aakar",
+  "shwet-shyam",
+  "dhanak",
   "chini-mitti",
   "libaas",
   "vanaspati",
