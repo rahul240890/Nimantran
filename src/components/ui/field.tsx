@@ -3,6 +3,7 @@
 import { CircleAlert } from "lucide-react";
 import { createContext, useContext, useId, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { useQuiet } from "./quiet";
 
 type FieldContextValue = {
   id: string;
@@ -49,7 +50,10 @@ export function Field({
   children,
 }: FieldProps) {
   const id = useId();
-  const hintId = hint ? `${id}-hint` : undefined;
+  // A quiet page keeps only the label: the hint's words are left out
+  const quiet = useQuiet();
+  const shownHint = quiet ? undefined : hint;
+  const hintId = shownHint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   const describedBy = [errorId, hintId].filter(Boolean).join(" ") || undefined;
 
@@ -64,12 +68,16 @@ export function Field({
         disabled,
       }}
     >
-      <div className={cn("flex min-w-0 flex-col gap-2", className)}>
+      <div className={cn("flex min-w-0 flex-col", quiet ? "gap-1.5" : "gap-2", className)}>
         <div className="flex items-baseline justify-between gap-3">
           <label
             id={`${id}-label`}
             htmlFor={id}
-            className={cn("font-semibold text-ink", disabled && "text-ink-muted")}
+            className={cn(
+              "font-semibold text-ink",
+              quiet && "text-sm",
+              disabled && "text-ink-muted",
+            )}
           >
             {label}
             {required ? (
@@ -88,9 +96,9 @@ export function Field({
             <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
             <span>{error}</span>
           </p>
-        ) : hint ? (
+        ) : shownHint ? (
           <p id={hintId} className="text-sm text-ink-muted">
-            {hint}
+            {shownHint}
           </p>
         ) : null}
       </div>

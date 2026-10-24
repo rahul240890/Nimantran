@@ -5,6 +5,7 @@ import { Select as SelectPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
+import { useQuiet } from "./quiet";
 
 export type SelectOption = {
   value: string;
@@ -56,6 +57,7 @@ export function Select({
   openAt,
 }: SelectProps) {
   const field = useField();
+  const quiet = useQuiet();
   const [open, setOpen] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
   const empty = !(value ?? defaultValue);
@@ -91,7 +93,8 @@ export function Select({
         aria-describedby={field?.describedBy}
         className={cn(
           controlClasses,
-          "group flex h-12 cursor-pointer items-center gap-2.5 px-3.5 text-start text-base",
+          "group flex cursor-pointer items-center gap-2.5 text-start",
+          quiet ? "h-11 px-3 text-ui" : "h-12 px-3.5 text-base",
           "data-placeholder:text-ink-muted data-[state=open]:border-ring",
           className,
         )}

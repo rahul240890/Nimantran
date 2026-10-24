@@ -12,6 +12,7 @@ import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
+import { Hint } from "@/components/ui/quiet";
 
 /** The language's name in the site's own language ("Gujarati", "गुजराती"). */
 function siteName(code: CardLanguage, locale: string): string {
@@ -65,7 +66,7 @@ export function CardLanguagePicker({ draft, update }: Pick<StepProps, "draft" | 
         <h2 id="card-language-heading" className="font-label text-xs tracking-[0.2em] uppercase">
           {languageCopy.mainHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{languageCopy.mainHint}</p>
+        <Hint>{languageCopy.mainHint}</Hint>
       </div>
       <RadioPrimitive.Root
         aria-labelledby="card-language-heading"

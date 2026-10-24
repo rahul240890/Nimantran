@@ -1,16 +1,9 @@
 "use client";
 
-import {
-  ArrowLeft,
-  ArrowRight,
-  LoaderCircle,
-  PlayCircle,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ArrowLeft, ArrowRight, LoaderCircle, PlayCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { AccountMenu } from "@/components/account/account-menu";
 import { Logo } from "@/components/brand/logo";
 import { SocialIcon } from "@/components/brand/social-links";
@@ -20,6 +13,7 @@ import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { helpPath } from "@/components/shell/nav-links";
 import { Button } from "@/components/ui/button";
+import { Quiet } from "@/components/ui/quiet";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { draftCategory, includedFunctions, type EditorStep } from "@/lib/editor/draft";
@@ -28,35 +22,35 @@ import { noFamily } from "@/lib/editor/family";
 import { startWithDesign, type GalleryChoice } from "@/lib/editor/gallery-start";
 import { inviteDraft } from "@/lib/editor/store";
 import { funnel } from "@/lib/funnel";
-import { coupleLayouts } from "@/lib/publish/frames";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PreviewStage } from "../preview-stage";
-import { CoupleStep } from "../steps/couple-step";
+import { CoupleStep, WordsStep } from "../steps/couple-step";
 import { FamilySection } from "../steps/family-section";
 import { Fold } from "../steps/fold";
-import { DesignPhotos } from "../steps/photos-music-steps";
+import { MusicStep, PhotosStep } from "../steps/photos-music-steps";
 import { QuickFunctions } from "./quick-functions";
 import "@/components/invitation/type/fonts.css";
 
 const noSubscribe = () => () => {};
 
-/** The parts of the full editor the short form fills in. */
 /** How long on a design's page before offering to make it for them. */
 const STALL_MS = 60_000;
 const MAKE_HIDDEN_KEY = "shubh-make-nudge-hidden";
 
-const CHECKED: readonly EditorStep[] = ["couple", "functions"];
+/** The parts with fields that must be right before the preview. */
+const CHECKED: readonly EditorStep[] = ["couple", "words", "functions"];
 
 /**
- * A design's own page (update 4; owner, 2026-10-24: tap a design, see it on top and fill
- * in the details below). The design shows as the invitation itself, the names appearing on
- * it as they are typed, with its price and the way to watch it open. Under it, one short
- * form: the card's language, the names, and when and where; the family and photos fold
- * away. Everything else (wording, music, reply questions) fills itself in. See my
- * invitation opens the editor's last step, where it is previewed, published and paid for;
- * More options opens the full editor, everything typed already in place. Both work on the
- * same draft as the editor, so nothing is typed twice.
+ * A design's own page, the whole editor on one page (update 4; owner, 2026-10-24: one main
+ * page, nothing nested, clean and short). The design shows as the invitation itself, the
+ * names appearing on it as they are typed, with its price and the way to watch it open.
+ * Beside it, every part of the editor for the occasion: the card's language and the names,
+ * when and where, then the family, photos, card words, and music and replies, folded until
+ * opened. The page is quiet (components/ui/quiet.tsx): no helper words, small type, close
+ * together. See my invitation opens the editor's preview, where it is published and paid
+ * for, on the same draft, so nothing is typed twice. Other designs for the occasion sit
+ * underneath to compare with.
  */
 export function QuickStart({
   designId,
@@ -65,6 +59,7 @@ export function QuickStart({
   signedIn,
   backHref,
   sampleHref,
+  more,
 }: {
   designId: string;
   /** The design's name in the site's language. */
@@ -75,8 +70,10 @@ export function QuickStart({
   backHref: string;
   /** The design as a guest gets it. */
   sampleHref: string;
+  /** Other designs for the occasion, drawn on the server (suggested-designs.tsx). */
+  more?: ReactNode;
 }) {
-  const { quickCopy, editor } = useText(editorText);
+  const { quickCopy, editor, stepCopy } = useText(editorText);
   const locale = useLocale();
   const router = useRouter();
   const still = useReducedMotion();
@@ -108,7 +105,17 @@ export function QuickStart({
     if (started.current) return;
     started.current = true;
     funnel("Details opened", { design: designId });
-    void startWithDesign(choice, { signedIn, site: locale })
+    // Back on a page whose design the invite already has (a reload, or back from the
+    // preview), what the family changed since stays: the address's faith or tradition
+    // isn't applied again
+    const current = inviteDraft.get().draft;
+    const already =
+      current.updatedAt !== 0 &&
+      current.suite === choice.suite &&
+      current.templateId === choice.template &&
+      current.format === (choice.format ?? "story") &&
+      current.categoryId === choice.category;
+    void (already ? Promise.resolve() : startWithDesign(choice, { signedIn, site: locale }))
       .then(() => {
         const current = inviteDraft.get().draft;
         if (includedFunctions(current).length > 0) return;
@@ -191,6 +198,8 @@ export function QuickStart({
         const first = form.current?.querySelector<HTMLElement>(
           '[aria-invalid="true"], [data-invalid]',
         );
+        // A field folded away opens first, so it can be seen and typed in
+        first?.closest("details")?.setAttribute("open", "");
         first?.focus();
         first?.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
       });
@@ -199,7 +208,6 @@ export function QuickStart({
     leave("preview");
   };
 
-  const photos = coupleLayouts(draft).some((layout) => layout !== "none");
   const familyFilled = JSON.stringify(draft.family) !== JSON.stringify(noFamily);
   const stepProps = { draft, update, errors, goTo: () => {} };
 
@@ -232,7 +240,7 @@ export function QuickStart({
         >
           <div
             ref={stage}
-            className="h-[min(60svh,32rem)] min-h-[22rem] lg:h-[min(calc(100dvh-17rem),42rem)] lg:min-h-[26rem]"
+            className="h-[min(50svh,28rem)] min-h-[20rem] lg:h-[min(calc(100dvh-17rem),42rem)] lg:min-h-[26rem]"
           >
             {ready ? (
               <PreviewStage draft={draft} page={page} onPage={setPage} className="h-full" />
@@ -271,7 +279,7 @@ export function QuickStart({
         <form
           ref={form}
           noValidate
-          aria-labelledby="quick-title"
+          aria-label={quickCopy.title}
           // Filling in a function turns the design to its page, the names to the cover
           onFocusCapture={(event) => {
             const target = (event.target as HTMLElement).closest<HTMLElement>("[data-page-target]");
@@ -281,52 +289,41 @@ export function QuickStart({
             event.preventDefault();
             see();
           }}
-          className="flex min-w-0 flex-col gap-8 lg:max-w-2xl"
+          className="flex min-w-0 flex-col gap-5 lg:max-w-2xl"
         >
-          <div className="flex flex-col gap-2">
-            <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-              {quickCopy.eyebrow}
-            </p>
-            <h2 id="quick-title" className="font-display text-[1.6rem] leading-tight sm:text-3xl">
-              {quickCopy.title}
-            </h2>
-            <p className="text-ink-muted">{quickCopy.intro}</p>
-          </div>
-
           {ready && (
-            <>
+            <Quiet className="flex flex-col gap-5">
               <CoupleStep {...stepProps} />
               <section
                 aria-labelledby="when-heading"
-                className="flex flex-col gap-4 border-t border-line pt-6"
+                className="flex flex-col gap-3 border-t border-line pt-4"
               >
-                <h2 id="when-heading" className="font-display text-xl">
+                <h2 id="when-heading" className="font-display text-lg">
                   {quickCopy.whenHeading}
                 </h2>
                 <QuickFunctions draft={draft} update={update} errors={errors} />
               </section>
-              <Fold
-                title={quickCopy.familyTitle}
-                intro={quickCopy.familyIntro}
-                filled={familyFilled}
-                pageTarget="family"
-              >
+              {/* The rest of the editor, each part folded until opened */}
+              <Fold title={quickCopy.familyTitle} filled={familyFilled} pageTarget="family">
                 <FamilySection draft={draft} update={update} />
               </Fold>
-              {photos && (
-                <Fold
-                  title={quickCopy.photosTitle}
-                  intro={quickCopy.photosIntro}
-                  filled={draft.photos.length > 0}
-                  pageTarget="cover"
-                >
-                  <DesignPhotos draft={draft} update={update} />
-                </Fold>
-              )}
+              <Fold
+                title={quickCopy.photosTitle}
+                filled={draft.photos.length > 0}
+                pageTarget="cover"
+              >
+                <PhotosStep {...stepProps} />
+              </Fold>
+              <Fold title={stepCopy.words.label} pageTarget="cover">
+                <WordsStep {...stepProps} />
+              </Fold>
+              <Fold title={stepCopy.music.label} pageTarget="family">
+                <MusicStep {...stepProps} />
+              </Fold>
               <DesignPackages
                 designId={designId}
                 tone="paper"
-                className="border-t border-line pt-6"
+                className="border-t border-line pt-4"
               />
               {/* An offer running now on this design, with its code to copy */}
               <PreviewOffers designId={designId} tone="paper" />
@@ -339,7 +336,7 @@ export function QuickStart({
                 <SocialIcon channel="whatsapp" className="size-4 text-success" />
                 {quickCopy.make}
               </a>
-            </>
+            </Quiet>
           )}
 
           {/* See my invitation stays in reach on a phone */}
@@ -388,22 +385,11 @@ export function QuickStart({
                 {quickCopy.see}
               </Button>
               <p className="text-xs text-ink-muted">{quickCopy.nothingToPay}</p>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                disabled={!ready}
-                leadingIcon={<SlidersHorizontal aria-hidden />}
-                onClick={() => leave("couple")}
-                title={quickCopy.moreIntro}
-                className="ms-auto"
-              >
-                {quickCopy.more}
-              </Button>
             </div>
           </div>
         </form>
       </main>
+      {more}
 
       {/* Phones: the design, small, while it is out of view, until put away */}
       {ready && !wide && !stageSeen && !miniHidden && (
