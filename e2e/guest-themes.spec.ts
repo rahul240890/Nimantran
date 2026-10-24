@@ -132,6 +132,53 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 
+// Owner, 2026-10-24: a couple with one photo each saw only the first, and guests had to
+// scroll sideways through the photos
+test("the welcome shows both photos when the couple gave one each, and the photos turn by themselves", async ({
+  page,
+}) => {
+  expect(sectionLayouts("rajwada-bagh").photos).toBe("film");
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=two");
+  const welcome = page.locator('section[aria-labelledby="guest-welcome"]');
+  await expect(welcome.locator("figure")).toHaveCount(2);
+  await expect(welcome.locator("figcaption")).toHaveText(["Arjun", "Sia"]);
+  await expect(welcome.getByRole("img", { name: guestCopy.photoAlt(2) })).toBeVisible();
+
+  const photos = page.getByRole("group", { name: "Photos" });
+  await photos.scrollIntoViewIfNeeded();
+  const counter = photos.locator("p[aria-live]");
+  await expect(counter).toContainText("Photo 1 of 2");
+  // It moves on by itself while on screen, unless the guest's pointer rests on it
+  await page.mouse.move(1, 1);
+  await expect(counter).toContainText("Photo 2 of 2", { timeout: 9_000 });
+  await photos.getByRole("button", { name: "Next photo" }).click();
+  await expect(counter).toContainText("Photo 1 of 2");
+  await photos.getByRole("button", { name: "Previous photo" }).click();
+  await expect(counter).toContainText("Photo 2 of 2");
+  await photos.getByRole("button", { name: "Pause the photos" }).click();
+  await expect(photos.getByRole("button", { name: "Play the photos" })).toBeVisible();
+  await page.mouse.move(1, 1);
+  await page.waitForTimeout(5_500);
+  await expect(counter).toContainText("Photo 2 of 2");
+  expect(await noOverflow(page)).toBe(true);
+  expect((await axe(page).analyze()).violations).toEqual([]);
+});
+
+test("in still mode the photos stay put and have no pause", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
+  const photos = page.getByRole("group", { name: "Photos" });
+  await photos.scrollIntoViewIfNeeded();
+  const counter = photos.locator("p[aria-live]");
+  await expect(counter).toContainText("Photo 1 of 3");
+  await expect(photos.getByRole("button", { name: "Pause the photos" })).toHaveCount(0);
+  await page.mouse.move(1, 1);
+  await page.waitForTimeout(5_500);
+  await expect(counter).toContainText("Photo 1 of 3");
+  await photos.getByRole("button", { name: "Next photo" }).click();
+  await expect(counter).toContainText("Photo 2 of 3");
+});
+
 for (const suite of ["rajwada-bagh", "kayal"] as const) {
   for (const colorScheme of ["light", "dark"] as const) {
     test(`${suite} as One Scene, ${colorScheme} theme`, async ({ page }) => {

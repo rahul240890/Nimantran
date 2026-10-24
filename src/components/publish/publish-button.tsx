@@ -1,6 +1,15 @@
 "use client";
 
-import { Check, CircleAlert, Globe, LoaderCircle, LogIn, Send, Sparkles } from "lucide-react";
+import {
+  Check,
+  CircleAlert,
+  Globe,
+  LoaderCircle,
+  LogIn,
+  PencilLine,
+  Send,
+  Sparkles,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
@@ -11,11 +20,11 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
-import { type InviteDraft } from "@/lib/editor/draft";
+import { mainFunction, type InviteDraft } from "@/lib/editor/draft";
 import { draftProblems } from "@/lib/editor/draft-checks";
 import { inviteDraft } from "@/lib/editor/store";
 import { syncDraft } from "@/lib/invites/sync";
-import { cleanSlugInput, isSlug, suggestSlug } from "@/lib/publish/slug";
+import { cleanSlugInput, isSlug, slugYear, suggestSlug } from "@/lib/publish/slug";
 import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { editionsText } from "@/i18n/copy/editions";
@@ -113,16 +122,27 @@ async function packageCheck(remoteId: string): Promise<boolean> {
   return answer;
 }
 
+/** A link typed in English letters is cleaned as it is typed; one in another script once
+ * the host leaves the field, so their keyboard can finish each letter. */
+const asTyped = (text: string) => (/^[\x20-\x7e]*$/.test(text) ? cleanSlugInput(text) : text);
+
 function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => void }) {
   const { publishCopy } = useText(publishText);
   const router = useRouter();
-  const [slug, setSlug] = useState(() =>
+  // The link is made from the names, in English letters whatever script they're in, and a
+  // free one is found for it (owner, 2026-10-24: hosts kept having to make one up)
+  const [text, setText] = useState(() =>
     suggestSlug({
       first: draft.content.first ?? "",
       second: draft.content.second ?? "",
       categoryId: draft.categoryId,
     }),
   );
+  const slug = cleanSlugInput(text).replace(/-+$/, "");
+  const main = mainFunction(draft);
+  const year = slugYear(main ? draft.functions[main].date : undefined);
+  /** The host's own link, once they change it; until then, the one made for them. */
+  const [editing, setEditing] = useState(false);
   const [check, setCheck] = useState<SlugState>(null);
   const [busy, setBusy] = useState<"saving" | "publishing" | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -135,19 +155,25 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
   const valid = isSlug(slug);
   const current = check?.slug === slug ? check.result : null;
 
-  // Ask whether the link is free a moment after typing stops
+  // Ask whether the link is free a moment after typing stops; the link made for the host
+  // moves on to a free one by itself
   useEffect(() => {
     if (!isSlug(slug)) return;
     let cancelled = false;
     const timer = setTimeout(async () => {
-      const result = await checkSlug(slug).catch(() => null);
-      if (!cancelled && result) setCheck({ slug, result });
+      const result = await checkSlug(slug, year).catch(() => null);
+      if (cancelled || !result) return;
+      const free = result.suggestions[0];
+      if (!editing && !result.available && free) {
+        setText(free);
+        setCheck({ slug: free, result: { available: true, suggestions: [] } });
+      } else setCheck({ slug, result });
     }, 350);
     return () => {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [slug]);
+  }, [slug, year, editing]);
 
   const publish = async () => {
     if (!valid || busy) return;
@@ -162,9 +188,14 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
       return;
     }
     setBusy("publishing");
-    const outcome = await publishInvite(remoteId, slug).catch(
-      () => ({ status: "failed" }) as const,
-    );
+    const attempt = (link: string) =>
+      publishInvite(remoteId, link, year).catch(() => ({ status: "failed" }) as const);
+    let outcome: PublishOutcome = await attempt(slug);
+    // Taken in the moment since it was checked: the link made for the host moves on once
+    if (outcome.status === "taken" && !editing && outcome.suggestions[0]) {
+      setText(outcome.suggestions[0]);
+      outcome = await attempt(outcome.suggestions[0]);
+    }
     setBusy(null);
     if (outcome.status === "published") {
       funnel("Invite published");
@@ -192,12 +223,12 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
         aria-hidden
         className="size-4 shrink-0 animate-spin motion-still:animate-none"
       />
-      {publishCopy.checking}
+      {editing ? publishCopy.checking : publishCopy.finding}
     </span>
   ) : current.available ? (
     <span className="flex items-center gap-1.5 text-success">
       <Check aria-hidden className="size-4 shrink-0" strokeWidth={2.5} />
-      {publishCopy.available}
+      {editing ? publishCopy.available : publishCopy.ready}
     </span>
   ) : (
     <span className="flex items-center gap-1.5 text-danger">
@@ -239,28 +270,53 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
         }}
         className="flex flex-col gap-4"
       >
-        <Field label={publishCopy.linkLabel} hint={publishCopy.linkHint}>
-          <div className="flex min-w-0 flex-col gap-1.5">
-            <span aria-hidden className="truncate text-sm text-ink-muted">
+        {editing ? (
+          <>
+            <Field label={publishCopy.linkLabel} hint={publishCopy.linkHint}>
+              <Input
+                value={text}
+                onChange={(event) => {
+                  setError(null);
+                  setText(asTyped(event.target.value));
+                }}
+                onBlur={() => setText(slug)}
+                autoFocus
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                maxLength={60}
+                aria-describedby={statusId}
+                className="font-medium"
+              />
+            </Field>
+            <p className="text-sm break-all text-ink-muted">
               {`${location.host}/i/`}
-            </span>
-            <Input
-              value={slug}
-              onChange={(event) => {
-                setError(null);
-                setSlug(cleanSlugInput(event.target.value));
-              }}
-              onBlur={() => setSlug((value) => value.replace(/-+$/, ""))}
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              inputMode="url"
-              maxLength={60}
-              aria-describedby={statusId}
-              className="font-medium"
-            />
+              <span className="font-semibold text-ink">{slug}</span>
+            </p>
+          </>
+        ) : (
+          <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-2 px-4 py-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="font-label text-xs tracking-[0.14em] text-ink-muted uppercase">
+                {publishCopy.linkLabel}
+              </p>
+              <p className="text-base break-all text-ink-muted">
+                {`${location.host}/i/`}
+                <span className="font-semibold text-ink">{slug}</span>
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="self-start"
+              leadingIcon={<PencilLine aria-hidden />}
+              onClick={() => setEditing(true)}
+              disabled={busy !== null}
+            >
+              {publishCopy.change}
+            </Button>
           </div>
-        </Field>
+        )}
         <p id={statusId} role="status" className="min-h-6 text-sm font-medium">
           {status}
         </p>
@@ -270,7 +326,7 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
             <ul className="flex flex-wrap gap-2">
               {current.suggestions.map((option) => (
                 <li key={option}>
-                  <Button variant="secondary" size="sm" onClick={() => setSlug(option)}>
+                  <Button variant="secondary" size="sm" onClick={() => setText(option)}>
                     {option}
                   </Button>
                 </li>

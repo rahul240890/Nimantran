@@ -51,10 +51,12 @@ test.describe("publish and share", () => {
 
     // The packages come first; until payments are on, the invite publishes free
     const dialog = await openPublish(page);
-    await expect(dialog.getByRole("textbox", { name: /Invitation link/ })).toHaveValue(
-      /^aarav-weds-meera/,
-    );
+    // The link is made from the names and is free, with nothing to type
+    await expect(dialog.getByText(/\/i\/aarav-weds-meera/)).toBeVisible();
+    await expect(dialog.getByText("Made from your names, and it's yours.")).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Publish invitation" })).toBeEnabled();
     // A unique link, as other tests publish the same names
+    await dialog.getByRole("button", { name: "Change link" }).click();
     await dialog
       .getByRole("textbox", { name: /Invitation link/ })
       .fill(`aarav-weds-meera-${Date.now()}`);
@@ -145,6 +147,22 @@ test.describe("publish and share", () => {
     await expect(guest.getByRole("heading", { level: 1 })).toHaveText(
       "This invitation isn't available",
     );
+  });
+
+  // Owner, 2026-10-24: names typed in Hindi gave no link, so hosts had to make one up
+  test("names in Hindi give a link in English letters, ready in one click", async ({
+    page,
+  }, info) => {
+    await writeInvite(page, numberFor(info), ["राहुल", "प्रिया"]);
+    const dialog = await openPublish(page);
+    await expect(dialog.getByText(/\/i\/rahul-weds-priya/)).toBeVisible();
+    await expect(dialog.getByText("Made from your names, and it's yours.")).toBeVisible();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await dialog.getByRole("button", { name: "Publish invitation" }).click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);
+    const link = (await page.getByTestId("invite-link").textContent())!.trim();
+    // Taken by an earlier run, it moves on to the occasion's year, or a number
+    expect(link).toMatch(/\/i\/rahul-weds-priya(-\d+)?$/);
   });
 
   test("photos move to the account and appear on another device", async ({

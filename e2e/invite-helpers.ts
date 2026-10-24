@@ -154,7 +154,7 @@ export async function writeInvite(
  * nothing, so try again.
  */
 export async function openPublish(page: Page) {
-  const dialog = page.getByRole("dialog", { name: "Choose your link" });
+  const dialog = page.getByRole("dialog", { name: "Publish your invitation" });
   await expect(async () => {
     if (!(await dialog.isVisible())) {
       if (/\/edition/.test(page.url())) {
@@ -174,6 +174,8 @@ export async function openPublish(page: Page) {
 /** Publishes the invite open in the editor under a unique link; ends on the share page. */
 export async function publish(page: Page, base: string): Promise<string> {
   const dialog = await openPublish(page);
+  // The link made from the names is ready; a unique one, as other tests publish the same names
+  await dialog.getByRole("button", { name: "Change link" }).click();
   const link = dialog.getByRole("textbox", { name: /Invitation link/ });
   const wanted = `${base}-${Date.now()}`;
   await link.fill(wanted);

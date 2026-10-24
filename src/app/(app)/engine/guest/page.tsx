@@ -35,6 +35,7 @@ export const metadata: Metadata = {
  * WELCOME_SCENES) chooses the welcome after it, and ?hold=1 keeps it up until Continue.
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
+ * ?couple=two gives the couple one photo each, as a host can, and ?couple=one one together.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
   const {
@@ -49,6 +50,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     hold,
     turn,
     faith,
+    couple,
   } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
@@ -66,7 +68,11 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
   };
   const shown = scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS;
   const turns = Number(turn);
-  const placed = scene ? sceneDraft(base, sceneCount) : base;
+  const sampled = scene ? sceneDraft(base, sceneCount) : base;
+  const placed: InviteDraft =
+    couple === "two" || couple === "one"
+      ? { ...sampled, couplePhotos: { ...sampled.couplePhotos, layout: couple } }
+      : sampled;
   const draft: InviteDraft = {
     ...placed,
     tradition: { ...placed.tradition, faith: isFaith(faith) ? faith : placed.tradition.faith },

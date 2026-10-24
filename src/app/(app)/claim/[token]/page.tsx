@@ -1,6 +1,6 @@
 import { Link2Off } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { AccountShell } from "@/components/account/account-shell";
 import { TemplateCover } from "@/components/brand/template-cover";
