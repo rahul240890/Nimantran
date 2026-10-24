@@ -859,10 +859,12 @@ function PhotoCarousel({
         }
       }}
     >
+      {/* Focusable so a keyboard can reach the scrolling strip; its arrow keys turn the photos */}
       <ul
         ref={track}
+        tabIndex={0}
         onScroll={settle}
-        className="guest-gallery flex w-full snap-x snap-mandatory gap-8 overflow-x-auto px-[calc(50%-min(31vw,7.5rem))] pt-8 pb-10 sm:gap-10"
+        className="guest-gallery flex w-full snap-x snap-mandatory gap-8 overflow-x-auto px-[calc(50%-min(31vw,7.5rem))] pt-8 pb-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:gap-10"
       >
         {photos.map((photo, i) => (
           <li
