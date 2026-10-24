@@ -312,8 +312,12 @@ test.describe("packages", () => {
     // that adds what isn't paid for (another design, more languages) waits for a package
     await page.goto(`/create?invite=${id}&quality=2d`);
     await expect(page.getByText("Your invitation is live")).toBeVisible({ timeout: 30_000 });
+    // One step at a time: a click that lands while the last step is still coming in is lost
+    const heading = page.getByRole("heading", { level: 1 });
     for (let step = 0; step < 6; step++) {
+      const title = (await heading.textContent()) ?? "";
       await page.getByRole("button", { name: "Back", exact: true }).click();
+      await expect(heading).not.toHaveText(title);
     }
     await page.getByRole("textbox", { name: /Second name/ }).fill("Isha Rani");
     await expect
