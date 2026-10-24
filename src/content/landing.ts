@@ -153,6 +153,65 @@ export const homeRows = {
   allDesigns: "See all designs",
 };
 
+/**
+ * Why Shubh (owner, 2026-10-24): what a family gets, in plain words, under the phone that shows
+ * how it works. Each point is something the site does today; the first two lead.
+ */
+export const homeWhy = {
+  eyebrow: "Why Shubh",
+  title: "Everything your invitation needs",
+  intro: "Easy to make, easy to send, and easy for every guest to open.",
+  /** Opens a whole invitation as a guest gets it (/sample). */
+  demo: "Open a live invitation",
+  free: "Free to start",
+  points: {
+    preview: {
+      title: "See it before you pay",
+      body: "Every change shows at once on a phone, exactly as your guests will see it. Open any design as a live invitation first.",
+    },
+    payLater: {
+      title: "Make it free, pay later",
+      body: "Make the whole invitation free, video included, and pay only when you send it. Keep editing after it's live; the link never changes.",
+    },
+    oneLink: {
+      title: "One link for everything",
+      body: "Every function on one page, each with its map and add-to-calendar, a countdown, and replies in one tap.",
+    },
+    social: {
+      title: "Ready for WhatsApp and Instagram",
+      body: "Send it on WhatsApp with each guest's own link, and a full-HD video of your invitation for Status, Reels and Stories.",
+    },
+    guests: {
+      title: "Add guests in minutes",
+      body: "From your phone contacts or an Excel file, or take a photo of a handwritten list and AI reads it.",
+    },
+    language: {
+      title: "In your language",
+      body: "English, Hindi, Marathi, Gujarati, Bengali or Tamil, or two languages on one card. Type names in any script.",
+    },
+    replies: {
+      title: "Know who's coming",
+      body: "See who opened it and who is coming, with head counts for each function, a list to download, and co-hosts to help.",
+    },
+    opening: {
+      title: "Opens like a real card",
+      body: "Painted gates, ribbons, doors and a blooming flower open it, more than 200 ways, with its own music or your song.",
+    },
+    cards: {
+      title: "Save the date and thank you cards",
+      body: "Made in the same design as your invitation, ready to send before and after the day.",
+    },
+    photos: {
+      title: "Your photos, beautifully framed",
+      body: "Photos sit in the design's own frames, both of you when you add one each, and guests share theirs after the day.",
+    },
+    family: {
+      title: "Show your family first",
+      body: "Send a preview to family before guests see it. Your link is made from your names, even typed in Hindi.",
+    },
+  },
+};
+
 /** Two ways on for a family short of time: the whole wedding at once, or one made for them. */
 export const homeHelp = {
   set: {

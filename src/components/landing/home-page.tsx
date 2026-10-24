@@ -5,6 +5,7 @@ import { Hero } from "./hero";
 import { HomeDesigns } from "./home-designs";
 import { HomeHelp } from "./home-help";
 import { HomeOccasions } from "./home-occasions";
+import { HomeWhy } from "./home-why";
 import { HomeOffers } from "@/components/offers/offers";
 import { HomeReviews } from "@/components/reviews/home-reviews";
 import { OfferBar } from "@/components/offers/offer-bar";
@@ -18,7 +19,7 @@ import { application, faqPage, organization, website } from "@/lib/seo/structure
 
 /**
  * The landing page in one site language; / and /hi render it. Kept to what helps a family
- * decide quickly: a phone that shows how it works beside Start free, the occasions, rows of
+ * decide quickly: a phone that shows how it works beside Start free, why Shubh, the occasions, rows of
  * designs, two ways on for a family short of time, then the questions families ask.
  */
 export function HomePage({ locale }: { locale: UiLocale }) {
@@ -31,6 +32,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
         <OfferBar />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale} />
+          <HomeWhy locale={locale} />
           <HomeOccasions locale={locale} />
           <HomeDesigns locale={locale} />
           <HomeHelp locale={locale} />
