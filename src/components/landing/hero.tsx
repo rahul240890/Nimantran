@@ -1,6 +1,7 @@
 import { ArrowRight, Check, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { TrustLine } from "@/components/reviews/trust-line";
 import { Button } from "@/components/ui/button";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
@@ -101,6 +102,7 @@ export function Hero({ locale }: { locale: UiLocale }) {
               </li>
             ))}
           </ul>
+          <TrustLine className="max-xl:justify-center" />
         </div>
         <HomeFlow
           copy={flowCopy(locale)}

@@ -14,6 +14,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { AccountMenu } from "@/components/account/account-menu";
 import { Logo } from "@/components/brand/logo";
 import { SocialIcon } from "@/components/brand/social-links";
+import { PreviewOffers } from "@/components/offers/preview-offers";
+import { TrustLine } from "@/components/reviews/trust-line";
 import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { helpPath } from "@/components/shell/nav-links";
@@ -40,6 +42,10 @@ import "@/components/invitation/type/fonts.css";
 const noSubscribe = () => () => {};
 
 /** The parts of the full editor the short form fills in. */
+/** How long on a design's page before offering to make it for them. */
+const STALL_MS = 60_000;
+const MAKE_HIDDEN_KEY = "shubh-make-nudge-hidden";
+
 const CHECKED: readonly EditorStep[] = ["couple", "functions"];
 
 /**
@@ -148,6 +154,29 @@ export function QuickStart({
     return () => observer.disconnect();
   }, [ready]);
 
+  // A minute on the page without going on: offer to make it for them (owner, 2026-10-24).
+  // Put away, it stays away for the rest of the visit.
+  const [stalled, setStalled] = useState(false);
+  const [makeHidden, setMakeHidden] = useState(false);
+  useEffect(() => {
+    if (!ready) return;
+    try {
+      if (sessionStorage.getItem(MAKE_HIDDEN_KEY)) return;
+    } catch {
+      // Storage blocked: it can still be put away for this page
+    }
+    const timer = window.setTimeout(() => setStalled(true), STALL_MS);
+    return () => window.clearTimeout(timer);
+  }, [ready]);
+  const hideMake = () => {
+    setMakeHidden(true);
+    try {
+      sessionStorage.setItem(MAKE_HIDDEN_KEY, "1");
+    } catch {
+      // Storage blocked: hidden on this page only
+    }
+  };
+
   const form = useRef<HTMLFormElement>(null);
   const leave = (step: EditorStep) => {
     update((current) => ({ ...current, step }));
@@ -235,6 +264,7 @@ export function QuickStart({
               {quickCopy.watch}
             </Link>
           </Button>
+          <TrustLine />
         </section>
 
         {/* One short form; the rest fills itself in */}
@@ -298,6 +328,8 @@ export function QuickStart({
                 tone="paper"
                 className="border-t border-line pt-6"
               />
+              {/* An offer running now on this design, with its code to copy */}
+              <PreviewOffers designId={designId} tone="paper" />
               <a
                 href={helpPath(locale, "make", designId)}
                 target="_blank"
@@ -319,6 +351,31 @@ export function QuickStart({
               >
                 {editor.fixErrors(errorCount)}
               </p>
+            )}
+            {/* A minute in and still here: we can make it for them instead */}
+            {stalled && !makeHidden && errorCount === 0 && (
+              <div
+                data-make-nudge
+                className="flex items-center gap-1 rounded-md border border-success/40 bg-success/10 ps-3 animate-fade-in"
+              >
+                <SocialIcon channel="whatsapp" className="size-4 shrink-0 text-success" />
+                <a
+                  href={helpPath(locale, "make", designId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-11 flex-1 items-center rounded-sm px-1 text-sm font-semibold text-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  {quickCopy.make}
+                </a>
+                <button
+                  type="button"
+                  aria-label={quickCopy.hideMake}
+                  onClick={hideMake}
+                  className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink-muted hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <X aria-hidden className="size-4" />
+                </button>
+              </div>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <Button

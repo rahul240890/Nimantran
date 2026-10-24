@@ -87,6 +87,11 @@ database keeps every invite. Applied so far after the first setup:
   `claim_handover()`, which makes whoever takes the link the invite's owner. The rule that an
   invite keeps its owner now lets that function move it. Until it runs, making a link says it
   can't, and a link says hand-overs aren't switched on yet.
+- `20261024160000_funnel_and_reviews.sql` — where visitors stop and what families say:
+  `site_steps` with `record_step()` and `funnel_summary()` for the funnel on Admin, Visitors,
+  and `reviews` (server only) for hosts' reviews, which show on the site once an admin
+  approves them in Admin, Reviews. Until it runs the funnel says so and reviews can't be
+  sent; everything else works.
 
 ## Setting up a project
 

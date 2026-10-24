@@ -23,6 +23,7 @@ export default function robots(): MetadataRoute.Robots {
         "/family/",
         "/invites",
         "/join/",
+        "/review",
         "/sign-in",
       ],
     },

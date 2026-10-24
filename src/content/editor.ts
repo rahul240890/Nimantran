@@ -2265,5 +2265,7 @@ export const quickCopy = {
   more: "More options",
   moreIntro: "Your own song, wording, opening gate and questions",
   make: "Short on time? We'll make it for you",
+  /** Hides the make-it-for-you line that shows after a minute on a design's page. */
+  hideMake: "Hide this",
   opening: "Opening the design…",
 } as const;

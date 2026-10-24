@@ -79,5 +79,6 @@ export const config = {
     "/invoice/:path*",
     "/join/:path*",
     "/claim/:path*",
+    "/review",
   ],
 };

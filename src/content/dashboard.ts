@@ -564,3 +564,37 @@ export const claimCopy = {
   myInvites: "Go to My invites",
   off: "Accounts open soon.",
 } as const;
+
+/** A host's review (/review), shown on the site once an admin approves it. */
+export const reviewCopy = {
+  metaTitle: "Leave a review",
+  eyebrow: "Your invitation is live",
+  title: "How did Shubh do for you?",
+  intro:
+    "A few honest words help other families decide. We read every review before it shows on the site, with the name and place you choose.",
+  rating: "Your rating",
+  stars: (count: number) => (count === 1 ? "1 star" : `${count} stars`),
+  body: "Your words",
+  bodyHint: "What did your guests say? Was it easy to make?",
+  name: "Name to show",
+  nameHint: "For example Priya S., or the Sharma family.",
+  place: "City or town",
+  submit: "Send review",
+  saved: "Thank you! It shows on the site once we've read it.",
+  status: {
+    pending: "Your review is waiting to be read. You can still change it.",
+    approved: "Your review is on the site. Thank you!",
+    hidden: "Your review isn't shown on the site. You can write it again.",
+  },
+  notLive: "Reviews open once one of your invitations is live.",
+  myInvites: "Go to My invites",
+  failed: "Couldn't send it just now. Try again.",
+  errors: {
+    rating: "Choose from 1 to 5 stars.",
+    body: "Write at least 10 letters.",
+    name: "Write the name to show.",
+  },
+  ask: "How did it go? Leave a review",
+  askBody: "A few words from you help other families choose.",
+  write: "Write a review",
+} as const;

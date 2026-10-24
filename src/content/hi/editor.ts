@@ -2189,5 +2189,6 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   more: "और विकल्प",
   moreIntro: "अपना गाना, शब्द, खुलने का दरवाज़ा और सवाल",
   make: "समय कम है? हम आपके लिए बना देंगे",
+  hideMake: "इसे छिपाएँ",
   opening: "डिज़ाइन खुल रहा है…",
 };
