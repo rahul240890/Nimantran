@@ -140,7 +140,9 @@ test.describe("landing page", () => {
     await expect(page).toHaveURL(/\/invitations$/);
   });
 
-  test("the wedding row opens a design's page or its live demo, and leads on", async ({ page }) => {
+  test("the wedding section opens a design's page or its live demo, and leads on", async ({
+    page,
+  }) => {
     await visit(page);
     const row = page.locator('[data-shelf="home-wedding"]');
     await row.scrollIntoViewIfNeeded();
@@ -177,9 +179,16 @@ test.describe("landing page", () => {
     expect(await noOverflow(page)).toBe(true);
   });
 
-  test("a row for each main occasion, and See all designs", async ({ page }) => {
+  test("a section for each main occasion, and See all designs", async ({ page }) => {
     await visit(page);
-    for (const shelf of ["home-wedding", "home-engagement", "home-birthday", "home-anniversary"]) {
+    for (const shelf of [
+      "home-trending",
+      "home-bestsellers",
+      "home-wedding",
+      "home-engagement",
+      "home-birthday",
+      "home-anniversary",
+    ]) {
       await expect(page.locator(`[data-shelf="${shelf}"]`)).toHaveCount(1);
     }
     // No search on the home page: the menu and the occasions lead to the designs

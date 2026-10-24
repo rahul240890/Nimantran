@@ -7,6 +7,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
 import { useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
+import { cn } from "@/lib/cn";
 import { WEDDING_KINDS, WEDDING_KIND_ENTRIES, suiteImage } from "@/lib/gallery/catalog";
 import {
   NO_FILTERS,
@@ -15,6 +16,7 @@ import {
   type CatalogEntry,
   type DesignFilters,
 } from "@/lib/gallery/filters";
+import { SECTION_SHOWN } from "@/lib/gallery/home-sections";
 import { designPhotos } from "@/lib/gallery/photos";
 import { samplePath } from "@/lib/sample/paths";
 import { shelfHref, traditionShelf } from "@/lib/gallery/shelves";
@@ -77,6 +79,7 @@ export function ShelfRow({
   covers,
   priority,
   lazy = false,
+  layout = "row",
 }: {
   id: string;
   title: string;
@@ -92,6 +95,11 @@ export function ShelfRow({
    * it scrolls near, so a phone doesn't lay out every row's paintings before the first.
    */
   lazy?: boolean;
+  /**
+   * The home page's sections (owner, 2026-10-24: nobody should have to scroll sideways): a
+   * grid of 5 designs on a phone, 7 on a laptop and 9 on a wide screen, then View all.
+   */
+  layout?: "row" | "grid";
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   const label = shelfCopy.viewAllLabel(title, total);
@@ -100,6 +108,84 @@ export function ShelfRow({
   const item =
     "w-[44%] max-w-60 min-w-36 shrink-0 snap-start sm:w-[30%] lg:w-[calc((100%-4.5rem)/4.4)] xl:w-[calc((100%-6rem)/5.3)]";
 
+  const heading = (
+    <div className="flex items-end justify-between gap-3">
+      <div className="flex min-w-0 flex-col gap-1">
+        <h3
+          id={`${id}-heading`}
+          className="font-display text-[1.35rem] leading-tight sm:text-[1.55rem]"
+        >
+          {title}
+        </h3>
+        <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
+          <span className="min-w-0">{intro}</span>
+          <span className="inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-ink-muted ring-1 ring-line">
+            {catalogCopy.count(total)}
+          </span>
+        </p>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        {href && (
+          <Link
+            href={href}
+            aria-label={label}
+            className="group/all inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            {shelfCopy.viewAll}
+            <ArrowRight
+              aria-hidden
+              className="size-4 transition-transform duration-200 group-hover/all:translate-x-0.5 rtl:rotate-180 motion-still:transition-none"
+            />
+          </Link>
+        )}
+        {layout === "row" && <RowArrows row={row} labels={shelfCopy} />}
+      </div>
+    </div>
+  );
+
+  if (layout === "grid") {
+    const shown = entries.slice(0, SECTION_SHOWN);
+    // Fewer on narrower screens, so the grid ends on a full line with View all
+    const cell = (index: number) =>
+      cn(index >= 7 ? "max-xl:hidden" : index >= 5 && "max-lg:hidden");
+    return (
+      <section
+        ref={watch}
+        aria-labelledby={`${id}-heading`}
+        data-shelf={id}
+        data-layout="grid"
+        className="flex flex-col gap-4"
+      >
+        {heading}
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          {shown.map((entry, index) =>
+            near ? (
+              <li key={entry.design.id} data-format-item={entry.format} className={cell(index)}>
+                <CatalogCard
+                  entry={entry}
+                  filters={NO_FILTERS}
+                  covers={covers}
+                  priority={priority && index < 2}
+                />
+              </li>
+            ) : (
+              // Until the section is near, empty tiles of the same size hold its place
+              <li key={entry.design.id} aria-hidden className={cell(index)}>
+                <span className="block aspect-[3/4] rounded-2xl bg-surface-2" />
+                <span className="block h-20" />
+              </li>
+            ),
+          )}
+          {href && (
+            <li>
+              <ViewAllTile href={href} label={label} total={total} fill />
+            </li>
+          )}
+        </ul>
+      </section>
+    );
+  }
+
   return (
     <section
       ref={watch}
@@ -107,38 +193,7 @@ export function ShelfRow({
       data-shelf={id}
       className="flex flex-col gap-4"
     >
-      <div className="flex items-end justify-between gap-3">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h3
-            id={`${id}-heading`}
-            className="font-display text-[1.35rem] leading-tight sm:text-[1.55rem]"
-          >
-            {title}
-          </h3>
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
-            <span className="min-w-0">{intro}</span>
-            <span className="inline-flex items-center rounded-full bg-surface-2 px-2 py-0.5 text-xs font-semibold whitespace-nowrap text-ink-muted ring-1 ring-line">
-              {catalogCopy.count(total)}
-            </span>
-          </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          {href && (
-            <Link
-              href={href}
-              aria-label={label}
-              className="group/all inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-semibold whitespace-nowrap text-accent-text transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              {shelfCopy.viewAll}
-              <ArrowRight
-                aria-hidden
-                className="size-4 transition-transform duration-200 group-hover/all:translate-x-0.5 rtl:rotate-180 motion-still:transition-none"
-              />
-            </Link>
-          )}
-          <RowArrows row={row} labels={shelfCopy} />
-        </div>
-      </div>
+      {heading}
       <ScrollRow
         row={row}
         labels={shelfCopy}
@@ -167,32 +222,55 @@ export function ShelfRow({
           ))}
         {near && href && total > entries.length && (
           <li className={item}>
-            <Link
-              href={href}
-              aria-label={label}
-              className="group/more relative isolate flex aspect-[3/4] w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-2xl bg-night p-4 text-center shadow-raised ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-float focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0"
-            >
-              {/* A glow of marigold behind the words, like lamplight */}
-              <span
-                aria-hidden
-                className="absolute inset-0 -z-10 opacity-70"
-                style={{
-                  background:
-                    "radial-gradient(70% 55% at 50% 45%, color-mix(in srgb, var(--marigold) 32%, transparent), transparent)",
-                }}
-              />
-              <span className="grid size-14 place-items-center rounded-full bg-marigold text-on-marigold shadow-float transition-transform duration-300 group-hover/more:scale-110 motion-still:transition-none motion-still:group-hover/more:scale-100">
-                <ArrowRight aria-hidden className="size-6 rtl:rotate-180" />
-              </span>
-              <span className="font-display text-xl leading-tight text-card-ivory">
-                {shelfCopy.viewAll}
-              </span>
-              <span className="text-sm text-card-ivory/80">{catalogCopy.count(total)}</span>
-            </Link>
+            <ViewAllTile href={href} label={label} total={total} />
           </li>
         )}
       </ScrollRow>
     </section>
+  );
+}
+
+/** The last tile of a row or a section: the way on to all its designs. */
+function ViewAllTile({
+  href,
+  label,
+  total,
+  fill = false,
+}: {
+  href: string;
+  label: string;
+  total: number;
+  /** In a grid: as tall as the design cards beside it, words and price included. */
+  fill?: boolean;
+}) {
+  const { shelfCopy, catalogCopy } = useText(galleryText);
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className={cn(
+        "group/more relative isolate flex w-full flex-col",
+        fill ? "h-full min-h-56" : "aspect-[3/4]",
+        "items-center justify-center gap-3 overflow-hidden rounded-2xl bg-night p-4 text-center shadow-raised ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-float focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0",
+      )}
+    >
+      {/* A glow of marigold behind the words, like lamplight */}
+      <span
+        aria-hidden
+        className="absolute inset-0 -z-10 opacity-70"
+        style={{
+          background:
+            "radial-gradient(70% 55% at 50% 45%, color-mix(in srgb, var(--marigold) 32%, transparent), transparent)",
+        }}
+      />
+      <span className="grid size-14 place-items-center rounded-full bg-marigold text-on-marigold shadow-float transition-transform duration-300 group-hover/more:scale-110 motion-still:transition-none motion-still:group-hover/more:scale-100">
+        <ArrowRight aria-hidden className="size-6 rtl:rotate-180" />
+      </span>
+      <span className="font-display text-xl leading-tight text-card-ivory">
+        {shelfCopy.viewAll}
+      </span>
+      <span className="text-sm text-card-ivory/80">{catalogCopy.count(total)}</span>
+    </Link>
   );
 }
 

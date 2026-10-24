@@ -3,6 +3,7 @@
 import {
   Building2,
   Gift,
+  House,
   LayoutDashboard,
   Mail,
   Mails,
@@ -25,6 +26,7 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   overview: LayoutDashboard,
   payments: WalletCards,
   designs: Palette,
+  home: House,
   orders: ReceiptText,
   coupons: TicketPercent,
   invites: Mails,

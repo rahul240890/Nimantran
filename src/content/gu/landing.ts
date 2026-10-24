@@ -137,8 +137,10 @@ export const homePicks: Translation<typeof en.homePicks> = {
 export const homeRows: Translation<typeof en.homeRows> = {
   eyebrow: "ડિઝાઇન",
   title: "ગમતી ડિઝાઇન પસંદ કરો",
-  intro: "હરોળ સરકાવો, દરેક પાનું જોવા ચિત્ર પર ટૅપ કરો, અથવા મહેમાનોને દેખાશે એમ જીવંત ખોલો.",
+  intro: "દરેક પાનું જોવા ચિત્ર પર ટૅપ કરો, અથવા મહેમાનોને દેખાશે એમ જીવંત ખોલો.",
   allDesigns: "બધી ડિઝાઇન જુઓ",
+  bestsellers: { title: "બેસ્ટ સેલર", intro: "પરિવારો સૌથી વધુ ખરીદે છે તે ડિઝાઇન." },
+  newest: { title: "નવી ડિઝાઇન", intro: "હમણાં જ બનેલી અને સાઇટ પર ઉમેરાયેલી." },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

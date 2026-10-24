@@ -149,8 +149,10 @@ export const homePicks = {
 export const homeRows = {
   eyebrow: "Designs",
   title: "Pick a design you love",
-  intro: "Swipe a row, tap a painting to see every page, or open it live as your guests will.",
+  intro: "Tap a painting to see every page, or open it live as your guests will.",
   allDesigns: "See all designs",
+  bestsellers: { title: "Best sellers", intro: "The designs families pay for most." },
+  newest: { title: "New designs", intro: "Just painted and added to the site." },
 };
 
 /**
