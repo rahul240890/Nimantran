@@ -28,12 +28,21 @@ export function HomeShelves({
   names: DesignNames;
 }) {
   const entries = useMemo(() => designCatalog(), []);
-  const shelf = (row: HomeRow, index: number) => {
-    const { shown, total } = shelfEntries(entries, {
-      id: `occasion-${row.occasion}`,
-      kind: "occasion",
-      value: row.occasion,
+  // Each row in turn, without the designs a row above already shows
+  const shelves = useMemo(() => {
+    const seen = new Set<string>();
+    return rows.map((row) => {
+      const result = shelfEntries(
+        entries,
+        { id: `occasion-${row.occasion}`, kind: "occasion", value: row.occasion },
+        seen,
+      );
+      for (const entry of result.shown) seen.add(entry.design.id);
+      return result;
     });
+  }, [entries, rows]);
+  const shelf = (row: HomeRow, index: number) => {
+    const { shown, total } = shelves[index]!;
     return (
       <ShelfRow
         key={row.occasion}

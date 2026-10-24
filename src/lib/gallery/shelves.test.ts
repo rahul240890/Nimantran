@@ -29,6 +29,30 @@ describe("designs page rows", () => {
     }
   });
 
+  it("a row skips the designs a row above already shows, and keeps its whole count", () => {
+    const wedding = shelfEntries(entries, {
+      id: "occasion-wedding",
+      kind: "occasion",
+      value: "wedding",
+    });
+    const engagement = {
+      id: "occasion-engagement",
+      kind: "occasion",
+      value: "engagement",
+    } as const;
+    const alone = shelfEntries(entries, engagement);
+    const after = shelfEntries(
+      entries,
+      engagement,
+      new Set(wedding.shown.map((entry) => entry.design.id)),
+    );
+    expect(after.total).toBe(alone.total);
+    expect(after.shown).toHaveLength(SHELF_SIZE);
+    for (const entry of after.shown) {
+      expect(wedding.shown.map((item) => item.design.id)).not.toContain(entry.design.id);
+    }
+  });
+
   it("an occasion's row leads with its own painted designs before the shared 3D cards", () => {
     for (const shelf of SHELVES.filter((item) => item.kind === "occasion")) {
       const formats = shelfEntries(entries, shelf).shown.map((entry) => entry.format);
