@@ -503,6 +503,8 @@ function frameIds(draft: StepProps["draft"]): string[] {
 
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
+  // On a design's page the ragas are pills, with the chosen one's sound beside Listen
+  const quiet = useQuiet();
   const clip = draft.music.clip;
   const clipUrl = useClipUrl(draft);
   const songs = useSongLengths(draft);
@@ -592,7 +594,13 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <Hint className="min-w-0 flex-1 basis-48">{extrasCopy.ragaHint}</Hint>
+            {quiet ? (
+              <p className="min-w-0 flex-1 basis-48 text-sm text-ink-muted">
+                {extrasCopy.ragaSound(arrangement(heard), extrasCopy.ragaMoods[value])}
+              </p>
+            ) : (
+              <Hint className="min-w-0 flex-1 basis-48">{extrasCopy.ragaHint}</Hint>
+            )}
             <Button
               type="button"
               variant="secondary"
@@ -608,7 +616,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
           </div>
           <RadioGroup
             label={extrasCopy.musicHeading}
-            variant="card"
+            variant={quiet ? "chip" : "card"}
             value={value}
             onValueChange={(next) =>
               update((current) => ({
@@ -617,7 +625,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
                 music: { ...current.music, raga: next === own ? null : (next as RagaId) },
               }))
             }
-            className="grid-cols-1 min-[400px]:grid-cols-2"
+            className={quiet ? undefined : "grid-cols-1 min-[400px]:grid-cols-2"}
           >
             {RAGA_IDS.map((raga) => (
               <RadioItem

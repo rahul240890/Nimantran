@@ -19,6 +19,7 @@ import { editorText } from "@/i18n/copy/editor";
 import { draftCategory, includedFunctions, type EditorStep } from "@/lib/editor/draft";
 import { stepErrors } from "@/lib/editor/draft-checks";
 import { noFamily } from "@/lib/editor/family";
+import { markFromDesignPage } from "@/lib/editor/design-page";
 import { startWithDesign, type GalleryChoice } from "@/lib/editor/gallery-start";
 import { inviteDraft } from "@/lib/editor/store";
 import { funnel } from "@/lib/funnel";
@@ -188,6 +189,7 @@ export function QuickStart({
   const leave = (step: EditorStep) => {
     update((current) => ({ ...current, step }));
     inviteDraft.flush();
+    markFromDesignPage();
     router.push("/create");
   };
   const see = () => {

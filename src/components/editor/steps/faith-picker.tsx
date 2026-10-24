@@ -58,9 +58,9 @@ export function FaithPicker({ draft, update }: Pick<StepProps, "draft" | "update
       </div>
       <RadioGroup
         label={faithCopy.label}
+        variant="chip"
         value={faith}
         onValueChange={(value) => choose(value as Faith)}
-        className="grid-cols-2 sm:grid-cols-3"
       >
         {FAITHS.map((id) => (
           <RadioItem key={id} value={id} label={faithCopy.names[id]} />

@@ -1,8 +1,10 @@
 "use client";
 
-import { Plus, X } from "lucide-react";
+import { Check, Plus } from "lucide-react";
+import { useState } from "react";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
+import { cn } from "@/lib/cn";
 import {
   ceremonyName,
   draftCategory,
@@ -15,20 +17,26 @@ import {
 import { useFunctionFields } from "../steps/functions-step";
 import type { StepProps } from "../steps/types";
 
+const chip =
+  "inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color,transform] duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-95 motion-reduce:transition-none disabled:cursor-default disabled:active:scale-100";
+
 /**
- * When and where, in a design's short form: the main function's date, time and venue
- * straight away, every other one already planned under it, and the occasion's other
- * functions as chips that add one (the wedding's haldi, mehendi, sangeet and reception).
- * Its place is one tap from another function's, as in the full editor.
+ * When and where, in two moves (owner, 2026-10-24: first all the events, then their dates
+ * and places, so many events go in quickly). The occasion's events are chips to tick, the
+ * main one ticked already and the rarer ones behind More events; then each ticked event has
+ * its date, time and venue, in the order they happen. Its place is one tap from another
+ * event's, as in the full editor.
  */
 export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo">) {
-  const { functionCopy, quickCopy, editor } = useText(editorText);
+  const { functionCopy, quickCopy } = useText(editorText);
   const fields = useFunctionFields(draft, update);
   const main = mainFunction(draft) ?? draftCategory(draft).functions.primary;
   const included = includedFunctions(draft);
-  const shown: FunctionId[] = [main, ...included.filter((id) => id !== main)];
-  const { suggested } = functionOrder(draft);
-  const addable = suggested.filter((id) => !shown.includes(id));
+  const { suggested, more } = functionOrder(draft);
+  const offered = suggested.includes(main) ? suggested : [main, ...suggested];
+  // The rarer events show once asked for, or once one of them is ticked
+  const [showMore, setShowMore] = useState(() => more.some((id) => included.includes(id)));
+  const chips = showMore ? [...offered, ...more] : offered;
   const language = draftTradition(draft)?.language;
 
   const include = (id: FunctionId, on: boolean) =>
@@ -37,10 +45,61 @@ export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo"
       functions: { ...current.functions, [id]: { ...current.functions[id], included: on } },
     }));
 
+  // An occasion with one event only has nothing to pick: its date and place come straight away
+  const choosing = offered.length > 1 || more.length > 0;
+
   return (
     <div className="flex flex-col gap-4">
+      {choosing && (
+        <div role="group" aria-label={quickCopy.pickEvents} className="flex flex-col gap-2">
+          <p className="text-sm font-semibold text-ink">{quickCopy.pickEvents}</p>
+          <ul className="flex flex-wrap gap-2">
+            {chips.map((id) => {
+              const on = included.includes(id);
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    // The main event is always on the card
+                    disabled={id === main}
+                    onClick={() => include(id, !on)}
+                    className={cn(
+                      chip,
+                      on
+                        ? "border-marigold bg-marigold/15 text-ink"
+                        : "border-line-strong bg-surface text-ink hover:border-marigold-edge hover:text-accent-text",
+                    )}
+                  >
+                    {on ? (
+                      <Check aria-hidden className="size-4 text-accent-text" />
+                    ) : (
+                      <Plus aria-hidden className="size-4" />
+                    )}
+                    {functionCopy[id].name}
+                  </button>
+                </li>
+              );
+            })}
+            {!showMore && more.length > 0 && (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => setShowMore(true)}
+                  className={cn(
+                    chip,
+                    "border-transparent text-accent-text underline-offset-4 hover:underline",
+                  )}
+                >
+                  {quickCopy.moreEvents}
+                </button>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
       <ul className="flex flex-col gap-4">
-        {shown.map((id) => {
+        {included.map((id) => {
           const local = ceremonyName(draft, id);
           return (
             <li
@@ -49,8 +108,8 @@ export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo"
               data-function={id}
               className="overflow-hidden rounded-lg border border-marigold/60 bg-surface shadow-raised"
             >
-              <div className="flex min-h-12 items-center justify-between gap-3 px-4 pt-3 sm:px-5">
-                <h3 className="font-display text-lg">
+              <h3 className="flex min-h-11 items-center px-4 pt-3 font-display text-lg sm:px-5">
+                <span>
                   {functionCopy[id].name}
                   {local && (
                     <span lang={language} className="font-sans text-base text-accent-text">
@@ -58,46 +117,13 @@ export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo"
                       {local.native}
                     </span>
                   )}
-                </h3>
-                {/* The main function is always on the card, so only the others come off */}
-                {id !== main && (
-                  <button
-                    type="button"
-                    onClick={() => include(id, false)}
-                    aria-label={quickCopy.remove(functionCopy[id].name)}
-                    className="grid size-11 shrink-0 cursor-pointer place-items-center rounded-full text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-                  >
-                    <X aria-hidden className="size-5" />
-                  </button>
-                )}
-              </div>
+                </span>
+              </h3>
               {fields(id, errors)}
             </li>
           );
         })}
       </ul>
-      {addable.length > 0 && (
-        <div role="group" aria-label={quickCopy.addFunction} className="flex flex-col gap-2">
-          <p className="text-sm text-ink-muted">
-            {quickCopy.addFunction} ({editor.optional})
-          </p>
-          <ul className="flex flex-wrap gap-2">
-            {addable.map((id) => (
-              <li key={id}>
-                <button
-                  type="button"
-                  onClick={() => include(id, true)}
-                  aria-label={quickCopy.addOne(functionCopy[id].name)}
-                  className="inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink transition-[background-color,border-color,color,transform] duration-150 hover:border-marigold-edge hover:text-accent-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-95 motion-reduce:transition-none"
-                >
-                  <Plus aria-hidden className="size-4" />
-                  {functionCopy[id].name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }

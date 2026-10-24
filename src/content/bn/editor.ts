@@ -2152,6 +2152,8 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   moreIntro: "নিজের গান, কথা, খোলার দরজা আর প্রশ্ন",
   make: "সময় কম? আমরা আপনার হয়ে বানিয়ে দেব",
   hideMake: "এটি লুকান",
+  pickEvents: "আপনার অনুষ্ঠান",
+  moreEvents: "আরও অনুষ্ঠান",
   moreDesigns: (occasion) => `আরও ${occasion} ডিজাইন`,
   opening: "ডিজাইন খুলছে…",
 };
