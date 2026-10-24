@@ -162,7 +162,7 @@ export function EditionPicker({
 
   /** The package is the invite's now: say so and show the page as it stands. */
   const paid = (plan: PaidPlanId) => {
-    funnel("Payment completed", { plan, tier: design });
+    funnel("Payment completed", { plan, tier: design, design: designId });
     toast({
       title: upgradeCopy.paid(planCopy[plan].name),
       description: upgradeCopy.paidBody,
@@ -194,7 +194,7 @@ export function EditionPicker({
       if (started.reason === "already") router.refresh();
       return;
     }
-    funnel("Checkout started", { plan, tier: design });
+    funnel("Checkout started", { plan, tier: design, design: designId });
     // An offer covered the whole price: the server has already given the invite the package
     if (started.provider === "free") {
       setPending(null);

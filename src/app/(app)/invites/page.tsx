@@ -1,4 +1,4 @@
-import { Plus, UserRoundPen } from "lucide-react";
+import { MessageSquareHeart, Plus, UserRoundPen } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -10,6 +10,8 @@ import { Card } from "@/components/ui/card";
 import { firstName } from "@/lib/auth/account";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
+import { reviewStore } from "@/lib/reviews/store";
+import { dashboardText } from "@/i18n/copy/dashboard";
 import { getText } from "@/i18n/server";
 import { accountText } from "@/i18n/copy/account";
 
@@ -26,6 +28,18 @@ export default async function InvitesPage() {
   const account = await getAccount();
   if (!account) redirect("/sign-in?next=%2Finvites");
   const invites = (await inviteStore()?.list(account)) ?? null;
+  // Once an invitation of theirs is live, a host is asked for a review, until they write one
+  const live = (invites ?? []).some(
+    (invite) => invite.role === "owner" && invite.status === "published",
+  );
+  const [reviewed, { reviewCopy }] = await Promise.all([
+    live
+      ? reviewStore()
+          ?.mine(account)
+          .catch(() => null)
+      : null,
+    getText(dashboardText),
+  ]);
 
   return (
     <PageTransition>
@@ -62,6 +76,27 @@ export default async function InvitesPage() {
               </div>
               <Button asChild variant="secondary" size="sm">
                 <Link href="/account">{invitesCopy.addName.action}</Link>
+              </Button>
+            </Card>
+          )}
+          {live && !reviewed && (
+            <Card
+              elevation="flat"
+              data-ask-review
+              className="flex-row flex-wrap items-center justify-between gap-4 border-marigold/45 bg-marigold/10 p-5"
+            >
+              <div className="flex min-w-0 items-start gap-3">
+                <MessageSquareHeart
+                  aria-hidden
+                  className="mt-0.5 size-5 shrink-0 text-accent-text"
+                />
+                <div className="flex flex-col gap-0.5">
+                  <p className="font-semibold">{reviewCopy.ask}</p>
+                  <p className="text-sm text-ink-muted">{reviewCopy.askBody}</p>
+                </div>
+              </div>
+              <Button asChild variant="secondary" size="sm">
+                <Link href="/review">{reviewCopy.write}</Link>
               </Button>
             </Card>
           )}

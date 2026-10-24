@@ -8,6 +8,7 @@ import { useDesignTier } from "@/components/pricing/pricing-provider";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
 import { offersText } from "@/i18n/copy/offers";
+import { cn } from "@/lib/cn";
 import { offerArtImage } from "@/lib/plans/offers";
 import { pagePath } from "@/lib/seo/paths";
 import { offerValueIn, useSiteOffers } from "./use-site-offers";
@@ -17,12 +18,34 @@ import { offerValueIn, useSiteOffers } from "./use-site-offers";
  * tickets with what they take off and the code to copy.
  */
 
+/** Its colours: on the night of a preview, or on the page's own paper (a design's page). */
+const TONES = {
+  night: {
+    heading: "text-card-ivory/75",
+    ticket: "bg-card-ivory/5",
+    edge: "border-card-ivory/20",
+    note: "text-card-ivory/80",
+    focus: "focus-visible:outline-card-ivory",
+    link: "text-card-ivory focus-visible:outline-card-ivory",
+  },
+  paper: {
+    heading: "text-ink-muted",
+    ticket: "bg-surface",
+    edge: "border-line",
+    note: "text-ink-muted",
+    focus: "focus-visible:outline-ring",
+    link: "text-accent-text focus-visible:outline-ring",
+  },
+} as const;
+
 function CopyCode({
   code,
   words,
+  focus,
 }: {
   code: string;
   words: { copyCode: string; copied: string; copyFailed: string };
+  focus: string;
 }) {
   const [done, setDone] = useState(false);
   return (
@@ -39,7 +62,10 @@ function CopyCode({
         }
       }}
       aria-label={`${words.copyCode}: ${code}`}
-      className="inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-md focus-visible:outline-2 focus-visible:outline-card-ivory"
+      className={cn(
+        "inline-flex min-h-11 cursor-pointer items-center gap-2 self-start rounded-md focus-visible:outline-2",
+        focus,
+      )}
     >
       <span
         translate="no"
@@ -52,7 +78,16 @@ function CopyCode({
   );
 }
 
-export function PreviewOffers({ designId }: { designId: string }) {
+export function PreviewOffers({
+  designId,
+  tone = "night",
+  className,
+}: {
+  designId: string;
+  tone?: keyof typeof TONES;
+  className?: string;
+}) {
+  const colours = TONES[tone];
   const words = useText(offersText);
   const locale = useLocale();
   const { tier } = useDesignTier(designId);
@@ -70,11 +105,14 @@ export function PreviewOffers({ designId }: { designId: string }) {
     <section
       aria-labelledby={`offers-${designId}`}
       data-preview-offers
-      className="flex flex-col gap-2"
+      className={cn("flex flex-col gap-2", className)}
     >
       <h3
         id={`offers-${designId}`}
-        className="flex items-center gap-2 font-label text-xs tracking-[0.2em] text-card-ivory/75 uppercase"
+        className={cn(
+          "flex items-center gap-2 font-label text-xs tracking-[0.2em] uppercase",
+          colours.heading,
+        )}
       >
         <Sparkles aria-hidden className="size-4 animate-twinkle text-marigold" />
         {words.previewHeading}
@@ -83,7 +121,10 @@ export function PreviewOffers({ designId }: { designId: string }) {
         {offers.map((offer) => (
           <li
             key={offer.id}
-            className="group flex overflow-hidden rounded-lg border border-marigold/40 bg-card-ivory/5"
+            className={cn(
+              "group flex overflow-hidden rounded-lg border border-marigold/40",
+              colours.ticket,
+            )}
           >
             <div className="offer-shine relative isolate w-24 shrink-0 overflow-hidden bg-night">
               <Image
@@ -101,12 +142,17 @@ export function PreviewOffers({ designId }: { designId: string }) {
                 {offerValueIn(words, offer)}
               </p>
             </div>
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5 border-s-2 border-dashed border-card-ivory/20 px-3 py-2">
+            <div
+              className={cn(
+                "flex min-w-0 flex-1 flex-col gap-0.5 border-s-2 border-dashed px-3 py-2",
+                colours.edge,
+              )}
+            >
               <p className="font-semibold break-words">{offer.label}</p>
               {offer.autoApply ? (
-                <p className="text-xs text-card-ivory/80">{words.noCode}</p>
+                <p className={cn("text-xs", colours.note)}>{words.noCode}</p>
               ) : (
-                <CopyCode code={offer.code} words={words} />
+                <CopyCode code={offer.code} words={words} focus={colours.focus} />
               )}
             </div>
           </li>
@@ -114,7 +160,10 @@ export function PreviewOffers({ designId }: { designId: string }) {
       </ul>
       <Link
         href={pagePath({ kind: "offers" }, locale)}
-        className="inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold text-card-ivory underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-card-ivory"
+        className={cn(
+          "inline-flex min-h-11 items-center gap-2 self-start text-sm font-semibold underline underline-offset-4 hover:no-underline focus-visible:outline-2",
+          colours.link,
+        )}
       >
         {words.homeAll}
         <ArrowRight aria-hidden className="size-4 rtl:rotate-180" />

@@ -123,6 +123,9 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   photoAlt: (index) => `परिवार की तस्वीर ${index}`,
   madeWith: "शुभ इन्विटेशन से बना",
   createYours: "अपना निमंत्रण बनाएँ",
+  makeOwnTitle: "क्या आपके यहाँ भी कोई समारोह आने वाला है?",
+  makeOwn: "ऐसा ही निमंत्रण बनाएँ",
+  makeOwnNote: "आज़माना मुफ़्त है। पैसे सिर्फ़ भेजते समय।",
   notFoundTitle: "यह निमंत्रण उपलब्ध नहीं है",
   notFoundBody:
     "लिंक शायद ग़लत लिखा है, या परिवार ने इसे भेजना बंद कर दिया है। उनसे दोबारा भेजने को कहें।",
@@ -349,4 +352,9 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "प्रीव्यू के विकल्प",
   opening: "आपका निमंत्रण खुल रहा है",
   changeGate: "खुलने वाला द्वार बदलें",
+};
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  metaTitle: (names) => (names ? `${names}: निमंत्रण की झलक` : "निमंत्रण की झलक"),
+  badge: "झलक · अभी मेहमानों को नहीं भेजा गया",
 };

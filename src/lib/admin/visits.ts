@@ -42,3 +42,48 @@ export async function visitSummary(days: VisitRange): Promise<VisitSummary | nul
   const { data, error } = await service.rpc("visit_summary", { p_days: days });
   return error || !data ? null : (data as VisitSummary);
 }
+
+/** The funnel for the same days (funnel_summary()): see lib/admin/funnel-rows.ts. */
+export type FunnelSummary = {
+  days: number;
+  /** Visitor-days at each step: a visitor counts once a day at each. */
+  steps: Record<
+    | "visitors"
+    | "sample"
+    | "details"
+    | "editor"
+    | "preview"
+    | "signedIn"
+    | "checkout"
+    | "paid"
+    | "published",
+    number
+  >;
+  /** Where visitors came from (their first campaign or site that day), and how far they got. */
+  sources: {
+    label: string;
+    visitors: number;
+    designs: number;
+    preview: number;
+    checkout: number;
+    paid: number;
+  }[];
+  /** The designs opened most, live or on their own page. */
+  designs: VisitCount[];
+  /** Straight from the tables: exact even when a visitor's counting was blocked. */
+  outcomes: {
+    accounts: number;
+    invites: number;
+    payments: number;
+    revenuePaise: number;
+    published: number;
+  };
+};
+
+/** Null until the funnel migration (…_funnel_and_reviews.sql) has been run. */
+export async function funnelSummary(days: VisitRange): Promise<FunnelSummary | null> {
+  const service = supabaseService();
+  if (!service) return null;
+  const { data, error } = await service.rpc("funnel_summary", { p_days: days });
+  return error || !data ? null : (data as FunnelSummary);
+}

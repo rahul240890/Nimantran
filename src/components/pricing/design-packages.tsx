@@ -1,5 +1,6 @@
 "use client";
 
+import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
@@ -42,7 +43,7 @@ export function DesignPackages({
 }) {
   const colours = TONES[tone];
   const { galleryCopy } = useText(galleryText);
-  const { planCopy, invitesCount } = useText(editionsText);
+  const { planCopy, invitesCount, upgradeCopy } = useText(editionsText);
   const locale = useLocale();
   const pricing = usePricing();
   const { tier } = useDesignTier(designId);
@@ -83,6 +84,14 @@ export function DesignPackages({
           );
         })}
       </ul>
+      {/* What makes paying feel safe, right beside the prices */}
+      <div data-pay-safely className={cn("flex flex-col gap-1 text-xs", colours.guests)}>
+        <p className="flex items-start gap-1.5">
+          <ShieldCheck aria-hidden className="mt-px size-3.5 shrink-0 text-success" />
+          {upgradeCopy.secure}
+        </p>
+        <p className="ps-5">{upgradeCopy.refunds}</p>
+      </div>
       <Link
         href={pagePath({ kind: "pricing" }, locale)}
         className={cn(

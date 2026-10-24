@@ -6,6 +6,7 @@ import { HomeDesigns } from "./home-designs";
 import { HomeHelp } from "./home-help";
 import { HomeOccasions } from "./home-occasions";
 import { HomeOffers } from "@/components/offers/offers";
+import { HomeReviews } from "@/components/reviews/home-reviews";
 import { OfferBar } from "@/components/offers/offer-bar";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -33,6 +34,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
           <HomeOccasions locale={locale} />
           <HomeDesigns locale={locale} />
           <HomeHelp locale={locale} />
+          <HomeReviews />
           <HomeOffers locale={locale} />
           <Faq locale={locale} />
           <Closing locale={locale} />

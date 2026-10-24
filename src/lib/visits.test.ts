@@ -43,3 +43,15 @@ describe("visits", () => {
     expect(campaignSource("")).toBeNull();
   });
 });
+
+describe("funnel steps", () => {
+  it("are only the steps the site counts, with catalogue ids only", async () => {
+    const { catalogId, isStepKey } = await import("./visits");
+    expect(isStepKey("preview")).toBe(true);
+    expect(isStepKey("hacked")).toBe(false);
+    expect(isStepKey(7)).toBe(false);
+    expect(catalogId("rajwada-bagh")).toBe("rajwada-bagh");
+    expect(catalogId("Priya & Aditya")).toBeNull();
+    expect(catalogId("a".repeat(61))).toBeNull();
+  });
+});

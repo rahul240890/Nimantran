@@ -11,6 +11,7 @@ export type AdminPageIcon =
   | "coupons"
   | "invites"
   | "handover"
+  | "reviews"
   | "visitors"
   | "blog"
   | "ai"
@@ -73,6 +74,12 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Hand over",
     description: "Make an invitation for a family, then send them a link to take it.",
     icon: "handover",
+  },
+  {
+    href: "/admin/reviews",
+    label: "Reviews",
+    description: "Read hosts' reviews, and choose which show on the site.",
+    icon: "reviews",
   },
   {
     href: "/admin/visitors",

@@ -869,6 +869,18 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
   seeAsGuest: "मेहमानों की नज़र से देखें",
   watchVideo: "वीडियो में देखें",
   seeAsGuestBody: "पूरा निमंत्रण, पूरी स्क्रीन पर: खुलना, संगीत, हर पेज और जवाब का फ़ॉर्म।",
+  familyTitle: "पहले परिवार को दिखाएँ",
+  familyBody:
+    "उन्हें WhatsApp पर एक झलक भेजें। वे निमंत्रण वैसा ही देखेंगे जैसा मेहमान देखेंगे, झलक के निशान के साथ, और आपके भेजने तक मेहमानों को कुछ नहीं जाएगा।",
+  familySend: "परिवार को WhatsApp पर भेजें",
+  familyCopy: "लिंक कॉपी करें",
+  familyCopied: "लिंक कॉपी हो गया",
+  familyFailed: "अभी लिंक नहीं बन सका। थोड़ी देर में फिर कोशिश करें।",
+  familySignInBody:
+    "साइन इन करें, हम एक झलक का लिंक बना देंगे जिसे आप परिवार को WhatsApp पर भेज सकें।",
+  familySignIn: "भेजने के लिए साइन इन करें",
+  familyMessage: (url) =>
+    `हमारे निमंत्रण की एक झलक। देखकर बताइए कैसा लगा, फिर हम इसे भेजेंगे: ${url}`,
   notReady: "कुछ ब्योरा बाक़ी है",
   fix: (label) => `${label} पूरा करें`,
   occasionHeading: "अवसर",
@@ -2177,5 +2189,6 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   more: "और विकल्प",
   moreIntro: "अपना गाना, शब्द, खुलने का दरवाज़ा और सवाल",
   make: "समय कम है? हम आपके लिए बना देंगे",
+  hideMake: "इसे छिपाएँ",
   opening: "डिज़ाइन खुल रहा है…",
 };

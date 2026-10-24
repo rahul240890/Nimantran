@@ -1,12 +1,22 @@
 import { authMode } from "@/lib/auth/mode";
 import { supabaseServer } from "@/lib/supabase/server";
-import { campaignSource, isBot, readAgent, referrerHost, uncounted, visitPath } from "@/lib/visits";
+import {
+  campaignSource,
+  catalogId,
+  isBot,
+  isStepKey,
+  readAgent,
+  referrerHost,
+  uncounted,
+  visitPath,
+} from "@/lib/visits";
 
 /*
- * Counts one page view for the admin's Visitors page (lib/visits.ts). The database gets
- * the visitor's network and browser only to make the day's code, and keeps the code; a
- * signed-in person's view is recorded under their account by the database itself, from
- * their session. Bots, malformed beacons and the admin's pages are dropped quietly.
+ * Counts one page view, or one funnel step, for the admin's Visitors page (lib/visits.ts).
+ * The database gets the visitor's network and browser only to make the day's code, and
+ * keeps the code; a signed-in person's view is recorded under their account by the
+ * database itself, from their session. Bots, malformed beacons and the admin's pages are
+ * dropped quietly.
  */
 
 const MAX_BYTES = 2048;
@@ -23,19 +33,38 @@ export async function POST(request: Request) {
   } catch {
     return new Response(null, { status: 400 });
   }
-  const path = visitPath(beacon?.path);
-  if (!path) return new Response(null, { status: 400 });
-  if (uncounted(path)) return done();
-
   const network =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "";
-  const { device, browser, os } = readAgent(agent!);
+  const key = `${network}|${agent}`;
   const supabase = await supabaseServer();
+
+  // A funnel step: the same visitor code as the views, and only the design or occasion
+  if (typeof beacon === "object" && beacon !== null && "step" in beacon) {
+    if (!isStepKey(beacon.step)) return new Response(null, { status: 400 });
+    await supabase
+      ?.rpc("record_step", {
+        p_key: key,
+        p_step: beacon.step,
+        p_design: catalogId(beacon.design),
+        p_category: catalogId(beacon.category),
+      })
+      .then(
+        () => undefined,
+        () => undefined,
+      );
+    return done();
+  }
+
+  const path = visitPath(beacon?.path);
+  if (!path) return new Response(null, { status: 400 });
+  if (uncounted(path)) return done();
+
+  const { device, browser, os } = readAgent(agent!);
   await supabase
     ?.rpc("record_visit", {
-      p_key: `${network}|${agent}`,
+      p_key: key,
       p_path: path,
       p_referrer: referrerHost(beacon.referrer, request.headers.get("host")),
       p_source: campaignSource(beacon.source),

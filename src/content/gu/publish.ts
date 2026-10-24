@@ -122,6 +122,9 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   photoAlt: (index) => `પરિવારનો ફોટો ${index}`,
   madeWith: "શુભ ઇન્વિટેશન વડે બનાવેલું",
   createYours: "આપનું પોતાનું આમંત્રણ બનાવો",
+  makeOwnTitle: "તમારે ત્યાં પણ કોઈ પ્રસંગ આવી રહ્યો છે?",
+  makeOwn: "આવું જ આમંત્રણ બનાવો",
+  makeOwnNote: "અજમાવવું મફત છે. પૈસા ફક્ત મોકલતી વખતે.",
   notFoundTitle: "આ આમંત્રણ ઉપલબ્ધ નથી",
   notFoundBody:
     "લિંક કદાચ ખોટી લખાઈ છે, અથવા પરિવારે તે મોકલવાનું બંધ કર્યું છે. તેમને ફરી મોકલવા કહો.",
@@ -323,4 +326,9 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "પ્રીવ્યૂના વિકલ્પો",
   opening: "તમારું આમંત્રણ ખૂલી રહ્યું છે",
   changeGate: "ખૂલતો દરવાજો બદલો",
+};
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  metaTitle: (names) => (names ? `${names}: આમંત્રણની ઝલક` : "આમંત્રણની ઝલક"),
+  badge: "ઝલક · હજી મહેમાનોને મોકલ્યું નથી",
 };
