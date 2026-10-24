@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarPlus, RotateCcw } from "lucide-react";
+import { ArrowRight, CalendarPlus, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
@@ -130,6 +130,8 @@ type GuestViewProps = {
   sample?: boolean;
   /** For reviewing a welcome scene (/engine/guest?hold=1): it stays until Continue. */
   holdWelcome?: boolean;
+  /** A live invitation's "Make an invitation like this", for guests (lib/gallery/make-like-this.ts). */
+  makeHref?: string | null;
 };
 
 export function GuestView({
@@ -146,6 +148,7 @@ export function GuestView({
   preview = false,
   sample = false,
   holdWelcome = false,
+  makeHref = null,
 }: GuestViewProps) {
   const locale = useLocale();
   const languages = cardLanguages(draft);
@@ -346,6 +349,7 @@ export function GuestView({
         questions={questions}
         preview={preview}
         sample={sample}
+        makeHref={makeHref}
       />
     ) : null;
 
@@ -590,6 +594,29 @@ export function GuestView({
                 </Button>
               </div>
             )}
+            {/* Guests with a celebration of their own start from this very design */}
+            {makeHref && (
+              <div
+                data-make-like-this
+                className="mx-auto mb-6 flex w-full max-w-5xl flex-col items-center gap-4 rounded-lg border border-marigold/50 bg-marigold/10 px-5 py-5 text-center sm:flex-row sm:justify-between sm:text-start"
+              >
+                <div className="flex min-w-0 flex-col gap-1">
+                  <p className="font-display text-xl leading-snug text-balance">
+                    {guestCopy.makeOwnTitle}
+                  </p>
+                  <p className="text-sm text-ink-muted">{guestCopy.makeOwnNote}</p>
+                </div>
+                <Button
+                  asChild
+                  className="h-auto min-h-12 max-w-full shrink-0 py-2 text-balance whitespace-normal"
+                >
+                  <Link href={makeHref}>
+                    {guestCopy.makeOwn}
+                    <ArrowRight aria-hidden className="rtl:rotate-180" />
+                  </Link>
+                </Button>
+              </div>
+            )}
             <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-3 text-center sm:flex-row sm:justify-between sm:text-start">
               <div className="flex flex-col items-center gap-3 sm:items-start">
                 <p className="flex items-center gap-2 text-sm text-ink-muted">
@@ -602,14 +629,16 @@ export function GuestView({
               {/* Light or dark for the details; kept off the invitation's own full-screen pages */}
               <div className="flex max-w-full flex-wrap items-center justify-center gap-2">
                 <ThemeMenu labels={theme} />
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="h-auto min-h-11 max-w-full py-2 text-balance whitespace-normal"
-                >
-                  <Link href="/">{guestCopy.createYours}</Link>
-                </Button>
+                {!makeHref && (
+                  <Button
+                    asChild
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto min-h-11 max-w-full py-2 text-balance whitespace-normal"
+                  >
+                    <Link href="/">{guestCopy.createYours}</Link>
+                  </Button>
+                )}
               </div>
             </div>
           </footer>

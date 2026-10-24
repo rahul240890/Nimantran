@@ -124,6 +124,10 @@ export const guestCopy = {
   photoAlt: (index: number) => `Photo ${index} from the family`,
   madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",
+  /** On a live invitation, for guests with a celebration of their own (owner, 2026-10-24). */
+  makeOwnTitle: "Planning a celebration of your own?",
+  makeOwn: "Make an invitation like this",
+  makeOwnNote: "Free to try. Pay only when you send.",
   notFoundTitle: "This invitation isn't available",
   notFoundBody:
     "The link may be mistyped, or the family may have stopped sharing it. Ask them to send it again.",

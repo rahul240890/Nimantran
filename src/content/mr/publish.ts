@@ -122,6 +122,9 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   photoAlt: (index) => `कुटुंबाचा फोटो ${index}`,
   madeWith: "शुभ इन्व्हिटेशनने बनवलेले",
   createYours: "आपले स्वतःचे निमंत्रण बनवा",
+  makeOwnTitle: "तुमच्याकडेही एखादा समारंभ येतोय का?",
+  makeOwn: "असेच निमंत्रण बनवा",
+  makeOwnNote: "वापरून पाहणे मोफत. पैसे फक्त पाठवताना.",
   notFoundTitle: "हे निमंत्रण उपलब्ध नाही",
   notFoundBody:
     "लिंक कदाचित चुकीची आहे, किंवा कुटुंबाने ते पाठवणे थांबवले आहे. त्यांना पुन्हा पाठवायला सांगा.",

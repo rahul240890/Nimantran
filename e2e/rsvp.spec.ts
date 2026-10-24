@@ -54,6 +54,16 @@ test.describe("guest RSVP", () => {
       await expect(form.getByRole("listitem").filter({ hasText: "Wedding" })).toContainText(
         "Coming · 2 people",
       );
+      // A guest with a celebration of their own starts from this design, counted as a guest
+      const likeThis = /^\/(create\/[a-z0-9-]+\?category=wedding&|\?)utm_source=guest$/;
+      await expect(
+        form.getByRole("link", { name: "Make an invitation like this" }),
+      ).toHaveAttribute("href", likeThis);
+      await expect(
+        guest.locator("footer [data-make-like-this]").getByRole("link", {
+          name: "Make an invitation like this",
+        }),
+      ).toHaveAttribute("href", likeThis);
       expect((await axe(guest).analyze()).violations).toEqual([]);
 
       // Coming back on the same phone shows the reply, and it can change

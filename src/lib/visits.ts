@@ -11,6 +11,30 @@ import { countableUrl } from "@/lib/analytics";
 /** What the browser sends: the page, and on the first page only, how they arrived. */
 export type VisitBeacon = { path: string; referrer?: string; source?: string };
 
+/** The funnel steps the site counts itself (lib/funnel.ts). */
+export const STEP_KEYS = [
+  "sample",
+  "details",
+  "editor",
+  "preview",
+  "checkout",
+  "paid",
+  "published",
+] as const;
+export type StepKey = (typeof STEP_KEYS)[number];
+
+/** A step the browser reports, with the design or occasion it was about. */
+export type StepBeacon = { step: StepKey; design?: string; category?: string };
+
+export function isStepKey(value: unknown): value is StepKey {
+  return typeof value === "string" && (STEP_KEYS as readonly string[]).includes(value);
+}
+
+/** A design or occasion id as the catalogues write them, else nothing. */
+export function catalogId(value: unknown): string | null {
+  return typeof value === "string" && /^[a-z0-9][a-z0-9-]{0,59}$/.test(value) ? value : null;
+}
+
 export type Agent = {
   device: "mobile" | "tablet" | "desktop";
   browser: string | null;
@@ -100,6 +124,13 @@ export function campaignSource(source: unknown): string | null {
   return clean || null;
 }
 
+function send(beacon: VisitBeacon | StepBeacon): void {
+  const body = JSON.stringify(beacon);
+  if (!navigator.sendBeacon?.("/api/visit", new Blob([body], { type: "application/json" }))) {
+    void fetch("/api/visit", { method: "POST", body, keepalive: true }).catch(() => {});
+  }
+}
+
 /** Sends this page's view; the first page of a visit also says how they arrived. */
 export function sendVisit(landing: boolean): void {
   try {
@@ -110,10 +141,21 @@ export function sendVisit(landing: boolean): void {
       beacon.referrer = document.referrer || undefined;
       beacon.source = new URLSearchParams(window.location.search).get("utm_source") ?? undefined;
     }
-    const body = JSON.stringify(beacon);
-    if (!navigator.sendBeacon?.("/api/visit", new Blob([body], { type: "application/json" }))) {
-      void fetch("/api/visit", { method: "POST", body, keepalive: true }).catch(() => {});
-    }
+    send(beacon);
+  } catch {
+    // Counting must never break the page
+  }
+}
+
+/** Sends a funnel step, from the admin's own pages never. */
+export function sendStep(step: StepKey, design?: string, category?: string): void {
+  try {
+    if (uncounted(window.location.pathname)) return;
+    send({
+      step,
+      design: catalogId(design) ?? undefined,
+      category: catalogId(category) ?? undefined,
+    });
   } catch {
     // Counting must never break the page
   }

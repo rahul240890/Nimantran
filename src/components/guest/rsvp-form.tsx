@@ -11,6 +11,7 @@ import {
   Plus,
   Send,
 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { sendReply } from "@/actions/rsvp";
 import { guestReply, knownToken, storeToken } from "@/components/guest/guest-reply";
@@ -105,6 +106,7 @@ export function RsvpForm({
   questions,
   preview = false,
   sample = false,
+  makeHref = null,
 }: {
   slug: string;
   functions: RsvpFunction[];
@@ -113,9 +115,11 @@ export function RsvpForm({
   preview?: boolean;
   /** A design's public sample: the reply goes through to the thanks, and nothing is sent. */
   sample?: boolean;
+  /** On a live invitation: after replying, a guest can make one like it. */
+  makeHref?: string | null;
 }) {
   const language = useGuestLanguage();
-  const { rsvpCopy } = useGuestText();
+  const { rsvpCopy, guestCopy } = useGuestText();
   const [token, setToken] = useState<string | null>(null);
   const [invitedTo, setInvitedTo] = useState<string[]>([]);
   const [name, setName] = useState("");
@@ -306,6 +310,17 @@ export function RsvpForm({
         >
           {rsvpCopy.change}
         </Button>
+        {makeHref && !preview && !sample && (
+          <p data-make-like-this className="border-t border-success/30 pt-4 text-sm text-ink-muted">
+            {guestCopy.makeOwnTitle}{" "}
+            <Link
+              href={makeHref}
+              className="inline-flex min-h-11 items-center font-semibold text-accent-text underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {guestCopy.makeOwn}
+            </Link>
+          </p>
+        )}
       </div>
     );
   }

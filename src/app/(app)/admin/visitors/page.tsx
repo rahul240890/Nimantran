@@ -2,6 +2,7 @@ import { Activity, Globe2, MonitorSmartphone, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AdminHeading } from "@/components/admin/admin-shell";
+import { FunnelCard } from "@/components/admin/funnel-card";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireAdmin } from "@/lib/admin/access";
@@ -9,6 +10,7 @@ import {
   VISIT_RANGES,
   type VisitCount,
   type VisitSummary,
+  funnelSummary,
   visitRange,
   visitSummary,
 } from "@/lib/admin/visits";
@@ -41,7 +43,7 @@ function countryName(code: string) {
 export default async function VisitorsPage({ searchParams }: PageProps<"/admin/visitors">) {
   await requireAdmin("/admin/visitors");
   const days = visitRange((await searchParams).days);
-  const summary = await visitSummary(days);
+  const [summary, funnel] = await Promise.all([visitSummary(days), funnelSummary(days)]);
 
   return (
     <>
@@ -68,6 +70,7 @@ export default async function VisitorsPage({ searchParams }: PageProps<"/admin/v
             </Link>
           ))}
         </nav>
+        {summary && <FunnelCard funnel={funnel} />}
         {summary ? (
           <Summary summary={summary} />
         ) : (
