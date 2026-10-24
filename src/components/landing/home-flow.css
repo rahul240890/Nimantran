@@ -1,0 +1,165 @@
+/*
+ * The home page's phone (home-flow.tsx): each step's screen plays these once as it is shown.
+ * Every element rests in its final state, so still mode (animation: none) shows each screen
+ * complete; the animations only bring it there. A step's screen is shown with display, so
+ * its animations start again each time it comes round.
+ */
+
+.flow-screen [data-flow] {
+  animation-duration: 0.55s;
+  animation-timing-function: var(--ease-out-expo);
+  animation-fill-mode: both;
+  animation-delay: var(--d, 0s);
+}
+
+.flow-screen [data-flow="rise"] {
+  animation-name: flow-rise;
+}
+.flow-screen [data-flow="pop"] {
+  animation-name: flow-pop;
+}
+.flow-screen [data-flow="type"] {
+  animation-name: flow-type;
+  animation-duration: 0.7s;
+  animation-timing-function: steps(7, end);
+}
+.flow-screen [data-flow="pick"] {
+  animation-name: flow-pick;
+  animation-duration: 0.35s;
+}
+/* A finger's tap: unseen before and after, so no fill */
+.flow-screen [data-flow="tap"] {
+  animation-name: flow-tap;
+  animation-duration: 0.7s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: none;
+}
+.flow-screen [data-flow="door-start"] {
+  animation-name: flow-door-start;
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.flow-screen [data-flow="door-end"] {
+  animation-name: flow-door-end;
+  animation-duration: 1.2s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+.flow-screen [data-flow="fade-out"] {
+  animation-name: flow-fade-out;
+  animation-duration: 0.3s;
+}
+.flow-screen [data-flow="fall"] {
+  animation-name: flow-fall;
+  animation-duration: 2.4s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.flow-screen [data-flow="chip"] {
+  animation-name: flow-chip;
+  animation-duration: 0.3s;
+}
+.flow-screen [data-flow="read"] {
+  animation-name: flow-read;
+  animation-duration: 0.3s;
+}
+
+/* Under a step in the list: how long until the next one, filling while the steps play */
+.flow-progress {
+  transform-origin: left;
+  animation: flow-progress var(--flow-step, 3.2s) linear both;
+}
+[dir="rtl"] .flow-progress {
+  transform-origin: right;
+}
+
+/* Paused: every screen and bar holds where it is */
+[data-flow-paused] .flow-screen *,
+[data-flow-paused] .flow-progress {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-screen *,
+  .flow-progress {
+    animation: none !important;
+  }
+}
+[data-motion="reduce"] .flow-screen *,
+[data-motion="reduce"] .flow-progress {
+  animation: none !important;
+}
+
+@keyframes flow-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+}
+@keyframes flow-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes flow-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+@keyframes flow-pick {
+  from {
+    scale: 1;
+    box-shadow: none;
+  }
+}
+@keyframes flow-tap {
+  from {
+    opacity: 0.9;
+    scale: 0.4;
+  }
+  to {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+@keyframes flow-door-start {
+  from {
+    translate: 0 0;
+  }
+}
+@keyframes flow-door-end {
+  from {
+    translate: 0 0;
+  }
+}
+@keyframes flow-fade-out {
+  from {
+    opacity: 1;
+  }
+}
+@keyframes flow-fall {
+  from {
+    translate: 0 -2rem;
+    rotate: 0deg;
+  }
+  to {
+    translate: 0.75rem 34rem;
+    rotate: 300deg;
+  }
+}
+@keyframes flow-chip {
+  from {
+    background-color: transparent;
+    color: var(--ink-muted);
+  }
+}
+@keyframes flow-read {
+  from {
+    color: var(--ink-faint);
+  }
+}
+@keyframes flow-progress {
+  from {
+    scale: 0 1;
+  }
+}

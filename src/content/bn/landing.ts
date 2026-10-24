@@ -14,12 +14,29 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "weddings", label: "বিয়ের ডিজাইন" },
   { id: "designs", label: "সব ডিজাইন" },
   { id: "sample", label: "নমুনা নিমন্ত্রণপত্র" },
   { id: "pricing", label: "দাম" },
   { id: "help", label: "হোয়াটসঅ্যাপে সাহায্য" },
 ];
+
+export const menuCopy: Translation<typeof en.menuCopy> = {
+  tabs: {
+    weddings: "বিয়ে",
+    engagement: "বাগদান",
+    birthday: "জন্মদিন",
+    occasions: "আরও উপলক্ষ",
+    traditions: "ঐতিহ্য",
+  },
+  weddingAll: "বিয়ের নিমন্ত্রণপত্র",
+  video: { title: "নিমন্ত্রণ ভিডিও", note: "WhatsApp স্ট্যাটাস আর রিলসের জন্য" },
+  cards: { title: "সেভ দ্য ডেট আর ধন্যবাদ কার্ড", note: "বিয়ের আগে আর পরে পাঠানোর জন্য" },
+  set: { title: "সম্পূর্ণ বিয়ের সেট", note: "নিমন্ত্রণপত্র, ভিডিও আর কার্ড, একসঙ্গে" },
+  functions: "বিয়ের অনুষ্ঠান",
+  allOccasions: (count) => `সব ${count}টি উপলক্ষ`,
+  sample: "একটি নিমন্ত্রণপত্র খুলে দেখুন",
+  help: "সাহায্য দরকার? WhatsApp করুন",
+};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "মূল অংশে যান",
@@ -37,6 +54,8 @@ export const shell: Translation<typeof en.shell> = {
   },
   themeHeading: "থিম",
   helpMessage: "নমস্কার Shubh Invitation, আমার নিমন্ত্রণপত্র বানাতে সাহায্য চাই।",
+  makeMessage:
+    "নমস্কার Shubh Invitation, অনুগ্রহ করে আমাদের নিমন্ত্রণপত্রটি আমাদের জন্য বানিয়ে দিন। আমাদের বিবরণ:",
   footer: {
     tagline: "3D নিমন্ত্রণপত্র, যা অতিথিরা খোলেন, ঘোরান আর রেখে দেন।",
     explore: "ঘুরে দেখুন",
@@ -51,16 +70,7 @@ export const hero: Translation<typeof en.hero> = {
   eyebrow: "তৈরি · নিমন্ত্রণ · উদযাপন",
   title: "যে নিমন্ত্রণ জীবন্ত হয়ে ওঠে।",
   body: "আপনার উপলক্ষের জন্য একটি আঁকা ডিজাইন খুঁজে নিন, নাম আর তারিখ যোগ করুন, তারপর WhatsApp-এ শেয়ার করুন। অতিথিরা এক ট্যাপে উত্তর দেন।",
-  primary: "সব ডিজাইন দেখুন",
   sample: "একটি নিমন্ত্রণপত্র খুলে দেখুন",
-  popular: "জনপ্রিয়",
-  popularSearches: ["গুজরাটি বিয়ে", "গায়ে হলুদ", "জন্মদিন", "নিকাহ", "দীপাবলি"],
-  cardLabel: { closed: "নমুনা নিমন্ত্রণপত্র খুলুন", open: "নমুনা নিমন্ত্রণপত্র বন্ধ করুন" },
-  hint: {
-    scroll: "খুলতে স্ক্রল করুন",
-    tap: "খুলতে ট্যাপ করুন",
-    close: "বন্ধ করতে ট্যাপ করুন",
-  },
   proof: ["বিনামূল্যে তৈরি করুন", "অতিথিদের অ্যাপ লাগবে না", "একবারই পেমেন্ট, সাবস্ক্রিপশন নেই"],
   card: {
     doors: ["শুভ", "বিবাহ"],
@@ -75,47 +85,77 @@ export const hero: Translation<typeof en.hero> = {
   },
 };
 
-export const homeGallery: Translation<typeof en.homeGallery> = {
-  deckLabel: "আঁকা নিমন্ত্রণপত্রের থিম",
-  showTheme: (name: string) => `${name} দেখান`,
-  previousTheme: "আগের থিম",
-  nextTheme: "পরের থিম",
-  coverDate: "12 ডিসেম্বর 2026",
-  occasionsTitle: "আপনি কী উদযাপন করছেন?",
-  searchLabel: "উপলক্ষ ও ডিজাইন খুঁজুন",
-  searchPlaceholder: "যেমন গুজরাটি বিয়ে, গায়ে হলুদ, জন্মদিন…",
-  search: "খুঁজুন",
-  allOccasions: "সব উপলক্ষ",
-  designsEyebrow: "ডিজাইন",
-  designsTitle: "আপনার নিমন্ত্রণপত্র খুঁজে নিন",
-  designsIntro:
-    "আপনার পরিবারের রীতি দিয়ে শুরু করুন, অথবা অন্য আয়োজকরা যে ডিজাইনগুলো বেছে নিচ্ছেন সেগুলো দিয়ে।",
-  kindsEyebrow: "নিমন্ত্রণের তিনটি উপায়",
-  kindsTitle: "কীভাবে খুলবে, বেছে নিন",
-  kindsIntro: "প্রতিটি ডিজাইন এর কোনো একটি রূপে আসে। সব দেখতে যেকোনো একটিতে ট্যাপ করুন।",
+export const homeFlow: Translation<typeof en.homeFlow> = {
+  heading: "কীভাবে কাজ করে",
+  stepOf: (step, total) => `ধাপ ${step} / ${total}`,
+  pause: "থামান",
+  play: "চালান",
+  steps: [
+    { title: "ডিজাইন বাছুন", body: "প্রতিটি উপলক্ষ আর রীতির জন্য আঁকা।" },
+    { title: "আপনার তথ্য দিন", body: "নাম, তারিখ আর ঠিকানা, আপনার ভাষায়।" },
+    { title: "দেখুন কেমন জীবন্ত হয়ে ওঠে", body: "দরজা খোলে, সুর বাজে, পাতা একে একে খোলে।" },
+    { title: "অতিথিদের যোগ করুন", body: "ফোনের কন্টাক্ট, Excel শিট বা তালিকার ছবি থেকে।" },
+    {
+      title: "WhatsApp-এ পাঠান",
+      body: "প্রতিটি অতিথির জন্য আলাদা বার্তা, আর স্ট্যাটাসের জন্য ভিডিও।",
+    },
+    { title: "অতিথিরা এক ট্যাপে উত্তর দেন", body: "কে আসছেন আর কতজন, সঙ্গে সঙ্গে দেখুন।" },
+  ],
+  phone: {
+    designs: "বিয়ের ডিজাইন",
+    use: "এই ডিজাইনটি বাছুন",
+    bride: "কনে",
+    groom: "বর",
+    date: "বিয়ের তারিখ",
+    brideName: "মীরা",
+    groomName: "আরভ",
+    joiner: "ও",
+    dateValue: "শনি, 12 ডিসে",
+    cardLanguage: "কার্ডের ভাষা",
+    languages: ["English", "বাংলা"],
+    open: "নিমন্ত্রণপত্র খুলুন",
+    addGuests: "অতিথি যোগ করুন",
+    sources: ["কন্টাক্ট", "Excel", "তালিকার ছবি"],
+    guests: ["শর্মা পরিবার", "মেহতা জি", "প্রিয়া ও রোহন"],
+    chat: "শর্মা পরিবার",
+    message: "নমস্কার শর্মা পরিবার 🙏 মীরা ও আরভের শুভ বিবাহে আপনাদের সপরিবারে সাদর আমন্ত্রণ।",
+    linkTitle: "মীরা ও আরভ · শুভ বিবাহ",
+    video: "স্ট্যাটাসের জন্য ভিডিও",
+    replies: "কে আসছেন",
+    coming: "আসছেন",
+    wish: "অনেক অভিনন্দন! আমরা অবশ্যই আসব 🎉",
+    people: (count) => `${count} জন`,
+    tally: (count) => `${count} জন আসছেন`,
+  },
+};
+
+export const homePicks: Translation<typeof en.homePicks> = {
+  title: "আপনি কী উদযাপন করছেন?",
+  more: "আরও উপলক্ষ",
+  all: "সব উপলক্ষ",
+};
+
+export const homeRows: Translation<typeof en.homeRows> = {
+  eyebrow: "ডিজাইন",
+  title: "পছন্দের ডিজাইন বাছুন",
+  intro:
+    "সারি সরিয়ে দেখুন, প্রতিটি পাতা দেখতে ছবিতে ট্যাপ করুন, বা অতিথিরা যেমন দেখবেন তেমন খুলে দেখুন।",
   allDesigns: "সব ডিজাইন দেখুন",
 };
 
-export const howItWorks: Translation<typeof en.howItWorks> = {
-  eyebrow: "কীভাবে কাজ করে",
-  title: "তিন ধাপেই তৈরি",
-  intro:
-    "ডিজাইনের কোনো দক্ষতা লাগবে না। বেশিরভাগ পরিবার এক কাপ চায়ের মধ্যেই নিমন্ত্রণপত্র তৈরি করে ফেলেন।",
-  stepLabel: (step: number) => `ধাপ ${step}`,
-  steps: [
-    {
-      title: "ডিজাইন বেছে নিন",
-      body: "উপলক্ষ আর রীতি দিয়ে খুঁজুন বা ঘুরে দেখুন, তারপর ‘এই ডিজাইনটি বেছে নিন’-এ ট্যাপ করুন।",
-    },
-    {
-      title: "আপনার তথ্য যোগ করুন",
-      body: "নাম, তারিখ আর জায়গা; লিখতে লিখতেই পাশে নিমন্ত্রণপত্র বদলে যেতে দেখবেন।",
-    },
-    {
-      title: "পাঠান আর খোঁজ রাখুন",
-      body: "WhatsApp-এ একটি লিংক পাঠান। অতিথিরা এক ট্যাপে উত্তর দেন, আর কে আসছেন তা আপনি সঙ্গে সঙ্গে দেখতে পান।",
-    },
-  ],
+export const homeHelp: Translation<typeof en.homeHelp> = {
+  set: {
+    eyebrow: "সম্পূর্ণ বিয়ের সেট",
+    title: "পুরো বিয়ের জন্য একটি প্যাকেজ",
+    body: "আপনার নিমন্ত্রণপত্র, প্রতিটি অনুষ্ঠানের ভিডিও, আর সেভ দ্য ডেট ও ধন্যবাদ কার্ড, সব একই ডিজাইনে।",
+    cta: "এতে কী কী আছে দেখুন",
+  },
+  make: {
+    eyebrow: "সময় কম?",
+    title: "আমরা আপনার হয়ে বানিয়ে দেব",
+    body: "আপনাদের নাম, তারিখ আর ঠিকানা WhatsApp-এ পাঠান, আমরা নিমন্ত্রণপত্র তৈরি করে আপনাকে দেখে নিতে দেব।",
+    cta: "WhatsApp-এ তথ্য পাঠান",
+  },
 };
 
 export const templates: Translation<typeof en.templates> = {
@@ -142,36 +182,6 @@ export const templates: Translation<typeof en.templates> = {
     { id: "phulkari", name: "ফুলকারি রং", kind: "রাগ কাফি", tone: "gold" },
   ],
   sample: { first: "আরভ", second: "মীরা", date: "12 · XII · 2026", place: "উদয়পুর" },
-};
-
-export const pricing: Translation<typeof en.pricing> = {
-  eyebrow: "দাম",
-  title: (price) => `শুরু বিনামূল্যে, পেইড ডিজাইন ${price} থেকে`,
-  intro: "নিমন্ত্রণপত্র তৈরি করুন আর বিনামূল্যে শেয়ার করুন। আরও কিছু চাইলে একটি প্যাকেজ বেছে নিন।",
-  free: {
-    name: "ফ্রি",
-    price: "₹0",
-    per: "শুরু করতে",
-    points: [
-      "ফ্রি ডিজাইন, আর বাকি সবগুলোও ব্যবহার করে দেখুন",
-      "একটি লিংকে WhatsApp-এ শেয়ার করুন",
-      "অতিথিদের জন্য এক ট্যাপে RSVP",
-    ],
-  },
-  premium: {
-    name: "প্যাকেজ",
-    price: (price) => `${price} থেকে`,
-    per: "প্রতি নিমন্ত্রণপত্র",
-    badge: "বিয়ের জন্য সেরা",
-    points: [
-      "বেসিক: আপনার ডিজাইন, ওয়াটারমার্ক ছাড়া",
-      "সেলিব্রেশন: নিমন্ত্রণের ভিডিও, আর আরও বেশি নিমন্ত্রণ",
-      "গ্র্যান্ড: সীমাহীন নিমন্ত্রণ, প্রতিটি অনুষ্ঠানের ভিডিও, আর আপনার অতিথি তালিকা পড়ে দেয় এমন AI",
-    ],
-  },
-  note: "প্রতি নিমন্ত্রণপত্রে একবারই পেমেন্ট, সব কর সহ। কখনও সাবস্ক্রিপশন নয়। প্রতিটি প্যাকেজে সব অনুষ্ঠান থাকে।",
-  cta: "নিমন্ত্রণপত্র তৈরি করুন",
-  compare: "প্যাকেজগুলো তুলনা করুন",
 };
 
 export const faq: Translation<typeof en.faq> = {

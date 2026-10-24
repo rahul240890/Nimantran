@@ -206,7 +206,7 @@ export async function OffersPage({ locale }: { locale: UiLocale }) {
       />
       <section
         aria-label={copy.crumb}
-        className="mx-auto w-full max-w-6xl px-4 pb-4 sm:px-6 lg:px-8"
+        className="mx-auto w-full max-w-site px-4 pb-4 sm:px-6 lg:px-8"
       >
         {offers.length === 0 ? (
           <div className="flex flex-col items-start gap-2 rounded-lg border border-dashed border-line-strong bg-surface-2/60 p-6 sm:p-8">

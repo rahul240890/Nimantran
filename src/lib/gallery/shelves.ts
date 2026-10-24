@@ -100,10 +100,13 @@ export const SHELF_SIZE = 10;
 /**
  * A row's designs: the first few, and how many there are in all. An occasion's row leads
  * with the designs painted for it; the 3D cards every occasion shares come after them.
+ * Designs already shown in a row above (`shown`) step aside, so rows of occasions that
+ * share designs (a wedding and an engagement) each show new ones; the count stays whole.
  */
 export function shelfEntries(
   entries: readonly CatalogEntry[],
   shelf: Shelf,
+  shown: ReadonlySet<string> = new Set(),
 ): { shown: CatalogEntry[]; total: number } {
   const all = filterCatalog(entries, shelfFilters(shelf), () => "");
   const ordered =
@@ -113,5 +116,8 @@ export function shelfEntries(
           ...all.filter((entry) => entry.format === "card"),
         ]
       : all;
-  return { shown: ordered.slice(0, SHELF_SIZE), total: all.length };
+  const fresh = ordered.filter((entry) => !shown.has(entry.design.id));
+  // Too few new ones to fill a row: the row keeps its own designs, as without the others
+  const row = fresh.length >= SHELF_SIZE ? fresh : ordered;
+  return { shown: row.slice(0, SHELF_SIZE), total: all.length };
 }

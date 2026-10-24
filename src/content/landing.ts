@@ -12,12 +12,30 @@ export const homeMeta = {
 } as const;
 
 export const nav = [
-  { id: "weddings", label: "Wedding designs" },
   { id: "designs", label: "All designs" },
   { id: "sample", label: "Live invitation" },
   { id: "pricing", label: "Pricing" },
   { id: "help", label: "Help on WhatsApp" },
 ] as const;
+
+/** The header's tabs and their short lists (src/components/shell/site-menu.ts). */
+export const menuCopy = {
+  tabs: {
+    weddings: "Wedding",
+    engagement: "Engagement",
+    birthday: "Birthday",
+    occasions: "More occasions",
+    traditions: "Traditions",
+  },
+  weddingAll: "Wedding invitations",
+  video: { title: "Invitation video", note: "For WhatsApp Status and Reels" },
+  cards: { title: "Save the date and thank-you cards", note: "To send before and after the day" },
+  set: { title: "Complete Wedding Set", note: "Invitation, videos and cards together" },
+  functions: "Wedding functions",
+  allOccasions: (count: number) => `All ${count} occasions`,
+  sample: "See a live invitation",
+  help: "Need help? WhatsApp us",
+};
 
 export const shell = {
   skipToContent: "Skip to main content",
@@ -36,6 +54,8 @@ export const shell = {
   themeHeading: "Theme",
   /** What the Help on WhatsApp link writes for the visitor, ready to send. */
   helpMessage: "Hello Shubh Invitation, I'd like help making my invitation.",
+  /** What We'll make it for you writes, ready to send with the family's details. */
+  makeMessage: "Hello Shubh Invitation, please make our invitation for us. Our details:",
   footer: {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",
@@ -50,13 +70,8 @@ export const hero = {
   eyebrow: "Create · Invite · Celebrate",
   title: "Invitations that come alive.",
   body: "Find a painted design for your occasion, add your names and dates, and share it on WhatsApp. Guests reply in one tap.",
-  primary: "Browse all designs",
   /** Opens a whole invitation as a guest gets it, with made-up names (/sample). */
   sample: "Open a live invitation",
-  popular: "Popular",
-  popularSearches: ["Gujarati wedding", "Haldi", "Birthday", "Nikah", "Diwali"],
-  cardLabel: { closed: "Open the sample invitation", open: "Close the sample invitation" },
-  hint: { scroll: "Scroll to open", tap: "Tap to open", close: "Tap to close" },
   proof: ["Create free", "No app for guests", "Pay once, no subscription"],
   card: {
     doors: ["SHUBH", "VIVAH"],
@@ -71,47 +86,85 @@ export const hero = {
   },
 } as const;
 
-/** The home page's painted deck, occasion strip and rows of designs. */
-export const homeGallery = {
-  deckLabel: "Painted invitation themes",
-  showTheme: (name: string) => `Show ${name}`,
-  previousTheme: "Previous theme",
-  nextTheme: "Next theme",
-  coverDate: "12 December 2026",
-  occasionsTitle: "What are you celebrating?",
-  searchLabel: "Search occasions and designs",
-  searchPlaceholder: "Try Gujarati wedding, haldi, birthday…",
-  search: "Search",
-  allOccasions: "Every occasion",
-  designsEyebrow: "Designs",
-  designsTitle: "Find your invitation",
-  designsIntro: "Start with your family's tradition, or with the designs other hosts are choosing.",
-  kindsEyebrow: "Three ways to invite",
-  kindsTitle: "Pick how it opens",
-  kindsIntro: "Every design comes as one of these. Tap one to see them all.",
+/**
+ * The first screen's phone, which plays an invitation from its design to a guest's reply,
+ * and the steps beside it. The words in the phone are pictures of the app (hidden from
+ * screen readers); the steps say the same in full.
+ */
+export const homeFlow = {
+  heading: "How it works",
+  stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
+  pause: "Pause",
+  play: "Play",
+  steps: [
+    { title: "Choose a design", body: "Painted for every occasion and tradition." },
+    { title: "Add your details", body: "Names, dates and venues, in your own language." },
+    { title: "See it come alive", body: "Its doors open, music plays, its pages unfold." },
+    {
+      title: "Add your guests",
+      body: "From your contacts, an Excel sheet or a photo of your list.",
+    },
+    { title: "Send on WhatsApp", body: "A message for each guest, and a video for your Status." },
+    { title: "Guests reply in a tap", body: "See who is coming, and how many, as it happens." },
+  ],
+  phone: {
+    designs: "Wedding designs",
+    use: "Use this design",
+    bride: "Bride",
+    groom: "Groom",
+    date: "Wedding date",
+    brideName: "Meera",
+    groomName: "Aarav",
+    joiner: "&",
+    dateValue: "Sat, 12 Dec",
+    cardLanguage: "Card language",
+    languages: ["English", "हिंदी"],
+    open: "Open the invitation",
+    addGuests: "Add guests",
+    sources: ["Contacts", "Excel", "Photo of list"],
+    guests: ["Sharma family", "Mehta ji", "Priya and Rohan"],
+    chat: "Sharma family",
+    message: "Namaste Sharma ji 🙏 Please join us for Meera and Aarav's wedding.",
+    linkTitle: "Meera & Aarav · Wedding",
+    video: "Video for Status",
+    replies: "Who's coming",
+    coming: "Coming",
+    wish: "Congratulations! We'll be there 🎉",
+    people: (count: number) => `${count} guests`,
+    tally: (count: number) => `${count} coming`,
+  },
+};
+
+/** The occasions under the first screen: four large tiles, then a row of smaller ones. */
+export const homePicks = {
+  title: "What are you celebrating?",
+  more: "More occasions",
+  all: "All occasions",
+};
+
+/** The rows of designs: trending, then one row per main occasion. */
+export const homeRows = {
+  eyebrow: "Designs",
+  title: "Pick a design you love",
+  intro: "Swipe a row, tap a painting to see every page, or open it live as your guests will.",
   allDesigns: "See all designs",
 };
 
-export const howItWorks = {
-  eyebrow: "How it works",
-  title: "Ready in three steps",
-  intro: "No design skills needed. Most families finish their invite over one cup of chai.",
-  stepLabel: (step: number) => `Step ${step}`,
-  steps: [
-    {
-      title: "Pick a design",
-      body: "Search or browse by occasion and tradition, then tap Use this design.",
-    },
-    {
-      title: "Add your details",
-      body: "Names, dates and venues, with your invite updating beside the form as you type.",
-    },
-    {
-      title: "Share and track",
-      body: "Send one link on WhatsApp. Guests reply in a tap and you see who is coming as it happens.",
-    },
-  ],
-} as const;
+/** Two ways on for a family short of time: the whole wedding at once, or one made for them. */
+export const homeHelp = {
+  set: {
+    eyebrow: "Complete Wedding Set",
+    title: "One package for the whole wedding",
+    body: "Your invitation, a video for every function, and save-the-date and thank-you cards, made in the same design.",
+    cta: "See what's included",
+  },
+  make: {
+    eyebrow: "Short on time?",
+    title: "We'll make it for you",
+    body: "Send your names, dates and venues on WhatsApp, and we'll set up your invitation for you to check.",
+    cta: "Send details on WhatsApp",
+  },
+};
 
 export type { TemplateId };
 
@@ -139,37 +192,6 @@ export const templates = {
     { id: "phulkari", name: "Phulkari Rang", kind: "Raga Kafi", tone: "gold" },
   ] satisfies { id: TemplateId; name: string; kind: string; tone: string }[],
   sample: { first: "Aarav", second: "Meera", date: "12 · XII · 2026", place: "Udaipur" },
-} as const;
-
-export const pricing = {
-  eyebrow: "Pricing",
-  /** Premium's price as Admin, Designs sets it. */
-  title: (price: string) => `Free to start, paid designs from ${price}`,
-  intro: "Make your invite and share it for free. Choose a package when you want more.",
-  free: {
-    name: "Free",
-    price: "₹0",
-    per: "to start",
-    points: [
-      "Free designs, and try every other one",
-      "Share on WhatsApp with one link",
-      "One-tap RSVP for your guests",
-    ],
-  },
-  premium: {
-    name: "Packages",
-    price: (price: string) => `from ${price}`,
-    per: "per invitation",
-    badge: "Best for weddings",
-    points: [
-      "Basic: your design, with no watermark",
-      "Celebration: the invitation video, and more invites",
-      "Grand: unlimited invites, a video for every function, and AI that reads your guest list",
-    ],
-  },
-  note: "One payment per invitation, all taxes included. Never a subscription. Every package covers every function.",
-  cta: "Start your invite",
-  compare: "Compare the packages",
 } as const;
 
 export const faq = {

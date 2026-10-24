@@ -103,6 +103,9 @@ export const galleryCopy = {
   comparePackages: "Compare the packages",
   /** The design's public sample: the whole invitation as a guest gets it. */
   seeSample: "See it live as a guest",
+  /** On a design's painting: the design as a guest gets it, in one tap. */
+  liveDemo: "Live demo",
+  liveDemoLabel: (name: string) => `Live demo: ${name}`,
   sampleLabel: "Sample invitation",
   sampleNote: "The names, dates and places are made up",
   /** Over a sample: Previous and Next walk on to other designs, Choose this design opens the editor. */

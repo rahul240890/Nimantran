@@ -133,7 +133,7 @@ export function BlogIndexPage({
     >
       <section
         aria-labelledby="page-title"
-        className="mx-auto flex w-full max-w-6xl flex-col gap-5 px-4 pt-6 pb-4 sm:px-6 lg:px-8"
+        className="mx-auto flex w-full max-w-site flex-col gap-5 px-4 pt-6 pb-4 sm:px-6 lg:px-8"
       >
         <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
           <span aria-hidden className="h-px w-6 bg-marigold" />
@@ -159,7 +159,7 @@ export function BlogIndexPage({
           </p>
         )}
       </section>
-      <OfferStrip className="mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6 lg:px-8" />
+      <OfferStrip className="mx-auto w-full max-w-site px-4 pt-6 sm:px-6 lg:px-8" />
       <Block id="posts" heading={blogCopy.postsHeading} className="pt-6 sm:pt-8">
         <PostCards posts={posts} headingLevel="h3" />
       </Block>
@@ -442,7 +442,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
         </section>
       </article>
 
-      <OfferStrip className="mx-auto w-full max-w-6xl px-4 pb-12 sm:px-6 lg:px-8" />
+      <OfferStrip className="mx-auto w-full max-w-site px-4 pb-12 sm:px-6 lg:px-8" />
 
       {more.length > 0 && (
         <Block id="more-posts" heading={blogCopy.morePosts} className="pt-0 sm:pt-0">

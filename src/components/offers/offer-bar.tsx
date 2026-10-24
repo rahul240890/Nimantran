@@ -115,7 +115,7 @@ function OfferBarView({ offerKey, words }: { offerKey: string; words: OfferBarWo
       data-offer-bar={offerKey}
       className="offer-shine relative z-40 order-first animate-fade-in overflow-hidden bg-night text-card-ivory"
     >
-      <div className="mx-auto flex min-h-11 w-full max-w-6xl items-center gap-2 ps-3 pe-1 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-11 w-full max-w-site items-center gap-2 ps-3 pe-1 sm:px-6 lg:px-8">
         <Sparkles aria-hidden className="size-4 shrink-0 animate-twinkle text-card-gold" />
         <Link
           href={words.href}

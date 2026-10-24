@@ -8,7 +8,6 @@ import {
   CameraOff,
   ChevronLeft,
   ChevronRight,
-  Eye,
   Image as ImageIcon,
   Layers,
   Pause,
@@ -115,98 +114,117 @@ export function DesignCard({
           : "overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float",
       )}
     >
-      <button
-        type="button"
-        onClick={() => {
-          setOpen(true);
-          funnel("Design previewed", { design: design.id });
-        }}
-        aria-label={galleryCopy.preview(name)}
+      {/* The painting opens the preview; Live demo beside it opens the design as a guest gets it */}
+      <div
         className={cn(
-          "@container/tile relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night focus-visible:outline-2 focus-visible:outline-ring",
-          compact
-            ? "rounded-2xl shadow-raised ring-1 ring-line outline-offset-3 transition-[transform,box-shadow] duration-500 ease-out-expo group-hover:-translate-y-1 group-hover:shadow-float motion-still:transition-none motion-still:group-hover:translate-y-0"
-            : "outline-offset-[-3px]",
+          "@container/tile relative",
+          compact &&
+            "rounded-2xl shadow-raised ring-1 ring-line transition-[transform,box-shadow] duration-500 ease-out-expo group-hover:-translate-y-1 group-hover:shadow-float motion-still:transition-none motion-still:group-hover:translate-y-0",
         )}
       >
-        {scene ? (
-          <>
-            <ScenePoster
-              suite={design.suite}
-              alt={alt}
-              priority={priority}
-              className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
-            />
-            <span
-              aria-hidden
-              className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
-            />
-          </>
-        ) : painted ? (
-          <>
-            <Image
-              src={pages[0]!.src}
-              alt={alt}
-              fill
-              loading={priority ? "eager" : "lazy"}
-              sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
-              className="object-cover object-top transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
-            />
-            {/* A soft shade at the foot keeps the badge and button readable */}
-            <span
-              aria-hidden
-              className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
-            />
-          </>
-        ) : (
-          <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[12%]">
-            <span
-              aria-hidden
-              className="absolute top-1/2 left-1/2 aspect-square w-[110%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
-              style={{
-                background:
-                  "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 28%, transparent), transparent)",
-              }}
-            />
-            {cover ?? (
-              <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
-            )}
-          </span>
-        )}
-        <span className="absolute start-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 overflow-hidden rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
-          {moving ? (
-            <Clapperboard aria-hidden className="size-3.5" />
-          ) : scene ? (
-            <ImageIcon aria-hidden className="size-3.5" />
-          ) : painted ? (
-            <Layers aria-hidden className="size-3.5" />
-          ) : (
-            <Rotate3d aria-hidden className="size-3.5" />
+        <button
+          type="button"
+          onClick={() => {
+            setOpen(true);
+            funnel("Design previewed", { design: design.id });
+          }}
+          aria-label={galleryCopy.preview(name)}
+          className={cn(
+            "relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night focus-visible:outline-2 focus-visible:outline-ring",
+            compact ? "rounded-2xl outline-offset-3" : "outline-offset-[-3px]",
           )}
-          {moving
-            ? galleryCopy.movingBadge
-            : scene
-              ? galleryCopy.sceneBadge
-              : painted
-                ? galleryCopy.storyBadge(pages.length)
-                : galleryCopy.card}
-        </span>
-        {trending && (
-          <span
-            data-trending
-            className="absolute start-3 top-10 inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-on-marigold uppercase shadow-raised"
-          >
-            <Flame aria-hidden className="size-3.5" />
-            {galleryCopy.trendingBadge}
+        >
+          {scene ? (
+            <>
+              <ScenePoster
+                suite={design.suite}
+                alt={alt}
+                priority={priority}
+                className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
+              />
+              <span
+                aria-hidden
+                className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
+              />
+            </>
+          ) : painted ? (
+            <>
+              <Image
+                src={pages[0]!.src}
+                alt={alt}
+                fill
+                loading={priority ? "eager" : "lazy"}
+                sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
+                className="object-cover object-top transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
+              />
+              {/* A soft shade at the foot keeps the badge and button readable */}
+              <span
+                aria-hidden
+                className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
+              />
+            </>
+          ) : (
+            <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[12%]">
+              <span
+                aria-hidden
+                className="absolute top-1/2 left-1/2 aspect-square w-[110%] -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 28%, transparent), transparent)",
+                }}
+              />
+              {cover ?? (
+                <TemplateCover id={design.template} locale={locale} className="max-w-[16rem]" />
+              )}
+            </span>
+          )}
+          <span className="absolute start-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 overflow-hidden rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
+            {moving ? (
+              <Clapperboard aria-hidden className="size-3.5" />
+            ) : scene ? (
+              <ImageIcon aria-hidden className="size-3.5" />
+            ) : painted ? (
+              <Layers aria-hidden className="size-3.5" />
+            ) : (
+              <Rotate3d aria-hidden className="size-3.5" />
+            )}
+            {moving
+              ? galleryCopy.movingBadge
+              : scene
+                ? galleryCopy.sceneBadge
+                : painted
+                  ? galleryCopy.storyBadge(pages.length)
+                  : galleryCopy.card}
           </span>
-        )}
-        {compact && (
-          <TierBadge designId={design.id} className="absolute start-3 bottom-3 max-w-[60%]" />
-        )}
-        <span className="absolute end-3 bottom-3 grid size-11 place-items-center rounded-full bg-card-ivory/90 text-card-ink opacity-0 shadow-raised transition-opacity duration-300 group-focus-within:opacity-100 group-hover:opacity-100 max-md:opacity-100">
-          <Eye aria-hidden className="size-5" />
-        </span>
-      </button>
+          {trending && (
+            <span
+              data-trending
+              className="absolute start-3 top-10 inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-on-marigold uppercase shadow-raised"
+            >
+              <Flame aria-hidden className="size-3.5" />
+              {galleryCopy.trendingBadge}
+            </span>
+          )}
+          {compact && (
+            <TierBadge designId={design.id} className="absolute start-3 bottom-3 max-w-[55%]" />
+          )}
+        </button>
+        {/* A narrow tile keeps only its play button; its name stays for screen readers */}
+        <Link
+          href={sampleHref ?? samplePath(design.id)}
+          prefetch={false}
+          aria-label={galleryCopy.liveDemoLabel(name)}
+          data-live-demo
+          className="group/live absolute end-1.5 bottom-1.5 z-10 grid min-h-11 min-w-11 place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-card-ivory"
+        >
+          <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-card-ivory/95 ps-1.5 pe-1.5 text-xs font-semibold text-card-ink shadow-raised transition-colors group-hover/live:bg-card-ivory @min-[11rem]/tile:pe-3">
+            <span className="grid size-6 place-items-center rounded-full bg-marigold text-on-marigold">
+              <Play aria-hidden className="size-3 fill-current rtl:rotate-180" />
+            </span>
+            <span className="@max-[11rem]/tile:sr-only">{galleryCopy.liveDemo}</span>
+          </span>
+        </Link>
+      </div>
       {compact ? (
         <Link
           href={href}

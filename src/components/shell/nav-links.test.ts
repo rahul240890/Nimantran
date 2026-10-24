@@ -1,23 +1,21 @@
 import { describe, expect, it } from "vitest";
-import { helpPath, isHelpLink, isPageLink, navHref } from "./nav-links";
+import { helpPath, isHelpLink, navHref } from "./nav-links";
 
-describe("header links", () => {
-  it("send each of the five links where it belongs, in the site's language", () => {
-    expect(navHref("weddings", "en")).toBe("/invitations/wedding");
+describe("footer links", () => {
+  it("send each link where it belongs, in the site's language", () => {
     expect(navHref("designs", "en")).toBe("/designs");
     expect(navHref("sample", "en")).toBe("/sample");
-    expect(navHref("pricing", "en")).toBe("/#pricing");
+    expect(navHref("pricing", "en")).toBe("/pricing");
     expect(navHref("help", "en")).toBe("/help/whatsapp");
-    expect(navHref("weddings", "hi")).toBe("/hi/invitations/wedding");
-    expect(navHref("pricing", "hi")).toBe("/hi#pricing");
+    expect(navHref("pricing", "hi")).toBe("/hi/pricing");
     expect(navHref("help", "gu")).toBe("/help/whatsapp?lang=gu");
+    expect(isHelpLink("help")).toBe(true);
+    expect(isHelpLink("pricing")).toBe(false);
   });
 
-  it("tell pages, home page sections and WhatsApp apart", () => {
-    expect(["weddings", "designs", "sample"].every(isPageLink)).toBe(true);
-    expect(isPageLink("pricing")).toBe(false);
-    expect(isHelpLink("help")).toBe(true);
-    expect(isPageLink("help")).toBe(false);
+  it("ask for help, or for us to make the invitation, in the visitor's language", () => {
     expect(helpPath("ta")).toBe("/help/whatsapp?lang=ta");
+    expect(helpPath("en", "make")).toBe("/help/whatsapp?for=make");
+    expect(helpPath("hi", "make")).toBe("/help/whatsapp?lang=hi&for=make");
   });
 });

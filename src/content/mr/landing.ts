@@ -13,12 +13,29 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "weddings", label: "लग्नाचे डिझाइन" },
   { id: "designs", label: "सर्व डिझाइन" },
   { id: "sample", label: "जिवंत निमंत्रण" },
   { id: "pricing", label: "किंमत" },
   { id: "help", label: "व्हॉट्सॲपवर मदत" },
 ];
+
+export const menuCopy: Translation<typeof en.menuCopy> = {
+  tabs: {
+    weddings: "लग्न",
+    engagement: "साखरपुडा",
+    birthday: "वाढदिवस",
+    occasions: "आणखी प्रसंग",
+    traditions: "परंपरा",
+  },
+  weddingAll: "लग्नाची निमंत्रणे",
+  video: { title: "निमंत्रण व्हिडिओ", note: "WhatsApp स्टेटस आणि रील्ससाठी" },
+  cards: { title: "सेव्ह द डेट आणि आभार कार्ड", note: "लग्नाआधी आणि नंतर पाठवण्यासाठी" },
+  set: { title: "संपूर्ण लग्न सेट", note: "निमंत्रण, व्हिडिओ आणि कार्ड, एकत्र" },
+  functions: "लग्नाचे विधी",
+  allOccasions: (count) => `सर्व ${count} प्रसंग`,
+  sample: "जिवंत निमंत्रण पाहा",
+  help: "मदत हवी? WhatsApp करा",
+};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "मुख्य मजकुराकडे जा",
@@ -36,6 +53,7 @@ export const shell: Translation<typeof en.shell> = {
   },
   themeHeading: "थीम",
   helpMessage: "नमस्कार Shubh Invitation, मला माझे निमंत्रण बनवण्यासाठी मदत हवी आहे.",
+  makeMessage: "नमस्कार Shubh Invitation, कृपया आमचे निमंत्रण आमच्यासाठी बनवून द्या. आमचे तपशील:",
   footer: {
     tagline: "3D निमंत्रणे, जी पाहुणे उघडतात, फिरवतात आणि जपतात.",
     explore: "पाहा",
@@ -50,16 +68,7 @@ export const hero: Translation<typeof en.hero> = {
   eyebrow: "बनवा · बोलवा · साजरे करा",
   title: "जिवंत होणारी निमंत्रणे.",
   body: "आपल्या प्रसंगासाठी चित्रित डिझाइन शोधा, नावे आणि तारखा जोडा, आणि WhatsApp वर पाठवा. पाहुणे एका टॅपमध्ये उत्तर देतात.",
-  primary: "सर्व डिझाइन पाहा",
   sample: "जिवंत निमंत्रण उघडा",
-  popular: "लोकप्रिय",
-  popularSearches: ["गुजराती लग्न", "हळद", "वाढदिवस", "निकाह", "दिवाळी"],
-  cardLabel: { closed: "नमुना निमंत्रण उघडा", open: "नमुना निमंत्रण बंद करा" },
-  hint: {
-    scroll: "उघडण्यासाठी स्क्रोल करा",
-    tap: "उघडण्यासाठी टॅप करा",
-    close: "बंद करण्यासाठी टॅप करा",
-  },
   proof: ["मोफत बनवा", "पाहुण्यांना ॲप नको", "एकदाच पेमेंट, सबस्क्रिप्शन नाही"],
   card: {
     doors: ["शुभ", "विवाह"],
@@ -74,47 +83,77 @@ export const hero: Translation<typeof en.hero> = {
   },
 };
 
-export const homeGallery: Translation<typeof en.homeGallery> = {
-  deckLabel: "चित्रित निमंत्रण थीम",
-  showTheme: (name: string) => `${name} दाखवा`,
-  previousTheme: "मागील थीम",
-  nextTheme: "पुढील थीम",
-  coverDate: "12 डिसेंबर 2026",
-  occasionsTitle: "आपण काय साजरे करत आहात?",
-  searchLabel: "प्रसंग आणि डिझाइन शोधा",
-  searchPlaceholder: "उदा. गुजराती लग्न, हळद, वाढदिवस…",
-  search: "शोधा",
-  allOccasions: "सर्व प्रसंग",
-  designsEyebrow: "डिझाइन",
-  designsTitle: "आपले निमंत्रण शोधा",
-  designsIntro:
-    "आपल्या कुटुंबाच्या परंपरेपासून सुरुवात करा, किंवा इतर यजमान निवडत असलेल्या डिझाइनपासून.",
-  kindsEyebrow: "निमंत्रण देण्याचे तीन प्रकार",
-  kindsTitle: "ते कसे उघडावे ते निवडा",
-  kindsIntro: "प्रत्येक डिझाइन यांपैकी एका प्रकारात येते. सर्व पाहण्यासाठी एकावर टॅप करा.",
+export const homeFlow: Translation<typeof en.homeFlow> = {
+  heading: "हे कसे चालते",
+  stepOf: (step, total) => `पायरी ${step} / ${total}`,
+  pause: "थांबवा",
+  play: "सुरू करा",
+  steps: [
+    { title: "डिझाइन निवडा", body: "प्रत्येक प्रसंगासाठी आणि परंपरेसाठी रंगवलेले." },
+    { title: "आपले तपशील भरा", body: "नावे, तारखा आणि ठिकाणे, आपल्या भाषेत." },
+    { title: "ते जिवंत होताना पाहा", body: "दारे उघडतात, संगीत वाजते, पाने उलगडतात." },
+    { title: "पाहुणे जोडा", body: "फोनच्या संपर्कांतून, Excel शीटमधून किंवा यादीच्या फोटोतून." },
+    {
+      title: "WhatsApp वर पाठवा",
+      body: "प्रत्येक पाहुण्यासाठी वेगळा संदेश, आणि स्टेटससाठी व्हिडिओ.",
+    },
+    { title: "पाहुणे एका टॅपमध्ये उत्तर देतात", body: "कोण येत आहे आणि किती जण, लगेच पाहा." },
+  ],
+  phone: {
+    designs: "लग्नाची डिझाइन",
+    use: "हे डिझाइन निवडा",
+    bride: "वधू",
+    groom: "वर",
+    date: "लग्नाची तारीख",
+    brideName: "मीरा",
+    groomName: "आरव",
+    joiner: "व",
+    dateValue: "शनि, 12 डिसें",
+    cardLanguage: "कार्डची भाषा",
+    languages: ["English", "मराठी"],
+    open: "निमंत्रण उघडा",
+    addGuests: "पाहुणे जोडा",
+    sources: ["संपर्क", "Excel", "यादीचा फोटो"],
+    guests: ["शर्मा कुटुंब", "मेहता काका", "प्रिया आणि रोहन"],
+    chat: "शर्मा कुटुंब",
+    message: "नमस्कार शर्मा कुटुंबीय 🙏 मीरा आणि आरव यांच्या लग्नाचे आपल्याला सस्नेह निमंत्रण.",
+    linkTitle: "मीरा व आरव · शुभविवाह",
+    video: "स्टेटससाठी व्हिडिओ",
+    replies: "कोण येत आहे",
+    coming: "येत आहेत",
+    wish: "खूप खूप अभिनंदन! आम्ही नक्की येऊ 🎉",
+    people: (count) => `${count} जण`,
+    tally: (count) => `${count} जण येत आहेत`,
+  },
+};
+
+export const homePicks: Translation<typeof en.homePicks> = {
+  title: "आपण काय साजरे करत आहात?",
+  more: "आणखी प्रसंग",
+  all: "सर्व प्रसंग",
+};
+
+export const homeRows: Translation<typeof en.homeRows> = {
+  eyebrow: "डिझाइन",
+  title: "आवडणारे डिझाइन निवडा",
+  intro:
+    "ओळ सरकवा, सगळी पाने पाहण्यासाठी चित्रावर टॅप करा, किंवा पाहुण्यांना दिसेल तसे जिवंत उघडा.",
   allDesigns: "सर्व डिझाइन पाहा",
 };
 
-export const howItWorks: Translation<typeof en.howItWorks> = {
-  eyebrow: "हे कसे चालते",
-  title: "तीन पायऱ्यांत तयार",
-  intro:
-    "डिझाइनचे कोणतेही कौशल्य लागत नाही. बहुतेक कुटुंबे एक कप चहा होईपर्यंत आपले निमंत्रण तयार करतात.",
-  stepLabel: (step: number) => `पायरी ${step}`,
-  steps: [
-    {
-      title: "डिझाइन निवडा",
-      body: "प्रसंग आणि परंपरेनुसार शोधा किंवा पाहा, मग ‘हे डिझाइन वापरा’ वर टॅप करा.",
-    },
-    {
-      title: "आपला तपशील जोडा",
-      body: "नावे, तारखा आणि ठिकाणे, आणि आपण टाइप करताच शेजारी निमंत्रण बदलताना दिसते.",
-    },
-    {
-      title: "पाठवा आणि पाहा",
-      body: "WhatsApp वर एक लिंक पाठवा. पाहुणे एका टॅपमध्ये उत्तर देतात आणि कोण येत आहे ते आपल्याला लगेच दिसते.",
-    },
-  ],
+export const homeHelp: Translation<typeof en.homeHelp> = {
+  set: {
+    eyebrow: "संपूर्ण लग्न सेट",
+    title: "संपूर्ण लग्नासाठी एकच पॅकेज",
+    body: "आपले निमंत्रण, प्रत्येक सोहळ्यासाठी व्हिडिओ, आणि सेव्ह द डेट व धन्यवाद कार्ड, सगळे एकाच डिझाइनमध्ये.",
+    cta: "त्यात काय आहे ते पाहा",
+  },
+  make: {
+    eyebrow: "वेळ कमी आहे?",
+    title: "आम्ही ते तुमच्यासाठी बनवू",
+    body: "आपली नावे, तारखा आणि ठिकाणे WhatsApp वर पाठवा, आम्ही आपले निमंत्रण तयार करून तपासण्यासाठी देऊ.",
+    cta: "WhatsApp वर तपशील पाठवा",
+  },
 };
 
 export const templates: Translation<typeof en.templates> = {
@@ -141,36 +180,6 @@ export const templates: Translation<typeof en.templates> = {
     { id: "phulkari", name: "फुलकारी रंग", kind: "राग काफी", tone: "gold" },
   ],
   sample: { first: "आरव", second: "मीरा", date: "12 · XII · 2026", place: "उदयपूर" },
-};
-
-export const pricing: Translation<typeof en.pricing> = {
-  eyebrow: "किंमत",
-  title: (price) => `सुरुवात मोफत, सशुल्क डिझाइन ${price} पासून`,
-  intro: "आपले निमंत्रण बनवा आणि मोफत पाठवा. आणखी काही हवे असेल तेव्हा पॅकेज निवडा.",
-  free: {
-    name: "मोफत",
-    price: "₹0",
-    per: "सुरुवातीसाठी",
-    points: [
-      "मोफत डिझाइन, आणि बाकी सर्व वापरून पाहा",
-      "WhatsApp वर एका लिंकने पाठवा",
-      "पाहुण्यांसाठी एका टॅपमध्ये RSVP",
-    ],
-  },
-  premium: {
-    name: "पॅकेज",
-    price: (price) => `${price} पासून`,
-    per: "प्रत्येक निमंत्रणासाठी",
-    badge: "लग्नासाठी सर्वोत्तम",
-    points: [
-      "बेसिक: आपले डिझाइन, वॉटरमार्कशिवाय",
-      "सेलिब्रेशन: निमंत्रण व्हिडिओ, आणि जास्त निमंत्रणे",
-      "ग्रँड: अमर्यादित निमंत्रणे, प्रत्येक सोहळ्याचा व्हिडिओ, आणि तुमची पाहुण्यांची यादी वाचणारे AI",
-    ],
-  },
-  note: "प्रत्येक निमंत्रणासाठी एकदाच पेमेंट, सर्व करांसह. सबस्क्रिप्शन कधीच नाही. प्रत्येक पॅकेजमध्ये सर्व सोहळे येतात.",
-  cta: "आपले निमंत्रण बनवा",
-  compare: "पॅकेजची तुलना करा",
 };
 
 export const faq: Translation<typeof en.faq> = {
