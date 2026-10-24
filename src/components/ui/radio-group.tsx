@@ -4,7 +4,7 @@ import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { createContext, useContext, useId, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Variant = "list" | "card" | "segment";
+type Variant = "list" | "card" | "segment" | "chip";
 const VariantContext = createContext<Variant>("list");
 
 type RadioGroupProps = {
@@ -16,6 +16,7 @@ type RadioGroupProps = {
   /**
    * "card" shows each choice as a raised tile, good for 2–4 big choices.
    * "segment" puts 2–3 short choices side by side in one row, like a reply.
+   * "chip" wraps many short choices as pills, the compact way to offer a long list.
    */
   variant?: Variant;
   orientation?: "vertical" | "horizontal";
@@ -47,7 +48,9 @@ export function RadioGroup({
             ? "grid gap-3 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]"
             : variant === "segment"
               ? "flex flex-wrap gap-1 rounded-lg border border-line-strong bg-surface-2 p-1 aria-invalid:border-danger"
-              : cn("flex", orientation === "vertical" ? "flex-col" : "flex-wrap gap-x-6"),
+              : variant === "chip"
+                ? "flex flex-wrap gap-2"
+                : cn("flex", orientation === "vertical" ? "flex-col" : "flex-wrap gap-x-6"),
           className,
         )}
         {...props}
@@ -111,6 +114,40 @@ export function RadioItem({ value, label, description, icon, badge, disabled }: 
         ) : null}
         <span className="min-w-0">{label}</span>
       </RadioPrimitive.Item>
+    );
+  }
+
+  if (variant === "chip") {
+    return (
+      <>
+        <RadioPrimitive.Item
+          value={value}
+          disabled={disabled}
+          aria-describedby={description ? `${id}-d` : undefined}
+          className={cn(
+            "group/radio inline-flex min-h-11 max-w-full cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface py-1 pe-4 text-start text-sm leading-snug font-semibold text-ink",
+            icon ? "ps-1.5" : "ps-4",
+            "transition-[background-color,border-color,color,transform] duration-150 motion-safe:active:scale-95",
+            "hover:border-marigold-edge hover:text-accent-text",
+            "data-[state=checked]:border-marigold data-[state=checked]:bg-marigold/15 data-[state=checked]:text-ink",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+            "disabled:cursor-not-allowed disabled:opacity-60",
+          )}
+        >
+          {icon ? (
+            <span aria-hidden className="shrink-0">
+              {icon}
+            </span>
+          ) : null}
+          <span className="min-w-0">{label}</span>
+        </RadioPrimitive.Item>
+        {/* A pill has no room for the description; screen readers still hear it */}
+        {description ? (
+          <span id={`${id}-d`} hidden>
+            {description}
+          </span>
+        ) : null}
+      </>
     );
   }
 

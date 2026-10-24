@@ -1,6 +1,7 @@
 "use client";
 
 import { Image } from "@/components/ui/image";
+import { Hint } from "@/components/ui/quiet";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useId, useState } from "react";
 import { SymbolMark } from "@/components/guest/opening/opening-art";
@@ -100,7 +101,7 @@ export function OpeningPicker({
         <h2 id={headingId} className="font-display text-xl leading-tight">
           {openingCopy.heading}
         </h2>
-        <p className="max-w-2xl text-ink-muted">{openingCopy.intro}</p>
+        <Hint className="max-w-2xl text-base">{openingCopy.intro}</Hint>
       </div>
       {/* So many gates: a row of kinds narrows the list to one at a time (scrolls on phones) */}
       <div
@@ -207,7 +208,7 @@ export function OpeningPicker({
             <h3 id="opening-god-heading" className="font-semibold text-ink">
               {openingCopy.godHeading}
             </h3>
-            <p className="max-w-2xl text-sm text-ink-muted">{openingCopy.godIntro}</p>
+            <Hint className="max-w-2xl">{openingCopy.godIntro}</Hint>
           </div>
           <RadioPrimitive.Root
             aria-labelledby="opening-god-heading"
@@ -259,7 +260,7 @@ export function OpeningPicker({
             <h3 id="opening-welcome-heading" className="font-semibold text-ink">
               {openingCopy.welcomeHeading}
             </h3>
-            <p className="max-w-2xl text-sm text-ink-muted">{openingCopy.welcomeIntro}</p>
+            <Hint className="max-w-2xl">{openingCopy.welcomeIntro}</Hint>
           </div>
           <RadioPrimitive.Root
             aria-labelledby="opening-welcome-heading"

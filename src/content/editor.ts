@@ -2267,5 +2267,10 @@ export const quickCopy = {
   make: "Short on time? We'll make it for you",
   /** Hides the make-it-for-you line that shows after a minute on a design's page. */
   hideMake: "Hide this",
+  /** The events to tick first, then each one's date and place (owner, 2026-10-24). */
+  pickEvents: "Your events",
+  moreEvents: "More events",
+  /** The row of other designs for the occasion under the form. */
+  moreDesigns: (occasion: string) => `More ${occasion.toLowerCase()} designs`,
   opening: "Opening the design…",
 } as const;

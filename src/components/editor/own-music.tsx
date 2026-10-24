@@ -5,6 +5,7 @@ import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "@/components/ui/toast";
+import { Hint } from "@/components/ui/quiet";
 import {
   CLIP_ACCEPT,
   clipName,
@@ -523,7 +524,7 @@ export function OwnMusic({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-ink-muted">{extrasCopy.ownHint}</p>
+      <Hint>{extrasCopy.ownHint}</Hint>
       <input
         ref={input}
         type="file"

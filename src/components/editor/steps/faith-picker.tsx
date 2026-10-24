@@ -1,6 +1,7 @@
 "use client";
 
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { Hint } from "@/components/ui/quiet";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cardLanguages, draftFaith, type InviteDraft } from "@/lib/editor/draft";
@@ -53,13 +54,13 @@ export function FaithPicker({ draft, update }: Pick<StepProps, "draft" | "update
         <h2 id="faith-heading" className="font-display text-xl">
           {faithCopy.heading}
         </h2>
-        <p className="text-sm text-ink-muted">{faithCopy.intro}</p>
+        <Hint>{faithCopy.intro}</Hint>
       </div>
       <RadioGroup
         label={faithCopy.label}
+        variant="chip"
         value={faith}
         onValueChange={(value) => choose(value as Faith)}
-        className="grid-cols-2 sm:grid-cols-3"
       >
         {FAITHS.map((id) => (
           <RadioItem key={id} value={id} label={faithCopy.names[id]} />

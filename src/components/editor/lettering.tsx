@@ -4,6 +4,7 @@ import { Bold, CaseUpper, Italic, RotateCcw } from "lucide-react";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import type { CSSProperties, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Hint } from "@/components/ui/quiet";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { cn } from "@/lib/cn";
@@ -149,7 +150,7 @@ export function Lettering({
           <h2 id="lettering-heading" className="font-display text-xl">
             {studioCopy.lettering}
           </h2>
-          <p className="text-sm text-ink-muted">{studioCopy.letteringIntro}</p>
+          <Hint>{studioCopy.letteringIntro}</Hint>
         </div>
       )}
 

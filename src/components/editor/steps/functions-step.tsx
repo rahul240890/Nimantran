@@ -10,6 +10,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/time-picker";
+import { Hint } from "@/components/ui/quiet";
 import {
   ceremonyName,
   draftTradition,
@@ -212,7 +213,7 @@ function FunctionFields({
           >
             {functionFields.moreDetails}
           </Button>
-          {!open && <p className="text-sm text-ink-muted">{functionFields.moreDetailsHint}</p>}
+          {!open && <Hint>{functionFields.moreDetailsHint}</Hint>}
         </div>
       )}
       {withTime && open && (
@@ -481,7 +482,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
             >
               {functionFields.more}
             </h2>
-            <p className="text-sm text-ink-muted">{functionFields.moreHint}</p>
+            <Hint>{functionFields.moreHint}</Hint>
           </div>
           {showMore ? (
             <ul aria-label={functionFields.more} className="flex flex-col gap-4">

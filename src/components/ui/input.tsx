@@ -3,6 +3,7 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
+import { useQuiet } from "./quiet";
 
 type InputProps = ComponentProps<"input"> & {
   /** An icon or short text inside the start of the field. Decorative only. */
@@ -21,6 +22,7 @@ export function Input({
   ...props
 }: InputProps) {
   const field = useField();
+  const quiet = useQuiet();
 
   const input = (
     <input
@@ -31,7 +33,7 @@ export function Input({
       aria-describedby={props["aria-describedby"] ?? field?.describedBy}
       className={cn(
         controlClasses,
-        "h-12 px-3.5 text-base",
+        quiet ? "h-11 px-3 text-ui" : "h-12 px-3.5 text-base",
         leading != null && "ps-11",
         trailing != null && "pe-12",
         className,

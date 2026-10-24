@@ -97,34 +97,83 @@ test.describe("a design's page", () => {
       { timeout: 15_000 },
     );
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
+
+    // Back goes to the design's page, with everything as it was, not to the steps
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding$/);
+    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya", {
+      timeout: 30_000,
+    });
+    await expect(
+      page.locator('[data-function="wedding"]').getByRole("textbox", { name: /^Venue/ }),
+    ).toHaveValue("Taj Falaknuma, Hyderabad");
   });
 
-  test("another function is one tap, and so is its place", async ({ page }) => {
+  test("the events are ticked first, then each one's date and place", async ({ page }) => {
     await open(page);
     await fillNames(page);
     await fillWedding(page);
-    await page.getByRole("button", { name: "Add Haldi" }).click();
+    const events = page.getByRole("group", { name: "Your events" });
+    // The wedding is on the card already, and stays
+    await expect(events.getByRole("button", { name: "Wedding" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(events.getByRole("button", { name: "Wedding" })).toBeDisabled();
+    // Several events in a row, then their details in the order they happen
+    await events.getByRole("button", { name: "Haldi" }).click();
+    await events.getByRole("button", { name: "Reception" }).click();
+    await expect(events.getByRole("button", { name: "Haldi" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    await expect(page.locator("[data-function]")).toHaveCount(3);
+    expect(
+      await page
+        .locator("[data-function]")
+        .evaluateAll((items) => items.map((item) => item.getAttribute("data-function"))),
+    ).toEqual(["haldi", "wedding", "reception"]);
     const haldi = page.locator('[data-function="haldi"]');
-    await expect(haldi).toBeVisible();
     await haldi.getByRole("button", { name: "Same as Wedding" }).click();
     await expect(haldi.getByRole("textbox", { name: /^Venue/ })).toHaveValue(
       "Taj Falaknuma, Hyderabad",
     );
-    await page.getByRole("button", { name: "Remove Haldi" }).click();
-    await expect(haldi).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "Add Haldi" })).toBeVisible();
+    // Untick one and it goes
+    await events.getByRole("button", { name: "Reception" }).click();
+    await expect(page.locator('[data-function="reception"]')).toHaveCount(0);
+    // The rarer events wait behind More events
+    await events.getByRole("button", { name: "More events" }).click();
+    await expect(events.getByRole("button", { name: "More events" })).toHaveCount(0);
   });
 
-  test("More options opens the full editor with everything already typed", async ({ page }) => {
+  test("every part of the editor is on the page, quietly, and other designs below", async ({
+    page,
+  }) => {
     await open(page);
-    await fillNames(page);
-    await page.getByRole("button", { name: "More options" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?", {
-      timeout: 15_000,
-    });
-    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
-    await expect(page.getByRole("textbox", { name: /Second name/ })).toHaveValue("Priya");
+    // Nothing nested: no way off to another editor, and no helper words
+    await expect(page.getByRole("button", { name: "More options" })).toHaveCount(0);
+    await expect(page.getByText("Type in any script")).toHaveCount(0);
+    const parts: [string, RegExp][] = [
+      ["Family names", /Parents' names/],
+      ["Card words", /^Blessing/],
+    ];
+    for (const [title, field] of parts) {
+      await page.locator("summary", { hasText: title }).click();
+      await expect(page.getByRole("textbox", { name: field }).first()).toBeVisible();
+    }
+    await page.locator("summary", { hasText: "Your photos" }).click();
+    await expect(page.getByRole("button", { name: /Add photos/ }).first()).toBeVisible();
+    await page.locator("summary", { hasText: "Music & replies" }).click();
+    await expect(page.getByRole("radio", { name: /Your own music/ })).toBeVisible();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Other designs for the wedding, each opening its own page, never this one again
+    const more = page.locator("[data-suggested-designs]");
+    await expect(more.getByRole("heading", { name: "More wedding designs" })).toBeVisible();
+    const links = more.getByRole("link");
+    expect(await links.count()).toBeGreaterThan(3);
+    await expect(more.locator('a[href^="/create/rajwada-bagh"]')).toHaveCount(0);
+    await expect(links.first()).toHaveAttribute("href", /^\/create\/[a-z0-9-]+\?category=wedding/);
   });
 
   test("it opens live, and we'll make it for anyone short of time", async ({ page }) => {

@@ -1,0 +1,93 @@
+import Image from "next/image";
+import Link from "next/link";
+import { TemplateCover } from "@/components/brand/template-cover";
+import { designWords } from "@/components/gallery/design-words";
+import type { UiLocale } from "@/i18n/locales";
+import { editorText } from "@/i18n/copy/editor";
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import {
+  designById,
+  designHref,
+  kindDesigns,
+  occasionDesigns,
+  suiteImage,
+  type WeddingKind,
+} from "@/lib/gallery/catalog";
+
+/** How many designs the row offers. */
+const SHOWN = 12;
+
+/**
+ * More designs for the same occasion under a design's page, to compare with (owner,
+ * 2026-10-24). Each opens its own page; what was typed stays, since it is the same draft.
+ */
+export function SuggestedDesigns({
+  current,
+  occasion,
+  kind,
+  locale,
+}: {
+  current: string;
+  occasion: CategoryId;
+  kind: WeddingKind | null;
+  locale: UiLocale;
+}) {
+  const { quickCopy } = editorText[locale];
+  // One of each painting: its Scene and its Story are the same picture, so the first shown
+  const seen = new Set([designById(current)?.suite ?? current]);
+  const designs = (kind ? kindDesigns(kind) : occasionDesigns(occasion))
+    .filter((design) => {
+      const key = design.id.startsWith("card-") ? design.id : design.suite;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, SHOWN);
+  if (designs.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="more-designs"
+      data-suggested-designs
+      className="mx-auto w-full max-w-site border-t border-line px-4 py-8 sm:px-6 lg:px-8"
+    >
+      <h2 id="more-designs" className="mb-4 font-display text-lg">
+        {quickCopy.moreDesigns(CATEGORIES[occasion].names[locale])}
+      </h2>
+      <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+        {designs.map((design) => {
+          const name = designWords(design, locale).name;
+          const picture = design.id.startsWith("card-") ? null : suiteImage(design.suite);
+          return (
+            <li key={design.id}>
+              <Link
+                href={designHref(design, { category: occasion, kind })}
+                className="group flex flex-col gap-1.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              >
+                {picture ? (
+                  <span className="relative block aspect-[9/16] overflow-hidden rounded-md bg-night shadow-raised">
+                    <Image
+                      src={picture}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 12rem, 30vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                    />
+                  </span>
+                ) : (
+                  <TemplateCover
+                    id={design.template}
+                    locale={locale}
+                    className="rounded-md shadow-raised"
+                  />
+                )}
+                <span className="min-h-11 truncate text-sm font-semibold group-hover:text-accent-text">
+                  {name}
+                </span>
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}

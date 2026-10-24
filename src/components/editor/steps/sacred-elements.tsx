@@ -3,6 +3,8 @@
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { NO_SYMBOL, SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { Hint, useQuiet } from "@/components/ui/quiet";
+import { cn } from "@/lib/cn";
 import { draftFaith, draftSymbol, draftTradition, symbolOptions } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
@@ -17,15 +19,21 @@ const NONE = "none";
 export function SymbolChip({
   symbol,
   draft,
+  small = false,
 }: {
   symbol: SymbolId | null;
   draft: StepProps["draft"];
+  /** Inside a pill, a smaller chip. */
+  small?: boolean;
 }) {
   const sacred = symbol ? SYMBOLS[symbol] : null;
   return (
     <span
       style={stockStyle(TEMPLATES[draft.templateId])}
-      className="grid size-11 place-items-center rounded-full border border-[color-mix(in_srgb,var(--card-gold)_55%,transparent)] shadow-raised"
+      className={cn(
+        "grid place-items-center rounded-full border border-[color-mix(in_srgb,var(--card-gold)_55%,transparent)] shadow-raised",
+        small ? "size-8 [&_svg]:size-6" : "size-11",
+      )}
     >
       <span
         className="grid size-full place-items-center rounded-full"
@@ -77,6 +85,7 @@ export function SymbolChip({
  */
 export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { traditionCopy } = useText(editorText);
+  const quiet = useQuiet();
   const options = symbolOptions(draft);
   const found = draftTradition(draft);
   const pack = found && found.community !== "modern" && draftFaith(draft) !== "none" ? found : null;
@@ -102,38 +111,38 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
         <h2 id="elements-heading" className="font-display text-xl">
           {invocation ? traditionCopy.elements : traditionCopy.symbol}
         </h2>
-        <p className="text-sm text-ink-muted">
+        <Hint>
           {pack
             ? traditionCopy.elementsIntro(traditionCopy.names[pack.id])
             : traditionCopy.symbolIntro}
-        </p>
+        </Hint>
       </div>
 
       {options.length > 0 && (
         <div className="flex flex-col gap-3">
-          <h3 className="font-semibold">{traditionCopy.symbol}</h3>
+          {/* The section's heading already names the symbol when there's nothing else in it */}
+          {invocation && <h3 className="font-semibold">{traditionCopy.symbol}</h3>}
           <RadioGroup
             label={traditionCopy.symbol}
-            variant="card"
+            // On a design's page, pills: the whole list in a few lines
+            variant={quiet ? "chip" : "card"}
             value={symbol ?? NONE}
             onValueChange={(value) =>
               setTradition({ symbol: value === NONE ? "none" : (value as SymbolId) })
             }
-            className="grid-cols-2 min-[480px]:grid-cols-3 lg:grid-cols-5"
+            className={quiet ? undefined : "grid-cols-2 min-[480px]:grid-cols-3 lg:grid-cols-5"}
           >
             {[...options, null].map((id) => (
               <RadioItem
                 key={id ?? NONE}
                 value={id ?? NONE}
                 label={id ? traditionCopy.symbolNames[id] : traditionCopy.noSymbol}
-                icon={<SymbolChip symbol={id} draft={draft} />}
+                icon={<SymbolChip symbol={id} draft={draft} small={quiet} />}
               />
             ))}
           </RadioGroup>
           {/* The painted gods are Hindu: only a Hindu card is pointed to them */}
-          {draftFaith(draft) === "hindu" && (
-            <p className="text-sm text-ink-muted">{traditionCopy.symbolNote}</p>
-          )}
+          {draftFaith(draft) === "hindu" && <Hint>{traditionCopy.symbolNote}</Hint>}
         </div>
       )}
 
