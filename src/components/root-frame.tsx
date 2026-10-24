@@ -1,4 +1,8 @@
 import type { ReactNode } from "react";
+// The site's headings: Fraunces, and for Hindi and Marathi one weight of Noto Serif Devanagari
+import "@fontsource-variable/fraunces/wght.css";
+import "@fontsource/noto-serif-devanagari/devanagari-500.css";
+// The lettering invitations keep (globals.css, [data-invitation]); a page downloads a face only when it shows it
 import "@fontsource/rozha-one";
 import "@fontsource/tenor-sans";
 import "@fontsource-variable/karla";

@@ -49,7 +49,7 @@ export function Section({
           </p>
           <h2
             id={`${id}-title`}
-            className="font-display text-[2.1rem] leading-[1.08] sm:text-5xl lg:text-[3.25rem]"
+            className="font-display text-[1.8rem] leading-[1.08] sm:text-5xl lg:text-[2.5rem]"
           >
             {title}
           </h2>

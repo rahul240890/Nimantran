@@ -516,6 +516,7 @@ export function Opening({
       data-doorway={open ? "open" : "closed"}
       data-opening={style}
       style={{ "--story-scale": type.scale } as CSSProperties}
+      data-invitation
       className="opening-page relative isolate flex min-h-svh items-center justify-center overflow-hidden"
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
@@ -730,6 +731,7 @@ export function OpeningSample({
     <div
       data-suite={suite}
       data-opening={style}
+      data-invitation
       className="opening-page relative aspect-[9/16] w-full overflow-hidden rounded-lg"
     >
       <div

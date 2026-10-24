@@ -12,59 +12,21 @@ export const homeMeta = {
 } as const;
 
 export const nav = [
-  { id: "designs", label: "Designs" },
-  { id: "collections", label: "Collections" },
-  { id: "weddings", label: "Weddings" },
-  { id: "occasions", label: "Occasions" },
-  { id: "how-it-works", label: "How it works" },
+  { id: "weddings", label: "Wedding designs" },
+  { id: "designs", label: "All designs" },
+  { id: "sample", label: "Live invitation" },
   { id: "pricing", label: "Pricing" },
+  { id: "help", label: "Help on WhatsApp" },
 ] as const;
-
-/** The header's menus for Designs, Weddings and Occasions (src/components/shell/site-menu.ts). */
-export const menuCopy = {
-  photos: "Illustrated or with photos",
-  kinds: "By kind of invitation",
-  popular: "Popular",
-  regions: "By region",
-  communities: "By community and faith",
-  looks: "By look",
-  lookNames: {
-    garden: "Gardens and flowers",
-    palace: "Royal palaces",
-    temple: "Temples and blessings",
-    lotus: "Lotus",
-    peacock: "Peacocks",
-    sea: "Sea and backwaters",
-    night: "Night and lamps",
-    balloon: "Balloons and parties",
-    modern: "Modern and simple",
-  },
-  functions: "Wedding functions",
-  allDesigns: (count: number) => `See all ${count} designs`,
-  allWeddings: "All wedding designs",
-  allOccasions: "All occasions",
-  designsFeature: {
-    title: "Illustrated or with your photos",
-    text: "Painted art alone, your couple photo, or a photo of each of you: every design says which, and its price.",
-  },
-  weddingsFeature: {
-    title: "Wedding invitations",
-    text: "Every function on one painted invite, written in your tradition, with RSVP.",
-  },
-  occasionsFeature: {
-    title: "Every celebration",
-    text: "Birthdays, griha pravesh, baby showers, pujas and more, each with its own designs.",
-  },
-};
 
 export const shell = {
   skipToContent: "Skip to main content",
   primaryNav: "Main",
   openMenu: "Open menu",
   menuTitle: "Menu",
-  createInvite: "Start your invite",
+  createInvite: "Start free",
   faq: "FAQ",
-  createInviteShort: "Create invite",
+  createInviteShort: "Start free",
   language: {
     label: "Language",
     current: (name: string) => `Language: ${name}`,
@@ -72,6 +34,8 @@ export const shell = {
     note: "Marathi, Gujarati, Bengali and Tamil are new and being checked by native speakers. Telugu, Kannada, Malayalam and Punjabi follow.",
   },
   themeHeading: "Theme",
+  /** What the Help on WhatsApp link writes for the visitor, ready to send. */
+  helpMessage: "Hello Shubh Invitation, I'd like help making my invitation.",
   footer: {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",

@@ -365,6 +365,7 @@ export function TemplateCover({
     <div
       aria-hidden
       lang={locale}
+      data-invitation
       className={cn(
         "[container-type:inline-size] relative aspect-[4/5] w-full overflow-hidden rounded-md shadow-float",
         className,

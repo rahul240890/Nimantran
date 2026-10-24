@@ -110,7 +110,7 @@ export function ShelfRow({
         <div className="flex min-w-0 flex-col gap-1">
           <h3
             id={`${id}-heading`}
-            className="font-display text-[1.35rem] leading-tight sm:text-[1.75rem]"
+            className="font-display text-[1.35rem] leading-tight sm:text-[1.55rem]"
           >
             {title}
           </h3>
@@ -213,7 +213,7 @@ export function TraditionTiles({
   const Heading = level === 2 ? "h2" : "h3";
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-3">
-      <Heading id={headingId} className="font-display text-2xl sm:text-[1.7rem]">
+      <Heading id={headingId} className="font-display text-2xl sm:text-[1.5rem]">
         {shelfCopy.traditionsHeading}
       </Heading>
       {/* A strip of round paintings, as shops head a catalogue with its main kinds */}

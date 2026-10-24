@@ -64,7 +64,7 @@ export async function LegalPage({
         <header className="flex flex-col gap-4">
           <h1
             id="page-title"
-            className="font-display text-[2.3rem] leading-[1.06] break-words sm:text-[3.2rem]"
+            className="font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.5rem]"
           >
             {doc.title}
           </h1>

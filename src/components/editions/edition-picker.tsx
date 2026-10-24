@@ -331,7 +331,7 @@ export function EditionPicker({
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <p className="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-                    <span className="font-display text-[2.2rem] leading-none tabular-nums">
+                    <span className="font-display text-[1.9rem] leading-none tabular-nums">
                       {listPaise === 0 ||
                       (offer && price && !isDifference && price.amountPaise === 0)
                         ? upgradeCopy.free

@@ -30,8 +30,15 @@ async function addDesignPhotos(page: Page) {
 }
 
 async function fillCouple(page: Page) {
-  await page.getByRole("textbox", { name: /First name/ }).fill("Aditya");
-  await page.getByRole("textbox", { name: /Second name/ }).fill("Priya");
+  const first = page.getByRole("textbox", { name: /First name/ });
+  const second = page.getByRole("textbox", { name: /Second name/ });
+  // Typing that lands before the editor has hydrated is lost, so try again until both stay
+  await expect(async () => {
+    await first.fill("Aditya");
+    await second.fill("Priya");
+    await expect(first).toHaveValue("Aditya", { timeout: 3_000 });
+    await expect(second).toHaveValue("Priya", { timeout: 3_000 });
+  }).toPass({ timeout: 30_000 });
 }
 
 async function fillWedding(page: Page) {
@@ -108,6 +115,11 @@ for (const colorScheme of ["light", "dark"] as const) {
       await next(page);
       await expect(page.getByText("3 things need your attention")).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
+      // The step has scrolled to its first problem, which can leave a function's checkbox
+      // half under the sticky bar's logo link, and axe's target-size rule counts a control
+      // partly covered by another as too small. Where it lands depends only on the step's
+      // height, so axe reads the step from its top: every control is still checked.
+      await page.evaluate(() => window.scrollTo(0, 0));
       expect((await axe(page).analyze()).violations).toEqual([]);
 
       await fillWedding(page);

@@ -55,7 +55,7 @@ export function AdminHeading({
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="flex max-w-2xl min-w-0 flex-col gap-2">
         <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">{eyebrow}</p>
-        <h1 className="font-display text-[2rem] leading-[1.08] sm:text-[2.5rem]">{title}</h1>
+        <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2.1rem]">{title}</h1>
         {intro && <p className="text-ink-muted">{intro}</p>}
       </div>
       {action}

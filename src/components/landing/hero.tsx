@@ -47,7 +47,7 @@ export function Hero({ locale, children }: { locale: UiLocale; children?: ReactN
           </p>
           <h1
             id="hero-title"
-            className="font-display text-[2.5rem] leading-[1.04] sm:text-6xl lg:text-[4.1rem]"
+            className="font-display text-[2.1rem] leading-[1.04] sm:text-6xl lg:text-[2.95rem]"
           >
             {hero.title}
           </h1>

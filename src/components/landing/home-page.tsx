@@ -9,7 +9,6 @@ import { OfferBar } from "@/components/offers/offer-bar";
 import { HomeDesigns, HomeKinds, HomeOccasions } from "./home-gallery";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
-import { siteMenu } from "@/components/shell/site-menu";
 import { JsonLd } from "@/components/seo/json-ld";
 import { landingText } from "@/i18n/copy/landing";
 import { homePath, type UiLocale } from "@/i18n/locales";
@@ -21,7 +20,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
   return (
     <PageTransition>
       <div className="relative isolate flex min-h-dvh flex-col">
-        <SiteHeader menu={siteMenu(locale)} />
+        <SiteHeader />
         {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
         <OfferBar />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">

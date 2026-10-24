@@ -29,7 +29,7 @@ export function HowItWorks({ locale }: { locale: UiLocale }) {
                 {/* The step's number, large and faint behind the words */}
                 <span
                   aria-hidden
-                  className="pointer-events-none absolute -end-2 -top-6 font-display text-[7.5rem] leading-none text-marigold/15 select-none"
+                  className="pointer-events-none absolute -end-2 -top-6 font-display text-[5.4rem] leading-none text-marigold/15 select-none"
                 >
                   {index + 1}
                 </span>

@@ -1034,7 +1034,7 @@ export function StoryPage({
                   aria-hidden
                   className={cn(
                     "block text-center text-[length:calc(clamp(calc(3.4rem*var(--type-floor,1)),20cqmin,6.5rem)*var(--story-fit,1)*var(--glyph-scale,1))] leading-none whitespace-nowrap text-card-accent-text",
-                    sacred.font === "display" ? "font-display" : "font-sans",
+                    sacred.font === "display" ? "font-card-display" : "font-sans",
                   )}
                   style={{ "--glyph-scale": glyphScale(sacred) } as CSSProperties}
                 >

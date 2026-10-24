@@ -51,7 +51,7 @@ export function OfferPicture({
       <p
         className={cn(
           "absolute inset-x-0 bottom-0 font-display leading-none break-words text-card-ivory drop-shadow-md",
-          compact ? "p-2.5 text-xl" : "p-5 text-[2.6rem]",
+          compact ? "p-2.5 text-xl" : "p-5 text-[2.15rem]",
         )}
       >
         {value}

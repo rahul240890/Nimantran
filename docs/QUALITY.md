@@ -32,8 +32,8 @@ What changed:
 - Each page gets only the words it shows: copy is split per area (`src/i18n/copy/*.ts`)
   instead of one module holding every screen's text in both languages.
 
-Hindi pages are the one weak spot. They need Noto Sans Devanagari (118 KB) and Rozha One's
-Devanagari (71 KB) before their words look right, and Lighthouse counts those fonts
+Hindi pages are the one weak spot. They need Noto Sans Devanagari (118 KB) and, for headings,
+Noto Serif Devanagari at one weight (54 KB; Rozha One's 71 KB until 2026-10-24) before their words look right, and Lighthouse counts those fonts
 whenever they arrive before the first paint, which is why the score swings between runs
 (the earlier 90 was one of the lucky ones; the fonts and the page did not get heavier).
 The next step is cutting those fonts down to the letters Hindi pages use, or letting

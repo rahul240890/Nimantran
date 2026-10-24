@@ -33,7 +33,7 @@ export default function DesignPage() {
               <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
                 Step 2 · Design system
               </p>
-              <h1 className="font-display text-[2.4rem] leading-[1.05] sm:text-6xl">
+              <h1 className="font-display text-[2rem] leading-[1.05] sm:text-6xl">
                 The pieces every screen is built from
               </h1>
               <p className="max-w-2xl text-lg text-ink-muted">

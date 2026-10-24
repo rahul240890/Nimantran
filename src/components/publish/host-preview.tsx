@@ -104,7 +104,7 @@ export function HostPreview({
           />
         </div>
         <div className="flex max-w-sm flex-col gap-5">
-          <h1 className="font-display text-[2.2rem] leading-tight">{copy.heading}</h1>
+          <h1 className="font-display text-[1.9rem] leading-tight">{copy.heading}</h1>
           <p className="text-ink-muted">{copy.body}</p>
           <div className="flex flex-col gap-3">
             <Button asChild size="lg">

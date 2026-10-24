@@ -64,7 +64,7 @@ function Heading({
           <span aria-hidden className="h-px w-6 bg-marigold" />
           {eyebrow}
         </p>
-        <h2 id={id} className="font-display text-[1.9rem] leading-[1.08] sm:text-[2.5rem]">
+        <h2 id={id} className="font-display text-[1.65rem] leading-[1.08] sm:text-[2.1rem]">
           {title}
         </h2>
         {intro && <p className="text-base text-ink-muted sm:text-lg">{intro}</p>}
@@ -287,7 +287,7 @@ export function HomeKinds({ locale }: { locale: UiLocale }) {
                     <span className="grid size-10 place-items-center rounded-full bg-marigold text-on-marigold shadow-float">
                       <Icon aria-hidden className="size-5" />
                     </span>
-                    <span className="pt-1 font-display text-2xl leading-tight sm:text-[1.75rem]">
+                    <span className="pt-1 font-display text-2xl leading-tight sm:text-[1.55rem]">
                       {title}
                     </span>
                     <span className="text-sm leading-snug text-card-ivory/80 sm:text-base">

@@ -34,7 +34,7 @@ export function DropdownMenuContent({
 }
 
 const itemClasses =
-  "relative flex min-h-11 cursor-pointer items-center gap-3 rounded-sm py-2 ps-10 pe-3 text-base outline-none select-none " +
+  "relative flex min-h-11 cursor-pointer items-center gap-3 rounded-sm py-2 ps-10 pe-3 text-ui outline-none select-none " +
   "data-highlighted:bg-surface-2 data-disabled:cursor-not-allowed data-disabled:text-ink-muted";
 
 export function DropdownMenuItem({

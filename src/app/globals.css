@@ -4876,18 +4876,6 @@
   --color-motion-kite-yellow: var(--motion-kite-yellow);
   --color-motion-kite-green: var(--motion-kite-green);
 
-  /* Gujarati, Bengali and Tamil fall back to faces only the guest page and the editor load
-     (invitation/type/fonts.css), so a Tamil card's reply form reads in Tamil type there and
-     no other page downloads them */
-  --font-display:
-    "Rozha One", "Georgia", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
-    serif;
-  --font-sans:
-    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
-    "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-label:
-    "Tenor Sans", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2", "Catamaran",
-    "Trebuchet MS", system-ui, sans-serif;
   /* The device's own type, for a few native-script words on English pages (the footer), so
      those pages don't download ~190 KB of Devanagari fonts before they paint */
   --font-system: system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -4926,6 +4914,60 @@
   --animate-petal-sway: petal-sway 3.6s ease-in-out infinite alternate;
   --animate-sound-bar: sound-bar 0.9s ease-in-out infinite alternate;
   --animate-flicker: flicker 1.7s ease-in-out infinite alternate;
+}
+
+/*
+ * Type. The site's own pages set headings in Fraunces (Noto Serif Devanagari for Hindi and
+ * Marathi) and everything else in Karla, small labels included, on a scale a step smaller
+ * than Tailwind's (owner, 2026-10-24: clean and calm, not bold). Not inline, so a page's
+ * invitation can put back the type it was designed in ([data-invitation], below).
+ * Gujarati, Bengali and Tamil fall back to faces only the guest page and the editor load
+ * (invitation/type/fonts.css), so a Tamil card's reply form reads in Tamil type there and
+ * no other page downloads them.
+ */
+@theme {
+  --font-display:
+    "Fraunces Variable", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
+    "Georgia", serif;
+  --font-sans:
+    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
+    "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-label:
+    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
+    "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* The lettering invitations were designed in: their headings, labels and sacred symbols */
+  --font-card-display:
+    "Rozha One", "Georgia", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
+    serif;
+  --font-card-label:
+    "Tenor Sans", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2", "Catamaran",
+    "Trebuchet MS", system-ui, sans-serif;
+
+  /* Buttons and menu rows: a touch under body text on a wide screen */
+  --text-ui: 0.9375rem;
+  --text-ui--line-height: calc(1.4 / 0.9375);
+  --text-lg: 1.0625rem;
+  --text-xl: 1.1875rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.625rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2.375rem;
+  --text-6xl: 2.75rem;
+}
+
+/* An invitation keeps the type it was designed in, on a guest's page and in every preview */
+[data-invitation] {
+  --font-display: var(--font-card-display);
+  --font-label: var(--font-card-label);
+  --text-ui: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  font-size: 1rem;
 }
 
 /* Keyframes live outside @theme so page transitions and utilities can always use them */
@@ -5092,7 +5134,7 @@
     background-color: var(--paper);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-size: 1rem;
+    font-size: 0.9375rem;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -5102,6 +5144,26 @@
   h2,
   h3 {
     text-wrap: balance;
+  }
+
+  @media (width >= 64rem) {
+    body {
+      font-size: 1rem;
+    }
+  }
+
+  /* Headings in Fraunces read best at a medium weight; Karla labels need a little weight to
+     hold up small. Invitations put their own faces' single weight back */
+  :where(.font-display) {
+    font-weight: 500;
+    /* The Devanagari face comes in this one weight; never a smeared fake bold of it */
+    font-synthesis-weight: none;
+  }
+  :where(.font-label) {
+    font-weight: 600;
+  }
+  :where([data-invitation]) :where(.font-display, .font-label) {
+    font-weight: 400;
   }
 
   p {

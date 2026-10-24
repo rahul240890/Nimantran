@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.129.0",
+    "@fontsource-variable/fraunces": "^5.3.0",
     "@fontsource-variable/karla": "^5.3.0",
     "@fontsource-variable/noto-sans-devanagari": "^5.3.0",
     "@fontsource/alex-brush": "^5.3.0",
@@ -39,6 +40,7 @@
     "@fontsource/martel": "^5.3.0",
     "@fontsource/meera-inimai": "^5.3.0",
     "@fontsource/mogra": "^5.3.0",
+    "@fontsource/noto-serif-devanagari": "^5.3.0",
     "@fontsource/playfair-display": "^5.3.0",
     "@fontsource/rasa": "^5.3.0",
     "@fontsource/rozha-one": "^5.3.0",

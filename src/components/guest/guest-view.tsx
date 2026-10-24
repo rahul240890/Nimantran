@@ -352,7 +352,12 @@ export function GuestView({
   return (
     <GuestLanguage language={language}>
       {/* The page turns a whole screen at a time, like the pages above it (globals.css) */}
-      <div ref={pageRoot} lang={language} className="guest-snap flex min-h-dvh flex-col">
+      <div
+        ref={pageRoot}
+        lang={language}
+        data-invitation
+        className="guest-snap flex min-h-dvh flex-col"
+      >
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
           {watermark && <WatermarkLayer />}

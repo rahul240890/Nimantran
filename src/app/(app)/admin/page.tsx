@@ -71,7 +71,7 @@ export default async function AdminOverview() {
               <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
                 {tile.label}
               </dt>
-              <dd className="font-display text-[1.7rem] leading-none">{tile.value}</dd>
+              <dd className="font-display text-[1.5rem] leading-none">{tile.value}</dd>
               <dd>
                 <Badge tone={tile.state.tone} dot>
                   {tile.state.label}

@@ -11,58 +11,21 @@ export const homeMeta: Translation<typeof en.homeMeta> = {
 };
 
 export const nav: Translation<typeof en.nav> = [
-  { id: "designs", label: "டிசைன்" },
-  { id: "collections", label: "தொகுப்பு" },
-  { id: "weddings", label: "திருமணம்" },
-  { id: "occasions", label: "நிகழ்வு" },
-  { id: "how-it-works", label: "எப்படி வேலை செய்கிறது" },
+  { id: "weddings", label: "திருமண டிசைன்கள்" },
+  { id: "designs", label: "எல்லா டிசைன்களும்" },
+  { id: "sample", label: "லைவ் அழைப்பிதழ்" },
   { id: "pricing", label: "விலை" },
+  { id: "help", label: "வாட்ஸ்அப்பில் உதவி" },
 ];
-
-export const menuCopy: Translation<typeof en.menuCopy> = {
-  photos: "ஓவியமாக அல்லது புகைப்படங்களுடன்",
-  kinds: "அழைப்பிதழ் வகை வாரியாக",
-  popular: "பிரபலமானவை",
-  regions: "பகுதி வாரியாக",
-  communities: "சமூகம் மற்றும் மதம் வாரியாக",
-  looks: "தோற்றம் வாரியாக",
-  lookNames: {
-    garden: "தோட்டங்களும் மலர்களும்",
-    palace: "அரச மாளிகைகள்",
-    temple: "கோயில்களும் ஆசிகளும்",
-    lotus: "தாமரை",
-    peacock: "மயில்கள்",
-    sea: "கடலும் காயல்களும்",
-    night: "இரவும் விளக்குகளும்",
-    balloon: "பலூன்களும் பார்ட்டிகளும்",
-    modern: "நவீனமும் எளிமையும்",
-  },
-  functions: "திருமண நிகழ்ச்சிகள்",
-  allDesigns: (count: number) => `அனைத்து ${count} டிசைன்களையும் பார்க்கவும்`,
-  allWeddings: "அனைத்து திருமண டிசைன்கள்",
-  allOccasions: "அனைத்து நிகழ்வுகள்",
-  designsFeature: {
-    title: "ஓவியமாக அல்லது உங்கள் புகைப்படங்களுடன்",
-    text: "ஓவியம் மட்டும், உங்கள் ஜோடிப் புகைப்படம், அல்லது ஒவ்வொருவரின் தனிப் புகைப்படம்: ஒவ்வொரு டிசைனும் எது என்பதையும் அதன் விலையையும் சொல்லும்.",
-  },
-  weddingsFeature: {
-    title: "திருமண அழைப்பிதழ்கள்",
-    text: "ஒவ்வொரு நிகழ்ச்சியும் ஒரே ஓவிய அழைப்பிதழில், உங்கள் மரபுப்படி எழுதப்பட்டு, RSVP உடன்.",
-  },
-  occasionsFeature: {
-    title: "ஒவ்வொரு கொண்டாட்டமும்",
-    text: "பிறந்தநாள், கிரகப்பிரவேசம், வளைகாப்பு, பூஜைகள் மற்றும் பல, ஒவ்வொன்றுக்கும் தனி டிசைன்கள்.",
-  },
-};
 
 export const shell: Translation<typeof en.shell> = {
   skipToContent: "முதன்மை உள்ளடக்கத்திற்குச் செல்லவும்",
   primaryNav: "முதன்மை",
   openMenu: "மெனுவைத் திறக்கவும்",
   menuTitle: "மெனு",
-  createInvite: "உங்கள் அழைப்பிதழைத் தொடங்குங்கள்",
+  createInvite: "இலவசமாகத் தொடங்குங்கள்",
   faq: "கேள்வி-பதில்",
-  createInviteShort: "உருவாக்குக",
+  createInviteShort: "இலவசமாகத் தொடங்கு",
   language: {
     label: "மொழி",
     current: (name) => `மொழி: ${name}`,
@@ -70,6 +33,7 @@ export const shell: Translation<typeof en.shell> = {
     note: "மராத்தி, குஜராத்தி, வங்காளம், தமிழ் புதியவை; அந்த மொழி பேசுபவர்கள் சரிபார்த்து வருகிறார்கள். தெலுங்கு, கன்னடம், மலையாளம், பஞ்சாபி அடுத்து வரும்.",
   },
   themeHeading: "தீம்",
+  helpMessage: "வணக்கம் Shubh Invitation, என் அழைப்பிதழை உருவாக்க உதவி வேண்டும்.",
   footer: {
     tagline: "விருந்தினர்கள் திறந்து, சுழற்றி, பாதுகாக்கும் 3D அழைப்பிதழ்கள்.",
     explore: "ஆராயுங்கள்",
