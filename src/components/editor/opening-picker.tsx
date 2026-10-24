@@ -19,6 +19,7 @@ import {
 import {
   GOD_PAINTINGS,
   OPENING_GROUPS,
+  ownOpenings,
   offersGods,
   openingStyles,
   WELCOME_SCENES,
@@ -80,12 +81,14 @@ export function OpeningPicker({
   const headingId = `${ids}-heading`;
   const setOpening = (change: Partial<InviteDraft["opening"]>) =>
     update((current) => ({ ...current, opening: { ...current.opening, ...change } }));
-  // The design's own gate leads in a group of its own; the kinds after it leave it out
+  // The design's own gate leads in a group of its own, with any second made with it; the
+  // kinds after it leave them out
+  const mine = ownOpenings(own, suite).filter((id) => id === own || offered.includes(id));
   const groups = [
-    { id: "own", styles: [own] as readonly OpeningStyle[] },
+    { id: "own", styles: mine },
     ...OPENING_GROUPS.map((group) => ({
       id: group.id,
-      styles: group.styles.filter((id) => id !== own && offered.includes(id)),
+      styles: group.styles.filter((id) => !mine.includes(id) && offered.includes(id)),
     })),
   ].filter((group) => group.styles.length > 0);
   // The design's own stays above whichever kind is shown

@@ -17,6 +17,8 @@ import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
 import {
+  depthBeyond,
+  isDepthOpening,
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
@@ -53,6 +55,8 @@ export const OPEN_MS = 1500 * OPENING_PACE;
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
 /** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
 const TIED_OPEN_MS = 3200 * OPENING_PACE;
+/** A depth opening's three frames go by one after another (depth-openings.css). */
+const DEPTH_OPEN_MS = 2800 * OPENING_PACE;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
 /** The longest the opening waits for the screen to settle after going full screen. */
@@ -280,6 +284,7 @@ export function Opening({
   const cover = theme.images.cover;
   const gate = isPaintedGate(style);
   const tied = isTiedGate(style);
+  const depth = isDepthOpening(style);
   const fresh = isFreshOpening(style);
   const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
@@ -322,10 +327,18 @@ export function Opening({
         setPick(Math.random());
         setWelcome(true);
       },
-      still ? 0 : tied ? TIED_OPEN_MS : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
+      still
+        ? 0
+        : tied
+          ? TIED_OPEN_MS
+          : depth
+            ? DEPTH_OPEN_MS
+            : gate || fresh || themed
+              ? GATE_OPEN_MS
+              : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate, tied, fresh, themed]);
+  }, [open, pages, welcome, still, gate, tied, depth, fresh, themed]);
   useEffect(() => {
     if (!welcome || holdWelcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -507,7 +520,7 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || tied || fresh || themed || cover ? (
+        {gate || tied || depth || fresh || themed || cover ? (
           <Image
             // A painted opening's own place beyond, so the wide screen matches it
             src={
@@ -515,11 +528,13 @@ export function Opening({
                 ? `/openings/gates/${style}/beyond.webp`
                 : tied
                   ? tiedBeyond(style)
-                  : fresh
-                    ? freshBackdrop(style)
-                    : themed
-                      ? `/suites/${style}/scene.webp`
-                      : (cover as string)
+                  : depth
+                    ? depthBeyond(style)
+                    : fresh
+                      ? freshBackdrop(style)
+                      : themed
+                        ? `/suites/${style}/scene.webp`
+                        : (cover as string)
             }
             alt=""
             fill

@@ -455,6 +455,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "sikki",
       "kannauj",
       "phoolon-ki-ghati",
       "chanderi",
@@ -527,6 +528,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "bhil-chitra",
       "mishri",
       "sankheda",
       "kaanch-chitra",
@@ -563,6 +565,9 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "thewa",
+      "rekhachitra",
+      "bhil-chitra",
       "phool-bangla",
       "bundi-chitra",
       "leheriya",
@@ -636,6 +641,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "loktak",
+      "tarakasi",
       "vanaspati",
       "rajanigandha",
       "shola",
@@ -674,6 +681,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "hase-chittara",
+      "kuruthola",
       "vanaspati",
       "kurinji",
       "chandan",
@@ -730,6 +739,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
     suites: [
+      "chandigarh",
       "phoolon-ki-ghati",
       "jamawar",
       "purani-dilli",
@@ -756,6 +766,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "sadaf",
       "kannauj",
       "jamawar",
       "hashiya",
@@ -794,6 +805,14 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "chandigarh",
+      "do-rang",
+      "rekhachitra",
+      "masala",
+      "loktak",
+      "aakar",
+      "shwet-shyam",
+      "dhanak",
       "chini-mitti",
       "libaas",
       "vanaspati",

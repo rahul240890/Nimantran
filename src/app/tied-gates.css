@@ -59,6 +59,13 @@
 .opening-stage[data-open="true"] [data-move="swing"] .tied-door-right {
   transform: rotateY(-100deg);
 }
+/* Out toward the guest, like cupboard doors */
+.opening-stage[data-open="true"] [data-move="out"] .tied-door-left {
+  transform: rotateY(-100deg);
+}
+.opening-stage[data-open="true"] [data-move="out"] .tied-door-right {
+  transform: rotateY(100deg);
+}
 .opening-stage[data-open="true"] [data-move="slide"] .tied-door-left {
   transform: translateX(-104%);
 }
@@ -130,6 +137,28 @@
     transform 900ms cubic-bezier(0.5, 0, 0.6, 1),
     opacity 600ms ease 300ms;
 }
+/* A medallion turns a quarter turn with a click and lets go */
+.opening-stage[data-open="true"] [data-undo="turn"] .tied-tie {
+  transform: rotate(90deg) scale(0.92);
+  transition:
+    transform 600ms cubic-bezier(0.3, 1.4, 0.5, 1),
+    opacity 500ms ease 450ms;
+}
+/* A bell rings, a quick shake, then falls away */
+.opening-stage[data-open="true"] [data-undo="ring"] .tied-tie {
+  animation: tied-ring 520ms ease-in-out;
+  transform: translateY(24%);
+  transition:
+    transform 700ms cubic-bezier(0.55, 0, 0.9, 0.6) 480ms,
+    opacity 400ms ease 750ms;
+}
+/* A circle rolls away along its line */
+.opening-stage[data-open="true"] [data-undo="roll"] .tied-tie {
+  transform: translateX(70%) rotate(240deg);
+  transition:
+    transform 900ms cubic-bezier(0.5, 0, 0.7, 0.6),
+    opacity 500ms ease 450ms;
+}
 /* A seal cracks in two; each half leaves with its door */
 .tied-tie-left {
   clip-path: inset(0 50% 0 0);
@@ -169,6 +198,17 @@
   }
   to {
     scale: 1.025;
+  }
+}
+@keyframes tied-ring {
+  25% {
+    rotate: 9deg;
+  }
+  50% {
+    rotate: -8deg;
+  }
+  75% {
+    rotate: 5deg;
   }
 }
 @keyframes tied-piece {

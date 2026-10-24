@@ -102,8 +102,15 @@ describe("text areas", () => {
       for (const art of Object.keys(SUITES[id].images) as PageArt[]) {
         const area = textArea(id, art);
         expect(area, `${id} ${art}`).not.toBe(DEFAULT_AREA);
-        expect(100 - area.top - area.bottom, `${id} ${art}`).toBeGreaterThanOrEqual(24);
-        expect(100 - area.left - area.right, `${id} ${art}`).toBeGreaterThanOrEqual(60);
+        const tall = 100 - area.top - area.bottom;
+        const wide = 100 - area.left - area.right;
+        expect(tall, `${id} ${art}`).toBeGreaterThanOrEqual(24);
+        // Beside a tall column of art (templates 56 on) the words take half the page or more,
+        // and are given the height to wrap into
+        if (wide < 60) {
+          expect(wide, `${id} ${art}`).toBeGreaterThanOrEqual(48);
+          expect(tall, `${id} ${art}`).toBeGreaterThanOrEqual(50);
+        } else expect(wide, `${id} ${art}`).toBeGreaterThanOrEqual(60);
       }
     }
   });

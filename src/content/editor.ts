@@ -1777,6 +1777,155 @@ export const openingCopy = {
       description:
         "Doors woven of jasmine and roses, held by a ball of rose petals; it bursts into petals and the doors swing open.",
     },
+    "panna-pat": {
+      name: "Thewa locket",
+      description:
+        "A Thewa locket on a ruby cord holds two emerald-glass doors; it clicks open and drops, and the doors swing open.",
+    },
+    "sikki-dwar": {
+      name: "Grass fish",
+      description:
+        "A woven sikki fish on a grass rope holds the doors; it swims away, the rope slips off and the doors swing open.",
+    },
+    "hase-bagilu": {
+      name: "Painted birds",
+      description:
+        "Two painted birds latch red-earth doors; they slide apart and fly off, and the doors swing open.",
+    },
+    "kankreet-dwar": {
+      name: "Brass medallion",
+      description:
+        "A brass medallion on a strap holds concrete doors; it turns a quarter turn with a click and the doors slide apart.",
+    },
+    "chhaap-kiwad": {
+      name: "Safety pin",
+      description:
+        "A giant printed safety pin holds the doors; it springs open and drops, and the doors swing open.",
+    },
+    "purana-darwaza": {
+      name: "Shop bell",
+      description:
+        "A brass shop bell on a red cord holds old wooden doors; it rings, falls away and the doors swing open.",
+    },
+    "bindi-kiwad": {
+      name: "Dotted birds",
+      description:
+        "Two dotted birds carry a garland across the doors; they fly off with it and the doors swing open.",
+    },
+    "masala-almari": {
+      name: "String of chillies",
+      description:
+        "A string of chillies and cinnamon ties a spice cupboard; it slips loose and the doors swing out toward you.",
+    },
+    "kaagaz-pat": {
+      name: "Striped sash",
+      description:
+        "A striped Manipuri sash with a lily ties paper-cut doors; it floats away and the doors slide apart.",
+    },
+    "rupa-kiwad": {
+      name: "Silver ball",
+      description:
+        "A silver filigree ball on a chain holds the doors; it opens like a flower and the doors swing open.",
+    },
+    "ola-vathil": {
+      name: "Palm-leaf knot",
+      description:
+        "A plaited palm-leaf knot with a hibiscus ties the doors; it springs loose and the doors swing open.",
+    },
+    "seep-kiwad": {
+      name: "Pearl rosette",
+      description:
+        "Strings of pearls gathered by a pearl rosette hold rosewood doors; they slip away and the doors swing open.",
+    },
+    "aakar-pat": {
+      name: "Red circle",
+      description:
+        "A red circle on a black line holds the doors; it rolls away along the line and the doors slide apart.",
+    },
+    "shwet-dwar": {
+      name: "Velvet and lily",
+      description:
+        "A velvet ribbon holding a lily ties the doors; the lily drops, the ribbon slides away and the doors swing open.",
+    },
+    "moti-dwar": {
+      name: "Glass bubble",
+      description:
+        "A pearl-ringed glass bubble holds pearly doors; it bursts in a shimmer and the doors swing open.",
+    },
+    "sona-parat": {
+      name: "Gold-laced glass",
+      description:
+        "Three arches of glowing emerald, ruby and sapphire glass laced with gold; you glide through them one by one.",
+    },
+    mauni: {
+      name: "Coiled baskets",
+      description:
+        "Three coiled rims of golden grass, like looking into a basket; they spin and you dive through.",
+    },
+    chowka: {
+      name: "Turning diamonds",
+      description:
+        "Three diamonds of white rice-paste pattern on red earth; each turns a quarter turn as you pass through.",
+    },
+    khidkiyaan: {
+      name: "Concrete windows",
+      description:
+        "A concrete wall, a grid of coloured sunshades and a round window; you walk through all three.",
+    },
+    "phool-chhaap": {
+      name: "Printed flower",
+      description:
+        "A flower, a scallop and a circle printed in pink and blue; the inks slip, then you zoom through.",
+    },
+    "gali-gali": {
+      name: "Sketched lane",
+      description: "Three sketched archways down an old lane; you walk down the lane through each.",
+    },
+    tipki: {
+      name: "Dotted tree",
+      description:
+        "A dotted tree, a ring of birds and a ring of flowers twinkle, then you fly through them.",
+    },
+    "masala-dabba": {
+      name: "Spice tin",
+      description:
+        "Rings of whole spices and the rim of a brass spice tin; you dive down into the tin.",
+    },
+    phumdi: {
+      name: "Floating islands",
+      description:
+        "Paper-cut hills, a floating ring of grass and a ring of lilies; you glide over the lake through them.",
+    },
+    "rupa-jaali": {
+      name: "Silver lockets",
+      description:
+        "Three silver filigree ovals, like a locket inside a locket; each tilts and glints as you pass.",
+    },
+    thoranam: {
+      name: "Leaf arches",
+      description:
+        "An arch of plaited leaves, a ring of leaf flowers and a ring of leaf fish sway, then swing away as you pass.",
+    },
+    "seep-mehrab": {
+      name: "Pearl arches",
+      description:
+        "Three Mughal arches of dark wood inlaid with pearl, like a palace hall you walk down.",
+    },
+    "teen-aakar": {
+      name: "Three shapes",
+      description:
+        "A square, a circle and a triangle cut through three canvases turn slowly, then you pass through each.",
+    },
+    galiyara: {
+      name: "Colonnade",
+      description:
+        "Three stone arches down a black-and-white colonnade, traced in gold; you walk through them.",
+    },
+    chamak: {
+      name: "Rainbow shimmer",
+      description:
+        "A pearly arch, a ring of rainbow glass and a ring of pearls catch a rainbow shimmer as you glide through.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",
@@ -1866,6 +2015,7 @@ export const openingCopy = {
     play: "Fun and playful",
     themed: "Its own opening",
     tied: "Tied gates",
+    depth: "Depth openings",
     painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",
