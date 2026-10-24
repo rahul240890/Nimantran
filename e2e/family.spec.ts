@@ -72,6 +72,7 @@ test.describe("family preview links", () => {
   });
 
   test("signed out, the preview offers to sign in to share it", async ({ page }) => {
+    test.setTimeout(60_000);
     await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());

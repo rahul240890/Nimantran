@@ -29,9 +29,7 @@ describe("reviews", () => {
     await expect(write(host)).rejects.toThrow(/permission denied/);
     await expect(write(null)).rejects.toThrow(/permission denied/);
     await write("service");
-    await expect(t.as(host, () => q("select * from reviews"))).rejects.toThrow(
-      /permission denied/,
-    );
+    await expect(t.as(host, () => q("select * from reviews"))).rejects.toThrow(/permission denied/);
   });
 
   it("are one per account, and wait for an admin before they show", async () => {

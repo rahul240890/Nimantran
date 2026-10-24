@@ -356,7 +356,7 @@ export function QuickStart({
             {stalled && !makeHidden && errorCount === 0 && (
               <div
                 data-make-nudge
-                className="flex items-center gap-1 rounded-md border border-success/40 bg-success/10 ps-3 animate-fade-in"
+                className="flex animate-fade-in items-center gap-1 rounded-md border border-success/40 bg-success/10 ps-3"
               >
                 <SocialIcon channel="whatsapp" className="size-4 shrink-0 text-success" />
                 <a

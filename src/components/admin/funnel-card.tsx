@@ -62,8 +62,8 @@ export function FunnelCard({ funnel }: { funnel: FunnelSummary | null }) {
           Where visitors stop
         </CardTitle>
         <CardDescription>
-          Each step counts a visitor once a day. The totals at the top come straight from
-          accounts, invites and payments, so they are exact; the steps are what the site saw.
+          Each step counts a visitor once a day. The totals at the top come straight from accounts,
+          invites and payments, so they are exact; the steps are what the site saw.
         </CardDescription>
       </CardHeader>
       <CardBody className="flex flex-col gap-6">

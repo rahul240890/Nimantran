@@ -53,15 +53,15 @@ test.describe("reviews", () => {
     test.setTimeout(test.info().timeout + 60_000);
     const words = `Our guests loved the opening, run ${Date.now()}.`;
 
-    // Before anything is live, there is nothing to review yet
-    await page.goto(`/sign-in?next=${encodeURIComponent("/review")}`);
     const number = numberFor(info);
-    await signIn(page, number);
-    await expect(
-      page.getByText("Reviews open once one of your invitations is live."),
-    ).toBeVisible();
-
     await writeInvite(page, number, ["Kabir", "Isha"]);
+    // Before anything is live, there is nothing to review yet
+    const before = await page.context().newPage();
+    await before.goto("/review");
+    await expect(
+      before.getByText("Reviews open once one of your invitations is live."),
+    ).toBeVisible();
+    await before.close();
     await publish(page, "kabir-weds-isha");
     await page.goto("/invites");
     const ask = page.locator("[data-ask-review]");
