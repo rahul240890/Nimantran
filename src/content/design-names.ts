@@ -147,6 +147,21 @@ export const designNames = {
     paithani: "Paithani",
     jamawar: "Jamawar",
     "phool-bangla": "Phool Bangla",
+    yashab: "Yashab",
+    "usta-kala": "Usta Kala",
+    chaukhane: "Chaukhane",
+    saaya: "Saaya",
+    jingkieng: "Jingkieng",
+    rangmanch: "Rangmanch",
+    kashikari: "Kashikari",
+    paan: "Paan",
+    sangemarmar: "Sangemarmar",
+    susegad: "Susegad",
+    paranda: "Paranda",
+    japi: "Japi",
+    akeek: "Akeek",
+    "samudra-jyoti": "Samudra Jyoti",
+    nazaara: "Nazaara",
     thewa: "Thewa",
     sikki: "Sikki",
     "hase-chittara": "Hase Chittara",
@@ -648,6 +663,34 @@ export const designNames = {
       "A Kashmiri jamawar shawl: woven roses, irises and paisleys in claret, emerald and old gold, by Dal Lake.",
     "phool-bangla":
       "A palace built of flowers: arches, domes and pavilions of marigold, jasmine and roses, as Braj builds them.",
+    yashab:
+      "Mughal jade: pale green and white jade carved into lotus cups and flowers so thin the light shines through, set with gold and rubies.",
+    "usta-kala":
+      "Bikaner's Usta art: raised gold-leaf flowers and vines on soft pastel and ivory grounds, glowing like palace domes.",
+    chaukhane:
+      "Pixel art: an Indian wedding drawn square by square like a cosy retro video game, with havelis, fireworks and fairy lights.",
+    saaya:
+      "Silhouettes at golden hour: palms, bougainvillea, birds and old buildings cut as black shadows against glowing sunset skies.",
+    jingkieng:
+      "Meghalaya's living root bridges: mossy roots woven over clear green pools, with tree ferns, orchids and waterfalls.",
+    rangmanch:
+      "An old Parsi theatre: a gilded stage, crimson velvet and footlights, with a painted backdrop for every event.",
+    kashikari:
+      "The glazed tiles of Multan and Sindh: flowers, vines and vases in cobalt, turquoise and white, glossy as glass.",
+    paan: "Paan, the sweet end of every celebration: glossy betel leaves, silver paandaans, cardamom and silver leaf.",
+    sangemarmar:
+      "Modern marble and brass: white and blush marble with soft grey veins, brushed brass and sculptural white flowers.",
+    susegad:
+      "Goa at its most relaxed: colourful villas with oyster-shell windows, shady balconies, frangipani and bougainvillea.",
+    paranda:
+      "Punjabi parandas: silk braid tassels in jewel colours with gold thread, pompoms, tiny mirrors and bells.",
+    japi: "Assam's japi and muga silk: the woven sun hat in red, black and gold, golden silk, tea gardens and the Brahmaputra.",
+    akeek:
+      "Agate and gold: slices of agate and geode in rose, teal and smoky blue, edged in gold leaf and sparkling with crystals.",
+    "samudra-jyoti":
+      "The Andaman's glowing shores: waves that light up blue at night, mangroves, white sand, shells and coral.",
+    nazaara:
+      "India from above: marigold fields, salt pans, tea gardens, stepwells and rooftops seen from a drone.",
     thewa:
       "Thewa from Pratapgarh: gold worked as fine as lace and fused onto glowing emerald, ruby and sapphire glass.",
     sikki:

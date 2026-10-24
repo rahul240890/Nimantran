@@ -247,12 +247,15 @@ test.describe("the Designs page", () => {
     const prices = page.getByRole("group", { name: "Price" });
     await prices.getByRole("button", { name: "Free", exact: true }).click();
     await expect(page).toHaveURL(/price=free/);
-    // Every free design is a 3D card
-    const formats = await page
-      .locator("[data-format-item]")
-      .evaluateAll((items) => items.map((item) => item.getAttribute("data-format-item")));
-    expect(formats.length).toBeGreaterThan(0);
-    expect(new Set(formats)).toEqual(new Set(["card"]));
+    // Every free design is a 3D card, once the long list has redrawn for the price
+    await expect
+      .poll(async () => {
+        const formats = await page
+          .locator("[data-format-item]")
+          .evaluateAll((items) => items.map((item) => item.getAttribute("data-format-item")));
+        return formats.length > 0 ? [...new Set(formats)] : [];
+      })
+      .toEqual(["card"]);
 
     await prices.getByRole("button", { name: "Any price" }).click();
     await page.getByRole("combobox", { name: "Sort designs" }).click();

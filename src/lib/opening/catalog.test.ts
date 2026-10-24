@@ -21,7 +21,10 @@ import {
   TIED_GATES,
   DEPTH_OPENINGS,
   depthBeyond,
+  BLOOM_OPENINGS,
+  bloomBeyond,
   ownOpenings,
+  type BloomOpening,
   type DepthOpening,
   tiedBeyond,
   noOpening,
@@ -146,6 +149,24 @@ describe("openings", () => {
       expect(beyond, id).toMatch(/^\/suites\/[a-z-]+\/centre\.webp$/);
       const template = beyond.split("/")[2] as SuiteId;
       // The template opens with its tied gate and offers its depth opening beside it
+      expect(isTiedGate(openingStyle(noOpening, template, false)), id).toBe(true);
+      expect(ownOpenings(openingStyle(noOpening, template, false), template), id).toContain(id);
+      expect(openingNames(id), id).toBe("foot");
+    }
+  });
+
+  it("gives each bloom opening its pieces, offered beside its template's own gate", () => {
+    for (const id of Object.keys(BLOOM_OPENINGS) as BloomOpening[]) {
+      for (const part of ["outer", "inner", "heart"]) {
+        expect(
+          existsSync(join(process.cwd(), "public/openings/bloom", id, `${part}.webp`)),
+          id,
+        ).toBe(true);
+      }
+      const beyond = bloomBeyond(id);
+      expect(beyond, id).toMatch(/^\/suites\/[a-z-]+\/centre\.webp$/);
+      const template = beyond.split("/")[2] as SuiteId;
+      // The template opens with its tied gate and offers its bloom opening beside it
       expect(isTiedGate(openingStyle(noOpening, template, false)), id).toBe(true);
       expect(ownOpenings(openingStyle(noOpening, template, false), template), id).toContain(id);
       expect(openingNames(id), id).toBe("foot");

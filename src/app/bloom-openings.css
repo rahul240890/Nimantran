@@ -1,0 +1,336 @@
+/*
+ * Bloom openings (opening-bloom.tsx): the template's centre picture beyond, and one great
+ * flower over it, its middle a little above the screen's so the names and the way in below
+ * never cover the heart. --r is the reach from the middle to the farthest corner; every
+ * piece is sized by it, so the flower covers any screen. Each piece stands on its base at
+ * the middle, turned to its place in the ring (--a), and holds two layers: .bloom-move for
+ * the opening, and its image for the waiting sway.
+ *
+ * Closed, the flower waits in its template's own way (data-wait). Opened, the heart goes
+ * first (data-heart), then the rings open outward one after another, inner first (--order),
+ * each its template's way (data-open-as), onto the centre picture lit up. Everything follows
+ * the stage's data-open; still mode only fades.
+ */
+.bloom {
+  --cx: 50cqw;
+  --cy: 42cqh;
+  --r: hypot(50cqw, 58cqh);
+  /* The heart goes first; then the rings, one every --step */
+  --heart-ms: 700ms;
+  --ring-at: 380ms;
+  --step: 260ms;
+  --ring-ms: 1150ms;
+}
+.bloom-canvas {
+  width: max(100cqw, calc(100cqh * 768 / 1365));
+  aspect-ratio: 768 / 1365;
+  translate: -50% -50%;
+}
+/* The centre picture waits dim behind the flower and lights up as the flower opens */
+.bloom-beyond {
+  filter: brightness(0.5) saturate(0.9);
+  scale: 1.05;
+  transition:
+    filter 1300ms ease 900ms,
+    scale 2400ms cubic-bezier(0.3, 0, 0.2, 1) 500ms;
+}
+.opening-stage[data-open="true"] .bloom-beyond,
+[data-airy] .bloom-beyond {
+  filter: none;
+}
+.opening-stage[data-open="true"] .bloom-beyond {
+  scale: 1;
+}
+
+.bloom-flower,
+.bloom-ring {
+  transform-origin: var(--cx) var(--cy);
+}
+.bloom-piece {
+  position: absolute;
+  left: var(--cx);
+  top: var(--cy);
+  height: calc(var(--r) * var(--len));
+  aspect-ratio: 1 / 2;
+  margin-top: calc(var(--r) * var(--len) * -1);
+  margin-left: calc(var(--r) * var(--len) / -4);
+  transform-origin: 50% 100%;
+  rotate: var(--a);
+}
+.bloom-move,
+.bloom-sway {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+}
+.bloom-move {
+  transition:
+    transform var(--ring-ms) cubic-bezier(0.45, 0, 0.3, 1)
+      calc(var(--ring-at) + var(--order) * var(--step)),
+    opacity calc(var(--ring-ms) * 0.55) ease
+      calc(var(--ring-at) + var(--order) * var(--step) + var(--ring-ms) * 0.4);
+}
+.bloom-heart {
+  position: absolute;
+  left: var(--cx);
+  top: var(--cy);
+  width: calc(var(--r) * 0.4);
+  aspect-ratio: 1;
+  margin: calc(var(--r) * -0.2) 0 0 calc(var(--r) * -0.2);
+  transition:
+    transform var(--heart-ms) cubic-bezier(0.4, 0, 0.6, 1),
+    opacity calc(var(--heart-ms) * 0.6) ease calc(var(--heart-ms) * 0.4);
+}
+/* The light over the flower: a glow, a gleam, a flicker, a wave or a passing shadow */
+.bloom-light {
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  transition: opacity 400ms ease;
+}
+.opening-stage[data-open="true"] :is(.bloom-light, .bloom-flower, .bloom-sway) {
+  animation-play-state: paused;
+}
+.opening-stage[data-open="true"] .bloom-light {
+  opacity: 0;
+}
+
+/* ------------------------------------------------------------------ waiting (data-wait) */
+
+/* A lamp moving slowly behind the stone or the shell */
+[data-wait="glow"] .bloom-light {
+  opacity: 1;
+  inset: -40%;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in oklab, var(--open-light) 75%, transparent),
+    transparent 30%
+  );
+  animation: bloom-glow 9s ease-in-out infinite alternate;
+}
+/* A gleam of light sliding across gold, glaze, silver, marble or agate */
+[data-wait="gleam"] .bloom-light {
+  opacity: 1;
+  inset: 0 -100%;
+  background: linear-gradient(
+    115deg,
+    transparent 44%,
+    color-mix(in oklab, var(--open-light) 65%, transparent) 50%,
+    transparent 56%
+  );
+  animation: bloom-gleam 5.5s ease-in-out infinite;
+}
+/* The pixel flower breathes in steps */
+[data-wait="pulse"] .bloom-flower {
+  animation: bloom-pulse 2.4s steps(2, jump-none) infinite;
+}
+/* Fronds and tassels sway on their own, never all together */
+[data-wait="sway"] .bloom-sway {
+  animation: bloom-sway 4.2s ease-in-out calc(var(--k) * -0.7s) infinite alternate;
+}
+/* Footlights flickering warm */
+[data-wait="flicker"] .bloom-light {
+  opacity: 1;
+  background: radial-gradient(
+    120% 70% at 50% 100%,
+    color-mix(in oklab, var(--open-light) 65%, transparent),
+    transparent 70%
+  );
+  animation: bloom-flicker 3.1s linear infinite;
+}
+/* The whole flower turning very slowly */
+[data-wait="turn"] .bloom-flower {
+  animation: bloom-turn 90s linear infinite;
+}
+/* A glowing ring washing out from the middle */
+[data-wait="wave"] .bloom-light {
+  opacity: 1;
+  inset: -30%;
+  background: radial-gradient(
+    closest-side at 50% 45%,
+    transparent 55%,
+    color-mix(in oklab, var(--open-light) 75%, transparent) 70%,
+    transparent 85%
+  );
+  transform-origin: 50% 45%;
+  animation: bloom-wave 4.8s ease-out infinite;
+}
+/* A cloud's soft shadow drifting over the fields */
+[data-wait="shade"] .bloom-light {
+  opacity: 1;
+  inset: -40%;
+  mix-blend-mode: multiply;
+  background: radial-gradient(circle at 50% 50%, rgb(0 0 0 / 0.35), transparent 26%);
+  animation: bloom-shade 14s ease-in-out infinite alternate;
+}
+
+/* ------------------------------------------------------------------ the heart (data-heart) */
+
+.opening-stage[data-open="true"] .bloom-heart {
+  opacity: 0;
+}
+.opening-stage[data-open="true"] [data-heart="lift"] .bloom-heart {
+  transform: scale(1.7);
+}
+.opening-stage[data-open="true"] [data-heart="rise"] .bloom-heart {
+  transform: translateY(-75cqh);
+  transition:
+    transform 900ms cubic-bezier(0.5, 0, 0.75, 0.3),
+    opacity 400ms ease 500ms;
+}
+.opening-stage[data-open="true"] [data-heart="sink"] .bloom-heart {
+  transform: scale(0.2);
+}
+.opening-stage[data-open="true"] [data-heart="blink"] .bloom-heart {
+  transform: scale(1.15);
+  transition:
+    transform var(--heart-ms) steps(3, jump-none),
+    opacity var(--heart-ms) steps(3, jump-none);
+}
+.opening-stage[data-open="true"] [data-heart="turn"] .bloom-heart {
+  transform: rotate(200deg) scale(1.5);
+}
+/* A small dip, then up and away */
+.opening-stage[data-open="true"] [data-heart="bounce"] .bloom-heart {
+  transform: translateY(-80cqh);
+  transition:
+    transform 900ms cubic-bezier(0.45, -0.55, 0.7, 0.6),
+    opacity 350ms ease 550ms;
+}
+
+/* ------------------------------------------------------------- the rings (data-open-as) */
+
+.opening-stage[data-open="true"] .bloom-move {
+  opacity: 0;
+}
+/* Petals opening outward, growing toward the guest as they go */
+.opening-stage[data-open="true"] [data-open-as="out"] .bloom-move {
+  transform: translateY(-55%) scale(1.45);
+}
+.opening-stage[data-open="true"] [data-open-as="steps"] .bloom-move {
+  transform: translateY(-60%) scale(1.4);
+  transition:
+    transform var(--ring-ms) steps(5, jump-none) calc(var(--ring-at) + var(--order) * var(--step)),
+    opacity var(--ring-ms) steps(3, jump-none) calc(var(--ring-at) + var(--order) * var(--step));
+}
+/* Sliding straight out along their own line */
+.opening-stage[data-open="true"] [data-open-as="slide"] .bloom-move {
+  transform: translateY(-85%);
+}
+/* Folding back on their bases, like pleats or leaves laid open */
+.opening-stage[data-open="true"] [data-open-as="fold"] .bloom-move {
+  transform: perspective(140cqh) rotateX(70deg) translateY(-20%);
+}
+/* Swinging round on their bases, like shutters or tassels in a twirl */
+.opening-stage[data-open="true"] [data-open-as="swing"] .bloom-move {
+  transform: rotate(58deg) translateY(-25%);
+}
+/* Fanning out while the whole ring spins */
+.opening-stage[data-open="true"] [data-open-as="spin"] .bloom-move {
+  transform: translateY(-50%) scale(1.3);
+}
+.opening-stage[data-open="true"] [data-open-as="spin"] .bloom-ring {
+  rotate: calc(70deg - var(--order) * 50deg);
+  transition: rotate var(--ring-ms) cubic-bezier(0.45, 0, 0.3, 1)
+    calc(var(--ring-at) + var(--order) * var(--step));
+}
+
+@keyframes bloom-glow {
+  from {
+    translate: -12% -9%;
+  }
+  to {
+    translate: 12% 10%;
+  }
+}
+@keyframes bloom-gleam {
+  0% {
+    translate: 45% 0;
+  }
+  65%,
+  100% {
+    translate: -45% 0;
+  }
+}
+@keyframes bloom-pulse {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.03;
+  }
+}
+@keyframes bloom-sway {
+  from {
+    rotate: -2.5deg;
+  }
+  to {
+    rotate: 2.5deg;
+  }
+}
+@keyframes bloom-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  12% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  34% {
+    opacity: 0.95;
+  }
+  55% {
+    opacity: 0.75;
+  }
+  70% {
+    opacity: 1;
+  }
+}
+@keyframes bloom-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes bloom-wave {
+  from {
+    scale: 0.25;
+    opacity: 1;
+  }
+  to {
+    scale: 1.6;
+    opacity: 0;
+  }
+}
+@keyframes bloom-shade {
+  from {
+    translate: -18% -12%;
+  }
+  to {
+    translate: 18% 14%;
+  }
+}
+
+/* Still: nothing waits or moves; the flower fades into the centre picture */
+@media (prefers-reduced-motion: reduce) {
+  .bloom :is(.bloom-light, .bloom-flower, .bloom-sway) {
+    animation: none;
+  }
+  .opening-stage[data-open="true"] .bloom :is(.bloom-move, .bloom-heart, .bloom-ring) {
+    transform: none;
+    rotate: none;
+  }
+}
+:root[data-motion="reduce"] .bloom :is(.bloom-light, .bloom-flower, .bloom-sway) {
+  animation: none;
+}
+:root[data-motion="reduce"]
+  .opening-stage[data-open="true"]
+  .bloom
+  :is(.bloom-move, .bloom-heart, .bloom-ring) {
+  transform: none;
+  rotate: none;
+}

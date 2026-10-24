@@ -1852,6 +1852,81 @@ export const openingCopy = {
       description:
         "A pearl-ringed glass bubble holds pearly doors; it bursts in a shimmer and the doors swing open.",
     },
+    "yashab-kiwad": {
+      name: "Jade bangle",
+      description:
+        "A carved jade bangle on a gold chain holds the jade doors; it slips free and drops, and the doors swing open.",
+    },
+    "usta-kiwad": {
+      name: "Gold sunburst",
+      description:
+        "A raised-gold sunburst on a blue ribbon holds the doors; the ribbon unties and the doors swing open.",
+    },
+    "pixel-kiwad": {
+      name: "Pixel gem",
+      description:
+        "A pixel gem on a pixel chain holds the doors; it bursts into pixels and the doors swing open.",
+    },
+    "saaya-kiwad": {
+      name: "Birds on a wire",
+      description:
+        "Two silhouette birds sit on a wire across the doors; they fly off and the doors swing open onto the sunset.",
+    },
+    "jad-dwar": {
+      name: "Bamboo latch",
+      description:
+        "A bamboo latch with an orchid holds the doors of living roots; it slides free and the doors part to each side.",
+    },
+    "natak-dwar": {
+      name: "Velvet rope",
+      description:
+        "A theatre's velvet rope on a brass hook holds the stage doors; it drops and the doors swing open.",
+    },
+    "kashi-kiwad": {
+      name: "Tile chain",
+      description:
+        "A brass door chain with a glazed tile holds the doors; it rings, falls away and the doors swing open.",
+    },
+    "paandaan-pat": {
+      name: "Peacock cutter",
+      description:
+        "A silver peacock betel-nut cutter holds the silver doors; it turns and lets go, and the doors open outward.",
+    },
+    "marmar-dwar": {
+      name: "Brass rings",
+      description:
+        "Two interlocking brass rings hold the marble doors; they roll away and the doors slide apart.",
+    },
+    "goa-dwar": {
+      name: "Painted tile",
+      description:
+        "A painted Goan tile on a cord holds the blue doors; it turns and lets go, and the doors swing open.",
+    },
+    "haveli-pat": {
+      name: "Paranda braid",
+      description:
+        "A silk paranda braid with pompoms ties the painted doors; it unties and the doors swing open.",
+    },
+    "bah-dwar": {
+      name: "Gamosa knot",
+      description:
+        "A gamosa tied in a knot holds the bamboo doors; it unties and the doors swing open.",
+    },
+    "akeek-pat": {
+      name: "Quartz crystal",
+      description:
+        "A quartz crystal wrapped in gold holds the agate doors; it cracks and the doors slide apart.",
+    },
+    "sagar-dwar": {
+      name: "Sailor's knot",
+      description:
+        "A sailor's knot with a shell holds the driftwood doors; it unties and the doors open outward to the sea.",
+    },
+    "khet-phatak": {
+      name: "Kite on a string",
+      description:
+        "A kite caught on its string holds the gate to the fields; it flies off and the doors open outward.",
+    },
     "sona-parat": {
       name: "Gold-laced glass",
       description:
@@ -1925,6 +2000,81 @@ export const openingCopy = {
       name: "Rainbow shimmer",
       description:
         "A pearly arch, a ring of rainbow glass and a ring of pearls catch a rainbow shimmer as you glide through.",
+    },
+    "yashab-kamal": {
+      name: "Jade lotus",
+      description:
+        "A great jade lotus covers the screen round a gold-and-ruby heart; the heart lifts and the petals open out, ring by ring.",
+    },
+    manoti: {
+      name: "Gold-relief dome",
+      description:
+        "A gold-relief flower of rounded lobes, like the inside of a Bikaner dome; the gold boss lifts and the lobes open out.",
+    },
+    "chaukor-phool": {
+      name: "Pixel flower",
+      description:
+        "A giant pixel flower fills the screen; its heart blinks away and the petals open in blocky steps, like a game level starting.",
+    },
+    "naariyal-chhaya": {
+      name: "Palm canopy",
+      description:
+        "Looking up through black palm fronds at a sunset sky; they sway, the crown slips away and the fronds part.",
+    },
+    kundal: {
+      name: "Fern canopy",
+      description:
+        "Giant tree-fern fronds cover the screen like a forest canopy; the curled fern uncurls and the fronds open.",
+    },
+    "makhmali-chakra": {
+      name: "Velvet fan",
+      description:
+        "A sunburst of pleated crimson velvet and teal silk with gold fringe; the medallion rises and the pleats fold back.",
+    },
+    "kashi-phool": {
+      name: "Tile flower",
+      description:
+        "A great flower of glazed tile petals in cobalt and turquoise; the centre tile turns away and the petals tip outward.",
+    },
+    beeda: {
+      name: "Betel leaves",
+      description:
+        "A ring of glossy betel leaves round a silver-wrapped paan; the paan lifts away and the leaves fold outward.",
+    },
+    "farshi-phool": {
+      name: "Marble medallion",
+      description:
+        "A marble floor medallion of white and blush petals edged in brass; the brass boss rises and the petals slide apart.",
+    },
+    "seep-khidki": {
+      name: "Shell window",
+      description:
+        "A round window of glowing oyster-shell panes in blue frames; the hub turns and the panes swing open like shutters.",
+    },
+    phundne: {
+      name: "Tassel burst",
+      description:
+        "A burst of silk paranda tassels round a big pompom; the pompom bounces away and the tassels swing outward.",
+    },
+    "japi-chakra": {
+      name: "Japi wheel",
+      description:
+        "A giant japi's woven segments round a jewelled centre; the centre lifts and the segments fan out, spinning open.",
+    },
+    "akeek-phool": {
+      name: "Agate flower",
+      description:
+        "A flower of agate slices edged in gold round a sparkling geode; the geode lifts and the slices slide outward.",
+    },
+    "sagar-seep": {
+      name: "Glowing shell",
+      description:
+        "A giant scallop shell glowing in the dark; the pearl at its heart lifts and the ribs open outward like a wave.",
+    },
+    "khet-chakra": {
+      name: "Wheel of fields",
+      description:
+        "Wedges of marigold and tea fields seen from above round a stepwell; the stepwell sinks and the wedges slide out.",
     },
     doors: {
       name: "Theme doors",
@@ -2016,6 +2166,7 @@ export const openingCopy = {
     themed: "Its own opening",
     tied: "Tied gates",
     depth: "Depth openings",
+    bloom: "Bloom openings",
     painted: "Painted gates",
     doors: "Doors and gates",
     reveals: "Curtains and reveals",

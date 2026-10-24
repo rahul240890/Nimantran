@@ -603,6 +603,126 @@ export const TIED_GATES = {
     pieces: false,
     welcome: "party",
   },
+  // Yashab: a jade bangle on a gold chain
+  "yashab-kiwad": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Usta Kala: a gold sunburst on a blue ribbon
+  "usta-kiwad": {
+    move: "swing",
+    undo: "untie",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Chaukhane: a pixel gem on a pixel chain
+  "pixel-kiwad": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
+  // Saaya: two silhouette birds on a wire
+  "saaya-kiwad": {
+    move: "swing",
+    undo: "fly",
+    at: 40,
+    pieces: false,
+    welcome: "night",
+  },
+  // Jingkieng: a bamboo latch with an orchid
+  "jad-dwar": {
+    move: "part",
+    undo: "slip",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
+  // Rangmanch: a theatre's velvet rope on a brass hook
+  "natak-dwar": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: false,
+    welcome: "royal",
+  },
+  // Kashikari: a brass door chain with a tile
+  "kashi-kiwad": {
+    move: "swing",
+    undo: "ring",
+    at: 40,
+    pieces: false,
+    welcome: "letter",
+  },
+  // Paan: a peacock betel-nut cutter
+  "paandaan-pat": {
+    move: "out",
+    undo: "turn",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
+  // Sangemarmar: two interlocking brass rings
+  "marmar-dwar": {
+    move: "slide",
+    undo: "roll",
+    at: 40,
+    pieces: false,
+    welcome: "letter",
+  },
+  // Susegad: a painted tile on a cord
+  "goa-dwar": {
+    move: "swing",
+    undo: "turn",
+    at: 40,
+    pieces: false,
+    welcome: "lamps",
+  },
+  // Paranda: a paranda braid with pompoms
+  "haveli-pat": {
+    move: "swing",
+    undo: "untie",
+    at: 40,
+    pieces: false,
+    welcome: "party",
+  },
+  // Japi: a gamosa tied in a knot
+  "bah-dwar": {
+    move: "swing",
+    undo: "untie",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
+  // Akeek: a quartz crystal wrapped in gold
+  "akeek-pat": {
+    move: "slide",
+    undo: "crack",
+    at: 40,
+    pieces: false,
+    welcome: "night",
+  },
+  // Samudra Jyoti: a sailor's knot with a shell
+  "sagar-dwar": {
+    move: "out",
+    undo: "untie",
+    at: 40,
+    pieces: false,
+    welcome: "night",
+  },
+  // Nazaara: a kite caught on its string
+  "khet-phatak": {
+    move: "out",
+    undo: "fly",
+    at: 40,
+    pieces: false,
+    welcome: "bloom",
+  },
 } as const satisfies Record<string, TiedSpec>;
 export type TiedGate = keyof typeof TIED_GATES;
 const TIED_IDS = Object.keys(TIED_GATES) as TiedGate[];
@@ -691,6 +811,123 @@ export function depthSpec(id: DepthOpening): DepthSpec {
 export function depthBeyond(id: DepthOpening): string {
   const template = STORY_IDS.find((story) => STORY_SECOND[story] === id);
   return template ? `/suites/${template}/centre.webp` : `/openings/depth/${id}/beyond.webp`;
+}
+
+/**
+ * How a bloom opening's flower waits: a lamp's glow moving behind it (glow), a gleam sliding
+ * across it (gleam), breathing in steps (pulse), its pieces swaying each on its own (sway),
+ * footlights flickering on it (flicker), the whole flower turning very slowly (turn), a
+ * glowing ring washing out from the middle (wave), or a cloud's shadow drifting over (shade).
+ */
+export type BloomWait = "glow" | "gleam" | "pulse" | "sway" | "flicker" | "turn" | "wave" | "shade";
+/**
+ * How the heart goes, first: lifting toward the guest (lift), rising out of sight (rise),
+ * sinking away (sink), blinking out (blink), turning away (turn) or bouncing off (bounce).
+ */
+export type BloomHeart = "lift" | "rise" | "sink" | "blink" | "turn" | "bounce";
+/**
+ * How the rings open after it, inner first: outward, growing toward the guest (out), the
+ * same in blocky steps (steps), sliding straight out (slide), folding back on their bases
+ * (fold), swinging round on them (swing), or fanning out while the ring spins (spin).
+ */
+export type BloomOpen = "out" | "steps" | "slide" | "fold" | "swing" | "spin";
+export type BloomSpec = {
+  wait: BloomWait;
+  heart: BloomHeart;
+  open: BloomOpen;
+  welcome: WelcomeKind;
+  /**
+   * Fewer, wider-spaced pieces over the centre picture left bright, for a flower that is
+   * looked through rather than at (Saaya's black palm fronds against the sunset).
+   */
+  airy?: true;
+};
+
+/*
+ * The bloom openings (templates 71 to 85, docs/TEMPLATE_PROMPTS_71_TO_85.md): one great
+ * flower over the template's centre picture, made of an outer piece and an inner piece
+ * copied round in rings and a heart in the middle (opening-bloom.tsx). In
+ * public/openings/bloom/<id>/: outer, inner and heart, cut and boxed by
+ * scripts/import-template.mjs. Each is its template's second choice, after its tied gate.
+ */
+export const BLOOM_OPENINGS = {
+  // Yashab: a carved jade lotus round a gold-and-ruby heart
+  "yashab-kamal": { wait: "glow", heart: "lift", open: "out", welcome: "royal" },
+  // Usta Kala: a gold-relief flower of rounded lobes, like a Bikaner dome
+  manoti: { wait: "gleam", heart: "lift", open: "out", welcome: "royal" },
+  // Chaukhane: a pixel flower, opening like a game level starting
+  "chaukor-phool": { wait: "pulse", heart: "blink", open: "steps", welcome: "party" },
+  // Saaya: black palm fronds against a sunset sky
+  "naariyal-chhaya": {
+    wait: "sway",
+    heart: "rise",
+    open: "slide",
+    welcome: "night",
+    airy: true,
+  },
+  // Jingkieng: a canopy of tree-fern fronds round a curled fern
+  kundal: { wait: "sway", heart: "turn", open: "out", welcome: "bloom" },
+  // Rangmanch: pleated crimson velvet and teal silk round a gilded medallion
+  "makhmali-chakra": { wait: "flicker", heart: "rise", open: "fold", welcome: "royal" },
+  // Kashikari: glazed tile petals in cobalt and turquoise round a tile rosette
+  "kashi-phool": { wait: "gleam", heart: "turn", open: "fold", welcome: "letter" },
+  // Paan: glossy betel leaves round a silver-wrapped paan
+  beeda: { wait: "gleam", heart: "lift", open: "fold", welcome: "party" },
+  // Sangemarmar: a marble floor medallion round a brass boss
+  "farshi-phool": { wait: "gleam", heart: "lift", open: "slide", welcome: "letter" },
+  // Susegad: oyster-shell window panes round a carved hub
+  "seep-khidki": { wait: "glow", heart: "turn", open: "swing", welcome: "lamps" },
+  // Paranda: silk tassels round a pompom
+  phundne: { wait: "sway", heart: "bounce", open: "swing", welcome: "party" },
+  // Japi: a japi's woven segments round a jewelled centre
+  "japi-chakra": { wait: "turn", heart: "lift", open: "spin", welcome: "bloom" },
+  // Akeek: agate slices edged in gold round a geode
+  "akeek-phool": { wait: "gleam", heart: "lift", open: "slide", welcome: "night" },
+  // Samudra Jyoti: a scallop shell glowing in the dark round a pearl
+  "sagar-seep": { wait: "wave", heart: "lift", open: "out", welcome: "night" },
+  // Nazaara: wedges of fields from above round a stepwell
+  "khet-chakra": { wait: "shade", heart: "sink", open: "out", welcome: "bloom" },
+} as const satisfies Record<string, BloomSpec>;
+export type BloomOpening = keyof typeof BLOOM_OPENINGS;
+const BLOOM_IDS = Object.keys(BLOOM_OPENINGS) as BloomOpening[];
+
+export function isBloomOpening(style: string): style is BloomOpening {
+  return style in BLOOM_OPENINGS;
+}
+
+export function bloomSpec(id: BloomOpening): BloomSpec {
+  return (BLOOM_OPENINGS as Record<string, BloomSpec>)[id]!;
+}
+
+/**
+ * A bloom opening's rings, back to front: how many pieces, how long each is against the reach to the
+ * farthest corner, where the first sits (as a share of the gap between two), and when it
+ * opens (0 first). The second outer ring sits between the first one's pieces, so no gap
+ * shows the centre picture before the flower opens.
+ */
+export const BLOOM_RINGS = [
+  { part: "outer", count: 14, length: 1.4, offset: 0, order: 2 },
+  { part: "outer", count: 14, length: 1.05, offset: 0.5, order: 1 },
+  { part: "inner", count: 10, length: 0.6, offset: 0.25, order: 0 },
+] as const;
+/** An airy flower's rings: one of the outer piece and one of the inner, the sky between them. */
+export const BLOOM_RINGS_AIRY = [
+  { part: "outer", count: 9, length: 1.3, offset: 0, order: 1 },
+  { part: "inner", count: 7, length: 0.7, offset: 0.5, order: 0 },
+] as const;
+
+/** The rings a bloom opening's flower is made of. */
+export function bloomRings(id: BloomOpening) {
+  return bloomSpec(id).airy ? BLOOM_RINGS_AIRY : BLOOM_RINGS;
+}
+
+/** The flower's middle, % across and down the screen: a little above the screen's own. */
+export const BLOOM_MIDDLE = { x: 50, y: 42 } as const;
+
+/** A bloom opening's place beyond: the centre picture of the template it was painted with. */
+export function bloomBeyond(id: BloomOpening): string {
+  const template = STORY_IDS.find((story) => STORY_SECOND[story] === id);
+  return template ? `/suites/${template}/centre.webp` : `/openings/bloom/${id}/beyond.webp`;
 }
 
 /**
@@ -803,6 +1040,7 @@ export const OPENING_STYLES = [
   ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
   ...TIED_IDS,
   ...DEPTH_IDS,
+  ...BLOOM_IDS,
   ...FRESH_OPENINGS,
   ...THEMED_IDS,
   "doors",
@@ -832,6 +1070,7 @@ export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyl
   { id: "themed", styles: THEMED_IDS },
   { id: "tied", styles: TIED_IDS },
   { id: "depth", styles: DEPTH_IDS },
+  { id: "bloom", styles: BLOOM_IDS },
   {
     id: "fresh",
     styles: [
@@ -951,6 +1190,8 @@ export function openingNames(style: OpeningStyle): OpeningNames {
   if (isTiedGate(style)) return "foot";
   // The frames' openings meet in the middle, where the centre picture waits
   if (isDepthOpening(style)) return "foot";
+  // The heart waits in the middle, where the flower opens
+  if (isBloomOpening(style)) return "foot";
   if (isFreshOpening(style)) return pick(["seal", "foot"]);
   if (isThemedOpening(style)) return pick(["foot", "seal", "quiet"]);
   return "print";
@@ -1019,6 +1260,36 @@ const WEDDING_OPENINGS: readonly OpeningStyle[] = [
   "teen-aakar",
   "galiyara",
   "chamak",
+  "yashab-kiwad",
+  "usta-kiwad",
+  "pixel-kiwad",
+  "saaya-kiwad",
+  "jad-dwar",
+  "natak-dwar",
+  "kashi-kiwad",
+  "paandaan-pat",
+  "marmar-dwar",
+  "goa-dwar",
+  "haveli-pat",
+  "bah-dwar",
+  "akeek-pat",
+  "sagar-dwar",
+  "khet-phatak",
+  "yashab-kamal",
+  "manoti",
+  "chaukor-phool",
+  "naariyal-chhaya",
+  "kundal",
+  "makhmali-chakra",
+  "kashi-phool",
+  "beeda",
+  "farshi-phool",
+  "seep-khidki",
+  "phundne",
+  "japi-chakra",
+  "akeek-phool",
+  "sagar-seep",
+  "khet-chakra",
   "noor-darwaza",
   "haveli-kiwad",
   "shahi-parda",
@@ -1524,6 +1795,21 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
   aakar: "aakar-pat",
   "shwet-shyam": "shwet-dwar",
   dhanak: "moti-dwar",
+  yashab: "yashab-kiwad",
+  "usta-kala": "usta-kiwad",
+  chaukhane: "pixel-kiwad",
+  saaya: "saaya-kiwad",
+  jingkieng: "jad-dwar",
+  rangmanch: "natak-dwar",
+  kashikari: "kashi-kiwad",
+  paan: "paandaan-pat",
+  sangemarmar: "marmar-dwar",
+  susegad: "goa-dwar",
+  paranda: "haveli-pat",
+  japi: "bah-dwar",
+  akeek: "akeek-pat",
+  "samudra-jyoti": "sagar-dwar",
+  nazaara: "khet-phatak",
   "sona-gulaab": "gulaab-lifafa",
   shabnam: "os-parda",
   "surkh-gulaab": "surkh-dwar",
@@ -1556,9 +1842,10 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
 
 /**
  * A template's second opening, after its own gate: templates 56 to 70 open with a tied gate
- * and offer their depth opening beside it, both made for the design.
+ * and offer their depth opening beside it, and 71 to 85 their bloom opening, all made for
+ * the design.
  */
-const STORY_SECOND: Partial<Record<StoryId, DepthOpening>> = {
+const STORY_SECOND: Partial<Record<StoryId, DepthOpening | BloomOpening>> = {
   thewa: "sona-parat",
   sikki: "mauni",
   "hase-chittara": "chowka",
@@ -1574,6 +1861,21 @@ const STORY_SECOND: Partial<Record<StoryId, DepthOpening>> = {
   aakar: "teen-aakar",
   "shwet-shyam": "galiyara",
   dhanak: "chamak",
+  yashab: "yashab-kamal",
+  "usta-kala": "manoti",
+  chaukhane: "chaukor-phool",
+  saaya: "naariyal-chhaya",
+  jingkieng: "kundal",
+  rangmanch: "makhmali-chakra",
+  kashikari: "kashi-phool",
+  paan: "beeda",
+  sangemarmar: "farshi-phool",
+  susegad: "seep-khidki",
+  paranda: "phundne",
+  japi: "japi-chakra",
+  akeek: "akeek-phool",
+  "samudra-jyoti": "sagar-seep",
+  nazaara: "khet-chakra",
 };
 
 /** The design's own openings: its own first, then any second made with it. */
@@ -1709,6 +2011,10 @@ export const filmedWelcome = (scene: WelcomeScene): WelcomeKind => FILMED_AS[sce
 const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
   ...(Object.fromEntries(DEPTH_IDS.map((id) => [id, depthSpec(id).welcome])) as Record<
     DepthOpening,
+    WelcomeKind
+  >),
+  ...(Object.fromEntries(BLOOM_IDS.map((id) => [id, bloomSpec(id).welcome])) as Record<
+    BloomOpening,
     WelcomeKind
   >),
   ...(Object.fromEntries(TIED_IDS.map((id) => [id, tiedSpec(id).welcome])) as Record<
