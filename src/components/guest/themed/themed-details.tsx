@@ -776,6 +776,22 @@ function centre(list: HTMLElement, index: number, smooth: boolean) {
   });
 }
 
+/** The photo nearest the middle of the strip. */
+function nearestPhoto(list: HTMLElement): number {
+  const middle = list.scrollLeft + list.clientWidth / 2;
+  let nearest = 0;
+  let gap = Infinity;
+  Array.from(list.children).forEach((child, i) => {
+    const item = child as HTMLElement;
+    const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
+    if (distance < gap) {
+      gap = distance;
+      nearest = i;
+    }
+  });
+  return nearest;
+}
+
 /**
  * The photos one after another (owner, 2026-10-24: guests had to scroll sideways to find
  * them): each comes to the middle by itself while the section is on screen, and the guest
@@ -800,6 +816,8 @@ function PhotoCarousel({
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [holding, setHolding] = useState(false);
+  // The photo the strip is gliding to by itself; its scrolling on the way says nothing
+  const aim = useRef<number | null>(null);
   const count = photos.length;
   const playing = !still && !paused && count > 1;
 
@@ -807,6 +825,7 @@ function PhotoCarousel({
     if (!playing || holding || !onScreen) return;
     const timer = setTimeout(() => {
       const next = (index + 1) % count;
+      aim.current = next;
       if (track.current) centre(track.current, next, true);
       setIndex(next);
     }, PHOTO_MS);
@@ -815,25 +834,28 @@ function PhotoCarousel({
 
   const go = (to: number) => {
     const next = (to + count) % count;
+    aim.current = next;
     if (track.current) centre(track.current, next, !still);
     setIndex(next);
   };
   // A swipe settles on a photo; the counter follows it
   const settle = () => {
     const list = track.current;
-    if (!list) return;
-    const middle = list.scrollLeft + list.clientWidth / 2;
-    let nearest = 0;
-    let gap = Infinity;
-    Array.from(list.children).forEach((child, i) => {
-      const item = child as HTMLElement;
-      const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
-      if (distance < gap) {
-        gap = distance;
-        nearest = i;
-      }
-    });
+    if (!list || aim.current !== null) return;
+    const nearest = nearestPhoto(list);
     if (nearest !== index) setIndex(nearest);
+  };
+  // A glide that stopped short (a Next pressed before the last glide began, on a slow phone)
+  // goes the rest of the way at once, so the photo shown is always the one counted
+  const arrive = () => {
+    const list = track.current;
+    const target = aim.current;
+    aim.current = null;
+    if (list && target !== null && nearestPhoto(list) !== target) centre(list, target, false);
+  };
+  // The guest's own swipe, wheel or key: the counter follows the strip again
+  const takeOver = () => {
+    aim.current = null;
   };
 
   return (
@@ -864,6 +886,10 @@ function PhotoCarousel({
         ref={track}
         tabIndex={0}
         onScroll={settle}
+        onScrollEnd={arrive}
+        onPointerDown={takeOver}
+        onWheel={takeOver}
+        onKeyDown={takeOver}
         className="guest-gallery flex w-full snap-x snap-mandatory gap-8 overflow-x-auto px-[calc(50%-min(31vw,7.5rem))] pt-8 pb-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:gap-10"
       >
         {photos.map((photo, i) => (
