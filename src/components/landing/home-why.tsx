@@ -49,8 +49,10 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
   const { preview, payLater } = homeWhy.points;
   return (
     <Section id="why" eyebrow={homeWhy.eyebrow} title={homeWhy.title} intro={homeWhy.intro}>
-      <ul className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5">
-        <li className="relative isolate flex reveal-on-scroll overflow-hidden rounded-3xl bg-night p-6 text-card-ivory shadow-overlay sm:col-span-2 sm:p-8">
+      {/* One rise for the whole grid: a scroll-timed rise on each of the eleven cards held
+          Chrome's page change for four seconds while it pictured the page on the way out */}
+      <ul className="grid reveal-on-scroll gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 lg:gap-5">
+        <li className="relative isolate flex overflow-hidden rounded-3xl bg-night p-6 text-card-ivory shadow-overlay sm:col-span-2 sm:p-8">
           <span
             aria-hidden
             className="absolute -end-16 -top-24 -z-10 size-72 rounded-full bg-marigold/20 blur-3xl"
@@ -92,7 +94,7 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
             </div>
           </div>
         </li>
-        <li className="flex reveal-on-scroll flex-col items-start gap-3 rounded-3xl border border-marigold/40 bg-marigold/10 p-6 shadow-raised sm:p-8">
+        <li className="flex flex-col items-start gap-3 rounded-3xl border border-marigold/40 bg-marigold/10 p-6 shadow-raised sm:p-8">
           <span className="grid size-12 place-items-center rounded-full bg-marigold/20 text-accent-text">
             <BadgeIndianRupee aria-hidden className="size-6" />
           </span>
@@ -108,7 +110,7 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
             <li
               key={point}
               data-why={point}
-              className="flex reveal-on-scroll items-start gap-4 rounded-2xl border border-line bg-surface p-5 shadow-raised transition-shadow duration-300 hover:shadow-float sm:flex-col sm:gap-3 sm:p-6 motion-still:transition-none"
+              className="flex items-start gap-4 rounded-2xl border border-line bg-surface p-5 shadow-raised transition-shadow duration-300 hover:shadow-float sm:flex-col sm:gap-3 sm:p-6 motion-still:transition-none"
             >
               <span className="grid size-11 shrink-0 place-items-center rounded-full bg-marigold/15 text-accent-text">
                 <Icon aria-hidden className="size-5" />
