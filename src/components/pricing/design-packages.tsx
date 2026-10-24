@@ -90,7 +90,7 @@ export function DesignPackages({
               )}
             >
               {extras && id === "grand" && (
-                <span className="absolute inset-x-0 -top-2 mx-auto w-max max-w-[calc(100%-0.5rem)] truncate rounded-full bg-marigold px-2 py-px text-[0.65rem] leading-tight font-semibold text-on-marigold">
+                <span className="absolute inset-x-0 -top-2 mx-auto w-max max-w-[calc(100%-0.25rem)] truncate rounded-full bg-marigold px-1.5 py-px text-[0.6rem] leading-tight font-semibold text-on-marigold">
                   {galleryCopy.packageSet[extras]}
                 </span>
               )}
