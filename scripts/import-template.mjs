@@ -5,12 +5,15 @@
  * doors.png, tie.png, pieces.png), with or without the template's folder in front:
  *
  *   node scripts/import-template.mjs <folder> <template> --gate <gate> --key magenta|green
+ *     [--tie-size <scale>] [--tie-at <% down>]
  *
  * It writes, all as WebP at the size the site uses (768 x 1365, 9:16):
  * - public/suites/<template>/: the nine pages and the centre; the two photo pages with their
  *   green cut out with a soft edge, so the photos show through
  * - public/openings/tied/<gate>/: door-left and door-right, split at the doors' seam; the
- *   tie with its key colour cut away; piece-0 to piece-5 cut from the pieces sheet
+ *   tie with its key colour cut away, at its size and place on the screen (--tie-size, a
+ *   scale, and --tie-at, its middle in % down), a ribbon or cord drawn on to both edges
+ *   when the painting has it running off them; piece-0 to piece-5 cut from the pieces sheet
  * and prints what the catalog needs: the photo frames and where the names go under them,
  * the calm part of each page for its words, the centre's empty field, how light or dark
  * each calm part is, and the doors' seam and the tie's place. Check every number by eye
@@ -56,6 +59,8 @@ const flag = (name) => {
 };
 const gate = flag("gate");
 const keyName = flag("key") ?? "magenta";
+const tieSize = Number(flag("tie-size") ?? 1);
+const tieAt = flag("tie-at") === undefined ? null : Number(flag("tie-at"));
 const write = !args.includes("--dry");
 if (!source || !template || !existsSync(source)) {
   console.error(
@@ -324,6 +329,62 @@ function solidBox(img) {
   return [pct(x0, width), pct(y0, height), pct(x1 - x0 + 1, width), pct(y1 - y0 + 1, height)];
 }
 
+/**
+ * The tie at its size, its middle moved to `at` % down the screen. A ribbon, cord or chain
+ * that ran off the painting's edges is drawn on to the new edges, mirrored from its own
+ * last stretch, so it still reaches right across the doors once the tie is smaller.
+ */
+async function placeTie(img, size, at) {
+  const { data, width, height } = img;
+  const box = solidBox(img);
+  const middle = ((box[1] + box[3] / 2) / 100) * height;
+  const touches = (y, x0, x1) => {
+    for (let x = x0; x < x1; x++) if (data[(y * width + x) * 4 + 3] > 128) return true;
+    return false;
+  };
+  const sw = Math.round(width * size);
+  const sh = Math.round(height * size);
+  const scaled = await sharp(data, { raw: { width, height, channels: 4 } })
+    .resize({ width: sw, height: sh, fit: "fill" })
+    .raw()
+    .toBuffer();
+  const left = Math.round(width / 2 - sw / 2);
+  const top = Math.round((at / 100) * height - middle * size);
+  const out = Buffer.alloc(width * height * 4);
+  for (let y = 0; y < height; y++) {
+    const sy = y - top;
+    if (sy < 0 || sy >= sh) continue;
+    for (let x = 0; x < width; x++) {
+      const sx = x - left;
+      if (sx < 0 || sx >= sw) continue;
+      scaled.copy(out, (y * width + x) * 4, (sy * sw + sx) * 4, (sy * sw + sx) * 4 + 4);
+    }
+  }
+  if (left > 0) {
+    const stretch = Math.round(width * 0.08);
+    for (let y = 0; y < height; y++) {
+      const from = Math.min(height - 1, Math.max(0, Math.round((y - top) / size)));
+      if (y - top < 0 || y - top >= sh) continue;
+      for (const side of ["left", "right"]) {
+        const edge = side === "left" ? touches(from, 0, 4) : touches(from, width - 4, width);
+        if (!edge) continue;
+        // The band's end on the new tie, then mirrored outward to the screen's edge
+        const end = side === "left" ? left : left + sw - 1;
+        const step = side === "left" ? 1 : -1;
+        for (let d = 1; ; d++) {
+          const x = end - step * d;
+          if (x < 0 || x >= width) break;
+          const p = (d - 1) % (2 * stretch);
+          const offset = p < stretch ? p : 2 * stretch - 1 - p;
+          const sx = end + step * offset;
+          out.copy(out, (y * width + x) * 4, (y * width + sx) * 4, (y * width + sx) * 4 + 4);
+        }
+      }
+    }
+  }
+  return { data: out, width, height };
+}
+
 const found = pictures(source);
 const need = (role) => {
   const path = found.get(role);
@@ -398,7 +459,8 @@ if (gateDir) {
   }
   const tiePath = need("tie");
   if (tiePath) {
-    const cut = await cutKey(await raw(tiePath), key);
+    let cut = await cutKey(await raw(tiePath), key);
+    if (tieAt !== null) cut = await placeTie(cut, tieSize, tieAt);
     report.tie = solidBox(cut);
     if (write) await webp(cut, 86).toFile(join(gateDir, "tie.webp"));
   }

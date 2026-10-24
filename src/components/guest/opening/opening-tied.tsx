@@ -27,7 +27,7 @@ function flight(i: number): CSSProperties {
 }
 
 export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?: boolean }) {
-  const { move, undo, at, drawn, size, pieces } = tiedSpec(gate);
+  const { move, undo, at, pieces } = tiedSpec(gate);
   const base = `/openings/tied/${gate}`;
   // A small editor tile needs small files; the guest's first screen loads at once
   const sizes = sample ? "12rem" : "(min-width: 40rem) 32rem, 100vw";
@@ -57,14 +57,7 @@ export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?:
       data-move={move}
       data-undo={undo}
       className="tied absolute inset-0 overflow-hidden"
-      style={
-        {
-          "--tie-at": `${at}%`,
-          "--tie-drawn": `${drawn}%`,
-          "--tie-shift": `${at - drawn}%`,
-          "--tie-size": size,
-        } as CSSProperties
-      }
+      style={{ "--tie-at": `${at}%` } as CSSProperties}
     >
       <div className="tied-canvas absolute top-1/2 left-1/2">
         <div className="tied-beyond absolute inset-0">

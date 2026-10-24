@@ -513,21 +513,21 @@ const UNDO: Record<TiedUndo, { move: number; fade: number; fadeDelay: number; de
   crack: { move: 1.1, fade: 0.6, fadeDelay: 0.7, delay: 0.15 },
 };
 
-/** The tie on the seam: moved to its place at its size, breathing, then undone. */
+/** The tie on the seam, breathing, then undone. */
 function drawTie(ctx: Ctx, tie: CanvasImageSource, gate: TiedGate, seconds: number, t: number) {
-  const { undo, at, drawn, size } = tiedSpec(gate);
+  const { undo, at } = tiedSpec(gate);
   const timing = UNDO[undo];
   const p = transition(t, timing.move, timing.delay ?? 0, tieEase);
   const alpha = 1 - transition(t, timing.fade, timing.fadeDelay);
   if (alpha <= 0) return;
-  const originY = (drawn / 100) * PAGE_H;
+  const originY = (at / 100) * PAGE_H;
   const wait = t > 0 ? 1 : 1 + 0.0125 * (1 - Math.cos((seconds / 3.2) * Math.PI));
   const halves = undo === "crack" ? (["left", "right"] as const) : ([null] as const);
   for (const half of halves) {
     ctx.save();
     ctx.globalAlpha *= alpha;
-    ctx.translate(PAGE_W / 2, originY + ((at - drawn) / 100) * PAGE_H);
-    ctx.scale(size * wait, size * wait);
+    ctx.translate(PAGE_W / 2, originY);
+    ctx.scale(wait, wait);
     undoMove(ctx, undo, p, half);
     ctx.translate(-PAGE_W / 2, -originY);
     if (half) {

@@ -78,15 +78,9 @@
     opacity 700ms ease 1100ms;
 }
 
-/*
- * The tie: moved from where it is painted to its place on the seam, at its own size,
- * breathing while it waits
- */
+/* The tie, painted in its place on the seam, breathing while it waits */
 .tied-tie {
-  translate: 0 var(--tie-shift);
-  scale: var(--tie-size);
-  /* Its own middle, where it is painted; the translate carries it to its place */
-  transform-origin: 50% var(--tie-drawn);
+  transform-origin: 50% var(--tie-at);
   animation: tied-wait 3.2s ease-in-out infinite alternate;
   transition:
     transform 700ms cubic-bezier(0.5, 0, 0.3, 1),
@@ -171,10 +165,10 @@
 
 @keyframes tied-wait {
   from {
-    scale: var(--tie-size);
+    scale: 1;
   }
   to {
-    scale: calc(var(--tie-size) * 1.025);
+    scale: 1.025;
   }
 }
 @keyframes tied-piece {

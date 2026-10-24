@@ -332,31 +332,26 @@ export type TiedUndo = "untie" | "lift" | "fly" | "crack" | "drop" | "burst" | "
 export type TiedSpec = {
   move: TiedMove;
   undo: TiedUndo;
-  /** Where the tie sits: its middle, % down the screen. */
-  at: number;
-  /** Where the painting has it, measured by the import: its middle, % down the picture. */
-  drawn: number;
   /**
-   * How big it shows, against the painting: a tall tie (a posy, a rosette with long tails)
-   * is drawn smaller, to keep between the god at the top and the names at the foot.
+   * Where the tie sits: its middle, % down the screen. The import puts it there in the tie's
+   * own picture (scripts/import-template.mjs --tie-at), at a size that keeps it between the
+   * god at the top and the names at the foot (--tie-size).
    */
-  size: number;
+  at: number;
   pieces: boolean;
   welcome: WelcomeKind;
 };
 /*
- * Templates 41 to 55 (docs/TEMPLATE_PROMPTS_41_TO_55.md). Each tie's middle and height come
- * from scripts/import-template.mjs; a tie taller than 44% of the screen is drawn smaller, and
- * every tie keeps below the top 22% (the god's), its middle at 40% where it fits.
+ * Templates 41 to 55 (docs/TEMPLATE_PROMPTS_41_TO_55.md). Each tie was placed by the import
+ * with its middle at 40% down and no taller than 36% of the screen, so it keeps below the
+ * top 22% (the god's) and clear of the names; a ribbon or cord still runs to both edges.
  */
 export const TIED_GATES = {
   // Chini Mitti: a blush satin bow on porcelain doors
   "reshmi-gaanth": {
     move: "swing",
     undo: "untie",
-    at: 43.9,
-    drawn: 54.1,
-    size: 0.86,
+    at: 40,
     pieces: true,
     welcome: "bloom",
   },
@@ -364,9 +359,7 @@ export const TIED_GATES = {
   "moti-kaanta": {
     move: "part",
     undo: "lift",
-    at: 44,
-    drawn: 51.9,
-    size: 0.72,
+    at: 40,
     pieces: true,
     welcome: "royal",
   },
@@ -374,9 +367,7 @@ export const TIED_GATES = {
   guldasta: {
     move: "slide",
     undo: "drop",
-    at: 44.6,
-    drawn: 47.2,
-    size: 0.72,
+    at: 40,
     pieces: true,
     welcome: "letter",
   },
@@ -385,8 +376,6 @@ export const TIED_GATES = {
     move: "swing",
     undo: "fly",
     at: 40,
-    drawn: 49.9,
-    size: 1,
     pieces: true,
     welcome: "bloom",
   },
@@ -394,9 +383,7 @@ export const TIED_GATES = {
   "itr-shishi": {
     move: "swing",
     undo: "drop",
-    at: 41.1,
-    drawn: 53.1,
-    size: 1,
+    at: 40,
     pieces: true,
     welcome: "royal",
   },
@@ -405,8 +392,6 @@ export const TIED_GATES = {
     move: "swing",
     undo: "slip",
     at: 40,
-    drawn: 51.9,
-    size: 1,
     pieces: true,
     welcome: "bloom",
   },
@@ -414,9 +399,7 @@ export const TIED_GATES = {
   gulband: {
     move: "slide",
     undo: "spin",
-    at: 45,
-    drawn: 50.5,
-    size: 0.72,
+    at: 40,
     pieces: true,
     welcome: "party",
   },
@@ -425,8 +408,6 @@ export const TIED_GATES = {
     move: "slide",
     undo: "crack",
     at: 40,
-    drawn: 49.9,
-    size: 1,
     pieces: true,
     welcome: "letter",
   },
@@ -435,8 +416,6 @@ export const TIED_GATES = {
     move: "swing",
     undo: "crack",
     at: 40,
-    drawn: 49.4,
-    size: 1,
     pieces: true,
     welcome: "lamps",
   },
@@ -444,9 +423,7 @@ export const TIED_GATES = {
   challa: {
     move: "part",
     undo: "slip",
-    at: 43.3,
-    drawn: 49.6,
-    size: 1,
+    at: 40,
     pieces: true,
     welcome: "party",
   },
@@ -454,9 +431,7 @@ export const TIED_GATES = {
   latkan: {
     move: "part",
     undo: "drop",
-    at: 43.9,
-    drawn: 57.3,
-    size: 0.91,
+    at: 40,
     pieces: true,
     welcome: "royal",
   },
@@ -465,8 +440,6 @@ export const TIED_GATES = {
     move: "swing",
     undo: "burst",
     at: 40,
-    drawn: 49.5,
-    size: 1,
     pieces: true,
     welcome: "party",
   },
@@ -475,8 +448,6 @@ export const TIED_GATES = {
     move: "slide",
     undo: "crack",
     at: 40,
-    drawn: 49.7,
-    size: 1.15,
     pieces: true,
     welcome: "royal",
   },
@@ -484,9 +455,7 @@ export const TIED_GATES = {
   "taala-chaabi": {
     move: "swing",
     undo: "drop",
-    at: 42.2,
-    drawn: 49.9,
-    size: 1,
+    at: 40,
     pieces: true,
     welcome: "night",
   },
@@ -494,9 +463,7 @@ export const TIED_GATES = {
   "phool-gend": {
     move: "swing",
     undo: "burst",
-    at: 43.8,
-    drawn: 51,
-    size: 1,
+    at: 40,
     pieces: true,
     welcome: "bloom",
   },
