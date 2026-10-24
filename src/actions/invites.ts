@@ -121,7 +121,10 @@ export async function invitePhotoUrls(inviteId: string): Promise<Record<string, 
 
 export type SlugCheck = { available: boolean; suggestions: string[] };
 
-const yearSchema = z.string().regex(/^\d{4}$/).optional();
+const yearSchema = z
+  .string()
+  .regex(/^\d{4}$/)
+  .optional();
 
 async function freeAlternatives(slug: string, year?: string): Promise<string[]> {
   const store = inviteStore();
