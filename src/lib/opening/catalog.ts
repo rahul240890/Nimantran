@@ -315,9 +315,10 @@ export type TiedMove = "swing" | "slide" | "part";
 /**
  * How its tie comes undone: a bow unties and slips off both sides, a brooch or medallion
  * lifts toward the guest, a butterfly or bird flies off, a seal cracks in two, a lock or
- * locket drops, a ball of petals or a bubble bursts, a garland or sash slips away.
+ * locket drops, a ball of petals or a bubble bursts, a garland or sash slips away, a
+ * rosette spins off.
  */
-export type TiedUndo = "untie" | "lift" | "fly" | "crack" | "drop" | "burst" | "slip";
+export type TiedUndo = "untie" | "lift" | "fly" | "crack" | "drop" | "burst" | "slip" | "spin";
 
 /**
  * The tied gates (owner's paintings, templates 41 on: docs/TEMPLATE_PROMPTS_41_TO_55.md and
@@ -335,10 +336,171 @@ export type TiedSpec = {
   at: number;
   /** Where the painting has it, measured by the import: its middle, % down the picture. */
   drawn: number;
+  /**
+   * How big it shows, against the painting: a tall tie (a posy, a rosette with long tails)
+   * is drawn smaller, to keep between the god at the top and the names at the foot.
+   */
+  size: number;
   pieces: boolean;
   welcome: WelcomeKind;
 };
-export const TIED_GATES = {} as const satisfies Record<string, TiedSpec>;
+/*
+ * Templates 41 to 55 (docs/TEMPLATE_PROMPTS_41_TO_55.md). Each tie's middle and height come
+ * from scripts/import-template.mjs; a tie taller than 44% of the screen is drawn smaller, and
+ * every tie keeps below the top 22% (the god's), its middle at 40% where it fits.
+ */
+export const TIED_GATES = {
+  // Chini Mitti: a blush satin bow on porcelain doors
+  "reshmi-gaanth": {
+    move: "swing",
+    undo: "untie",
+    at: 43.9,
+    drawn: 54.1,
+    size: 0.86,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Libaas: a pearl-and-crystal brooch pinning two silk panels
+  "moti-kaanta": {
+    move: "part",
+    undo: "lift",
+    at: 44,
+    drawn: 51.9,
+    size: 0.72,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Vanaspati: a posy of frangipani on linen twine across copper plates
+  guldasta: {
+    move: "slide",
+    undo: "drop",
+    at: 44.6,
+    drawn: 47.2,
+    size: 0.72,
+    pieces: true,
+    welcome: "letter",
+  },
+  // Kurinji: an enamel blue butterfly holding two cottage doors
+  "neeli-titli": {
+    move: "swing",
+    undo: "fly",
+    at: 40,
+    drawn: 49.9,
+    size: 1,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Kannauj: a cut-glass attar bottle on a silk cord
+  "itr-shishi": {
+    move: "swing",
+    undo: "drop",
+    at: 41.1,
+    drawn: 53.1,
+    size: 1,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Phoolon ki Ghati: a garland of wild mountain flowers knotted across deodar doors
+  "van-mala": {
+    move: "swing",
+    undo: "slip",
+    at: 40,
+    drawn: 51.9,
+    size: 1,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Tulika: a coral rosette on a ribbon round two canvases
+  gulband: {
+    move: "slide",
+    undo: "spin",
+    at: 45,
+    drawn: 50.5,
+    size: 0.72,
+    pieces: true,
+    welcome: "party",
+  },
+  // Ubhaar: an oxblood wax seal pressed with a jasmine flower
+  mudra: {
+    move: "slide",
+    undo: "crack",
+    at: 40,
+    drawn: 49.9,
+    size: 1,
+    pieces: true,
+    welcome: "letter",
+  },
+  // Rajanigandha: a shell bangle and a red lac bangle linked on a tuberose string
+  "shankha-pola": {
+    move: "swing",
+    undo: "crack",
+    at: 40,
+    drawn: 49.4,
+    size: 1,
+    pieces: true,
+    welcome: "lamps",
+  },
+  // Rumaal: a silk scarf knotted through a gold ring
+  challa: {
+    move: "part",
+    undo: "slip",
+    at: 43.3,
+    drawn: 49.6,
+    size: 1,
+    pieces: true,
+    welcome: "party",
+  },
+  // Chanderi: a tasselled zari tie-back holding sheer curtains
+  latkan: {
+    move: "part",
+    undo: "drop",
+    at: 43.9,
+    drawn: 57.3,
+    size: 0.91,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Mishri: a sugar medallion with a sugar rose on fondant doors
+  "shakkar-chakri": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    drawn: 49.5,
+    size: 1,
+    pieces: true,
+    welcome: "party",
+  },
+  // Paithani: a gold clasp of two parrots beak to beak
+  "raghu-maina": {
+    move: "slide",
+    undo: "crack",
+    at: 40,
+    drawn: 49.7,
+    size: 1.15,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Jamawar: an antique silver rose lock on carved walnut doors
+  "taala-chaabi": {
+    move: "swing",
+    undo: "drop",
+    at: 42.2,
+    drawn: 49.9,
+    size: 1,
+    pieces: true,
+    welcome: "night",
+  },
+  // Phool Bangla: a ball of rose petals on a jasmine string
+  "phool-gend": {
+    move: "swing",
+    undo: "burst",
+    at: 43.8,
+    drawn: 51,
+    size: 1,
+    pieces: true,
+    welcome: "bloom",
+  },
+} as const satisfies Record<string, TiedSpec>;
 export type TiedGate = keyof typeof TIED_GATES;
 const TIED_IDS = Object.keys(TIED_GATES) as TiedGate[];
 
@@ -633,6 +795,21 @@ const WEDDING_OPENINGS: readonly OpeningStyle[] = [
   "gumbad",
   "ghadi",
   "hindolo",
+  "reshmi-gaanth",
+  "moti-kaanta",
+  "guldasta",
+  "neeli-titli",
+  "itr-shishi",
+  "van-mala",
+  "gulband",
+  "mudra",
+  "shankha-pola",
+  "challa",
+  "latkan",
+  "shakkar-chakri",
+  "raghu-maina",
+  "taala-chaabi",
+  "phool-gend",
   "noor-darwaza",
   "haveli-kiwad",
   "shahi-parda",
@@ -1108,6 +1285,21 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
   "gagan-safar": "gagan-parda",
   "kagzi-phool": "bel-khidki",
   nilofar: "pankhudi-pat",
+  "chini-mitti": "reshmi-gaanth",
+  libaas: "moti-kaanta",
+  vanaspati: "guldasta",
+  kurinji: "neeli-titli",
+  kannauj: "itr-shishi",
+  "phoolon-ki-ghati": "van-mala",
+  tulika: "gulband",
+  ubhaar: "mudra",
+  rajanigandha: "shankha-pola",
+  rumaal: "challa",
+  chanderi: "latkan",
+  mishri: "shakkar-chakri",
+  paithani: "raghu-maina",
+  jamawar: "taala-chaabi",
+  "phool-bangla": "phool-gend",
   "sona-gulaab": "gulaab-lifafa",
   shabnam: "os-parda",
   "surkh-gulaab": "surkh-dwar",

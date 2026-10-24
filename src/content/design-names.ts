@@ -132,6 +132,21 @@ export const designNames = {
     "deco-yatra": "Deco Yatra",
     "gehra-neela": "Gehra Neela",
     "shatranj-baazi": "Shatranj Baazi",
+    "chini-mitti": "Chini Mitti",
+    libaas: "Libaas",
+    vanaspati: "Vanaspati",
+    kurinji: "Kurinji",
+    kannauj: "Kannauj",
+    "phoolon-ki-ghati": "Phoolon ki Ghati",
+    tulika: "Tulika",
+    ubhaar: "Ubhaar",
+    rajanigandha: "Rajanigandha",
+    rumaal: "Rumaal",
+    chanderi: "Chanderi",
+    mishri: "Mishri",
+    paithani: "Paithani",
+    jamawar: "Jamawar",
+    "phool-bangla": "Phool Bangla",
     "udaipur-lake": "Udaipur Lake",
     "space-voyage": "Space Voyage",
     "rainbow-unicorn": "Rainbow Unicorn",
@@ -588,6 +603,36 @@ export const designNames = {
     "deco-yatra": "A journey across India painted like old railway posters in sunburst colours.",
     "gehra-neela": "Sunlit water under the sea, coral and pearls on every page.",
     "shatranj-baazi": "An ivory and rosewood chess game set in a palace hall.",
+    "chini-mitti":
+      "White bisque porcelain: roses, jasmine and lily of the valley in matte relief, edged in hand-painted gold.",
+    libaas:
+      "Bridal couture up close: organza flowers, seed pearls and crystals hand-sewn on ivory tulle and champagne silk.",
+    vanaspati:
+      "An old botanical folio: hand-coloured engravings of lotus, champak and frangipani on cream rag paper.",
+    kurinji:
+      "The Neelakurinji bloom: misty blue-violet hills, tea terraces and old bungalows, once in twelve years.",
+    kannauj:
+      "Kannauj, the city of attar: rose fields at dawn, copper stills and cut-glass bottles in rose-gold light.",
+    "phoolon-ki-ghati":
+      "The Valley of Flowers in bloom: blue poppies, primulas and snowy peaks, painted fresh in plein-air oil.",
+    tulika:
+      "Palette-knife oil paintings: garden roses, ranunculus and blossom in thick paint and gold leaf on raw linen.",
+    ubhaar:
+      "Blind embossing on thick cotton paper: flowers raised white on white, deckled edges and one soft wash of colour.",
+    rajanigandha:
+      "Bengal School wash painting: tuberose, red hibiscus and lotus in soft misty colour by old Kolkata houses.",
+    rumaal:
+      "A luxury silk scarf: Indian flowers, parrots and palaces printed inside an ornate border.",
+    chanderi:
+      "Sheer Chanderi silk: pastel weaves with tiny gold butis and lotus borders, layered like curtains in soft light.",
+    mishri:
+      "Sugar couture: sugar flowers, royal-icing lace, sugar pearls and gold leaf on pastel fondant.",
+    paithani:
+      "Maharashtra's Paithani silk: jewel-toned shot silk with gold zari borders of lotus and parrots.",
+    jamawar:
+      "A Kashmiri jamawar shawl: woven roses, irises and paisleys in claret, emerald and old gold, by Dal Lake.",
+    "phool-bangla":
+      "A palace built of flowers: arches, domes and pavilions of marigold, jasmine and roses, as Braj builds them.",
     "udaipur-lake": "Lake Pichola at dusk, with a white marble jharokha for each celebration.",
     "space-voyage": "A porthole among the planets, with a starship plaque for each celebration.",
     "rainbow-unicorn": "Candy clouds and a rainbow, with a unicorn keeping watch.",

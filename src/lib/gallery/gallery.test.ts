@@ -52,6 +52,7 @@ describe("gallery catalog", () => {
         "kaanch-chitra",
         "sankheda",
         "rogan",
+        "mishri",
         "card-bandhani",
       ].sort(),
     );

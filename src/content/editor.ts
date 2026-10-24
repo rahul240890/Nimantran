@@ -1702,6 +1702,81 @@ export const openingCopy = {
       description:
         "A painted Sankheda swing sways, then sweeps high toward you and up out of sight.",
     },
+    "reshmi-gaanth": {
+      name: "Satin bow",
+      description:
+        "Porcelain doors tied with a blush satin bow; it slips loose, the ribbon falls away and the doors swing open.",
+    },
+    "moti-kaanta": {
+      name: "Pearl brooch",
+      description:
+        "Silk panels pinned with a pearl-and-crystal brooch; it unpins and floats up, and the panels part like a train.",
+    },
+    guldasta: {
+      name: "Posy on twine",
+      description:
+        "Engraved copper plates tied with a posy of frangipani; the twine slips, the posy drops and the plates slide apart.",
+    },
+    "neeli-titli": {
+      name: "Blue butterfly",
+      description:
+        "Mist-blue cottage doors held by an enamel butterfly; it opens its wings and flies off, and the doors swing open.",
+    },
+    "itr-shishi": {
+      name: "Attar bottle",
+      description:
+        "Rose-pink doors tied with a silk cord and a cut-glass attar bottle; the cord slips and the bottle drops in a puff of petals.",
+    },
+    "van-mala": {
+      name: "Wild-flower garland",
+      description:
+        "Carved deodar doors with a garland of mountain flowers knotted across; the knot loosens and the garland falls.",
+    },
+    gulband: {
+      name: "Silk rosette",
+      description:
+        "Two thick-painted canvases wrapped with a coral ribbon and rosette; the rosette spins away and the canvases slide apart.",
+    },
+    mudra: {
+      name: "Wax seal",
+      description:
+        "Embossed paper panels sealed with an oxblood wax seal; it cracks in two and each half leaves with its panel.",
+    },
+    "shankha-pola": {
+      name: "Shankha and pola",
+      description:
+        "Green Kolkata shutters linked by a shell bangle and a red lac bangle; they unlink and roll apart, and the shutters open.",
+    },
+    challa: {
+      name: "Scarf ring",
+      description:
+        "A printed silk scarf knotted through a gold ring; the ring slides away and the silk panels draw apart.",
+    },
+    latkan: {
+      name: "Zari tassels",
+      description:
+        "Sheer Chanderi curtains held by a tasselled zari tie-back; it loosens, the tassels drop and the curtains drift apart.",
+    },
+    "shakkar-chakri": {
+      name: "Sugar medallion",
+      description:
+        "Fondant doors sealed with a sugar medallion; it bursts into sugar pearls and the doors swing open.",
+    },
+    "raghu-maina": {
+      name: "Parrot clasp",
+      description:
+        "Paithani silk panels held by a gold clasp of two parrots; they unhook and swing apart, and the silk slides open.",
+    },
+    "taala-chaabi": {
+      name: "Silver lock",
+      description:
+        "Carved walnut doors held by a silver rose lock; it springs open and drops, and the doors swing open.",
+    },
+    "phool-gend": {
+      name: "Ball of petals",
+      description:
+        "Doors woven of jasmine and roses, held by a ball of rose petals; it bursts into petals and the doors swing open.",
+    },
     doors: {
       name: "Theme doors",
       description: "Your theme's own painting parts down the middle like two doors.",

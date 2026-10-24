@@ -78,9 +78,13 @@
     opacity 700ms ease 1100ms;
 }
 
-/* The tie: moved from where it is painted to its place on the seam, breathing while it waits */
+/*
+ * The tie: moved from where it is painted to its place on the seam, at its own size,
+ * breathing while it waits
+ */
 .tied-tie {
   translate: 0 var(--tie-shift);
+  scale: var(--tie-size);
   /* Its own middle, where it is painted; the translate carries it to its place */
   transform-origin: 50% var(--tie-drawn);
   animation: tied-wait 3.2s ease-in-out infinite alternate;
@@ -125,6 +129,13 @@
 .opening-stage[data-open="true"] [data-undo="slip"] .tied-tie {
   transform: translateY(20%) rotate(-3deg);
 }
+/* A rosette spins off, shrinking away */
+.opening-stage[data-open="true"] [data-undo="spin"] .tied-tie {
+  transform: rotate(300deg) scale(0.35);
+  transition:
+    transform 900ms cubic-bezier(0.5, 0, 0.6, 1),
+    opacity 600ms ease 300ms;
+}
 /* A seal cracks in two; each half leaves with its door */
 .tied-tie-left {
   clip-path: inset(0 50% 0 0);
@@ -160,10 +171,10 @@
 
 @keyframes tied-wait {
   from {
-    scale: 1;
+    scale: var(--tie-size);
   }
   to {
-    scale: 1.025;
+    scale: calc(var(--tie-size) * 1.025);
   }
 }
 @keyframes tied-piece {
@@ -179,6 +190,7 @@
     transform: translate(var(--dx), var(--dy)) rotate(var(--spin)) scale(1);
   }
 }
+/* Still: the closed doors fade into the centre picture, with no tie moving or pieces flying */
 @media (prefers-reduced-motion: reduce) {
   .tied,
   .tied-tie {
@@ -187,4 +199,10 @@
   .tied-piece {
     display: none;
   }
+}
+:root[data-motion="reduce"] :is(.tied, .tied-tie) {
+  animation: none;
+}
+:root[data-motion="reduce"] .tied-piece {
+  display: none;
 }

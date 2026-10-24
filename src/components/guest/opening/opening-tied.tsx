@@ -7,7 +7,7 @@ import { tiedBeyond, tiedSpec, type TiedGate } from "@/lib/opening/catalog";
  * A tied gate (the owner's paintings, templates 41 on): the template's centre picture
  * beyond, two closed doors filling the screen, and the tie on their seam. Closed, the tie
  * breathes and light glows down the seam; opened, the tie comes undone its own way (it
- * unties, lifts, flies off, cracks, drops, bursts or slips away), its pieces burst out,
+ * unties, lifts, flies off, cracks, drops, bursts, slips or spins away), its pieces burst out,
  * then the doors swing, slide or part onto the centre picture. The movement is in CSS
  * (tied-gates.css) and follows the stage's data-open; still mode shows the end of it.
  */
@@ -27,7 +27,7 @@ function flight(i: number): CSSProperties {
 }
 
 export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?: boolean }) {
-  const { move, undo, at, drawn, pieces } = tiedSpec(gate);
+  const { move, undo, at, drawn, size, pieces } = tiedSpec(gate);
   const base = `/openings/tied/${gate}`;
   // A small editor tile needs small files; the guest's first screen loads at once
   const sizes = sample ? "12rem" : "(min-width: 40rem) 32rem, 100vw";
@@ -62,6 +62,7 @@ export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?:
           "--tie-at": `${at}%`,
           "--tie-drawn": `${drawn}%`,
           "--tie-shift": `${at - drawn}%`,
+          "--tie-size": size,
         } as CSSProperties
       }
     >

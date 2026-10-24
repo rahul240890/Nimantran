@@ -19,13 +19,18 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  isTiedGate,
   openingNames,
+  tiedBeyond,
+  tiedSpec,
   type FreshOpening,
   type OpeningGod,
   type OpeningStyle,
   type PaintedGate,
   type ThemedMove,
   type ThemedOpening,
+  type TiedGate,
+  type TiedUndo,
   type WelcomeKind,
 } from "@/lib/opening/catalog";
 import { firstGrapheme } from "@/lib/initials";
@@ -185,6 +190,9 @@ export function preludeImages(style: OpeningStyle, suite: SuiteId, god: OpeningG
     urls.push(freshBeyond(style), ...freshLayerUrls(style));
   } else if (isThemedOpening(style)) {
     urls.push(`/suites/${style}/scene.webp`, `/openings/themed/${style}.webp`);
+  } else if (isTiedGate(style)) {
+    const base = `/openings/tied/${style}`;
+    urls.push(tiedBeyond(style), ...TIED_PARTS.map((n) => `${base}/${n}.webp`));
   }
   const cover = SUITES[suite].images.cover;
   if (cover) urls.push(cover);
@@ -224,6 +232,7 @@ function drawOpening(ctx: Ctx, film: PreludeFilm, seconds: number, opened: numbe
   if (isPaintedGate(style)) drawGate(ctx, film, style, seconds, opened);
   else if (isFreshOpening(style)) drawFresh(ctx, film, style, seconds, opened);
   else if (isThemedOpening(style)) drawThemed(ctx, film, style, seconds, opened);
+  else if (isTiedGate(style)) drawTied(ctx, film, style, seconds, opened);
   else drawDrawn(ctx, film, seconds, opened);
 }
 
@@ -438,6 +447,170 @@ function drawSeam(
   ctx.shadowBlur = 12;
   ctx.fillRect(x - 1, y, 2, h);
   ctx.restore();
+}
+
+/* ----------------------------------------------------------------------- tied gates */
+
+const TIED_PIECES = 6;
+const TIED_PARTS = [
+  "door-left",
+  "door-right",
+  "tie",
+  ...Array.from({ length: TIED_PIECES }, (_, i) => `piece-${i}`),
+];
+const tieEase = bezier(0.5, 0, 0.3, 1);
+const pieceEase = bezier(0.2, 0.6, 0.3, 1);
+
+/**
+ * A tied gate, as opening-tied.tsx and tied-gates.css draw it: the template's centre picture
+ * beyond, the doors filling the page and the tie on their seam. Opened, the tie comes undone
+ * its own way and its pieces burst out, then the doors swing, slide or part.
+ */
+function drawTied(ctx: Ctx, film: PreludeFilm, gate: TiedGate, seconds: number, t: number) {
+  const { move, pieces } = tiedSpec(gate);
+  const base = `/openings/tied/${gate}`;
+  const image = (name: string) => film.images.get(`${base}/${name}.webp`);
+  const beyond = film.images.get(tiedBeyond(gate));
+  ctx.save();
+  // The doors lean in while they wait, then the guest steps closer as they open
+  scaleAbout(
+    ctx,
+    1 + 0.015 * breathe(seconds) + 0.08 * transition(t, 2.6, 0.7, canvasEase),
+    0.5,
+    0.55,
+  );
+  // The centre picture waits dim behind the doors and lights up as they open
+  if (beyond) fillWith(ctx, beyond, 0, 0, PAGE_W, PAGE_H);
+  const dark = 1 - transition(t, 1.4, 0.9);
+  if (dark > 0) {
+    ctx.fillStyle = `rgb(0 0 0 / ${0.5 * dark})`;
+    ctx.fillRect(0, 0, PAGE_W, PAGE_H);
+  }
+  const door = transition(t, 1.5, 0.75, doorEase);
+  for (const side of ["left", "right"] as const) {
+    const art = image(`door-${side}`);
+    if (!art) continue;
+    const half: Box = { x: side === "left" ? 0 : PAGE_W / 2, y: 0, w: PAGE_W / 2, h: PAGE_H };
+    drawDoor(ctx, art, null, half, side, move === "part" ? "gather" : move, door, film.colours);
+  }
+  const seam = (0.55 + 0.35 * Math.sin(seconds * 2.4)) * (1 - transition(t, 0.7, 0.65));
+  if (seam > 0) drawSeam(ctx, PAGE_W / 2, 0, PAGE_H, film.colours, seam);
+  const tie = image("tie");
+  if (tie) drawTie(ctx, tie, gate, seconds, t);
+  if (pieces) drawTiedPieces(ctx, gate, image, t);
+  ctx.restore();
+}
+
+/** How each tie comes undone (tied-gates.css): its move, how long, and its fade. */
+const UNDO: Record<TiedUndo, { move: number; fade: number; fadeDelay: number; delay?: number }> = {
+  untie: { move: 0.7, fade: 0.52, fadeDelay: 0.18 },
+  lift: { move: 0.7, fade: 0.52, fadeDelay: 0.18 },
+  fly: { move: 0.9, fade: 0.7, fadeDelay: 0.25 },
+  drop: { move: 0.8, fade: 0.4, fadeDelay: 0.4 },
+  burst: { move: 0.42, fade: 0.3, fadeDelay: 0.08 },
+  slip: { move: 0.7, fade: 0.52, fadeDelay: 0.18 },
+  spin: { move: 0.9, fade: 0.6, fadeDelay: 0.3 },
+  crack: { move: 1.1, fade: 0.6, fadeDelay: 0.7, delay: 0.15 },
+};
+
+/** The tie on the seam: moved to its place at its size, breathing, then undone. */
+function drawTie(ctx: Ctx, tie: CanvasImageSource, gate: TiedGate, seconds: number, t: number) {
+  const { undo, at, drawn, size } = tiedSpec(gate);
+  const timing = UNDO[undo];
+  const p = transition(t, timing.move, timing.delay ?? 0, tieEase);
+  const alpha = 1 - transition(t, timing.fade, timing.fadeDelay);
+  if (alpha <= 0) return;
+  const originY = (drawn / 100) * PAGE_H;
+  const wait = t > 0 ? 1 : 1 + 0.0125 * (1 - Math.cos((seconds / 3.2) * Math.PI));
+  const halves = undo === "crack" ? (["left", "right"] as const) : ([null] as const);
+  for (const half of halves) {
+    ctx.save();
+    ctx.globalAlpha *= alpha;
+    ctx.translate(PAGE_W / 2, originY + ((at - drawn) / 100) * PAGE_H);
+    ctx.scale(size * wait, size * wait);
+    undoMove(ctx, undo, p, half);
+    ctx.translate(-PAGE_W / 2, -originY);
+    if (half) {
+      ctx.beginPath();
+      ctx.rect(half === "left" ? 0 : PAGE_W / 2, 0, PAGE_W / 2, PAGE_H);
+      ctx.clip();
+    }
+    ctx.drawImage(tie, 0, 0, PAGE_W, PAGE_H);
+    ctx.restore();
+  }
+}
+
+/** One undo's move, `p` of the way, about the tie's middle (the CSS transforms, in order). */
+function undoMove(ctx: Ctx, undo: TiedUndo, p: number, half: "left" | "right" | null) {
+  const deg = (d: number) => (d * Math.PI) / 180;
+  switch (undo) {
+    case "untie":
+      ctx.scale(1 + 0.35 * p, 1 - 0.22 * p);
+      break;
+    case "lift":
+      ctx.translate(0, -0.05 * PAGE_H * p);
+      ctx.scale(1 + 0.3 * p, 1 + 0.3 * p);
+      break;
+    case "fly":
+      ctx.translate(0.18 * PAGE_W * p, -0.38 * PAGE_H * p);
+      ctx.rotate(deg(-14 * p));
+      ctx.scale(1 - 0.3 * p, 1 - 0.3 * p);
+      break;
+    case "drop":
+      ctx.translate(0, 0.34 * PAGE_H * p);
+      ctx.rotate(deg(7 * p));
+      break;
+    case "burst":
+      ctx.scale(1 + 0.6 * p, 1 + 0.6 * p);
+      break;
+    case "slip":
+      ctx.translate(0, 0.2 * PAGE_H * p);
+      ctx.rotate(deg(-3 * p));
+      break;
+    case "spin":
+      ctx.rotate(deg(300 * p));
+      ctx.scale(1 - 0.65 * p, 1 - 0.65 * p);
+      break;
+    case "crack": {
+      const sign = half === "left" ? -1 : 1;
+      ctx.translate(sign * 0.24 * PAGE_W * p, 0);
+      ctx.rotate(deg(sign * 7 * p));
+      break;
+    }
+  }
+}
+
+/** The tie's pieces bursting out round it and drifting away (the .tied-piece flights). */
+function drawTiedPieces(
+  ctx: Ctx,
+  gate: TiedGate,
+  image: (name: string) => CanvasImageSource | undefined,
+  t: number,
+) {
+  const { at } = tiedSpec(gate);
+  const count = 12;
+  for (let i = 0; i < count; i++) {
+    const local = t - 0.16 - i * 0.03;
+    if (local <= 0 || local >= 1.7) continue;
+    const art = image(`piece-${i % TIED_PIECES}`);
+    if (!art) continue;
+    const q = local / 1.7;
+    const e = pieceEase(q);
+    const turn = (i / count) * Math.PI * 2 + (i % 3) * 0.4;
+    const reach = 26 + ((i * 37) % 22);
+    const x = PAGE_W / 2 + Math.cos(turn) * reach * CQW * e;
+    const y = (at / 100) * PAGE_H + (Math.sin(turn) * reach * 1.4 + 12) * CQW * e;
+    const { width, height } = sizeOf(art);
+    if (!width || !height) continue;
+    const side = 9 * CQW * (0.5 + 0.5 * e);
+    const fit = Math.min(side / width, side / height);
+    ctx.save();
+    ctx.globalAlpha *= q < 0.12 ? q / 0.12 : 1 - (q - 0.12) / 0.88;
+    ctx.translate(x, y);
+    ctx.rotate(((((i * 73) % 300) - 150) * e * Math.PI) / 180);
+    ctx.drawImage(art, (-width * fit) / 2, (-height * fit) / 2, width * fit, height * fit);
+    ctx.restore();
+  }
 }
 
 /* ------------------------------------------------------------------- fresh openings */

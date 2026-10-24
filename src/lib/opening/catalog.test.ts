@@ -17,6 +17,9 @@ import {
   isFreshOpening,
   THEMED_OPENINGS,
   isPaintedGate,
+  isTiedGate,
+  TIED_GATES,
+  tiedBeyond,
   noOpening,
   OCCASION_OPENINGS,
   offersGods,
@@ -87,9 +90,10 @@ describe("openings", () => {
   it("opens each story theme at its own gate, which any card can also pick", () => {
     for (const story of STORY_IDS) {
       const gate = openingStyle(noOpening, story, false);
-      // From template 26 a template opens with a fresh opening of its own, onto its centre
+      // From template 26 a template opens with a fresh opening of its own, and from 41 with a
+      // tied gate of its own, onto its centre
       if (SUITES[story].centre) {
-        expect(isFreshOpening(gate), story).toBe(true);
+        expect(isFreshOpening(gate) || isTiedGate(gate), story).toBe(true);
         expect(existsSync(join(process.cwd(), "public/suites", story, "centre.webp"))).toBe(true);
         continue;
       }
@@ -104,6 +108,26 @@ describe("openings", () => {
     expect(new Set(STORY_IDS.map((id) => openingStyle(noOpening, id, false))).size).toBe(
       STORY_IDS.length,
     );
+  });
+
+  it("gives each tied gate its doors, tie and pieces, opening onto its template's centre", () => {
+    for (const [gate, spec] of Object.entries(TIED_GATES)) {
+      const files = ["door-left", "door-right", "tie"];
+      if (spec.pieces) files.push(...Array.from({ length: 6 }, (_, i) => `piece-${i}`));
+      for (const file of files) {
+        expect(
+          existsSync(join(process.cwd(), "public/openings/tied", gate, `${file}.webp`)),
+          file,
+        ).toBe(true);
+      }
+      expect(tiedBeyond(gate as keyof typeof TIED_GATES)).toMatch(
+        /^\/suites\/[a-z-]+\/centre\.webp$/,
+      );
+      // The tie keeps below the god at the top and clear of the names at the foot
+      expect(spec.at, gate).toBeGreaterThanOrEqual(38);
+      expect(spec.at, gate).toBeLessThanOrEqual(46);
+      expect(openingNames(gate as keyof typeof TIED_GATES), gate).toBe("foot");
+    }
   });
 
   it("opens each themed design with its own painting, which any card can also pick", () => {
