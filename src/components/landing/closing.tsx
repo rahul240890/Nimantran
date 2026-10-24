@@ -1,5 +1,5 @@
 import { ArrowRight, Check } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { Mandala } from "@/components/brand/mandala";
 import { Button } from "@/components/ui/button";

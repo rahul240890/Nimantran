@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";

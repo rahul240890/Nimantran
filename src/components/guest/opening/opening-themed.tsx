@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import { THEMED_OPENINGS, type ThemedMove, type ThemedOpening } from "@/lib/opening/catalog";
 

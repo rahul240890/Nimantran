@@ -16,7 +16,7 @@ import {
   Rotate3d,
   X,
 } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -37,6 +37,7 @@ import { suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
 import { paintedPages } from "@/lib/gallery/pictures";
 import type { PageArt } from "@/lib/suites/catalog";
+import { CardPicture } from "./card-picture";
 import { ScenePoster, SceneSample } from "./scene-poster";
 import { useTrending } from "./use-trending";
 import { StorySample } from "./story-sample";
@@ -149,13 +150,11 @@ export function DesignCard({
             </>
           ) : painted ? (
             <>
-              <Image
+              <CardPicture
                 src={pages[0]!.src}
                 alt={alt}
-                fill
-                loading={priority ? "eager" : "lazy"}
-                sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
-                className="object-cover object-top transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
+                priority={priority}
+                className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
               />
               {/* A soft shade at the foot keeps the badge and button readable */}
               <span
@@ -551,7 +550,8 @@ export function DesignPreview({
                           : "border-transparent opacity-65 hover:opacity-100",
                       )}
                     >
-                      <Image src={page.src} alt="" fill sizes="5rem" className="object-cover" />
+                      {/* The paintings the slideshow is already fetching, so never through the resizer */}
+                      <Image src={page.src} alt="" fill unoptimized className="object-cover" />
                     </button>
                   </li>
                 ))}

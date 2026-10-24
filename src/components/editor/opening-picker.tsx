@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useId, useState } from "react";
 import { SymbolMark } from "@/components/guest/opening/opening-art";

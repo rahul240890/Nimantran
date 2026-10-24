@@ -1,5 +1,5 @@
 import { Sparkles } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import type { SiteOffer } from "@/lib/payments/coupons";
 import { offerArtImage } from "@/lib/plans/offers";
 import { cn } from "@/lib/cn";

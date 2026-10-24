@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";

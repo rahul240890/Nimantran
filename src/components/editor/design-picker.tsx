@@ -14,12 +14,12 @@ import {
   SlidersHorizontal,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useDeferredValue, useEffect, useId, useMemo, useState } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { ChipRow } from "@/components/gallery/chip-row";
+import { CardPicture } from "@/components/gallery/card-picture";
 import { ScenePoster } from "@/components/gallery/scene-poster";
 import { warmLettering } from "@/components/invitation/type/warm-lettering";
 import { usePricing } from "@/components/pricing/pricing-provider";
@@ -396,14 +396,7 @@ function DesignTile({
           // The sample photos show through the Scene's frames, as the couple's own will
           <ScenePoster suite={design.suite} priority={priority} />
         ) : picture ? (
-          <Image
-            src={picture}
-            alt=""
-            fill
-            loading={priority ? "eager" : "lazy"}
-            sizes="(min-width: 80rem) 11rem, (min-width: 40rem) 30vw, 46vw"
-            className="object-cover object-top"
-          />
+          <CardPicture src={picture} priority={priority} />
         ) : (
           <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[14%]">
             <TemplateCover id={design.template} locale={locale} className="w-full" />

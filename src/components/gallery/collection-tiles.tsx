@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";

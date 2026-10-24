@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { useEffect, useRef, type CSSProperties } from "react";
 import "@/app/depth-openings.css";
 import { depthBeyond, depthSpec, type DepthOpening } from "@/lib/opening/catalog";

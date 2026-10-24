@@ -11,7 +11,7 @@ import {
   Play,
   Users,
 } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import {
   useEffect,
   useRef,

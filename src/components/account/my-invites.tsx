@@ -12,7 +12,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { useRouter } from "next/navigation";
 import { useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { deleteInvite } from "@/actions/invites";

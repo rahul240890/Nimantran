@@ -18,8 +18,8 @@ import {
   Sparkles,
   X,
 } from "lucide-react";
-import Image from "next/image";
 import { useDeferredValue, useMemo, useState } from "react";
+import { CardPicture } from "@/components/gallery/card-picture";
 import { DesignPreview } from "@/components/gallery/design-card";
 import { paintedPages } from "@/lib/gallery/pictures";
 import { allSearchWords } from "@/components/gallery/design-words";
@@ -206,15 +206,7 @@ function DesignArt({ row, covers }: { row: DesignRow; covers: Covers }) {
   if (design.format === "scene") return <ScenePoster suite={design.suite} />;
   const first = paintedPages(design)[0];
   if (first) {
-    return (
-      <Image
-        src={first.src}
-        alt=""
-        fill
-        sizes="(min-width: 64rem) 16rem, (min-width: 40rem) 30vw, 6rem"
-        className="object-cover object-top"
-      />
-    );
+    return <CardPicture src={first.src} />;
   }
   return (
     <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[12%]">
