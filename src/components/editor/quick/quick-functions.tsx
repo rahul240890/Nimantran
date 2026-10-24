@@ -45,54 +45,59 @@ export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo"
       functions: { ...current.functions, [id]: { ...current.functions[id], included: on } },
     }));
 
+  // An occasion with one event only has nothing to pick: its date and place come straight away
+  const choosing = offered.length > 1 || more.length > 0;
+
   return (
     <div className="flex flex-col gap-4">
-      <div role="group" aria-label={quickCopy.pickEvents} className="flex flex-col gap-2">
-        <p className="text-sm font-semibold text-ink">{quickCopy.pickEvents}</p>
-        <ul className="flex flex-wrap gap-2">
-          {chips.map((id) => {
-            const on = included.includes(id);
-            return (
-              <li key={id}>
+      {choosing && (
+        <div role="group" aria-label={quickCopy.pickEvents} className="flex flex-col gap-2">
+          <p className="text-sm font-semibold text-ink">{quickCopy.pickEvents}</p>
+          <ul className="flex flex-wrap gap-2">
+            {chips.map((id) => {
+              const on = included.includes(id);
+              return (
+                <li key={id}>
+                  <button
+                    type="button"
+                    aria-pressed={on}
+                    // The main event is always on the card
+                    disabled={id === main}
+                    onClick={() => include(id, !on)}
+                    className={cn(
+                      chip,
+                      on
+                        ? "border-marigold bg-marigold/15 text-ink"
+                        : "border-line-strong bg-surface text-ink hover:border-marigold-edge hover:text-accent-text",
+                    )}
+                  >
+                    {on ? (
+                      <Check aria-hidden className="size-4 text-accent-text" />
+                    ) : (
+                      <Plus aria-hidden className="size-4" />
+                    )}
+                    {functionCopy[id].name}
+                  </button>
+                </li>
+              );
+            })}
+            {!showMore && more.length > 0 && (
+              <li>
                 <button
                   type="button"
-                  aria-pressed={on}
-                  // The main event is always on the card
-                  disabled={id === main}
-                  onClick={() => include(id, !on)}
+                  onClick={() => setShowMore(true)}
                   className={cn(
                     chip,
-                    on
-                      ? "border-marigold bg-marigold/15 text-ink"
-                      : "border-line-strong bg-surface text-ink hover:border-marigold-edge hover:text-accent-text",
+                    "border-transparent text-accent-text underline-offset-4 hover:underline",
                   )}
                 >
-                  {on ? (
-                    <Check aria-hidden className="size-4 text-accent-text" />
-                  ) : (
-                    <Plus aria-hidden className="size-4" />
-                  )}
-                  {functionCopy[id].name}
+                  {quickCopy.moreEvents}
                 </button>
               </li>
-            );
-          })}
-          {!showMore && more.length > 0 && (
-            <li>
-              <button
-                type="button"
-                onClick={() => setShowMore(true)}
-                className={cn(
-                  chip,
-                  "border-transparent text-accent-text underline-offset-4 hover:underline",
-                )}
-              >
-                {quickCopy.moreEvents}
-              </button>
-            </li>
-          )}
-        </ul>
-      </div>
+            )}
+          </ul>
+        </div>
+      )}
       <ul className="flex flex-col gap-4">
         {included.map((id) => {
           const local = ceremonyName(draft, id);

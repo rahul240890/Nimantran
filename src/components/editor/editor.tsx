@@ -36,6 +36,7 @@ import {
   type InviteDraft,
 } from "@/lib/editor/draft";
 import { stepErrors } from "@/lib/editor/draft-checks";
+import { cameFromDesignPage, designPageHref } from "@/lib/editor/design-page";
 import { deletePhoto } from "@/lib/editor/photos";
 import { startWithDesign } from "@/lib/editor/gallery-start";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
@@ -675,7 +676,14 @@ export function Editor({
                       <Button
                         variant="secondary"
                         leadingIcon={<ArrowLeft aria-hidden className="rtl:rotate-180" />}
-                        onClick={() => goTo(EDITOR_STEPS[index - 1] ?? "design")}
+                        onClick={() => {
+                          // From a design's page, the preview goes back to that page
+                          if (last && !draft.slug && cameFromDesignPage()) {
+                            router.push(designPageHref(draft));
+                            return;
+                          }
+                          goTo(EDITOR_STEPS[index - 1] ?? "design");
+                        }}
                         className="max-[359px]:min-w-11 max-[359px]:px-3"
                       >
                         {/* Only the arrow on the narrowest phones, so a longer Continue still fits */}

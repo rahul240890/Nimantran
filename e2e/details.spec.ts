@@ -97,6 +97,16 @@ test.describe("a design's page", () => {
       { timeout: 15_000 },
     );
     await expect(page.getByText("Your invitation is ready")).toBeVisible();
+
+    // Back goes to the design's page, with everything as it was, not to the steps
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding$/);
+    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya", {
+      timeout: 30_000,
+    });
+    await expect(
+      page.locator('[data-function="wedding"]').getByRole("textbox", { name: /^Venue/ }),
+    ).toHaveValue("Taj Falaknuma, Hyderabad");
   });
 
   test("the events are ticked first, then each one's date and place", async ({ page }) => {
