@@ -23,6 +23,7 @@ import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import { PreviewMark } from "@/components/guest/preview-mark";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
 import {
@@ -126,6 +127,8 @@ type GuestViewProps = {
   previewNow?: number;
   /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
   preview?: boolean;
+  /** Not yet paid for and sent: "Preview" runs across every screen (preview-mark.tsx). */
+  unsent?: boolean;
   /** A design's public sample with made-up names: replies thank the visitor but go nowhere. */
   sample?: boolean;
   /** For reviewing a welcome scene (/engine/guest?hold=1): it stays until Continue. */
@@ -146,6 +149,7 @@ export function GuestView({
   watermark = false,
   previewNow,
   preview = false,
+  unsent = false,
   sample = false,
   holdWelcome = false,
   makeHref = null,
@@ -368,6 +372,7 @@ export function GuestView({
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
           {watermark && <WatermarkLayer />}
+          {unsent && <PreviewMark words={guestCopy.previewMark} />}
           <main id="main" className="flex flex-1 flex-col">
             {scene && !showOpening ? (
               <OneScene

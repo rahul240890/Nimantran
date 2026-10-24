@@ -36,6 +36,7 @@ export const metadata: Metadata = {
  * ?now=2026-11-19T20:00 (India time) shows the event-day banner as it would be then.
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  * ?couple=two gives the couple one photo each, as a host can, and ?couple=one one together.
+ * ?unsent=1 shows it as a family preview link does: marked Preview, with replies off.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
   const {
@@ -51,6 +52,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     turn,
     faith,
     couple,
+    unsent,
   } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
@@ -115,6 +117,8 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       questions={[]}
       previewNow={previewNow}
       holdWelcome={hold === "1"}
+      preview={unsent === "1"}
+      unsent={unsent === "1"}
     />
   );
 }

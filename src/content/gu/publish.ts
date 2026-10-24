@@ -131,6 +131,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     play: "ફોટા ચલાવો",
     position: (index, total) => `${total} માંથી ફોટો ${index}`,
   },
+  previewMark: "ઝલક · હજી મોકલ્યું નથી",
   madeWith: "શુભ ઇન્વિટેશન વડે બનાવેલું",
   createYours: "આપનું પોતાનું આમંત્રણ બનાવો",
   makeOwnTitle: "તમારે ત્યાં પણ કોઈ પ્રસંગ આવી રહ્યો છે?",
@@ -243,6 +244,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   notInvited: "આ લિંક તેમાંના કોઈ પ્રસંગ માટે નથી. પરિવારને તપાસવા કહો.",
   previewOnly:
     "આ તમારું પ્રીવ્યૂ છે, તેથી કંઈ મોકલાયું નથી. પ્રકાશિત કર્યા પછી મહેમાનો જવાબ આપી શકશે.",
+  previewNotice: "આ ઝલક છે, તેથી જવાબ બંધ છે. આમંત્રણ મોકલાયા પછી મહેમાનો જવાબ આપી શકશે.",
   full: "આ આમંત્રણ પર હમણાં વધુ જવાબ ઉમેરી શકાતા નથી. આપનો જવાબ સીધો પરિવારને મોકલો.",
   tooMany:
     "આ નેટવર્ક પરથી હમણાં ઘણા નવા જવાબ આવ્યા છે. કૃપા કરી એક કલાક પછી ફરી પ્રયાસ કરો, અથવા આપનો જવાબ સીધો પરિવારને મોકલો.",
@@ -337,9 +339,12 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "પ્રીવ્યૂના વિકલ્પો",
   opening: "તમારું આમંત્રણ ખૂલી રહ્યું છે",
   changeGate: "ખૂલતો દરવાજો બદલો",
+  marked:
+    "મોકલાય ત્યાં સુધી આ ઝલકની દરેક સ્ક્રીન પર ‘ઝલક’ લખેલું રહે છે અને જવાબ બંધ રહે છે. મહેમાનોને સ્વચ્છ આમંત્રણ મળે છે.",
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
   metaTitle: (names) => (names ? `${names}: આમંત્રણની ઝલક` : "આમંત્રણની ઝલક"),
   badge: "ઝલક · હજી મહેમાનોને મોકલ્યું નથી",
+  metaDescription: "પરિવારને જોવા માટે એક ઝલક. તે હજી મહેમાનોને મોકલાઈ નથી, અને જવાબ બંધ છે.",
 };

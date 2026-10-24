@@ -87,6 +87,7 @@ export default async function InvitePreviewPage({
       next={next}
       gateHref={`/create?invite=${id}&gate=1`}
       published={Boolean(draft.slug)}
+      marked={free && !draft.slug}
       copy={hostPreviewCopy}
     >
       <GuestView
@@ -100,6 +101,8 @@ export default async function InvitePreviewPage({
         questions={draftQuestions(draft)}
         watermark={free}
         preview
+        // Before its package is chosen, a recording of the preview can't stand in for it either
+        unsent={free && !draft.slug}
       />
     </HostPreview>
   );

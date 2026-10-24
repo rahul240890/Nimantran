@@ -135,6 +135,7 @@ export const guestCopy = {
     play: "Play the photos",
     position: (index: number, total: number) => `Photo ${index} of ${total}`,
   },
+  previewMark: "Preview · Not sent yet",
   madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",
   /** On a live invitation, for guests with a celebration of their own (owner, 2026-10-24). */
@@ -302,6 +303,8 @@ export const rsvpCopy = {
   missing: "This invitation isn't taking replies any more.",
   notInvited: "This link isn't for one of those celebrations. Ask the family to check it.",
   previewOnly: "This is your preview, so nothing was sent. Guests can reply once you publish.",
+  previewNotice:
+    "This is a preview, so replies are off. Guests can reply once the invitation is sent.",
   full: "Replies on this invitation are full for now. Please send your reply to the family directly.",
   tooMany:
     "A lot of new replies have come from this network just now. Please try again in an hour, or send your reply to the family directly.",
@@ -399,10 +402,14 @@ export const hostPreviewCopy = {
   menu: "Preview options",
   opening: "Opening your invitation",
   changeGate: "Change the opening gate",
+  marked:
+    "Until it's sent, this preview says Preview across every screen and replies are off. Guests get the invitation clean.",
 } as const;
 
 /** A family preview link (/family/<token>): the invitation before it is sent. */
 export const familyCopy = {
   metaTitle: (names: string) => (names ? `${names}: invitation preview` : "Invitation preview"),
   badge: "Preview · not sent to guests yet",
+  metaDescription:
+    "A preview for the family to check. It hasn't been sent to guests yet, and replies are off.",
 } as const;

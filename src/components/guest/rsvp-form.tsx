@@ -5,6 +5,7 @@ import {
   CircleCheck,
   CircleHelp,
   CircleX,
+  Lock,
   Minus,
   PartyPopper,
   Pencil,
@@ -334,6 +335,16 @@ export function RsvpForm({
       }}
       className="flex flex-col gap-6"
     >
+      {/* Said before anything is filled in, so nobody takes a preview for the real thing */}
+      {preview && (
+        <p
+          data-preview-replies
+          className="flex items-start gap-3 rounded-lg border border-marigold/50 bg-marigold/10 p-4 text-sm font-medium text-ink"
+        >
+          <Lock aria-hidden className="mt-0.5 size-4.5 shrink-0 text-accent-text" />
+          {rsvpCopy.previewNotice}
+        </p>
+      )}
       <div aria-hidden className="sr-only">
         <input
           ref={trap}
