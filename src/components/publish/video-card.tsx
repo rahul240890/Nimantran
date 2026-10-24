@@ -71,7 +71,7 @@ import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
 import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
 import { filmedWelcome, welcomeScene } from "@/lib/opening/catalog";
-import { site } from "@/lib/site";
+import { instagramHandle, site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "@/components/invitation/type/fonts.css";
 
@@ -1008,6 +1008,9 @@ export function useVideoFilm(
       copy.line,
       copy.date,
       copy.venue,
+      videoCopy.ending.open,
+      videoCopy.ending.madeWith,
+      videoCopy.ending.tagline,
     ].join(" ");
     const families = [fonts.display, fonts.sans, fonts.label, type.names, type.words];
     await loadFonts(
@@ -1022,9 +1025,13 @@ export function useVideoFilm(
     );
     const palette = paletteReader(suite, template);
     const ending = {
-      brand: site.name,
       open: videoCopy.ending.open,
       link: url.replace(/^https?:\/\//, ""),
+      brand: site.name,
+      madeWith: videoCopy.ending.madeWith,
+      tagline: videoCopy.ending.tagline,
+      site: new URL(site.url).host.replace(/^www\./, ""),
+      handle: instagramHandle(),
     };
     // The opening's paintings load with the pages', and its colours are read from the theme
     const prelude = opening

@@ -367,6 +367,9 @@ export const videoCopy = {
   whole: "The whole invitation",
   ending: {
     open: "Open the invitation",
+    /** Above Shubh's name in the video's sign-off. */
+    madeWith: "Made with love on",
+    tagline: "Invitations that come alive.",
   },
   shareText: (names: string) => `${names}: our invitation`,
   fileName: (slug: string) => `${slug}-invitation.mp4`,

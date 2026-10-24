@@ -194,7 +194,7 @@ test.describe("publish and share", () => {
       .toBe(true);
   });
 
-  test("a host's own music is trimmed, kept and follows the invite to another device", async ({
+  test("a host's own music is kept at once, its start moved, and follows the invite to another device", async ({
     page,
     browser,
   }, info) => {
@@ -204,6 +204,7 @@ test.describe("publish and share", () => {
     await page.getByRole("button", { name: "Edit music" }).click();
     await expect(page).toHaveURL(/\/create\/rajwada-bagh\?.*#part-music$/);
     await page.getByRole("radio", { name: "Your own music" }).click();
+    await expect(page.getByText("Only songs you have the right to use.")).toBeVisible();
     await page.locator('input[accept^="audio"]').setInputFiles({
       name: "Shehnai at dawn.wav",
       mimeType: "audio/wav",
@@ -211,19 +212,29 @@ test.describe("publish and share", () => {
     });
     // Shorter than the invitation plays: the host is asked for a longer song
     await expect(page.getByText(/Choose a longer song/)).toBeVisible();
+    await page.getByRole("button", { name: "Cancel" }).click();
     await page.locator('input[accept^="audio"]').setInputFiles({
       name: "Shehnai at dawn.wav",
       mimeType: "audio/wav",
       buffer: toneWav(150),
     });
-    await expect(page.getByText("Keep the part you love")).toBeVisible();
-    await expect(page.getByText(/Your invitation plays for about/)).toBeVisible();
-    await expect(page.getByRole("slider", { name: "Ends at" })).toBeVisible();
+    // Long enough: it is the invitation's music straight away, nothing more to press
     await expect(page.getByRole("img", { name: /The shape of Shehnai at dawn/ })).toBeVisible();
-    const use = page.getByRole("button", { name: "Use this music" });
-    await expect(use).toBeDisabled();
-    await page.getByRole("checkbox", { name: "I have the right to use this music" }).click();
-    await use.click();
+    await expect(page.getByText(/Your music · [12]:\d\d/)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByRole("button", { name: "Use this music" })).toHaveCount(0);
+    // Moving where it starts keeps the new part a moment later
+    const clipId = () =>
+      page.evaluate(
+        () => JSON.parse(localStorage.getItem("nimantran-invite-draft") ?? "null")?.music?.clip?.id,
+      );
+    await expect.poll(clipId).toBeTruthy();
+    const first = await clipId();
+    const start = page.getByRole("slider", { name: "Starts at" });
+    await start.focus();
+    await page.keyboard.press("End");
+    await expect(start).not.toHaveAttribute("aria-valuetext", "0:00");
+    await page.clock.runFor(1_000);
+    await expect.poll(clipId, { timeout: 30_000 }).not.toBe(first);
     await expect(page.getByText(/Your music · [12]:\d\d/)).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
@@ -256,11 +267,11 @@ test.describe("publish and share", () => {
     await expect(laptop.getByRole("button", { name: "Listen" })).toBeEnabled({ timeout: 15_000 });
   });
 
-  test("a two-language card with a muhurat opens in the guest's language", async ({
+  test("a Gujarati card with a muhurat opens in its own language", async ({
     page,
     browser,
   }, info) => {
-    // Every step, a second language and the packages before publishing
+    // Every step and the packages before publishing
     test.slow();
     await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
     // A Gujarati wedding's design: the card is written in Gujarati from the start
@@ -293,12 +304,8 @@ test.describe("publish and share", () => {
     await openPart(page, "Your photos");
     await addDesignPhotos(page);
     await seeInvitation(page);
-
-    // After the preview: English beside it, for guests to switch to
-    const english = page.getByRole("region", { name: "Add a second language?" });
-    await english.getByRole("radio", { name: "English" }).click();
-    await english.locator('[data-translation="first"]').fill("Aarav");
-    await english.locator('[data-translation="second"]').fill("Meera");
+    // One card language for now (owner, 2026-10-24): no second one is offered
+    await expect(page.getByRole("region", { name: "Add a second language?" })).toHaveCount(0);
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     const path = await publish(page, "aarav-meera-gu");
@@ -315,19 +322,16 @@ test.describe("publish and share", () => {
     // The painted theme opens at its gate, counting down to the wedding
     const door = guest.locator("[data-doorway]");
     await expect(door).toHaveAttribute("data-doorway", "closed");
-    await expect(guest.getByRole("timer", { name: /In 5 days/ })).toBeVisible();
-    const toggle = guest.getByRole("radiogroup", { name: "Card language" });
-    // An English-speaking guest sees the English card first
-    await expect(toggle.getByRole("radio", { name: "English" })).toBeChecked();
-    await expect(door.getByRole("heading", { level: 1 })).toContainText("Aarav");
+    // One language on the card: no switch, and the names in Gujarati
+    await expect(guest.getByRole("radiogroup", { name: /Card language|કાર્ડની ભાષા/ })).toHaveCount(
+      0,
+    );
+    await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
     // The opening shows only the names, lightly, with no plate over the gate; the blessing
     // waits for the pages
-    await expect(door.getByText("Shri Ganeshaya Namah")).toHaveCount(0);
-    await toggle.getByRole("radio", { name: "ગુજરાતી" }).click();
-    await expect(door.getByRole("heading", { level: 1 })).toContainText("આરવ");
+    await expect(door.getByText("॥ શ્રી ગણેશાય નમઃ ॥")).toHaveCount(0);
     // The countdown and the buttons around the card speak the card's language too
     await expect(door.getByText("દિવસ", { exact: true })).toBeVisible();
-    await expect(guest.getByRole("radiogroup", { name: "કાર્ડની ભાષા" })).toBeVisible();
     expect(await noOverflow(guest)).toBe(true);
     expect((await axe(guest).analyze()).violations).toEqual([]);
 

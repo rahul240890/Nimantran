@@ -333,6 +333,8 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   whole: "पूरा निमंत्रण",
   ending: {
     open: "निमंत्रण खोलें",
+    madeWith: "प्यार से बनाया गया",
+    tagline: "निमंत्रण, जो जीवंत हो उठें।",
   },
   shareText: (names) => `${names}: हमारा निमंत्रण`,
   fileName: (slug) => `${slug}-invitation.mp4`,

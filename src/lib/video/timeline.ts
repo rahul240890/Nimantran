@@ -14,8 +14,8 @@ export const VIDEO_MAX_SECONDS = 45;
 export const VIDEO_LONGEST_SECONDS = 60;
 /** With the host's fixed time on each page, the video runs as long as that, up to a minute. */
 export const VIDEO_FIXED_MAX_SECONDS = VIDEO_LONGEST_SECONDS;
-/** The closing card with the link. */
-export const END_SECONDS = 4;
+/** The closing card: the invitation's link, then Shubh's sign-off (ENDING_SIGN_OFF). */
+export const END_SECONDS = 6;
 /**
  * A function's page (name, day, hour, place) holds this long before the video grows past
  * 45 seconds, and never shorter than its minimum unless it would pass a minute.
@@ -56,7 +56,7 @@ export type VideoTimeline = {
 
 /**
  * Times each page so the whole video, closing card included, is 30 to 45 seconds. When the
- * pages need more than that at a comfortable pace (five functions or so), the video grows
+ * pages need more than that at a comfortable pace (four functions or so), the video grows
  * towards a minute instead. A function's page keeps more time than the cover or family's.
  * With `fixed` (the host set a time for every page) each page keeps it, so the video and its
  * music run exactly as long as the pages need, squeezed only past a minute. `lead` is how
