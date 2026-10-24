@@ -2225,3 +2225,32 @@ export const openingCopy = {
     jain: "Jain symbol",
   },
 } as const;
+
+/**
+ * A design's own page (/create/<design>, update 4): the design on top with the names
+ * appearing as they're typed, and one short form below.
+ */
+export const quickCopy = {
+  metaTitle: (name: string) => `Make your invitation: ${name}`,
+  back: "Back",
+  watch: "Watch it open",
+  free: "Free to try. Pay only when you send.",
+  eyebrow: "Make it yours",
+  title: "Your invitation in a few minutes",
+  intro:
+    "Type your names and they appear on the design. The wording, music and reply questions fill themselves in.",
+  whenHeading: "When and where",
+  addFunction: "Add another function",
+  addOne: (name: string) => `Add ${name}`,
+  remove: (name: string) => `Remove ${name}`,
+  familyTitle: "Family names",
+  familyIntro: "Optional: parents, blessings and whom guests can call",
+  photosTitle: "Your photos",
+  photosIntro: "Optional: the design has a frame for your photo",
+  see: "See my invitation",
+  nothingToPay: "Nothing to pay yet",
+  more: "More options",
+  moreIntro: "Your own song, wording, opening gate and questions",
+  make: "Short on time? We'll make it for you",
+  opening: "Opening the design…",
+} as const;

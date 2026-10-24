@@ -73,20 +73,19 @@ test.describe("live samples", () => {
     expect(sent).toEqual([]);
 
     await page.getByRole("link", { name: "Choose this design" }).click();
-    // The editor sets the design up, then tidies its address
-    await expect(page).toHaveURL(/\/create$/, { timeout: 15_000 });
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
+    // The design's own page, to fill in the names, date and venue
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding/, { timeout: 15_000 });
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Rajwada Bagh");
   });
 
-  test("a gallery preview opens its design as a guest, and Next stays with the occasion", async ({
+  test("a design's Live demo opens it as a guest, and Next stays with the occasion", async ({
     page,
   }) => {
     await page.goto("/invitations/birthday");
     await page.getByRole("button", { name: /^Show all \d+ designs$/ }).click();
-    await page.getByRole("button", { name: "Preview Gubbara" }).click();
     await page
-      .getByRole("dialog", { name: "Gubbara" })
-      .getByRole("link", { name: "See it live as a guest" })
+      .locator('[data-design="gubbara"]')
+      .getByRole("link", { name: "Live demo: Gubbara" })
       .click();
     // The sample is rendered on demand: give a busy machine time to answer
     await expect(page).toHaveURL(/\/sample\/gubbara\?occasion=birthday$/, { timeout: 15_000 });

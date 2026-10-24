@@ -91,7 +91,6 @@ export const galleryCopy = {
       other: "The Garden Lawns, Jaipur",
     },
   },
-  preview: (name: string) => `Preview ${name}`,
   /** A design's picture described for search engines and screen readers: name, occasion, scene. */
   designImage: (name: string, occasion: string, description: string) =>
     `${name}: ${occasion} invitation design. ${description}`,

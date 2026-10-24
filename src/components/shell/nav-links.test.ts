@@ -17,5 +17,8 @@ describe("footer links", () => {
     expect(helpPath("ta")).toBe("/help/whatsapp?lang=ta");
     expect(helpPath("en", "make")).toBe("/help/whatsapp?for=make");
     expect(helpPath("hi", "make")).toBe("/help/whatsapp?lang=hi&for=make");
+    expect(helpPath("en", "make", "rajwada-bagh")).toBe(
+      "/help/whatsapp?for=make&design=rajwada-bagh",
+    );
   });
 });

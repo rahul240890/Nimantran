@@ -70,6 +70,7 @@ export const config = {
   matcher: [
     "/",
     "/create",
+    "/create/:path*",
     "/sign-in",
     "/auth/:path*",
     "/invites/:path*",
@@ -77,5 +78,6 @@ export const config = {
     "/admin/:path*",
     "/invoice/:path*",
     "/join/:path*",
+    "/claim/:path*",
   ],
 };

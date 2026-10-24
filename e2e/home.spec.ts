@@ -140,24 +140,23 @@ test.describe("landing page", () => {
     await expect(page).toHaveURL(/\/invitations$/);
   });
 
-  test("the wedding row previews a design, opens it live, and leads on", async ({ page }) => {
+  test("the wedding row opens a design's page or its live demo, and leads on", async ({ page }) => {
     await visit(page);
     const row = page.locator('[data-shelf="home-wedding"]');
     await row.scrollIntoViewIfNeeded();
     const first = row.locator("article").first();
+    const id = (await first.getAttribute("data-design"))!;
     const name = (await first.locator("h3").first().textContent())!.trim();
-    await first.getByRole("button", { name: `Preview ${name}` }).click();
-    await expect(page.getByRole("dialog", { name })).toBeVisible();
-    await page.keyboard.press("Escape");
     await expect(first.getByRole("link", { name: `Live demo: ${name}` })).toHaveAttribute(
       "href",
-      /^\/sample\/[a-z0-9-]+/,
+      new RegExp(`^/sample/${id}`),
     );
-    await row
-      .getByRole("link", { name: /^View all \d+ designs: Wedding$/ })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/invitations\/wedding$/);
+    await expect(
+      row.getByRole("link", { name: /^View all \d+ designs: Wedding$/ }).first(),
+    ).toHaveAttribute("href", "/invitations/wedding");
+    await first.getByRole("link", { name: /Use this design/ }).click();
+    await expect(page).toHaveURL(new RegExp(`/create/${id}\\?category=wedding`));
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(name);
   });
 
   test("a row for each main occasion, and See all designs", async ({ page }) => {

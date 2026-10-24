@@ -77,17 +77,20 @@ test.describe("finding a design", () => {
     await expect(page.locator('[data-occasion="birthday"]')).toBeVisible();
   });
 
-  test("the preview shows every page, and Use this design sets up the editor", async ({ page }) => {
+  test("a design opens its own page, with what each package costs on it", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
     await page.goto("/invitations/wedding/gujarati");
-    await page.getByRole("button", { name: "Preview Shahi Savari" }).click();
-    const preview = page.getByRole("dialog", { name: "Shahi Savari" });
-    await expect(preview.getByText("Page 1 of 9")).toBeVisible();
-    await preview.getByRole("button", { name: "Next page" }).click();
-    await expect(preview.getByText("Page 2 of 9")).toBeVisible();
+    await page
+      .locator('[data-design="shahi-savari"]')
+      .getByRole("link", { name: /Use this design/ })
+      .click();
+    await expect(page).toHaveURL(/\/create\/shahi-savari\?category=wedding&kind=gujarati/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Shahi Savari");
+    // The card is in the tradition's language: a Gujarati wedding suggests Gujarati
+    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked({ timeout: 30_000 });
     // A Story is Royal: what each package costs on it, not just the design's own price
-    const packages = preview.getByRole("region", { name: "Packages for this design" });
+    const packages = page.getByRole("region", { name: "Packages for this design" });
     for (const [plan, price] of [
       ["basic", "₹799"],
       ["celebration", "₹1,199"],
@@ -96,11 +99,6 @@ test.describe("finding a design", () => {
       await expect(packages.locator(`[data-plan="${plan}"]`)).toContainText(price);
     }
     await expect(packages.locator('[data-plan="basic"]')).toContainText("100 guests or families");
-    await preview.getByRole("link", { name: "Use this design" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    // The names come first, in the card's language: a Gujarati wedding suggests Gujarati
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked();
   });
 
   test("a birthday has its own theme and one name on the cover", async ({ page }) => {
@@ -113,18 +111,19 @@ test.describe("finding a design", () => {
     await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
     // Wedding themes stay with weddings
     await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
-    await page.getByRole("button", { name: "Preview Gubbara" }).click();
-    const preview = page.getByRole("dialog", { name: "Gubbara" });
-    await expect(preview.getByText("Page 1 of 4")).toBeVisible();
-    await preview.getByRole("link", { name: "Use this design" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Whose birthday is it?");
+    await page
+      .locator('[data-design="gubbara"]')
+      .getByRole("link", { name: /Use this design/ })
+      .click();
+    await expect(page).toHaveURL(/\/create\/gubbara\?category=birthday/);
+    await expect(page.getByLabel(/^Birthday name/)).toBeVisible({ timeout: 30_000 });
     await expect(page.getByLabel(/^Second name/)).toHaveCount(0);
     await page.getByLabel(/^Birthday name/).fill("Aarav");
-    // Phones show the live page behind a Preview button
-    if (page.viewportSize()!.width < 1024)
-      await page.getByRole("button", { name: "Preview", exact: true }).click();
-    const cover = page.locator('[data-suite="gubbara"]').first();
+    // The design is on top of its page, the name arriving on its cover
+    const cover = page
+      .getByRole("region", { name: "Gubbara" })
+      .locator('[data-suite="gubbara"]')
+      .first();
     await expect(cover).toContainText("Happy birthday");
     await expect(cover).toContainText("Aarav");
     await expect(cover).not.toContainText("&");

@@ -2116,3 +2116,28 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     jain: "জৈন প্রতীক",
   },
 };
+
+export const quickCopy: Translation<typeof en.quickCopy> = {
+  metaTitle: (name) => `আপনার নিমন্ত্রণপত্র বানান: ${name}`,
+  back: "ফিরে যান",
+  watch: "খুলতে দেখুন",
+  free: "চেষ্টা করা বিনামূল্যে। টাকা শুধু পাঠানোর সময়।",
+  eyebrow: "নিজের মতো করে নিন",
+  title: "কয়েক মিনিটেই আপনার নিমন্ত্রণপত্র",
+  intro:
+    "আপনাদের নাম লিখুন, সেগুলো ডিজাইনে দেখা যাবে। কথা, সুর আর উত্তরের প্রশ্ন নিজে থেকেই ভরে যায়।",
+  whenHeading: "কবে আর কোথায়",
+  addFunction: "আরেকটি অনুষ্ঠান যোগ করুন",
+  addOne: (name) => `${name} যোগ করুন`,
+  remove: (name) => `${name} সরান`,
+  familyTitle: "পরিবারের নাম",
+  familyIntro: "চাইলে: বাবা-মা, আশীর্বাদ আর অতিথিরা কাকে ফোন করবেন",
+  photosTitle: "আপনার ছবি",
+  photosIntro: "চাইলে: ডিজাইনে আপনার ছবির জন্য ফ্রেম আছে",
+  see: "আমার নিমন্ত্রণপত্র দেখুন",
+  nothingToPay: "এখন কিছু দিতে হবে না",
+  more: "আরও বিকল্প",
+  moreIntro: "নিজের গান, কথা, খোলার দরজা আর প্রশ্ন",
+  make: "সময় কম? আমরা আপনার হয়ে বানিয়ে দেব",
+  opening: "ডিজাইন খুলছে…",
+};

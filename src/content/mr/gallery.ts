@@ -81,7 +81,6 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
     },
   },
   pagesCount: (count: number) => `${count} पाने`,
-  preview: (name: string) => `${name} ची झलक पाहा`,
   designImage: (name: string, occasion: string, description: string) =>
     `${name}: ${occasion} निमंत्रण पत्रिका डिझाइन. ${description}`,
   kindOccasion: (name: string) => `${name} लग्न`,

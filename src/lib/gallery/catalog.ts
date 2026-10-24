@@ -995,19 +995,20 @@ export function allDesigns(): GalleryDesign[] {
   );
 }
 
-/** Where "Use this design" takes the host: the editor, set up for this choice. */
+/**
+ * Where "Use this design" and a design's picture take the host: the design's own page
+ * (/create/<design>, update 4), with the occasion and kind of wedding it was chosen for.
+ */
 export function designHref(
   design: GalleryDesign,
   context: { category: CategoryId; kind?: WeddingKind | null },
 ): string {
   const params = new URLSearchParams({ category: context.category });
   const entry = context.kind ? WEDDING_KIND_ENTRIES[context.kind] : null;
+  if (context.kind) params.set("kind", context.kind);
   if (entry?.tradition) params.set("tradition", entry.tradition);
   if (entry?.faith) params.set("faith", entry.faith);
-  params.set("suite", design.suite);
-  params.set("template", design.template);
-  if (design.format) params.set("format", design.format);
-  return `/create?${params.toString()}`;
+  return `/create/${design.id}?${params.toString()}`;
 }
 
 /** The painting for a theme's page, or null for the card-colour theme. */

@@ -56,6 +56,9 @@ export const shell = {
   helpMessage: "Hello Shubh Invitation, I'd like help making my invitation.",
   /** What We'll make it for you writes, ready to send with the family's details. */
   makeMessage: "Hello Shubh Invitation, please make our invitation for us. Our details:",
+  /** The same, from a design's own page: the design named. */
+  makeMessageFor: (design: string) =>
+    `Hello Shubh Invitation, please make our invitation for us in the design ${design}. Our details:`,
   footer: {
     tagline: "3D invitations your guests open, turn and keep.",
     explore: "Explore",

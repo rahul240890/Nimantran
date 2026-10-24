@@ -13,7 +13,34 @@ import { useDesignTier, usePricing } from "./pricing-provider";
  * What each package costs on this one design, so the badge's price is never mistaken for
  * the whole story: Basic is the design, Celebration and Grand add the video and more guests.
  */
-export function DesignPackages({ designId, className }: { designId: string; className?: string }) {
+/** Its colours: on the night of a preview, or on the page's own paper (a design's page). */
+const TONES = {
+  night: {
+    heading: "text-card-ivory/75",
+    box: "border-card-ivory/15 bg-card-ivory/5",
+    name: "text-card-ivory/75",
+    guests: "text-card-ivory/70",
+    link: "text-card-ivory focus-visible:outline-card-ivory",
+  },
+  paper: {
+    heading: "text-ink-muted",
+    box: "border-line bg-surface",
+    name: "text-ink-muted",
+    guests: "text-ink-muted",
+    link: "text-accent-text focus-visible:outline-ring",
+  },
+} as const;
+
+export function DesignPackages({
+  designId,
+  tone = "night",
+  className,
+}: {
+  designId: string;
+  tone?: keyof typeof TONES;
+  className?: string;
+}) {
+  const colours = TONES[tone];
   const { galleryCopy } = useText(galleryText);
   const { planCopy, invitesCount } = useText(editionsText);
   const locale = useLocale();
@@ -28,7 +55,7 @@ export function DesignPackages({ designId, className }: { designId: string; clas
     >
       <h3
         id={`packages-${designId}`}
-        className="font-label text-xs tracking-[0.2em] text-card-ivory/75 uppercase"
+        className={cn("font-label text-xs tracking-[0.2em] uppercase", colours.heading)}
       >
         {galleryCopy.packagesHeading}
       </h3>
@@ -40,13 +67,16 @@ export function DesignPackages({ designId, className }: { designId: string; clas
             <li
               key={id}
               data-plan={id}
-              className="flex min-w-0 flex-col gap-0.5 rounded-lg border border-card-ivory/15 bg-card-ivory/5 px-2.5 py-2"
+              className={cn(
+                "flex min-w-0 flex-col gap-0.5 rounded-lg border px-2.5 py-2",
+                colours.box,
+              )}
             >
-              <span className="truncate text-xs text-card-ivory/75">{planCopy[id].name}</span>
+              <span className={cn("truncate text-xs", colours.name)}>{planCopy[id].name}</span>
               <span className="font-display text-lg leading-tight tabular-nums">
                 {paise === 0 ? galleryCopy.packageFree : formatRupees(paise)}
               </span>
-              <span className="text-[0.7rem] leading-snug text-card-ivory/70">
+              <span className={cn("text-[0.7rem] leading-snug", colours.guests)}>
                 {guests.value} {guests.label}
               </span>
             </li>
@@ -55,7 +85,10 @@ export function DesignPackages({ designId, className }: { designId: string; clas
       </ul>
       <Link
         href={pagePath({ kind: "pricing" }, locale)}
-        className="inline-flex min-h-11 items-center self-start text-sm font-semibold text-card-ivory underline underline-offset-4 hover:no-underline focus-visible:outline-2 focus-visible:outline-card-ivory"
+        className={cn(
+          "inline-flex min-h-11 items-center self-start text-sm font-semibold underline underline-offset-4 hover:no-underline focus-visible:outline-2",
+          colours.link,
+        )}
       >
         {galleryCopy.comparePackages}
       </Link>

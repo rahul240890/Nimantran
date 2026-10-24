@@ -136,7 +136,7 @@ const LAYOUT_ICONS: Record<CoupleLayout, typeof ImageIcon> = {
  * or a Scene's frame): one, or one each where it has a two-frame painting. Every one is
  * optional; a design without painted frames can also leave its photo page out.
  */
-function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
+export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
   const ids = draft.photos.map((photo) => photo.id);
   const urls = usePhotoUrls(ids, draft.remoteId);

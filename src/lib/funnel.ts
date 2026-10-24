@@ -10,6 +10,7 @@ import { track } from "@vercel/analytics";
 export type FunnelStep =
   | "Sample opened"
   | "Design previewed"
+  | "Details opened"
   | "Editor opened"
   | "Preview reached"
   | "Checkout started"
