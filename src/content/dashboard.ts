@@ -541,3 +541,26 @@ export const joinCopy = {
   myInvites: "Go to My invites",
   off: "Accounts open soon.",
 } as const;
+
+/** A hand-over link (/claim/<token>, update 5): an invitation Shubh made for the family. */
+export const claimCopy = {
+  metaTitle: "Your invitation",
+  eyebrow: "Made for you by Shubh",
+  title: (names: string) =>
+    names ? `${names}: your invitation is ready` : "Your invitation is ready",
+  body: (occasion: string) =>
+    `We've made your ${occasion.toLowerCase()} invitation. Take it into your account, look it over, then choose a package and send it to your guests. Their replies come to you.`,
+  take: "Take it to my account",
+  signIn: "Sign in to take it",
+  signInNote: "Use your mobile number or Google. It takes a moment.",
+  /** While sign-in by number is off on the live site. */
+  signInNoteGoogle: "Sign in with your Google account. It takes a moment.",
+  failed: "Couldn't take it just now. Try again.",
+  own: "This invitation is already in your account. Send this link to the family it was made for.",
+  setup: "Hand-over links aren't switched on yet. Please message us on WhatsApp.",
+  usedTitle: "This link has already been used",
+  usedBody:
+    "A hand-over link works once, for 30 days. If you've taken it, the invitation is in My invites. Otherwise ask us for a new link.",
+  myInvites: "Go to My invites",
+  off: "Accounts open soon.",
+} as const;

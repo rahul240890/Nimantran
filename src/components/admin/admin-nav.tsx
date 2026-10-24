@@ -2,6 +2,7 @@
 
 import {
   Building2,
+  Gift,
   LayoutDashboard,
   Mail,
   Mails,
@@ -26,6 +27,7 @@ const ICONS: Record<AdminPageIcon, LucideIcon> = {
   orders: ReceiptText,
   coupons: TicketPercent,
   invites: Mails,
+  handover: Gift,
   visitors: Users,
   blog: Newspaper,
   ai: Sparkles,

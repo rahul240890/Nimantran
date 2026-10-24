@@ -80,8 +80,13 @@ database keeps every invite. Applied so far after the first setup:
 - `20261021120000_offer_art.sql` — offer pictures: an `art` column on `coupons` naming the
   painted occasion tile an offer shows. Offers show the festival painting until it runs.
 - `20261021130000_discover_email.sql` — lets `email_log` record the new-designs email
-- `20261022120000_free_coupons.sql` — lets an offer take up to 100% off, and an order cost ₹0
   (`discover`). Until it runs that email can't be logged, so it isn't sent.
+- `20261022120000_free_coupons.sql` — lets an offer take up to 100% off, and an order cost ₹0.
+- `20261024120000_handovers.sql` — hand-over links for We'll make it for you (Admin, Hand
+  over): `event_handovers`, `handover_preview()` for anyone with the link and
+  `claim_handover()`, which makes whoever takes the link the invite's owner. The rule that an
+  invite keeps its owner now lets that function move it. Until it runs, making a link says it
+  can't, and a link says hand-overs aren't switched on yet.
 
 ## Setting up a project
 

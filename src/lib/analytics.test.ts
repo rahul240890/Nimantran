@@ -12,6 +12,7 @@ describe("counted addresses", () => {
     expect(countableUrl("https://shubhinvitations.com/join/tok-1")).toBe(
       "https://shubhinvitations.com/join/[token]",
     );
+    expect(countableUrl("/claim/0123abcd")).toBe("/claim/[token]");
     expect(countableUrl("https://shubhinvitations.com/sign-in?next=%2Finvites#x")).toBe(
       "https://shubhinvitations.com/sign-in",
     );
