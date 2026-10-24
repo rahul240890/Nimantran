@@ -686,9 +686,10 @@ export function Editor({
                         variant="secondary"
                         leadingIcon={<ArrowLeft aria-hidden className="rtl:rotate-180" />}
                         onClick={() => goTo(EDITOR_STEPS[index - 1] ?? "design")}
-                        className="max-[359px]:px-3.5"
+                        className="max-[359px]:min-w-11 max-[359px]:px-3"
                       >
-                        {editor.back}
+                        {/* Only the arrow on the narrowest phones, so a longer Continue still fits */}
+                        <span className="max-[359px]:sr-only">{editor.back}</span>
                       </Button>
                     ) : null}
                     <div className="ms-auto flex min-w-0 items-center gap-2 sm:gap-3">

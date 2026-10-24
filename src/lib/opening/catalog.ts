@@ -310,6 +310,181 @@ export function isPaintedGate(style: string): style is PaintedGate {
   return style in PAINTED_GATES;
 }
 
+/** How a tied gate's doors open: swing in, slide apart, or part like curtains. */
+export type TiedMove = "swing" | "slide" | "part";
+/**
+ * How its tie comes undone: a bow unties and slips off both sides, a brooch or medallion
+ * lifts toward the guest, a butterfly or bird flies off, a seal cracks in two, a lock or
+ * locket drops, a ball of petals or a bubble bursts, a garland or sash slips away, a
+ * rosette spins off.
+ */
+export type TiedUndo = "untie" | "lift" | "fly" | "crack" | "drop" | "burst" | "slip" | "spin";
+
+/**
+ * The tied gates (owner's paintings, templates 41 on: docs/TEMPLATE_PROMPTS_41_TO_55.md and
+ * docs/TEMPLATE_GATES_56_TO_85.md): two closed doors filling the screen, held shut by a tie
+ * the guest taps to undo, and the doors open onto the template's centre picture. In
+ * public/openings/tied/<gate>/: door-left and door-right (one painting cut at its seam by
+ * scripts/import-template.mjs), the tie (the whole screen, clear round the tie) and, when
+ * it has them, piece-0 to piece-5, which burst out as it comes undone. at: the middle of
+ * the tie, % down the screen.
+ */
+export type TiedSpec = {
+  move: TiedMove;
+  undo: TiedUndo;
+  /**
+   * Where the tie sits: its middle, % down the screen. The import puts it there in the tie's
+   * own picture (scripts/import-template.mjs --tie-at), at a size that keeps it between the
+   * god at the top and the names at the foot (--tie-size).
+   */
+  at: number;
+  pieces: boolean;
+  welcome: WelcomeKind;
+};
+/*
+ * Templates 41 to 55 (docs/TEMPLATE_PROMPTS_41_TO_55.md). Each tie was placed by the import
+ * with its middle at 40% down and no taller than 36% of the screen, so it keeps below the
+ * top 22% (the god's) and clear of the names; a ribbon or cord still runs to both edges.
+ */
+export const TIED_GATES = {
+  // Chini Mitti: a blush satin bow on porcelain doors
+  "reshmi-gaanth": {
+    move: "swing",
+    undo: "untie",
+    at: 40,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Libaas: a pearl-and-crystal brooch pinning two silk panels
+  "moti-kaanta": {
+    move: "part",
+    undo: "lift",
+    at: 40,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Vanaspati: a posy of frangipani on linen twine across copper plates
+  guldasta: {
+    move: "slide",
+    undo: "drop",
+    at: 40,
+    pieces: true,
+    welcome: "letter",
+  },
+  // Kurinji: an enamel blue butterfly holding two cottage doors
+  "neeli-titli": {
+    move: "swing",
+    undo: "fly",
+    at: 40,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Kannauj: a cut-glass attar bottle on a silk cord
+  "itr-shishi": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Phoolon ki Ghati: a garland of wild mountain flowers knotted across deodar doors
+  "van-mala": {
+    move: "swing",
+    undo: "slip",
+    at: 40,
+    pieces: true,
+    welcome: "bloom",
+  },
+  // Tulika: a coral rosette on a ribbon round two canvases
+  gulband: {
+    move: "slide",
+    undo: "spin",
+    at: 40,
+    pieces: true,
+    welcome: "party",
+  },
+  // Ubhaar: an oxblood wax seal pressed with a jasmine flower
+  mudra: {
+    move: "slide",
+    undo: "crack",
+    at: 40,
+    pieces: true,
+    welcome: "letter",
+  },
+  // Rajanigandha: a shell bangle and a red lac bangle linked on a tuberose string
+  "shankha-pola": {
+    move: "swing",
+    undo: "crack",
+    at: 40,
+    pieces: true,
+    welcome: "lamps",
+  },
+  // Rumaal: a silk scarf knotted through a gold ring
+  challa: {
+    move: "part",
+    undo: "slip",
+    at: 40,
+    pieces: true,
+    welcome: "party",
+  },
+  // Chanderi: a tasselled zari tie-back holding sheer curtains
+  latkan: {
+    move: "part",
+    undo: "drop",
+    at: 40,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Mishri: a sugar medallion with a sugar rose on fondant doors
+  "shakkar-chakri": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    pieces: true,
+    welcome: "party",
+  },
+  // Paithani: a gold clasp of two parrots beak to beak
+  "raghu-maina": {
+    move: "slide",
+    undo: "crack",
+    at: 40,
+    pieces: true,
+    welcome: "royal",
+  },
+  // Jamawar: an antique silver rose lock on carved walnut doors
+  "taala-chaabi": {
+    move: "swing",
+    undo: "drop",
+    at: 40,
+    pieces: true,
+    welcome: "night",
+  },
+  // Phool Bangla: a ball of rose petals on a jasmine string
+  "phool-gend": {
+    move: "swing",
+    undo: "burst",
+    at: 40,
+    pieces: true,
+    welcome: "bloom",
+  },
+} as const satisfies Record<string, TiedSpec>;
+export type TiedGate = keyof typeof TIED_GATES;
+const TIED_IDS = Object.keys(TIED_GATES) as TiedGate[];
+
+export function isTiedGate(style: string): style is TiedGate {
+  return style in TIED_GATES;
+}
+
+export function tiedSpec(id: TiedGate): TiedSpec {
+  return (TIED_GATES as Record<string, TiedSpec>)[id]!;
+}
+
+/** A tied gate's place beyond: the centre picture of the template it opens. */
+export function tiedBeyond(id: TiedGate): string {
+  const template = STORY_IDS.find((story) => STORY_GATE[story] === id);
+  return template ? `/suites/${template}/centre.webp` : `/openings/tied/${id}/beyond.webp`;
+}
+
 /**
  * The fresh openings (owner's paintings, 2026-10-11): not gates but a fan that folds shut,
  * mirror panels that turn, a pop-up palace, clouds that part, a snow globe to fall into.
@@ -418,6 +593,7 @@ export function isThemedOpening(style: string): style is ThemedOpening {
 
 export const OPENING_STYLES = [
   ...(Object.keys(PAINTED_GATES) as [PaintedGate, ...PaintedGate[]]),
+  ...TIED_IDS,
   ...FRESH_OPENINGS,
   ...THEMED_IDS,
   "doors",
@@ -445,6 +621,7 @@ export const OPENING_STYLES = [
 /** How the editor groups the styles, so many choices stay easy to scan. */
 export const OPENING_GROUPS: readonly { id: string; styles: readonly OpeningStyle[] }[] = [
   { id: "themed", styles: THEMED_IDS },
+  { id: "tied", styles: TIED_IDS },
   {
     id: "fresh",
     styles: [
@@ -560,6 +737,8 @@ export type OpeningNames = "print" | "foot" | "seal" | "quiet";
 export function openingNames(style: OpeningStyle): OpeningNames {
   const pick = (looks: readonly OpeningNames[]) => looks[tintIndex(style, looks.length)]!;
   if (isPaintedGate(style)) return pick(["foot", "quiet"]);
+  // The tie sits on the seam below the names, so the names keep to the foot
+  if (isTiedGate(style)) return "foot";
   if (isFreshOpening(style)) return pick(["seal", "foot"]);
   if (isThemedOpening(style)) return pick(["foot", "seal", "quiet"]);
   return "print";
@@ -583,6 +762,21 @@ const WEDDING_OPENINGS: readonly OpeningStyle[] = [
   "gumbad",
   "ghadi",
   "hindolo",
+  "reshmi-gaanth",
+  "moti-kaanta",
+  "guldasta",
+  "neeli-titli",
+  "itr-shishi",
+  "van-mala",
+  "gulband",
+  "mudra",
+  "shankha-pola",
+  "challa",
+  "latkan",
+  "shakkar-chakri",
+  "raghu-maina",
+  "taala-chaabi",
+  "phool-gend",
   "noor-darwaza",
   "haveli-kiwad",
   "shahi-parda",
@@ -1001,8 +1195,11 @@ export function openingStyles(suite: SuiteId, scene: boolean): readonly OpeningS
   );
 }
 
-/** Each story theme's own gate (or, from template 26, its own fresh opening), painted with its pages. */
-const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening> = {
+/**
+ * Each story theme's own gate, painted with its pages: from template 26 its own fresh
+ * opening, from template 41 its own tied gate.
+ */
+const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening | TiedGate> = {
   hashiya: "chadar",
   gara: "parwaaz",
   abri: "bhanwar",
@@ -1055,6 +1252,21 @@ const STORY_GATE: Record<StoryId, PaintedGate | FreshOpening> = {
   "gagan-safar": "gagan-parda",
   "kagzi-phool": "bel-khidki",
   nilofar: "pankhudi-pat",
+  "chini-mitti": "reshmi-gaanth",
+  libaas: "moti-kaanta",
+  vanaspati: "guldasta",
+  kurinji: "neeli-titli",
+  kannauj: "itr-shishi",
+  "phoolon-ki-ghati": "van-mala",
+  tulika: "gulband",
+  ubhaar: "mudra",
+  rajanigandha: "shankha-pola",
+  rumaal: "challa",
+  chanderi: "latkan",
+  mishri: "shakkar-chakri",
+  paithani: "raghu-maina",
+  jamawar: "taala-chaabi",
+  "phool-bangla": "phool-gend",
   "sona-gulaab": "gulaab-lifafa",
   shabnam: "os-parda",
   "surkh-gulaab": "surkh-dwar",
@@ -1210,6 +1422,10 @@ const FILMED_AS: Record<WelcomeScene, WelcomeKind> = {
 export const filmedWelcome = (scene: WelcomeScene): WelcomeKind => FILMED_AS[scene];
 
 const WELCOME_KIND: Record<OpeningStyle, WelcomeKind> = {
+  ...(Object.fromEntries(TIED_IDS.map((id) => [id, tiedSpec(id).welcome])) as Record<
+    TiedGate,
+    WelcomeKind
+  >),
   pankhi: "royal",
   "sheesh-mahal": "royal",
   "popup-mahal": "royal",

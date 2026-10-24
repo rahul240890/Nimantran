@@ -9,6 +9,7 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  isTiedGate,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
 import { CROSSFADE } from "./timeline";
@@ -20,7 +21,7 @@ import { CROSSFADE } from "./timeline";
 export const PRELUDE_PACE = 2.2 / 1.6;
 /** The opening holds closed this long, the names on it, before it opens. */
 export const PRELUDE_IDLE = 2.4;
-/** A painted, fresh or themed opening opens over this long, as on the guest's link. */
+/** A painted, tied, fresh or themed opening opens over this long, as on the guest's link. */
 export const PRELUDE_OPEN_PAINTED = 2.6 * PRELUDE_PACE;
 /** A drawn opening (doors, curtains, the envelope) opens sooner. */
 export const PRELUDE_OPEN_DRAWN = 1.8 * PRELUDE_PACE;
@@ -42,7 +43,9 @@ export type PreludeTimeline = {
 
 /** Whether a style is one of the painted openings, which take longer to open. */
 export function paintedOpening(style: OpeningStyle): boolean {
-  return isPaintedGate(style) || isFreshOpening(style) || isThemedOpening(style);
+  return (
+    isPaintedGate(style) || isTiedGate(style) || isFreshOpening(style) || isThemedOpening(style)
+  );
 }
 
 /** The prelude's timing for an opening style; null without an opening. */

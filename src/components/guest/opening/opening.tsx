@@ -20,7 +20,10 @@ import {
   isFreshOpening,
   isPaintedGate,
   isThemedOpening,
+  isTiedGate,
   openingNames,
+  tiedBeyond,
+  tiedSpec,
   welcomeScene,
   type OpeningGod,
   type OpeningStyle,
@@ -48,6 +51,8 @@ export const OPEN_MS = 1500 * OPENING_PACE;
  * fresh or themed opening takes as long, its painting going its own way.
  */
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
+/** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
+const TIED_OPEN_MS = 3200 * OPENING_PACE;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
 /** The longest the opening waits for the screen to settle after going full screen. */
@@ -274,6 +279,7 @@ export function Opening({
   const theme = SUITES[suite];
   const cover = theme.images.cover;
   const gate = isPaintedGate(style);
+  const tied = isTiedGate(style);
   const fresh = isFreshOpening(style);
   const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
@@ -316,10 +322,10 @@ export function Opening({
         setPick(Math.random());
         setWelcome(true);
       },
-      still ? 0 : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
+      still ? 0 : tied ? TIED_OPEN_MS : gate || fresh || themed ? GATE_OPEN_MS : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [open, pages, welcome, still, gate, fresh, themed]);
+  }, [open, pages, welcome, still, gate, tied, fresh, themed]);
   useEffect(() => {
     if (!welcome || holdWelcome) return;
     const timer = window.setTimeout(() => goInLatest.current(), WELCOME_MS);
@@ -501,17 +507,19 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || fresh || themed || cover ? (
+        {gate || tied || fresh || themed || cover ? (
           <Image
             // A painted opening's own place beyond, so the wide screen matches it
             src={
               gate
                 ? `/openings/gates/${style}/beyond.webp`
-                : fresh
-                  ? freshBackdrop(style)
-                  : themed
-                    ? `/suites/${style}/scene.webp`
-                    : (cover as string)
+                : tied
+                  ? tiedBeyond(style)
+                  : fresh
+                    ? freshBackdrop(style)
+                    : themed
+                      ? `/suites/${style}/scene.webp`
+                      : (cover as string)
             }
             alt=""
             fill
@@ -532,6 +540,18 @@ export function Opening({
         {open && !still && <OpeningPetals />}
 
         <div className="absolute inset-0 z-30 flex flex-col">
+          {tied && !open && (
+            // A tap on the tie opens the gate too; the button below stays the way in for
+            // keyboards and screen readers
+            <button
+              type="button"
+              aria-hidden
+              tabIndex={-1}
+              onClick={enter}
+              className="absolute left-1/2 z-10 h-[24cqw] w-[48cqw] -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full"
+              style={{ top: `${tiedSpec(style).at}%` }}
+            />
+          )}
           {languages.length > 1 && (
             <div className="opening-fade absolute inset-x-0 top-0 z-10 flex justify-center pt-[max(0.75rem,env(safe-area-inset-top))]">
               <CardLanguageToggle

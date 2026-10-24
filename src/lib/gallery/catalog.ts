@@ -455,6 +455,11 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("north-hindu"),
     art: { suite: "rajwada-bagh", page: "cover" },
     suites: [
+      "kannauj",
+      "phoolon-ki-ghati",
+      "chanderi",
+      "jamawar",
+      "phool-bangla",
       "hashiya",
       "meenakari",
       "purani-dilli",
@@ -522,6 +527,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("gujarati"),
     art: { suite: "kutch-toran", page: "sangeet" },
     suites: [
+      "mishri",
       "sankheda",
       "kaanch-chitra",
       "rogan",
@@ -557,6 +563,7 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("rajasthani"),
     art: { suite: "shahi-savari", page: "cover" },
     suites: [
+      "phool-bangla",
       "bundi-chitra",
       "leheriya",
       "banjara",
@@ -609,6 +616,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("marathi"),
     art: { suite: "peshwai-wada", page: "cover" },
     suites: [
+      "vanaspati",
+      "paithani",
       "kaanch-chitra",
       "neelgulmohar",
       "shevanti-haldi",
@@ -627,6 +636,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("bengali"),
     art: { suite: "rajbari", page: "cover" },
     suites: [
+      "vanaspati",
+      "rajanigandha",
       "shola",
       "dhokra",
       "kumudini",
@@ -663,6 +674,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     ...pack("tamil"),
     art: { suite: "kayal", page: "cover" },
     suites: [
+      "vanaspati",
+      "kurinji",
       "chandan",
       "nirmal",
       "kaanch-chitra",
@@ -717,6 +730,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "ਪੰਜਾਬੀ", lang: "pa" },
     art: { suite: "phulkari-haveli", page: "cover" },
     suites: [
+      "phoolon-ki-ghati",
+      "jamawar",
       "purani-dilli",
       "sunehri-sarovar",
       "shevanti-haldi",
@@ -741,6 +756,8 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: { text: "نکاح", lang: "ur" },
     art: { suite: "noor-bagh", page: "cover" },
     suites: [
+      "kannauj",
+      "jamawar",
       "hashiya",
       "abri",
       "shab-e-gul",
@@ -777,6 +794,13 @@ export const WEDDING_KIND_ENTRIES: Record<WeddingKind, WeddingKindEntry> = {
     nativeName: null,
     art: { suite: "rajwada-bagh", page: "reception" },
     suites: [
+      "chini-mitti",
+      "libaas",
+      "vanaspati",
+      "tulika",
+      "ubhaar",
+      "rumaal",
+      "mishri",
       "aasmaani",
       "tasveer-khana",
       "leheriya",
