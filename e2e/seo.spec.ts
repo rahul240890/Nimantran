@@ -106,21 +106,12 @@ test.describe("moving around", () => {
     await page.evaluate(() => localStorage.clear());
     await page.goto("/traditions/gujarati");
     await page.getByRole("link", { name: "Create your invitation" }).click();
-    await expect(page).toHaveURL(/\/create/);
-    // The editor draws on the client and can take a while on a busy test machine
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the design your guests will open",
-      { timeout: 15_000 },
-    );
-    // The 3D cards, by the Kind of invitation filter
-    await page
-      .getByRole("radiogroup", { name: "Kind of invitation" })
-      .getByRole("radio", { name: "3D card" })
-      .click();
-    const designs = page
-      .getByRole("radiogroup", { name: "Designs for your occasion" })
-      .getByRole("radio");
-    await expect(designs.first()).toHaveAccessibleName(/Bandhani Utsav/);
+    // The tradition's own card, on its page, written in the tradition's language
+    await expect(page).toHaveURL(/\/create\/card-bandhani\?category=wedding&tradition=gujarati$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Bandhani Utsav", {
+      timeout: 15_000,
+    });
+    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked({ timeout: 30_000 });
   });
 
   test("the language menu keeps the page and the footer reaches every page", async ({ page }) => {

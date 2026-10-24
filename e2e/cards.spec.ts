@@ -45,6 +45,10 @@ test.describe("save-the-date and thank-you cards", () => {
       await file.saveAs(`${process.env.CARD_SHOTS}/save-the-date-${info.project.name}.png`);
     }
     expect(await noOverflow(page)).toBe(true);
+    // The picture can be remade once more as the fonts settle, the buttons waiting for it;
+    // their colours ease back in 150ms, so the check reads them once they have
+    await expect(page.getByRole("button", { name: "Download picture" })).toBeEnabled();
+    await page.waitForTimeout(300);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
     await page.getByRole("tab", { name: "Thank you" }).click();
