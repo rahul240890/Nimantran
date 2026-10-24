@@ -4697,6 +4697,8 @@
   position: relative;
   display: block;
   width: calc(clamp(4.5rem, 26cqmin, 9rem) * var(--story-fit, 1));
+  /* Never wider than its words' column, beside a tall column of art in a small preview */
+  max-width: 100%;
   height: 0.5rem;
   flex-shrink: 0;
   background: linear-gradient(
@@ -4750,6 +4752,18 @@
 /* Words break only when a page is too full to fit them whole even at the smallest size */
 [data-overflow] > .story-line {
   overflow-wrap: anywhere;
+}
+/*
+ * A person's name stays on one line; on a page too narrow for that it breaks only after
+ * its first three words, and anywhere once the page overflows (story-player.tsx KeptWords)
+ */
+.story-keep,
+.story-keep-head {
+  white-space: nowrap;
+}
+:is([data-loose], [data-overflow]) > .story-line .story-keep,
+[data-overflow] > .story-line .story-keep-head {
+  white-space: normal;
 }
 
 @theme inline {
@@ -7353,7 +7367,9 @@ html:has(.guest-snap) {
  */
 .scene-words *,
 .story-fit,
-.story-fit > * {
+.story-fit > *,
+.story-keep,
+.story-keep-head {
   transition-property: none !important;
 }
 /*

@@ -8,6 +8,11 @@
 export const FIT_MIN = 0.6;
 /** Nor grow past this: a short page fills its calm space a little, keeping the theme's proportions. */
 export const FIT_MAX = 1.25;
+/**
+ * A person's name stays on one line unless that would shrink the page's words below this:
+ * then, in a narrow column beside the art, it may break after its first three words.
+ */
+export const FIT_KEEP_NAMES = 0.75;
 
 /**
  * The largest scale between `min` and `max` at which `fits` holds, to within a few
