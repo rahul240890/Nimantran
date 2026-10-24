@@ -105,7 +105,17 @@ export function QuickStart({
     if (started.current) return;
     started.current = true;
     funnel("Details opened", { design: designId });
-    void startWithDesign(choice, { signedIn, site: locale })
+    // Back on a page whose design the invite already has (a reload, or back from the
+    // preview), what the family changed since stays: the address's faith or tradition
+    // isn't applied again
+    const current = inviteDraft.get().draft;
+    const already =
+      current.updatedAt !== 0 &&
+      current.suite === choice.suite &&
+      current.templateId === choice.template &&
+      current.format === (choice.format ?? "story") &&
+      current.categoryId === choice.category;
+    void (already ? Promise.resolve() : startWithDesign(choice, { signedIn, site: locale }))
       .then(() => {
         const current = inviteDraft.get().draft;
         if (includedFunctions(current).length > 0) return;
