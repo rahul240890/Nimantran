@@ -2,7 +2,7 @@
 
 import { format, parseISO } from "date-fns";
 import { Car, ChevronDown, CircleAlert, CopyCheck, MapPin, MapPinned, Shirt } from "lucide-react";
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -316,16 +316,18 @@ function FunctionFields({
   );
 }
 
-export function FunctionsStep({ draft, update, errors }: StepProps) {
-  const { editor, functionCopy, functionFields } = useText(editorText);
-  const main = mainFunction(draft);
-  const category = draftCategory(draft);
-  const locale = useLocale();
+/**
+ * A function's date, time and place, for each function the host includes: here and in
+ * the short form on a design's own page (quick-start.tsx). A place typed once can be
+ * given to the other events.
+ */
+export function useFunctionFields(
+  draft: StepProps["draft"],
+  update: StepProps["update"],
+): (id: FunctionId, errors: StepProps["errors"]) => ReactNode {
+  const { functionCopy } = useText(editorText);
   const { suggested, more } = functionOrder(draft);
   const withTime = needsTime(draft);
-  // The rarer functions stay folded on a short list until the host asks, unless one is planned
-  const [moreOpen, setMoreOpen] = useState(false);
-  const showMore = moreOpen || more.some((id) => draft.functions[id].included);
 
   const setFunction = (id: FunctionId, change: Partial<EventFunction>) =>
     update((current) => ({
@@ -356,11 +358,58 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
   const withPlace = included.filter((id) => draft.functions[id].venue.trim());
   const withoutPlace = included.filter((id) => !draft.functions[id].venue.trim());
 
+  return function fieldsFor(id, errors) {
+    const fn = draft.functions[id];
+    const muhurat = muhuratName(draft, id);
+    return (
+      <FunctionFields
+        id={id}
+        fn={fn}
+        errors={errors}
+        withTime={withTime}
+        muhurat={muhurat ? { name: muhurat.native, lang: draftTradition(draft)!.language } : null}
+        set={(change) => setFunction(id, change)}
+        guide={functionGuide(draft.guide, id)}
+        setGuide={(change) => setGuide(id, change)}
+        sources={withPlace
+          .filter(
+            (other) => other !== id && draft.functions[other].venue.trim() !== fn.venue.trim(),
+          )
+          .map((other) => ({ id: other, name: functionCopy[other].name }))}
+        copyFrom={(from) => copyPlace(from, [id])}
+        emptyOthers={withoutPlace.filter((other) => other !== id).length}
+        copyToEmpty={() =>
+          copyPlace(
+            id,
+            withoutPlace.filter((other) => other !== id),
+          )
+        }
+      />
+    );
+  };
+}
+
+export function FunctionsStep({ draft, update, errors }: StepProps) {
+  const { editor, functionCopy, functionFields } = useText(editorText);
+  const main = mainFunction(draft);
+  const category = draftCategory(draft);
+  const locale = useLocale();
+  const { suggested, more } = functionOrder(draft);
+  const fields = useFunctionFields(draft, update);
+  // The rarer functions stay folded on a short list until the host asks, unless one is planned
+  const [moreOpen, setMoreOpen] = useState(false);
+  const showMore = moreOpen || more.some((id) => draft.functions[id].included);
+
+  const setFunction = (id: FunctionId, change: Partial<EventFunction>) =>
+    update((current) => ({
+      ...current,
+      functions: { ...current.functions, [id]: { ...current.functions[id], ...change } },
+    }));
+
   const item = (id: FunctionId) => {
     const fn = draft.functions[id];
     const copy = functionCopy[id];
     const local = ceremonyName(draft, id);
-    const muhurat = muhuratName(draft, id);
     return (
       <li
         key={id}
@@ -399,33 +448,7 @@ export function FunctionsStep({ draft, update, errors }: StepProps) {
             </Badge>
           )}
         </div>
-        {fn.included && (
-          <FunctionFields
-            id={id}
-            fn={fn}
-            errors={errors}
-            withTime={withTime}
-            muhurat={
-              muhurat ? { name: muhurat.native, lang: draftTradition(draft)!.language } : null
-            }
-            set={(change) => setFunction(id, change)}
-            guide={functionGuide(draft.guide, id)}
-            setGuide={(change) => setGuide(id, change)}
-            sources={withPlace
-              .filter(
-                (other) => other !== id && draft.functions[other].venue.trim() !== fn.venue.trim(),
-              )
-              .map((other) => ({ id: other, name: functionCopy[other].name }))}
-            copyFrom={(from) => copyPlace(from, [id])}
-            emptyOthers={withoutPlace.filter((other) => other !== id).length}
-            copyToEmpty={() =>
-              copyPlace(
-                id,
-                withoutPlace.filter((other) => other !== id),
-              )
-            }
-          />
-        )}
+        {fn.included && fields(id, errors)}
       </li>
     );
   };

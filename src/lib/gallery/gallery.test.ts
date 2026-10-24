@@ -6,6 +6,7 @@ import { SUITES, suiteFor, suiteSuits, weddingFit } from "@/lib/suites/catalog";
 import {
   OCCASIONS,
   WEDDING_KINDS,
+  cardDesign,
   designHref,
   kindDesigns,
   occasionDesigns,
@@ -109,9 +110,12 @@ describe("gallery catalog", () => {
     expect(suiteOccasion("love-letter")).toBe("save-the-date");
   });
 
-  it("sends Use this design to the editor with everything chosen", () => {
+  it("sends Use this design to the design's own page with everything chosen", () => {
     expect(designHref(paintedDesign("rajbari"), { category: "wedding", kind: "bengali" })).toBe(
-      "/create?category=wedding&tradition=bengali&suite=rajbari&template=alpona",
+      "/create/rajbari?category=wedding&kind=bengali&tradition=bengali",
+    );
+    expect(designHref(cardDesign("marigold"), { category: "haldi" })).toBe(
+      "/create/card-marigold?category=haldi",
     );
   });
 
@@ -120,7 +124,9 @@ describe("gallery catalog", () => {
     expect(ids).toContain("kayal-scene");
     expect(ids).toContain("kayal");
     expect(new Set(ids).size).toBe(ids.length);
-    expect(designHref(sceneDesign("kayal"), { category: "wedding" })).toContain("format=scene");
+    expect(designHref(sceneDesign("kayal"), { category: "wedding" })).toContain(
+      "/create/kayal-scene?",
+    );
   });
 
   it("lists the Scene themes painted for an occasion there, and not for weddings", () => {

@@ -1,6 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { designWords } from "@/components/gallery/design-words";
 import { landingText } from "@/i18n/copy/landing";
 import { isUiLocale } from "@/i18n/locales";
+import { designById } from "@/lib/gallery/catalog";
 import { getBusiness } from "@/lib/payments/business";
 import { supportWhatsAppUrl } from "@/lib/publish/links";
 import { pagePath } from "@/lib/seo/paths";
@@ -18,9 +20,9 @@ export async function GET(request: NextRequest) {
   const locale = isUiLocale(lang) ? lang : "en";
   const { shell } = landingText[locale];
   const { phone } = await getBusiness();
-  const chat = supportWhatsAppUrl(
-    phone,
-    params.get("for") === "make" ? shell.makeMessage : shell.helpMessage,
-  );
+  // From a design's own page the request names the design (&design=<id>)
+  const design = designById(params.get("design") ?? "");
+  const make = design ? shell.makeMessageFor(designWords(design, locale).name) : shell.makeMessage;
+  const chat = supportWhatsAppUrl(phone, params.get("for") === "make" ? make : shell.helpMessage);
   return NextResponse.redirect(chat ?? new URL(pagePath({ kind: "contact" }, locale), request.url));
 }

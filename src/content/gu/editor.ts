@@ -2143,3 +2143,28 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
     jain: "જૈન પ્રતીક",
   },
 };
+
+export const quickCopy: Translation<typeof en.quickCopy> = {
+  metaTitle: (name) => `તમારું આમંત્રણ બનાવો: ${name}`,
+  back: "પાછા",
+  watch: "ખૂલતું જુઓ",
+  free: "અજમાવવું મફત છે. પૈસા ફક્ત મોકલતી વખતે.",
+  eyebrow: "તેને તમારું બનાવો",
+  title: "થોડી જ મિનિટોમાં તમારું આમંત્રણ",
+  intro:
+    "તમારાં નામ લખો, તે ડિઝાઇન પર દેખાવા લાગશે. શબ્દો, સંગીત અને જવાબના સવાલો આપમેળે ભરાઈ જાય છે.",
+  whenHeading: "ક્યારે અને ક્યાં",
+  addFunction: "બીજો પ્રસંગ ઉમેરો",
+  addOne: (name) => `${name} ઉમેરો`,
+  remove: (name) => `${name} કાઢો`,
+  familyTitle: "પરિવારનાં નામ",
+  familyIntro: "ઇચ્છો તો: માતા-પિતા, આશીર્વાદ અને મહેમાનો કોને ફોન કરે",
+  photosTitle: "તમારા ફોટા",
+  photosIntro: "ઇચ્છો તો: ડિઝાઇનમાં તમારા ફોટા માટે ફ્રેમ છે",
+  see: "મારું આમંત્રણ જુઓ",
+  nothingToPay: "હમણાં કંઈ ચૂકવવાનું નથી",
+  more: "વધુ વિકલ્પો",
+  moreIntro: "તમારું ગીત, શબ્દો, ખૂલવાનો દરવાજો અને સવાલો",
+  make: "સમય ઓછો છે? અમે તમારા માટે બનાવી આપીશું",
+  opening: "ડિઝાઇન ખૂલી રહી છે…",
+};

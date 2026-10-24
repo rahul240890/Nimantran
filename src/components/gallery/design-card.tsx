@@ -28,7 +28,6 @@ import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
 import { galleryText } from "@/i18n/copy/gallery";
 import { cn } from "@/lib/cn";
-import { funnel } from "@/lib/funnel";
 import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -100,7 +99,6 @@ export function DesignCard({
   const scene = design.format === "scene";
   const moving = isMoving(design.suite);
   const painted = pages.length > 0;
-  const [open, setOpen] = useState(false);
   const trending = useTrending().includes(design.id);
 
   return (
@@ -114,7 +112,8 @@ export function DesignCard({
           : "overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float",
       )}
     >
-      {/* The painting opens the preview; Live demo beside it opens the design as a guest gets it */}
+      {/* The painting opens the design's own page, as its words do (owner, 2026-10-24: tap a
+          design to fill in the details); Live demo beside it opens it as a guest gets it */}
       <div
         className={cn(
           "@container/tile relative",
@@ -122,16 +121,16 @@ export function DesignCard({
             "rounded-2xl shadow-raised ring-1 ring-line transition-[transform,box-shadow] duration-500 ease-out-expo group-hover:-translate-y-1 group-hover:shadow-float motion-still:transition-none motion-still:group-hover:translate-y-0",
         )}
       >
-        <button
-          type="button"
-          onClick={() => {
-            setOpen(true);
-            funnel("Design previewed", { design: design.id });
-          }}
-          aria-label={galleryCopy.preview(name)}
+        {/* A second way to the same page for the pointer: keyboards and screen readers take
+            the words' link, so this one stays out of the tab order */}
+        <Link
+          href={href}
+          tabIndex={-1}
+          aria-hidden
+          data-design-picture
           className={cn(
-            "relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night focus-visible:outline-2 focus-visible:outline-ring",
-            compact ? "rounded-2xl outline-offset-3" : "outline-offset-[-3px]",
+            "relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night",
+            compact && "rounded-2xl",
           )}
         >
           {scene ? (
@@ -208,7 +207,7 @@ export function DesignCard({
           {compact && (
             <TierBadge designId={design.id} className="absolute start-3 bottom-3 max-w-[55%]" />
           )}
-        </button>
+        </Link>
         {/* A narrow tile keeps only its play button; its name stays for screen readers */}
         <Link
           href={sampleHref ?? samplePath(design.id)}
@@ -281,17 +280,6 @@ export function DesignCard({
           </Button>
         </div>
       )}
-      <DesignPreview
-        open={open}
-        onOpenChange={setOpen}
-        design={design}
-        name={name}
-        description={description}
-        href={href}
-        sampleHref={sampleHref}
-        photos={photos}
-        pages={pages}
-      />
     </article>
   );
 }

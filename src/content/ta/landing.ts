@@ -56,6 +56,8 @@ export const shell: Translation<typeof en.shell> = {
   helpMessage: "வணக்கம் Shubh Invitation, என் அழைப்பிதழை உருவாக்க உதவி வேண்டும்.",
   makeMessage:
     "வணக்கம் Shubh Invitation, எங்கள் அழைப்பிதழை எங்களுக்காக உருவாக்கித் தாருங்கள். எங்கள் விவரங்கள்:",
+  makeMessageFor: (design) =>
+    `வணக்கம் Shubh Invitation, ${design} டிசைனில் எங்கள் அழைப்பிதழை எங்களுக்காக உருவாக்கித் தாருங்கள். எங்கள் விவரங்கள்:`,
   footer: {
     tagline: "விருந்தினர்கள் திறந்து, சுழற்றி, பாதுகாக்கும் 3D அழைப்பிதழ்கள்.",
     explore: "ஆராயுங்கள்",

@@ -414,8 +414,12 @@ test.describe("invite editor", () => {
       .first()
       .getByRole("link", { name: /Use this design/ });
     await expect(use).toHaveAttribute("href", /faith=muslim/);
-    await page.goto(`${await use.getAttribute("href")}&quality=2d`);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
+    // The design's own page, then More options for the full editor
+    await page.goto((await use.getAttribute("href"))!);
+    await page.getByRole("button", { name: "More options" }).click();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?", {
+      timeout: 15_000,
+    });
 
     const parts = page.getByRole("group", { name: "Your details, in six parts" });
     await parts.getByRole("button", { name: /^Card words: / }).click();

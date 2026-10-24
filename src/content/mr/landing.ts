@@ -54,6 +54,8 @@ export const shell: Translation<typeof en.shell> = {
   themeHeading: "थीम",
   helpMessage: "नमस्कार Shubh Invitation, मला माझे निमंत्रण बनवण्यासाठी मदत हवी आहे.",
   makeMessage: "नमस्कार Shubh Invitation, कृपया आमचे निमंत्रण आमच्यासाठी बनवून द्या. आमचे तपशील:",
+  makeMessageFor: (design) =>
+    `नमस्कार Shubh Invitation, कृपया आमचे निमंत्रण ${design} डिझाइनमध्ये आमच्यासाठी बनवून द्या. आमचे तपशील:`,
   footer: {
     tagline: "3D निमंत्रणे, जी पाहुणे उघडतात, फिरवतात आणि जपतात.",
     explore: "पाहा",

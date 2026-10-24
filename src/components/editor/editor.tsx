@@ -30,7 +30,6 @@ import {
   newDraft,
   withCategory,
   functionOrder,
-  withGalleryChoice,
   withSiteLanguage,
   withTradition,
   type EditorStep,
@@ -38,6 +37,7 @@ import {
 } from "@/lib/editor/draft";
 import { stepErrors } from "@/lib/editor/draft-checks";
 import { deletePhoto } from "@/lib/editor/photos";
+import { startWithDesign } from "@/lib/editor/gallery-start";
 import { inviteDraft, type SaveState } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore, type SyncState } from "@/lib/invites/sync";
 import type { SuiteId } from "@/lib/suites/catalog";
@@ -350,27 +350,17 @@ export function Editor({
         // date, photo and word kept (owner, 2026-10-22: hosts had to fill everything in
         // again). Only an invite already live, or one for another occasion, stays as it is
         // in My invites while a new one starts with the design.
-        const choice = {
-          category: initialCategory,
-          tradition: initialTradition,
-          suite: initialSuite,
-          template: initialTemplate,
-          format: initialFormat ?? undefined,
-          faith: initialFaith,
-        };
-        const current = inviteDraft.get().draft;
-        const keepsWork =
-          current.slug === null && (!choice.category || choice.category === current.categoryId);
-        const switched =
-          signedIn && current.updatedAt !== 0 && !initialInvite && !fresh && !keepsWork
-            ? await switchDraft(null, {
-                signedIn,
-                fresh: () => withGalleryChoice(newDraft(), choice, siteLanguage.current),
-              })
-            : false;
-        if (!switched) {
-          update((draft) => withGalleryChoice(draft, choice, siteLanguage.current));
-        }
+        await startWithDesign(
+          {
+            category: initialCategory,
+            tradition: initialTradition,
+            suite: initialSuite,
+            template: initialTemplate,
+            format: initialFormat ?? undefined,
+            faith: initialFaith,
+          },
+          { signedIn: signedIn && !initialInvite && !fresh, site: siteLanguage.current },
+        );
         router.replace("/create", { scroll: false });
         return;
       }
