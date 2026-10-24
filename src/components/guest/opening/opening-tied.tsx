@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import "@/app/tied-gates.css";
 import { tiedBeyond, tiedSpec, type TiedGate } from "@/lib/opening/catalog";

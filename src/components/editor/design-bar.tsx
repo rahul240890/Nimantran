@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { useState } from "react";
 import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { TierBadge } from "@/components/pricing/tier-badge";

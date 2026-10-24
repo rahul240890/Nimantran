@@ -2,7 +2,7 @@
 
 import { format, parseISO } from "date-fns";
 import { CalendarPlus, Flower2 } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import type { FunctionId } from "@/lib/events/functions";

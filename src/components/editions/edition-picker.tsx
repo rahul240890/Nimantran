@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Globe, LockOpen, ShieldCheck, Sparkles, TicketPercent, Users } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

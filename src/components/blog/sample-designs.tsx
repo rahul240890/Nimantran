@@ -1,5 +1,5 @@
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { designWords } from "@/components/gallery/design-words";
 import { galleryText } from "@/i18n/copy/gallery";

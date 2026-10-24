@@ -1,5 +1,5 @@
 import { FlowerMark } from "@/components/invitation/art/flower-mark";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import type { CSSProperties, ReactNode } from "react";
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";

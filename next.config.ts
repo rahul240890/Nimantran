@@ -28,7 +28,7 @@ const nextConfig: NextConfig = {
   headers: async () => [
     { source: "/:path*", headers: SECURITY_HEADERS },
     // The paintings keep their names when redrawn, so a day's cache, refreshed quietly after
-    ...["/suites/:path*", "/openings/:path*"].map((source) => ({
+    ...["/suites/:path*", "/openings/:path*", "/cards/:path*"].map((source) => ({
       source,
       headers: [
         { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },

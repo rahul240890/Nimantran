@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { OneScene } from "@/components/invitation/scene/one-scene";
 import type { CategoryId } from "@/lib/categories/catalog";
 import { cn } from "@/lib/cn";
@@ -10,6 +9,7 @@ import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { PAINTING_ASPECT } from "@/lib/suites/photo-frames";
 import { sceneLine } from "@/lib/suites/scene-type";
 import { scenePage, type ScenePage } from "@/lib/suites/scene";
+import { CardPicture } from "./card-picture";
 import { useSampleInvite } from "./sample";
 
 /*
@@ -72,35 +72,35 @@ export function ScenePoster({
       className={cn("absolute inset-x-0 top-0 block", className)}
       style={{ aspectRatio: String(PAINTING_ASPECT) }}
     >
-      {/* The sample photos show through the frames, as the couple's own will */}
-      {page.frames.map(([x, y, width, height], i) =>
-        photos[i] ? (
-          // eslint-disable-next-line @next/next/no-img-element -- a small stand-in under the painting
-          <img
-            key={i}
-            src={photos[i].src}
-            alt=""
-            aria-hidden
-            loading={priority ? undefined : "lazy"}
-            className="absolute bg-card-ivory object-cover"
-            style={{
-              left: `${x - 0.8}%`,
-              top: `${y - 0.5}%`,
-              width: `${width + 1.6}%`,
-              height: `${height + 1}%`,
-            }}
-          />
-        ) : null,
-      )}
-      {/* A Scene theme shows its painting with the card in place */}
-      <Image
+      {/* A Scene theme shows its painting with the card in place, its top three quarters as
+          the card shows it, and the sample photos show through the frames, as the couple's
+          own will */}
+      <CardPicture
         src={scenePicture(suite)!}
         alt={alt}
-        fill
-        loading={priority ? "eager" : "lazy"}
-        sizes="(min-width: 80rem) 22vw, (min-width: 40rem) 33vw, 50vw"
-        className="object-cover"
-      />
+        priority={priority}
+        box="inset-x-0 top-0 aspect-[3/4] w-full"
+      >
+        {page.frames.map(([x, y, width, height], i) =>
+          photos[i] ? (
+            // eslint-disable-next-line @next/next/no-img-element -- a small stand-in under the painting
+            <img
+              key={i}
+              src={photos[i].src}
+              alt=""
+              aria-hidden
+              loading={priority ? undefined : "lazy"}
+              className="absolute bg-card-ivory object-cover"
+              style={{
+                left: `${x - 0.8}%`,
+                top: `${y - 0.5}%`,
+                width: `${width + 1.6}%`,
+                height: `${height + 1}%`,
+              }}
+            />
+          ) : null,
+        )}
+      </CardPicture>
       {/* An illustrated card's empty space carries sample names, so it reads as a card */}
       {page.style === "bare" && !SUITES[suite].occasions && (
         <PosterNames suite={suite} page={page} />

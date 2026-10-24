@@ -1,5 +1,5 @@
 import { ArrowRight, Star } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { SocialIcon } from "@/components/brand/social-links";
 import { helpPath } from "@/components/shell/nav-links";

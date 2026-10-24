@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronDown, DoorOpen, LoaderCircle, MailCheck } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import { pageImage, StoryPlayer } from "@/components/invitation/story/story-player";

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import { PAINTED_GATES, type PaintedGate } from "@/lib/opening/catalog";
 

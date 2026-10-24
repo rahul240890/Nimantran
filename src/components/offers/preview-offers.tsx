@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowRight, Check, Copy, Sparkles } from "lucide-react";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useDesignTier } from "@/components/pricing/pricing-provider";

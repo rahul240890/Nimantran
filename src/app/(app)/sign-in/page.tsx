@@ -1,6 +1,6 @@
 import { Check, PenLine } from "lucide-react";
 import type { Metadata } from "next";
-import Image from "next/image";
+import { Image } from "@/components/ui/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AccountShell } from "@/components/account/account-shell";
