@@ -560,11 +560,18 @@ function AddressedCatalog({ covers }: { covers: Covers }) {
   const params = useSearchParams();
   const pathname = usePathname();
   const filters = useMemo(() => filtersFromParams(new URLSearchParams(params)), [params]);
-  const change = (next: DesignFilters) => {
+  const change = (asked: DesignFilters) => {
+    // A long list can still be drawing the last change when the next one comes, so this
+    // render's filters may be behind the address: carry over only what this change alters
+    const latest = filtersFromParams(new URLSearchParams(window.location.search));
+    const next = { ...latest };
+    for (const key of Object.keys(asked) as (keyof DesignFilters)[]) {
+      if (asked[key] !== filters[key]) Object.assign(next, { [key]: asked[key] });
+    }
     const url = `${pathname}${filtersToParams(next)}`;
     // Moving between the rows and a list is a new step Back returns from; a change
     // within the list replaces it, so Back does not walk through every letter typed
-    if (hasFilters(next) !== hasFilters(filters)) {
+    if (hasFilters(next) !== hasFilters(latest)) {
       window.history.pushState(null, "", url);
     } else {
       window.history.replaceState(null, "", url);
