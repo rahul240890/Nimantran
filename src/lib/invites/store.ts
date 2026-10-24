@@ -92,6 +92,51 @@ type Joined = EventRow & {
 };
 
 type Supabase = NonNullable<Awaited<ReturnType<typeof supabaseServer>>>;
+/** The signed-in person's connection, or the server's own key. */
+type Reader = Supabase | NonNullable<ReturnType<typeof supabaseService>>;
+
+/** An invite with its functions, photos and questions, as far as this connection may read. */
+async function readInvite(supabase: Reader, id: string): Promise<InviteDraft | null> {
+  const { data, error } = await supabase
+    .from("events")
+    .select(
+      `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), media(${MEDIA_COLUMNS}), rsvp_questions(${QUESTION_COLUMNS})`,
+    )
+    .eq("id", id)
+    .maybeSingle();
+  if (error || !data) return null;
+  const { functions, media, rsvp_questions: questions, ...event } = data as Joined;
+  return rowsToDraft(
+    event,
+    functions,
+    media ?? [],
+    (questions ?? []).flatMap((row) => (row.preset ? [row.preset] : [])),
+  );
+}
+
+/** Short-lived links to an invite's photos and music clip, by id. */
+async function mediaUrls(supabase: Reader, id: string): Promise<Record<string, string>> {
+  const { data: media, error } = await supabase
+    .from("media")
+    .select("id, storage_path")
+    .eq("event_id", id)
+    .in("kind", ["photo", "audio"]);
+  // An error isn't an empty invite: the editor would take its photos for lost
+  if (error) throw error;
+  if (!media?.length) return {};
+  const { data, error: linkError } = await supabase.storage.from(BUCKET).createSignedUrls(
+    media.map((row) => row.storage_path as string),
+    PHOTO_LINK_SECONDS,
+  );
+  if (linkError) throw linkError;
+  const byPath = new Map((data ?? []).map((link) => [link.path, link.signedUrl]));
+  return Object.fromEntries(
+    media.flatMap((row) => {
+      const url = byPath.get(row.storage_path as string);
+      return url ? [[row.id as string, url]] : [];
+    }),
+  );
+}
 
 /**
  * Writes a live invite's design columns with the server's key, for a host who edits it, so
@@ -146,22 +191,7 @@ const supabaseStore: InviteStore = {
 
   async get(_account, id) {
     const supabase = await supabaseServer();
-    if (!supabase) return null;
-    const { data, error } = await supabase
-      .from("events")
-      .select(
-        `${EVENT_COLUMNS}, functions(${FUNCTION_COLUMNS}), media(${MEDIA_COLUMNS}), rsvp_questions(${QUESTION_COLUMNS})`,
-      )
-      .eq("id", id)
-      .maybeSingle();
-    if (error || !data) return null;
-    const { functions, media, rsvp_questions: questions, ...event } = data as Joined;
-    return rowsToDraft(
-      event,
-      functions,
-      media ?? [],
-      (questions ?? []).flatMap((row) => (row.preset ? [row.preset] : [])),
-    );
+    return supabase ? readInvite(supabase, id) : null;
   },
 
   async save(account, draft) {
@@ -350,27 +380,7 @@ const supabaseStore: InviteStore = {
 
   async photoUrls(_account, id) {
     const supabase = await supabaseServer();
-    if (!supabase) return {};
-    const { data: media, error } = await supabase
-      .from("media")
-      .select("id, storage_path")
-      .eq("event_id", id)
-      .in("kind", ["photo", "audio"]);
-    // An error isn't an empty invite: the editor would take its photos for lost
-    if (error) throw error;
-    if (!media?.length) return {};
-    const { data, error: linkError } = await supabase.storage.from(BUCKET).createSignedUrls(
-      media.map((row) => row.storage_path as string),
-      PHOTO_LINK_SECONDS,
-    );
-    if (linkError) throw linkError;
-    const byPath = new Map((data ?? []).map((link) => [link.path, link.signedUrl]));
-    return Object.fromEntries(
-      media.flatMap((row) => {
-        const url = byPath.get(row.storage_path as string);
-        return url ? [[row.id as string, url]] : [];
-      }),
-    );
+    return supabase ? mediaUrls(supabase, id) : {};
   },
 
   async slugAvailable(slug) {
@@ -561,4 +571,35 @@ export function inviteStore(): InviteStore | null {
   if (mode === "supabase") return supabaseStore;
   if (mode === "preview") return previewStore;
   return null;
+}
+
+/**
+ * An invite, its photos and its music read with the server's key, for a family preview link
+ * (lib/invites/family-link.ts), where the signed link itself is the permission. Null for an
+ * unknown invite, or without the key.
+ */
+export async function readInviteAsServer(
+  id: string,
+): Promise<{ draft: InviteDraft; urls: Record<string, string> } | null> {
+  const mode = authMode();
+  if (mode === "preview") {
+    const stored = previewDb.invites.get(id);
+    if (!stored) return null;
+    const draft = rowsToDraft(stored.event, stored.functions, stored.photos, stored.questions);
+    const ids = [...stored.photos.map((photo) => photo.id), ...(stored.clip ? [stored.clip] : [])];
+    const urls = Object.fromEntries(
+      ids.flatMap((fileId) => {
+        const url = previewPhotoUrl(id, fileId);
+        return url ? [[fileId, url]] : [];
+      }),
+    );
+    return { draft, urls };
+  }
+  if (mode !== "supabase") return null;
+  const service = supabaseService();
+  if (!service) return null;
+  const draft = await readInvite(service, id);
+  if (!draft) return null;
+  const urls = await mediaUrls(service, id).catch(() => ({}) as Record<string, string>);
+  return { draft, urls };
 }

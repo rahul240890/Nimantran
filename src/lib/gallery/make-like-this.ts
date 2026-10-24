@@ -2,8 +2,11 @@ import type { InviteDraft } from "@/lib/editor/draft";
 import { draftDesignId } from "@/lib/plans/design-defaults";
 import { designById, designHref } from "./catalog";
 
-/** Marks a visit that came from a guest's "Make an invitation like this" (Admin, Visitors). */
-export const GUEST_SOURCE = "guest";
+/**
+ * Marks where a visit came from on Admin, Visitors: a guest's "Make an invitation like
+ * this", or the same on a family preview link.
+ */
+export type LikeThisSource = "guest" | "family";
 
 /**
  * Where a guest goes from a live invitation to make one like it (owner, 2026-10-24: every
@@ -13,8 +16,9 @@ export const GUEST_SOURCE = "guest";
  */
 export function makeLikeThisHref(
   draft: Pick<InviteDraft, "suite" | "tradition" | "templateId" | "categoryId" | "format">,
+  source: LikeThisSource = "guest",
 ): string {
   const design = designById(draftDesignId(draft));
   const href = design ? designHref(design, { category: draft.categoryId }) : "/";
-  return `${href}${href.includes("?") ? "&" : "?"}utm_source=${GUEST_SOURCE}`;
+  return `${href}${href.includes("?") ? "&" : "?"}utm_source=${source}`;
 }

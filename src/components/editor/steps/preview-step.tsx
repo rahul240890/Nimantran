@@ -20,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { CategoryIcon } from "@/components/categories/category-icon";
 import { EditionNotice } from "@/components/editions/edition-notice";
+import { FamilyPreview } from "../family-preview";
 import {
   draftCategory,
   draftTemplate,
@@ -143,6 +144,11 @@ export function PreviewStep({
 
       {signedIn && draft.remoteId && problems.length === 0 && (
         <SeeAsGuest remoteId={draft.remoteId} published={Boolean(draft.slug)} />
+      )}
+
+      {/* Before it's live, the family can see it first */}
+      {problems.length === 0 && !draft.slug && (
+        <FamilyPreview signedIn={signedIn} remoteId={draft.remoteId} />
       )}
 
       {/* After seeing it once: guests can also read it in a second language */}

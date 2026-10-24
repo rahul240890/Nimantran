@@ -406,3 +406,8 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   opening: "உங்கள் அழைப்பிதழ் திறக்கிறது",
   changeGate: "திறக்கும் வாயிலை மாற்றவும்",
 };
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  metaTitle: (names) => (names ? `${names}: அழைப்பிதழ் முன்னோட்டம்` : "அழைப்பிதழ் முன்னோட்டம்"),
+  badge: "முன்னோட்டம் · இன்னும் விருந்தினர்களுக்கு அனுப்பப்படவில்லை",
+};

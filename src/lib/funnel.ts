@@ -17,7 +17,8 @@ export type FunnelStep =
   | "Preview reached"
   | "Checkout started"
   | "Payment completed"
-  | "Invite published";
+  | "Invite published"
+  | "Family preview shared";
 
 type Detail = Partial<Record<"design" | "category" | "plan" | "tier", string>>;
 

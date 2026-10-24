@@ -921,6 +921,19 @@ export const previewCopy = {
   watchVideo: "Watch it as a video",
   seeAsGuestBody:
     "The whole invitation, full screen: the opening, the music, every page and the reply form.",
+  /** Before paying, a preview the family can see (lib/invites/family-link.ts). */
+  familyTitle: "Show your family first",
+  familyBody:
+    "Send them a preview on WhatsApp. They see the invitation as guests will, marked as a preview, and nothing goes to guests until you send it.",
+  familySend: "Send to family on WhatsApp",
+  familyCopy: "Copy link",
+  familyCopied: "Link copied",
+  familyFailed: "Couldn't make the link just now. Try again in a moment.",
+  familySignInBody:
+    "Sign in and we'll make a preview link you can send to your family on WhatsApp.",
+  familySignIn: "Sign in to share",
+  familyMessage: (url: string) =>
+    `Here's a preview of our invitation. Have a look and tell us what you think before we send it: ${url}`,
   notReady: "A few details are missing",
   fix: (label: string) => `Finish ${label.toLowerCase()}`,
   occasionHeading: "Occasion",

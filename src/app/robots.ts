@@ -20,6 +20,7 @@ export default function robots(): MetadataRoute.Robots {
         "/auth/",
         "/claim/",
         "/create",
+        "/family/",
         "/invites",
         "/join/",
         "/sign-in",

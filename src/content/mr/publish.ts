@@ -346,3 +346,8 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   opening: "तुमचे निमंत्रण उघडत आहे",
   changeGate: "उघडणारे प्रवेशद्वार बदला",
 };
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  metaTitle: (names) => (names ? `${names}: निमंत्रणाची झलक` : "निमंत्रणाची झलक"),
+  badge: "झलक · अजून पाहुण्यांना पाठवलेले नाही",
+};

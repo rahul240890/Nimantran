@@ -387,3 +387,9 @@ export const hostPreviewCopy = {
   opening: "Opening your invitation",
   changeGate: "Change the opening gate",
 } as const;
+
+/** A family preview link (/family/<token>): the invitation before it is sent. */
+export const familyCopy = {
+  metaTitle: (names: string) => (names ? `${names}: invitation preview` : "Invitation preview"),
+  badge: "Preview · not sent to guests yet",
+} as const;

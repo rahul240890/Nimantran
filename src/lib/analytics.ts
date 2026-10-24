@@ -9,6 +9,7 @@ const PRIVATE: readonly [RegExp, string][] = [
   [/^\/invites\/[^/]+/, "/invites/[id]"],
   [/^\/join\/[^/]+/, "/join/[token]"],
   [/^\/claim\/[^/]+/, "/claim/[token]"],
+  [/^\/family\/[^/]+/, "/family/[token]"],
 ];
 
 /** The address as it may be counted: no query or fragment, private segments replaced. */

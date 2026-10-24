@@ -338,3 +338,8 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   opening: "আপনার নিমন্ত্রণপত্র খুলছে",
   changeGate: "খোলার দরজা বদলান",
 };
+
+export const familyCopy: Translation<typeof en.familyCopy> = {
+  metaTitle: (names) => (names ? `${names}: নিমন্ত্রণপত্রের ঝলক` : "নিমন্ত্রণপত্রের ঝলক"),
+  badge: "ঝলক · এখনও অতিথিদের পাঠানো হয়নি",
+};
