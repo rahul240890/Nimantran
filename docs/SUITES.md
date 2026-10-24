@@ -48,7 +48,11 @@ A Scene prints the blessing (॥ श्री गणेशाय नमः ॥, 
 
 The welcome shows the couple's photo, or both photos side by side over their names when the host gave one each (owner, 2026-10-24; preview with `&couple=two`). A theme whose photos are laid out as a film (`section-layouts.ts`) shows them as a carousel: each photo comes to the middle by itself every few seconds while the section is on screen, with previous, next and pause, and a swipe still works; a pointer resting on it or a button in focus holds it, and in still mode it only moves when asked.
 
-## Later
+## Which occasions a theme shows for
+
+A wedding theme shows for the steps of the wedding journey it suits (`weddingFit`), a theme painted for an occasion for its own `occasions`. A story theme told without a wedding in it says whose days it is painted for, `storyFor` (owner, 2026-10-24: a birthday listed rose-and-perfume wedding designs, and a wedding kites and toys): `couples` (the wedding journey, anniversaries and Karva Chauth), `children` (birthdays and a baby's days, never a wedding) or `family` (the wedding journey and the home's, festivals', parties', business and graduation days); `STORY_OCCASIONS` in `src/lib/suites/catalog.ts` lists them. Away from the wedding journey a design shows only the pages that occasion's invitation has (`occasionPages`: the blessing where painted, the cover, the family, its one celebration on the reception's painting, the reply), so a birthday's card counts four pages and never shows a haldi, and its Live demo plays that occasion's invitation (`sampleInvite` with the listing's occasion).
+
+## Later## Later
 
 - Faith-specific themes whose art carries the faith: a Nikah garden with jaali and a crescent, a chapel with florals, Anand Karaj. These come with the Muslim, Christian and Sikh packs in Step 23.
 - Guests invited to some functions see only those pages.

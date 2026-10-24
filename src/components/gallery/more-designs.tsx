@@ -42,6 +42,7 @@ export function MoreDesigns({
           sampleHref={samplePath(design.id, kind ? { kind } : { occasion: category })}
           photos={designPhotos(design, category)}
           occasion={occasion}
+          category={category}
           cover={design.suite === "classic" ? covers[design.template] : undefined}
         />
       </li>

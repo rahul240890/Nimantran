@@ -15,7 +15,7 @@ import { storyFunctions } from "@/lib/publish/story";
 import { sampleInvite } from "@/lib/sample/invite";
 import { listingPath, sampleWalk } from "@/lib/sample/browse";
 import { pagePath } from "@/lib/seo/paths";
-import type { CategoryId } from "@/lib/categories/catalog";
+import { isCategoryId, type CategoryId } from "@/lib/categories/catalog";
 import type { WeddingKind } from "@/lib/gallery/catalog";
 
 /*
@@ -53,7 +53,13 @@ export default async function SamplePage({ params, searchParams }: PageProps<"/s
   const locale = await getLocale();
   const { galleryCopy } = galleryText[locale];
   const { functionCopy } = editorText[locale];
-  const { draft, photos, category } = sampleInvite(design, locale);
+  // Opened from an occasion's page, the sample is that occasion's invitation
+  const listed = search.get("occasion");
+  const { draft, photos, category } = sampleInvite(
+    design,
+    locale,
+    isCategoryId(listed) ? listed : undefined,
+  );
 
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => ({
     ...told,

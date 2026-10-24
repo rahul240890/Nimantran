@@ -100,6 +100,16 @@ test.describe("live samples", () => {
     await expect(page.getByRole("button", { name: "Open the invitation" })).toBeVisible();
   });
 
+  // Owner, 2026-10-24: a story design's demo from the birthdays played a wedding, haldi and all
+  test("a story design opened from the birthdays plays a birthday", async ({ page }) => {
+    await page.goto("/sample/panchatantra?occasion=birthday");
+    await expect(page.getByText("Aanya").first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("Arjun")).toHaveCount(0);
+    for (const wedding of ["Haldi", "Mehendi", "Sangeet", "Baraat"]) {
+      await expect(page.getByText(wedding, { exact: true })).toHaveCount(0);
+    }
+  });
+
   test("a 3D card's page opens its sample", async ({ page }) => {
     await page.goto("/designs/marigold");
     await page.getByRole("link", { name: "See it live as a guest" }).click();

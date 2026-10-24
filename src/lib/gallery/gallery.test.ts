@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { occasionPages, paintedPages } from "./pictures";
 import { allSearchWords } from "@/components/gallery/design-words";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
 import { newDraft, withGalleryChoice } from "@/lib/editor/draft";
@@ -7,6 +8,7 @@ import {
   OCCASIONS,
   WEDDING_KINDS,
   cardDesign,
+  designById,
   designHref,
   kindDesigns,
   occasionDesigns,
@@ -79,20 +81,48 @@ describe("gallery catalog", () => {
         }
         expect(suiteSuits(design.suite, category), `${design.id} for ${category}`).toBe(true);
         // A wedding's theme never shows for a party, a puja or a festival; a story theme,
-        // told without a wedding in it, shows for every occasion
-        if (!wedding && !SUITES[design.suite].everyOccasion)
+        // told without a wedding in it, shows for the days of those it is painted for
+        if (!wedding && !SUITES[design.suite].storyFor)
           expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
+        // A birthday or a baby's day lists nothing that also tells a wedding (owner, 2026-10-24)
+        if (
+          ["birthdays", "baby"].includes(CATEGORIES[category].group) &&
+          category !== "anniversary"
+        )
+          expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
+        // ...and a wedding no children's theme
+        if (wedding)
+          expect(SUITES[design.suite].storyFor ?? [], design.id).not.toEqual(["children"]);
       }
-      // A story theme suits every occasion but a prayer meet
-      expect(suiteSuits("navrang", category)).toBe(category !== "prayer-meet");
       // Every occasion has at least one painted design of its own
       expect(occasionDesigns(category).some((design) => design.suite !== "classic")).toBe(true);
     }
+    // Each story theme is listed for the days of those it is painted for
+    expect(["wedding", "anniversary"].every((c) => suiteSuits("navrang", c as never))).toBe(true);
+    expect(suiteSuits("navrang", "birthday")).toBe(false);
+    expect(suiteSuits("panchatantra", "birthday")).toBe(true);
+    expect(suiteSuits("panchatantra", "wedding")).toBe(false);
+    expect(suiteSuits("panchatantra", "anniversary")).toBe(false);
+    expect(suiteSuits("phool-mandi", "diwali")).toBe(true);
+    expect(suiteSuits("phool-mandi", "wedding")).toBe(true);
+    expect(suiteSuits("phool-mandi", "birthday")).toBe(false);
     for (const kind of WEDDING_KINDS) {
       for (const design of kindDesigns(kind)) {
         if (design.suite !== "classic") expect(suiteSuits(design.suite, "wedding")).toBe(true);
       }
     }
+  });
+
+  it("shows each occasion only the pages its own invitation has", () => {
+    const story = designById("panchatantra")!;
+    // Owner, 2026-10-24: a birthday's preview turned through the haldi, mehendi and baraat
+    const party = occasionPages(story, "birthday");
+    expect(party.map((page) => page.page)).toEqual(["cover", "family", "reception", "reply"]);
+    expect(party.find((page) => page.page === "reception")?.celebration).toBe("birthday");
+    // The wedding journey keeps every painted page
+    const palace = designById("rajwada-bagh")!;
+    expect(occasionPages(palace, "wedding")).toEqual(paintedPages(palace));
+    expect(occasionPages(palace).length).toBeGreaterThan(4);
   });
 
   it("keeps function themes to their own step of the wedding journey", () => {

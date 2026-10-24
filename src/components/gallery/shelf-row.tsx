@@ -53,6 +53,7 @@ export function CatalogCard({
       href={catalogHref(entry, filters)}
       sampleHref={samplePath(entry.design.id, filters)}
       photos={designPhotos(entry.design, catalogCategory(entry, filters))}
+      category={catalogCategory(entry, filters)}
       priority={priority}
       cover={entry.design.suite === "classic" ? covers[entry.design.template] : undefined}
       compact={compact}

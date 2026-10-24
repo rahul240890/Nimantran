@@ -187,6 +187,7 @@ function DesignGallery({
                 sampleHref={samplePath(design.id, kind ? { kind } : { occasion: category })}
                 photos={designPhotos(design, category)}
                 occasion={occasion}
+                category={category}
                 priority={index < 4}
                 cover={design.suite === "classic" ? cover(design) : undefined}
               />
