@@ -1,8 +1,10 @@
 import type { CategoryId } from "@/lib/categories/catalog";
+import { romanize } from "@/lib/names/romanize";
 
 /*
  * The invite's public address, /i/<slug>. Built from the names so families can read it
  * ("aarav-weds-meera"), in plain lowercase ASCII so it survives WhatsApp, SMS and print.
+ * Names in an Indian script are written in English letters first ("राहुल" gives "rahul").
  */
 
 export const SLUG_MAX = 60;
@@ -15,9 +17,9 @@ export function isSlug(value: unknown): value is string {
   return typeof value === "string" && value.length <= SLUG_MAX && SLUG_PATTERN.test(value);
 }
 
-/** "Priyá  D'Souza" → "priya-dsouza". Scripts other than Latin give an empty string. */
+/** "Priyá  D'Souza" → "priya-dsouza", "प्रिया" → "priya". Other scripts give an empty string. */
 export function slugify(text: string): string {
-  return text
+  return romanize(text)
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
@@ -30,7 +32,7 @@ export function slugify(text: string): string {
 
 /** Cleans what a host types into the link field, keeping a trailing dash while they type. */
 export function cleanSlugInput(text: string): string {
-  return text
+  return romanize(text)
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .toLowerCase()
@@ -63,11 +65,24 @@ function trim(slug: string, room = 0): string {
   return slug.slice(0, SLUG_MAX - room).replace(/-+$/, "");
 }
 
-/** Other links to offer when one is taken: "-2" to "-9", then a short random ending. */
-export function slugAlternatives(slug: string, random: () => number = Math.random): string[] {
+/** The year of an ISO date ("2026-12-04"), to end a link with when its own is taken. */
+export function slugYear(date: string | undefined): string | undefined {
+  return /^(\d{4})-\d{2}-\d{2}/.exec(date ?? "")?.[1];
+}
+
+/**
+ * Other links to offer when one is taken: the occasion's year first when known
+ * ("aarav-weds-meera-2026"), then "-2" to "-9", then a short random ending.
+ */
+export function slugAlternatives(
+  slug: string,
+  random: () => number = Math.random,
+  year?: string,
+): string[] {
+  const dated = year && /^\d{4}$/.test(year) ? [`${trim(slug, 5)}-${year}`] : [];
   const numbered = Array.from({ length: 8 }, (_, i) => `${trim(slug, 2)}-${i + 2}`);
   const tail = Math.floor(random() * 36 ** 4)
     .toString(36)
     .padStart(4, "0");
-  return [...numbered, `${trim(slug, 5)}-${tail}`];
+  return [...dated, ...numbered, `${trim(slug, 5)}-${tail}`];
 }

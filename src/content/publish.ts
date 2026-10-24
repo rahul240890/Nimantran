@@ -8,12 +8,16 @@ export const publishCopy = {
   signInToPublish: "Sign in to publish",
   share: "Share",
   finishFirst: "Finish the steps marked above to publish.",
-  dialogTitle: "Choose your link",
+  dialogTitle: "Publish your invitation",
   dialogBody:
     "Guests open your invitation at this address. Once you share it, it stays the same, even if you edit the invite later.",
   linkLabel: "Invitation link",
-  linkHint: "Letters, numbers and dashes.",
+  linkHint:
+    "Letters, numbers and dashes. Type in any language and it's written in English letters.",
   checking: "Checking…",
+  finding: "Finding a free link for you…",
+  ready: "Made from your names, and it's yours.",
+  change: "Change link",
   available: "This link is free.",
   taken: "Someone already has this link.",
   tryOne: "Try one of these:",
@@ -122,6 +126,15 @@ export const guestCopy = {
   addAll: "Add all to calendar",
   photos: "Photos",
   photoAlt: (index: number) => `Photo ${index} from the family`,
+  /** The photos' carousel below the card. */
+  carousel: {
+    label: "slideshow",
+    previous: "Previous photo",
+    next: "Next photo",
+    pause: "Pause the photos",
+    play: "Play the photos",
+    position: (index: number, total: number) => `Photo ${index} of ${total}`,
+  },
   madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",
   /** On a live invitation, for guests with a celebration of their own (owner, 2026-10-24). */

@@ -179,7 +179,7 @@ test.describe("packages", () => {
 
     // Back to the editor with the link dialog open
     await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
-    await expect(page.getByRole("dialog", { name: "Choose your link" })).toBeVisible({
+    await expect(page.getByRole("dialog", { name: "Publish your invitation" })).toBeVisible({
       timeout: 30_000,
     });
     const path = await publish(page, "aarav-paid");

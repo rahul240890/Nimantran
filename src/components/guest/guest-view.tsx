@@ -263,8 +263,11 @@ export function GuestView({
       ...photo,
       fit: photoFit(couple, photo.id, photoAspect(photos, photo.id)),
     }));
-    const welcome = all.find((photo) => photo.id === framed[0]) ?? all[0];
-    return { all, welcome, rest: all.filter((photo) => photo !== welcome) };
+    // The couple's photo, or both when the host gave one each (owner, 2026-10-24: the welcome
+    // showed only the first of the two)
+    const framedPhotos = framed.flatMap((id) => all.find((photo) => photo.id === id) ?? []);
+    const welcome = framedPhotos.length > 0 ? framedPhotos : all.slice(0, 1);
+    return { all, welcome, rest: all.filter((photo) => !welcome.includes(photo)) };
   }, [draft, photos, copy.second]);
   // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
   const opening = draftOpeningStyle(draft, suite, Boolean(scene));
@@ -460,7 +463,7 @@ export function GuestView({
                       ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
                       : null
                   }
-                  photo={placed.welcome}
+                  welcome={placed.welcome}
                   photos={placed.rest}
                   family={family}
                   familyLang={language}

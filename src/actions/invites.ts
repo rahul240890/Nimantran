@@ -121,24 +121,32 @@ export async function invitePhotoUrls(inviteId: string): Promise<Record<string, 
 
 export type SlugCheck = { available: boolean; suggestions: string[] };
 
-async function freeAlternatives(slug: string): Promise<string[]> {
+const yearSchema = z.string().regex(/^\d{4}$/).optional();
+
+async function freeAlternatives(slug: string, year?: string): Promise<string[]> {
   const store = inviteStore();
   if (!store) return [];
   const free: string[] = [];
-  for (const option of slugAlternatives(slug)) {
+  for (const option of slugAlternatives(slug, Math.random, year)) {
     if (await store.slugAvailable(option)) free.push(option);
     if (free.length === 2) break;
   }
   return free;
 }
 
-/** Whether a link is free, with two free ones to offer when it isn't. */
-export async function checkSlug(slug: string): Promise<SlugCheck> {
+/**
+ * Whether a link is free, with two free ones to offer when it isn't, the first ending in
+ * the occasion's year when it is given.
+ */
+export async function checkSlug(slug: string, occasionYear?: string): Promise<SlugCheck> {
   const store = inviteStore();
   const account = await getAccount();
-  if (!store || !account || !isSlug(slug)) return { available: false, suggestions: [] };
+  const ending = yearSchema.safeParse(occasionYear);
+  if (!store || !account || !isSlug(slug) || !ending.success) {
+    return { available: false, suggestions: [] };
+  }
   if (await store.slugAvailable(slug)) return { available: true, suggestions: [] };
-  return { available: false, suggestions: await freeAlternatives(slug) };
+  return { available: false, suggestions: await freeAlternatives(slug, ending.data) };
 }
 
 export type PublishOutcome =
@@ -149,7 +157,11 @@ export type PublishOutcome =
   | { status: "not-ready" | "signed-out" | "failed" };
 
 /** Puts an invite live at /i/<slug>. It must be saved and complete. */
-export async function publishInvite(inviteId: string, slug: string): Promise<PublishOutcome> {
+export async function publishInvite(
+  inviteId: string,
+  slug: string,
+  occasionYear?: string,
+): Promise<PublishOutcome> {
   const store = inviteStore();
   if (!store || !id.safeParse(inviteId).success || !isSlug(slug)) return { status: "failed" };
   const account = await getAccount();
@@ -164,8 +176,10 @@ export async function publishInvite(inviteId: string, slug: string): Promise<Pub
   }
   const result = await store.publish(account, inviteId, slug);
   if (result.ok) return { status: "published", slug: result.slug };
-  if (result.reason === "taken")
-    return { status: "taken", suggestions: await freeAlternatives(slug) };
+  if (result.reason === "taken") {
+    const ending = yearSchema.safeParse(occasionYear);
+    return { status: "taken", suggestions: await freeAlternatives(slug, ending.data) };
+  }
   return { status: "failed" };
 }
 

@@ -501,3 +501,32 @@
     transition: none;
   }
 }
+
+/* The photos' carousel: the photo in the middle in full, its neighbours softer either side */
+.guest-slide {
+  opacity: 0.55;
+  scale: 0.92;
+}
+.guest-slide[data-current] {
+  opacity: 1;
+  scale: 1;
+}
+/* Its buttons in the theme's jewel, ringed in gilt like the music button */
+.guest-step {
+  color: var(--guest-cloth);
+  background: var(--guest-jewel);
+  box-shadow:
+    0 0 0 2px var(--guest-cloth),
+    0 0 0 3.5px var(--guest-gilt),
+    0 10px 20px -10px rgb(0 0 0 / 0.55);
+}
+.guest-step:hover {
+  background: color-mix(in oklab, var(--guest-jewel) 85%, black);
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion="reduce"]) .guest-slide {
+    transition:
+      opacity 500ms ease,
+      scale 500ms ease;
+  }
+}
