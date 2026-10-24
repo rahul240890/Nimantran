@@ -206,7 +206,7 @@ test.describe("blog", () => {
     expect(await noOverflow(page)).toBe(true);
 
     await page.getByRole("link", { name: "Create your invitation" }).last().click();
-    await expect(page).toHaveURL(/\/create\?category=wedding/);
+    await expect(page).toHaveURL(/\/create\/[a-z0-9-]+\?category=wedding/);
   });
 
   test("a Hindi post switches to the English blog", async ({ page }) => {

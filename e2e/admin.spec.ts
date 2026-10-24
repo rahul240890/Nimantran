@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 import {
   axe,
+  firstName,
   noOverflow,
   numberFor,
-  pickDesign,
+  openPart,
   publish,
   signIn,
   writeInvite,
@@ -227,10 +228,17 @@ test.describe("packages", () => {
       "rajwada-bagh",
     );
 
-    // Another ₹799 design on the live invite isn't saved: guests keep the paid one
-    await page.goto(`/create?invite=${id}&quality=2d`);
-    await page.getByRole("button", { name: "Change design" }).first().click();
-    await pickDesign(page, "Kayal");
+    // Edit invite opens it on its design's page
+    await page.goto(`/create?invite=${id}`);
+    await expect(page).toHaveURL(new RegExp(`/create/rajwada-bagh\\?.*invite=${id}`));
+    await expect(firstName(page)).toHaveValue("Ved", {
+      timeout: 30_000,
+    });
+
+    // Another ₹799 design for the live invite, as picked under its page, isn't saved:
+    // guests keep the paid one
+    const kayal = `/create/kayal?category=wedding&invite=${id}`;
+    await page.goto(kayal);
     const held = page.locator("[data-held-back]");
     await expect(held).toBeVisible({ timeout: 20_000 });
     await expect(held).toContainText("Your package is for Rajwada Bagh");
@@ -242,16 +250,13 @@ test.describe("packages", () => {
       "rajwada-bagh",
     );
 
-    // Going back to the paid design saves again
+    // Going back to the paid design saves again, and the page turns to it
     await held.getByRole("button", { name: "Go back to Rajwada Bagh" }).click();
     await expect(held).toHaveCount(0, { timeout: 20_000 });
-    await page.getByRole("searchbox", { name: "Search designs" }).fill("Rajwada Bagh");
-    await expect(
-      page.getByRole("radio", { name: "Rajwada Bagh, Story", exact: true }),
-    ).toBeChecked();
+    await expect(page).toHaveURL(new RegExp(`/create/rajwada-bagh\\?.*invite=${id}`));
 
     // Or the new design gets its own package, at its full price, and then goes live
-    await pickDesign(page, "Kayal");
+    await page.goto(kayal);
     await expect(held).toBeVisible({ timeout: 20_000 });
     await held.getByRole("link", { name: "Choose a package" }).click();
     await expect(page).toHaveURL(/\/edition\?plan=basic&design=kayal$/);
@@ -265,18 +270,14 @@ test.describe("packages", () => {
       .getByRole("button", { name: "Pay (test)" })
       .click();
     await expect(page.getByText("Basic is on. Thank you!").first()).toBeVisible();
+    // Back on the invite's page in its new design, which now saves and goes live
     await page.getByRole("link", { name: "Put it live" }).click();
-    await expect(page).toHaveURL(/\/create/);
-    // This page's clock is held in September while the account's saves are dated today, so
-    // the editor reopens on the account's copy; pick the paid-for design again to be sure
-    const search = page.getByRole("searchbox", { name: "Search designs" });
-    const change = page.getByRole("button", { name: "Change design" }).first();
-    // Wait for the editor to show one or the other before deciding
-    await expect(search.or(change)).toBeVisible({ timeout: 20_000 });
-    if (!(await search.isVisible())) await change.click();
-    await pickDesign(page, "Kayal");
-    const kayal = page.getByRole("radio", { name: "Kayal, Story", exact: true });
-    await expect(kayal).toBeChecked();
+    await expect(page).toHaveURL(new RegExp(`/create/kayal\\?.*invite=${id}`), {
+      timeout: 30_000,
+    });
+    await expect(firstName(page)).toHaveValue("Ved", {
+      timeout: 30_000,
+    });
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
     await expect
       .poll(
@@ -310,15 +311,10 @@ test.describe("packages", () => {
 
     // Its paid design has no package, yet its words can still be corrected: only a change
     // that adds what isn't paid for (another design, more languages) waits for a package
-    await page.goto(`/create?invite=${id}&quality=2d`);
-    await expect(page.getByText("Your invitation is live")).toBeVisible({ timeout: 30_000 });
-    // One step at a time: a click that lands while the last step is still coming in is lost
-    const heading = page.getByRole("heading", { level: 1 });
-    for (let step = 0; step < 6; step++) {
-      const title = (await heading.textContent()) ?? "";
-      await page.getByRole("button", { name: "Back", exact: true }).click();
-      await expect(heading).not.toHaveText(title);
-    }
+    await page.goto(`/create?invite=${id}`);
+    await expect(page).toHaveURL(new RegExp(`/create/rajwada-bagh\\?.*invite=${id}`));
+    await expect(firstName(page)).toHaveValue("Kabir", { timeout: 30_000 });
+    await openPart(page, "Names");
     await page.getByRole("textbox", { name: /Second name/ }).fill("Isha Rani");
     await expect
       .poll(

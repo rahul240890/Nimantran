@@ -132,19 +132,17 @@ test.describe("switching language", () => {
   test("the card's language turns the editor to it, and a new invite starts in the site's", async ({
     page,
   }) => {
-    const onward = () => page.getByRole("button", { name: /^(Continue|આગળ વધો)$/ }).click();
-    const heading = page.getByRole("heading", { level: 1 });
-    await page.goto("/create?quality=2d");
+    const design = "/create/rajwada-bagh?category=wedding";
+    await page.goto("/");
     await page.evaluate(() => localStorage.clear());
-    await page.reload();
-    for (let i = 0; i < 3; i++) await onward();
-    await expect(heading).toHaveText("Who's getting married?");
+    await page.goto(design);
     const language = page.getByRole("radiogroup", { name: "Card language" });
-    await expect(language.getByRole("radio", { name: /^English/ })).toBeChecked();
+    await expect(language.getByRole("radio", { name: /^English/ })).toBeChecked({
+      timeout: 30_000,
+    });
 
     // A Gujarati card: the form's words, examples and ideas all turn Gujarati
     await language.getByRole("radio", { name: /^ગુજરાતી/ }).click();
-    await expect(heading).toHaveText("કોનાં લગ્ન છે?");
     await expect(page.locator("html")).toHaveAttribute("lang", "gu");
     const first = page.getByRole("textbox", { name: /^પહેલું નામ/ });
     await expect(first).toHaveAttribute("placeholder", "જેમ કે રાધા");
@@ -156,22 +154,22 @@ test.describe("switching language", () => {
       .getByRole("radiogroup", { name: "કાર્ડની ભાષા" })
       .getByRole("radio", { name: /^English/ })
       .click();
-    await expect(heading).toHaveText("Who's getting married?");
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("textbox", { name: /^First name/ })).toBeVisible();
 
     // A new invite on the Gujarati site is a Gujarati card from the start
-    await page.context().addCookies([{ name: "shubhdwar-locale", value: "gu", url: page.url() }]);
+    await page
+      .context()
+      .addCookies([{ name: "shubhdwar-locale", value: "gu", url: new URL("/", page.url()).href }]);
     // Cleared away from the editor, which would save the open invite again
     await page.goto("/sign-in");
     await page.evaluate(() => localStorage.clear());
-    await page.goto("/create?quality=2d");
-    for (let i = 0; i < 3; i++) await onward();
-    await expect(heading).toHaveText("કોનાં લગ્ન છે?");
+    await page.goto(design);
     await expect(
       page
         .getByRole("radiogroup", { name: "કાર્ડની ભાષા" })
         .getByRole("radio", { name: /^ગુજરાતી/ }),
-    ).toBeChecked();
+    ).toBeChecked({ timeout: 30_000 });
     await expect(page.getByRole("textbox", { name: /^પહેલું નામ/ })).toBeVisible();
   });
 

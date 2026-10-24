@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, LoaderCircle, PlayCircle, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, LoaderCircle, PlayCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -13,23 +13,34 @@ import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { helpPath } from "@/components/shell/nav-links";
 import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
+import { HeldBackNotice } from "@/components/editions/held-back";
+import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { Quiet } from "@/components/ui/quiet";
+import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
-import { draftCategory, includedFunctions, type EditorStep } from "@/lib/editor/draft";
+import {
+  draftCategory,
+  includedFunctions,
+  type EditorStep,
+  type InviteDraft,
+} from "@/lib/editor/draft";
 import { stepErrors } from "@/lib/editor/draft-checks";
-import { noFamily } from "@/lib/editor/family";
-import { markFromDesignPage } from "@/lib/editor/design-page";
-import { startWithDesign, type GalleryChoice } from "@/lib/editor/gallery-start";
+import { designPageHref } from "@/lib/editor/design-page";
+import { changeDesign, startWithDesign, type GalleryChoice } from "@/lib/editor/gallery-start";
 import { inviteDraft } from "@/lib/editor/store";
+import { switchDraft, syncDraft, syncStore } from "@/lib/invites/sync";
 import { funnel } from "@/lib/funnel";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PreviewStage } from "../preview-stage";
+import { SaveStatus } from "../save-status";
 import { CoupleStep, WordsStep } from "../steps/couple-step";
 import { FamilySection } from "../steps/family-section";
 import { Fold } from "../steps/fold";
 import { MusicStep, PhotosStep } from "../steps/photos-music-steps";
+import { useDropLostPhotos } from "../use-photo-urls";
 import { QuickFunctions } from "./quick-functions";
 import "@/components/invitation/type/fonts.css";
 
@@ -37,7 +48,17 @@ const noSubscribe = () => () => {};
 
 /** How long on a design's page before offering to make it for them. */
 const STALL_MS = 60_000;
+/** Saved to the account a moment after each change, as the editor always has. */
+const SYNC_DELAY = 1200;
 const MAKE_HIDDEN_KEY = "shubh-make-nudge-hidden";
+/** The page's parts open one at a time (owner, 2026-10-24): the one being worked on. */
+const PARTS = "editor-parts";
+
+/** The part open as the page arrives: the names until typed, then dates and places due. */
+function firstPart(draft: InviteDraft): "names" | "when" | null {
+  if (!draft.content.first?.trim()) return "names";
+  return Object.keys(stepErrors(draft, "functions")).length > 0 ? "when" : null;
+}
 
 /** The parts with fields that must be right before the preview. */
 const CHECKED: readonly EditorStep[] = ["couple", "words", "functions"];
@@ -58,6 +79,8 @@ export function QuickStart({
   name,
   choice,
   signedIn,
+  initialInvite = null,
+  missing = false,
   backHref,
   sampleHref,
   more,
@@ -67,6 +90,10 @@ export function QuickStart({
   name: string;
   choice: GalleryChoice;
   signedIn: boolean;
+  /** An invite opened from the account (?invite=<id>): this design becomes its design. */
+  initialInvite?: InviteDraft | null;
+  /** ?invite= named an invite this person can't open. */
+  missing?: boolean;
   /** Where Back goes: the listing the design was opened from. */
   backHref: string;
   /** The design as a guest gets it. */
@@ -74,24 +101,29 @@ export function QuickStart({
   /** Other designs for the occasion, drawn on the server (suggested-designs.tsx). */
   more?: ReactNode;
 }) {
-  const { quickCopy, editor, stepCopy } = useText(editorText);
+  const { quickCopy, editor, stepCopy, syncCopy, coupleCopy, functionCopy } = useText(editorText);
   const locale = useLocale();
   const router = useRouter();
   const still = useReducedMotion();
   const wide = useMediaQuery("(min-width: 64rem)");
-  const { draft } = useSyncExternalStore(
+  const { draft, save } = useSyncExternalStore(
     inviteDraft.subscribe,
     inviteDraft.get,
     inviteDraft.getServer,
   );
+  const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
   const update = inviteDraft.update;
+  const paidOn = usePaidOn(draft.remoteId ?? null);
   const hydrated = useSyncExternalStore(
     noSubscribe,
     () => true,
     () => false,
   );
   const [arriving, setArriving] = useState(true);
+  const [opened, setOpened] = useState<"names" | "when" | null>(null);
+  const [previewing, setPreviewing] = useState(false);
   const ready = hydrated && !arriving;
+  useDropLostPhotos(draft, update, ready);
   const [page, setPage] = useState("cover");
   const [checking, setChecking] = useState(false);
   const errors = checking
@@ -99,24 +131,15 @@ export function QuickStart({
     : {};
   const errorCount = Object.keys(errors).length;
 
-  // The design is applied once, to the invite under way (gallery-start.ts), and its main
-  // function planned, so the form opens on the wedding's date, time and venue
+  // The design is applied once, to the invite under way (gallery-start.ts), or to the
+  // invite opened from the account, and its main function planned, so the form opens on the
+  // wedding's date, time and venue
   const started = useRef(false);
   useEffect(() => {
     if (started.current) return;
     started.current = true;
     funnel("Details opened", { design: designId });
-    // Back on a page whose design the invite already has (a reload, or back from the
-    // preview), what the family changed since stays: the address's faith or tradition
-    // isn't applied again
-    const current = inviteDraft.get().draft;
-    const already =
-      current.updatedAt !== 0 &&
-      current.suite === choice.suite &&
-      current.templateId === choice.template &&
-      current.format === (choice.format ?? "story") &&
-      current.categoryId === choice.category;
-    void (already ? Promise.resolve() : startWithDesign(choice, { signedIn, site: locale }))
+    void arrive()
       .then(() => {
         const current = inviteDraft.get().draft;
         if (includedFunctions(current).length > 0) return;
@@ -132,12 +155,75 @@ export function QuickStart({
           { touch: false },
         );
       })
-      .finally(() => setArriving(false));
-  }, [choice, signedIn, locale, designId]);
+      .finally(() => {
+        setOpened(firstPart(inviteDraft.get().draft));
+        setArriving(false);
+      });
+
+    async function arrive() {
+      if (missing) toast({ title: syncCopy.missing, tone: "error" });
+      // The invite opened from the account replaces the one open, which is saved first
+      if (initialInvite && !(await switchDraft(initialInvite, { signedIn }))) {
+        toast({ title: syncCopy.switchFailed, tone: "error" });
+        return;
+      }
+      // Back on a page whose design the invite already has (a reload, or back from the
+      // preview), what the family changed since stays: the address's faith or tradition
+      // isn't applied again
+      const current = inviteDraft.get().draft;
+      const already =
+        current.updatedAt !== 0 &&
+        current.suite === choice.suite &&
+        current.templateId === choice.template &&
+        current.format === (choice.format ?? "story") &&
+        current.categoryId === choice.category;
+      if (already) return;
+      // Another design for the invite opened from the account is that invite's new design
+      if (initialInvite) changeDesign(choice, locale);
+      else await startWithDesign(choice, { signedIn, site: locale });
+    }
+  }, [choice, signedIn, locale, designId, initialInvite, missing, syncCopy]);
+
+  // The preview's Edit for a part lands on it (#part-family and the like), opened
+  useEffect(() => {
+    if (!ready) return;
+    const target = window.location.hash
+      ? document.getElementById(window.location.hash.slice(1))
+      : null;
+    if (!target) return;
+    if (target instanceof HTMLDetailsElement) target.open = true;
+    requestAnimationFrame(() =>
+      target.scrollIntoView({ block: "start", behavior: still ? "auto" : "smooth" }),
+    );
+  }, [ready, still]);
+
+  // Saved to the account a moment after each change, and when the connection comes back
+  useEffect(() => {
+    if (!signedIn || draft.updatedAt === 0) return;
+    const timer = setTimeout(() => void syncDraft(), SYNC_DELAY);
+    const onOnline = () => void syncDraft();
+    window.addEventListener("online", onOnline);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("online", onOnline);
+    };
+  }, [signedIn, draft.updatedAt]);
+
+  // Leaving for the preview or the design's page saves at once, so the page arriving never
+  // opens the account's copy a save behind
+  useEffect(
+    () => () => {
+      if (signedIn && inviteDraft.get().draft.updatedAt !== 0) void syncDraft();
+    },
+    [signedIn],
+  );
 
   // Written straight away if the tab is closed or hidden mid-way
   useEffect(() => {
-    const flush = () => inviteDraft.flush();
+    const flush = () => {
+      inviteDraft.flush();
+      if (signedIn && inviteDraft.get().draft.updatedAt !== 0) void syncDraft();
+    };
     const onVisibility = () => document.visibilityState === "hidden" && flush();
     window.addEventListener("pagehide", flush);
     document.addEventListener("visibilitychange", onVisibility);
@@ -145,7 +231,7 @@ export function QuickStart({
       window.removeEventListener("pagehide", flush);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [signedIn]);
 
   // On a phone, once the design scrolls away, a small copy of it floats in the corner so the
   // names can still be seen arriving on it; tapping it brings the design back up
@@ -189,7 +275,6 @@ export function QuickStart({
   const leave = (step: EditorStep) => {
     update((current) => ({ ...current, step }));
     inviteDraft.flush();
-    markFromDesignPage();
     router.push("/create");
   };
   const see = () => {
@@ -210,7 +295,14 @@ export function QuickStart({
     leave("preview");
   };
 
-  const familyFilled = JSON.stringify(draft.family) !== JSON.stringify(noFamily);
+  // What's in the names and the events, beside their titles while folded
+  const names = [draft.content.first, draft.content.second]
+    .map((name) => name?.trim())
+    .filter(Boolean)
+    .join(" & ");
+  const events = includedFunctions(draft)
+    .map((id) => functionCopy[id].name)
+    .join(", ");
   const stepProps = { draft, update, errors, goTo: () => {} };
 
   return (
@@ -227,7 +319,17 @@ export function QuickStart({
             </Link>
             <Logo className="max-[359px]:[&>span]:sr-only" />
           </div>
-          <AccountMenu compact />
+          <div className="flex min-w-0 items-center gap-1 sm:gap-3">
+            {ready && (
+              <SaveStatus
+                state={save}
+                sync={sync}
+                signedIn={signedIn}
+                edited={draft.updatedAt !== 0}
+              />
+            )}
+            <AccountMenu compact />
+          </div>
         </div>
       </header>
 
@@ -245,7 +347,14 @@ export function QuickStart({
             className="h-[min(50svh,28rem)] min-h-[20rem] lg:h-[min(calc(100dvh-17rem),42rem)] lg:min-h-[26rem]"
           >
             {ready ? (
-              <PreviewStage draft={draft} page={page} onPage={setPage} className="h-full" />
+              // With its Edit this page: a page's words rewritten, placed or left out right here
+              <PreviewStage
+                draft={draft}
+                page={page}
+                onPage={setPage}
+                update={update}
+                className="h-full"
+              />
             ) : (
               <div
                 role="status"
@@ -264,16 +373,38 @@ export function QuickStart({
               <h1 id="design-name" className="font-display text-2xl leading-tight">
                 {name}
               </h1>
-              <p className="text-sm text-ink-muted">{quickCopy.free}</p>
+              {/* A live invite is already paid for or free; the line is for new ones */}
+              {!draft.slug && <p className="text-sm text-ink-muted">{quickCopy.free}</p>}
             </div>
-            <TierBadge designId={designId} variant="plain" />
+            {/* Once this design is paid for, it says so rather than showing its price */}
+            <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
           </div>
-          <Button asChild variant="secondary" className="self-start">
-            <Link href={sampleHref} prefetch={false} data-watch-live>
-              <PlayCircle aria-hidden className="text-accent-text" />
-              {quickCopy.watch}
-            </Link>
-          </Button>
+          {/* The demo plays the design with sample names; the preview is the family's own */}
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="secondary">
+              <Link href={sampleHref} prefetch={false} data-watch-live>
+                <PlayCircle aria-hidden className="text-accent-text" />
+                {quickCopy.watch}
+              </Link>
+            </Button>
+            {ready && (
+              <Sheet open={previewing} onOpenChange={setPreviewing}>
+                <SheetTrigger asChild>
+                  <Button variant="secondary" leadingIcon={<Eye aria-hidden />} data-own-preview>
+                    {quickCopy.preview}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent title={editor.previewTitle} closeLabel={editor.close}>
+                  <PreviewStage
+                    draft={draft}
+                    page={page}
+                    onPage={setPage}
+                    className="h-[min(72dvh,40rem)] min-h-[24rem]"
+                  />
+                </SheetContent>
+              </Sheet>
+            )}
+          </div>
           <TrustLine />
         </section>
 
@@ -295,31 +426,67 @@ export function QuickStart({
         >
           {ready && (
             <Quiet className="flex flex-col gap-5">
-              <CoupleStep {...stepProps} />
-              <section
-                aria-labelledby="when-heading"
-                className="flex flex-col gap-3 border-t border-line pt-4"
+              {/* A live invite's change its package doesn't cover stays off the live copy */}
+              {signedIn && (
+                <HeldBackNotice
+                  draft={draft}
+                  onRestored={() => router.replace(designPageHref(inviteDraft.get().draft))}
+                />
+              )}
+              {/* Every part folded to its title, the one being worked on open */}
+              <Fold
+                id="part-names"
+                group={PARTS}
+                open={opened === "names"}
+                title={coupleCopy.namesHeading}
+                note={names}
+                pageTarget="cover"
               >
-                <h2 id="when-heading" className="font-display text-lg">
-                  {quickCopy.whenHeading}
-                </h2>
+                <CoupleStep {...stepProps} />
+              </Fold>
+              <Fold
+                id="part-when"
+                group={PARTS}
+                open={opened === "when"}
+                title={quickCopy.whenHeading}
+                note={events}
+              >
                 <QuickFunctions draft={draft} update={update} errors={errors} />
-              </section>
-              {/* The rest of the editor, each part folded until opened */}
-              <Fold title={quickCopy.familyTitle} filled={familyFilled} pageTarget="family">
+              </Fold>
+              <Fold
+                id="part-family"
+                group={PARTS}
+                open={false}
+                title={quickCopy.familyTitle}
+                pageTarget="family"
+              >
                 <FamilySection draft={draft} update={update} />
               </Fold>
               <Fold
+                id="part-photos"
+                group={PARTS}
+                open={false}
                 title={quickCopy.photosTitle}
-                filled={draft.photos.length > 0}
                 pageTarget="cover"
               >
                 <PhotosStep {...stepProps} />
               </Fold>
-              <Fold title={stepCopy.words.label} pageTarget="cover">
+              <Fold
+                id="part-words"
+                group={PARTS}
+                open={false}
+                title={stepCopy.words.label}
+                pageTarget="cover"
+              >
                 <WordsStep {...stepProps} />
               </Fold>
-              <Fold title={stepCopy.music.label} pageTarget="family">
+              <Fold
+                id="part-music"
+                group={PARTS}
+                open={false}
+                title={stepCopy.music.label}
+                pageTarget="family"
+              >
                 <MusicStep {...stepProps} />
               </Fold>
               <DesignPackages

@@ -1,19 +1,23 @@
-import { isInviteFormat } from "@/lib/editor/formats";
 import type { Metadata } from "next";
-import { isTraditionId } from "@/lib/traditions/catalog";
-import { isFaith } from "@/lib/traditions/faith";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { Editor } from "@/components/editor/editor";
 import { PageTransition } from "@/components/motion/page-transition";
 import { editorText } from "@/i18n/copy/editor";
-import { getText } from "@/i18n/server";
+import { getLocale, getText } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
+import { isInviteFormat } from "@/lib/editor/formats";
+import { designById, WEDDING_KIND_ENTRIES } from "@/lib/gallery/catalog";
+import { WEDDING_KINDS } from "@/lib/gallery/ids";
 import { hostStore } from "@/lib/invites/hosts";
 import { inviteStore } from "@/lib/invites/store";
+import { draftDesignId } from "@/lib/plans/design-defaults";
+import { pagePath } from "@/lib/seo/paths";
 import { isSuiteId } from "@/lib/suites/catalog";
 import { isTemplateId } from "@/lib/templates/ids";
+import { isTraditionId } from "@/lib/traditions/catalog";
+import { isFaith } from "@/lib/traditions/faith";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { editor } = await getText(editorText);
@@ -26,28 +30,52 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const inviteId = z.uuid();
 
+/**
+ * Where an older link into the editor now goes: a design named by its theme or card to that
+ * design's page, an occasion or tradition alone to its designs in the gallery.
+ */
+function legacyHref(
+  params: Record<string, string | string[] | undefined>,
+  locale: Awaited<ReturnType<typeof getLocale>>,
+): string | null {
+  const { template, category, tradition, suite, format, faith } = params;
+  const occasion = isCategoryId(category) ? category : null;
+  const pack = isTraditionId(tradition) ? tradition : null;
+  if (isSuiteId(suite) || isTemplateId(template)) {
+    const id = draftDesignId({
+      suite: isSuiteId(suite) ? suite : "classic",
+      templateId: isTemplateId(template) ? template : "marigold",
+      categoryId: occasion ?? "wedding",
+      tradition: { id: pack },
+      format: isInviteFormat(format) ? format : "story",
+    } as Parameters<typeof draftDesignId>[0]);
+    if (designById(id)) {
+      const query = new URLSearchParams({ category: occasion ?? "wedding" });
+      if (pack) query.set("tradition", pack);
+      if (isFaith(faith)) query.set("faith", faith);
+      return `/create/${id}?${query.toString()}`;
+    }
+  }
+  if (occasion === "wedding" && pack) {
+    const kind = WEDDING_KINDS.find((id) => WEDDING_KIND_ENTRIES[id].tradition === pack);
+    if (kind) return pagePath({ kind: "wedding-kind", id: kind }, locale);
+  }
+  if (occasion) return pagePath({ kind: "occasion", id: occasion }, locale);
+  if (pack) return pagePath({ kind: "tradition", id: pack }, locale);
+  return null;
+}
+
 /*
- * The invite editor. Drafts save on this device, and to the account once signed in.
- * ?invite=<id> opens an invite from My invites (with &publish=1, back from choosing its
- * package, its Publish dialog too; with &gate=1, the summary with its opening gate to change); ?new=1 starts another, keeping the open one in the
- * account. ?category=<id> starts a fresh invite for that occasion (roka,
- * engagement, save-the-date…); ?template=<id> starts one with that design, and
- * ?tradition=<id> with that tradition, ?suite=<id> with that page theme (the gallery's
- * Use this design sends all four);
+ * Preview and publish. An invite is written on its design's own page (/create/<design>), so
+ * here: ?invite=<id> opens an invite from My invites, then its design's page, or with
+ * &publish=1 (back from choosing its package) its preview and Publish dialog, with &gate=1
+ * its preview with the opening gate to change, with &preview=1 its preview; ?new=1 starts another, keeping the open one in
+ * the account, from the gallery. Older links naming a design, occasion or tradition go to
+ * that design's page or the gallery.
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
-  const {
-    template,
-    category,
-    tradition,
-    suite,
-    format,
-    faith,
-    invite,
-    new: fresh,
-    publish,
-    gate,
-  } = await searchParams;
+  const params = await searchParams;
+  const { invite, new: fresh, publish, gate, preview } = params;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -63,36 +91,25 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
     wanted && account && store && inviteId.safeParse(wanted).success
       ? await store.get(account, wanted)
       : null;
+  if (!wanted && fresh !== "1") {
+    const older = legacyHref(params, await getLocale());
+    if (older) redirect(older);
+  }
 
-  const params = {
-    initialTemplate: isTemplateId(template) ? template : null,
-    initialCategory: isCategoryId(category) ? category : null,
-    initialTradition: isTraditionId(tradition) ? tradition : null,
-    initialSuite: isSuiteId(suite) ? suite : null,
-    initialFormat: isInviteFormat(format) ? format : null,
-    initialFaith: isFaith(faith) ? faith : null,
-    fresh: fresh === "1",
-  };
   return (
     <PageTransition>
       <Editor
         // A new ?invite= or ?new= while the editor is open starts it over
-        key={[
-          wanted,
-          params.fresh,
-          params.initialCategory,
-          params.initialTemplate,
-          params.initialTradition,
-          params.initialSuite,
-          params.initialFormat,
-          params.initialFaith,
-        ].join("|")}
-        {...params}
+        key={[wanted, fresh === "1"].join("|")}
         signedIn={Boolean(account)}
         initialInvite={initialInvite}
+        fresh={fresh === "1"}
         missing={Boolean(wanted && !initialInvite)}
         openPublish={Boolean(initialInvite) && publish === "1"}
         openGate={Boolean(initialInvite) && gate === "1"}
+        openPreview={Boolean(initialInvite) && preview === "1"}
+        // Changing an invite happens on its design's page, once it's open on this device
+        openEdit={Boolean(initialInvite) && publish !== "1" && gate !== "1" && preview !== "1"}
       />
     </PageTransition>
   );

@@ -125,7 +125,17 @@ export async function switchDraft(
 ): Promise<boolean> {
   let current = inviteDraft.get().draft;
   if (target && target.remoteId && current.remoteId === target.remoteId) {
-    // The same invite: keep whichever copy is newer, with photos from both
+    // The same invite. Edits made here and not yet in the account stay, whatever the clocks
+    // say: the account's copy can be a save behind (moving between the design's page and
+    // the preview, say), and this device's own clock can run slow
+    if (current.updatedAt !== 0 && !isSynced(current)) {
+      if (target.slug !== current.slug) {
+        inviteDraft.update((draft) => ({ ...draft, slug: target.slug }), { touch: false });
+      }
+      void syncDraft();
+      return true;
+    }
+    // Otherwise whichever copy is newer, with photos from both
     if (target.updatedAt > current.updatedAt) {
       inviteDraft.replace({ ...target, photos: mergePhotos(target.photos, current.photos) });
       markSynced(target);

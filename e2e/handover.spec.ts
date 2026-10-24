@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { axe, noOverflow, numberFor, signIn } from "./invite-helpers";
+import { axe, noOverflow, numberFor, openPart, signIn } from "./invite-helpers";
 
 /* Hand-over links (update 5), in preview mode: Shubh makes an invite, the family takes it. */
 
@@ -41,6 +41,7 @@ async function makeInvite(page: Page, names: [string, string]) {
     await expect(first).toHaveValue(names[0], { timeout: 3_000 });
     await expect(second).toHaveValue(names[1], { timeout: 3_000 });
   }).toPass({ timeout: 30_000 });
+  await openPart(page, "When and where");
   const wedding = page.locator('[data-function="wedding"]');
   await wedding.getByRole("button", { name: /^Date/ }).click();
   await page.getByRole("button", { name: /next month/i }).click();

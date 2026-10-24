@@ -2246,7 +2246,9 @@ export const openingCopy = {
 export const quickCopy = {
   metaTitle: (name: string) => `Make your invitation: ${name}`,
   back: "Back",
-  watch: "Watch it open",
+  watch: "Watch demo",
+  /** Opens the invitation with the family's own names, as guests will see it. */
+  preview: "Preview",
   free: "Free to try. Pay only when you send.",
   eyebrow: "Make it yours",
   title: "Your invitation in a few minutes",

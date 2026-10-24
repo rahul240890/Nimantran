@@ -20,16 +20,20 @@ const SHOWN = 12;
 /**
  * More designs for the same occasion under a design's page, to compare with (owner,
  * 2026-10-24). Each opens its own page; what was typed stays, since it is the same draft.
+ * An invite opened from the account stays named, so the design picked is that invite's.
  */
 export function SuggestedDesigns({
   current,
   occasion,
   kind,
+  invite = null,
   locale,
 }: {
   current: string;
   occasion: CategoryId;
   kind: WeddingKind | null;
+  /** The invite open on the page (?invite=), when it came from the account. */
+  invite?: string | null;
   locale: UiLocale;
 }) {
   const { quickCopy } = editorText[locale];
@@ -60,7 +64,7 @@ export function SuggestedDesigns({
           return (
             <li key={design.id}>
               <Link
-                href={designHref(design, { category: occasion, kind })}
+                href={`${designHref(design, { category: occasion, kind })}${invite ? `&invite=${invite}` : ""}`}
                 className="group flex flex-col gap-1.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 {picture ? (

@@ -1,54 +1,89 @@
 import { expect, test, type Page } from "@playwright/test";
-import { axe, noOverflow, numberFor, writeInvite } from "./invite-helpers";
+import {
+  axe,
+  firstName,
+  noOverflow,
+  numberFor,
+  openPart,
+  publish,
+  seeInvitation,
+  writeInvite,
+} from "./invite-helpers";
 
 /*
- * Changing the design (owner, 2026-10-22): only the designs, a dozen at a time with filters,
- * and nothing to fill in again, whether the design is changed in the editor or picked in
- * the gallery while the invite is under way.
+ * Changing the design (owner, 2026-10-22, 2026-10-24): every name, date, place and word
+ * stays, whether another design is picked under the invite's own page or in the gallery,
+ * and a live invite opened from the account is changed on its design's page.
  */
 
-const title = (page: Page) => page.getByRole("heading", { level: 1 });
+/** The wedding's venue, its part opened. */
+async function weddingVenue(page: Page) {
+  await openPart(page, "When and where");
+  return page.locator('[data-function="wedding"]').getByRole("textbox", { name: /^Venue/ });
+}
 
 test.describe("changing the design", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("from the preview: filters, a new design, and straight back with every detail", async ({
+  test("from the preview: other designs under the invite's page, and every detail kept", async ({
     page,
   }, info) => {
     await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
     await page.getByRole("button", { name: "Change design" }).first().click();
-    await expect(title(page)).toHaveText("Pick the design your guests will open");
-    const designs = page.getByRole("radiogroup", { name: "Designs for your occasion" });
-    await expect(designs.getByRole("radio")).toHaveCount(12);
-    // Only designs: how it opens is chosen with the music
-    await expect(page.getByRole("heading", { name: "How it opens" })).toHaveCount(0);
-
-    // Scenes only, then the first of them
-    await page
-      .getByRole("radiogroup", { name: "Kind of invitation" })
-      .getByRole("radio", { name: "Scene", exact: true })
-      .click();
-    const scene = designs.getByRole("radio").first();
-    await expect(scene).toHaveAccessibleName(/, Scene$/);
-    await scene.click();
-    await expect(scene).toBeChecked();
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding.*#more-designs$/);
+    const designs = page.locator("[data-suggested-designs]");
+    await expect(designs.getByRole("link").first()).toBeVisible({ timeout: 30_000 });
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
-    // Use this design goes back to the preview, the names and functions as they were
-    await page.getByRole("button", { name: "Use this design" }).click();
-    await expect(title(page)).toHaveText("Here's what your guests will see");
+    // Another design is this invite's, with its names and functions as they were
+    const other = designs.getByRole("link").first();
+    const name = (await other.textContent())!.trim();
+    await other.click();
+    await expect(page).not.toHaveURL(/\/create\/rajwada-bagh/);
+    await expect(firstName(page)).toHaveValue("Kabir", { timeout: 30_000 });
+    await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
+    await seeInvitation(page);
     await expect(page.getByText(/Kabir/).first()).toBeVisible();
     await expect(page.getByText("Taj Falaknuma, Hyderabad").first()).toBeVisible();
+    await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
   });
 
   test("a design picked in the gallery joins the invite under way", async ({ page }, info) => {
     await writeInvite(page, numberFor(info), ["Isha", "Dev"]);
-    // The gallery's Use this design, while signed in and not yet live
-    await page.goto("/create?quality=2d&category=wedding&suite=kayal&template=marigold");
-    await expect(title(page)).toHaveText("Here's what your guests will see", { timeout: 20_000 });
-    await expect(page.getByText(/Isha/).first()).toBeVisible();
-    await expect(page.getByText("Taj Falaknuma, Hyderabad").first()).toBeVisible();
-    await expect(page.getByText("Kayal", { exact: true }).first()).toBeVisible();
+    // An older link to the editor naming a design: the design's page, with the invite in it
+    await page.goto("/create?category=wedding&suite=kayal&template=marigold");
+    await expect(page).toHaveURL(/\/create\/kayal\?category=wedding$/);
+    await expect(firstName(page)).toHaveValue("Isha", { timeout: 30_000 });
+    await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
+    await expect(page.getByRole("heading", { level: 1, name: "Kayal" })).toBeVisible();
+  });
+
+  test("a live invite opens on its design's page, and a design from the gallery starts a new one already filled in", async ({
+    page,
+  }, info) => {
+    await writeInvite(page, numberFor(info), ["Riya", "Arjun"]);
+    await publish(page, "change");
+    const live = /\/invites\/([0-9a-f-]{36})\/share$/.exec(page.url())![1]!;
+
+    // Edit invite: the whole invite on its design's page
+    await page.getByRole("link", { name: "Edit invite" }).click();
+    await expect(page).toHaveURL(new RegExp(`/create/rajwada-bagh\\?.*invite=${live}`));
+    await expect(firstName(page)).toHaveValue("Riya", { timeout: 30_000 });
+    await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
+
+    // A design picked in the gallery is another invite: the live one stays as it is, and
+    // the new one starts with all of its details
+    await page.goto("/invitations/wedding");
+    const card = page.locator("[data-design]").nth(2);
+    await card.getByRole("link", { name: /Use this design/ }).click();
+    await expect(page).toHaveURL(/\/create\/[a-z0-9-]+\?category=wedding/);
+    await expect(firstName(page)).toHaveValue("Riya", { timeout: 30_000 });
+    await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
+    await seeInvitation(page);
+    // Not live yet: it publishes under a link of its own
+    await expect(page.getByRole("button", { name: "Publish", exact: true })).toBeVisible();
+    await page.goto("/invites");
+    await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });
 });

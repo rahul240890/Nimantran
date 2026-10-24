@@ -2159,7 +2159,8 @@ export const openingCopy: Translation<typeof en.openingCopy> = {
 export const quickCopy: Translation<typeof en.quickCopy> = {
   metaTitle: (name) => `તમારું આમંત્રણ બનાવો: ${name}`,
   back: "પાછા",
-  watch: "ખૂલતું જુઓ",
+  watch: "ડેમો જુઓ",
+  preview: "પ્રીવ્યૂ",
   free: "અજમાવવું મફત છે. પૈસા ફક્ત મોકલતી વખતે.",
   eyebrow: "તેને તમારું બનાવો",
   title: "થોડી જ મિનિટોમાં તમારું આમંત્રણ",

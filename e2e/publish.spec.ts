@@ -2,11 +2,13 @@ import { expect, test } from "@playwright/test";
 import {
   addDesignPhotos,
   axe,
-  next,
+  firstName,
   noOverflow,
   numberFor,
+  openPart,
   openPublish,
   publish,
+  seeInvitation,
   signIn,
   writeInvite,
 } from "./invite-helpers";
@@ -174,8 +176,13 @@ test.describe("publish and share", () => {
     });
     await laptop.goto("/sign-in?next=/invites");
     await signIn(laptop, number);
+    // Continue opens the invite on its design's page, everything in it
     await laptop.getByRole("article").getByRole("link", { name: "Continue" }).click();
-    await expect(laptop.getByText("Your invitation is ready")).toBeVisible();
+    await expect(laptop).toHaveURL(/\/create\/rajwada-bagh\?.*invite=/);
+    await expect(firstName(laptop)).toHaveValue("Kabir", {
+      timeout: 30_000,
+    });
+    await seeInvitation(laptop);
     // The photo's link comes from the account by a server action, slow on a busy runner
     await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible({ timeout: 30_000 });
     await expect
@@ -193,7 +200,9 @@ test.describe("publish and share", () => {
   }, info) => {
     const number = numberFor(info);
     await writeInvite(page, number, ["Ishaan", "Tara"]);
+    // The preview's Edit opens Music & replies on the design's page
     await page.getByRole("button", { name: "Edit music" }).click();
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?.*#part-music$/);
     await page.getByRole("radio", { name: "Your own music" }).click();
     await page.locator('input[accept^="audio"]').setInputFiles({
       name: "Shehnai at dawn.wav",
@@ -218,7 +227,7 @@ test.describe("publish and share", () => {
     await expect(page.getByText(/Your music · [12]:\d\d/)).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
-    await next(page);
+    await seeInvitation(page);
     await expect(page.getByText(/Shehnai at dawn/)).toBeVisible();
 
     await page.clock.runFor(2_000);
@@ -240,7 +249,8 @@ test.describe("publish and share", () => {
     await laptop.goto("/sign-in?next=/invites");
     await signIn(laptop, number);
     await laptop.getByRole("article").getByRole("link", { name: "Continue" }).click();
-    await laptop.getByRole("button", { name: "Edit music" }).click();
+    await expect(laptop).toHaveURL(/\/create\/rajwada-bagh\?.*invite=/);
+    await openPart(laptop, "Music & replies");
     await expect(laptop.getByRole("radio", { name: "Your own music" })).toBeChecked();
     await expect(laptop.getByText("Shehnai at dawn")).toBeVisible();
     await expect(laptop.getByRole("button", { name: "Listen" })).toBeEnabled({ timeout: 15_000 });
@@ -253,24 +263,23 @@ test.describe("publish and share", () => {
     // Every step, a second language and the packages before publishing
     test.slow();
     await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
-    await page.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1&region=GJ")}`);
+    // A Gujarati wedding's design: the card is written in Gujarati from the start
+    await page.goto(
+      `/sign-in?next=${encodeURIComponent("/create/kutch-toran?category=wedding&tradition=gujarati")}`,
+    );
     await signIn(page, numberFor(info));
-    await expect(page).toHaveURL(/\/create/);
-    await next(page);
-    await page.getByRole("radio", { name: /^Gujarati/ }).click();
-    await next(page);
-    await next(page);
+    await expect(page).toHaveURL(/\/create\/kutch-toran/);
 
     // The names, in Gujarati: the tradition's own language
-    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked();
-    await page.locator('[data-slot="first"]').fill("આરવ");
+    await expect(page.getByRole("radio", { name: /^ગુજરાતી/ })).toBeChecked({ timeout: 30_000 });
+    await expect(async () => {
+      await page.locator('[data-slot="first"]').fill("આરવ");
+      await expect(page.locator('[data-slot="first"]')).toHaveValue("આરવ", { timeout: 3_000 });
+    }).toPass({ timeout: 30_000 });
     await page.locator('[data-slot="second"]').fill("મીરા");
-    await next(page);
-    await next(page); // family
 
-    const wedding = page
-      .getByRole("listitem")
-      .filter({ has: page.getByRole("checkbox", { name: /^Wedding/ }) });
+    await openPart(page, "When and where");
+    const wedding = page.locator('[data-function="wedding"]');
     await wedding.getByRole("button", { name: /^Date/ }).click();
     await page.getByRole("button", { name: /next month/i }).click();
     await page.getByRole("gridcell").getByRole("button", { name: /, 15 / }).click();
@@ -281,12 +290,9 @@ test.describe("publish and share", () => {
     await wedding.getByRole("combobox", { name: /Ends at/ }).click();
     await page.getByRole("option", { name: "10:31 am" }).click();
     await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Hotel Grand Bhagwati, Surat");
-    await next(page);
+    await openPart(page, "Your photos");
     await addDesignPhotos(page);
-    await next(page);
-    await next(page); // card words
-    await next(page); // music and replies
-    await expect(page.getByText("Your invitation is ready")).toBeVisible();
+    await seeInvitation(page);
 
     // After the preview: English beside it, for guests to switch to
     const english = page.getByRole("region", { name: "Add a second language?" });
