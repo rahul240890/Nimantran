@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { TemplateCover } from "@/components/brand/template-cover";
+import { CardPicture } from "@/components/gallery/card-picture";
 import { designWords } from "@/components/gallery/design-words";
 import type { UiLocale } from "@/i18n/locales";
 import { editorText } from "@/i18n/copy/editor";
@@ -64,13 +64,11 @@ export function SuggestedDesigns({
                 className="group flex flex-col gap-1.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
                 {picture ? (
-                  <span className="relative block aspect-[9/16] overflow-hidden rounded-md bg-night shadow-raised">
-                    <Image
+                  // The card's own cut of its painting, as in the gallery, never the image resizer
+                  <span className="relative block aspect-[3/4] overflow-hidden rounded-md bg-night shadow-raised">
+                    <CardPicture
                       src={picture}
-                      alt=""
-                      fill
-                      sizes="(min-width: 1024px) 12rem, 30vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+                      className="transition-transform duration-500 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                     />
                   </span>
                 ) : (
