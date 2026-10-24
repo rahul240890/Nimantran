@@ -9870,3 +9870,28 @@ html:has(.guest-snap) {
   animation: none !important;
   transition: none !important;
 }
+
+/*
+ * A quiet page (components/ui/quiet.tsx): the one-page editor on a design's page, clean
+ * and short (owner, 2026-10-24). Its parts sit closer together and its section headings
+ * are a size smaller; touch targets keep their 44px.
+ */
+[data-quiet] :where(h2, h3).text-xl {
+  font-size: var(--text-lg);
+  line-height: var(--text-lg--line-height);
+}
+[data-quiet] .gap-8 {
+  gap: 1.25rem;
+}
+[data-quiet] .gap-6 {
+  gap: 1rem;
+}
+[data-quiet] .gap-5 {
+  gap: 0.875rem;
+}
+[data-quiet] .pt-6 {
+  padding-top: 1rem;
+}
+[data-quiet] .mt-6 {
+  margin-top: 1rem;
+}

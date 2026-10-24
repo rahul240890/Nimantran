@@ -115,16 +115,34 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("button", { name: "Add Haldi" })).toBeVisible();
   });
 
-  test("More options opens the full editor with everything already typed", async ({ page }) => {
+  test("every part of the editor is on the page, quietly, and other designs below", async ({
+    page,
+  }) => {
     await open(page);
-    await fillNames(page);
-    await page.getByRole("button", { name: "More options" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?", {
-      timeout: 15_000,
-    });
-    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
-    await expect(page.getByRole("textbox", { name: /Second name/ })).toHaveValue("Priya");
+    // Nothing nested: no way off to another editor, and no helper words
+    await expect(page.getByRole("button", { name: "More options" })).toHaveCount(0);
+    await expect(page.getByText("Type in any script")).toHaveCount(0);
+    const parts: [string, RegExp][] = [
+      ["Family names", /Parents' names/],
+      ["Card words", /^Blessing/],
+    ];
+    for (const [title, field] of parts) {
+      await page.locator("summary", { hasText: title }).click();
+      await expect(page.getByRole("textbox", { name: field }).first()).toBeVisible();
+    }
+    await page.locator("summary", { hasText: "Your photos" }).click();
+    await expect(page.getByRole("button", { name: /Add photos/ }).first()).toBeVisible();
+    await page.locator("summary", { hasText: "Music & replies" }).click();
+    await expect(page.getByRole("radio", { name: /Your own music/ })).toBeVisible();
+    expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Other designs for the wedding, each opening its own page, never this one again
+    const more = page.locator("[data-suggested-designs]");
+    await expect(more.getByRole("heading", { name: "More wedding designs" })).toBeVisible();
+    const links = more.getByRole("link");
+    expect(await links.count()).toBeGreaterThan(3);
+    await expect(more.locator('a[href^="/create/rajwada-bagh"]')).toHaveCount(0);
+    await expect(links.first()).toHaveAttribute("href", /^\/create\/[a-z0-9-]+\?category=wedding/);
   });
 
   test("it opens live, and we'll make it for anyone short of time", async ({ page }) => {

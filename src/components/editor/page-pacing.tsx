@@ -13,6 +13,7 @@ import { PAGE_SECONDS, storyBeats, storyLength } from "@/lib/engine/story";
 import { cardFunctions, draftBlessing, storyFamily, storyFunctions } from "@/lib/publish/story";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { videoTimeline } from "@/lib/video/timeline";
+import { Hint } from "@/components/ui/quiet";
 
 const AUTO = "auto";
 
@@ -73,7 +74,7 @@ export function PagePacing({
         <h3 id="pacing-heading" className="font-semibold text-ink">
           {words.heading}
         </h3>
-        <p className="max-w-2xl text-sm text-ink-muted">{words.hint}</p>
+        <Hint className="max-w-2xl">{words.hint}</Hint>
       </div>
       <RadioPrimitive.Root
         aria-labelledby="pacing-heading"

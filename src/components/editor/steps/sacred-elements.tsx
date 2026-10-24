@@ -3,6 +3,7 @@
 import { DecorSvg } from "@/components/invitation/art/decor-svg";
 import { NO_SYMBOL, SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
+import { Hint } from "@/components/ui/quiet";
 import { draftFaith, draftSymbol, draftTradition, symbolOptions } from "@/lib/editor/draft";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import { stockStyle } from "@/lib/templates/stock";
@@ -102,11 +103,11 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
         <h2 id="elements-heading" className="font-display text-xl">
           {invocation ? traditionCopy.elements : traditionCopy.symbol}
         </h2>
-        <p className="text-sm text-ink-muted">
+        <Hint>
           {pack
             ? traditionCopy.elementsIntro(traditionCopy.names[pack.id])
             : traditionCopy.symbolIntro}
-        </p>
+        </Hint>
       </div>
 
       {options.length > 0 && (
@@ -131,9 +132,7 @@ export function SacredElements({ draft, update }: Pick<StepProps, "draft" | "upd
             ))}
           </RadioGroup>
           {/* The painted gods are Hindu: only a Hindu card is pointed to them */}
-          {draftFaith(draft) === "hindu" && (
-            <p className="text-sm text-ink-muted">{traditionCopy.symbolNote}</p>
-          )}
+          {draftFaith(draft) === "hindu" && <Hint>{traditionCopy.symbolNote}</Hint>}
         </div>
       )}
 

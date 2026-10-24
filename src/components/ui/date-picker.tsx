@@ -8,6 +8,7 @@ import { enIN } from "react-day-picker/locale";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { useQuiet } from "./quiet";
 
 type CalendarProps = {
   selected?: Date;
@@ -97,6 +98,7 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   const field = useField();
+  const quiet = useQuiet();
   const [open, setOpen] = useState(false);
   const valueId = useId();
 
@@ -117,7 +119,8 @@ export function DatePicker({
           data-invalid={field?.invalid || undefined}
           className={cn(
             controlClasses,
-            "group @container flex h-12 cursor-pointer items-center gap-2.5 px-3.5 text-start text-base data-invalid:border-danger data-[state=open]:border-ring",
+            "group @container flex cursor-pointer items-center gap-2.5 text-start data-invalid:border-danger data-[state=open]:border-ring",
+            quiet ? "h-11 px-3 text-ui" : "h-12 px-3.5 text-base",
             className,
           )}
         >

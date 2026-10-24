@@ -414,15 +414,11 @@ test.describe("invite editor", () => {
       .first()
       .getByRole("link", { name: /Use this design/ });
     await expect(use).toHaveAttribute("href", /faith=muslim/);
-    // The design's own page, then More options for the full editor
+    // Every part of the editor is on the design's own page: the card words, folded
     await page.goto((await use.getAttribute("href"))!);
-    await page.getByRole("button", { name: "More options" }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?", {
-      timeout: 15_000,
-    });
-
-    const parts = page.getByRole("group", { name: "Your details, in six parts" });
-    await parts.getByRole("button", { name: /^Card words: / }).click();
+    const words = page.locator("summary", { hasText: "Card words" });
+    await expect(words).toBeVisible({ timeout: 30_000 });
+    await words.click();
     const faith = page.getByRole("radiogroup", { name: "Faith" });
     await expect(faith.getByRole("radio", { name: "Muslim" })).toBeChecked();
     const blessing = page.getByRole("textbox", { name: /^Blessing/ });
@@ -453,6 +449,7 @@ test.describe("invite editor", () => {
     });
 
     await page.reload();
+    await words.click();
     await expect(
       page.getByRole("radiogroup", { name: "Faith" }).getByRole("radio", { name: "Christian" }),
     ).toBeChecked();

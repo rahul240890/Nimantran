@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { designWords } from "@/components/gallery/design-words";
 import { PageTransition } from "@/components/motion/page-transition";
 import { QuickStart } from "@/components/editor/quick/quick-start";
+import { SuggestedDesigns } from "@/components/editor/quick/suggested-designs";
 import { editorText } from "@/i18n/copy/editor";
 import { getLocale } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
@@ -67,6 +68,14 @@ export default async function DesignStartPage({
             : pagePath({ kind: "occasion", id: occasion }, locale)
         }
         sampleHref={samplePath(design.id, { occasion, kind: weddingKind })}
+        more={
+          <SuggestedDesigns
+            current={design.id}
+            occasion={occasion}
+            kind={weddingKind}
+            locale={locale}
+          />
+        }
       />
     </PageTransition>
   );

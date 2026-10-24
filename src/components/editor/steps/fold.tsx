@@ -2,6 +2,7 @@
 
 import { ChevronDown } from "lucide-react";
 import { useState, type ReactNode } from "react";
+import { useQuiet } from "@/components/ui/quiet";
 import { cn } from "@/lib/cn";
 
 /**
@@ -29,16 +30,17 @@ export function Fold({
 }) {
   // Opens already filled in, so a returning host sees their words; then it's theirs to fold
   const [startOpen] = useState(filled);
+  const quiet = useQuiet();
   return (
     <details
       open={startOpen || undefined}
       data-page-target={pageTarget}
-      className={cn("group border-t border-line pt-6", className)}
+      className={cn("group border-t border-line", quiet ? "pt-3" : "pt-6", className)}
     >
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
         <span className="flex flex-col gap-1">
-          <span className="font-display text-xl">{title}</span>
-          {intro && <span className="text-sm text-ink-muted">{intro}</span>}
+          <span className={cn("font-display", quiet ? "text-lg" : "text-xl")}>{title}</span>
+          {intro && !quiet && <span className="text-sm text-ink-muted">{intro}</span>}
         </span>
         <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-accent-text">
           {action && <span className="sr-only sm:not-sr-only">{action}</span>}
@@ -48,7 +50,7 @@ export function Fold({
           />
         </span>
       </summary>
-      <div className="mt-6 flex flex-col gap-6">{children}</div>
+      <div className={cn("flex flex-col", quiet ? "mt-3 gap-4" : "mt-6 gap-6")}>{children}</div>
     </details>
   );
 }

@@ -3,12 +3,14 @@
 import type { ComponentProps } from "react";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
+import { useQuiet } from "./quiet";
 
 type TextareaProps = ComponentProps<"textarea">;
 
 /** Grows with its content (where the browser supports it) between 3 and 12 lines. */
 export function Textarea({ className, id, disabled, required, rows = 3, ...props }: TextareaProps) {
   const field = useField();
+  const quiet = useQuiet();
 
   return (
     <textarea
@@ -20,7 +22,8 @@ export function Textarea({ className, id, disabled, required, rows = 3, ...props
       aria-describedby={props["aria-describedby"] ?? field?.describedBy}
       className={cn(
         controlClasses,
-        "block [field-sizing:content] max-h-[18lh] min-h-[calc(3lh+1.5rem)] resize-y px-3.5 py-3 text-base leading-relaxed",
+        "block [field-sizing:content] max-h-[18lh] min-h-[calc(3lh+1.5rem)] resize-y leading-relaxed",
+        quiet ? "px-3 py-2.5 text-ui" : "px-3.5 py-3 text-base",
         className,
       )}
       {...props}

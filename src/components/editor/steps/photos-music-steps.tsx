@@ -21,6 +21,7 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Hint, useQuiet } from "@/components/ui/quiet";
 import { photoAspect, type CoupleLayout } from "@/lib/editor/couple-photos";
 import type { PhotoCrop } from "@/lib/editor/photo-fit";
 import {
@@ -61,6 +62,7 @@ import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
 import { categoriesText } from "@/i18n/copy/categories";
 import { editorText } from "@/i18n/copy/editor";
+import { GateSummary } from "../gate-chooser";
 
 function newId(): string {
   return typeof crypto.randomUUID === "function"
@@ -217,13 +219,13 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
         <h2 id="design-photos-heading" className="font-display text-xl">
           {framed ? extrasCopy.designPhotosHeading : extrasCopy.coupleHeading}
         </h2>
-        <p className="text-sm text-ink-muted">
+        <Hint>
           {framed
             ? extrasCopy.designPhotosHint(slots.length)
             : one
               ? extrasCopy.photoHintOne
               : extrasCopy.coupleHint}
-        </p>
+        </Hint>
       </div>
       {layouts.length > 1 && (
         <RadioGroup
@@ -404,7 +406,7 @@ function MorePhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
         <h2 id="photos-heading" className="font-display text-xl">
           {extrasCopy.galleryHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.galleryHint(MAX_PHOTOS)}</p>
+        <Hint>{extrasCopy.galleryHint(MAX_PHOTOS)}</Hint>
       </div>
 
       <div
@@ -428,9 +430,7 @@ function MorePhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
         >
           {extrasCopy.addPhotos}
         </Button>
-        <p aria-hidden className="hidden text-sm text-ink-muted sm:block">
-          {extrasCopy.dropHere}
-        </p>
+        <Hint className="hidden sm:block">{extrasCopy.dropHere}</Hint>
         <p className="text-sm text-ink-muted" aria-live="polite">
           {busy
             ? extrasCopy.processing
@@ -555,7 +555,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
         <h2 id="music-heading" className="font-display text-xl">
           {extrasCopy.musicHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.musicHint}</p>
+        <Hint>{extrasCopy.musicHint}</Hint>
       </div>
       <RadioGroup
         label={extrasCopy.musicHeading}
@@ -592,7 +592,7 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
       ) : (
         <>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="min-w-0 flex-1 basis-48 text-sm text-ink-muted">{extrasCopy.ragaHint}</p>
+            <Hint className="min-w-0 flex-1 basis-48">{extrasCopy.ragaHint}</Hint>
             <Button
               type="button"
               variant="secondary"
@@ -664,7 +664,7 @@ function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
         <h2 id="questions-heading" className="font-display text-xl">
           {extrasCopy.questionsHeading}
         </h2>
-        <p className="text-sm text-ink-muted">{extrasCopy.questionsHint}</p>
+        <Hint>{extrasCopy.questionsHint}</Hint>
       </div>
       <ul aria-labelledby="questions-heading" className="flex flex-col">
         {ASKABLE_QUESTIONS.map((id) => (
@@ -710,19 +710,26 @@ export function PhotosStep({ draft, update }: StepProps) {
 
 /** The music and replies section: what plays, what the reply asks, and whom to call. */
 export function MusicStep({ draft, update }: StepProps) {
+  // A quiet page shows the chosen opening and a way to change it, not every opening there is
+  const quiet = useQuiet();
+  const [gate, setGate] = useState(false);
   return (
     <div className={sections}>
       <Music draft={draft} update={update} />
       {/* How it opens sits with the music, what guests see and hear first, so the design
           step is only designs (owner, 2026-10-22) */}
-      <div className="border-t border-line pt-6">
-        <OpeningPicker
-          draft={draft}
-          suite={draftSuite(draft)}
-          scene={draftShowsScene(draft)}
-          update={update}
-        />
-      </div>
+      {quiet ? (
+        <GateSummary draft={draft} update={update} open={gate} onOpenChange={setGate} />
+      ) : (
+        <div className="border-t border-line pt-6">
+          <OpeningPicker
+            draft={draft}
+            suite={draftSuite(draft)}
+            scene={draftShowsScene(draft)}
+            update={update}
+          />
+        </div>
+      )}
       <Questions draft={draft} update={update} />
       <section className="flex flex-col gap-3 border-t border-line pt-6" data-page-target="family">
         <ContactsSection draft={draft} update={update} />

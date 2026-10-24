@@ -4,6 +4,7 @@ import { DoorOpen } from "lucide-react";
 import { OpeningSample } from "@/components/guest/opening/opening";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogClose, DialogContent } from "@/components/ui/dialog";
+import { Hint } from "@/components/ui/quiet";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { draftOpeningGod, draftOpeningStyle, type InviteDraft } from "@/lib/editor/draft";
@@ -101,7 +102,7 @@ export function GateSummary({
         <div className="flex min-w-0 flex-col items-start gap-1.5">
           <p className="font-display text-lg leading-tight break-words">{words.name}</p>
           <p className="text-sm text-ink-muted">{words.description}</p>
-          <p className="text-sm text-ink-muted">{openingCopy.summaryBody}</p>
+          <Hint>{openingCopy.summaryBody}</Hint>
           <Button
             variant="secondary"
             size="sm"

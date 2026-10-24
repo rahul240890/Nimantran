@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { CharacterCount, Textarea } from "@/components/ui/textarea";
+import { Hint, useQuiet } from "@/components/ui/quiet";
 import { Sparkles } from "lucide-react";
 import { useEffect, useState } from "react";
 import {
@@ -134,6 +135,7 @@ export function SlotField({
   translation?: { language: CardLanguage; placeholder: string };
 }) {
   const { coupleCopy, editor } = useText(editorText);
+  const quiet = useQuiet();
   const hints: Partial<Record<SlotId, string>> = {
     joiner: coupleCopy.joinerHint,
     doorLeft: coupleCopy.doorsHint,
@@ -174,7 +176,9 @@ export function SlotField({
         autoComplete="off"
         spellCheck={rule.kind === "long"}
         onChange={(event) => onChange(event.target.value)}
-        className={rule.kind === "name" ? "font-display text-xl" : undefined}
+        className={
+          rule.kind === "name" ? cn("font-display", quiet ? "text-lg" : "text-xl") : undefined
+        }
         data-slot={translation ? undefined : id}
         data-translation={translation ? id : undefined}
       />
@@ -290,7 +294,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
           <h2 id="names-heading" className="font-display text-xl">
             {coupleCopy.namesHeading}
           </h2>
-          <p className="text-sm text-ink-muted">{coupleCopy.anyScript}</p>
+          <Hint>{coupleCopy.anyScript}</Hint>
         </div>
         <div className="flex flex-col gap-5">{names.map(field)}</div>
       </section>
