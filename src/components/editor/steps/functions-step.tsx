@@ -1,23 +1,18 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { Car, ChevronDown, CircleAlert, CopyCheck, MapPin, MapPinned, Shirt } from "lucide-react";
+import { Car, ChevronDown, CopyCheck, MapPin, MapPinned, Shirt } from "lucide-react";
 import { useId, useMemo, useState, type ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { TimePicker } from "@/components/ui/time-picker";
 import { Hint } from "@/components/ui/quiet";
 import {
-  ceremonyName,
   draftTradition,
   FUNCTION_RULES,
-  draftCategory,
   functionOrder,
-  mainFunction,
   muhuratName,
   needsTime,
   type EventFunction,
@@ -26,7 +21,7 @@ import {
 import { functionGuide, GUIDE_RULES, mapsPin, type FunctionGuide } from "@/lib/editor/guide";
 import { cn } from "@/lib/cn";
 import type { StepProps } from "./types";
-import { useLocale, useText } from "@/i18n/client";
+import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 
 /** Where an empty time list opens: mid-morning, so the rest of the day is a short scroll. */
@@ -388,120 +383,4 @@ export function useFunctionFields(
       />
     );
   };
-}
-
-export function FunctionsStep({ draft, update, errors }: StepProps) {
-  const { editor, functionCopy, functionFields } = useText(editorText);
-  const main = mainFunction(draft);
-  const category = draftCategory(draft);
-  const locale = useLocale();
-  const { suggested, more } = functionOrder(draft);
-  const fields = useFunctionFields(draft, update);
-  // The rarer functions stay folded on a short list until the host asks, unless one is planned
-  const [moreOpen, setMoreOpen] = useState(false);
-  const showMore = moreOpen || more.some((id) => draft.functions[id].included);
-
-  const setFunction = (id: FunctionId, change: Partial<EventFunction>) =>
-    update((current) => ({
-      ...current,
-      functions: { ...current.functions, [id]: { ...current.functions[id], ...change } },
-    }));
-
-  const item = (id: FunctionId) => {
-    const fn = draft.functions[id];
-    const copy = functionCopy[id];
-    const local = ceremonyName(draft, id);
-    return (
-      <li
-        key={id}
-        data-page-target={`fn-${id}`}
-        className={cn(
-          "overflow-hidden rounded-lg border bg-surface transition-[border-color,box-shadow] duration-300",
-          fn.included ? "border-marigold/70 shadow-float" : "border-line shadow-raised",
-          errors.functions && "border-danger",
-        )}
-      >
-        <div className="flex items-start justify-between gap-3 px-4 py-2 sm:px-5">
-          <Checkbox
-            label={
-              <span className="font-display text-lg">
-                {copy.name}
-                {local && (
-                  <span
-                    lang={draftTradition(draft)?.language}
-                    className="font-sans text-base font-normal text-accent-text"
-                  >
-                    {" · "}
-                    {local.native}
-                  </span>
-                )}
-              </span>
-            }
-            description={copy.description}
-            checked={fn.included}
-            invalid={Boolean(errors.functions)}
-            onCheckedChange={(checked) => setFunction(id, { included: checked === true })}
-            className="flex-1"
-          />
-          {fn.included && main === id && (
-            <Badge tone="gold" className="mt-3 shrink-0">
-              {functionFields.onCard}
-            </Badge>
-          )}
-        </div>
-        {fn.included && fields(id, errors)}
-      </li>
-    );
-  };
-
-  return (
-    <div className="flex flex-col gap-4">
-      {errors.functions && (
-        <p role="alert" className="flex items-start gap-1.5 text-sm font-medium text-danger">
-          <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-          {editor.errors["no-functions"]}
-        </p>
-      )}
-      <section aria-labelledby="functions-suggested" className="flex flex-col gap-3">
-        <h2
-          id="functions-suggested"
-          className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
-        >
-          {functionFields.suggested(category.names[locale])}
-        </h2>
-        <ul aria-label={functionFields.group} className="flex flex-col gap-4">
-          {suggested.map(item)}
-        </ul>
-      </section>
-      {more.length > 0 && (
-        <section aria-labelledby="functions-more" className="mt-4 flex flex-col gap-3">
-          <div className="flex flex-col gap-0.5">
-            <h2
-              id="functions-more"
-              className="font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
-            >
-              {functionFields.more}
-            </h2>
-            <Hint>{functionFields.moreHint}</Hint>
-          </div>
-          {showMore ? (
-            <ul aria-label={functionFields.more} className="flex flex-col gap-4">
-              {more.map(item)}
-            </ul>
-          ) : (
-            <Button
-              type="button"
-              variant="secondary"
-              aria-expanded={false}
-              trailingIcon={<ChevronDown aria-hidden />}
-              onClick={() => setMoreOpen(true)}
-              className="self-start"
-            >
-              {functionFields.showMore(more.length)}
-            </Button>
-          )}
-        </section>
-      )}
-    </div>
-  );
 }

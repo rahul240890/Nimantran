@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page, type TestInfo } from "@playwright/test";
+import { fillNames, firstName, openPart } from "./invite-helpers";
 
 const axe = (page: Page) =>
   new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]);
@@ -154,14 +155,17 @@ test.describe("accounts", () => {
   });
 
   test("a draft made before signing in moves into the account", async ({ page }, info) => {
-    await page.goto("/create?quality=2d&category=engagement");
+    await page.goto("/");
     await page.evaluate(() => localStorage.clear());
-    await page.goto("/create?quality=2d&category=engagement");
-    await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByRole("textbox", { name: /First name/ }).fill("Aditya");
-    await page.getByRole("textbox", { name: /Second name/ }).fill("Priya");
-    await page.getByRole("button", { name: "Continue" }).click();
-    await page.getByRole("button", { name: "Continue" }).click(); // family
+    // An engagement design from the gallery, its names typed before signing in
+    await page.goto("/invitations/engagement");
+    await page
+      .locator("[data-design]")
+      .first()
+      .getByRole("link", { name: /Use this design/ })
+      .click();
+    await expect(page).toHaveURL(/\/create\/[a-z0-9-]+\?category=engagement/);
+    await fillNames(page, ["Aditya", "Priya"]);
 
     await page.goto("/sign-in?next=/invites");
     await signInWithPhone(page, numberFor(info));
@@ -169,12 +173,13 @@ test.describe("accounts", () => {
     await expect(draft.getByRole("heading", { name: "Aditya & Priya" })).toBeVisible();
     await expect(draft.getByText("Engagement")).toBeVisible();
     await expect(draft.getByText("Not in your account")).toBeVisible();
+    // Continue opens it on its design's page, where it saves to the account
     await draft.getByRole("link", { name: "Continue" }).click();
-    await expect(page).toHaveURL(/\/create/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "When and where is everything?",
-    );
-    await expect(page.getByText("Saved to your account")).toHaveCount(1);
+    await expect(page).toHaveURL(/\/create\/[a-z0-9-]+\?category=engagement/);
+    await expect(firstName(page)).toHaveValue("Aditya", {
+      timeout: 30_000,
+    });
+    await expect(page.getByText("Saved to your account")).toHaveCount(1, { timeout: 15_000 });
 
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "1 invite" })).toBeVisible();
@@ -189,14 +194,17 @@ test.describe("accounts", () => {
     browser,
   }, info) => {
     const number = numberFor(info);
-    await phone.goto(`/sign-in?next=${encodeURIComponent("/create?quality=2d&new=1")}`);
+    await phone.goto(`/sign-in?next=${encodeURIComponent("/invitations/roka")}`);
     await signInWithPhone(phone, number);
-    await expect(phone).toHaveURL(/\/create/);
-    await phone.getByRole("radio", { name: /Roka/ }).click();
-    for (let i = 0; i < 3; i++) await phone.getByRole("button", { name: "Continue" }).click();
-    await phone.getByRole("textbox", { name: /First name/ }).fill("Kabir");
-    await phone.getByRole("textbox", { name: /Second name/ }).fill("Ananya");
-    await expect(phone.getByText("Saved to your account")).toHaveCount(1);
+    await expect(phone).toHaveURL(/\/invitations\/roka$/);
+    await phone
+      .locator("[data-design]")
+      .first()
+      .getByRole("link", { name: /Use this design/ })
+      .click();
+    await expect(phone).toHaveURL(/\/create\/[a-z0-9-]+\?category=roka/);
+    await fillNames(phone, ["Kabir", "Ananya"]);
+    await expect(phone.getByText("Saved to your account")).toHaveCount(1, { timeout: 15_000 });
 
     // A second browser has none of the first one's storage
     const laptop = await browser.newPage({
@@ -209,17 +217,16 @@ test.describe("accounts", () => {
     await expect(card.getByRole("heading", { name: "Kabir & Ananya" })).toBeVisible();
     await expect(card.getByText("Roka")).toBeVisible();
     await card.getByRole("link", { name: "Continue" }).click();
-    await expect(laptop).toHaveURL(/\/create$/);
-    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    await expect(laptop.getByRole("textbox", { name: /First name/ })).toHaveValue("Kabir");
-    await laptop.getByRole("textbox", { name: /First name/ }).fill("Kabir Singh");
-    await expect(laptop.getByText("Saved to your account")).toHaveCount(1);
+    await expect(laptop).toHaveURL(/\/create\/[a-z0-9-]+\?category=roka&invite=/);
+    await expect(firstName(laptop)).toHaveValue("Kabir", { timeout: 30_000 });
+    await openPart(laptop, "Names");
+    await firstName(laptop).fill("Kabir Singh");
+    await expect(laptop.getByText("Saved to your account")).toHaveCount(1, { timeout: 15_000 });
 
-    // Starting another keeps the first in the account
+    // Starting another keeps the first in the account, and starts from the designs
     await laptop.goto("/invites");
     await laptop.getByRole("link", { name: "New invite" }).click();
-    await expect(laptop).toHaveURL(/\/create$/);
-    await expect(laptop.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+    await expect(laptop).toHaveURL(/\/invitations$/, { timeout: 30_000 });
 
     await phone.goto("/invites");
     await expect(phone.getByRole("heading", { name: "Kabir Singh & Ananya" })).toBeVisible();
@@ -236,8 +243,9 @@ test.describe("accounts", () => {
   test("an invite that isn't in the account says so", async ({ page }, info) => {
     await page.goto("/sign-in?next=/invites");
     await signInWithPhone(page, numberFor(info));
-    await page.goto("/create?quality=2d&invite=7d7f1f5e-3c55-4d3a-9d1c-2b1e6f0b9a11");
+    await page.goto("/create?invite=7d7f1f5e-3c55-4d3a-9d1c-2b1e6f0b9a11");
     await expect(page.getByText(/isn't in your account/).first()).toBeVisible();
-    await expect(page).toHaveURL(/\/create$/);
+    // and the host is back among their own invites
+    await expect(page).toHaveURL(/\/invites$/, { timeout: 30_000 });
   });
 });

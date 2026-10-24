@@ -232,6 +232,8 @@ export function lineIdeas(
 /** The names section: the card's language, then the names in large letters. */
 export function CoupleStep({ draft, update, errors }: StepProps) {
   const { coupleCopy, namesCopy } = useText(editorText);
+  // On a design's page the names sit in a fold titled with them, so the heading isn't shown
+  const quiet = useQuiet();
   const { template, one, names } = useNames(draft);
   const set = (id: SlotId, value: string) =>
     update((current) => ({ ...current, content: { ...current.content, [id]: value } }));
@@ -291,7 +293,7 @@ export function CoupleStep({ draft, update, errors }: StepProps) {
         className="flex flex-col gap-5 border-t border-line pt-6"
       >
         <div className="flex flex-col gap-1">
-          <h2 id="names-heading" className="font-display text-xl">
+          <h2 id="names-heading" className={cn("font-display text-xl", quiet && "sr-only")}>
             {coupleCopy.namesHeading}
           </h2>
           <Hint>{coupleCopy.anyScript}</Hint>

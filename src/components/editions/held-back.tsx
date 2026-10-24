@@ -21,7 +21,14 @@ import { draftDesignId } from "@/lib/plans/design-defaults";
  * doesn't cover the change (most often another design than the one paid for): guests keep
  * the live copy, and the host either buys a package for the change or goes back.
  */
-export function HeldBackNotice({ draft }: { draft: InviteDraft }) {
+export function HeldBackNotice({
+  draft,
+  onRestored,
+}: {
+  draft: InviteDraft;
+  /** After going back to the paid design: a design's own page turns to it. */
+  onRestored?: () => void;
+}) {
   const { heldCopy, limitCopy } = useText(editionsText);
   const locale = useLocale();
   const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
@@ -54,6 +61,7 @@ export function HeldBackNotice({ draft }: { draft: InviteDraft }) {
       languages: live.languages,
     }));
     void syncDraft();
+    onRestored?.();
   };
 
   return (

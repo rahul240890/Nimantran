@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { firstName, openPart } from "./invite-helpers";
 
 /* A design's own page (update 4): the design on top, one short form below. */
 
@@ -19,6 +20,7 @@ async function open(page: Page, path = DESIGN) {
 }
 
 async function fillNames(page: Page) {
+  await openPart(page, "Names");
   const first = page.getByRole("textbox", { name: /First name/ });
   const second = page.getByRole("textbox", { name: /Second name/ });
   // Typing that lands before the page has hydrated is lost, so try again until both stay
@@ -31,6 +33,7 @@ async function fillNames(page: Page) {
 }
 
 async function fillWedding(page: Page) {
+  await openPart(page, "When and where");
   const wedding = page.locator('[data-function="wedding"]');
   await wedding.getByRole("button", { name: /^Date/ }).click();
   await page.getByRole("button", { name: /next month/i }).click();
@@ -101,9 +104,8 @@ test.describe("a design's page", () => {
     // Back goes to the design's page, with everything as it was, not to the steps
     await page.getByRole("button", { name: "Back" }).click();
     await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding$/);
-    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya", {
-      timeout: 30_000,
-    });
+    await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
+    await openPart(page, "When and where");
     await expect(
       page.locator('[data-function="wedding"]').getByRole("textbox", { name: /^Venue/ }),
     ).toHaveValue("Taj Falaknuma, Hyderabad");
@@ -146,26 +148,55 @@ test.describe("a design's page", () => {
     await expect(events.getByRole("button", { name: "More events" })).toHaveCount(0);
   });
 
-  test("every part of the editor is on the page, quietly, and other designs below", async ({
+  test("every part of the editor is on the page, quietly, one part open at a time", async ({
     page,
   }) => {
     await open(page);
     // Nothing nested: no way off to another editor, and no helper words
     await expect(page.getByRole("button", { name: "More options" })).toHaveCount(0);
     await expect(page.getByText("Type in any script")).toHaveCount(0);
+    // Every part folds to its title; a new invite opens on the names
+    const titles = [
+      "Names",
+      "When and where",
+      "Family names",
+      "Your photos",
+      "Card words",
+      "Music & replies",
+    ];
+    const folds = page.locator('details[name="editor-parts"]');
+    await expect(folds).toHaveCount(titles.length);
+    for (const [index, title] of titles.entries()) {
+      await expect(folds.nth(index).locator(":scope > summary")).toContainText(title);
+    }
+    const opened = page.locator('details[name="editor-parts"][open]');
+    await expect(opened).toHaveCount(1);
+    await expect(opened.locator(":scope > summary")).toContainText("Names");
+
+    // Opening one part closes the one before
     const parts: [string, RegExp][] = [
       ["Family names", /Parents' names/],
       ["Card words", /^Blessing/],
     ];
     for (const [title, field] of parts) {
-      await page.locator("summary", { hasText: title }).click();
+      await openPart(page, title);
+      await expect(opened).toHaveCount(1);
       await expect(page.getByRole("textbox", { name: field }).first()).toBeVisible();
     }
-    await page.locator("summary", { hasText: "Your photos" }).click();
+    await openPart(page, "Your photos");
     await expect(page.getByRole("button", { name: /Add photos/ }).first()).toBeVisible();
-    await page.locator("summary", { hasText: "Music & replies" }).click();
+    await openPart(page, "Music & replies");
     await expect(page.getByRole("radio", { name: /Your own music/ })).toBeVisible();
+    await expect(opened).toHaveCount(1);
+    // Read from the top: a control scrolled under the sticky header counts as too small
+    await page.evaluate(() => window.scrollTo(0, 0));
     expect((await axe(page).analyze()).violations).toEqual([]);
+
+    // Folded, the names say what's in them
+    await openPart(page, "Names");
+    await fillNames(page);
+    await openPart(page, "When and where");
+    await expect(folds.first().locator(":scope > summary")).toContainText("Aditya & Priya");
 
     // Other designs for the wedding, each opening its own page, never this one again
     const more = page.locator("[data-suggested-designs]");
@@ -176,12 +207,22 @@ test.describe("a design's page", () => {
     await expect(links.first()).toHaveAttribute("href", /^\/create\/[a-z0-9-]+\?category=wedding/);
   });
 
-  test("it opens live, and we'll make it for anyone short of time", async ({ page }) => {
+  test("a demo with sample names, a preview with the family's own, and we'll make it for anyone short of time", async ({
+    page,
+  }) => {
     await open(page);
-    await expect(page.getByRole("link", { name: "Watch it open" })).toHaveAttribute(
+    await expect(page.getByRole("link", { name: "Watch demo" })).toHaveAttribute(
       "href",
       "/sample/rajwada-bagh?occasion=wedding",
     );
+    // The preview is the invitation as it stands, with the names typed
+    await fillNames(page);
+    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    const preview = page.getByRole("dialog", { name: "Your invitation" });
+    await expect(preview.getByRole("img", { name: /, as guests see it$/ })).toContainText("Aditya");
+    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
+    await page.keyboard.press("Escape");
+    await expect(preview).toHaveCount(0);
     const make = page.getByRole("link", { name: /We'll make it for you/ });
     await expect(make).toHaveAttribute("href", "/help/whatsapp?for=make&design=rajwada-bagh");
     await expect(make).toHaveAttribute("target", "_blank");

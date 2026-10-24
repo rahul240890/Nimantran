@@ -1,12 +1,21 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { AI_SHOWN } from "../src/lib/ai/shown";
+import {
+  addDesignPhotos,
+  axe,
+  fillEvent,
+  fillNames,
+  firstName,
+  noOverflow,
+  openPart,
+  seeInvitation,
+  tickEvents,
+} from "./invite-helpers";
 
-const noOverflow = (page: Page) =>
-  page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-
-const axe = (page: Page) =>
-  new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]);
+/*
+ * The editor: one page per design (owner, 2026-10-24: one editor for everything), its parts
+ * folded and opened one at a time, then the preview to publish from.
+ */
 
 // A 4×4 marigold PNG, enough for the browser to decode, shrink and store
 const PNG = Buffer.from(
@@ -14,49 +23,60 @@ const PNG = Buffer.from(
   "base64",
 );
 
-const next = (page: Page) =>
-  page.getByRole("button", { name: /^(Continue|Preview invitation)$/ }).click();
+const PARTS = [
+  "Names",
+  "When and where",
+  "Family names",
+  "Your photos",
+  "Card words",
+  "Music & replies",
+];
 
-/** Fills each of the design's photo frames through its own upload field. */
-async function addDesignPhotos(page: Page) {
-  const add = page.getByRole("button", { name: /^Add: / });
-  const count = await add.count();
-  for (let i = count; i > 0; i--) {
-    const chooser = page.waitForEvent("filechooser");
-    await add.first().click();
-    await (await chooser).setFiles({ name: "us.png", mimeType: "image/png", buffer: PNG });
-    await expect(add).toHaveCount(i - 1);
-  }
+/** Opens a design's page on this device's empty draft, ready for typing. */
+async function open(page: Page, path: string) {
+  await page.goto(path);
+  await expect(page.locator('details[name="editor-parts"]').first()).toBeAttached({
+    timeout: 30_000,
+  });
 }
 
-async function fillCouple(page: Page) {
-  const first = page.getByRole("textbox", { name: /First name/ });
-  const second = page.getByRole("textbox", { name: /Second name/ });
-  // Typing that lands before the editor has hydrated is lost, so try again until both stay
-  await expect(async () => {
-    await first.fill("Aditya");
-    await second.fill("Priya");
-    await expect(first).toHaveValue("Aditya", { timeout: 3_000 });
-    await expect(second).toHaveValue("Priya", { timeout: 3_000 });
-  }).toPass({ timeout: 30_000 });
+/** The accessibility check, read from the top: a control under the sticky header reads small. */
+async function axeFromTop(page: Page) {
+  await page.evaluate(() => window.scrollTo(0, 0));
+  return (await axe(page).analyze()).violations;
 }
 
+/** The wedding's date, time, venue and dress code. */
 async function fillWedding(page: Page) {
-  await page.getByRole("button", { name: /^Date/ }).click();
-  await page.getByRole("button", { name: /next month/i }).click();
-  await page.getByRole("gridcell").getByRole("button", { name: /, 15 / }).click();
-  await page.getByRole("combobox", { name: /Starts at/ }).click();
-  await page.getByRole("option", { name: "6:30 pm" }).click();
-  await page.getByRole("textbox", { name: /^Venue/ }).fill("Taj Falaknuma, Hyderabad");
+  const wedding = await fillEvent(page, "wedding", {
+    day: 15,
+    time: "6:30 pm",
+    venue: "Taj Falaknuma, Hyderabad",
+  });
   // The dress code is one of the details folded away until asked for
-  await page.getByRole("button", { name: "More details" }).click();
-  await page.getByRole("button", { name: "Traditional Indian" }).click();
+  await wedding.getByRole("button", { name: "More details" }).click();
+  await wedding.getByRole("button", { name: "Traditional Indian" }).click();
+  return wedding;
+}
+
+/** Opens the first design a gallery page offers. */
+async function useFirstDesign(page: Page, gallery: string) {
+  await page.goto(gallery);
+  await page
+    .locator("[data-design]")
+    .first()
+    .getByRole("link", { name: /Use this design/ })
+    .click();
+  await expect(page).toHaveURL(/\/create\/[a-z0-9-]+\?/);
+  await expect(page.locator('details[name="editor-parts"]').first()).toBeAttached({
+    timeout: 30_000,
+  });
 }
 
 test.beforeEach(async ({ page }) => {
   // A fixed "today", so the calendar and the dates it produces never drift
   await page.clock.setFixedTime(new Date("2026-09-26T10:00:00"));
-  await page.goto("/create?quality=2d");
+  await page.goto("/");
   await page.evaluate(() => localStorage.clear());
 });
 
@@ -64,94 +84,46 @@ for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`invite editor, ${colorScheme} theme`, () => {
     test.use({ colorScheme, reducedMotion: "reduce" });
 
-    test("every step fits the screen and passes an accessibility check", async ({ page }) => {
-      // Ten steps, each checked for accessibility
+    test("every part and the preview fit the screen and pass an accessibility check", async ({
+      page,
+    }) => {
       test.slow();
-      await page.goto("/create?quality=2d");
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        "Whose tradition should the card follow?",
-      );
-      await page.getByRole("radio", { name: /Marathi/ }).click();
-      await expect(page.getByText(/symbol and the blessing.*in Card words/)).toBeVisible();
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        "Pick the design your guests will open",
-      );
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
+      await open(page, "/create/rajwada-bagh?category=wedding&tradition=marathi");
       // The card's language leads the names: a Marathi tradition suggests a Marathi card
       const language = page.getByRole("radiogroup", { name: "Card language" });
       await expect(language.getByRole("radio", { name: /^मराठी/ })).toBeChecked();
       await language.getByRole("radio", { name: /^English/ }).click();
       await expect(language.getByRole("radio", { name: /^English/ })).toBeChecked();
       expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
+      expect(await axeFromTop(page)).toEqual([]);
 
-      await next(page); // names missing: errors show
-      await expect(page.getByText("2 things need your attention")).toBeVisible();
+      // Nothing typed: what's missing is shown, the first of it opened
+      await page.getByRole("button", { name: "See my invitation" }).click();
+      await expect(page.getByText(/\d+ things need your attention/)).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
+      expect(await axeFromTop(page)).toEqual([]);
 
-      await fillCouple(page);
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-        "Who's inviting your guests?",
-      );
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
+      // Each part, opened in turn
+      for (const part of PARTS) {
+        await openPart(page, part);
+        expect(await noOverflow(page)).toBe(true);
+        expect(await axeFromTop(page)).toEqual([]);
+      }
 
-      await next(page);
-      await next(page);
-      await expect(page.getByText("3 things need your attention")).toBeVisible();
-      expect(await noOverflow(page)).toBe(true);
-      // The step has scrolled to its first problem, which can leave a function's checkbox
-      // half under the sticky bar's logo link, and axe's target-size rule counts a control
-      // partly covered by another as too small. Where it lands depends only on the step's
-      // height, so axe reads the step from its top: every control is still checked.
-      await page.evaluate(() => window.scrollTo(0, 0));
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
+      await openPart(page, "Names");
+      await fillNames(page, ["Aditya", "Priya"]);
       await fillWedding(page);
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Add your photos");
-      // The design's photo frames have their own fields, apart from any other photos, and
-      // each one is optional
-      await expect(page.getByText("Optional", { exact: true }).first()).toBeVisible();
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
+      await openPart(page, "Your photos");
       await addDesignPhotos(page);
-
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Read the card's words");
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
-      await next(page);
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("Music and replies");
-      expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
-
-      await next(page);
-      await expect(page.getByText("Your invitation is ready")).toBeVisible();
-      // A second language is offered here, after the details
+      await seeInvitation(page);
+      // A second language is offered on the preview, after the details
       await expect(
         page.getByRole("radiogroup", { name: "Add a second language?" }).getByRole("radio", {
           name: "Only one language",
         }),
       ).toBeChecked();
       expect(await noOverflow(page)).toBe(true);
-      expect((await axe(page).analyze()).violations).toEqual([]);
+      expect(await axeFromTop(page)).toEqual([]);
     });
   });
 }
@@ -159,51 +131,39 @@ for (const colorScheme of ["light", "dark"] as const) {
 test.describe("invite editor", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("writes an invite from design to preview and keeps it after a reload", async ({ page }) => {
-    await page.goto("/create?quality=2d");
-    await expect(page.getByRole("radio", { name: /Wedding/ })).toBeChecked();
-    await next(page);
-    await next(page);
-    // The wedding's designs, a dozen at a time with filters, the chosen one first and marked
-    const designs = page.getByRole("radiogroup", { name: "Designs for your occasion" });
-    await expect(designs.getByRole("radio").first()).toBeChecked();
-    await expect(designs.getByRole("radio")).toHaveCount(12);
-    await expect(page.getByRole("button", { name: /^Show 12 more designs$/ })).toBeVisible();
-    // Only designs here: how it opens is chosen with the music
-    await expect(page.getByRole("heading", { name: "How it opens" })).toHaveCount(0);
-    await next(page);
-
-    await fillCouple(page);
-    await next(page);
-    await next(page); // family, all optional
+  test("writes an invite on its design's page, previews it, and keeps it after a reload", async ({
+    page,
+  }) => {
+    await open(page, "/create/rajwada-bagh?category=wedding");
+    await fillNames(page, ["Aditya", "Priya"]);
 
     // Only the wedding starts planned; add the sangeet too
-    await page.getByRole("checkbox", { name: /Sangeet/ }).click();
-    await next(page);
+    await tickEvents(page, "Sangeet");
+    await page.getByRole("button", { name: "See my invitation" }).click();
     await expect(page.getByText("6 things need your attention")).toBeVisible();
-    await page.getByRole("checkbox", { name: /Sangeet/ }).click();
-    await fillWedding(page);
-    await expect(page.getByRole("button", { name: "Traditional Indian" })).toHaveAttribute(
+    await page
+      .getByRole("group", { name: "Your events" })
+      .getByRole("button", { name: "Sangeet", exact: true })
+      .click();
+    const wedding = await fillWedding(page);
+    await expect(wedding.getByRole("button", { name: "Traditional Indian" })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    await next(page);
 
     // The theme's own frame has its own upload field; other photos go below it
+    await openPart(page, "Your photos");
     await addDesignPhotos(page);
     await expect(page.getByRole("button", { name: /^Change: / }).first()).toBeVisible();
-    await page.getByRole("region", { name: "More photos" });
     await page
       .getByRole("region", { name: "More photos" })
       .locator('input[type="file"]')
       .setInputFiles({ name: "more.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByRole("img", { name: "Photo 1" })).toBeVisible();
-    await next(page);
-    await next(page); // card words, already written
+    await openPart(page, "Music & replies");
     await page.getByRole("radio", { name: /Raag Bhupali/ }).click();
-    await next(page);
+    await seeInvitation(page);
 
-    await expect(page.getByText("Your invitation is ready")).toBeVisible();
     const summary = page.getByRole("region", { name: "Functions" });
     await expect(summary.getByText("Thu, 15 Oct 2026 · 6:30 pm")).toBeVisible();
     await expect(summary.getByText("Taj Falaknuma, Hyderabad")).toBeVisible();
@@ -214,8 +174,8 @@ test.describe("invite editor", () => {
     await page.getByRole("button", { name: "Show the Wedding page" }).click();
     await expect(phone).toContainText("Taj Falaknuma, Hyderabad");
     await expect(phone).toContainText("15 October 2026");
-    // The editor shows only the design, never a stand-in card
-    await expect(page.getByRole("button", { name: "Card", exact: true })).toHaveCount(0);
+    // The preview has no steps any more: only the way back and Publish
+    await expect(page.getByText(/Step \d of \d/)).toHaveCount(0);
 
     // The opening gate changes from the summary, and the summary shows the new one at once
     const gate = page.getByRole("region", { name: "Opening gate (cover screen)" });
@@ -233,172 +193,95 @@ test.describe("invite editor", () => {
       "Silk curtains",
     );
 
+    // Edit on the preview opens that part on the design's page
+    await page.getByRole("button", { name: "Edit photos" }).click();
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding#part-photos$/);
+    await expect(page.locator("#part-photos")).toHaveAttribute("open", "");
+    await seeInvitation(page);
+
+    // A new invite starts from the designs
     await page.getByRole("button", { name: "Start a new invite" }).click();
     await page.getByRole("button", { name: "Clear and start again" }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
-    await page.reload();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+    await expect(page).toHaveURL(/\/invitations$/, { timeout: 30_000 });
   });
 
-  test("the details are one page whose parts fold to what's in them", async ({ page }) => {
-    await page.goto("/create?quality=2d");
-    for (let i = 0; i < 3; i++) await next(page);
-    const parts = page.getByRole("group", { name: "Your details, in six parts" });
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    for (const part of ["Family", "Functions", "Photos", "Card words", "Music & replies"]) {
-      await expect(parts.getByRole("button", { name: new RegExp(`^${part}: `) })).toBeVisible();
-    }
-
-    await fillCouple(page);
-    await next(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's inviting your guests?");
-    const couple = parts.getByRole("button", { name: "Names: Aditya & Priya, done. Open" });
-    await expect(couple).toBeVisible();
-    await expect(parts.getByRole("button", { name: /^Family: / })).toHaveCount(0);
-
-    // Any part opens with one tap, without walking through the others
-    await parts.getByRole("button", { name: /^Music & replies: / }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Music and replies");
-    await expect(parts.getByRole("button", { name: /^Functions: .*needs a look/ })).toBeVisible();
-    await expect(
-      parts.getByRole("button", { name: "Card words: Written for your occasion, done. Open" }),
-    ).toBeVisible();
-    await parts.getByRole("button", { name: /^Names: / }).click();
-    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
+  test("older links into the editor open the design's page or its designs", async ({ page }) => {
+    const goes = async (from: string, to: string) => {
+      const response = await page.request.get(from, { maxRedirects: 0 });
+      expect(response.status(), from).toBe(307);
+      expect(response.headers().location, from).toBe(to);
+    };
+    await goes(
+      "/create?category=wedding&tradition=marathi&suite=kayal&template=gopuram",
+      "/create/kayal?category=wedding&tradition=marathi",
+    );
+    await goes("/create?template=kasavu", "/create/card-kasavu?category=wedding");
+    await goes(
+      "/create?suite=udaipur-lake&format=scene",
+      "/create/udaipur-lake-scene?category=wedding",
+    );
+    await goes("/create?category=roka", "/invitations/roka");
+    await goes("/create?category=wedding&tradition=gujarati", "/invitations/wedding/gujarati");
+    // A design from a landing page, opened: its own page, already chosen
+    await page.goto("/create?template=kasavu");
+    await expect(page.getByRole("heading", { level: 1, name: "Kerala Kasavu" })).toBeVisible();
   });
 
-  test("a design picked in the gallery opens on the names, with no other step flashing first", async ({
+  test("an occasion's design sets up its events and wording, and another occasion keeps the names", async ({
     page,
   }) => {
-    // Every main heading the page ever shows, from the first paint
-    await page.addInitScript(() => {
-      const seen: string[] = [];
-      (window as unknown as { headings: string[] }).headings = seen;
-      new MutationObserver(() => {
-        const text = document.querySelector("main h1")?.textContent;
-        if (text && seen.at(-1) !== text) seen.push(text);
-      }).observe(document, { childList: true, subtree: true, characterData: true });
-    });
-    // A draft already part way through the design steps
-    await next(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Whose tradition should the card follow?",
+    await useFirstDesign(page, "/invitations/roka");
+    await expect(page).toHaveURL(/category=roka/);
+    await fillNames(page, ["Aditya", "Priya"]);
+    await openPart(page, "When and where");
+    const events = page.getByRole("group", { name: "Your events" });
+    await expect(events.getByRole("button", { name: "Roka", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "true",
     );
-    await page.goto(
-      "/create?quality=2d&category=wedding&tradition=marathi&suite=kayal&template=gopuram",
+    // The wedding is one of the roka's rarer events, folded until asked for
+    await events.getByRole("button", { name: "More events" }).click();
+    await expect(events.getByRole("button", { name: "Wedding", exact: true })).toHaveAttribute(
+      "aria-pressed",
+      "false",
     );
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    expect(
-      await page.evaluate(() => (window as unknown as { headings: string[] }).headings),
-    ).toEqual(["Who's getting married?"]);
-  });
-
-  test("a design chosen on the landing page starts the invite", async ({ page }) => {
-    await page.goto("/create?quality=2d&template=kasavu");
-    await expect(page.getByRole("radio", { name: /Kerala Kasavu/ })).toBeChecked();
-  });
-
-  test("an occasion from the home page sets up the functions, wording and designs", async ({
-    page,
-  }) => {
-    await page.goto("/create?quality=2d&category=roka");
-    // The occasion is chosen, so the host starts on the designs, the roka's first
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Pick the design your guests will open",
-    );
-    // The 3D cards, by the Kind of invitation filter
-    await page
-      .getByRole("radiogroup", { name: "Kind of invitation" })
-      .getByRole("radio", { name: "3D card" })
-      .click();
-    const designs = page
-      .getByRole("radiogroup", { name: "Designs for your occasion" })
-      .getByRole("radio");
-    // Only the roka's own designs are offered, not a Kerala wedding card
-    await expect(designs.first()).toHaveAccessibleName(/Marigold Gate/);
-    await expect(designs.filter({ hasText: "Kerala Kasavu" })).toHaveCount(0);
-    await next(page);
-    await fillCouple(page);
-    await next(page);
-    await next(page); // family
-
-    await expect(page.getByRole("heading", { name: "Roka functions" })).toBeVisible();
-    await expect(page.getByRole("checkbox", { name: /Roka/ })).toBeChecked();
-    // The wedding is one of the roka's rarer functions, folded until asked for
-    await page.getByRole("button", { name: /^Show \d+ more functions$/ }).click();
-    await expect(page.getByRole("checkbox", { name: /Wedding/ })).not.toBeChecked();
-    // The design announces the roka in the occasion's own words (in a sheet on phones)
-    if (page.viewportSize()!.width < 1024) {
-      await page.getByRole("button", { name: "Preview", exact: true }).click();
-    }
-    await page.getByRole("button", { name: "Show the Family page" }).last().click();
-    await expect(page.getByRole("img", { name: /, as guests see it$/ }).last()).toContainText(
+    // The design announces the roka in the occasion's own words
+    await page.getByRole("button", { name: "Show the Family page" }).first().click();
+    await expect(page.getByRole("img", { name: /, as guests see it$/ }).first()).toContainText(
       "seek your blessings at their roka ceremony",
     );
-    if (page.viewportSize()!.width < 1024) await page.keyboard.press("Escape");
 
-    // Switching the occasion keeps what was typed
-    for (let i = 0; i < 5; i++) await page.getByRole("button", { name: "Back" }).click();
-    await page.getByRole("radio", { name: /Engagement/ }).click();
-    await expect(page.getByRole("region", { name: "What this sets up" })).toContainText(
-      "Engagement",
-    );
-    for (let i = 0; i < 3; i++) await next(page);
-    await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Aditya");
+    // Another occasion's design keeps what was typed
+    await useFirstDesign(page, "/invitations/engagement");
+    await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
   });
 
-  test("a tradition sets the designs, and its symbol and invocation wait in the card words", async ({
-    page,
-  }) => {
-    await page.goto("/create?quality=2d&region=TN");
-    await next(page);
-    // The visitor's own tradition comes first
-    const traditions = page.getByRole("radiogroup", { name: "Traditions" }).getByRole("radio");
-    await expect(traditions.first()).toHaveAccessibleName(/Tamil Hindu/);
-    await traditions.first().click();
-    // The tradition step only picks the tradition; the top of the card is set in the details
-    await expect(page.getByRole("radio", { name: /In its script/ })).toHaveCount(0);
-    await expect(page.getByText(/symbol and the blessing.*in Card words/)).toBeVisible();
-
-    // The tradition's designs lead the list
-    await next(page);
-    // The 3D cards, by the Kind of invitation filter
-    await page
-      .getByRole("radiogroup", { name: "Kind of invitation" })
-      .getByRole("radio", { name: "3D card" })
-      .click();
-    const designs = page
-      .getByRole("radiogroup", { name: "Designs for your occasion" })
-      .getByRole("radio");
-    await expect(designs.first()).toHaveAccessibleName(/Gopuram Pon/);
-
-    await next(page);
+  test("a tradition's symbol and invocation wait in the card words", async ({ page }) => {
+    await open(page, "/create/kayal?category=wedding&tradition=tamil");
     await page
       .getByRole("radiogroup", { name: "Card language" })
       .getByRole("radio", { name: /^English/ })
       .click();
-    const parts = page.getByRole("group", { name: "Your details, in six parts" });
-    await parts.getByRole("button", { name: /^Card words: / }).click();
+    await openPart(page, "Card words");
     await expect(page.getByRole("heading", { name: "Symbol and blessing" })).toBeVisible();
     await expect(page.getByRole("radio", { name: "Pillaiyar suzhi", exact: true })).toBeChecked();
     await expect(page.getByRole("radio", { name: /In its script/ })).toBeChecked();
     const blessing = page.getByRole("textbox", { name: /^Blessing/ });
 
-    const wide = page.viewportSize()!.width >= 1024;
-    const card = page.getByRole("img", { name: /, as guests see it$/ });
+    const card = page.getByRole("img", { name: /, as guests see it$/ }).first();
     await page.getByRole("radio", { name: /In English letters/ }).click();
     await expect(blessing).toHaveValue("Sri Vinayagar Thunai");
-    if (wide) await expect(card).toContainText("Sri Vinayagar Thunai");
+    await expect(card).toContainText("Sri Vinayagar Thunai");
     // A typed blessing wins until an invocation is picked again
     await blessing.fill("Om Shanti");
     await expect(page.getByRole("radio", { name: /In English letters/ })).toBeChecked();
     await page.getByRole("radio", { name: /Leave it off/ }).click();
     await expect(blessing).toHaveValue("");
-    if (wide) await expect(card).not.toContainText("Sri Vinayagar Thunai");
+    await expect(card).not.toContainText("Sri Vinayagar Thunai");
     await page.getByRole("radio", { name: "No symbol" }).click();
 
     await page.reload();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Read the card's words");
+    await openPart(page, "Card words");
     await expect(page.getByRole("radio", { name: /Leave it off/ })).toBeChecked();
     await expect(page.getByRole("radio", { name: "No symbol" })).toBeChecked();
   });
@@ -414,11 +297,8 @@ test.describe("invite editor", () => {
       .first()
       .getByRole("link", { name: /Use this design/ });
     await expect(use).toHaveAttribute("href", /faith=muslim/);
-    // Every part of the editor is on the design's own page: the card words, folded
-    await page.goto((await use.getAttribute("href"))!);
-    const words = page.locator("summary", { hasText: "Card words" });
-    await expect(words).toBeVisible({ timeout: 30_000 });
-    await words.click();
+    await open(page, (await use.getAttribute("href"))!);
+    await openPart(page, "Card words");
     const faith = page.getByRole("radiogroup", { name: "Faith" });
     await expect(faith.getByRole("radio", { name: "Muslim" })).toBeChecked();
     const blessing = page.getByRole("textbox", { name: /^Blessing/ });
@@ -448,8 +328,9 @@ test.describe("invite editor", () => {
       violations: [],
     });
 
+    // Back on the page, and on another design, the family's faith stays
     await page.reload();
-    await words.click();
+    await openPart(page, "Card words");
     await expect(
       page.getByRole("radiogroup", { name: "Faith" }).getByRole("radio", { name: "Christian" }),
     ).toBeChecked();
@@ -457,45 +338,38 @@ test.describe("invite editor", () => {
       "With the blessings of our elders",
     );
     expect(await noOverflow(page)).toBe(true);
+    await open(page, "/create/kayal?category=wedding");
+    await openPart(page, "Card words");
+    await expect(
+      page.getByRole("radiogroup", { name: "Faith" }).getByRole("radio", { name: "Christian" }),
+    ).toBeChecked();
   });
 
   test("the family section keeps parents, the tradition's hosts line and whom to call", async ({
     page,
   }) => {
-    await page.goto(
-      "/create?quality=2d&category=wedding&tradition=tamil&suite=kayal&template=gopuram",
-    );
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    // Typing that lands before the editor has hydrated is lost, so try again
-    await expect(async () => {
-      await page.getByRole("textbox", { name: /First name/ }).fill("Arjun");
-      await expect(page.getByRole("textbox", { name: /First name/ })).toHaveValue("Arjun", {
-        timeout: 3_000,
-      });
-    }).toPass({ timeout: 30_000 });
-    await page.getByRole("textbox", { name: /Second name/ }).fill("Meena");
-    await next(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's inviting your guests?");
+    await open(page, "/create/kayal?category=wedding&tradition=tamil");
+    await fillNames(page, ["Arjun", "Meena"]);
+    await openPart(page, "Family names");
     const arjun = page.getByRole("group", { name: "Arjun's family" });
     await arjun.getByRole("radio", { name: "Son of" }).click();
     await arjun.getByRole("textbox", { name: /Parents' names/ }).fill("Smt. Lakshmi & Shri Raman");
     // The tradition's own heading sits beside the hosts line
     await page.getByRole("textbox", { name: /Hosted by/ }).fill("ஐயர் குடும்பத்தினர்");
     expect(await noOverflow(page)).toBe(true);
-    expect((await axe(page).analyze()).violations).toEqual([]);
+    expect(await axeFromTop(page)).toEqual([]);
 
     // Whom guests can call sits with the replies
-    const parts = page.getByRole("group", { name: "Your details, in six parts" });
-    await expect(parts.getByRole("button", { name: /^Family: / })).toHaveCount(0);
-    await parts.getByRole("button", { name: /^Music & replies: / }).click();
+    await openPart(page, "Music & replies");
     await page.getByRole("button", { name: "Add a number" }).click();
     await page.getByRole("textbox", { name: "Phone" }).fill("98765 43210");
     expect(await noOverflow(page)).toBe(true);
-    expect((await axe(page).analyze()).violations).toEqual([]);
+    expect(await axeFromTop(page)).toEqual([]);
 
     await page.reload();
+    await openPart(page, "Music & replies");
     await expect(page.getByRole("textbox", { name: "Phone" })).toHaveValue("98765 43210");
-    await parts.getByRole("button", { name: /^Family: Family added/ }).click();
+    await openPart(page, "Family names");
     const family = page.getByRole("group", { name: "Arjun's family" });
     await expect(family.getByRole("textbox", { name: /Parents' names/ })).toHaveValue(
       "Smt. Lakshmi & Shri Raman",
@@ -507,14 +381,10 @@ test.describe("invite editor", () => {
   });
 
   test("a page's words can be rewritten, placed and left out", async ({ page }) => {
-    await page.goto("/create?quality=2d&category=wedding&suite=kayal&template=kasavu");
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    await page.getByRole("textbox", { name: /First name/ }).fill("Meera");
-    await page.getByRole("textbox", { name: /Second name/ }).fill("Kabir");
-    const wide = page.viewportSize()!.width >= 1024;
-    if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await open(page, "/create/kayal?category=wedding");
+    await fillNames(page, ["Meera", "Kabir"]);
 
-    await page.getByRole("button", { name: "Edit this page" }).click();
+    await page.getByRole("button", { name: "Edit this page" }).first().click();
     const dialog = page.getByRole("dialog", { name: "The Cover page" });
     await dialog.getByRole("button", { name: "Add a line" }).click();
     const added = dialog.getByRole("textbox", { name: /^Line \d+$/ }).last();
@@ -527,8 +397,7 @@ test.describe("invite editor", () => {
     await dialog.getByRole("button", { name: "Done" }).click();
 
     await page.reload();
-    if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
-    await page.getByRole("button", { name: "Edit this page" }).click();
+    await page.getByRole("button", { name: "Edit this page" }).first().click();
     const again = page.getByRole("dialog", { name: "The Cover page" });
     await expect(again.getByRole("textbox", { name: /^Line \d+$/ }).last()).toHaveValue(
       "Together forever",
@@ -552,26 +421,13 @@ test.describe("invite editor", () => {
     await expect(ai.getByRole("status")).toHaveText(/Sign in so your invite is saved/);
   });
 
-  test("the phone follows the page being edited, in the host's own lettering", async ({ page }) => {
-    await page.goto(
-      "/create?quality=2d&category=wedding&tradition=gujarati&suite=shahi-savari&template=bandhani",
-    );
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Who's getting married?");
-    const wide = page.viewportSize()!.width >= 1024;
-    const parts = page.getByRole("group", { name: "Your details, in six parts" });
-    const showPhone = async () => {
-      if (!wide) await page.getByRole("button", { name: "Preview", exact: true }).click();
-    };
-    const hidePhone = async () => {
-      if (wide) return;
-      await page.keyboard.press("Escape");
-      // The page behind the sheet takes clicks again once it has closed
-      await expect(page.getByRole("dialog")).toHaveCount(0);
-    };
-    await page.getByRole("textbox", { name: /First name/ }).fill("રાધા");
-    await page.getByRole("textbox", { name: /Second name/ }).fill("અર્જુન");
+  test("the design follows the part being filled in, in the host's own lettering", async ({
+    page,
+  }) => {
+    await open(page, "/create/shahi-savari?category=wedding&tradition=gujarati");
+    await fillNames(page, ["રાધા", "અર્જુન"]);
     // Untyped lines preview in the card's language, never the design's English samples
-    await parts.getByRole("button", { name: /^Card words: / }).click();
+    await openPart(page, "Card words");
     await expect(page.getByRole("textbox", { name: /Families/ })).toHaveValue("બંને પરિવાર તરફથી");
     // Ideas for each line come in the card's language too
     await expect(
@@ -595,53 +451,44 @@ test.describe("invite editor", () => {
       violations: [],
     });
 
-    await showPhone();
-    const phone = page.getByRole("img", { name: /The Cover page, as guests see it/ });
-    await expect(phone).toBeVisible();
-    const name = page.locator('[data-page="cover"]').getByText("રાધા");
+    await expect(
+      page.getByRole("img", { name: /The Cover page, as guests see it/ }).first(),
+    ).toBeVisible();
+    const name = page.locator('[data-page="cover"]').getByText("રાધા").first();
     await expect(name).toHaveCSS("font-family", /Mogra/);
     await expect(name).toHaveCSS("font-weight", "700");
-    await hidePhone();
 
-    await parts.getByRole("button", { name: /^Functions: / }).click();
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "When and where is everything?",
-    );
-    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
-    await page.getByRole("checkbox", { name: /Sangeet/ }).focus();
-    await showPhone();
-    await expect(page.getByRole("img", { name: /The Sangeet page/ })).toBeVisible();
-    await expect(page.locator('[data-page="fn-sangeet"]').getByText("સંગીત સંધ્યા")).toBeVisible();
+    // An event being filled in turns the design to its page
+    await tickEvents(page, "Sangeet");
+    await page.locator('[data-function="sangeet"]').getByRole("button", { name: /^Date/ }).focus();
+    await expect(page.getByRole("img", { name: /The Sangeet page/ }).first()).toBeVisible();
+    await expect(
+      page.locator('[data-page="fn-sangeet"]').getByText("સંગીત સંધ્યા").first(),
+    ).toBeVisible();
     // Every page is a tap away
-    await page.getByRole("button", { name: "Show the Cover page" }).click();
-    await expect(page.getByRole("img", { name: /The Cover page/ })).toBeVisible();
+    await page.getByRole("button", { name: "Show the Cover page" }).first().click();
+    await expect(page.getByRole("img", { name: /The Cover page/ }).first()).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
   });
 
   test("a save-the-date asks only for the date and the city", async ({ page }) => {
-    await page.goto("/create?quality=2d&category=save-the-date");
-    await next(page);
-    await fillCouple(page);
-    await next(page);
-    await next(page); // family
+    await useFirstDesign(page, "/invitations/save-the-date");
+    await fillNames(page, ["Aditya", "Priya"]);
+    await openPart(page, "When and where");
     await expect(page.getByRole("combobox", { name: /Starts at/ })).toHaveCount(0);
-    await expect(page.getByRole("heading", { name: "More functions" })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "More events" })).toHaveCount(0);
     await page.getByRole("button", { name: /^Date/ }).click();
     await page.getByRole("button", { name: /next month/i }).click();
     await page.getByRole("gridcell").getByRole("button", { name: /, 15 / }).click();
     await page.getByRole("textbox", { name: /City or venue/ }).fill("Udaipur");
-    await next(page);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Add your photos");
+    await seeInvitation(page);
     expect(await noOverflow(page)).toBe(true);
   });
 
   test("a place typed for one event fills the others in a tap", async ({ page }) => {
-    await page.goto("/create?suite=udaipur-lake");
-    await fillCouple(page);
-    await next(page);
-    await next(page); // family
-    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
-    await page.getByRole("checkbox", { name: /Haldi/ }).check();
+    await open(page, "/create/udaipur-lake?category=wedding");
+    await fillNames(page, ["Aditya", "Priya"]);
+    await tickEvents(page, "Sangeet", "Haldi");
     const wedding = page.locator('[data-page-target="fn-wedding"]');
     const sangeet = page.locator('[data-page-target="fn-sangeet"]');
     const haldi = page.locator('[data-page-target="fn-haldi"]');
@@ -668,20 +515,18 @@ test.describe("invite editor", () => {
     await expect(wedding.getByRole("button", { name: /^Use this place for/ })).toHaveCount(0);
   });
 
-  test("a Scene keeps its painting and holds the function being filled in", async ({ page }) => {
-    test.skip(page.viewportSize()!.width < 1024, "the phone beside the form");
-    await page.goto("/create?suite=udaipur-lake&format=scene");
-    await fillCouple(page);
-    await next(page);
-    await next(page); // family
-    await page.getByRole("checkbox", { name: /Sangeet/ }).check();
+  test("a Scene keeps its painting and holds the event being filled in", async ({ page }) => {
+    test.skip(page.viewportSize()!.width < 1024, "the design beside the form");
+    await open(page, "/create/udaipur-lake-scene?category=wedding");
+    await fillNames(page, ["Aditya", "Priya"]);
+    await tickEvents(page, "Sangeet");
     await page
+      .locator('[data-function="sangeet"]')
       .getByRole("textbox", { name: /^Venue/ })
-      .first()
       .fill("Lake Palace lawns");
     // The design itself, with only its event box changing: no stand-in card to switch to
     await expect(page.getByRole("button", { name: "Card", exact: true })).toHaveCount(0);
-    const slot = page.getByRole("group", { name: "The celebrations, one by one" });
+    const slot = page.getByRole("group", { name: "The celebrations, one by one" }).first();
     await expect(slot).toContainText("Sangeet");
     await expect(slot).toContainText("Lake Palace lawns");
     // It stays while the host types, past the time a function would play for
@@ -689,42 +534,33 @@ test.describe("invite editor", () => {
     await expect(slot).toContainText("Sangeet");
   });
 
-  test("the button bar fits common phone widths on every step", async ({ browser }, info) => {
+  test("the page and the preview fit common phone widths", async ({ browser }, info) => {
     test.skip(info.project.name !== "phone-320", "phones only");
-    // The whole editor, three times over
-    test.setTimeout(90_000);
+    test.setTimeout(120_000);
     for (const width of [360, 375, 414]) {
-      // A fresh phone each time, so no saved draft or step carries over
+      // A fresh phone each time, so no saved draft carries over
       const context = await browser.newContext({
         viewport: { width, height: 760 },
         reducedMotion: "reduce",
       });
       const page = await context.newPage();
       await page.clock.setFixedTime(new Date("2026-09-26T10:00:00"));
-      await page.goto("/create?quality=2d");
-      await expect(page.getByRole("heading", { level: 1 })).toHaveText("What are you celebrating?");
+      await open(page, "/create/rajwada-bagh?category=wedding");
       expect(await noOverflow(page)).toBe(true);
-      await next(page); // tradition
-      await next(page); // design: Back, Preview and Continue share the bar
-      await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
-      expect(await noOverflow(page)).toBe(true);
-      await next(page); // names
-      expect(await noOverflow(page)).toBe(true);
-      await fillCouple(page);
-      await next(page); // family
-      expect(await noOverflow(page)).toBe(true);
-      await next(page);
+      for (const part of PARTS) {
+        await openPart(page, part);
+        expect(await noOverflow(page)).toBe(true);
+      }
+      await openPart(page, "Names");
+      await fillNames(page, ["Aditya", "Priya"]);
       await fillWedding(page);
-      await next(page);
-      expect(await noOverflow(page)).toBe(true);
+      await openPart(page, "Your photos");
       await addDesignPhotos(page);
       expect(await noOverflow(page)).toBe(true);
-      await next(page); // card words
-      expect(await noOverflow(page)).toBe(true);
-      await next(page); // music and replies
-      expect(await noOverflow(page)).toBe(true);
-      await next(page);
-      await expect(page.getByText("Your invitation is ready")).toBeVisible();
+      await seeInvitation(page);
+      // Back and the way to publish share the bar
+      await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
+      await expect(page.getByRole("link", { name: "Sign in to publish" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       await context.close();
     }

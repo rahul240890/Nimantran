@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { z } from "zod";
 import { designWords } from "@/components/gallery/design-words";
 import { PageTransition } from "@/components/motion/page-transition";
 import { QuickStart } from "@/components/editor/quick/quick-start";
@@ -8,6 +9,8 @@ import { editorText } from "@/i18n/copy/editor";
 import { getLocale } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
 import { isCategoryId } from "@/lib/categories/catalog";
+import { hostStore } from "@/lib/invites/hosts";
+import { inviteStore } from "@/lib/invites/store";
 import { WEDDING_KINDS, designById, suiteOccasion, type WeddingKind } from "@/lib/gallery/catalog";
 import { samplePath } from "@/lib/sample/paths";
 import { pagePath } from "@/lib/seo/paths";
@@ -28,10 +31,14 @@ export async function generateMetadata({
   };
 }
 
+const inviteId = z.uuid();
+
 /*
- * A design's own page (update 4): every Use this design and every design picture lands
- * here (designHref), with the occasion, tradition and faith it was chosen for
- * (?category=wedding&tradition=gujarati&faith=muslim, as the gallery knows them). The page
+ * A design's own page (update 4), the whole editor (owner, 2026-10-24): every Use this
+ * design and every design picture lands here (designHref), with the occasion, tradition and
+ * faith it was chosen for (?category=wedding&tradition=gujarati&faith=muslim, as the gallery
+ * knows them). ?invite=<id> opens an invite from the account here (My invites' Edit), and
+ * this design is then that invite's: the other designs under it keep the invite. The page
  * itself works on the editor's draft in the browser (quick-start.tsx).
  */
 export default async function DesignStartPage({
@@ -41,13 +48,30 @@ export default async function DesignStartPage({
   const { design: id } = await params;
   const design = designById(id);
   if (!design) notFound();
-  const { category, tradition, faith, kind } = await searchParams;
+  const { category, tradition, faith, kind, invite } = await searchParams;
   const locale = await getLocale();
   const occasion = isCategoryId(category) ? category : suiteOccasion(design.suite);
   const weddingKind = (WEDDING_KINDS as readonly string[]).includes(String(kind))
     ? (kind as WeddingKind)
     : null;
   const account = await getAccount();
+
+  const wanted = typeof invite === "string" && inviteId.safeParse(invite).success ? invite : null;
+  if (wanted && !account) {
+    const here = `/create/${design.id}?${new URLSearchParams(
+      Object.entries({ category, tradition, faith, kind, invite }).flatMap(([key, value]) =>
+        typeof value === "string" ? [[key, value]] : [],
+      ),
+    ).toString()}`;
+    redirect(`/sign-in?next=${encodeURIComponent(here)}`);
+  }
+  // A co-host who runs only the guests goes to the guest list; the card stays the owner's
+  if (wanted && account && (await hostStore()?.myAccess(account, wanted))?.access === "guests") {
+    redirect(`/invites/${wanted}`);
+  }
+  const store = inviteStore();
+  const initialInvite = wanted && account && store ? await store.get(account, wanted) : null;
+
   return (
     <PageTransition>
       <QuickStart
@@ -59,13 +83,18 @@ export default async function DesignStartPage({
           suite: design.suite,
           template: design.template,
           format: design.format ?? undefined,
-          faith: isFaith(faith) ? faith : null,
+          // Only a kind of wedding names a faith: otherwise the family's own choice stays
+          faith: isFaith(faith) ? faith : undefined,
         }}
         signedIn={Boolean(account)}
+        initialInvite={initialInvite}
+        missing={Boolean(wanted && !initialInvite)}
         backHref={
-          weddingKind
-            ? pagePath({ kind: "wedding-kind", id: weddingKind }, locale)
-            : pagePath({ kind: "occasion", id: occasion }, locale)
+          initialInvite
+            ? `/invites/${wanted}`
+            : weddingKind
+              ? pagePath({ kind: "wedding-kind", id: weddingKind }, locale)
+              : pagePath({ kind: "occasion", id: occasion }, locale)
         }
         sampleHref={samplePath(design.id, { occasion, kind: weddingKind })}
         more={
@@ -73,6 +102,7 @@ export default async function DesignStartPage({
             current={design.id}
             occasion={occasion}
             kind={weddingKind}
+            invite={initialInvite ? wanted : null}
             locale={locale}
           />
         }

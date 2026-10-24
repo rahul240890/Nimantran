@@ -141,7 +141,8 @@ export function TraditionPage({ id, locale }: { id: TraditionId; locale: UiLocal
         eyebrow={seoCopy.traditions}
         heading={words.heading}
         intro={words.intro}
-        createHref={`/create?category=wedding&tradition=${id}`}
+        // The tradition's own card, shown beside, opened on its page in the tradition
+        createHref={`/create/card-${pack.templates[0]}?category=wedding&tradition=${id}`}
         aside={<Cover id={pack.templates[0]!} locale={locale} />}
       >
         {pack.invocation && (
@@ -247,7 +248,7 @@ export function DesignPage({ id, locale }: { id: TemplateId; locale: UiLocale })
         eyebrow={seoCopy.design.eyebrow}
         heading={design.name}
         intro={design.description}
-        createHref={`/create?template=${id}`}
+        createHref={`/create/card-${id}?category=wedding`}
         createLabel={seoCopy.useDesign}
         sampleHref={samplePath(`card-${id}`)}
         aside={<Cover id={id} locale={locale} />}

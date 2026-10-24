@@ -205,7 +205,11 @@ test.describe("host dashboard", () => {
     await expect(cohost.getByText("You're looking after the guests")).toBeVisible();
     await expect(cohost.getByRole("link", { name: "Edit invite" })).toHaveCount(0);
     const dashboardUrl = cohost.url();
-    await cohost.goto(`/create?invite=${dashboardUrl.split("/").pop()}`);
+    const inviteId = dashboardUrl.split("/").pop();
+    await cohost.goto(`/create?invite=${inviteId}`);
+    await expect(cohost).toHaveURL(dashboardUrl);
+    // nor the design's page that changes it
+    await cohost.goto(`/create/rajwada-bagh?category=wedding&invite=${inviteId}`);
     await expect(cohost).toHaveURL(dashboardUrl);
     expect(await noOverflow(cohost)).toBe(true);
     expect((await axe(cohost).analyze()).violations).toEqual([]);

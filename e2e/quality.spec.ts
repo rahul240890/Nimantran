@@ -45,7 +45,7 @@ const everyPublicPage = [
   ),
   ...POSTS.map((post) => blogPostPath(post.slug, post.locale)),
 ];
-const appPages = ["/sign-in", "/create?quality=2d", "/no-such-page"];
+const appPages = ["/sign-in", "/create/rajwada-bagh?category=wedding", "/no-such-page"];
 
 test.describe("accessibility sweep", () => {
   test.use({ reducedMotion: "reduce" });

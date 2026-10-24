@@ -67,8 +67,9 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
       <AccountShell>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
           <div className="-ms-2 flex flex-wrap items-center gap-x-4">
+            {/* Back to where it was watched from: the invite's preview, to publish or share */}
             <Link
-              href={`/create?invite=${id}`}
+              href={`/create?invite=${id}&preview=1`}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
             >
               <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />

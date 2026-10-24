@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { axe, numberFor, signIn } from "./invite-helpers";
+import { axe, numberFor, openPart, signIn } from "./invite-helpers";
 
 /* Family preview links: the invitation shown to the family before it is paid for and sent. */
 
@@ -16,6 +16,7 @@ async function writeAndPreview(page: Page) {
     await expect(first).toHaveValue("Aditya", { timeout: 3_000 });
     await expect(second).toHaveValue("Priya", { timeout: 3_000 });
   }).toPass({ timeout: 30_000 });
+  await openPart(page, "When and where");
   const wedding = page.locator('[data-function="wedding"]');
   await wedding.getByRole("button", { name: /^Date/ }).click();
   await page.getByRole("button", { name: /next month/i }).click();

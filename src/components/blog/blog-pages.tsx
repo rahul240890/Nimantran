@@ -13,6 +13,14 @@ import { blogPostPath, readingMinutes } from "@/lib/blog/posts";
 import { occasionTile } from "@/lib/gallery/catalog";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { pagePath } from "@/lib/seo/paths";
+import { designHref, occasionDesigns } from "@/lib/gallery/catalog";
+import type { CategoryId } from "@/lib/categories/catalog";
+
+/** Where a post's Create your invitation starts: its occasion's first design. */
+function startHref(occasion: CategoryId): string {
+  const [first] = occasionDesigns(occasion);
+  return first ? designHref(first, { category: occasion }) : `/create?category=${occasion}`;
+}
 import { blogPosting, faqPage, itemList } from "@/lib/seo/structured-data";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
@@ -428,7 +436,8 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           <p className="text-ink-muted">{blogCopy.ctaBody}</p>
           <div className="flex flex-wrap gap-3">
             <Button asChild size="lg">
-              <Link href={`/create?category=${post.occasion}`}>
+              {/* Straight to a design's own page, the occasion's first, to start typing */}
+              <Link href={startHref(post.occasion)}>
                 {blogCopy.ctaCreate}
                 <ArrowRight aria-hidden className="rtl:rotate-180" />
               </Link>
