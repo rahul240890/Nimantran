@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { preload } from "react-dom";
 import { z } from "zod";
 import { designWords } from "@/components/gallery/design-words";
 import { PageTransition } from "@/components/motion/page-transition";
@@ -12,6 +13,7 @@ import { isCategoryId } from "@/lib/categories/catalog";
 import { hostStore } from "@/lib/invites/hosts";
 import { inviteStore } from "@/lib/invites/store";
 import { WEDDING_KINDS, designById, suiteOccasion, type WeddingKind } from "@/lib/gallery/catalog";
+import { designPicture } from "@/lib/gallery/pictures";
 import { samplePath } from "@/lib/sample/paths";
 import { pagePath } from "@/lib/seo/paths";
 import { isTraditionId } from "@/lib/traditions/catalog";
@@ -71,6 +73,10 @@ export default async function DesignStartPage({
   }
   const store = inviteStore();
   const initialInvite = wanted && account && store ? await store.get(account, wanted) : null;
+  // The preview's first page, asked for with the page rather than once the editor's code has
+  // run, which on a phone's connection held it back behind the editor's scripts and fonts
+  const painting = designPicture(design);
+  if (painting) preload(painting, { as: "image", fetchPriority: "high" });
 
   return (
     <PageTransition>

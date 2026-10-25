@@ -25,6 +25,13 @@ import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "./home-flow.css";
 
+/**
+ * The chosen design's painting is on four of the phone's screens at different sizes; all of
+ * them ask for it at the phone's width, so it comes once rather than as three sizes.
+ * The Why Shubh phone (home-why.tsx) asks the same, for the same reason.
+ */
+const PHONE_SIZES = "17rem";
+
 /** How long each step's screen shows while the steps play. */
 const STEP_MS = 3200;
 
@@ -82,7 +89,7 @@ function Tap({ delay }: { delay: number }) {
 function Picture({
   src,
   className,
-  sizes = "8rem",
+  sizes = PHONE_SIZES,
 }: {
   src: string;
   className?: string;
@@ -133,7 +140,7 @@ function ChooseScreen({
               index === 1 && "z-10 scale-105 shadow-[0_0_0_2px_var(--marigold)]",
             )}
           >
-            <Picture src={src} />
+            <Picture src={src} sizes="8rem" />
             {index === 1 && <Tap delay={0.55} />}
           </div>
         ))}
@@ -169,7 +176,7 @@ function DetailsScreen({ copy, picture }: { copy: FlowCopy["phone"]; picture: st
   return (
     <div className="flex h-full flex-col gap-3 px-3 pt-3">
       <div className="relative h-36 shrink-0 overflow-hidden rounded-xl bg-night">
-        <Picture src={picture} sizes="16rem" />
+        <Picture src={picture} />
         <span className="absolute inset-0 bg-linear-to-t from-night/85 via-night/20 to-transparent" />
         <span
           data-invitation
@@ -228,7 +235,7 @@ function AliveScreen({ copy, picture }: { copy: FlowCopy["phone"]; picture: stri
     "absolute inset-y-0 w-1/2 border-marigold/60 bg-night bg-[radial-gradient(circle_at_center,color-mix(in_srgb,var(--marigold)_35%,transparent)_0_18%,transparent_19%)]";
   return (
     <div className="relative h-full overflow-hidden bg-night">
-      <Picture src={picture} sizes="17rem" />
+      <Picture src={picture} />
       <span className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-night/90 to-transparent" />
       <span
         data-invitation
@@ -371,7 +378,7 @@ function SendScreen({ copy, picture }: { copy: FlowCopy["phone"]; picture: strin
           className="w-[86%] overflow-hidden rounded-lg rounded-se-sm border border-success/25 bg-surface p-1 shadow-raised"
         >
           <span className="relative block aspect-[1.9] overflow-hidden rounded-md bg-surface-2">
-            <Picture src={picture} sizes="14rem" />
+            <Picture src={picture} />
           </span>
           <span className="block px-1.5 pt-1.5 text-[0.68rem] font-semibold text-ink">
             {copy.linkTitle}
@@ -394,7 +401,7 @@ function SendScreen({ copy, picture }: { copy: FlowCopy["phone"]; picture: strin
           className="flex w-[62%] flex-col gap-1 rounded-lg rounded-se-sm border border-success/25 bg-surface p-1 shadow-raised"
         >
           <span className="relative block aspect-[4/5] overflow-hidden rounded-md bg-night">
-            <Picture src={picture} sizes="10rem" className="opacity-85" />
+            <Picture src={picture} className="opacity-85" />
             <span className="absolute inset-0 grid place-items-center">
               <span className="grid size-9 place-items-center rounded-full bg-card-ivory/90 text-card-ink">
                 <Play aria-hidden className="size-4 fill-current" />

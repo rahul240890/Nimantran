@@ -2,7 +2,7 @@
 
 import { Bold, CaseUpper, Italic, RotateCcw } from "lucide-react";
 import { RadioGroup as RadioPrimitive } from "radix-ui";
-import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Hint } from "@/components/ui/quiet";
 import { useText } from "@/i18n/client";
@@ -50,6 +50,29 @@ function Tiles({
       {children}
     </RadioPrimitive.Root>
   );
+}
+
+/**
+ * Whether every fold the element sits in is open. A closed fold's words are still read by
+ * the browser, so its fonts would load: the lettering tiles name 30-odd faces, and loading
+ * them all with the editor held back its painting (2026-10-25).
+ */
+function useInOpenFolds() {
+  const ref = useRef<HTMLElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const folds: HTMLDetailsElement[] = [];
+    for (let node = ref.current?.parentElement; node; node = node.parentElement) {
+      if (node instanceof HTMLDetailsElement) folds.push(node);
+    }
+    const check = () => setOpen(folds.every((fold) => fold.open));
+    check();
+    for (const fold of folds) fold.addEventListener("toggle", check);
+    return () => {
+      for (const fold of folds) fold.removeEventListener("toggle", check);
+    };
+  }, []);
+  return { ref, open };
 }
 
 const TILE =
@@ -103,6 +126,8 @@ export function Lettering({
   headless?: boolean;
 }) {
   const { studioCopy } = useText(editorText);
+  // Each tile writes in its own font only once the host can see it (useInOpenFolds)
+  const { ref, open } = useInOpenFolds();
   const languages = cardLanguages(draft);
   const main = languages[0];
   const { type } = draft;
@@ -124,7 +149,7 @@ export function Lettering({
           value={id}
           name={`${FONTS[id].family.replace(/ Variable$/, "")} · ${studioCopy.feels[FONTS[id].feel]}`}
           sample={sample}
-          font={fontStack(id)}
+          font={open ? fontStack(id) : undefined}
           lang={main}
         />
       ))}
@@ -140,6 +165,7 @@ export function Lettering({
 
   return (
     <section
+      ref={ref}
       aria-labelledby={headless ? undefined : "lettering-heading"}
       aria-label={headless ? studioCopy.lettering : undefined}
       data-page-target="cover"

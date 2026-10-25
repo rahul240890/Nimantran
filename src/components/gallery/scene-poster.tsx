@@ -17,11 +17,13 @@ import { useSampleInvite } from "./sample";
  * and, in the preview, the scene itself playing with sample names and days.
  */
 
-/** Pictures standing in for the couple's photos, so the frames show how a photo sits. */
-const SAMPLE_PHOTOS: StoryPhoto[] = [
-  { src: "/occasions/engagement.webp", alt: "" },
-  { src: "/occasions/mehendi.webp", alt: "" },
-];
+/**
+ * A picture standing in for the couple's photos, so the frames show how a photo sits. A
+ * card's frames are a thumb's width, so it shows a small copy; the preview, the picture.
+ */
+const standIn = (picture: string, small: boolean) =>
+  small ? `/occasions/stand-in/${picture}-small.webp` : `/occasions/${picture}.webp`;
+const SAMPLE_PICTURES = ["engagement", "mehendi"] as const;
 
 /**
  * A design painted for another occasion shows a picture of that occasion in its frames:
@@ -44,12 +46,11 @@ const OCCASION_PHOTO: Partial<Record<CategoryId, string>> = {
   launch: "business",
 };
 
-function samplePhotos(suite: SuiteId): StoryPhoto[] {
+function samplePhotos(suite: SuiteId, small = false): StoryPhoto[] {
   const occasion = SUITES[suite].occasions?.[0];
-  if (!occasion) return SAMPLE_PHOTOS;
   if (occasion === "prayer-meet") return [];
-  const picture = OCCASION_PHOTO[occasion] ?? "festival";
-  return SAMPLE_PHOTOS.map(() => ({ src: `/occasions/${picture}.webp`, alt: "" }));
+  const picture = occasion ? (OCCASION_PHOTO[occasion] ?? "festival") : null;
+  return SAMPLE_PICTURES.map((own) => ({ src: standIn(picture ?? own, small), alt: "" }));
 }
 
 export function ScenePoster({
@@ -66,7 +67,7 @@ export function ScenePoster({
 }) {
   const page = scenePage(suite, 2);
   if (!page) return null;
-  const photos = samplePhotos(suite);
+  const photos = samplePhotos(suite, true);
   return (
     <span
       className={cn("absolute inset-x-0 top-0 block", className)}

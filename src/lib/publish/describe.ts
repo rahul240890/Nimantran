@@ -1,6 +1,6 @@
 import { format, parseISO } from "date-fns";
 import { dateLocale } from "@/i18n/dates";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 import { publishText } from "@/i18n/copy/publish";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
@@ -57,7 +57,7 @@ export function calendarEntries(
   { id, url }: { id: string; url: string },
   locale: UiLocale = "en",
 ): CalendarEntry[] {
-  const { functionCopy } = editorText[locale];
+  const { functionCopy } = functionText[locale];
   const { guestCopy } = publishText[locale];
   const names = inviteNames(draft);
   const timed = needsTime(draft);

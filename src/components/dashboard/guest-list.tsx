@@ -61,7 +61,7 @@ import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale, timeAgo } from "@/i18n/dates";
 import { dashboardText } from "@/i18n/copy/dashboard";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 
 const statusLook = {
   attending: { icon: CircleCheck, className: "border-success/35 bg-success/10 text-success" },
@@ -108,7 +108,7 @@ function GuestRow({
 }) {
   const locale = useLocale();
   const copy = useText(dashboardText).dashboardCopy;
-  const { functionCopy } = useText(editorText);
+  const { functionCopy } = useText(functionText);
   const router = useRouter();
   const waiting = guest.replies.length === 0;
   const opened = Boolean(guest.openedAt) || !waiting;
@@ -374,7 +374,7 @@ function RemoveGuest({
 /** The guest list: search, filters, add, export and each guest's replies and actions. */
 export function GuestList({ view }: { view: DashboardView }) {
   const copy = useText(dashboardText).dashboardCopy;
-  const { functionCopy } = useText(editorText);
+  const { functionCopy } = useText(functionText);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<GuestFilter>("all");
   const [functionId, setFunctionId] = useState<string | null>(null);

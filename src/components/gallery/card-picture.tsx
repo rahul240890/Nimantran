@@ -33,7 +33,7 @@ export function CardPicture({
   const files = cardPictureFiles(src);
   // The sheet first, ahead of the thumbnails, so on a slow connection every card has its
   // blurred painting while the thumbnails come in
-  if (files) preload(CARD_SHEET, { as: "image", fetchPriority: "high" });
+  if (files?.blur) preload(CARD_SHEET, { as: "image", fetchPriority: "high" });
   const [failed, setFailed] = useState<string[]>([]);
   const shown = (files ? [files.thumb, src] : [src]).find((file) => !failed.includes(file));
   const fail = (file: string | null) => {
@@ -45,7 +45,7 @@ export function CardPicture({
   };
   return (
     <>
-      {files && (
+      {files?.blur && (
         <span aria-hidden className={cn("absolute bg-no-repeat", box)} style={files.blur} />
       )}
       {children}

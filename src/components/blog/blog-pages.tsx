@@ -4,6 +4,7 @@ import Link from "next/link";
 import { OfferStrip } from "@/components/offers/offer-strip";
 import { Block, PublicShell, type Crumb } from "@/components/seo/public-page";
 import { Button } from "@/components/ui/button";
+import { Image } from "@/components/ui/image";
 import type { BlogPost, PostBlock } from "@/content/blog/types";
 import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
@@ -76,6 +77,9 @@ function coverOf(post: BlogPost): { src: string; alt: string } | null {
   return tile ? { src: tile, alt: "" } : null;
 }
 
+const POST_CARD_COVER =
+  "-mx-5 -mt-5 mb-1 aspect-[16/9] w-[calc(100%+2.5rem)] max-w-none object-cover sm:-mx-6 sm:-mt-6 sm:w-[calc(100%+3rem)]";
+
 function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "h2" | "h3" }) {
   const Heading = headingLevel;
   return (
@@ -83,18 +87,29 @@ function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "
       {posts.map((post) => (
         <li key={post.slug} className="flex">
           <article className="relative flex w-full flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-5 shadow-raised transition-[border-color,transform] duration-150 focus-within:border-marigold hover:-translate-y-0.5 hover:border-marigold motion-reduce:hover:translate-y-0 sm:p-6">
-            {coverOf(post) && (
-              // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
-              <img
-                src={coverOf(post)!.src}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                width={640}
-                height={360}
-                className="-mx-5 -mt-5 mb-1 aspect-[16/9] w-[calc(100%+2.5rem)] max-w-none object-cover sm:-mx-6 sm:-mt-6 sm:w-[calc(100%+3rem)]"
-              />
-            )}
+            {coverOf(post) &&
+              (coverOf(post)!.src.startsWith("/") ? (
+                // An occasion's painted tile, the site's own, at the card's size (768px as it is)
+                <Image
+                  src={coverOf(post)!.src}
+                  alt=""
+                  width={640}
+                  height={360}
+                  sizes="(min-width: 40rem) 45vw, 100vw"
+                  className={POST_CARD_COVER}
+                />
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
+                <img
+                  src={coverOf(post)!.src}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  width={640}
+                  height={360}
+                  className={POST_CARD_COVER}
+                />
+              ))}
             <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
               {CATEGORIES[post.occasion].names[post.locale]}
             </p>
@@ -167,10 +182,12 @@ export function BlogIndexPage({
           </p>
         )}
       </section>
-      <OfferStrip className="mx-auto w-full max-w-site px-4 pt-6 sm:px-6 lg:px-8" />
       <Block id="posts" heading={blogCopy.postsHeading} className="pt-6 sm:pt-8">
         <PostCards posts={posts} headingLevel="h3" />
       </Block>
+      {/* After the posts, as on a post's own page: the offers come once the page has asked for
+          them, and above the posts they pushed the whole list down a phone's screen (2026-10-25) */}
+      <OfferStrip className="mx-auto w-full max-w-site px-4 pb-12 sm:px-6 lg:px-8" />
     </PublicShell>
   );
 }

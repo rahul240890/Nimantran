@@ -4,7 +4,8 @@
  * plan's resizer stops making new sizes once its month's allowance is spent).
  *
  * Each card's painting gets a small thumbnail of just what the card shows, its top three
- * quarters: public/cards/<theme>/<painting>.webp. And every card's painting gets a tile in
+ * quarters: public/cards/<theme>/<painting>.webp, as does each design's cover for the
+ * editor's More designs (2026-10-25). And every card's painting gets a tile in
  * one small blurred sheet, public/cards/sheet-<hash>.webp, which a page fetches once so
  * each card has its painting, blurred, the moment it is drawn. Which tile is whose is in
  * src/lib/gallery/card-sheet.json (read by src/lib/gallery/card-pictures.ts).
@@ -16,7 +17,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import sharp, { type OverlayOptions } from "sharp";
-import { allDesigns } from "../src/lib/gallery/catalog";
+import { allDesigns, suiteImage } from "../src/lib/gallery/catalog";
 import { designPicture } from "../src/lib/gallery/pictures";
 
 /** A thumbnail's width: sharp on a phone's two columns and a laptop's five. */
@@ -32,12 +33,27 @@ const IVORY = "#f6ecd8";
 const root = process.cwd();
 const cards = join(root, "public", "cards");
 
-const pictures = [...new Set(allDesigns().flatMap((design) => designPicture(design) ?? []))].sort();
-const keys = pictures.map((src) => {
+const keyOf = (src: string) => {
   const match = /^\/suites\/([^/]+)\/([^/]+)\.webp$/.exec(src);
   if (!match) throw new Error(`A card picture outside the themes: ${src}`);
   return `${match[1]}/${match[2]}`;
-});
+};
+
+const pictures = [...new Set(allDesigns().flatMap((design) => designPicture(design) ?? []))].sort();
+const keys = pictures.map(keyOf);
+
+// Each painted design's cover no card shows (a Scene's card shows its scene), for the
+// editor's More designs: a thumbnail only, so the sheet every gallery page loads stays small
+const covers = [
+  ...new Set(
+    allDesigns().flatMap((design) =>
+      design.id.startsWith("card-") ? [] : (suiteImage(design.suite) ?? []),
+    ),
+  ),
+]
+  .filter((src) => !pictures.includes(src))
+  .sort();
+const coverKeys = covers.map(keyOf);
 
 /** A painting's top three quarters, as a card shows it. */
 async function cardPart(src: string) {
@@ -84,6 +100,17 @@ async function main() {
     });
   }
 
+  for (const [i, src] of covers.entries()) {
+    const out = join(cards, `${coverKeys[i]!}.webp`);
+    mkdirSync(dirname(out), { recursive: true });
+    const part = await cardPart(src);
+    await part
+      .resize({ width: THUMB_WIDTH, withoutEnlargement: true })
+      .webp({ quality: THUMB_QUALITY, effort: 6, smartSubsample: true })
+      .toFile(out);
+    written.add(out);
+  }
+
   const sheet = await sharp({
     create: {
       width: sheetSize[0],
@@ -122,10 +149,13 @@ async function main() {
       tile: TILE,
       gutter: GUTTER,
       pictures: keys,
+      covers: coverKeys,
     }),
   );
   execFileSync("npx", ["prettier", "--write", json], { stdio: "ignore" });
-  console.log(`${keys.length} card pictures; sheet ${sheetSize.join("x")} (${sheet.length} bytes)`);
+  console.log(
+    `${keys.length} card pictures and ${coverKeys.length} covers; sheet ${sheetSize.join("x")} (${sheet.length} bytes)`,
+  );
   if (!existsSync(json)) throw new Error("No sheet index written");
 }
 

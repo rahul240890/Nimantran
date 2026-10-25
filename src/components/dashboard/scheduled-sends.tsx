@@ -55,7 +55,7 @@ import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
 import { dashboardText } from "@/i18n/copy/dashboard";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 
 type Copy = (typeof dashboardText)["en"]["dashboardCopy"];
 
@@ -104,7 +104,7 @@ function PlanDialog({
 }) {
   const locale = useLocale();
   const { dashboardCopy } = useText(dashboardText);
-  const { functionCopy } = useText(editorText);
+  const { functionCopy } = useText(functionText);
   const copy = dashboardCopy.schedule;
   const router = useRouter();
   const start = useMemo(() => defaultSendTime(now), [now]);
@@ -424,7 +424,7 @@ export function ScheduledSends({
 }) {
   const locale = useLocale();
   const { dashboardCopy } = useText(dashboardText);
-  const { functionCopy } = useText(editorText);
+  const { functionCopy } = useText(functionText);
   const copy = dashboardCopy.schedule;
   const router = useRouter();
   // The server's clock first, so the first paint matches; then the browser's, every half minute

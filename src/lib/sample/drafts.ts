@@ -12,10 +12,14 @@ export const SAMPLE_PHOTOS = [
   "/suites/rajwada-bagh/sangeet.webp",
 ].map((url, index) => ({ id: `sample-${index}`, url, width: 768, height: 1365 }));
 
-/** Stand-ins for the couple's own photos in One Scene's frames. */
-export const SCENE_PHOTOS = ["/occasions/engagement.webp", "/occasions/mehendi.webp"].map(
-  (url, index) => ({ id: `scene-${index}`, url, width: 1024, height: 1024 }),
-);
+/**
+ * Stand-ins for the couple's own photos in One Scene's frames and the welcome: copies sized
+ * for a phone's frames, so a sample's opening doesn't wait on the occasion tiles' pictures.
+ */
+export const SCENE_PHOTOS = [
+  "/occasions/stand-in/engagement.webp",
+  "/occasions/stand-in/mehendi.webp",
+].map((url, index) => ({ id: `scene-${index}`, url, width: 1024, height: 1024 }));
 
 export const at = (date: string, time: string, venue: string, address = "") => ({
   included: true,

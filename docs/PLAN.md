@@ -311,6 +311,14 @@ Detailed in [MEMORIES.md](MEMORIES.md). Starts once payments work (after Step 18
 
 **Opening without a black screen, and Preview as guests see it** (owner, 2026-10-25). Open the invitation no longer asks the browser for full screen: switching to it blanked the screen until the whole page was redrawn at the new size, which took a phone or laptop 2 to 4 seconds before the doors moved. The opening now plays in place on the screen the guest already has, at once; the raga's first notes still wait a second so the doors' first moves stay smooth. On a design's page, Preview for a signed-in host saves and opens the guests' own view (`/invites/<id>/preview?from=design`): the gate chosen there, the welcome, every page and the music, with Keep editing and Change the gate leading back to the design's page; without an account it stays the quick look at the pages. The designs under a design's page carry the family's own names, on each painting in that design's colours and in each card design's own lettering, with its price under it, and say that names, dates and photos come along.
 
+**Lighter pages, sooner pictures** (owner, 2026-10-25: "review the whole website for image showing and loading, in the editor and everywhere, and fix it"). Measured as a phone on 4G with a slower processor, then fixed:
+
+- The guest page no longer carries the editor's words in all six languages: the functions' names it needs are their own small files (`src/content/functions.ts` and each language's, through `functionText`), so a guest downloads about a third less code and the invitation is ready to open sooner. The host's guest list and sends use them too. The calendar's code comes only when a date field is about to open (`src/components/ui/calendar.tsx`).
+- Sample invitations and Scene cards use small copies of the stand-in couple photos (`public/occasions/stand-in/`) instead of the occasion tiles' full pictures.
+- The editor asks for the design's first painting with the page, so the preview no longer waits behind the editor's code and fonts; the lettering tiles load their 30-odd fonts only once Lettering is opened; More designs shows each design's cover from a small cut (`scripts/card-pictures.ts` now cuts each design's cover too, kept out of the shared blurred sheet).
+- The home page's phone fetches its painting once at one size, not three; on the wedding page the design cards under the kinds no longer load ahead of the kinds' paintings.
+- The blog's offers come after its posts, as on a post's page: arriving after the page, above the posts they pushed the whole list down. Occasion tiles used as post covers go through the image resizer.
+
 ## Phase 4 — Business edition
 
 **Step 25.** Business accounts for planners and printers: client workspaces, own branding, bulk edits. Business and education categories: shop openings, launches, office parties, dealer meets, college fests, convocations, fundraisers.
