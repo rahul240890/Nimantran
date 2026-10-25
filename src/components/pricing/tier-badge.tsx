@@ -9,7 +9,8 @@ import { formatRupees, type PlanId } from "@/lib/plans/catalog";
 import type { DesignTier } from "@/lib/plans/design-tiers";
 import { useDesignTier } from "./pricing-provider";
 
-const ICONS: Record<DesignTier, typeof Gift> = {
+/** Each tier's mark, beside its name wherever a price is shown. */
+export const TIER_ICONS: Record<DesignTier, typeof Gift> = {
   free: Gift,
   premium: Sparkles,
   royal: Crown,
@@ -62,7 +63,7 @@ export function TierBadge({
   const { tier, pricePaise } = useDesignTier(designId);
   const name = galleryCopy.tiers[tier];
   const price = pricePaise ? formatRupees(pricePaise) : null;
-  const Icon = ICONS[tier];
+  const Icon = TIER_ICONS[tier];
 
   if (paid !== "free") {
     return (

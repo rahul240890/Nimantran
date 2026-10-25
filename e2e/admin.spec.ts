@@ -75,9 +75,10 @@ test.describe("designs and prices", () => {
     // The search's own result, first on the page: the shelves below can show it too
     const tile = page.locator(`[data-design="${id}"]`).first();
     await expect(tile.locator("[data-tier]")).toHaveAttribute("data-tier", "premium");
-    // A phone's narrow tile shows the price alone
+    // The price large, its tier's name small beside it
     const phone = info.project.name.startsWith("phone");
-    await expect(tile.getByText(phone ? "₹499" : "Premium · ₹499", { exact: true })).toBeVisible();
+    await expect(tile.getByText("₹499", { exact: true })).toBeVisible();
+    await expect(tile.getByText("Premium", { exact: true })).toBeVisible();
 
     await page.goto("/sign-in?next=%2Fadmin%2Fdesigns");
     await signIn(page, ADMIN);

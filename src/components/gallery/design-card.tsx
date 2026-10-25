@@ -23,6 +23,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { PreviewOffers } from "@/components/offers/preview-offers";
 import { DesignPackages } from "@/components/pricing/design-packages";
+import { DesignPrice } from "@/components/pricing/design-price";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
@@ -71,8 +72,8 @@ type DesignCardProps = {
    */
   cover?: ReactNode;
   /**
-   * For a sideways row: the painting stands on its own with its price over it, and the words
-   * under it lead to the editor, without the card's box and its full-width button.
+   * For a sideways row: the painting stands on its own, and the words under it lead to the
+   * editor, without the card's box and its full-width button.
    */
   compact?: boolean;
 };
@@ -209,9 +210,6 @@ export function DesignCard({
               {galleryCopy.trendingBadge}
             </span>
           )}
-          {compact && (
-            <TierBadge designId={design.id} className="absolute start-3 bottom-3 max-w-[55%]" />
-          )}
         </Link>
         {/* A narrow tile keeps only its play button; its name stays for screen readers */}
         <Link
@@ -235,7 +233,7 @@ export function DesignCard({
           className="group/use flex flex-1 flex-col gap-1 rounded-lg px-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
         >
           <h3 className="truncate font-display text-lg leading-tight text-ink">{name}</h3>
-          <p className="line-clamp-1 text-sm text-ink-muted">{description}</p>
+          <DesignPrice designId={design.id} />
           <p data-photos={photos} className="flex items-center gap-1.5 text-xs text-ink-muted">
             {photos === "none" ? (
               <CameraOff aria-hidden className="size-3.5 shrink-0" />
@@ -253,24 +251,21 @@ export function DesignCard({
           </span>
         </Link>
       ) : (
-        /* Named "tile" so a narrow card's price badge drops its tier name */
+        /* Named "tile" so a narrow card's button drops its arrow. Its name, what it costs
+           and what photos it takes, nothing more (owner, 2026-10-25: a clear, simple card) */
         <div className="@container/tile flex flex-1 flex-col gap-3 p-3 sm:p-4">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-1.5">
             <h3 className="font-display text-xl leading-tight">{name}</h3>
-            <p className="line-clamp-2 text-sm text-ink-muted">{description}</p>
+            <DesignPrice designId={design.id} />
           </div>
-          {/* What it costs and what photos it takes, the two things a host weighs first */}
-          <div className="flex flex-col items-start gap-2">
-            <TierBadge designId={design.id} variant="plain" className="max-w-full" />
-            <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
-              {photos === "none" ? (
-                <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
-              ) : (
-                <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
-              )}
-              {galleryCopy.photoNeeds[photos]}
-            </p>
-          </div>
+          <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
+            {photos === "none" ? (
+              <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
+            ) : (
+              <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
+            )}
+            {galleryCopy.photoNeeds[photos]}
+          </p>
           {/* Two cards to a row on a phone leave little room: the arrow goes and the words
             may wrap before they would ever touch the button's edge */}
           <Button
