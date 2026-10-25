@@ -34,7 +34,7 @@ describe("video timeline", () => {
   });
 
   it("squeezes a long wedding into 45 seconds, no page too fast to see", () => {
-    const story = Array.from({ length: 12 }, (_, i) => beat(`page-${i}`, 6));
+    const story = Array.from({ length: 11 }, (_, i) => beat(`page-${i}`, 6));
     const timeline = videoTimeline(story);
     expect(timeline.total).toBeLessThanOrEqual(VIDEO_MAX_SECONDS + 0.01);
     for (const entry of timeline.beats)
@@ -98,8 +98,8 @@ describe("several functions", () => {
   const others = (count: number) =>
     pages(count).filter((entry) => !entry.beat.id.startsWith("fn-"));
 
-  it("keeps up to four functions within 45 seconds, each long enough to read", () => {
-    for (const count of [1, 2, 3, 4]) {
+  it("keeps up to three functions within 45 seconds, each long enough to read", () => {
+    for (const count of [1, 2, 3]) {
       expect(videoTimeline(wedding(count)).total).toBeLessThanOrEqual(VIDEO_MAX_SECONDS + 0.01);
       for (const entry of fns(count))
         expect(entry.seconds).toBeGreaterThanOrEqual(VIDEO_FUNCTION_SECONDS - 0.01);
@@ -107,7 +107,7 @@ describe("several functions", () => {
   });
 
   it("grows towards a minute for more, rather than flash their pages by", () => {
-    for (const count of [5, 6, 8]) {
+    for (const count of [4, 5, 6, 8]) {
       const total = videoTimeline(wedding(count)).total;
       expect(total).toBeGreaterThan(VIDEO_MAX_SECONDS);
       expect(total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);
@@ -137,16 +137,23 @@ describe("a fixed time on every page (Step 12y)", () => {
   ];
 
   it("holds every page for the host's time, so the music runs exactly as long", () => {
-    const timeline = videoTimeline(paceStory(story(3), 5), { fixed: true });
-    expect(timeline.beats.map((b) => b.seconds)).toEqual([5, 5, 5, 5, 5, 5]);
-    expect(timeline.total).toBe(6 * 5 + END_SECONDS);
+    const timeline = videoTimeline(paceStory(story(3), 8), { fixed: true });
+    expect(timeline.beats.map((b) => b.seconds)).toEqual([8, 8, 8, 8, 8, 8]);
+    expect(timeline.total).toBe(6 * 8 + END_SECONDS);
+  });
+
+  it("keeps a page longer than the host's time when its lines need it", () => {
+    const long = beat("family", 8);
+    const [paced] = paceStory([long], 5);
+    expect(paced!.seconds).toBe(long.seconds);
+    expect(paced!.seconds).toBeGreaterThan(5);
   });
 
   it("grows with the number of functions instead of stretching to 30 seconds", () => {
-    const two = videoTimeline(paceStory(story(1), 4), { fixed: true }).total;
-    const five = videoTimeline(paceStory(story(4), 4), { fixed: true }).total;
-    expect(two).toBe(4 * 4 + END_SECONDS);
-    expect(five - two).toBe(3 * 4);
+    const two = videoTimeline(paceStory(story(1), 6), { fixed: true }).total;
+    const five = videoTimeline(paceStory(story(4), 6), { fixed: true }).total;
+    expect(two).toBe(4 * 6 + END_SECONDS);
+    expect(five - two).toBe(3 * 6);
   });
 
   it("still squeezes a very long story into a minute", () => {

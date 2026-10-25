@@ -30,6 +30,7 @@ const PARTS = [
   "Your photos",
   "Card words",
   "Music & replies",
+  "Opening gate (cover screen)",
 ];
 
 /** Opens a design's page on this device's empty draft, ready for typing. */
@@ -116,12 +117,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       await openPart(page, "Your photos");
       await addDesignPhotos(page);
       await seeInvitation(page);
-      // A second language is offered on the preview, after the details
-      await expect(
-        page.getByRole("radiogroup", { name: "Add a second language?" }).getByRole("radio", {
-          name: "Only one language",
-        }),
-      ).toBeChecked();
+      // No second language is offered for now (owner, 2026-10-24)
+      await expect(page.getByRole("radiogroup", { name: "Add a second language?" })).toHaveCount(0);
       expect(await noOverflow(page)).toBe(true);
       expect(await axeFromTop(page)).toEqual([]);
     });

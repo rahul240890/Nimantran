@@ -332,6 +332,8 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   whole: "পুরো নিমন্ত্রণপত্র",
   ending: {
     open: "নিমন্ত্রণপত্র খুলুন",
+    madeWith: "ভালোবাসায় তৈরি",
+    tagline: "যে নিমন্ত্রণ জীবন্ত হয়ে ওঠে।",
   },
   shareText: (names) => `${names}: আমাদের নিমন্ত্রণ`,
   fileName: (slug) => `${slug}-invitation.mp4`,

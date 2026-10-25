@@ -364,7 +364,15 @@ function useCardStill(draft: InviteDraft, photos: PublicPhoto[]) {
     const main = mainFunction(draft) ?? "wedding";
     // Both cards' pages, so their paintings load together
     const beats = CARD_KINDS.map((kind) => cardBeat(kind, copy, story, words, ""));
-    const ending = { brand: "", open: "", link: "" };
+    const ending = {
+      brand: "",
+      open: "",
+      link: "",
+      madeWith: "",
+      tagline: "",
+      site: "",
+      handle: "",
+    };
     let loading: Promise<Tools> | null = null;
 
     const tools = () => {

@@ -100,6 +100,14 @@ export const galleryCopy = {
   packagesHeading: "Packages for this design",
   packageFree: "Free",
   comparePackages: "Compare the packages",
+  /** What comes inside the packages' prices, on a design's page (owner, 2026-10-24). */
+  packageExtras: {
+    heading: "Included in the package price",
+    video: "WhatsApp video for Status and Reels",
+    cards: "Save the date and thank-you cards",
+  },
+  /** Grand's tag: everything for the wedding, or for another celebration. */
+  packageSet: { wedding: "Wedding set", other: "Full set" },
   /** The design's public sample: the whole invitation as a guest gets it. */
   seeSample: "See it live as a guest",
   /** On a design's painting: the design as a guest gets it, in one tap. */

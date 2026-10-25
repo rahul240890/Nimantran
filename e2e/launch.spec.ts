@@ -137,7 +137,7 @@ test.describe("pages for payments", () => {
     page,
   }) => {
     const channels = {
-      instagram: "https://www.instagram.com/shubh.celebration/",
+      instagram: "https://www.instagram.com/shubhinvitations.in/",
       whatsapp: "https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o",
       youtube: "https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw",
     };

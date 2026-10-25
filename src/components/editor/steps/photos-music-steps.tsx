@@ -8,12 +8,10 @@ import {
   Images,
   LoaderCircle,
   Music2,
-  Pause,
-  Play,
   Upload,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useRef, useState, type DragEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -21,7 +19,7 @@ import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Hint, useQuiet } from "@/components/ui/quiet";
+import { Hint } from "@/components/ui/quiet";
 import { photoAspect, type CoupleLayout } from "@/lib/editor/couple-photos";
 import type { PhotoCrop } from "@/lib/editor/photo-fit";
 import {
@@ -31,7 +29,6 @@ import {
   draftFrameSlots,
   framedDesign,
 } from "@/lib/publish/frames";
-import { OpeningPicker } from "../opening-picker";
 import { FramePreview, PhotoAdjust } from "../photo-adjust";
 import {
   ASKABLE_QUESTIONS,
@@ -41,9 +38,6 @@ import {
   MAX_PHOTOS,
 } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
-import type { MusicPlayer } from "@/lib/engine/music-player";
-import { arrangement } from "@/lib/engine/music";
-import { RAGA_IDS, type RagaId } from "@/lib/templates/ids";
 import { cn } from "@/lib/cn";
 import {
   forgetPhotoUrl,
@@ -53,16 +47,16 @@ import {
   usePhotoUrls,
 } from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
+import { RagaList } from "../raga-list";
 import { useSongLengths } from "../song-times";
 import { PagePacing } from "../page-pacing";
 import { ContactsSection } from "./family-section";
-import { draftShowsScene, draftSuite } from "@/lib/publish/story";
+import { draftShowsScene } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
 import { categoriesText } from "@/i18n/copy/categories";
 import { editorText } from "@/i18n/copy/editor";
-import { GateSummary } from "../gate-chooser";
 
 function newId(): string {
   return typeof crypto.randomUUID === "function"
@@ -503,8 +497,6 @@ function frameIds(draft: StepProps["draft"]): string[] {
 
 function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const { extrasCopy } = useText(editorText);
-  // On a design's page the ragas are pills, with the chosen one's sound beside Listen
-  const quiet = useQuiet();
   const clip = draft.music.clip;
   const clipUrl = useClipUrl(draft);
   const songs = useSongLengths(draft);
@@ -516,37 +508,6 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const setClip = (next: MusicClip | null) =>
     update((current) => ({ ...current, music: { ...current.music, clip: next } }));
   const design = designMusic(draft);
-  const own = design.raga;
-  const value = draft.music.raga ?? own;
-  // The design's own raga is heard as the design plays it; any other, its own way
-  const heard = value === own ? design : { raga: value };
-  const heardKey = JSON.stringify(heard);
-
-  // Hosts hear a raga before they choose it; the player loads only on the first tap
-  const player = useRef<MusicPlayer | null>(null);
-  const [listening, setListening] = useState(false);
-  useEffect(() => {
-    player.current?.setTrack(JSON.parse(heardKey) as typeof heard);
-  }, [heardKey]);
-  useEffect(() => () => player.current?.dispose(), []);
-  const listen = async () => {
-    if (listening) {
-      player.current?.pause();
-      setListening(false);
-      return;
-    }
-    try {
-      if (!player.current) {
-        const { MusicPlayer } = await import("@/lib/engine/music-player");
-        player.current = new MusicPlayer(heard);
-      }
-      await player.current.play();
-      setListening(true);
-    } catch {
-      // No Web Audio: the button simply stays off
-      setListening(false);
-    }
-  };
 
   return (
     <section
@@ -565,8 +526,6 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
         value={source}
         onValueChange={(next) => {
           if (next === "own") {
-            player.current?.pause();
-            setListening(false);
             setOwnChosen(true);
             if (!clip && setAside.current) setClip(setAside.current);
           } else {
@@ -592,59 +551,18 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
           }}
         />
       ) : (
-        <>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            {quiet ? (
-              <p className="min-w-0 flex-1 basis-48 text-sm text-ink-muted">
-                {extrasCopy.ragaSound(arrangement(heard), extrasCopy.ragaMoods[value])}
-              </p>
-            ) : (
-              <Hint className="min-w-0 flex-1 basis-48">{extrasCopy.ragaHint}</Hint>
-            )}
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              aria-pressed={listening}
-              leadingIcon={listening ? <Pause aria-hidden /> : <Play aria-hidden />}
-              onClick={() => void listen()}
-            >
-              {listening
-                ? extrasCopy.stopListening
-                : extrasCopy.listen(extrasCopy.ragaNames[value])}
-            </Button>
-          </div>
-          <RadioGroup
-            label={extrasCopy.musicHeading}
-            variant={quiet ? "chip" : "card"}
-            value={value}
-            onValueChange={(next) =>
-              update((current) => ({
-                ...current,
-                // Choosing the design's own raga follows the design if it changes later
-                music: { ...current.music, raga: next === own ? null : (next as RagaId) },
-              }))
-            }
-            className={quiet ? undefined : "grid-cols-1 min-[400px]:grid-cols-2"}
-          >
-            {RAGA_IDS.map((raga) => (
-              <RadioItem
-                key={raga}
-                value={raga}
-                label={
-                  <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    {extrasCopy.ragaNames[raga]}
-                    {raga === own && <Badge tone="gold">{extrasCopy.designsOwn}</Badge>}
-                  </span>
-                }
-                description={extrasCopy.ragaSound(
-                  arrangement(raga === own ? design : { raga }),
-                  extrasCopy.ragaMoods[raga],
-                )}
-              />
-            ))}
-          </RadioGroup>
-        </>
+        <RagaList
+          label={extrasCopy.musicHeading}
+          value={draft.music.raga ?? design.raga}
+          design={design}
+          onChoose={(next) =>
+            update((current) => ({
+              ...current,
+              // Choosing the design's own raga follows the design if it changes later
+              music: { ...current.music, raga: next === design.raga ? null : next },
+            }))
+          }
+        />
       )}
       <Switch
         label={extrasCopy.playOnOpen}
@@ -716,28 +634,14 @@ export function PhotosStep({ draft, update }: StepProps) {
   );
 }
 
-/** The music and replies section: what plays, what the reply asks, and whom to call. */
+/**
+ * The music and replies section: what plays, what the reply asks, and whom to call. How it
+ * opens is its own part, the last on a design's page (owner, 2026-10-24).
+ */
 export function MusicStep({ draft, update }: StepProps) {
-  // A quiet page shows the chosen opening and a way to change it, not every opening there is
-  const quiet = useQuiet();
-  const [gate, setGate] = useState(false);
   return (
     <div className={sections}>
       <Music draft={draft} update={update} />
-      {/* How it opens sits with the music, what guests see and hear first, so the design
-          step is only designs (owner, 2026-10-22) */}
-      {quiet ? (
-        <GateSummary draft={draft} update={update} open={gate} onOpenChange={setGate} />
-      ) : (
-        <div className="border-t border-line pt-6">
-          <OpeningPicker
-            draft={draft}
-            suite={draftSuite(draft)}
-            scene={draftShowsScene(draft)}
-            update={update}
-          />
-        </div>
-      )}
       <Questions draft={draft} update={update} />
       <section className="flex flex-col gap-3 border-t border-line pt-6" data-page-target="family">
         <ContactsSection draft={draft} update={update} />

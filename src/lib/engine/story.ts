@@ -151,10 +151,13 @@ export const isFunctionBeat = (beat: Pick<StoryBeat, "id">) => beat.id.startsWit
 const words = (lines: readonly StoryLine[]) =>
   lines.reduce((sum, line) => sum + line.text.split(/\s+/).filter(Boolean).length, 0);
 
+/** Seconds until a beat's last line has arrived, one rising in after another. */
+const arrival = (count: number) => Math.max(0, count - 1) * LINE_STAGGER + LINE_IN;
+
 /** Seconds a beat needs: its lines arriving one after another, then time to read them. */
 export function beatSeconds(lines: readonly StoryLine[], symbol = false): number {
   const count = lines.length + (symbol ? 1 : 0);
-  const arrive = Math.max(0, count - 1) * LINE_STAGGER + LINE_IN;
+  const arrive = arrival(count);
   const read = Math.min(READ_MAX, Math.max(READ_MIN, words(lines) * READ_PER_WORD));
   return Number(Math.max(BEAT_MIN, arrive + read).toFixed(2));
 }
@@ -412,12 +415,19 @@ export function storyBeats({
 /**
  * Squeezes a long story so it stays under STORY_MAX_SECONDS. The cover, family and closing
  * pages give up their time first, down to BEAT_MIN; only then do the functions shorten, and
- * never below FUNCTION_BEAT_MIN. A kankotri with a dozen functions runs longer rather than
- * too fast to read.
+ * never below FUNCTION_BEAT_MIN. No page gives up the time its lines take to arrive and be
+ * read (owner, 2026-10-24: a long family page moved on half shown). A kankotri with a dozen
+ * functions runs longer rather than too fast to read.
  */
 export function fitStory(beats: StoryBeat[]): StoryBeat[] {
   const floors = beats.map((b) =>
-    Math.min(b.seconds, isFunctionBeat(b) ? FUNCTION_BEAT_MIN : BEAT_MIN),
+    Math.min(
+      b.seconds,
+      Math.max(
+        isFunctionBeat(b) ? FUNCTION_BEAT_MIN : BEAT_MIN,
+        arrival(b.lines.length + (b.symbol ? 1 : 0)) + READ_MIN,
+      ),
+    ),
   );
   const lengths = squeeze(
     beats.map((b) => b.seconds),
@@ -457,12 +467,20 @@ export function squeeze(
 
 const sum = (values: readonly number[]) => values.reduce((total, value) => total + value, 0);
 
-/** The times a host can fix for every page (Step 12y); null lets each page take its own. */
-export const PAGE_SECONDS = [4, 5, 6, 8, 10] as const;
+/**
+ * The times a host can give every page (Step 12y); null lets each page take its own. Four
+ * seconds is gone (owner, 2026-10-24): a page of parents' names and blessings moved on
+ * before its last lines had arrived.
+ */
+export const PAGE_SECONDS = [5, 6, 8, 10] as const;
 
-/** Every page held for the host's fixed time, or the story as timed when they left it. */
+/**
+ * Every page held for at least the host's time, and longer where its words need it, so no
+ * page moves on before all of it has arrived and been read. Without a time, the story as
+ * timed when they left it.
+ */
 export function paceStory(beats: StoryBeat[], pace: number | null): StoryBeat[] {
-  return pace ? beats.map((b) => ({ ...b, seconds: pace })) : beats;
+  return pace ? beats.map((b) => ({ ...b, seconds: Math.max(pace, b.seconds) })) : beats;
 }
 
 export function storyLength(beats: readonly StoryBeat[]): number {

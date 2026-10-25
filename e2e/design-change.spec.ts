@@ -34,6 +34,8 @@ test.describe("changing the design", () => {
     const designs = page.locator("[data-suggested-designs]");
     await expect(designs.getByRole("link").first()).toBeVisible({ timeout: 30_000 });
     expect(await noOverflow(page)).toBe(true);
+    // Read from the top: a control scrolled under the sticky header counts as too small
+    await page.evaluate(() => window.scrollTo(0, 0));
     expect((await axe(page).analyze()).violations).toEqual([]);
 
     // Another design is this invite's, with its names and functions as they were

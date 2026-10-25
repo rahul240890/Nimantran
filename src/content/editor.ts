@@ -708,38 +708,19 @@ export const extrasCopy = {
   musicHeading: "Music",
   musicHint: "A raga composed live as the card opens, or your own song.",
   musicSource: { raga: "A raga", own: "Your own music" },
-  ragaHint: "Composed live, so it costs your guests no data.",
-  ownHint:
-    "Pick a song or a recording from your phone and choose where it starts and ends. Guests hear it from their first tap, once through with no repeats, and it fades out at the end. It plays in your video too.",
   chooseSong: "Choose a song",
-  songTypes: "MP3, M4A, WAV or AAC",
+  /** Under the upload button: the formats, and that uploading is the host's word. */
+  songNote: "MP3 or M4A. Only songs you have the right to use.",
   readingSong: "Reading your song…",
   songFailed: "That file couldn't be read. Try an MP3 or M4A file.",
   clipFailed: "The clip couldn't be made in this browser. Try Chrome or Safari.",
   clipStorageFailed: "Music can't be saved in this browser, for example in private mode.",
-  trimHeading: "Keep the part you love",
   waveformLabel: (name: string) => `The shape of ${name}, with the part you keep lit`,
   startAt: "Starts at",
-  endAt: "Ends at",
-  keeping: (length: string) => `Keeping ${length}`,
-  needNote: (need: string, pages: number) =>
-    `Your invitation plays for about ${need}: the opening and ${pages === 1 ? "1 page" : `${pages} pages`}. Keep at least ${need} so the song never stops early or repeats.`,
-  sceneNeedNote: (need: string) =>
-    `Your invitation plays for about ${need}: the opening and the scene. Keep at least ${need} so the song never stops early or repeats.`,
-  fullNote: (full: string) =>
-    `Keep about ${full} and the song also plays on softly while the page moves down to the reply form.`,
-  fitInvitation: (length: string) => `The invitation, ${length}`,
-  fitAll: (length: string) => `With the page below, ${length}`,
   tooShort: (song: string, need: string) =>
     `This song is ${song} long, and your invitation plays for about ${need}. Choose a longer song, so the music lasts to the end without repeating.`,
   chooseLonger: "Choose another song",
-  playPart: "Play from the start",
-  playEnd: "Hear the ending",
   stopPart: "Stop",
-  rights: "I have the right to use this music",
-  rightsHint:
-    "Use your own recording, a song you've licensed, or royalty-free music. Clips downloaded from Instagram or YouTube usually aren't allowed, and we remove music when its owner asks.",
-  useClip: "Use this music",
   makingClip: "Making your clip…",
   cancelTrim: "Cancel",
   changeClip: "Change",

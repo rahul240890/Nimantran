@@ -25,10 +25,11 @@ describe("the host's own pages", () => {
     expect(applyPages(beats, noPages, "en")).toEqual(beats);
   });
 
-  it("holds every page for the time the host fixed (Step 12y)", () => {
+  it("holds every page for at least the time the host fixed (Step 12y)", () => {
     const paced = applyPages(beats, noPages, "en", 6);
     expect(paced.map((b) => b.id)).toEqual(beats.map((b) => b.id));
-    expect(paced.every((b) => b.seconds === 6)).toBe(true);
+    // A page whose lines need longer keeps its own time, so none moves on half shown
+    paced.forEach((b, i) => expect(b.seconds).toBe(Math.max(6, beats[i]!.seconds)));
   });
 
   it("uses the host's lines, placement and box, in the language they were written for", () => {

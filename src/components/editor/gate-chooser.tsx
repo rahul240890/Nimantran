@@ -9,6 +9,7 @@ import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import { draftOpeningGod, draftOpeningStyle, type InviteDraft } from "@/lib/editor/draft";
 import { draftShowsScene, draftSuite } from "@/lib/publish/story";
+import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { OpeningPicker, useBeat } from "./opening-picker";
 
@@ -65,11 +66,14 @@ export function GateSummary({
   update,
   open,
   onOpenChange,
+  bare = false,
 }: {
   draft: InviteDraft;
   update: Update;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  /** Inside a part titled with it (a design's page): no heading or rule of its own. */
+  bare?: boolean;
 }) {
   const { openingCopy } = useText(editorText);
   const suite = draftSuite(draft);
@@ -81,9 +85,9 @@ export function GateSummary({
     <section
       aria-labelledby="summary-gate"
       data-testid="gate-summary"
-      className="flex flex-col gap-3 border-t border-line pt-5"
+      className={cn("flex flex-col gap-3", !bare && "border-t border-line pt-5")}
     >
-      <h2 id="summary-gate" className="font-display text-xl">
+      <h2 id="summary-gate" className={cn("font-display text-xl", bare && "sr-only")}>
         {openingCopy.heading}
       </h2>
       <div className="flex items-start gap-4">
