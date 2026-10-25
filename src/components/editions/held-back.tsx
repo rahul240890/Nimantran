@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock, Sparkles, Undo2 } from "lucide-react";
+import { CopyPlus, Lock, Sparkles, Undo2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
 import { loadInvite } from "@/actions/invites";
@@ -13,21 +13,25 @@ import { editionsText } from "@/i18n/copy/editions";
 import type { InviteDraft } from "@/lib/editor/draft";
 import { inviteDraft } from "@/lib/editor/store";
 import { designById } from "@/lib/gallery/catalog";
-import { syncDraft, syncStore } from "@/lib/invites/sync";
+import { splitOffDraft, syncDraft, syncStore } from "@/lib/invites/sync";
 import { draftDesignId } from "@/lib/plans/design-defaults";
 
 /**
  * In the editor, while the account refuses to save a live invite because its package
  * doesn't cover the change (most often another design than the one paid for): guests keep
- * the live copy, and the host either buys a package for the change or goes back.
+ * the live copy, and the host buys a package for the change, goes back, or makes the change
+ * an invitation of its own (owner, 2026-10-25).
  */
 export function HeldBackNotice({
   draft,
   onRestored,
+  onSplit,
 }: {
   draft: InviteDraft;
   /** After going back to the paid design: a design's own page turns to it. */
   onRestored?: () => void;
+  /** After the change became a new invitation: a design's own page drops the live one. */
+  onSplit?: () => void;
 }) {
   const { heldCopy, limitCopy } = useText(editionsText);
   const locale = useLocale();
@@ -64,6 +68,14 @@ export function HeldBackNotice({
     onRestored?.();
   };
 
+  // The live invite stays as guests have it; this one saves as a new invite, unpublished
+  const split = () => {
+    splitOffDraft();
+    void syncDraft();
+    toast({ title: heldCopy.newInviteDone, tone: "success" });
+    onSplit?.();
+  };
+
   return (
     <Card
       elevation="flat"
@@ -81,6 +93,7 @@ export function HeldBackNotice({
       <p className="text-sm text-ink-muted">
         {held.shortfalls.map((need) => limitCopy.used[need.limit](need.used)).join(" · ")}
       </p>
+      <p className="text-sm text-ink-muted">{heldCopy.guestView}</p>
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
         <Button asChild size="sm">
           <Link
@@ -101,6 +114,15 @@ export function HeldBackNotice({
             {paidName ? heldCopy.back(paidName) : heldCopy.backPlain}
           </Button>
         )}
+        <Button
+          variant="secondary"
+          size="sm"
+          leadingIcon={<CopyPlus aria-hidden />}
+          onClick={split}
+          data-split-invite
+        >
+          {heldCopy.newInvite}
+        </Button>
       </div>
     </Card>
   );

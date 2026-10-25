@@ -2178,4 +2178,13 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   moreDesignsNote:
     "आपके नाम, तारीखें और फ़ोटो साथ आते हैं। किसी डिज़ाइन पर टैप करके उसमें अपना निमंत्रण देखें।",
   opening: "डिज़ाइन खुल रहा है…",
+  /** Another design picked under a live invite: a new invitation, or the live one changed. */
+  pickTitle: (design) => (design ? `${design} किसके लिए?` : "यह डिज़ाइन किसके लिए?"),
+  pickNew: "नया निमंत्रण",
+  pickNewBody:
+    "आपके नाम, तारीखें, जगहें, परिवार, फ़ोटो और शब्द साथ आते हैं। आपका लाइव निमंत्रण मेहमानों के लिए जैसा है वैसा ही रहेगा।",
+  pickLive: "आपका लाइव निमंत्रण",
+  pickLiveBody:
+    "वही लिंक, मेहमान और जवाब, इस डिज़ाइन में। अगर आपका पैकेज इसे कवर नहीं करता, तो पैकेज चुनने तक मेहमानों को पुराना डिज़ाइन ही दिखेगा।",
+  pickClose: "बंद करें",
 };

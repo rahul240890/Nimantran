@@ -201,4 +201,9 @@ export const heldCopy = {
   back: (paid: string) => `Go back to ${paid}`,
   backPlain: "Go back to the design you paid for",
   backFailed: "Couldn't load your live invitation. Check your connection and try again.",
+  newInvite: "Make it a new invitation",
+  newInviteDone:
+    "It's a new invitation now, with all your details. Your live one stays as guests have it.",
+  guestView:
+    "See as guest and the video show this once it has its package, or once you make it a new invitation.",
 } as const;

@@ -45,6 +45,7 @@ import { FamilySection } from "../steps/family-section";
 import { Fold } from "../steps/fold";
 import { MusicStep, PhotosStep } from "../steps/photos-music-steps";
 import { useDropLostPhotos } from "../use-photo-urls";
+import { DesignChoice } from "./design-choice";
 import { QuickFunctions } from "./quick-functions";
 import "@/components/invitation/type/fonts.css";
 
@@ -307,9 +308,11 @@ export function QuickStart({
   const guestPreview = async () => {
     setToGuests(true);
     inviteDraft.flush();
-    await syncDraft();
+    // A change the live invite's package refused isn't in the account: the account's copy
+    // is the live one as guests have it, so the quick look shows this one instead
+    const saved = await syncDraft();
     const id = inviteDraft.get().draft.remoteId;
-    if (id) {
+    if (id && saved !== "needs-plan") {
       router.push(`/invites/${id}/preview?from=design`);
       return;
     }
@@ -492,6 +495,7 @@ export function QuickStart({
                 <HeldBackNotice
                   draft={draft}
                   onRestored={() => router.replace(designPageHref(inviteDraft.get().draft))}
+                  onSplit={() => router.replace(designPageHref(inviteDraft.get().draft))}
                 />
               )}
               {/* Every part folded to its title, the one being worked on open */}
@@ -637,7 +641,8 @@ export function QuickStart({
           </div>
         </form>
       </main>
-      {more}
+      {/* On a live invite, another design asks first: a new invitation, or this one changed */}
+      <DesignChoice live={ready && Boolean(draft.slug)}>{more}</DesignChoice>
 
       {/* Phones: the design, small, while it is out of view, until put away */}
       {ready && !wide && !stageSeen && typing && !miniHidden && (
