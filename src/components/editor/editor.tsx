@@ -120,7 +120,8 @@ export function Editor({
       try {
         if (missing) toast({ title: syncCopy.missing, tone: "error" });
         if (!initialInvite && !fresh) return;
-        const switched = await switchDraft(initialInvite, { signedIn });
+        const switched = await switchDraft(initialInvite, { signedIn, setAside: true });
+        if (switched === "set-aside") toast({ title: syncCopy.setAside, tone: "success" });
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
         else if (openEdit) {
           editing = true;

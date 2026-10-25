@@ -121,10 +121,40 @@ export const syncStore = {
  */
 export async function switchDraft(
   target: InviteDraft | null,
-  { signedIn, fresh = newDraft }: { signedIn: boolean; fresh?: () => InviteDraft },
-): Promise<boolean> {
+  {
+    signedIn,
+    fresh = newDraft,
+    setAside = false,
+  }: {
+    signedIn: boolean;
+    fresh?: () => InviteDraft;
+    /**
+     * Opened from the account (My invites, Edit invite): a live invite opens as guests have
+     * it, and a change on this device its package refused moves to a draft of its own.
+     */
+    setAside?: boolean;
+  },
+): Promise<boolean | "set-aside"> {
   let current = inviteDraft.get().draft;
+  let setAsideDone = false;
   if (target && target.remoteId && current.remoteId === target.remoteId) {
+    // A live invite whose refused change stayed on this device couldn't be edited at all:
+    // every save was refused with it (owner, 2026-10-25)
+    if (setAside && current.updatedAt !== 0 && !isSynced(current) && current.slug) {
+      const saved = await syncDraft();
+      if (saved === "needs-plan") {
+        if (!(await setAsideHeld())) return false;
+        replaceWith(target);
+        return "set-aside";
+      }
+      current = inviteDraft.get().draft;
+      if (saved === "synced") {
+        if (target.slug !== current.slug) {
+          inviteDraft.update((draft) => ({ ...draft, slug: target.slug }), { touch: false });
+        }
+        return true;
+      }
+    }
     // The same invite. Edits made here and not yet in the account stay, whatever the clocks
     // say: the account's copy can be a save behind (moving between the design's page and
     // the preview, say), and this device's own clock can run slow
@@ -146,22 +176,56 @@ export async function switchDraft(
   }
   if (current.updatedAt !== 0) {
     if (!signedIn) return false;
-    if ((await syncDraft()) !== "synced") return false;
+    const saved = await syncDraft();
+    // A live invite holding a refused change can't be put away as it is: the change goes
+    // to a draft of its own, so another invite can still be opened
+    if (saved === "needs-plan" && current.slug) {
+      if (!(await setAsideHeld())) return false;
+      setAsideDone = true;
+    } else if (saved !== "synced") return false;
     current = inviteDraft.get().draft;
   }
   if (current.remoteId) shelvePhotos(current.remoteId, current.photos);
   if (target?.remoteId) {
-    inviteDraft.replace({
-      ...target,
-      photos: mergePhotos(target.photos, shelvedPhotos(target.remoteId)),
-    });
-    markSynced(target);
-    set("synced");
+    replaceWith(target);
   } else {
     inviteDraft.replace(fresh());
     set("idle");
   }
+  return setAsideDone ? "set-aside" : true;
+}
+
+/** Opens an invite from the account, with any of its photos still waiting on this device. */
+function replaceWith(target: InviteDraft) {
+  inviteDraft.replace({
+    ...target,
+    photos: mergePhotos(target.photos, shelvedPhotos(target.remoteId!)),
+  });
+  markSynced(target);
+  set("synced");
+}
+
+/** The open live invite's refused change, saved as a new draft; false if it couldn't save. */
+async function setAsideHeld(): Promise<boolean> {
+  splitOffDraft();
+  if ((await syncDraft()) !== "synced") return false;
+  const draft = inviteDraft.get().draft;
+  if (draft.remoteId) shelvePhotos(draft.remoteId, draft.photos);
   return true;
+}
+
+/**
+ * The draft open now, as it is on this device, becomes a new invite with no link, and the
+ * one it came from stays in the account as last saved: for a change to a live invite its
+ * package refused (another design, most often), so the host can publish it on its own
+ * instead (owner, 2026-10-25).
+ */
+export function splitOffDraft() {
+  const current = inviteDraft.get().draft;
+  if (current.remoteId) shelvePhotos(current.remoteId, current.photos);
+  held = null;
+  inviteDraft.replace({ ...current, remoteId: null, slug: null, updatedAt: Date.now() });
+  set("idle");
 }
 
 /** The account's photos, then any on this device that haven't been uploaded yet. */

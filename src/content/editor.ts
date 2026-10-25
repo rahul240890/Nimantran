@@ -78,6 +78,8 @@ export const syncCopy = {
   offline: "Saved on this device, retrying",
   "needs-plan": "Not live yet: needs a package",
   missing: "That invite isn't in your account. It may have been deleted.",
+  setAside:
+    "Your change to another design is now a draft of its own in My invites. This one opens as your guests see it.",
   switchFailed: "Couldn't save the invite that's open, so it stays open. Try again in a moment.",
 } as const;
 
@@ -2010,4 +2012,13 @@ export const quickCopy = {
   moreDesignsNote:
     "Your names, dates and photos come along. Tap a design to see your invitation in it.",
   opening: "Opening the design…",
+  /** Another design picked under a live invite: a new invitation, or the live one changed. */
+  pickTitle: (design: string) => (design ? `Use ${design} for…` : "Use this design for…"),
+  pickNew: "A new invitation",
+  pickNewBody:
+    "Your names, dates, places, family, photos and words come with it. Your live invitation stays as guests have it.",
+  pickLive: "Your live invitation",
+  pickLiveBody:
+    "The same link, guests and replies, in this design. If your package doesn't cover it, guests keep the design they have until you choose one.",
+  pickClose: "Close",
 } as const;
