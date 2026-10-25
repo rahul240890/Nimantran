@@ -27,6 +27,8 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   cancel: "अजून नाही",
   close: "बंद करा",
   failed: "प्रकाशित करता आले नाही. इंटरनेट तपासा आणि पुन्हा प्रयत्न करा.",
+  /** Opening the video or the cards from the editor, which saves first. */
+  saveFailed: "आत्ता सेव्ह झाले नाही. इंटरनेट तपासा आणि पुन्हा प्रयत्न करा.",
   notReady: "हे पाठवण्यापूर्वी काही पायऱ्या पूर्ण करायच्या बाकी आहेत.",
   published: "तुमचे निमंत्रण लाइव्ह आहे",
 };
@@ -301,6 +303,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   stop: "थांबवा",
   stopped: "व्हिडिओ थांबवला",
   ready: "तुमचा व्हिडिओ तयार आहे",
+  keepsGoing: "हवे तर हे पेज सोडा: व्हिडिओ बनत राहील.",
+  watch: "पाहा",
+  hideAway: "लपवा",
   changed:
     "हा व्हिडिओ बनवल्यानंतर तुमचे निमंत्रण बदलले आहे. बदल समाविष्ट करण्यासाठी तो पुन्हा बनवा.",
   finishing: "तुम्ही बनवलेला व्हिडिओ पूर्ण होत आहे, म्हणजे तो तुमच्या निमंत्रणाच्या लिंकने संपेल.",

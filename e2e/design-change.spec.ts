@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import {
   axe,
+  editorBar,
   firstName,
   noOverflow,
   numberFor,
@@ -25,12 +26,9 @@ async function weddingVenue(page: Page) {
 test.describe("changing the design", () => {
   test.use({ reducedMotion: "reduce" });
 
-  test("from the preview: other designs under the invite's page, and every detail kept", async ({
-    page,
-  }, info) => {
+  test("other designs under the invite's page, and every detail kept", async ({ page }, info) => {
     await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
-    await page.getByRole("button", { name: "Change design" }).first().click();
-    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding.*#more-designs$/);
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding/);
     const designs = page.locator("[data-suggested-designs]");
     await expect(designs.getByRole("link").first()).toBeVisible({ timeout: 30_000 });
     expect(await noOverflow(page)).toBe(true);
@@ -46,9 +44,7 @@ test.describe("changing the design", () => {
     await expect(firstName(page)).toHaveValue("Kabir", { timeout: 30_000 });
     await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
     await seeInvitation(page);
-    await expect(page.getByText(/Kabir/).first()).toBeVisible();
-    await expect(page.getByText("Taj Falaknuma, Hyderabad").first()).toBeVisible();
-    await expect(page.getByText(name, { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("heading", { level: 1, name })).toBeVisible();
   });
 
   test("a design picked in the gallery joins the invite under way", async ({ page }, info) => {
@@ -84,7 +80,7 @@ test.describe("changing the design", () => {
     await expect(await weddingVenue(page)).toHaveValue("Taj Falaknuma, Hyderabad");
     await seeInvitation(page);
     // Not live yet: it publishes under a link of its own
-    await expect(page.getByRole("button", { name: "Publish", exact: true })).toBeVisible();
+    await expect(editorBar(page)).toHaveText("Publish");
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });
@@ -93,7 +89,6 @@ test.describe("changing the design", () => {
     page,
   }, info) => {
     await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
-    await page.getByRole("button", { name: "Change design" }).first().click();
     const designs = page.locator("[data-suggested-designs]");
     await expect(designs.getByRole("link").first()).toBeVisible({ timeout: 30_000 });
     // Each design carries the couple's own names, on a painting or in a card's lettering,
@@ -122,7 +117,7 @@ test.describe("changing the design", () => {
 
     // Preview, signed in, is the guests' own view: it opens with that gate
     await page.getByRole("button", { name: "Preview", exact: true }).click();
-    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview\?from=design$/);
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview$/);
     const guest = info.project.name.startsWith("phone")
       ? page
       : page.frameLocator('[data-testid="host-preview-phone"]');

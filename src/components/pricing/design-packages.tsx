@@ -1,6 +1,6 @@
 "use client";
 
-import { Clapperboard, Mails, ShieldCheck } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useLocale, useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
@@ -17,8 +17,6 @@ const TONES = {
     box: "border-card-ivory/15 bg-card-ivory/5",
     name: "text-card-ivory/75",
     guests: "text-card-ivory/70",
-    strong: "text-card-ivory",
-    icon: "text-marigold",
     link: "text-card-ivory focus-visible:outline-card-ivory",
   },
   paper: {
@@ -26,24 +24,15 @@ const TONES = {
     box: "border-line bg-surface",
     name: "text-ink-muted",
     guests: "text-ink-muted",
-    strong: "text-ink",
-    icon: "text-accent-text",
     link: "text-accent-text focus-visible:outline-ring",
   },
 } as const;
 
-/** What comes inside the packages beyond the invitation, and which of them have it. */
-const EXTRAS = [
-  { id: "video", icon: Clapperboard, plans: ["celebration", "grand"] },
-  { id: "cards", icon: Mails, plans: ["grand"] },
-] as const;
-
 /**
  * What each package costs on this one design, so the badge's price is never mistaken for
  * the whole story: Basic is the design, Celebration and Grand add the video and more guests.
- * With `extras` (a design's page), the WhatsApp video and the save the date and thank-you
- * cards are named as part of those prices, nothing sold on its own (owner, 2026-10-24), and
- * Grand is tagged the wedding set.
+ * With `extras` (a design's page), Grand is tagged the wedding set, and the page stays short:
+ * no list of what the packages include and no link to compare them (owner, 2026-10-25).
  */
 export function DesignPackages({
   designId,
@@ -53,7 +42,7 @@ export function DesignPackages({
 }: {
   designId: string;
   tone?: keyof typeof TONES;
-  /** Names what the packages include, Grand as the set for this occasion. */
+  /** Grand as the set for this occasion, on a design's page. */
   extras?: "wedding" | "other";
   className?: string;
 }) {
@@ -105,27 +94,6 @@ export function DesignPackages({
           );
         })}
       </ul>
-      {extras && (
-        <div data-package-extras className="flex flex-col gap-1.5 text-xs">
-          <p className={cn("font-semibold", colours.name)}>{galleryCopy.packageExtras.heading}</p>
-          <ul className="flex flex-col gap-1.5">
-            {EXTRAS.map(({ id, icon: Icon, plans }) => (
-              <li key={id} data-extra={id} className="flex items-start gap-1.5">
-                <Icon aria-hidden className={cn("mt-px size-3.5 shrink-0", colours.icon)} />
-                <span>
-                  <span className={colours.strong}>{galleryCopy.packageExtras[id]}</span>
-                  <span className={colours.guests}>
-                    {" · "}
-                    {new Intl.ListFormat(locale, { type: "conjunction" }).format(
-                      plans.map((plan) => planCopy[plan].name),
-                    )}
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
       {/* What makes paying feel safe, right beside the prices */}
       <div data-pay-safely className={cn("flex flex-col gap-1 text-xs", colours.guests)}>
         <p className="flex items-start gap-1.5">
@@ -134,15 +102,17 @@ export function DesignPackages({
         </p>
         <p className="ps-5">{upgradeCopy.refunds}</p>
       </div>
-      <Link
-        href={pagePath({ kind: "pricing" }, locale)}
-        className={cn(
-          "inline-flex min-h-11 items-center self-start text-sm font-semibold underline underline-offset-4 hover:no-underline focus-visible:outline-2",
-          colours.link,
-        )}
-      >
-        {galleryCopy.comparePackages}
-      </Link>
+      {!extras && (
+        <Link
+          href={pagePath({ kind: "pricing" }, locale)}
+          className={cn(
+            "inline-flex min-h-11 items-center self-start text-sm font-semibold underline underline-offset-4 hover:no-underline focus-visible:outline-2",
+            colours.link,
+          )}
+        >
+          {galleryCopy.comparePackages}
+        </Link>
+      )}
     </section>
   );
 }

@@ -27,6 +27,8 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   cancel: "এখন না",
   close: "বন্ধ করুন",
   failed: "প্রকাশ করা গেল না। ইন্টারনেট দেখে আবার চেষ্টা করুন।",
+  /** Opening the video or the cards from the editor, which saves first. */
+  saveFailed: "এখন সেভ করা গেল না। ইন্টারনেট দেখে আবার চেষ্টা করুন।",
   notReady: "পাঠানোর আগে কয়েকটি ধাপ এখনও শেষ করা বাকি।",
   published: "আপনার নিমন্ত্রণ এখন লাইভ",
 };
@@ -294,6 +296,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   stop: "থামান",
   stopped: "ভিডিও তৈরি থামানো হয়েছে",
   ready: "আপনার ভিডিও তৈরি",
+  keepsGoing: "চাইলে এই পেজ ছেড়ে যান: ভিডিও তৈরি হতেই থাকবে।",
+  watch: "দেখুন",
+  hideAway: "লুকান",
   changed: "এই ভিডিও তৈরির পরে আপনার নিমন্ত্রণ বদলেছে। বদলগুলো রাখতে আবার তৈরি করুন।",
   finishing: "আপনার তৈরি ভিডিওটি শেষ করা হচ্ছে, যাতে এর শেষে আপনার নিমন্ত্রণের লিংক থাকে।",
   unfinished:

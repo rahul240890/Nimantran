@@ -49,8 +49,8 @@ async function makeInvite(page: Page, names: [string, string]) {
   await wedding.getByRole("combobox", { name: /Starts at/ }).click();
   await page.getByRole("option", { name: "6:30 pm" }).click();
   await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Taj Falaknuma, Hyderabad");
-  await page.getByRole("button", { name: "See my invitation" }).click();
-  await expect(page.getByText("Your invitation is ready")).toBeVisible({ timeout: 15_000 });
+  // The design's page is the whole editor: once the details are in, the rest shows there
+  await expect(page.locator("[data-try-video]")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByText("Saved to your account")).toHaveCount(1, { timeout: 15_000 });
 }
 

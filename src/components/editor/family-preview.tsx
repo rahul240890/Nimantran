@@ -19,10 +19,13 @@ import { funnel } from "@/lib/funnel";
 export function FamilyPreview({
   signedIn,
   remoteId,
+  signInNext = "/create",
 }: {
   signedIn: boolean;
   /** The invite in the account; still null for a moment while a new one is saved. */
   remoteId: string | null;
+  /** Where signing in comes back to: the design's page the card is on. */
+  signInNext?: string;
 }) {
   const { previewCopy } = useText(editorText);
   const [link, setLink] = useState<string | null>(null);
@@ -55,7 +58,7 @@ export function FamilyPreview({
       </p>
       {!signedIn ? (
         <Button asChild variant="secondary" className="self-start">
-          <Link href={`/sign-in?next=${encodeURIComponent("/create")}`}>
+          <Link href={`/sign-in?next=${encodeURIComponent(signInNext)}`}>
             <LogIn aria-hidden />
             {previewCopy.familySignIn}
           </Link>

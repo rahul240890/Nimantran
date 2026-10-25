@@ -22,7 +22,12 @@ export type VideoMade = {
 };
 
 export type KeptVideo =
-  { step: "making"; done: number } | ({ step: "ready"; blob: Blob; href: string } & VideoMade);
+  /** `frame`: the canvas the video is being drawn on, its latest frame, to show as it's made. */
+  | { step: "making"; done: number; frame?: HTMLCanvasElement }
+  | ({ step: "ready"; blob: Blob; href: string } & VideoMade);
+
+/** A video made from a page, shown on the others until it's watched (video-away.tsx). */
+export type AwayVideo = { key: string; from: string; video: KeptVideo };
 
 /** Where a video was kept before it was kept under its invitation, and what it was made with. */
 export type OlderVideo = { key: string; url: string | null; marked: boolean };
@@ -32,12 +37,33 @@ type Entry = { video: KeptVideo; stop?: AbortController };
 const entries = new Map<string, Entry>();
 const listeners = new Set<() => void>();
 const loaded = new Set<string>();
+/** The page each video was made from, while it's made and until it's watched or put away. */
+const origins = new Map<string, string>();
+let away: readonly AwayVideo[] = [];
 
 const DB = "shubh-videos";
 const STORE = "videos";
 
 function changed() {
+  away = [...origins].flatMap(([key, from]) => {
+    const video = entries.get(key)?.video;
+    return video ? [{ key, from, video }] : [];
+  });
   for (const listener of listeners) listener();
+}
+
+/**
+ * The videos made from a page in this visit, being made or made and not yet watched: the
+ * host can go on to another page while one is made (owner, 2026-10-25), and see it there.
+ */
+export function awayVideos(): readonly AwayVideo[] {
+  return away;
+}
+
+/** Puts a made video's notice away: it was watched, or hidden. */
+export function seenVideo(key: string) {
+  if (!origins.delete(key)) return;
+  changed();
 }
 
 export function subscribeVideos(listener: () => void): () => void {
@@ -65,17 +91,23 @@ function set(key: string, entry: Entry | null) {
 
 /**
  * Makes a video under `key`, replacing what was kept there once it is done. Resolves when it
- * is made and saved; rejects when it fails or is stopped, and the kept one stays.
+ * is made and saved; rejects when it fails or is stopped, and the kept one stays. `from` is
+ * the page it's made from, where the other pages send the host to watch it.
  */
 export async function makeKept(
   key: string,
   made: VideoMade,
-  make: (onProgress: (done: number) => void, signal: AbortSignal) => Promise<Blob>,
+  make: (
+    onProgress: (done: number, frame?: HTMLCanvasElement) => void,
+    signal: AbortSignal,
+  ) => Promise<Blob>,
+  from?: string,
 ): Promise<void> {
   const previous = entries.get(key)?.video;
   const keep = previous?.step === "ready" ? previous : null;
   const stop = new AbortController();
   entries.set(key, { video: { step: "making", done: 0 }, stop });
+  if (from) origins.set(key, from);
   changed();
   // Stopping takes effect at once, even while the raga is still being rendered: the work
   // underneath ends at its next check, and what it made is thrown away
@@ -86,10 +118,10 @@ export async function makeKept(
   );
   stopped.catch(() => undefined);
   try {
-    const making = make((done) => {
+    const making = make((done, frame) => {
       const entry = entries.get(key);
       if (entry?.stop !== stop) return;
-      entries.set(key, { video: { step: "making", done }, stop });
+      entries.set(key, { video: { step: "making", done, frame }, stop });
       changed();
     }, stop.signal);
     making.catch(() => undefined);
@@ -102,6 +134,7 @@ export async function makeKept(
     if (entries.get(key)?.stop === stop) {
       if (keep) entries.set(key, { video: keep });
       else entries.delete(key);
+      origins.delete(key);
       changed();
     }
     throw error;
@@ -120,6 +153,7 @@ export function stopKept(key: string) {
 export async function removeKept(key: string): Promise<void> {
   const entry = entries.get(key);
   entry?.stop?.abort();
+  origins.delete(key);
   set(key, null);
   await forget(key).catch(() => undefined);
 }

@@ -11,47 +11,10 @@ export const editor = {
   metaTitle: "Create your invitation",
   metaDescription:
     "Choose a 3D design, add your names and functions, then preview your invitation.",
-  headerLabel: "Invite editor",
   opening: "Opening your invite…",
-  progressLabel: "Invite progress",
-  progress: (step: number, total: number) => `Step ${step} of ${total}`,
-  done: "done",
-  designChosen: "Your design",
-  changeDesign: "Change design",
-  /** The three stages the progress shows: pick, fill in, see it. */
-  stages: { design: "Design", details: "Your details", preview: "Preview & share" },
-  /** The details page: its sections, each folded to one line with what's filled in. */
-  sections: {
-    label: "Your details, in six parts",
-    open: (part: string, summary: string, state: "done" | "todo" | "check") =>
-      `${part}: ${summary}${state === "done" ? ", done" : state === "check" ? ", needs a look" : ""}. Open`,
-    done: "Done",
-    check: "Needs a look",
-    edit: "Edit",
-    names: (names: string[]) => (names.length ? names.join(" & ") : "Add the names"),
-    functions: (names: string[]) =>
-      names.length === 0
-        ? "Choose your functions"
-        : names.length <= 3
-          ? names.join(", ")
-          : `${names.slice(0, 2).join(", ")} and ${names.length - 2} more`,
-    family: (filled: boolean) =>
-      filled ? "Family added" : "Optional: parents, blessings and who invites",
-    photos: (photos: number) =>
-      photos === 0 ? "No photos yet" : photos === 1 ? "1 photo" : `${photos} photos`,
-    words: (own: boolean) => (own ? "Your own words" : "Written for your occasion"),
-    music: (own: boolean, questions: number) =>
-      `${own ? "Your own music" : "The design's music"} · ${questions === 0 ? "no extra questions" : questions === 1 ? "1 question" : `${questions} questions`}`,
-  },
-  back: "Back",
-  next: "Continue",
-  toPreview: "Preview invitation",
-  preview: "Invitation preview",
-  showPreview: "Preview",
   previewTitle: "Your invitation",
   livePreview: "Live preview, open it large",
   hideLivePreview: "Hide the live preview",
-  showLivePreview: "Show the live preview",
   close: "Close",
   optional: "Optional",
   characters: (used: number, max: number) => `${used} of ${max} characters used`,
@@ -641,18 +604,6 @@ export const occasionCopy = {
 } as const;
 
 export const previewCopy = {
-  ready: "Your invitation is ready",
-  live: "Your invitation is live",
-  liveBody: (link: string) =>
-    `Guests open it at ${link}. Changes you make here show there straight away.`,
-  readyBody:
-    "It's saved on this device. Sign in to keep it in your account and publish it, then share the link on WhatsApp.",
-  readyBodyAccount:
-    "It's saved to your account, photos included. See it as your guests will, then publish it to get your link.",
-  seeAsGuest: "See it as your guests will",
-  watchVideo: "Watch it as a video",
-  seeAsGuestBody:
-    "The whole invitation, full screen: the opening, the music, every page and the reply form.",
   /** Before paying, a preview the family can see (lib/invites/family-link.ts). */
   familyTitle: "Show your family first",
   familyBody:
@@ -666,27 +617,6 @@ export const previewCopy = {
   familySignIn: "Sign in to share",
   familyMessage: (url: string) =>
     `Here's a preview of our invitation. Have a look and tell us what you think before we send it: ${url}`,
-  notReady: "A few details are missing",
-  fix: (label: string) => `Finish ${label.toLowerCase()}`,
-  occasionHeading: "Occasion",
-  namesHeading: "Names",
-  functionsHeading: "Functions",
-  photosHeading: "Photos",
-  noPhotos: "No photos added",
-  musicHeading: "Music",
-  playsOnOpen: "plays as guests open the card",
-  dressCode: "Dress code",
-  edit: "Edit",
-  editStep: (label: string) => `Edit ${label.toLowerCase()}`,
-  startOver: "Start a new invite",
-  startOverTitle: "Start a new invite?",
-  startOverBody: "This clears the names, functions and photos saved on this device.",
-  startOverConfirm: "Clear and start again",
-  startOverKeepBody:
-    "This invite stays in My invites, so you can come back to it. The new one starts empty.",
-  startOverKeepConfirm: "Start a new invite",
-  cancel: "Keep this invite",
-  cleared: "Started a new invite",
 } as const;
 
 /** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */
@@ -1995,8 +1925,10 @@ export const quickCopy = {
   familyIntro: "Optional: parents, blessings and whom guests can call",
   photosTitle: "Your photos",
   photosIntro: "Optional: the design has a frame for your photo",
-  see: "See my invitation",
-  nothingToPay: "Nothing to pay yet",
+  /** Once the names and dates are in: the invitation's video and its cards, from the editor. */
+  video: "Video",
+  cards: "Cards",
+  signInToTry: "Sign in to make its video and cards.",
   more: "More options",
   moreIntro: "Your own song, wording, opening gate and questions",
   make: "Short on time? We'll make it for you",

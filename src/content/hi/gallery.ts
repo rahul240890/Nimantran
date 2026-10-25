@@ -88,11 +88,6 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "इस डिज़ाइन के पैकेज",
   packageFree: "मुफ़्त",
   comparePackages: "पैकेज की तुलना करें",
-  packageExtras: {
-    heading: "पैकेज की कीमत में शामिल",
-    video: "स्टेटस और रील्स के लिए WhatsApp वीडियो",
-    cards: "सेव द डेट और धन्यवाद कार्ड",
-  },
   packageSet: { wedding: "वेडिंग सेट", other: "पूरा सेट" },
   seeSample: "मेहमान बनकर लाइव देखें",
   liveDemo: "लाइव डेमो",

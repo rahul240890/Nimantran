@@ -1,5 +1,14 @@
 import { expect, test, type Page } from "@playwright/test";
-import { axe, firstName, noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
+import {
+  axe,
+  editorBar,
+  firstName,
+  noOverflow,
+  numberFor,
+  publish,
+  seeInvitation,
+  writeInvite,
+} from "./invite-helpers";
 
 /*
  * Many invitations (owner, 2026-10-25): another design picked under a live invite's page
@@ -64,11 +73,10 @@ test.describe("many invitations", () => {
     await choice.getByRole("button", { name: /^A new invitation/ }).click();
     await expect(page).not.toHaveURL(/invite=/);
     await expect(firstName(page)).toHaveValue("Riya", { timeout: 30_000 });
-    // Nothing held back: it isn't the live one
+    // Nothing held back: it isn't the live one, and it publishes on its own
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
-    await page.getByRole("button", { name: "See my invitation" }).click();
-    await expect(page.getByText("Your invitation is ready")).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByText("Your invitation is live")).toHaveCount(0);
+    await seeInvitation(page);
+    await expect(editorBar(page)).toHaveText("Publish");
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });
@@ -83,17 +91,14 @@ test.describe("many invitations", () => {
     const held = page.locator("[data-held-back]");
     await expect(held).toBeVisible({ timeout: 30_000 });
 
-    await page.getByRole("button", { name: "See my invitation" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    await expect(held).toBeVisible({ timeout: 15_000 });
-    // Not live, and the guest view and video, which would play the live copy, wait
-    await expect(page.getByText("Your invitation is live")).toHaveCount(0);
-    await expect(page.getByRole("button", { name: "See it as your guests will" })).toHaveCount(0);
+    // The guests' view, video and cards would show the live copy, so they wait
+    await expect(page.locator("[data-try-video]")).toHaveCount(0);
+    await expect(page.locator("[data-try-cards]")).toHaveCount(0);
 
     await held.getByRole("button", { name: "Make it a new invitation" }).click();
     await expect(held).toHaveCount(0);
-    await expect(page.getByText("Your invitation is ready")).toBeVisible();
-    await expect(page.getByRole("button", { name: "See it as your guests will" })).toBeVisible();
+    await seeInvitation(page);
+    await expect(editorBar(page)).toHaveText("Publish");
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });

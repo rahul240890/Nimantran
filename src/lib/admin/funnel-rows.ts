@@ -26,7 +26,7 @@ const STEPS: readonly { key: keyof FunnelCounts; label: string }[] = [
   { key: "visitors", label: "Visited the site" },
   { key: "details", label: "Opened a design's page" },
   { key: "editor", label: "Opened the editor" },
-  { key: "preview", label: "Reached the preview" },
+  { key: "preview", label: "Filled in the names and dates" },
   { key: "signedIn", label: "Signed in" },
   { key: "checkout", label: "Started paying" },
   { key: "paid", label: "Paid" },

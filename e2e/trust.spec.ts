@@ -28,11 +28,14 @@ test.describe("a design's page", () => {
     await page.clock.fastForward(61_000);
     await expect(nudge.getByRole("link", { name: /We'll make it for you/ })).toHaveAttribute(
       "href",
-      "/help/whatsapp?for=make&design=rajwada-bagh",
+      "https://www.instagram.com/shubhinvitations.in/",
     );
+    // Said once: the line at the end of the form waits while this one shows
+    await expect(page.getByRole("link", { name: /We'll make it for you/ })).toHaveCount(1);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await nudge.getByRole("button", { name: "Hide this" }).click();
     await expect(nudge).toHaveCount(0);
+    await expect(page.locator("[data-make-link]")).toBeVisible();
     // Put away, it stays away for the rest of the visit
     await page.reload();
     await expect(page.getByRole("textbox", { name: /First name/ })).toBeVisible({

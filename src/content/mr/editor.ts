@@ -8,44 +8,10 @@ import { designNames } from "./design-names";
 export const editor: Translation<typeof en.editor> = {
   metaTitle: "आपले निमंत्रण बनवा",
   metaDescription: "3D डिझाइन निवडा, नावे आणि सोहळे जोडा, मग आपले निमंत्रण पाहा.",
-  headerLabel: "निमंत्रण एडिटर",
   opening: "आपले निमंत्रण उघडत आहे…",
-  progressLabel: "निमंत्रणाची प्रगती",
-  progress: (step, total) => `${total} पैकी पायरी ${step}`,
-  done: "पूर्ण",
-  designChosen: "आपले डिझाइन",
-  changeDesign: "डिझाइन बदला",
-  stages: { design: "डिझाइन", details: "आपली माहिती", preview: "झलक आणि पाठवा" },
-  sections: {
-    label: "आपली माहिती, सहा भागांत",
-    open: (part, summary, state) =>
-      `${part}: ${summary}${state === "done" ? ", पूर्ण" : state === "check" ? ", एकदा पाहा" : ""}. उघडा`,
-    done: "पूर्ण",
-    check: "एकदा पाहा",
-    edit: "बदला",
-    names: (names) => (names.length ? names.join(" आणि ") : "नावे जोडा"),
-    functions: (names) =>
-      names.length === 0
-        ? "आपले सोहळे निवडा"
-        : names.length <= 3
-          ? names.join(", ")
-          : `${names.slice(0, 2).join(", ")} आणि आणखी ${names.length - 2}`,
-    family: (filled) =>
-      filled ? "कुटुंबाची माहिती जोडली" : "ऐच्छिक: आई-वडील, आशीर्वाद आणि निमंत्रक",
-    photos: (photos) => (photos === 0 ? "अजून एकही फोटो नाही" : `${photos} फोटो`),
-    words: (own) => (own ? "आपले स्वतःचे शब्द" : "आपल्या प्रसंगासाठी लिहिलेले"),
-    music: (own, questions) =>
-      `${own ? "आपले स्वतःचे संगीत" : "डिझाइनचे संगीत"} · ${questions === 0 ? "आणखी प्रश्न नाहीत" : `${questions} प्रश्न`}`,
-  },
-  back: "मागे",
-  next: "पुढे चला",
-  toPreview: "निमंत्रण पाहा",
-  preview: "निमंत्रणाची झलक",
-  showPreview: "झलक",
   previewTitle: "आपले निमंत्रण",
   livePreview: "लाइव्ह झलक, मोठी करून पाहा",
   hideLivePreview: "लाइव्ह झलक लपवा",
-  showLivePreview: "लाइव्ह झलक दाखवा",
   close: "बंद करा",
   optional: "ऐच्छिक",
   characters: (used, max) => `${max} पैकी ${used} अक्षरे वापरली`,
@@ -601,17 +567,6 @@ export const occasionCopy: Translation<typeof en.occasionCopy> = {
 };
 
 export const previewCopy: Translation<typeof en.previewCopy> = {
-  ready: "आपले निमंत्रण तयार आहे",
-  live: "आपले निमंत्रण लाइव्ह आहे",
-  liveBody: (link) => `पाहुणे ते ${link} वर उघडतात. इथे केलेले बदल तिथे लगेच दिसतात.`,
-  readyBody:
-    "हे याच डिव्हाइसवर सेव्ह झाले आहे. ते आपल्या खात्यात ठेवण्यासाठी आणि प्रकाशित करण्यासाठी साइन इन करा, मग लिंक WhatsApp वर पाठवा.",
-  readyBodyAccount:
-    "हे फोटोंसह आपल्या खात्यात सेव्ह झाले आहे. आधी ते पाहुण्यांच्या नजरेतून पाहा, मग लिंक मिळवण्यासाठी प्रकाशित करा.",
-  seeAsGuest: "पाहुण्यांच्या नजरेतून पाहा",
-  watchVideo: "व्हिडिओमध्ये पाहा",
-  seeAsGuestBody:
-    "संपूर्ण निमंत्रण, पूर्ण स्क्रीनवर: उघडणे, संगीत, प्रत्येक पान आणि उत्तराचा फॉर्म.",
   familyTitle: "आधी कुटुंबाला दाखवा",
   familyBody:
     "तपासण्यासाठी त्यांना WhatsApp वर एक झलक पाठवा. प्रत्येक स्क्रीनवर ‘झलक’ लिहिलेले असते आणि उत्तरे बंद असतात, त्यामुळे ती निमंत्रण म्हणून पाठवता येत नाही. तुम्ही पाठवल्यावर पाहुण्यांना स्वच्छ निमंत्रण मिळते.",
@@ -624,27 +579,6 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
   familySignIn: "पाठवण्यासाठी साइन इन करा",
   familyMessage: (url) =>
     `आमच्या निमंत्रणाची एक झलक. पाहून सांगा कसे वाटले, मग आम्ही ते पाठवू: ${url}`,
-  notReady: "काही तपशील बाकी आहेत",
-  fix: (label) => `${label} पूर्ण करा`,
-  occasionHeading: "प्रसंग",
-  namesHeading: "नावे",
-  functionsHeading: "सोहळे",
-  photosHeading: "फोटो",
-  noPhotos: "एकही फोटो जोडलेला नाही",
-  musicHeading: "संगीत",
-  playsOnOpen: "पाहुण्यांनी कार्ड उघडताच वाजते",
-  dressCode: "ड्रेस कोड",
-  edit: "बदला",
-  editStep: (label) => `${label} बदला`,
-  startOver: "नवे निमंत्रण सुरू करा",
-  startOverTitle: "नवे निमंत्रण सुरू करायचे?",
-  startOverBody: "यामुळे या डिव्हाइसवर सेव्ह केलेली नावे, सोहळे आणि फोटो पुसले जातील.",
-  startOverConfirm: "पुसून नव्याने सुरू करा",
-  startOverKeepBody:
-    "हे निमंत्रण 'माझी निमंत्रणे' मध्ये राहील, आपण केव्हाही परत येऊ शकता. नवे निमंत्रण रिकामे सुरू होईल.",
-  startOverKeepConfirm: "नवे निमंत्रण सुरू करा",
-  cancel: "हेच निमंत्रण ठेवा",
-  cleared: "नवे निमंत्रण सुरू झाले",
 };
 
 export const suiteCopy: Translation<typeof en.suiteCopy> = {
@@ -1923,8 +1857,9 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   familyIntro: "हवे असल्यास: आई-वडील, आशीर्वाद आणि पाहुण्यांनी कोणाला फोन करावा",
   photosTitle: "आपले फोटो",
   photosIntro: "हवे असल्यास: डिझाइनमध्ये आपल्या फोटोसाठी फ्रेम आहे",
-  see: "माझे निमंत्रण पाहा",
-  nothingToPay: "आत्ता काहीही भरायचे नाही",
+  video: "व्हिडिओ",
+  cards: "कार्ड",
+  signInToTry: "व्हिडिओ आणि कार्ड बनवण्यासाठी साइन इन करा.",
   more: "आणखी पर्याय",
   moreIntro: "आपले गाणे, शब्द, उघडण्याचे दार आणि प्रश्न",
   make: "वेळ कमी आहे? आम्ही आपल्यासाठी बनवू",

@@ -7,6 +7,7 @@ import {
   fillNames,
   firstName,
   noOverflow,
+  editorBar,
   openPart,
   seeInvitation,
   tickEvents,
@@ -99,7 +100,7 @@ for (const colorScheme of ["light", "dark"] as const) {
       expect(await axeFromTop(page)).toEqual([]);
 
       // Nothing typed: what's missing is shown, the first of it opened
-      await page.getByRole("button", { name: "See my invitation" }).click();
+      await editorBar(page).click();
       await expect(page.getByText(/\d+ things need your attention/)).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect(await axeFromTop(page)).toEqual([]);
@@ -196,7 +197,7 @@ test.describe("invite editor", () => {
 
     // Only the wedding starts planned; add the sangeet too
     await tickEvents(page, "Sangeet");
-    await page.getByRole("button", { name: "See my invitation" }).click();
+    await editorBar(page).click();
     await expect(page.getByText("6 things need your attention")).toBeVisible();
     await page
       .getByRole("group", { name: "Your events" })
@@ -221,22 +222,25 @@ test.describe("invite editor", () => {
     await page.getByRole("radio", { name: /Raag Bhupali/ }).click();
     await seeInvitation(page);
 
-    const summary = page.getByRole("region", { name: "Functions" });
-    await expect(summary.getByText("Thu, 15 Oct 2026 · 6:30 pm")).toBeVisible();
-    await expect(summary.getByText("Taj Falaknuma, Hyderabad")).toBeVisible();
-    await expect(page.getByText(/Raag Bhupali/)).toBeVisible();
+    // Nothing to go on to: the design's page is the whole editor (owner, 2026-10-25)
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding$/);
     // The design itself carries the couple's names and the wedding's date and venue
     const phone = page.getByRole("img", { name: /, as guests see it$/ });
+    await page.getByRole("button", { name: "Show the Cover page" }).click();
     await expect(phone).toContainText("Aditya");
     await page.getByRole("button", { name: "Show the Wedding page" }).click();
     await expect(phone).toContainText("Taj Falaknuma, Hyderabad");
     await expect(phone).toContainText("15 October 2026");
-    // The preview has no steps any more: only the way back and Publish
-    await expect(page.getByText(/Step \d of \d/)).toHaveCount(0);
+    // The demo's sample names give way to the family's own video and cards
+    await expect(page.getByRole("link", { name: "Watch demo" })).toHaveCount(0);
+    await expect(editorBar(page)).toHaveText("Sign in to publish");
 
-    // The opening gate changes from the summary, and the summary shows the new one at once
-    const gate = page.getByRole("region", { name: "Opening gate (cover screen)" });
-    await gate.getByRole("button", { name: "Change opening gate" }).click();
+    // The opening gate changes here, and its fold shows the new one at once
+    await openPart(page, "Opening gate (cover screen)");
+    await page
+      .getByTestId("gate-summary")
+      .getByRole("button", { name: "Change opening gate" })
+      .click();
     const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
     // Owner, 2026-10-24: the picker was heavy to open. Each painted gate is now its small
     // picture, made ahead, and only the chosen gate plays, in the preview beside the list
@@ -249,24 +253,11 @@ test.describe("invite editor", () => {
     await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
     await dialog.getByRole("button", { name: "Done" }).click();
     await expect(dialog).toHaveCount(0);
-    await expect(gate).toContainText("Silk curtains");
 
     await page.reload();
-    await expect(page.getByText("Your invitation is ready")).toBeVisible();
-    await expect(page.getByRole("region", { name: "Opening gate (cover screen)" })).toContainText(
-      "Silk curtains",
-    );
-
-    // Edit on the preview opens that part on the design's page
-    await page.getByRole("button", { name: "Edit photos" }).click();
-    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding#part-photos$/);
-    await expect(page.locator("#part-photos")).toHaveAttribute("open", "");
+    await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
     await seeInvitation(page);
-
-    // A new invite starts from the designs
-    await page.getByRole("button", { name: "Start a new invite" }).click();
-    await page.getByRole("button", { name: "Clear and start again" }).click();
-    await expect(page).toHaveURL(/\/invitations$/, { timeout: 30_000 });
+    await expect(page.locator("#part-gate")).toContainText("Silk curtains");
   });
 
   test("older links into the editor open the design's page or its designs", async ({ page }) => {
@@ -622,9 +613,8 @@ test.describe("invite editor", () => {
       await addDesignPhotos(page);
       expect(await noOverflow(page)).toBe(true);
       await seeInvitation(page);
-      // Back and the way to publish share the bar
-      await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Sign in to publish" })).toBeVisible();
+      // The way to publish stays in the bar
+      await expect(editorBar(page)).toHaveText("Sign in to publish");
       expect(await noOverflow(page)).toBe(true);
       await context.close();
     }

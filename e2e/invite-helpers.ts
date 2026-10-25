@@ -105,11 +105,19 @@ export async function openPart(page: Page, title: string) {
 /** The first name's field, folded away or not. */
 export const firstName = (page: Page) => page.locator('input[data-slot="first"]');
 
-/** See my invitation: from a design's page to its preview. */
+/**
+ * The main button in the design page's bar: Publish, Share once live, or Sign in to publish.
+ * Clicked while names or dates are missing, it shows them.
+ */
+export const editorBar = (page: Page) => page.locator("[data-editor-bar]").getByRole("button");
+
+/**
+ * The details are in: the design's page, which is the whole editor (owner, 2026-10-25),
+ * offers the invitation's video and cards under the design, and Publish in its bar.
+ */
 export async function seeInvitation(page: Page) {
-  await page.getByRole("button", { name: "See my invitation" }).click();
-  await expect(page).toHaveURL(/\/create$/);
-  await expect(page.getByText("Your invitation is ready")).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("[data-try-video]")).toBeVisible({ timeout: 15_000 });
+  await expect(page.locator("[data-try-cards]")).toBeVisible();
 }
 
 /**
@@ -158,15 +166,17 @@ export async function openPublish(page: Page) {
   await expect(async () => {
     if (!(await dialog.isVisible())) {
       if (/\/edition/.test(page.url())) {
-        await page.getByRole("link", { name: "Publish your invite" }).click();
+        await page.getByRole("link", { name: "Publish your invite" }).click({ timeout: 5_000 });
       } else {
-        await page.getByRole("button", { name: "Publish" }).click();
+        // Back from the packages the dialog opens by itself, over the bar: a click that
+        // waits on the bar would wait behind it
+        await editorBar(page).click({ timeout: 5_000 });
       }
     }
     await expect(dialog).toBeVisible({ timeout: 5_000 });
   }).toPass({ timeout: 60_000 });
-  // Back from the packages, the editor reopens the invite and then the dialog, once
-  await expect(page).not.toHaveURL(/[?&]invite=/);
+  // Back from the packages, the design's page opens the dialog once, and forgets it
+  await expect(page).not.toHaveURL(/[?&]publish=1/);
   await expect(dialog).toBeVisible();
   return dialog;
 }

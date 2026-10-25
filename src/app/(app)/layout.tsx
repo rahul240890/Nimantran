@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { VideoAway } from "@/components/publish/video-away";
 import { RootHtml, rootMetadata, rootViewport } from "@/components/root-html";
 import { BUILT_PRICING } from "@/lib/plans/design-defaults";
 import { getLocale } from "@/i18n/server";
@@ -16,6 +17,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <RootHtml locale={await getLocale()} pricing={BUILT_PRICING}>
       {children}
+      {/* A video being made carries on, and shows, on the app's other pages */}
+      <VideoAway />
     </RootHtml>
   );
 }

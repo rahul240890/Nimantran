@@ -27,6 +27,8 @@ export const publishCopy = {
   cancel: "Not yet",
   close: "Close",
   failed: "Couldn't publish. Check your connection and try again.",
+  /** Opening the video or the cards from the editor, which saves first. */
+  saveFailed: "Couldn't save just now. Check your connection and try again.",
   notReady: "Some steps still need finishing before this can go out.",
   published: "Your invitation is live",
 } as const;
@@ -343,6 +345,10 @@ export const videoCopy = {
   stop: "Stop",
   stopped: "Video stopped",
   ready: "Your video is ready",
+  /** While it's made, and once made, on the editor's other pages. */
+  keepsGoing: "Leave this page if you like: it keeps going.",
+  watch: "Watch",
+  hideAway: "Hide",
   changed:
     "Your invitation has changed since this video was made. Make it again to include the changes.",
   finishing: "Finishing the video you made, so it ends on your invitation's link.",
