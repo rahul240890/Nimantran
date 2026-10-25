@@ -909,6 +909,7 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
 export const studioCopy: Translation<typeof en.studioCopy> = {
   pagesHint: "आपण जे पान भरत आहात, ते टाइप करतानाच इथे दिसते.",
   pageNames: {
+    gate: "प्रवेशद्वार",
     blessing: "आशीर्वाद",
     cover: "मुखपृष्ठ",
     couple: "फोटो",

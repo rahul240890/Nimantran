@@ -956,6 +956,7 @@ export const suiteCopy = {
 export const studioCopy = {
   pagesHint: "The page you're editing comes up here as you type.",
   pageNames: {
+    gate: "Gate",
     blessing: "Blessing",
     cover: "Cover",
     couple: "Photo",

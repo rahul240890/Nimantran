@@ -1,8 +1,11 @@
 "use client";
 
-import { useDeferredValue, useMemo, useState } from "react";
-import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
+import { DoorOpen } from "lucide-react";
+import { useDeferredValue, useMemo } from "react";
+import { OpeningPreview } from "@/components/guest/opening/opening";
+import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
+import { guestText } from "@/i18n/copy/guest";
 import { storyBeats } from "@/lib/engine/story";
 import {
   cardFunctions,
@@ -17,7 +20,10 @@ import { editorText } from "@/i18n/copy/editor";
 import {
   cardLanguages,
   draftCopy,
+  draftOpeningGod,
+  draftOpeningStyle,
   draftTemplate,
+  mainFunction,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -27,7 +33,11 @@ import { applyPages, type DraftPages } from "@/lib/editor/pages";
 import { pageType, type PageType } from "@/lib/editor/type";
 import { OneScene } from "@/components/invitation/scene/one-scene";
 import { scenePage } from "@/lib/suites/scene";
-import { PagePreview } from "./page-preview";
+import type { OpeningStyle } from "@/lib/opening/catalog";
+import { startsAt } from "@/lib/publish/countdown";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { useBeat } from "./opening-picker";
+import { PagePreview, pageChip } from "./page-preview";
 import { AiWording } from "./ai-wording";
 import { AI_SHOWN } from "@/lib/ai/shown";
 import { PageWords } from "./page-words";
@@ -36,6 +46,9 @@ import type { StepProps } from "./steps/types";
 import { useCouplePhotos } from "./use-couple-photos";
 import { useClipUrl } from "./use-photo-urls";
 import { withClip } from "@/lib/editor/music-clip";
+
+/** The opening gate's place in the preview, before the pages. */
+export const GATE_PAGE = "gate";
 
 type PreviewStageProps = {
   draft: InviteDraft;
@@ -46,13 +59,17 @@ type PreviewStageProps = {
   update?: StepProps["update"];
   /** Only the phone showing the page being edited: the floating live preview on phones. */
   mini?: boolean;
+  /** Opens the gate's chooser, from the gate shown in the phone. */
+  onGate?: () => void;
   className?: string;
 };
 
 /**
  * The live invitation beside the form, as the design itself: the Scene's one painting or
- * the Story's pages, never a stand-in card. Typing is never held up by it: the words reach
- * it as a deferred value, and it only repaints when they actually change.
+ * the Story's pages, never a stand-in card, led by the opening gate as guests first meet it
+ * (owner, 2026-10-25). It is in the card's one language: a second is no longer offered, so
+ * one left on an older invite isn't switched to here. Typing is never held up by it: the
+ * words reach it as a deferred value, and it only repaints when they actually change.
  */
 export function PreviewStage({
   draft,
@@ -60,18 +77,15 @@ export function PreviewStage({
   onPage,
   update,
   mini = false,
+  onGate,
   className,
 }: PreviewStageProps) {
-  const { coupleCopy, studioCopy, functionCopy } = useText(editorText);
+  const { studioCopy, functionCopy, openingCopy } = useText(editorText);
   const pageName = (id: string) =>
     id.startsWith("fn-")
       ? functionCopy[id.slice(3) as FunctionId].name
       : (studioCopy.pageNames[id as keyof typeof studioCopy.pageNames] ?? id);
-  const languages = cardLanguages(draft);
-  const [chosen, setChosen] = useState<CardLanguage | null>(null);
-  const language = chosen && languages.includes(chosen) ? chosen : languages[0];
-  const key = JSON.stringify(draftCopy(draft, language));
-  const copy = useMemo(() => JSON.parse(key) as CardCopy, [key]);
+  const { language, copy } = useCardCopy(draft);
   const deferredCopy = useDeferredValue(copy);
 
   // The pages guests will see, without the reply button (there is no form here); here they
@@ -83,31 +97,87 @@ export function PreviewStage({
   const familyKey = JSON.stringify(storyFamily(draft, language));
   const suite = draftSuite(draft);
   const { textBox } = draft;
-  const typeKey = JSON.stringify(pageType(draft.type, [language]));
-  const type = useMemo(() => JSON.parse(typeKey) as PageType, [typeKey]);
+  const type = usePageType(draft, language);
   const couple = useCouplePhotos(draft, deferredCopy);
+  // The gate guests open first
+  const gateStyle = draftOpeningStyle(draft, suite, draftShowsScene(draft));
+  const atGate = gateStyle !== "none" && page === GATE_PAGE;
+  const lead =
+    gateStyle === "none"
+      ? undefined
+      : {
+          id: GATE_PAGE,
+          name: pageName(GATE_PAGE),
+          screen: (
+            <GateScreen
+              draft={draft}
+              style={gateStyle}
+              copy={deferredCopy}
+              language={language}
+              type={type}
+            />
+          ),
+        };
+  // The gate's own tool, in the row under the phone while it shows
+  const gateTool = onGate && (
+    <Button
+      variant="secondary"
+      size="sm"
+      onClick={onGate}
+      aria-label={openingCopy.change}
+      className="shrink-0"
+    >
+      <DoorOpen aria-hidden />
+      <span className="max-sm:sr-only">{openingCopy.change}</span>
+    </Button>
+  );
   const blessing = draftBlessing(draft);
   // One Scene (pilot): the whole invitation on one painting instead of the pages
   const scenePhotos = useCouplePhotos(draft, deferredCopy, true);
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
   const sceneView = scene && (
-    <div className={cn("flex min-h-0 flex-col items-center", mini ? className : "flex-1")}>
+    <div className={cn("flex min-h-0 flex-col items-center gap-3", mini ? className : "flex-1")}>
       <div className="relative isolate aspect-[9/19] h-full max-h-full min-h-0 max-w-full overflow-hidden rounded-[2.2rem] border-[6px] border-night bg-night shadow-overlay">
-        <OneScene
-          suite={suite}
-          page={scene}
-          copy={deferredCopy}
-          lang={language}
-          functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
-          photos={scenePhotos}
-          reply={null}
-          type={type}
-          framed
-          miniature
-          still={mini}
-          focus={page.startsWith("fn-") ? page.slice(3) : null}
-        />
+        {atGate && lead ? (
+          lead.screen
+        ) : (
+          <OneScene
+            suite={suite}
+            page={scene}
+            copy={deferredCopy}
+            lang={language}
+            functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
+            photos={scenePhotos}
+            reply={null}
+            type={type}
+            framed
+            miniature
+            still={mini}
+            focus={page.startsWith("fn-") ? page.slice(3) : null}
+          />
+        )}
       </div>
+      {/* The gate, then the one painting behind it */}
+      {!mini && lead && (
+        <div className="flex shrink-0 items-center justify-center gap-2">
+          <ul aria-label={studioCopy.pageList} className="flex gap-1.5 px-1 py-1">
+            {[lead.id, "cover"].map((id) => (
+              <li key={id} className="shrink-0">
+                <button
+                  type="button"
+                  aria-pressed={atGate === (id === GATE_PAGE)}
+                  aria-label={studioCopy.showPage(pageName(id === GATE_PAGE ? id : "invite"))}
+                  onClick={() => onPage(id)}
+                  className={pageChip(atGate === (id === GATE_PAGE))}
+                >
+                  {pageName(id === GATE_PAGE ? id : "invite")}
+                </button>
+              </li>
+            ))}
+          </ul>
+          {atGate && gateTool}
+        </div>
+      )}
     </div>
   );
   // The pages as the invite writes them, then with the host's own words and placement
@@ -171,6 +241,7 @@ export function PreviewStage({
         page={page}
         onPage={onPage}
         list={false}
+        lead={lead}
         className={className}
       />
     );
@@ -192,16 +263,6 @@ export function PreviewStage({
             "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 30%, transparent), color-mix(in srgb, var(--rose) 8%, transparent) 60%, transparent)",
         }}
       />
-      {languages.length > 1 && (
-        <div className="flex shrink-0 flex-wrap items-center justify-center gap-2 pb-3">
-          <CardLanguageToggle
-            label={coupleCopy.languagesHeading}
-            languages={languages}
-            value={language}
-            onValueChange={setChosen}
-          />
-        </div>
-      )}
       {sceneView ?? (
         <PagePreview
           beats={listed}
@@ -214,38 +275,91 @@ export function PreviewStage({
           page={page}
           onPage={onPage}
           hidden={hidden}
+          lead={lead}
           className="min-h-0 flex-1"
         >
-          {update && listed[shownIndex] && written[shownIndex] && (
-            <div className="flex shrink-0 flex-wrap justify-center gap-2">
-              <PageWords
-                draft={draft}
-                update={update}
-                written={
-                  written.find((b) => b.id === listed[shownIndex]!.id) ?? written[shownIndex]!
-                }
-                shown={listed[shownIndex]!}
-                language={language}
-                copy={deferredCopy}
-                template={template}
-                suite={suite}
-                textBox={textBox}
-                type={type}
-              />
-              {AI_SHOWN && (
-                <AiWording
-                  draft={draft}
-                  update={update}
-                  beats={beats}
-                  page={listed[shownIndex]!}
-                  pageName={pageName(listed[shownIndex]!.id)}
-                  language={language}
-                />
+          {atGate
+            ? gateTool
+            : update &&
+              listed[shownIndex] &&
+              written[shownIndex] && (
+                <div className="flex shrink-0 flex-wrap justify-center gap-2">
+                  <PageWords
+                    draft={draft}
+                    update={update}
+                    written={
+                      written.find((b) => b.id === listed[shownIndex]!.id) ?? written[shownIndex]!
+                    }
+                    shown={listed[shownIndex]!}
+                    language={language}
+                    copy={deferredCopy}
+                    template={template}
+                    suite={suite}
+                    textBox={textBox}
+                    type={type}
+                  />
+                  {AI_SHOWN && (
+                    <AiWording
+                      draft={draft}
+                      update={update}
+                      beats={beats}
+                      page={listed[shownIndex]!}
+                      pageName={pageName(listed[shownIndex]!.id)}
+                      language={language}
+                    />
+                  )}
+                </div>
               )}
-            </div>
-          )}
         </PagePreview>
       )}
     </div>
   );
+}
+
+/** The opening gate in the phone, playing its move over and over while it shows. */
+function GateScreen({
+  draft,
+  style,
+  copy,
+  language,
+  type,
+}: {
+  draft: InviteDraft;
+  style: Exclude<OpeningStyle, "none">;
+  copy: CardCopy;
+  language: CardLanguage;
+  type: PageType;
+}) {
+  const open = useBeat(!useReducedMotion());
+  const mainKind = mainFunction(draft);
+  const date = mainKind ? draft.functions[mainKind].date : "";
+  const at = mainKind ? startsAt(date, draft.functions[mainKind].time) : null;
+  const { doorway } = guestText[language].guestCopy;
+  return (
+    <OpeningPreview
+      suite={draftSuite(draft)}
+      style={style}
+      god={draftOpeningGod(draft)}
+      copy={copy}
+      lang={language}
+      type={type}
+      main={at === null ? null : { date, at }}
+      open={open}
+      words={{ counting: doorway.counting, open: doorway.open }}
+    />
+  );
+}
+
+/** The card's words in its one language, the same object until they change. */
+function useCardCopy(draft: InviteDraft): { language: CardLanguage; copy: CardCopy } {
+  const language = cardLanguages(draft)[0];
+  const key = JSON.stringify(draftCopy(draft, language));
+  const copy = useMemo(() => JSON.parse(key) as CardCopy, [key]);
+  return { language, copy };
+}
+
+/** The pages' lettering for the card's language, the same object until it changes. */
+function usePageType(draft: InviteDraft, language: CardLanguage): PageType {
+  const key = JSON.stringify(pageType(draft.type, [language]));
+  return useMemo(() => JSON.parse(key) as PageType, [key]);
 }
