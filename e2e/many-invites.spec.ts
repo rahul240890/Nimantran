@@ -1,5 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
-import { axe, firstName, noOverflow, numberFor, publish, writeInvite } from "./invite-helpers";
+import {
+  axe,
+  firstName,
+  noOverflow,
+  numberFor,
+  openPart,
+  publish,
+  writeInvite,
+} from "./invite-helpers";
 
 /*
  * Many invitations (owner, 2026-10-25): another design picked under a live invite's page
@@ -96,5 +104,56 @@ test.describe("many invitations", () => {
     await expect(page.getByRole("button", { name: "See it as your guests will" })).toBeVisible();
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
+  });
+
+  test("a live invite left holding a refused change opens from My invites to edit, gate and preview", async ({
+    page,
+  }, info) => {
+    const id = await paidLiveInvite(page, numberFor(info), ["Riya", "Arjun"]);
+    const choice = await pickAnotherDesign(page, id);
+    await choice.getByRole("button", { name: /^Your live invitation/ }).click();
+    await expect(page.locator("[data-held-back]")).toBeVisible({ timeout: 30_000 });
+
+    // Later, from My invites: the live one opens as guests have it, and edits save
+    await page.goto("/invites");
+    await page
+      .getByRole("article")
+      .filter({ hasText: "Published" })
+      .getByRole("link", { name: /Continue/ })
+      .click();
+    await expect(page).toHaveURL(new RegExp(`/create/rajwada-bagh\\?.*invite=${id}`), {
+      timeout: 30_000,
+    });
+    await expect(page.getByText(/now a draft of its own/).first()).toBeVisible();
+    await expect(page.locator("[data-held-back]")).toHaveCount(0);
+    await openPart(page, "Names");
+    await firstName(page).fill("Riyaa");
+
+    // A new gate, then Preview: the guests' own view, with that gate
+    await openPart(page, "Opening gate (cover screen)");
+    await page
+      .getByTestId("gate-summary")
+      .getByRole("button", { name: "Change opening gate" })
+      .click();
+    const gates = page.getByRole("dialog", { name: "Choose your opening gate" });
+    await gates.getByRole("button", { name: "Curtains and reveals" }).click();
+    await gates.getByRole("radio", { name: /^Silk curtains/ }).click();
+    await gates.getByRole("button", { name: "Done" }).click();
+    await expect(page.locator("[data-held-back]")).toHaveCount(0);
+    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/invites/${id}/preview\\?from=design$`), {
+      timeout: 30_000,
+    });
+    const guest = info.project.name.startsWith("phone")
+      ? page
+      : page.frameLocator('[data-testid="host-preview-phone"]');
+    await expect(guest.locator("[data-opening]").first()).toHaveAttribute(
+      "data-opening",
+      "curtain",
+      { timeout: 15_000 },
+    );
+    await expect(guest.getByText("Riyaa").first()).toBeVisible();
+    await page.goto("/invites");
+    await expect(page.getByRole("heading", { name: /^Riyaa? & Arjun$/ })).toHaveCount(2);
   });
 });

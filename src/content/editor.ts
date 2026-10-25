@@ -78,6 +78,8 @@ export const syncCopy = {
   offline: "Saved on this device, retrying",
   "needs-plan": "Not live yet: needs a package",
   missing: "That invite isn't in your account. It may have been deleted.",
+  setAside:
+    "Your change to another design is now a draft of its own in My invites. This one opens as your guests see it.",
   switchFailed: "Couldn't save the invite that's open, so it stays open. Try again in a moment.",
 } as const;
 

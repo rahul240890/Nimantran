@@ -184,10 +184,12 @@ export function QuickStart({
     async function arrive() {
       if (missing) toast({ title: syncCopy.missing, tone: "error" });
       // The invite opened from the account replaces the one open, which is saved first
-      if (initialInvite && !(await switchDraft(initialInvite, { signedIn }))) {
+      const switched = initialInvite ? await switchDraft(initialInvite, { signedIn }) : true;
+      if (!switched) {
         toast({ title: syncCopy.switchFailed, tone: "error" });
         return;
       }
+      if (switched === "set-aside") toast({ title: syncCopy.setAside, tone: "success" });
       // Back on a page whose design the invite already has (a reload, or back from the
       // preview), what the family changed since stays: the address's faith or tradition
       // isn't applied again
