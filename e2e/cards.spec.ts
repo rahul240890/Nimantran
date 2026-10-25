@@ -59,6 +59,9 @@ test.describe("save-the-date and thank-you cards", () => {
     );
     await expect(page.getByText("Drawing your card…")).toHaveCount(0, { timeout: 30_000 });
     expect(await drawn(page, thankYou)).toBe(true);
+    // As above: the buttons wait for the card and ease their colours back, so read them after
+    await expect(page.getByRole("button", { name: "Download picture" })).toBeEnabled();
+    await page.waitForTimeout(300);
     expect((await axe(page).analyze()).violations).toEqual([]);
 
     const shots = process.env.CARD_SHOTS;
