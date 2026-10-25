@@ -9,45 +9,39 @@ import { suiteImage } from "@/lib/gallery/catalog";
 import { DEMO_PATH } from "@/lib/sample/paths";
 import { pagePath } from "@/lib/seo/paths";
 import type { SuiteId } from "@/lib/suites/catalog";
-import { HomeFlow, type FlowCopy } from "./home-flow";
+import { HomeFeatures, type FeaturesCopy } from "./home-features";
 
-/** The covers on the phone's first screen; the second is the one chosen and filled in. */
-const FLOW_SUITES = [
-  "kayal",
-  "rajwada-bagh",
-  "noor-bagh",
-  "rajbari",
-  "shahi-savari",
-  "peshwai-wada",
-] as const satisfies readonly SuiteId[];
+/** The design most of the phone's screens show. */
+const FEATURE_SUITE: SuiteId = "rajwada-bagh";
 
 /** The phone's words in the page's language, as plain strings for the browser. */
-function flowCopy(locale: UiLocale): FlowCopy {
-  const { homeFlow } = landingText[locale];
+function featuresCopy(locale: UiLocale): FeaturesCopy {
+  const { homeFeatures } = landingText[locale];
   // The phone's counts are worked out here: the browser gets only their words
-  const { people, tally, guests, ...words } = homeFlow.phone;
+  const { people, added, guests, brideName, groomName, joiner, ...words } = homeFeatures.phone;
   const counts = [4, 2, 2];
+  const total = homeFeatures.features.length;
   return {
-    heading: homeFlow.heading,
-    pause: homeFlow.pause,
-    play: homeFlow.play,
-    steps: homeFlow.steps.map((step, index) => ({
-      ...step,
-      label: homeFlow.stepOf(index + 1, homeFlow.steps.length),
+    heading: homeFeatures.heading,
+    pause: homeFeatures.pause,
+    play: homeFeatures.play,
+    features: homeFeatures.features.map((feature, index) => ({
+      ...feature,
+      label: homeFeatures.of(index + 1, total),
     })),
     phone: {
       ...words,
-      cardLang: locale === "en" ? "hi" : undefined,
+      names: `${brideName} ${joiner} ${groomName}`,
       guests: guests.map((name, index) => ({ name, people: people(counts[index]!) })),
-      tally: tally(counts.reduce((sum, count) => sum + count, 0)),
+      added: added(counts.reduce((sum, count) => sum + count, 0)),
     },
   };
 }
 
 /**
  * The first screen: what Shubh Invitation is, its two ways in (start free, or open a live
- * invitation), and a phone beside them that plays the whole journey, from choosing a design
- * to the guests' replies, so a family sees in a few seconds how it works.
+ * invitation), a phone beside them that shows what Shubh gives a family one feature at a
+ * time, and every feature in one row beneath (owner, 2026-10-25: features, not steps).
  */
 export function Hero({ locale }: { locale: UiLocale }) {
   const { hero, shell } = landingText[locale];
@@ -67,7 +61,7 @@ export function Hero({ locale }: { locale: UiLocale }) {
           className="object-cover object-[78%_center] opacity-15 xl:object-right xl:opacity-40 dark:opacity-10 xl:dark:opacity-25"
         />
       </div>
-      <div className="mx-auto grid w-full max-w-site items-center gap-10 px-4 pt-8 pb-12 sm:px-6 sm:pt-12 lg:px-8 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-14 xl:pt-10 xl:pb-14">
+      <div className="mx-auto grid w-full max-w-site items-center gap-10 px-4 pt-8 pb-12 sm:px-6 sm:pt-12 lg:px-8 xl:grid-cols-[minmax(0,1fr)_auto] xl:gap-x-14 xl:gap-y-10 xl:pt-10 xl:pb-14">
         <div className="flex min-w-0 animate-rise flex-col gap-5 max-xl:mx-auto max-xl:max-w-2xl max-xl:items-center max-xl:text-center sm:gap-6">
           <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
             {hero.eyebrow}
@@ -104,9 +98,10 @@ export function Hero({ locale }: { locale: UiLocale }) {
           </ul>
           <TrustLine className="max-xl:justify-center" />
         </div>
-        <HomeFlow
-          copy={flowCopy(locale)}
-          pictures={FLOW_SUITES.map((suite) => suiteImage(suite, "cover") ?? "")}
+        <HomeFeatures
+          copy={featuresCopy(locale)}
+          picture={suiteImage(FEATURE_SUITE, "cover") ?? ""}
+          locale={locale}
         />
       </div>
     </section>

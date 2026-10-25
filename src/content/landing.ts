@@ -90,51 +90,78 @@ export const hero = {
 } as const;
 
 /**
- * The first screen's phone, which plays an invitation from its design to a guest's reply,
- * and the steps beside it. The words in the phone are pictures of the app (hidden from
- * screen readers); the steps say the same in full.
+ * The first screen's phone (home-features.tsx): what Shubh gives a family, one feature at a
+ * time, in the owner's order (2026-10-25). Each feature's `id` picks its screen and sign.
  */
-export const homeFlow = {
-  heading: "How it works",
-  stepOf: (step: number, total: number) => `Step ${step} of ${total}`,
+export const homeFeatures = {
+  heading: "What you get with Shubh",
+  of: (index: number, total: number) => `${index} of ${total}`,
   pause: "Pause",
   play: "Play",
-  steps: [
-    { title: "Choose a design", body: "Painted for every occasion and tradition." },
-    { title: "Add your details", body: "Names, dates and venues, in your own language." },
-    { title: "See it come alive", body: "Its doors open, music plays, its pages unfold." },
+  features: [
     {
-      title: "Add your guests",
-      body: "From your contacts, an Excel sheet or a photo of your list.",
+      id: "free",
+      title: "Make it free, pay later",
+      body: "Make the whole invitation free, video included, and pay only when you send it.",
     },
-    { title: "Send on WhatsApp", body: "A message for each guest, and a video for your Status." },
-    { title: "Guests reply in a tap", body: "See who is coming, and how many, as it happens." },
-  ],
+    {
+      id: "link",
+      title: "One link to share",
+      body: "Every function, with its map and replies, on one page that opens in a tap.",
+    },
+    {
+      id: "video",
+      title: "Ready-made invitation videos",
+      body: "A full-HD video of your invitation for WhatsApp Status, Reels and Stories.",
+    },
+    {
+      id: "language",
+      title: "In your language",
+      body: "English, Hindi, Marathi, Gujarati, Bengali or Tamil, or two on one card.",
+    },
+    {
+      id: "music",
+      title: "Your music in invitations and videos",
+      body: "A tune chosen for your design, or your own song, in both.",
+    },
+    {
+      id: "contacts",
+      title: "Import contacts in a minute with AI",
+      body: "From your phone or Excel, or a photo of a handwritten list that AI reads.",
+    },
+    {
+      id: "photos",
+      title: "Your photos, beautifully framed",
+      body: "Your pictures set in frames painted to match your design.",
+    },
+  ] as const,
   phone: {
-    designs: "Wedding designs",
-    use: "Use this design",
-    bride: "Bride",
-    groom: "Groom",
-    date: "Wedding date",
     brideName: "Meera",
     groomName: "Aarav",
     joiner: "&",
     dateValue: "Sat, 12 Dec",
+    free: "Free",
+    included: ["Design", "Video", "Music"],
+    zero: "₹0",
+    payLater: "Pay when you send",
+    link: "shubhinvitations.com/i/meera-aarav",
+    events: ["Haldi · Fri 11 Dec", "Sangeet · Fri 11 Dec", "Wedding · Sat 12 Dec"],
+    share: "Share on WhatsApp",
+    hd: "Full HD",
+    status: "Status · Reels · Stories",
     cardLanguage: "Card language",
-    languages: ["English", "हिंदी"],
-    open: "Open the invitation",
+    twoLanguages: "Two languages on one card",
+    music: "Music",
+    upload: "Add your song",
+    song: "Your song",
+    inInvite: "In the invitation",
+    inVideo: "In the video",
     addGuests: "Add guests",
-    sources: ["Contacts", "Excel", "Photo of list"],
+    reading: "AI is reading your list",
     guests: ["Sharma family", "Mehta ji", "Priya and Rohan"],
-    chat: "Sharma family",
-    message: "Namaste Sharma ji 🙏 Please join us for Meera and Aarav's wedding.",
-    linkTitle: "Meera & Aarav · Wedding",
-    video: "Video for Status",
-    replies: "Who's coming",
-    coming: "Coming",
-    wish: "Congratulations! We'll be there 🎉",
     people: (count: number) => `${count} guests`,
-    tally: (count: number) => `${count} coming`,
+    added: (count: number) => `${count} guests added`,
+    photos: "Your photos",
   },
 };
 
