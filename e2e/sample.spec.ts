@@ -209,3 +209,27 @@ test.describe("a painting on a slow connection", () => {
     });
   });
 });
+
+test.describe("names typed letter by letter", () => {
+  // Motion on: the names arrive one letter at a time
+  test.use({ reducedMotion: "no-preference" });
+
+  test("every letter of both names stays shown once typed in", async ({ page }) => {
+    // Dak Tikat's scene types its names in; "Sia" began at a delay the browser ended a hair
+    // short of 100%, so its letters never switched on
+    test.setTimeout(90_000);
+    await page.goto("/sample/dak-tikat");
+    await page.getByRole("button", { name: "Open the invitation" }).click();
+    const letters = page.locator(".reveal-name-type .reveal-letter");
+    await expect(page.locator('.reveal-name-type[data-part="second"]')).toBeAttached({
+      timeout: 30_000,
+    });
+    // Once every letter's animation is over, each is fully shown
+    const shown = await letters.evaluateAll(async (all) => {
+      await Promise.all(all.flatMap((letter) => letter.getAnimations().map((a) => a.finished)));
+      return all.map((letter) => `${letter.textContent}:${getComputedStyle(letter).opacity}`);
+    });
+    expect(shown.length).toBeGreaterThan(5);
+    expect(shown.filter((letter) => !letter.endsWith(":1"))).toEqual([]);
+  });
+});
