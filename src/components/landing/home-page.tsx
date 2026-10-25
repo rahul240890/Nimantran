@@ -19,8 +19,8 @@ import { application, faqPage, organization, website } from "@/lib/seo/structure
 
 /**
  * The landing page in one site language; / and /hi render it. Kept to what helps a family
- * decide quickly: a phone that shows how it works beside Start free, why Shubh, the occasions, rows of
- * designs, two ways on for a family short of time, then the questions families ask.
+ * decide quickly: a phone that shows how it works beside Start free, the occasions, rows of
+ * designs, why Shubh, two ways on for a family short of time, then the questions families ask.
  */
 export function HomePage({ locale }: { locale: UiLocale }) {
   const { faq, homeMeta } = landingText[locale];
@@ -32,9 +32,9 @@ export function HomePage({ locale }: { locale: UiLocale }) {
         <OfferBar />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale} />
-          <HomeWhy locale={locale} />
           <HomeOccasions locale={locale} />
           <HomeDesigns locale={locale} />
+          <HomeWhy locale={locale} />
           <HomeHelp locale={locale} />
           <HomeReviews />
           <HomeOffers locale={locale} />
