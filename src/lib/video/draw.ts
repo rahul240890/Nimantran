@@ -26,6 +26,17 @@ import { photoPlacement, type PhotoFit } from "@/lib/editor/photo-fit";
 import type { CardCopy } from "@/lib/templates/content";
 import type { StockRole } from "@/lib/templates/schema";
 import {
+  NAME_WRITE,
+  clipTurn,
+  drawTurnEdge,
+  glowAfter,
+  photoDrift,
+  turnAlpha,
+  turnFor,
+  writtenFor,
+} from "./motion";
+import {
+  LINES_START,
   lineProgress,
   pagesAt,
   VIDEO_HEIGHT,
@@ -107,7 +118,23 @@ export function drawFrame(ctx: CanvasRenderingContext2D, scene: VideoScene, seco
   if (previous !== null) drawPage(ctx, scene, scene.timeline.beats[previous]!, seconds, 1);
   if (current === "end") {
     drawEnding(ctx, scene, seconds - scene.timeline.end, previous === null ? 1 : fade);
-  } else drawPage(ctx, scene, scene.timeline.beats[current]!, seconds, fade);
+    return;
+  }
+  const entry = scene.timeline.beats[current]!;
+  if (previous === null) {
+    drawPage(ctx, scene, entry, seconds, fade);
+    return;
+  }
+  // The next page comes in its own way: through parting doors, a sweep of light, a gust
+  // of petals or an opening circle, taking turns down the story
+  const turn = turnFor(current);
+  const p = 1 - (1 - fade) ** 2;
+  ctx.save();
+  clipTurn(ctx, turn, p, PAGE_W, PAGE_H);
+  drawPage(ctx, scene, entry, seconds, turnAlpha(turn, p));
+  ctx.restore();
+  const colours = scene.palette(pageLook(entry.beat.scene).mood, null);
+  drawTurnEdge(ctx, turn, p, PAGE_W, PAGE_H, colours);
 }
 
 function drawPage(
@@ -139,20 +166,25 @@ function drawPage(
     zoomAbout(ctx, zoom);
     ctx.fillStyle = colours.paper;
     ctx.fillRect(0, 0, PAGE_W, PAGE_H);
-    // Couple photos lie under the painting and show through its cut-out frames
+    // Couple photos lie under the painting and show through its cut-out frames, each
+    // drifting slowly closer in its frame through the page
     frames?.frames.forEach((box, i) => {
       const photo = beat.photos?.[i] && scene.images.get(beat.photos[i]!.src);
       if (!photo) return;
       const [x, y, w, h] = photoBox(box);
-      drawFittedPhoto(
-        ctx,
-        photo,
-        (x / 100) * PAGE_W,
-        (y / 100) * PAGE_H,
-        (w / 100) * PAGE_W,
-        (h / 100) * PAGE_H,
-        beat.photos?.[i]?.fit,
-      );
+      const at = {
+        x: (x / 100) * PAGE_W,
+        y: (y / 100) * PAGE_H,
+        w: (w / 100) * PAGE_W,
+        h: (h / 100) * PAGE_H,
+      };
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(at.x, at.y, at.w, at.h);
+      ctx.clip();
+      photoDrift(ctx, at, progress, i);
+      drawFittedPhoto(ctx, photo, at.x, at.y, at.w, at.h, beat.photos?.[i]?.fit);
+      ctx.restore();
     });
     fillWith(ctx, painting, 0, 0, PAGE_W, PAGE_H);
     ctx.restore();
@@ -315,6 +347,8 @@ type Placed = {
   space: number;
   rule?: boolean;
   mark?: boolean;
+  /** The couple's names, which write themselves in rather than rise. */
+  name?: boolean;
 };
 
 function styleOf(
@@ -465,6 +499,7 @@ function drawWords(
           fit,
         rule: index === rule,
         mark: index === mark,
+        name,
       });
     }
     height = placed.reduce((sum, item) => sum + item.space + item.height, 0) + padY * 2;
@@ -528,7 +563,9 @@ function drawWords(
       const em = Math.min(1.35 * REM, Math.max(REM, 4 * cq)) * fit;
       drawPlaceMark(ctx, x, y - item.space / 2, em, colours.goldText, 1 - (1 - p) ** 3);
     }
-    if (p > 0) {
+    if (item.name && item.kind === "text") {
+      drawName(ctx, item, x, y, entry, index, seconds, colours, printed);
+    } else if (p > 0) {
       const eased = 1 - (1 - p) ** 3;
       ctx.save();
       ctx.globalAlpha *= eased;
@@ -555,6 +592,64 @@ function drawWords(
     }
     y += item.height;
   });
+}
+
+/**
+ * The couple's names writing themselves in, left to right and line by line, a spark of
+ * gold light at the pen's tip; once written, a glow swells round them and settles.
+ */
+function drawName(
+  ctx: CanvasRenderingContext2D,
+  item: Placed,
+  x: number,
+  y: number,
+  entry: VideoBeat,
+  index: number,
+  seconds: number,
+  colours: Palette,
+  printed: boolean,
+) {
+  const begun = seconds - entry.start - LINES_START - index * entry.stagger;
+  // As long as the page allows, so the names are always written before it changes
+  const writing = Math.min(NAME_WRITE, Math.max(0.6, entry.seconds * 0.4));
+  const p = Math.max(0, Math.min(1, begun / writing));
+  if (p <= 0) return;
+  const glow = glowAfter(begun - writing);
+  ctx.save();
+  ctx.font = item.font;
+  ctx.letterSpacing = `${item.spacing}px`;
+  ctx.fillStyle = item.colour;
+  item.lines.forEach((text, i) => {
+    const done = writtenFor(1 - (1 - p) ** 2, i, item.lines.length);
+    if (done <= 0) return;
+    const width = ctx.measureText(text).width;
+    const lineY = y + item.size * item.lineHeight * (i + 0.5);
+    const from = x - width / 2 - item.size * 0.3;
+    const reach = from + (width + item.size * 0.6) * done;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(from, lineY - item.size, reach - from, item.size * 2);
+    ctx.clip();
+    if (printed || glow > 0) {
+      ctx.shadowColor = printed && glow === 0 ? colours.glow : colours.gold;
+      ctx.shadowBlur = item.size * (printed ? 0.6 : 0) + item.size * 0.7 * glow;
+    }
+    ctx.fillText(text, x + item.spacing / 2, lineY);
+    if (printed) ctx.fillText(text, x + item.spacing / 2, lineY);
+    ctx.restore();
+    if (done < 1) {
+      // The pen's tip: a small gold spark where the writing has reached
+      const spark = ctx.createRadialGradient(reach, lineY, 0, reach, lineY, item.size * 0.45);
+      spark.addColorStop(0, withAlpha(colours.glow, 0.95));
+      spark.addColorStop(0.4, withAlpha(colours.gold, 0.5));
+      spark.addColorStop(1, withAlpha(colours.gold, 0));
+      ctx.save();
+      ctx.fillStyle = spark;
+      ctx.fillRect(reach - item.size, lineY - item.size, item.size * 2, item.size * 2);
+      ctx.restore();
+    }
+  });
+  ctx.restore();
 }
 
 /**
