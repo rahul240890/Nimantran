@@ -1,0 +1,204 @@
+/*
+ * The home page's phone (home-features.tsx): each feature's screen plays these once as it is
+ * shown. Every element rests in its final state, so still mode (animation: none) shows each
+ * screen complete; the animations only bring it there. A feature's screen is shown with
+ * display, so its animations start again each time it comes round.
+ */
+
+.flow-screen [data-flow] {
+  animation-duration: 0.55s;
+  animation-timing-function: var(--ease-out-expo);
+  animation-fill-mode: both;
+  animation-delay: var(--d, 0s);
+}
+
+.flow-screen [data-flow="rise"] {
+  animation-name: flow-rise;
+}
+.flow-screen [data-flow="pop"] {
+  animation-name: flow-pop;
+}
+/* jump-none reaches the whole line on its last step, not at exactly 100%, which the
+   browser can miss by a hair and leave the line cut short (as reveals.css explains) */
+.flow-screen [data-flow="type"] {
+  animation-name: flow-type;
+  animation-duration: 1s;
+  animation-timing-function: steps(12, jump-none);
+}
+/* A finger's tap: unseen before and after, so no fill */
+.flow-screen [data-flow="tap"] {
+  animation-name: flow-tap;
+  animation-duration: 0.7s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: none;
+}
+.flow-screen [data-flow="chip"] {
+  animation-name: flow-chip;
+  animation-duration: 0.3s;
+}
+/* A switch turning on: its track takes colour as its knob slides across */
+.flow-screen [data-flow="switch"] {
+  animation-name: flow-switch;
+  animation-duration: 0.3s;
+}
+.flow-screen [data-flow="knob"] {
+  animation-name: flow-knob;
+  animation-duration: 0.3s;
+}
+/* The video's painting drifts closer the whole time it shows, and its bar fills */
+.flow-screen [data-flow="zoom"] {
+  animation-name: flow-zoom;
+  animation-duration: var(--flow-step, 3.6s);
+  animation-timing-function: linear;
+}
+.flow-screen [data-flow="played"] {
+  animation-name: flow-played;
+  animation-duration: var(--flow-step, 3.6s);
+  animation-timing-function: linear;
+}
+/* The couple's names in one language after another; each but the last is unseen at rest */
+.flow-screen [data-flow="word"] {
+  animation-name: flow-word;
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: none;
+}
+/* A line read down a photo of a handwritten list, ending past its foot */
+.flow-screen [data-flow="scan"] {
+  animation-name: flow-scan;
+  animation-duration: 1.3s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0.2s;
+}
+.flow-screen [data-flow="frame"] {
+  animation-name: flow-frame;
+  animation-duration: 0.8s;
+}
+.flow-screen [data-flow="develop"] {
+  animation-name: flow-develop;
+  animation-duration: 1.2s;
+  animation-timing-function: ease-out;
+}
+
+/* Under a feature in the row: how long until the next one, filling while they play */
+.flow-progress {
+  transform-origin: left;
+  animation: flow-progress var(--flow-step, 3.6s) linear both;
+}
+[dir="rtl"] .flow-progress {
+  transform-origin: right;
+}
+
+/* Paused: every screen and bar holds where it is */
+[data-flow-paused] .flow-screen *,
+[data-flow-paused] .flow-progress {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flow-screen *,
+  .flow-progress {
+    animation: none !important;
+  }
+}
+[data-motion="reduce"] .flow-screen *,
+[data-motion="reduce"] .flow-progress {
+  animation: none !important;
+}
+
+@keyframes flow-rise {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+}
+@keyframes flow-pop {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+@keyframes flow-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+@keyframes flow-tap {
+  from {
+    opacity: 0.9;
+    scale: 0.4;
+  }
+  to {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+@keyframes flow-chip {
+  from {
+    background-color: transparent;
+    color: var(--ink-muted);
+  }
+}
+@keyframes flow-switch {
+  from {
+    background-color: var(--line-strong);
+  }
+}
+@keyframes flow-knob {
+  from {
+    translate: -0.75rem 0;
+  }
+}
+@keyframes flow-zoom {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 1.12;
+  }
+}
+@keyframes flow-played {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes flow-word {
+  0% {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+  20%,
+  80% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -0.5rem;
+  }
+}
+@keyframes flow-scan {
+  from {
+    translate: 0 -1.5rem;
+  }
+  to {
+    translate: 0 6rem;
+  }
+}
+@keyframes flow-frame {
+  from {
+    opacity: 0;
+    scale: 0.85;
+  }
+}
+@keyframes flow-develop {
+  from {
+    opacity: 0;
+    filter: sepia(1) blur(4px);
+  }
+}
+@keyframes flow-progress {
+  from {
+    scale: 0 1;
+  }
+}

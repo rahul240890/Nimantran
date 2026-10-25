@@ -82,7 +82,7 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
                 src={PHONE_PAINTING}
                 alt=""
                 fill
-                // The hero's phone asks for this painting at its own width (home-flow.tsx), so
+                // The hero's phone asks for this painting at its own width (home-features.tsx), so
                 // asking the same here finds it already in rather than fetching another size
                 sizes="17rem"
                 className="object-cover object-top"
