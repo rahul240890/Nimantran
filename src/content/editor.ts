@@ -2255,5 +2255,7 @@ export const quickCopy = {
   moreEvents: "More events",
   /** The row of other designs for the occasion under the form. */
   moreDesigns: (occasion: string) => `More ${occasion.toLowerCase()} designs`,
+  moreDesignsNote:
+    "Your names, dates and photos come along. Tap a design to see your invitation in it.",
   opening: "Opening the design…",
 } as const;

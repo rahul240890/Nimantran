@@ -7,6 +7,7 @@ import { templates as templatesMr } from "@/content/mr/landing";
 import { templates as templatesGu } from "@/content/gu/landing";
 import { templates as templatesBn } from "@/content/bn/landing";
 import { templates as templatesTa } from "@/content/ta/landing";
+import type { ReactNode } from "react";
 import type { UiLocale } from "@/i18n/locales";
 import { cn } from "@/lib/cn";
 import { CARD_SAMPLES } from "@/lib/templates/story-words";
@@ -21,6 +22,8 @@ import { Mandala } from "./mandala";
  */
 type Words = {
   sample: { first: string; second: string; date: string; place: string };
+  /** Names in place of the samples (see TemplateCover's `names`). */
+  names?: { first: ReactNode; second: ReactNode };
   and: string;
   rose: { eyebrow: string; and: string };
   marigold: string;
@@ -86,7 +89,7 @@ const WORDS: Record<UiLocale, Words> = {
 /* Every cover uses container units, so it scales with the card it sits in */
 
 function MarigoldGate({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-card-ivory text-center text-card-ink">
       <span className="absolute inset-[4%] rounded-[4px] border-2 border-card-gold" />
@@ -106,7 +109,7 @@ function MarigoldGate({ w }: { w: Words }) {
 }
 
 function RoseGarden({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-rose-paper text-center text-tpl-rose-ink">
       {/* Rose buds climbing the corners */}
@@ -158,7 +161,7 @@ function RoseGarden({ w }: { w: Words }) {
 }
 
 function EmeraldPalace({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-end bg-tpl-emerald-paper pb-[14%] text-center text-tpl-emerald-ink">
       {/* A palace arch framing the names */}
@@ -201,7 +204,7 @@ function EmeraldPalace({ w }: { w: Words }) {
 }
 
 function RoyalScroll({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-scroll-paper px-[12%] text-center text-tpl-scroll-ink">
       {/* Wooden rods at the top and bottom of the scroll */}
@@ -229,7 +232,7 @@ function RoyalScroll({ w }: { w: Words }) {
 }
 
 function MinimalMonogram({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-monogram-paper text-center text-tpl-monogram-ink">
       <span className="absolute inset-[7%] border border-tpl-monogram-ornament" />
@@ -239,8 +242,8 @@ function MinimalMonogram({ w }: { w: Words }) {
         <FlowerMark className="w-[18cqw]" strokeWidth={1.1} />
         <span className="h-px w-[14cqw] bg-tpl-monogram-ornament" />
       </span>
-      <span className="relative mt-[10%] font-label text-[4.2cqw] tracking-[0.34em]">
-        {`${s.first} ${w.and} ${s.second}`.toUpperCase()}
+      <span className="relative mt-[10%] font-label text-[4.2cqw] tracking-[0.34em] uppercase">
+        {s.first} {w.and} {s.second}
       </span>
       <span className="relative mt-[4%] text-[4.2cqw] text-tpl-monogram-accent">{s.date}</span>
     </div>
@@ -248,7 +251,7 @@ function MinimalMonogram({ w }: { w: Words }) {
 }
 
 function KeralaKasavu({ w }: { w: Words }) {
-  const s = w.sample;
+  const s = { ...w.sample, ...w.names };
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center bg-tpl-kasavu-paper text-center text-tpl-kasavu-ink">
       {/* The gold kasavu border of a Kerala saree, woven along both edges */}
@@ -284,7 +287,7 @@ function KeralaKasavu({ w }: { w: Words }) {
 /** A cover drawn from the design's own ornament data, for designs that carry one. */
 function motifCover(id: TemplateId) {
   function MotifCover({ w }: { w: Words }) {
-    const s = w.sample;
+    const s = { ...w.sample, ...w.names };
     const template = TEMPLATES[id];
     const cover = MOTIFS[template.scene.motif].cover!;
     const sample = (slot: string) => template.slots.find((item) => item.id === slot)?.sample ?? "";
@@ -354,13 +357,26 @@ const covers: Record<TemplateId, (props: { w: Words }) => React.JSX.Element> = {
 export function TemplateCover({
   id,
   locale = "en",
+  names,
   className,
 }: {
   id: TemplateId;
   locale?: UiLocale;
+  /** Each name in place of its sample, such as the family's own from their draft. */
+  names?: (slot: "first" | "second", sample: string) => ReactNode;
   className?: string;
 }) {
   const Cover = covers[id];
+  const base = WORDS[locale];
+  const words: Words = names
+    ? {
+        ...base,
+        names: {
+          first: names("first", base.sample.first),
+          second: names("second", base.sample.second),
+        },
+      }
+    : base;
   return (
     <div
       aria-hidden
@@ -371,7 +387,7 @@ export function TemplateCover({
         className,
       )}
     >
-      <Cover w={WORDS[locale]} />
+      <Cover w={words} />
     </div>
   );
 }

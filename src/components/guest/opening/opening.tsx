@@ -6,11 +6,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties }
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import { pageImage, StoryPlayer } from "@/components/invitation/story/story-player";
 import { MusicBars } from "@/components/invitation/music-bars";
-import {
-  FULL_SCREEN_LEAD_S,
-  musicMuted,
-  type RagaMusic,
-} from "@/components/invitation/use-raga-music";
+import { OPEN_LEAD_S, musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
@@ -63,8 +59,6 @@ const DEPTH_OPEN_MS = 2800 * OPENING_PACE;
 const BLOOM_OPEN_MS = 2600 * OPENING_PACE;
 /** How long the welcome stays between the opening and the invitation, unless tapped. */
 export const WELCOME_MS = 4400;
-/** The longest the opening waits for the screen to settle after going full screen. */
-const SETTLE_CAP_MS = 1000;
 
 const noSubscribe = () => () => {};
 
@@ -216,25 +210,6 @@ export type OpeningProps = {
 };
 
 /**
- * Opening the invitation fills the whole screen where the browser allows it, so the
- * browser's own bars don't crowd the card. Only a guest's tap may ask, and a page shown
- * inside another (the host's phone preview) leaves its frame alone. Phones that can't
- * (an iPhone's Safari) simply carry on as they were.
- */
-function fillScreen(): Promise<void> | null {
-  const root = document.documentElement;
-  if (window.self !== window.top || document.fullscreenElement || !root.requestFullscreen) {
-    return null;
-  }
-  return root.requestFullscreen({ navigationUI: "hide" }).catch(() => {});
-}
-
-/** Closing the invitation again gives the browser its bars back. */
-function leaveFullScreen() {
-  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-}
-
-/**
  * The guest's first screen (Step 12x): a full-height opening in the style the host chose,
  * with the god or symbol they chose top-centre, the names, and a countdown to the main
  * event. Opening it plays the style's move (doors swing, curtains gather, the flap lifts,
@@ -264,13 +239,10 @@ export function Opening({
   const still = useReducedMotion();
   const [asked, setAsked] = useState(false);
   const [pages, setPages] = useState(false);
-  // Going full screen blanks a phone's screen for a moment while it resizes; the move waits
-  // until the screen is back, so the guest sees the whole of it
-  const [settled, setSettled] = useState(true);
   const stage = useRef<HTMLDivElement>(null);
   // The move waits for its paintings, so it never plays over empty space; still mode needn't
   const ready = useOpeningReady(stage, `${suite}/${style}`);
-  const open = asked && settled && (ready || still);
+  const open = asked && (ready || still);
   const waiting = asked && !open;
   // Once the opening's own paintings are in, the pages' paintings load while the guest is
   // still on it, so the pages come in whole the moment it opens
@@ -361,33 +333,25 @@ export function Opening({
     }
   }, [open]);
 
+  /*
+   * Opening plays in place, on the screen the guest already has. It no longer asks the
+   * browser for full screen (owner, 2026-10-25): switching to it blanks the screen until the
+   * whole page has been redrawn at the new size, which a phone or laptop took 2 to 4
+   * seconds to do, black, before the doors moved.
+   */
   const enter = () => {
     setAsked(true);
-    const filling = fillScreen();
-    if (filling) {
-      setSettled(false);
-      let done = false;
-      const settle = () => {
-        if (done) return;
-        done = true;
-        // A frame for the resized page to be drawn before the move begins
-        requestAnimationFrame(() => requestAnimationFrame(() => setSettled(true)));
-      };
-      void filling.then(settle);
-      window.setTimeout(settle, SETTLE_CAP_MS);
-    }
     // Any page painting not yet on its way starts now, so no page comes in empty
     const next = latest.current;
     if (next.kind === "pages") warmPaintings(next.beats.map((beat) => pageImage(suite, beat)));
-    // The music swells in with the opening (it fades up over its first seconds); going full
-    // screen, its first notes wait until the phone has redrawn the page
+    // The music swells in with the opening (it fades up over its first seconds), its first
+    // notes a moment after the doors start to move
     if (musicOnOpen && !music.playing && !musicMuted()) {
-      void music.play(filling ? FULL_SCREEN_LEAD_S : 0);
+      void music.play(OPEN_LEAD_S);
     }
   };
   const leave = (hadFocus: boolean) => {
     returnFocus.current = hadFocus;
-    leaveFullScreen();
     setWelcome(false);
     setPages(false);
     setAsked(false);

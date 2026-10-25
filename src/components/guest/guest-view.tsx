@@ -26,11 +26,7 @@ import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { PreviewMark } from "@/components/guest/preview-mark";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
-import {
-  FULL_SCREEN_LEAD_S,
-  musicMuted,
-  useRagaMusic,
-} from "@/components/invitation/use-raga-music";
+import { OPEN_LEAD_S, musicMuted, useRagaMusic } from "@/components/invitation/use-raga-music";
 import { useStayAwake } from "@/components/guest/use-stay-awake";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
 import { Button } from "@/components/ui/button";
@@ -288,8 +284,8 @@ export function GuestView({
   useStayAwake(awake);
   // The music starts with the guest's first tap anywhere, the gate's or any other: a phone
   // plays no sound before one, and the song is then already playing as the gate opens. The
-  // tap may also take the invitation full screen, so the raga's first notes wait a moment
-  // and the page's own updates give way while the phone redraws it
+  // raga's first notes wait a moment and the page's own updates give way, so the gate's
+  // first moves come smoothly
   const playOnOpen = draft.music.playOnOpen;
   const latestMusic = useRef(music);
   useEffect(() => {
@@ -301,7 +297,7 @@ export function GuestView({
       events.forEach((name) => window.removeEventListener(name, first, true));
       startTransition(() => setAwake(true));
       if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
-        void latestMusic.current.play(FULL_SCREEN_LEAD_S);
+        void latestMusic.current.play(OPEN_LEAD_S);
       }
     };
     events.forEach((name) => window.addEventListener(name, first, true));

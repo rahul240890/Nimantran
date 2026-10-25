@@ -40,7 +40,7 @@ test.describe("changing the design", () => {
 
     // Another design is this invite's, with its names and functions as they were
     const other = designs.getByRole("link").first();
-    const name = (await other.textContent())!.trim();
+    const name = (await other.locator("[data-design-name]").textContent())!.trim();
     await other.click();
     await expect(page).not.toHaveURL(/\/create\/rajwada-bagh/);
     await expect(firstName(page)).toHaveValue("Kabir", { timeout: 30_000 });
@@ -87,5 +87,56 @@ test.describe("changing the design", () => {
     await expect(page.getByRole("button", { name: "Publish", exact: true })).toBeVisible();
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
+  });
+
+  test("a gate chosen on another design's page is the one its preview opens with", async ({
+    page,
+  }, info) => {
+    await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
+    await page.getByRole("button", { name: "Change design" }).first().click();
+    const designs = page.locator("[data-suggested-designs]");
+    await expect(designs.getByRole("link").first()).toBeVisible({ timeout: 30_000 });
+    // Each design carries the couple's own names, on a painting or in a card's lettering,
+    // and its price
+    await expect(designs.getByText("Kabir & Meera").first()).toBeAttached();
+    await expect(
+      designs.locator("[data-invitation]").getByText("Kabir", { exact: true }).first(),
+    ).toBeAttached();
+    await expect(designs.getByText("Aarav")).toHaveCount(0);
+    await expect(designs.locator("[data-design-price]").first()).toBeVisible();
+    await designs.getByRole("link").nth(1).click();
+    await expect(page).not.toHaveURL(/\/create\/rajwada-bagh/);
+
+    // A new gate on the new design
+    await openPart(page, "Opening gate (cover screen)");
+    await page.getByRole("button", { name: "Change opening gate" }).click();
+    const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
+    await dialog.getByRole("button", { name: "Curtains and reveals" }).click();
+    await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(page.locator("#part-gate")).toContainText("Silk curtains");
+
+    // Preview, signed in, is the guests' own view: it opens with that gate
+    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview\?from=design$/);
+    const guest = info.project.name.startsWith("phone")
+      ? page
+      : page.frameLocator('[data-testid="host-preview-phone"]');
+    await expect(guest.locator("[data-opening]").first()).toHaveAttribute(
+      "data-opening",
+      "curtain",
+      { timeout: 15_000 },
+    );
+    // Its way back is the design's page
+    const back = page.getByRole("link", { name: "Keep editing" });
+    if (info.project.name.startsWith("phone")) {
+      await page.getByRole("button", { name: "Preview options" }).click();
+      await expect(page.getByRole("menuitem", { name: "Keep editing" })).toHaveAttribute(
+        "href",
+        /^\/create\/[a-z0-9-]+\?.*invite=/,
+      );
+    } else {
+      await expect(back).toHaveAttribute("href", /^\/create\/[a-z0-9-]+\?.*invite=/);
+    }
   });
 });

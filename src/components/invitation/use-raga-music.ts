@@ -25,11 +25,11 @@ function writeMuted(muted: boolean) {
 }
 
 /**
- * How long (seconds) the raga's first notes wait when the tap that starts it also takes the
- * invitation full screen: the phone redraws the whole page first, and shows black until it
- * has (music-player.ts).
+ * How long (seconds) the raga's first notes wait after the tap that starts them: composing
+ * them takes a phone's attention, so the opening's first moves get it to themselves
+ * (music-player.ts).
  */
-export const FULL_SCREEN_LEAD_S = 1;
+export const OPEN_LEAD_S = 1;
 
 /** How loud the music plays on under the page below the pages, of its full volume. */
 const SOFT_LEVEL = 0.4;
@@ -140,12 +140,12 @@ export function useRagaMusic(template: Template) {
   const soften = useCallback(() => player.current?.setLevel(SOFT_LEVEL), []);
 
   // The guest opens the invitation again: the music starts again from the top, at full
-  // volume, unless they turned it off. Called from their tap, which may take the screen full
+  // volume, unless they turned it off. Called from their tap
   const replay = useCallback(() => {
     player.current?.setLevel(1, 0.6);
     if (musicMuted()) return;
     player.current?.rewind();
-    void play(FULL_SCREEN_LEAD_S);
+    void play(OPEN_LEAD_S);
   }, [play]);
 
   return { playing, play, toggle, rest, soften, replay };

@@ -12,7 +12,16 @@ import { TIER_ICONS } from "./tier-badge";
  * amount, then its tier's name small beside it, or Free in green. The same price as the
  * badge's, the design's own, which is what Basic costs on it.
  */
-export function DesignPrice({ designId, className }: { designId: string; className?: string }) {
+export function DesignPrice({
+  designId,
+  size = "md",
+  className,
+}: {
+  designId: string;
+  /** "sm" for a small tile, as under a design's page. */
+  size?: "md" | "sm";
+  className?: string;
+}) {
   const { galleryCopy } = useText(galleryText);
   const { tier, pricePaise } = useDesignTier(designId);
   const name = galleryCopy.tiers[tier];
@@ -28,7 +37,8 @@ export function DesignPrice({ designId, className }: { designId: string; classNa
       <span
         aria-hidden
         className={cn(
-          "font-display text-xl leading-tight font-semibold tabular-nums",
+          "font-display leading-tight font-semibold tabular-nums",
+          size === "sm" ? "text-base" : "text-xl",
           price ? "text-ink" : "text-success",
         )}
       >
@@ -37,9 +47,12 @@ export function DesignPrice({ designId, className }: { designId: string; classNa
       {price && (
         <span
           aria-hidden
-          className="inline-flex items-center gap-1 font-label text-[0.65rem] tracking-[0.12em] whitespace-nowrap text-accent-text uppercase"
+          className={cn(
+            "inline-flex items-center gap-1 font-label tracking-[0.12em] whitespace-nowrap text-accent-text uppercase",
+            size === "sm" ? "text-[0.6rem]" : "text-[0.65rem]",
+          )}
         >
-          <Icon className="size-3.5 shrink-0" />
+          <Icon className={cn("shrink-0", size === "sm" ? "size-3" : "size-3.5")} />
           {name}
         </span>
       )}

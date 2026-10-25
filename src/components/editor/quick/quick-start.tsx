@@ -282,6 +282,22 @@ export function QuickStart({
     inviteDraft.flush();
     router.push("/create");
   };
+  // Signed in, Preview is the guests' own view, saved first: the gate chosen here, the
+  // welcome, every page and the music (owner, 2026-10-25: a gate changed on this page didn't
+  // show in the pages-only preview). Without an account it stays the quick look at the pages
+  const [toGuests, setToGuests] = useState(false);
+  const guestPreview = async () => {
+    setToGuests(true);
+    inviteDraft.flush();
+    await syncDraft();
+    const id = inviteDraft.get().draft.remoteId;
+    if (id) {
+      router.push(`/invites/${id}/preview?from=design`);
+      return;
+    }
+    setToGuests(false);
+    setPreviewing(true);
+  };
   const see = () => {
     const problems = Object.assign({}, ...CHECKED.map((step) => stepErrors(draft, step)));
     if (Object.keys(problems).length > 0) {
@@ -393,13 +409,26 @@ export function QuickStart({
                 {quickCopy.watch}
               </Link>
             </Button>
+            {ready && signedIn && (
+              <Button
+                variant="secondary"
+                leadingIcon={<Eye aria-hidden />}
+                loading={toGuests}
+                onClick={() => void guestPreview()}
+                data-own-preview
+              >
+                {quickCopy.preview}
+              </Button>
+            )}
             {ready && (
               <Sheet open={previewing} onOpenChange={setPreviewing}>
-                <SheetTrigger asChild>
-                  <Button variant="secondary" leadingIcon={<Eye aria-hidden />} data-own-preview>
-                    {quickCopy.preview}
-                  </Button>
-                </SheetTrigger>
+                {!signedIn && (
+                  <SheetTrigger asChild>
+                    <Button variant="secondary" leadingIcon={<Eye aria-hidden />} data-own-preview>
+                      {quickCopy.preview}
+                    </Button>
+                  </SheetTrigger>
+                )}
                 <SheetContent title={editor.previewTitle} closeLabel={editor.close}>
                   <PreviewStage
                     draft={draft}
