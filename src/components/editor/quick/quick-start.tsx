@@ -21,6 +21,7 @@ import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import {
+  cardLanguages,
   draftCategory,
   draftOpeningStyle,
   includedFunctions,
@@ -37,7 +38,7 @@ import { draftShowsScene, draftSuite } from "@/lib/publish/story";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GateSummary } from "../gate-chooser";
-import { PreviewStage } from "../preview-stage";
+import { GATE_PAGE, PreviewStage } from "../preview-stage";
 import { SaveStatus } from "../save-status";
 import { CoupleStep, WordsStep } from "../steps/couple-step";
 import { FamilySection } from "../steps/family-section";
@@ -61,6 +62,13 @@ const PARTS = "editor-parts";
 function firstPart(draft: InviteDraft): "names" | "when" | null {
   if (!draft.content.first?.trim()) return "names";
   return Object.keys(stepErrors(draft, "functions")).length > 0 ? "when" : null;
+}
+
+/** A field the host types into, rather than a button or a choice. */
+function isTextField(target: EventTarget | null): boolean {
+  if (target instanceof HTMLTextAreaElement) return true;
+  if (!(target instanceof HTMLInputElement)) return false;
+  return !["checkbox", "radio", "button", "submit", "file", "range", "color"].includes(target.type);
 }
 
 /** The parts with fields that must be right before the preview. */
@@ -146,6 +154,13 @@ export function QuickStart({
     funnel("Details opened", { design: designId });
     void arrive()
       .then(() => {
+        // A second card language is no longer offered (owner, 2026-10-24): one left on an
+        // invite not yet sent goes, so its guests get the one language the host sees here
+        if (!inviteDraft.get().draft.slug && cardLanguages(inviteDraft.get().draft).length > 1) {
+          inviteDraft.update((draft) => ({ ...draft, languages: [cardLanguages(draft)[0]] }), {
+            touch: false,
+          });
+        }
         const current = inviteDraft.get().draft;
         if (includedFunctions(current).length > 0) return;
         const primary = draftCategory(current).functions.primary;
@@ -238,11 +253,14 @@ export function QuickStart({
     };
   }, [signedIn]);
 
-  // On a phone, once the design scrolls away, a small copy of it floats in the corner so the
-  // names can still be seen arriving on it; tapping it brings the design back up
+  // On a phone, once the design scrolls away, a small copy of it floats in the corner while a
+  // field is typed in, so the names can still be seen arriving on it; tapping it brings the
+  // design back up
   const stage = useRef<HTMLDivElement>(null);
   const [stageSeen, setStageSeen] = useState(true);
   const [miniHidden, setMiniHidden] = useState(false);
+  // Only while typing (owner, 2026-10-25): otherwise it sat over the parts' titles and choices
+  const [typing, setTyping] = useState(false);
   useEffect(() => {
     const node = stage.current;
     if (!node || !ready) return;
@@ -366,7 +384,8 @@ export function QuickStart({
         >
           <div
             ref={stage}
-            className="h-[min(50svh,28rem)] min-h-[20rem] lg:h-[min(calc(100dvh-17rem),42rem)] lg:min-h-[26rem]"
+            // The phone is the page's picture: most of a phone's screen, a laptop's height
+            className="h-[min(74svh,38rem)] min-h-[26rem] lg:h-[min(calc(100dvh-14rem),44rem)] lg:min-h-[28rem]"
           >
             {ready ? (
               // With its Edit this page: a page's words rewritten, placed or left out right here
@@ -375,6 +394,7 @@ export function QuickStart({
                 page={page}
                 onPage={setPage}
                 update={update}
+                onGate={() => setGate(true)}
                 className="h-full"
               />
             ) : (
@@ -398,8 +418,10 @@ export function QuickStart({
               {/* A live invite is already paid for or free; the line is for new ones */}
               {!draft.slug && <p className="text-sm text-ink-muted">{quickCopy.free}</p>}
             </div>
-            {/* Once this design is paid for, it says so rather than showing its price */}
-            <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
+            {/* The price is with the packages below (owner, 2026-10-25); once paid, it says so */}
+            {paidOn(designId) !== "free" && (
+              <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
+            )}
           </div>
           {/* The demo plays the design with sample names; the preview is the family's own */}
           <div className="flex flex-wrap gap-2">
@@ -452,6 +474,10 @@ export function QuickStart({
           onFocusCapture={(event) => {
             const target = (event.target as HTMLElement).closest<HTMLElement>("[data-page-target]");
             if (target?.dataset.pageTarget) setPage(target.dataset.pageTarget);
+            setTyping(isTextField(event.target));
+          }}
+          onBlurCapture={(event) => {
+            if (!isTextField(event.relatedTarget)) setTyping(false);
           }}
           onSubmit={(event) => {
             event.preventDefault();
@@ -531,7 +557,7 @@ export function QuickStart({
                 open={false}
                 title={openingCopy.heading}
                 note={openingCopy.styles[gateStyle].name}
-                pageTarget="cover"
+                pageTarget={GATE_PAGE}
               >
                 <GateSummary
                   draft={draft}
@@ -614,7 +640,7 @@ export function QuickStart({
       {more}
 
       {/* Phones: the design, small, while it is out of view, until put away */}
-      {ready && !wide && !stageSeen && !miniHidden && (
+      {ready && !wide && !stageSeen && typing && !miniHidden && (
         <div className="fixed end-3 top-[calc(env(safe-area-inset-top)+4.25rem)] z-30 animate-fade-in lg:hidden">
           <button
             type="button"

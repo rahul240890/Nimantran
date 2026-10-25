@@ -7,7 +7,7 @@ import { CardLanguageToggle } from "@/components/invitation/card-language-toggle
 import { pageImage, StoryPlayer } from "@/components/invitation/story/story-player";
 import { MusicBars } from "@/components/invitation/music-bars";
 import { OPEN_LEAD_S, musicMuted, type RagaMusic } from "@/components/invitation/use-raga-music";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClasses } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
@@ -209,6 +209,139 @@ export type OpeningProps = {
     | { kind: "enter"; onEnter: () => void };
 };
 
+/** The opening's lettering for one role, in the theme's own voice; the host's face wins. */
+function openingFace(suite: SuiteId, lang: CardLanguage) {
+  const voice = SUITES[suite].voice ?? "regal";
+  return (role: TypeRole, own: string | undefined): CSSProperties => {
+    const set = lettering(voice, role, lang);
+    return {
+      fontFamily: own ?? set.family,
+      ...(own || !set.weight ? {} : { fontWeight: set.weight }),
+      lineHeight: set.leading,
+    };
+  };
+}
+
+/**
+ * The names, never on a box over the painting: how they sit depends on the opening. The
+ * guest's first screen is named by them; the editor's small copy of it is no heading.
+ */
+function OpeningNames({
+  style,
+  suite,
+  copy,
+  lang,
+  type,
+  heading = true,
+}: {
+  style: OpeningStyle;
+  suite: SuiteId;
+  copy: CardCopy;
+  lang: CardLanguage;
+  type: PageType;
+  heading?: boolean;
+}) {
+  const face = openingFace(suite, lang);
+  const Title = heading ? "h1" : "p";
+  const id = heading ? "guest-names" : undefined;
+  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
+  const namesLook = openingNames(style);
+  const nameFace: CSSProperties = {
+    ...face("names", type.names),
+    ...(type.bold ? { fontWeight: 700 } : {}),
+    fontStyle: type.italic ? "italic" : undefined,
+  };
+  const spoken = joiner ? `${copy.first} ${joiner} ${copy.second}` : copy.first;
+  return namesLook === "print" ? (
+    <div
+      lang={lang}
+      className="opening-fade opening-print relative isolate flex max-h-full max-w-[min(84cqw,30rem)] flex-col items-center gap-[1.2cqh] text-center text-card-ivory"
+    >
+      <Title id={id} className="flex flex-col items-center break-words" style={nameFace}>
+        <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
+          {copy.first}
+        </span>{" "}
+        {joiner && (
+          <>
+            <span className="opening-joiner text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))]">
+              {joiner}
+            </span>{" "}
+            <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
+              {copy.second}
+            </span>
+          </>
+        )}
+      </Title>
+      {copy.date && (
+        <>
+          <span aria-hidden className="opening-rule" />
+          <p
+            className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ivory/90 [font-variant-numeric:lining-nums]"
+            style={face("body", type.words)}
+          >
+            {copy.date}
+          </p>
+        </>
+      )}
+    </div>
+  ) : namesLook === "foot" ? (
+    <div lang={lang} className="opening-foot flex max-w-full flex-col items-center text-center">
+      <Title
+        id={id}
+        className="max-w-[22ch] text-[length:calc(clamp(1.5rem,min(8cqw,4.6cqh),2.4rem)*var(--story-scale,1))] leading-tight break-words text-card-ivory"
+        style={nameFace}
+      >
+        {copy.first}
+        {joiner && (
+          <>
+            {" "}
+            <span className="opening-joiner text-[0.62em]">{joiner}</span> {copy.second}
+          </>
+        )}
+      </Title>
+      {copy.date && (
+        <p
+          className="mt-1 text-[clamp(0.8rem,3.4cqw,1rem)] text-card-ivory/85 [font-variant-numeric:lining-nums]"
+          style={face("body", type.words)}
+        >
+          {copy.date}
+        </p>
+      )}
+    </div>
+  ) : namesLook === "seal" ? (
+    <div lang={lang} className="flex max-w-full flex-col items-center gap-2 text-center">
+      <span
+        aria-hidden
+        className="opening-seal grid size-[clamp(3.75rem,17cqw,5rem)] place-items-center rounded-full text-card-ivory"
+        style={nameFace}
+      >
+        <span className="flex items-baseline gap-[0.12em] text-[clamp(1.35rem,6.5cqw,1.9rem)] leading-none">
+          {firstGrapheme(copy.first.trim())}
+          {joiner && (
+            <>
+              <span className="opening-joiner text-[0.55em]">&amp;</span>
+              {firstGrapheme(copy.second.trim())}
+            </>
+          )}
+        </span>
+      </span>
+      <Title
+        id={id}
+        className={cn(
+          "max-w-[28ch] text-sm break-words text-card-ivory/90",
+          lang === "en" && "font-label tracking-[0.2em] uppercase",
+        )}
+      >
+        {spoken}
+      </Title>
+    </div>
+  ) : (
+    <Title id={id} lang={lang} className="sr-only">
+      {spoken}
+    </Title>
+  );
+}
+
 /**
  * The guest's first screen (Step 12x): a full-height opening in the style the host chose,
  * with the god or symbol they chose top-centre, the names, and a countdown to the main
@@ -265,17 +398,8 @@ export function Opening({
   const fresh = isFreshOpening(style);
   const themed = isThemedOpening(style);
   const layout = OPENING_LAYOUT[style];
-  // The names in the theme's own lettering, as on the pages inside; the host's face wins
-  const voice = theme.voice ?? "regal";
-  const face = (role: TypeRole, own: string | undefined): CSSProperties => {
-    const set = lettering(voice, role, lang);
-    return {
-      fontFamily: own ?? set.family,
-      ...(own || !set.weight ? {} : { fontWeight: set.weight }),
-      lineHeight: set.leading,
-    };
-  };
-  const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
+  // The words in the theme's own lettering, as on the pages inside; the host's face wins
+  const face = openingFace(suite, lang);
 
   // The invitation follows the opening; in still mode it comes at once
   const latest = useRef(after);
@@ -380,103 +504,9 @@ export function Opening({
     if (replay > 0) enterLatest.current();
   }, [replay]);
 
-  // The names, never on a box over the painting: how they sit depends on the opening
+  // The names: in the painting's middle on a drawn opening, else over the ground
   const namesLook = openingNames(style);
-  const nameFace: CSSProperties = {
-    ...face("names", type.names),
-    ...(type.bold ? { fontWeight: 700 } : {}),
-    fontStyle: type.italic ? "italic" : undefined,
-  };
-  const spoken = joiner ? `${copy.first} ${joiner} ${copy.second}` : copy.first;
-  const names =
-    namesLook === "print" ? (
-      <div
-        lang={lang}
-        className="opening-fade opening-print relative isolate flex max-h-full max-w-[min(84cqw,30rem)] flex-col items-center gap-[1.2cqh] text-center text-card-ivory"
-      >
-        <h1 id="guest-names" className="flex flex-col items-center break-words" style={nameFace}>
-          <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
-            {copy.first}
-          </span>{" "}
-          {joiner && (
-            <>
-              <span className="opening-joiner text-[length:calc(clamp(1.2rem,min(6.5cqw,4.2cqh),2.4rem)*var(--story-scale,1))]">
-                {joiner}
-              </span>{" "}
-              <span className="text-[length:calc(clamp(2rem,min(11.5cqw,6.6cqh),4.2rem)*var(--story-scale,1))]">
-                {copy.second}
-              </span>
-            </>
-          )}
-        </h1>
-        {copy.date && (
-          <>
-            <span aria-hidden className="opening-rule" />
-            <p
-              className="text-[clamp(0.85rem,3.6cqw,1.2rem)] text-card-ivory/90 [font-variant-numeric:lining-nums]"
-              style={face("body", type.words)}
-            >
-              {copy.date}
-            </p>
-          </>
-        )}
-      </div>
-    ) : namesLook === "foot" ? (
-      <div lang={lang} className="opening-foot flex max-w-full flex-col items-center text-center">
-        <h1
-          id="guest-names"
-          className="max-w-[22ch] text-[length:calc(clamp(1.5rem,min(8cqw,4.6cqh),2.4rem)*var(--story-scale,1))] leading-tight break-words text-card-ivory"
-          style={nameFace}
-        >
-          {copy.first}
-          {joiner && (
-            <>
-              {" "}
-              <span className="opening-joiner text-[0.62em]">{joiner}</span> {copy.second}
-            </>
-          )}
-        </h1>
-        {copy.date && (
-          <p
-            className="mt-1 text-[clamp(0.8rem,3.4cqw,1rem)] text-card-ivory/85 [font-variant-numeric:lining-nums]"
-            style={face("body", type.words)}
-          >
-            {copy.date}
-          </p>
-        )}
-      </div>
-    ) : namesLook === "seal" ? (
-      <div lang={lang} className="flex max-w-full flex-col items-center gap-2 text-center">
-        <span
-          aria-hidden
-          className="opening-seal grid size-[clamp(3.75rem,17cqw,5rem)] place-items-center rounded-full text-card-ivory"
-          style={nameFace}
-        >
-          <span className="flex items-baseline gap-[0.12em] text-[clamp(1.35rem,6.5cqw,1.9rem)] leading-none">
-            {firstGrapheme(copy.first.trim())}
-            {joiner && (
-              <>
-                <span className="opening-joiner text-[0.55em]">&amp;</span>
-                {firstGrapheme(copy.second.trim())}
-              </>
-            )}
-          </span>
-        </span>
-        <h1
-          id="guest-names"
-          className={cn(
-            "max-w-[28ch] text-sm break-words text-card-ivory/90",
-            lang === "en" && "font-label tracking-[0.2em] uppercase",
-          )}
-        >
-          {spoken}
-        </h1>
-      </div>
-    ) : (
-      <h1 id="guest-names" lang={lang} className="sr-only">
-        {spoken}
-      </h1>
-    );
+  const names = <OpeningNames style={style} suite={suite} copy={copy} lang={lang} type={type} />;
 
   return (
     <section
@@ -679,6 +709,120 @@ export function Opening({
         />
       )}
     </section>
+  );
+}
+
+/** A guest's phone, as wide as most: the editor's copy of the first screen is drawn this wide. */
+const GUEST_WIDTH = 390;
+
+/**
+ * The guest's first screen, small, for the editor's preview (owner, 2026-10-25): the gate
+ * the host chose with its god or symbol, the names and the way in, playing its opening move
+ * while `open` (and still in still mode). It is drawn at a guest phone's width and shrunk
+ * to the space it has, so every word keeps its true share of the screen; nothing on it can
+ * be tapped.
+ */
+export function OpeningPreview({
+  suite,
+  style,
+  god,
+  copy,
+  lang,
+  type,
+  main,
+  open,
+  words,
+}: {
+  suite: SuiteId;
+  style: OpeningStyle;
+  god: OpeningGod | null;
+  copy: CardCopy;
+  lang: CardLanguage;
+  type: PageType;
+  /** The main event's date and start, for the countdown; null without a date. */
+  main: { date: string; at: number } | null;
+  open: boolean;
+  /** The countdown's name and the way in's words, as guests read them. */
+  words: { counting: string; open: string };
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  const stage = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState<{ width: number; height: number } | null>(null);
+  useEffect(() => {
+    const node = box.current;
+    if (!node) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry!.contentRect;
+      if (width > 0 && height > 0) setSize({ width, height });
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  useOpeningPace(stage, open, useReducedMotion());
+  const layout = OPENING_LAYOUT[style];
+  const namesLook = openingNames(style);
+  const names = (
+    <OpeningNames style={style} suite={suite} copy={copy} lang={lang} type={type} heading={false} />
+  );
+  const scale = size ? size.width / GUEST_WIDTH : 1;
+
+  return (
+    <div ref={box} aria-hidden className="absolute inset-0 overflow-hidden">
+      {size && (
+        <div
+          data-suite={suite}
+          data-mood="dusk"
+          data-doorway={open ? "open" : "closed"}
+          data-opening={style}
+          data-invitation
+          className="opening-page absolute top-0 left-0 isolate origin-top-left overflow-hidden"
+          style={
+            {
+              width: GUEST_WIDTH,
+              height: size.height / scale,
+              transform: `scale(${scale})`,
+              "--story-scale": type.scale,
+            } as CSSProperties
+          }
+        >
+          <div
+            ref={stage}
+            data-open={open}
+            className="opening-stage [container-type:size] absolute inset-0"
+          >
+            <OpeningArt style={style} cover={SUITES[suite].images.cover} sample />
+            <div className="absolute inset-0 z-30 flex flex-col">
+              <div
+                className="opening-crest flex flex-none items-end justify-center px-[10cqw] pt-[max(1.5rem,5cqh)] pb-[1.5cqh]"
+                style={{ height: god || style === "envelope" ? `${layout.crest}%` : undefined }}
+              >
+                {god && <GodCrest god={god} />}
+              </div>
+              <div className="flex-none" style={{ height: `${layout.gap}%` }} />
+              <div className="relative flex min-h-0 flex-1 items-center justify-center px-[7cqw]">
+                {style === "lotus" && <LotusBloom />}
+                {namesLook === "print" && names}
+              </div>
+              <div className="opening-fade flex flex-none flex-col items-center gap-4 bg-linear-to-t from-night/90 via-night/65 to-transparent px-4 pt-10 pb-6">
+                {namesLook !== "print" && names}
+                {main && (
+                  <Countdown target={main.at} date={main.date} lang={lang} label={words.counting} />
+                )}
+                <span
+                  className={buttonClasses({
+                    size: "lg",
+                    className: "pointer-events-none max-w-[92cqw] min-w-[min(16rem,80cqw)]",
+                  })}
+                >
+                  <DoorOpen aria-hidden />
+                  {words.open}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 

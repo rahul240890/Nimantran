@@ -984,6 +984,7 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
 export const studioCopy: Translation<typeof en.studioCopy> = {
   pagesHint: "நீங்கள் திருத்தும் பக்கம், எழுதும்போதே இங்கே தெரியும்.",
   pageNames: {
+    gate: "வாயில்",
     blessing: "ஆசீர்வாதம்",
     cover: "முகப்பு",
     couple: "புகைப்படம்",

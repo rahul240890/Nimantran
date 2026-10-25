@@ -118,9 +118,10 @@ export function PageWords(props: PageWordsProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm" className="shrink-0">
+        {/* Beside the pages' list under the phone: a phone shows its pen alone */}
+        <Button variant="secondary" size="sm" aria-label={t.open} className="shrink-0">
           <PenLine aria-hidden />
-          {t.open}
+          <span className="max-sm:sr-only">{t.open}</span>
         </Button>
       </DialogTrigger>
       <DialogContent
