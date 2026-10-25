@@ -1,10 +1,17 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, FlaskConical, Phone } from "lucide-react";
+import { ArrowLeft, ArrowRight, FlaskConical, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
-import { saveProfile, sendCode, startGoogle, verifyCode } from "@/actions/auth";
+import {
+  saveProfile,
+  sendCode,
+  sendEmailCode,
+  startGoogle,
+  verifyCode,
+  verifyEmailCode,
+} from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -13,6 +20,7 @@ import { accountText } from "@/i18n/copy/account";
 import { useLocale, useText } from "@/i18n/client";
 import { homePath } from "@/i18n/locales";
 import { PROFILE_RULES, firstName, type Account } from "@/lib/auth/account";
+import { maskEmail, normalizeEmail } from "@/lib/auth/email";
 import { OTP_LENGTH, maskPhone, normalizePhone } from "@/lib/auth/phone";
 import { CodeInput } from "./code-input";
 import { refreshAccountHint } from "./use-account-hint";
@@ -20,17 +28,39 @@ import { refreshAccountHint } from "./use-account-hint";
 const RESEND_SECONDS = 30;
 const legalLink =
   "font-medium text-accent-text underline underline-offset-4 decoration-accent-text/40 hover:decoration-current";
-/** Keeps the number and step through a refresh while the SMS arrives. */
+/** Keeps the number or address and step through a refresh while the code arrives. */
 const STORAGE_KEY = "nimantran-sign-in";
 
 type ErrorKey = keyof (typeof accountText)["en"]["signInCopy"]["errors"];
 
-type Flow = { step: "phone" | "code"; input: string; phone: string };
+/**
+ * Where the code went: a mobile number by SMS or an address by email. input and email are
+ * what's typed; to is the number or address the code was sent to; length is the code's.
+ */
+type Channel = "phone" | "email";
+type Flow = {
+  step: "start" | "code";
+  channel: Channel;
+  input: string;
+  email: string;
+  to: string;
+  length: number;
+};
+type Saved = Omit<Flow, "step">;
+
+const START: Flow = {
+  step: "start",
+  channel: "phone",
+  input: "",
+  email: "",
+  to: "",
+  length: OTP_LENGTH,
+};
 
 const noop = () => () => {};
-let savedCache: { raw: string | null; value: Omit<Flow, "step"> | null } | null = null;
+let savedCache: { raw: string | null; value: Saved | null } | null = null;
 
-function readSaved(): Omit<Flow, "step"> | null {
+function readSaved(): Saved | null {
   let raw: string | null = null;
   try {
     raw = sessionStorage.getItem(STORAGE_KEY);
@@ -38,11 +68,20 @@ function readSaved(): Omit<Flow, "step"> | null {
     // Storage blocked
   }
   if (savedCache && savedCache.raw === raw) return savedCache.value;
-  let value: Omit<Flow, "step"> | null = null;
+  let value: Saved | null = null;
   try {
-    const parsed = JSON.parse(raw ?? "null") as Partial<Flow> | null;
-    if (typeof parsed?.phone === "string" && parsed.phone) {
-      value = { phone: parsed.phone, input: String(parsed.input ?? "") };
+    const parsed = JSON.parse(raw ?? "null") as (Partial<Saved> & { phone?: unknown }) | null;
+    // Saved before email codes: { input, phone }
+    const to = typeof parsed?.to === "string" ? parsed.to : parsed?.phone;
+    if (typeof to === "string" && to) {
+      const length = Number(parsed?.length);
+      value = {
+        channel: parsed?.channel === "email" ? "email" : "phone",
+        input: String(parsed?.input ?? ""),
+        email: String(parsed?.email ?? ""),
+        to,
+        length: Number.isInteger(length) && length >= 6 && length <= 10 ? length : OTP_LENGTH,
+      };
     }
   } catch {
     // Damaged: start over
@@ -67,17 +106,23 @@ export function SignInForm({
   next,
   preview,
   phone: byPhone = true,
+  email: byEmail = false,
   initialError,
   askName,
+  onSignedIn,
 }: {
   next: string;
   /** Preview mode: any number, code 123456. */
   preview: boolean;
   /** Sign-in by mobile number; off on the live site until SMS codes are set up. */
   phone?: boolean;
+  /** Sign-in by a code sent to an email address. */
+  email?: boolean;
   initialError?: ErrorKey;
   /** Signed in, with no name yet: the form opens on the name step. */
   askName?: { language: Account["language"] };
+  /** Called once signed in and named, as the page goes on (the editor's sheet closes). */
+  onSignedIn?: () => void;
 }) {
   const { signInCopy, profileCopy } = useText(accountText);
   const locale = useLocale();
@@ -87,10 +132,14 @@ export function SignInForm({
   // A refresh while waiting for the SMS picks up at the code
   const saved = useSyncExternalStore(noop, readSaved, () => null);
   const [flow, setFlow] = useState<Flow | null>(null);
-  const { step, input, phone } =
+  const resumable = saved && (saved.channel === "email" ? byEmail : byPhone) ? saved : null;
+  const current: Flow =
     flow ??
-    (saved && byPhone ? { step: "code", ...saved } : { step: "phone", input: "", phone: "" });
-  const update = (change: Partial<Flow>) => setFlow({ step, input, phone, ...change });
+    (resumable
+      ? { step: "code", ...resumable }
+      : { ...START, channel: byPhone ? "phone" : "email" });
+  const { step, channel, input, email, to, length } = current;
+  const update = (change: Partial<Flow>) => setFlow({ ...current, ...change });
   const [code, setCode] = useState("");
   const [error, setError] = useState<ErrorKey | undefined>(initialError);
   const [resendAt, setResendAt] = useState(0);
@@ -110,6 +159,7 @@ export function SignInForm({
   const nameRef = useRef<HTMLInputElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (step === "code") codeRef.current?.focus();
@@ -128,10 +178,23 @@ export function SignInForm({
   }, [resendAt, now]);
   const wait = Math.max(0, Math.ceil((resendAt - now) / 1000));
 
+  const codeSent = (sent: Saved, resend: boolean) => {
+    setFlow({ step: "code", ...sent });
+    setCode("");
+    setResendAt(Date.now() + RESEND_SECONDS * 1000);
+    setNow(Date.now());
+    try {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(sent));
+    } catch {
+      // Storage blocked: a refresh starts over, nothing else changes
+    }
+    if (resend) toast({ title: signInCopy.resent, tone: "success" });
+  };
+
   const send = (resend = false) =>
     startSending(async () => {
       setError(undefined);
-      const result = await sendCode(resend ? phone : input);
+      const result = await sendCode(resend ? to : input);
       if (result.status === "invalid") {
         setError(result.error);
         phoneRef.current?.focus();
@@ -141,29 +204,47 @@ export function SignInForm({
         setError(result.error);
         return;
       }
-      update({ phone: result.phone, step: "code" });
-      setCode("");
-      setResendAt(Date.now() + RESEND_SECONDS * 1000);
-      setNow(Date.now());
-      try {
-        sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ input, phone: result.phone }));
-      } catch {
-        // Storage blocked: a refresh starts over, nothing else changes
+      codeSent({ channel: "phone", input, email, to: result.phone, length: OTP_LENGTH }, resend);
+    });
+
+  const sendEmail = (resend = false) =>
+    startSending(async () => {
+      setError(undefined);
+      const result = await sendEmailCode(resend ? to : email);
+      if (result.status === "invalid") {
+        setError(result.error);
+        emailRef.current?.focus();
+        return;
       }
-      if (resend) toast({ title: signInCopy.resent, tone: "success" });
+      if (result.status === "failed") {
+        setError(result.error);
+        return;
+      }
+      codeSent({ channel: "email", input, email, to: result.email, length: result.length }, resend);
     });
 
   const verify = (value = code) =>
     startVerifying(async () => {
-      if (value.length !== OTP_LENGTH) {
-        setError("code");
+      const byMail = channel === "email";
+      if (value.length !== length) {
+        setError(byMail ? "email-code" : "code");
         codeRef.current?.focus();
         return;
       }
       setError(undefined);
-      const result = await verifyCode(phone, value, next);
+      const result = byMail
+        ? await verifyEmailCode(to, value, next)
+        : await verifyCode(to, value, next);
       if (result.status !== "signed-in") {
-        setError(result.status === "invalid" ? "code" : result.error);
+        setError(
+          result.status === "invalid"
+            ? byMail
+              ? "email-code"
+              : "code"
+            : byMail && result.error === "bad-code"
+              ? "bad-email-code"
+              : result.error,
+        );
         setCode("");
         codeRef.current?.focus();
         return;
@@ -183,6 +264,7 @@ export function SignInForm({
 
   const finish = (to: string, who: string) => {
     toast({ title: signInCopy.success(firstName({ name: who })), tone: "success" });
+    onSignedIn?.();
     router.replace(to);
     router.refresh();
   };
@@ -221,7 +303,7 @@ export function SignInForm({
     });
 
   const changeNumber = () => {
-    update({ step: "phone" });
+    update({ step: "start" });
     setCode("");
     setError(undefined);
     try {
@@ -229,11 +311,13 @@ export function SignInForm({
     } catch {
       // Nothing to clear
     }
-    requestAnimationFrame(() => phoneRef.current?.focus());
+    requestAnimationFrame(() => (channel === "email" ? emailRef : phoneRef).current?.focus());
   };
 
   const message = error ? signInCopy.errors[error] : undefined;
-  const phoneError = step === "phone" && (error === "required" || error === "invalid");
+  const starting = step === "start";
+  const phoneError = starting && (error === "required" || error === "invalid");
+  const emailError = starting && (error === "email-required" || error === "email-invalid");
 
   if (welcome) {
     return (
@@ -291,51 +375,7 @@ export function SignInForm({
         </p>
       )}
 
-      {!byPhone ? null : step === "phone" ? (
-        <form
-          noValidate
-          onSubmit={(event) => {
-            event.preventDefault();
-            const parsed = normalizePhone(input);
-            if ("error" in parsed) {
-              setError(parsed.error);
-              phoneRef.current?.focus();
-              return;
-            }
-            send();
-          }}
-          className="flex animate-rise flex-col gap-5"
-        >
-          <Field
-            label={signInCopy.phoneLabel}
-            hint={signInCopy.phoneHint}
-            error={phoneError ? message : undefined}
-          >
-            <Input
-              ref={phoneRef}
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel"
-              value={input}
-              placeholder={signInCopy.phonePlaceholder}
-              leading={<Phone />}
-              onChange={(event) => {
-                update({ input: event.target.value });
-                if (phoneError) setError(undefined);
-              }}
-              className="text-lg tracking-wide"
-            />
-          </Field>
-          <Button
-            type="submit"
-            fullWidth
-            loading={sending}
-            trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
-          >
-            {signInCopy.sendCode}
-          </Button>
-        </form>
-      ) : (
+      {step === "code" ? (
         <form
           noValidate
           onSubmit={(event) => {
@@ -347,13 +387,19 @@ export function SignInForm({
           <div className="flex flex-col gap-1">
             <h2 className="font-display text-2xl">{signInCopy.codeTitle}</h2>
             <p className="text-ink-muted" aria-live="polite">
-              {signInCopy.codeSent(maskPhone(phone))}
+              {channel === "email"
+                ? signInCopy.codeSentEmail(maskEmail(to))
+                : signInCopy.codeSent(maskPhone(to))}
             </p>
           </div>
-          <Field label={signInCopy.codeLabel} error={message}>
+          <Field
+            label={channel === "email" ? signInCopy.codeLabelEmail : signInCopy.codeLabel}
+            error={message}
+          >
             <CodeInput
               ref={codeRef}
               value={code}
+              length={length}
               disabled={verifying}
               onChange={(value) => {
                 setCode(value);
@@ -373,24 +419,127 @@ export function SignInForm({
               onClick={changeNumber}
               className="-ms-3"
             >
-              {signInCopy.changeNumber}
+              {channel === "email" ? signInCopy.changeEmail : signInCopy.changeNumber}
             </Button>
             <Button
               variant="ghost"
               size="sm"
               disabled={wait > 0}
               loading={sending}
-              onClick={() => send(true)}
+              onClick={() => (channel === "email" ? sendEmail(true) : send(true))}
               className="-me-3"
             >
               {wait > 0 ? signInCopy.resendIn(wait) : signInCopy.resend}
             </Button>
           </div>
         </form>
+      ) : (
+        <>
+          {byPhone && (
+            <form
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault();
+                const parsed = normalizePhone(input);
+                if ("error" in parsed) {
+                  setError(parsed.error);
+                  phoneRef.current?.focus();
+                  return;
+                }
+                send();
+              }}
+              className="flex animate-rise flex-col gap-5"
+            >
+              <Field
+                label={signInCopy.phoneLabel}
+                hint={signInCopy.phoneHint}
+                error={phoneError ? message : undefined}
+              >
+                <Input
+                  ref={phoneRef}
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  value={input}
+                  placeholder={signInCopy.phonePlaceholder}
+                  leading={<Phone />}
+                  onChange={(event) => {
+                    update({ input: event.target.value, channel: "phone" });
+                    if (phoneError) setError(undefined);
+                  }}
+                  className="text-lg tracking-wide"
+                />
+              </Field>
+              <Button
+                type="submit"
+                fullWidth
+                loading={sending && channel === "phone"}
+                trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
+              >
+                {signInCopy.sendCode}
+              </Button>
+            </form>
+          )}
+          {byPhone && byEmail && (
+            <div className="flex items-center gap-4 text-sm text-ink-muted" aria-hidden>
+              <span className="h-px flex-1 bg-line" />
+              {signInCopy.or}
+              <span className="h-px flex-1 bg-line" />
+            </div>
+          )}
+          {byEmail && (
+            <form
+              noValidate
+              onSubmit={(event) => {
+                event.preventDefault();
+                const parsed = normalizeEmail(email);
+                if ("error" in parsed) {
+                  setError(parsed.error);
+                  emailRef.current?.focus();
+                  return;
+                }
+                sendEmail();
+              }}
+              className="flex animate-rise flex-col gap-5"
+            >
+              <Field
+                label={signInCopy.emailLabel}
+                hint={signInCopy.emailHint}
+                error={emailError ? message : undefined}
+              >
+                <Input
+                  ref={emailRef}
+                  type="email"
+                  inputMode="email"
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  value={email}
+                  placeholder={signInCopy.emailPlaceholder}
+                  leading={<Mail />}
+                  onChange={(event) => {
+                    update({ email: event.target.value, channel: "email" });
+                    if (emailError) setError(undefined);
+                  }}
+                />
+              </Field>
+              <Button
+                type="submit"
+                fullWidth
+                // Behind the number when both are offered
+                variant={byPhone ? "secondary" : "primary"}
+                loading={sending && channel === "email"}
+                trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
+              >
+                {signInCopy.emailCode}
+              </Button>
+            </form>
+          )}
+        </>
       )}
 
       {/* Errors that aren't about one field, such as Google or the SMS service */}
-      {step === "phone" && error && !phoneError && (
+      {starting && error && !phoneError && !emailError && (
         <p
           role="alert"
           className="rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
@@ -399,9 +548,9 @@ export function SignInForm({
         </p>
       )}
 
-      {(step === "phone" || !byPhone) && (
+      {starting && (
         <>
-          {byPhone && (
+          {(byPhone || byEmail) && (
             <div className="flex items-center gap-4 text-sm text-ink-muted" aria-hidden>
               <span className="h-px flex-1 bg-line" />
               {signInCopy.or}
@@ -410,7 +559,7 @@ export function SignInForm({
           )}
           <Button
             // Google alone is the main way in
-            variant={byPhone ? "secondary" : "primary"}
+            variant={byPhone || byEmail ? "secondary" : "primary"}
             fullWidth
             loading={googling}
             leadingIcon={<GoogleGlyph />}

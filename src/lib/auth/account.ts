@@ -7,9 +7,15 @@ import { LOCALES, type Locale } from "@/lib/categories/ids";
  */
 
 export type AuthFailure =
-  "unavailable" | "bad-code" | "too-many" | "sms-failed" | "provider-off" | "unknown";
+  | "unavailable"
+  | "bad-code"
+  | "too-many"
+  | "sms-failed"
+  | "email-failed"
+  | "provider-off"
+  | "unknown";
 
-export type SignInMethod = "phone" | "google";
+export type SignInMethod = "phone" | "email" | "google";
 
 export type Account = {
   id: string;

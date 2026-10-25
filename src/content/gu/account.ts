@@ -25,6 +25,14 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
   resendIn: (seconds) => `${seconds} સેકન્ડમાં નવો કોડ મોકલો`,
   resent: "નવો કોડ આવી રહ્યો છે",
   changeNumber: "નંબર બદલો",
+  emailLabel: "ઈમેલ",
+  emailHint: "અમે તમને ઈમેલ પર કોડ મોકલીશું. પાસવર્ડની જરૂર નથી.",
+  emailPlaceholder: "you@example.com",
+  emailCode: "ઈમેલ પર કોડ મોકલો",
+  codeSentEmail: (masked) =>
+    `અમે ${masked} પર કોડ મોકલ્યો છે. એક મિનિટ લાગી શકે, Promotions અને Spam પણ જુઓ.`,
+  codeLabelEmail: "ઈમેલમાં આવેલો કોડ",
+  changeEmail: "ઈમેલ બદલો",
   previewNote: "પ્રીવ્યૂ મોડ: કોઈ પણ નંબર ચાલશે, અને કોડ 123456 છે.",
   terms: {
     before: "આગળ વધીને તમે ",
@@ -68,6 +76,11 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
     unavailable: "અત્યારે સાઇન ઇન ઉપલબ્ધ નથી. થોડી વારમાં ફરી પ્રયત્ન કરો.",
     unknown: "કંઈક ગડબડ થઈ. કૃપા કરી ફરી પ્રયત્ન કરો.",
     google: "Google સાઇન ઇન પૂરું ન થયું. કૃપા કરી ફરી પ્રયત્ન કરો.",
+    "email-required": "તમારું ઈમેલ સરનામું લખો",
+    "email-invalid": "આ ઈમેલ સરનામું બરાબર નથી લાગતું. એક વાર તપાસો.",
+    "email-code": "કોડના બધા અંક લખો",
+    "bad-email-code": "કોડ ખોટો છે અથવા જૂનો થઈ ગયો. ઈમેલ જુઓ અથવા નવો કોડ મંગાવો.",
+    "email-failed": "ઈમેલ મોકલી ન શક્યા. સરનામું તપાસો, અથવા Google થી સાઇન ઇન કરો.",
   },
 };
 
@@ -82,7 +95,7 @@ export const profileCopy: Translation<typeof en.profileCopy> = {
   languageHint:
     "અંગ્રેજી, હિન્દી, મરાઠી, ગુજરાતી, બંગાળી અને તમિલ પસંદ કરતાં ઍપ હમણાં જ બદલાઈ જાય છે; બીજી ભાષાઓ અનુવાદ તૈયાર થતાં આવશે. આમંત્રણ કોઈ પણ ભાષામાં હોઈ શકે છે.",
   signedInWith: "સાઇન ઇનની રીત",
-  methods: { phone: "મોબાઇલ નંબર", google: "Google" },
+  methods: { phone: "મોબાઇલ નંબર", email: "ઈમેલ", google: "Google" },
   save: "ફેરફાર સાચવો",
   saved: "પ્રોફાઇલ સચવાઈ ગઈ",
   signOut: "સાઇન આઉટ",
@@ -218,4 +231,11 @@ export const invitesCopy: Translation<typeof en.invitesCopy> = {
     body: "એક પ્રસંગ અને ડિઝાઇન પસંદ કરો; પહેલું આમંત્રણ લગભગ પાંચ મિનિટમાં બની જાય છે.",
     action: "પહેલું આમંત્રણ બનાવો",
   },
+};
+
+export const saveCopy: Translation<typeof en.saveCopy> = {
+  title: "તમારું આમંત્રણ સાચવો",
+  intro:
+    "સાઇન ઇન કરીને તેની લિંક મેળવો, પરિવારને મોકલો અને કોઈ પણ ફોન પર ખોલો. મફત, અને પાસવર્ડ નહીં.",
+  close: "બંધ કરો",
 };

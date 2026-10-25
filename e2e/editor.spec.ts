@@ -624,7 +624,7 @@ test.describe("invite editor", () => {
       await seeInvitation(page);
       // Back and the way to publish share the bar
       await expect(page.getByRole("button", { name: "Back" })).toBeVisible();
-      await expect(page.getByRole("link", { name: "Sign in to publish" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "Save and publish" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       await context.close();
     }

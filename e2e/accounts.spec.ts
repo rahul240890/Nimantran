@@ -249,3 +249,17 @@ test.describe("accounts", () => {
     await expect(page).toHaveURL(/\/invites$/, { timeout: 30_000 });
   });
 });
+
+test("signs in with a code sent by email", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.getByRole("button", { name: "Email me a code" }).click();
+  await expect(page.getByText("Enter your email address")).toBeVisible();
+  await page.getByRole("textbox", { name: /Email/ }).fill("Meera.Iyer@Example.com");
+  await page.getByRole("button", { name: "Email me a code" }).click();
+  await expect(page.getByText(/We emailed a code to me•+@example\.com/)).toBeVisible();
+  expect(await noOverflow(page)).toBe(true);
+  expect((await axe(page).analyze()).violations).toEqual([]);
+  await page.getByRole("textbox", { name: /Code from the email/ }).fill("123456");
+  await page.getByRole("button", { name: "Skip for now" }).click();
+  await expect(page).toHaveURL(/\/invites$/);
+});

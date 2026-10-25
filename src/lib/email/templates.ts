@@ -185,6 +185,25 @@ const offerLines = (offers: EmailOffer[]) =>
     `  ${offer.note}`,
   ]);
 
+/* ---------- Sign-in code ---------- */
+
+/** The code that signs someone in by email: large, first, and nothing else to click. */
+export function signInCodeEmail(brand: Brand, code: string, minutes: number): Email {
+  const why = `You're getting this because someone asked to sign in to ${brand.name} with this address. If it wasn't you, ignore this email: nobody can sign in without the code.`;
+  const intro = `Type this code on ${brand.name} to sign in. It works for ${minutes} minutes.`;
+  const after = "No password needed. Your invitation is saved as soon as you're in.";
+  return {
+    subject: `${code} is your ${brand.name} code`,
+    html: layout(
+      brand,
+      `Your sign-in code is ${code}`,
+      `${heading("Your sign-in code")}${paragraph(intro)}<p style="margin:8px 0 22px;font-family:Georgia,serif;font-size:40px;letter-spacing:10px;font-weight:700;color:${color.accentText}">${escapeHtml(code)}</p>${paragraph(after)}`,
+      { why },
+    ),
+    text: [intro, "", code, "", after, textFooter(brand, why)].join("\n"),
+  };
+}
+
 /* ---------- Welcome ---------- */
 
 export function welcomeEmail(

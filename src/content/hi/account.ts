@@ -25,6 +25,14 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
   resendIn: (seconds) => `${seconds} सेकंड में नया कोड भेजें`,
   resent: "नया कोड आ रहा है",
   changeNumber: "नंबर बदलें",
+  emailLabel: "ईमेल",
+  emailHint: "हम आपको ईमेल पर कोड भेजेंगे। कोई पासवर्ड नहीं।",
+  emailPlaceholder: "you@example.com",
+  emailCode: "ईमेल पर कोड भेजें",
+  codeSentEmail: (masked) =>
+    `हमने ${masked} पर कोड भेजा है। एक मिनट लग सकता है, Promotions और Spam भी देखें।`,
+  codeLabelEmail: "ईमेल में आया कोड",
+  changeEmail: "ईमेल बदलें",
   previewNote: "प्रीव्यू मोड: कोई भी नंबर चलेगा, कोड 123456 है।",
   terms: {
     before: "आगे बढ़कर आप ",
@@ -68,6 +76,11 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
     unavailable: "अभी साइन इन उपलब्ध नहीं है। थोड़ी देर में फिर कोशिश करें।",
     unknown: "कुछ गड़बड़ हो गई। कृपया फिर कोशिश करें।",
     google: "Google साइन इन पूरा नहीं हुआ। कृपया फिर कोशिश करें।",
+    "email-required": "अपना ईमेल पता लिखें",
+    "email-invalid": "यह ईमेल पता सही नहीं लगता। एक बार जाँच लें।",
+    "email-code": "कोड के सभी अंक लिखें",
+    "bad-email-code": "कोड ग़लत है या पुराना हो गया। ईमेल देखें या नया कोड मँगाएँ।",
+    "email-failed": "ईमेल नहीं भेज पाए। पता जाँचें, या Google से साइन इन करें।",
   },
 };
 
@@ -82,7 +95,7 @@ export const profileCopy: Translation<typeof en.profileCopy> = {
   languageHint:
     "हिन्दी, अंग्रेज़ी, मराठी, गुजराती, बांग्ला और तमिल चुनने पर ऐप अभी बदल जाता है; बाक़ी भाषाएँ अनुवाद आते ही। निमंत्रण किसी भी भाषा में हो सकते हैं।",
   signedInWith: "साइन इन किया",
-  methods: { phone: "मोबाइल नंबर से", google: "Google से" },
+  methods: { phone: "मोबाइल नंबर से", email: "ईमेल से", google: "Google से" },
   save: "बदलाव सहेजें",
   saved: "प्रोफ़ाइल सहेज ली गई",
   signOut: "साइन आउट",
@@ -217,4 +230,11 @@ export const invitesCopy: Translation<typeof en.invitesCopy> = {
     body: "एक अवसर और डिज़ाइन चुनिए; पहला निमंत्रण लगभग पाँच मिनट में बन जाता है।",
     action: "पहला निमंत्रण बनाएँ",
   },
+};
+
+export const saveCopy: Translation<typeof en.saveCopy> = {
+  title: "अपना निमंत्रण सेव करें",
+  intro:
+    "साइन इन करके इसका लिंक पाएँ, परिवार को भेजें और किसी भी फ़ोन पर खोलें। मुफ़्त, और कोई पासवर्ड नहीं।",
+  close: "बंद करें",
 };

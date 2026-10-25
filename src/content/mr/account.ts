@@ -27,6 +27,14 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
   resendIn: (seconds) => `${seconds} सेकंदांत नवीन कोड पाठवा`,
   resent: "नवीन कोड येत आहे",
   changeNumber: "नंबर बदला",
+  emailLabel: "ईमेल",
+  emailHint: "आम्ही तुम्हाला ईमेलवर कोड पाठवू. पासवर्डची गरज नाही.",
+  emailPlaceholder: "you@example.com",
+  emailCode: "ईमेलवर कोड पाठवा",
+  codeSentEmail: (masked) =>
+    `आम्ही ${masked} वर कोड पाठवला आहे. एक मिनिट लागू शकतो, Promotions आणि Spam पण पाहा.`,
+  codeLabelEmail: "ईमेलमधील कोड",
+  changeEmail: "ईमेल बदला",
   previewNote: "प्रिव्ह्यू मोड: कोणताही नंबर चालेल, आणि कोड 123456 आहे.",
   terms: {
     before: "पुढे जाऊन तुम्ही ",
@@ -70,6 +78,11 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
     unavailable: "आत्ता साइन इन उपलब्ध नाही. थोड्या वेळाने पुन्हा प्रयत्न करा.",
     unknown: "काहीतरी चुकले. कृपया पुन्हा प्रयत्न करा.",
     google: "Google साइन इन पूर्ण झाले नाही. कृपया पुन्हा प्रयत्न करा.",
+    "email-required": "तुमचा ईमेल पत्ता लिहा",
+    "email-invalid": "हा ईमेल पत्ता बरोबर वाटत नाही. एकदा तपासा.",
+    "email-code": "कोडचे सर्व अंक लिहा",
+    "bad-email-code": "कोड चुकीचा आहे किंवा जुना झाला. ईमेल पाहा किंवा नवीन कोड मागवा.",
+    "email-failed": "ईमेल पाठवता आला नाही. पत्ता तपासा, किंवा Google ने साइन इन करा.",
   },
 };
 
@@ -84,7 +97,7 @@ export const profileCopy: Translation<typeof en.profileCopy> = {
   languageHint:
     "इंग्रजी, हिंदी, मराठी, गुजराती, बंगाली आणि तमिळ निवडल्यास ॲप लगेच बदलते; इतर भाषा भाषांतर तयार होईल तशा येतील. निमंत्रणे कोणत्याही भाषेत असू शकतात.",
   signedInWith: "साइन इन केले",
-  methods: { phone: "मोबाइल नंबरने", google: "Google ने" },
+  methods: { phone: "मोबाइल नंबरने", email: "ईमेलने", google: "Google ने" },
   save: "बदल सेव्ह करा",
   saved: "प्रोफाइल सेव्ह झाले",
   signOut: "साइन आउट",
@@ -222,4 +235,11 @@ export const invitesCopy: Translation<typeof en.invitesCopy> = {
     body: "एक प्रसंग आणि एक डिझाइन निवडा; तुमचे पहिले निमंत्रण सुमारे पाच मिनिटांत तयार होते.",
     action: "तुमचे पहिले निमंत्रण बनवा",
   },
+};
+
+export const saveCopy: Translation<typeof en.saveCopy> = {
+  title: "तुमचे निमंत्रण सेव्ह करा",
+  intro:
+    "साइन इन करून त्याची लिंक मिळवा, कुटुंबाला पाठवा आणि कोणत्याही फोनवर उघडा. मोफत, आणि पासवर्ड नाही.",
+  close: "बंद करा",
 };

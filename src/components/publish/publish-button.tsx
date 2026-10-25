@@ -1,20 +1,12 @@
 "use client";
 
-import {
-  Check,
-  CircleAlert,
-  Globe,
-  LoaderCircle,
-  LogIn,
-  PencilLine,
-  Send,
-  Sparkles,
-} from "lucide-react";
+import { Check, CircleAlert, Globe, LoaderCircle, PencilLine, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { needsPackage } from "@/actions/checkout";
 import { checkSlug, publishInvite, type PublishOutcome, type SlugCheck } from "@/actions/invites";
+import { SaveSheet } from "@/components/account/save-sheet";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Field } from "@/components/ui/field";
@@ -75,35 +67,25 @@ export function PublishButton({
     setOpen(true);
   };
 
-  if (!signedIn) {
-    return (
-      <Button asChild>
-        <Link href={`/sign-in?next=${encodeURIComponent("/create")}`}>
-          <LogIn aria-hidden />
-          {publishCopy.signInToPublish}
-        </Link>
-      </Button>
-    );
-  }
-
-  if (draft.slug && draft.remoteId) {
-    return (
-      <Button asChild>
-        <Link href={`/invites/${draft.remoteId}/share`}>
-          <Send aria-hidden className="rtl:-scale-x-100" />
-          {publishCopy.share}
-        </Link>
-      </Button>
-    );
-  }
-
+  // Signing in opens over the invitation, so nothing typed is left behind
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <Button leadingIcon={<Globe aria-hidden />} loading={gating} onClick={() => void start()}>
-        {publishCopy.publish}
-      </Button>
-      {open && <PublishDialog draft={draft} onClose={() => setOpen(false)} />}
-    </Dialog>
+    <SaveSheet next="/create" label={publishCopy.signInToPublish} signedIn={signedIn}>
+      {draft.slug && draft.remoteId ? (
+        <Button asChild>
+          <Link href={`/invites/${draft.remoteId}/share`}>
+            <Send aria-hidden className="rtl:-scale-x-100" />
+            {publishCopy.share}
+          </Link>
+        </Button>
+      ) : (
+        <Dialog open={open} onOpenChange={setOpen}>
+          <Button leadingIcon={<Globe aria-hidden />} loading={gating} onClick={() => void start()}>
+            {publishCopy.publish}
+          </Button>
+          {open && <PublishDialog draft={draft} onClose={() => setOpen(false)} />}
+        </Dialog>
+      )}
+    </SaveSheet>
   );
 }
 

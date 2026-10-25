@@ -6,7 +6,7 @@ import { chatLines, detailLines } from "@/lib/publish/message";
 
 export const publishCopy: Translation<typeof en.publishCopy> = {
   publish: "প্রকাশ করুন",
-  signInToPublish: "প্রকাশ করতে সাইন ইন করুন",
+  signInToPublish: "সেভ করে প্রকাশ করুন",
   share: "শেয়ার করুন",
   finishFirst: "প্রকাশ করতে ওপরে চিহ্নিত ধাপগুলো শেষ করুন।",
   dialogTitle: "আপনার নিমন্ত্রণ প্রকাশ করুন",

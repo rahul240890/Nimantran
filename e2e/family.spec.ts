@@ -84,7 +84,9 @@ test.describe("family preview links", () => {
     await context.close();
   });
 
-  test("signed out, the preview offers to sign in to share it", async ({ page }) => {
+  test("signed out, the preview offers to sign in to share it, over the invitation", async ({
+    page,
+  }) => {
     test.setTimeout(60_000);
     await page.clock.install({ time: new Date("2026-09-26T10:00:00") });
     await page.goto("/");
@@ -92,9 +94,10 @@ test.describe("family preview links", () => {
     await page.goto(DESIGN);
     await writeAndPreview(page);
     const card = page.locator("[data-family-share]");
-    await expect(card.getByRole("link", { name: "Sign in to share" })).toHaveAttribute(
-      "href",
-      "/sign-in?next=%2Fcreate",
-    );
+    await card.getByRole("button", { name: "Sign in to share" }).click();
+    const sheet = page.getByRole("dialog", { name: "Save your invitation" });
+    await expect(sheet.getByRole("textbox", { name: /Email/ })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Continue with Google" })).toBeVisible();
+    await expect(page).toHaveURL(/\/create$/);
   });
 });
