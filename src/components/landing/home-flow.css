@@ -18,10 +18,12 @@
 .flow-screen [data-flow="pop"] {
   animation-name: flow-pop;
 }
+/* jump-none reaches the whole line on its last step, not at exactly 100%, which the
+   browser can miss by a hair and leave the line cut short (as reveals.css explains) */
 .flow-screen [data-flow="type"] {
   animation-name: flow-type;
   animation-duration: 0.7s;
-  animation-timing-function: steps(7, end);
+  animation-timing-function: steps(7, jump-none);
 }
 .flow-screen [data-flow="pick"] {
   animation-name: flow-pick;

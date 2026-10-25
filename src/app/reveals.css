@@ -246,8 +246,11 @@
 .reveal-name-drop .reveal-letter {
   animation: reveal-letter-drop 0.9s var(--reveal-delay, 0ms) both;
 }
+/* Each letter switches on in a blink. Not steps(1, end): a delay such as 2.02s makes the
+   browser end the animation a hair short of 100% (0.9999999999999964), so the jump never
+   came and the letter stayed hidden for good ("sha" for Isha, or no second name at all) */
 .reveal-name-type .reveal-letter {
-  animation: reveal-letter-type 0.05s steps(1, end) var(--reveal-delay, 0ms) both;
+  animation: reveal-letter-type 0.05s linear var(--reveal-delay, 0ms) both;
 }
 .reveal-name-wave .reveal-letter {
   transform-origin: 50% 80%;
@@ -343,10 +346,12 @@
     transform: none;
   }
 }
+/* Fully on by halfway, so an animation ending a hair short of 100% still shows it */
 @keyframes reveal-letter-type {
   from {
     opacity: 0;
   }
+  50%,
   to {
     opacity: 1;
   }
