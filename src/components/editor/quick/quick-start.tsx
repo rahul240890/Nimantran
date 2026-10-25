@@ -205,10 +205,12 @@ export function QuickStart({
     async function arrive() {
       if (missing) toast({ title: syncCopy.missing, tone: "error" });
       // The invite opened from the account replaces the one open, which is saved first
-      if (initialInvite && !(await switchDraft(initialInvite, { signedIn }))) {
+      const switched = initialInvite ? await switchDraft(initialInvite, { signedIn }) : true;
+      if (!switched) {
         toast({ title: syncCopy.switchFailed, tone: "error" });
         return;
       }
+      if (switched === "set-aside") toast({ title: syncCopy.setAside, tone: "success" });
       // Back on a page whose design the invite already has (a reload, or back from the
       // preview), what the family changed since stays: the address's faith or tradition
       // isn't applied again
@@ -710,7 +712,7 @@ export function QuickStart({
             </Quiet>
           )}
 
-          {/* See my invitation stays in reach on a phone */}
+          {/* Publish stays in reach on a phone */}
           <div className="sticky bottom-0 z-30 -mx-4 mt-auto flex flex-col gap-2 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-t-lg lg:border-x lg:px-4">
             {errorCount > 0 && (
               <p

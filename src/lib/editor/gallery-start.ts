@@ -35,6 +35,14 @@ export async function startWithDesign(
 ): Promise<void> {
   const current = inviteDraft.get().draft;
   const sameOccasion = !choice.category || choice.category === current.categoryId;
+  // A live invite holding a change its package refused can't save, so it can't be put
+  // away: the open copy, change and all, becomes the new invite, and the live one stays
+  // as guests have it
+  if (signedIn && current.slug !== null && sameOccasion && syncStore.get() === "needs-plan") {
+    splitOffDraft();
+    inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
+    return;
+  }
   const keepsWork = current.slug === null && sameOccasion;
   const switched =
     signedIn && current.updatedAt !== 0 && !keepsWork
@@ -44,12 +52,6 @@ export async function startWithDesign(
             withGalleryChoice(sameOccasion ? carriedOver(current) : newDraft(), choice, site),
         })
       : false;
-  // A live invite holding a change its package refused can't save, so it can't be put
-  // away: the open copy, change and all, becomes the new invite, and the live one stays
-  // as guests have it
-  if (!switched && signedIn && !keepsWork && sameOccasion && syncStore.get() === "needs-plan") {
-    splitOffDraft();
-  }
   if (!switched) inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
 }
 

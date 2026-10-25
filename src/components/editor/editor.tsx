@@ -56,7 +56,9 @@ export function Editor({
         return;
       }
       if (initialInvite || fresh) {
-        const switched = await switchDraft(initialInvite, { signedIn });
+        // A change held back from a live invite becomes a draft of its own (setAside)
+        const switched = await switchDraft(initialInvite, { signedIn, setAside: true });
+        if (switched === "set-aside") toast({ title: syncCopy.setAside, tone: "success" });
         if (!switched) toast({ title: syncCopy.switchFailed, tone: "error" });
       }
       const draft = inviteDraft.get().draft;
