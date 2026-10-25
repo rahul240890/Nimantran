@@ -8,9 +8,11 @@ import { OTP_LENGTH } from "@/lib/auth/phone";
 type CodeInputProps = {
   value: string;
   onChange: (value: string) => void;
-  /** Called once all six digits are in, typed or pasted or filled from the SMS. */
+  /** Called once all the digits are in, typed or pasted or filled from the SMS. */
   onComplete?: (value: string) => void;
   disabled?: boolean;
+  /** Six for SMS; an email code can be longer when Supabase is set so. */
+  length?: number;
 };
 
 /**
@@ -18,11 +20,11 @@ type CodeInputProps = {
  * SMS autofill, pasting, screen readers and the keyboard all work as usual.
  */
 export const CodeInput = forwardRef<HTMLInputElement, CodeInputProps>(function CodeInput(
-  { value, onChange, onComplete, disabled },
+  { value, onChange, onComplete, disabled, length = OTP_LENGTH },
   ref,
 ) {
   const field = useField();
-  const active = Math.min(value.length, OTP_LENGTH - 1);
+  const active = Math.min(value.length, length - 1);
   return (
     <div className="group/code relative w-full max-w-sm">
       <input
@@ -33,18 +35,22 @@ export const CodeInput = forwardRef<HTMLInputElement, CodeInputProps>(function C
         inputMode="numeric"
         autoComplete="one-time-code"
         pattern="\d*"
-        maxLength={OTP_LENGTH}
+        maxLength={length}
         aria-invalid={field?.invalid || undefined}
         aria-describedby={field?.describedBy}
         onChange={(event) => {
-          const digits = event.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH);
+          const digits = event.target.value.replace(/\D/g, "").slice(0, length);
           onChange(digits);
-          if (digits.length === OTP_LENGTH) onComplete?.(digits);
+          if (digits.length === length) onComplete?.(digits);
         }}
         className="absolute inset-0 z-10 size-full cursor-text opacity-0 disabled:cursor-not-allowed"
       />
-      <div aria-hidden className="grid grid-cols-6 gap-1.5 sm:gap-2.5">
-        {Array.from({ length: OTP_LENGTH }, (_, index) => {
+      <div
+        aria-hidden
+        className="grid gap-1.5 sm:gap-2.5"
+        style={{ gridTemplateColumns: `repeat(${length}, minmax(0, 1fr))` }}
+      >
+        {Array.from({ length }, (_, index) => {
           const digit = value[index];
           const current = index === active;
           return (

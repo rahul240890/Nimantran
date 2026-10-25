@@ -5,7 +5,7 @@ import { site } from "@/lib/site";
 
 export const publishCopy = {
   publish: "Publish",
-  signInToPublish: "Sign in to publish",
+  signInToPublish: "Save and publish",
   share: "Share",
   finishFirst: "Finish the steps marked above to publish.",
   dialogTitle: "Publish your invitation",

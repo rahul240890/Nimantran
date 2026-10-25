@@ -28,6 +28,14 @@ export const signInCopy = {
   resendIn: (seconds: number) => `Send a new code in ${seconds}s`,
   resent: "A new code is on its way",
   changeNumber: "Change number",
+  emailLabel: "Email",
+  emailHint: "We'll email you a code. No password needed.",
+  emailPlaceholder: "you@example.com",
+  emailCode: "Email me a code",
+  codeSentEmail: (masked: string) =>
+    `We emailed a code to ${masked}. It can take a minute, so check Promotions and Spam too.`,
+  codeLabelEmail: "Code from the email",
+  changeEmail: "Change email",
   previewNote: "Preview mode: any number works, and the code is 123456.",
   terms: {
     before: "By continuing you agree to the ",
@@ -71,7 +79,23 @@ export const signInCopy = {
     unavailable: "Sign-in isn't available right now. Please try again shortly.",
     unknown: "Something went wrong. Please try again.",
     google: "Google sign-in didn't finish. Please try again.",
-  } satisfies Record<AuthFailure | "required" | "invalid" | "code" | "google", string>,
+    "email-required": "Enter your email address",
+    "email-invalid": "That doesn't look like an email address. Check it for typos.",
+    "email-code": "Enter every digit of the code",
+    "bad-email-code": "That code is wrong or has expired. Check the email or send a new one.",
+    "email-failed": "We couldn't send the email. Check the address, or sign in with Google.",
+  } satisfies Record<
+    | AuthFailure
+    | "required"
+    | "invalid"
+    | "code"
+    | "google"
+    | "email-required"
+    | "email-invalid"
+    | "email-code"
+    | "bad-email-code",
+    string
+  >,
 } as const;
 
 export const profileCopy = {
@@ -85,7 +109,7 @@ export const profileCopy = {
   languageHint:
     "English, Hindi, Marathi, Gujarati, Bengali and Tamil switch the app now; other languages follow as translations arrive. Invitations can use any language.",
   signedInWith: "Signed in with",
-  methods: { phone: "Mobile number", google: "Google" },
+  methods: { phone: "Mobile number", email: "Email", google: "Google" },
   save: "Save changes",
   saved: "Profile saved",
   signOut: "Sign out",
@@ -224,4 +248,12 @@ export const invitesCopy = {
     body: "Pick an occasion and a design; your first invite takes about five minutes.",
     action: "Create your first invite",
   },
+} as const;
+
+/** Signing in from the editor, in a sheet over the invitation, so nothing typed is left behind. */
+export const saveCopy = {
+  title: "Save your invitation",
+  intro:
+    "Sign in to get its link, share it with family and open it on any phone. Free, and no password.",
+  close: "Close",
 } as const;

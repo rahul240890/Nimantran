@@ -1,10 +1,10 @@
 "use client";
 
-import { Copy, LogIn, UsersRound } from "lucide-react";
-import Link from "next/link";
+import { Copy, UsersRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { familyLink } from "@/actions/family";
 import { SocialIcon } from "@/components/brand/social-links";
+import { SaveSheet } from "@/components/account/save-sheet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/components/ui/toast";
@@ -53,58 +53,59 @@ export function FamilyPreview({
       <p className="text-sm text-ink-muted">
         {signedIn ? previewCopy.familyBody : previewCopy.familySignInBody}
       </p>
-      {!signedIn ? (
-        <Button asChild variant="secondary" className="self-start">
-          <Link href={`/sign-in?next=${encodeURIComponent("/create")}`}>
-            <LogIn aria-hidden />
-            {previewCopy.familySignIn}
-          </Link>
-        </Button>
-      ) : failed ? (
-        <p role="alert" className="text-sm font-medium text-danger">
-          {previewCopy.familyFailed}
-        </p>
-      ) : (
-        <div className="flex flex-wrap gap-3">
-          {link ? (
-            <Button
-              asChild
-              className="h-auto min-h-12 max-w-full py-2 text-balance whitespace-normal"
-            >
-              <a
-                href={`https://wa.me/?text=${encodeURIComponent(previewCopy.familyMessage(link))}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => funnel("Family preview shared")}
+      <SaveSheet
+        next="/create"
+        variant="secondary"
+        label={previewCopy.familySignIn}
+        className="self-start"
+        signedIn={signedIn}
+      >
+        {failed ? (
+          <p role="alert" className="text-sm font-medium text-danger">
+            {previewCopy.familyFailed}
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {link ? (
+              <Button
+                asChild
+                className="h-auto min-h-12 max-w-full py-2 text-balance whitespace-normal"
               >
-                <SocialIcon channel="whatsapp" />
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(previewCopy.familyMessage(link))}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => funnel("Family preview shared")}
+                >
+                  <SocialIcon channel="whatsapp" />
+                  {previewCopy.familySend}
+                </a>
+              </Button>
+            ) : (
+              <Button loading disabled>
                 {previewCopy.familySend}
-              </a>
+              </Button>
+            )}
+            <Button
+              variant="secondary"
+              leadingIcon={<Copy aria-hidden />}
+              disabled={!link}
+              onClick={async () => {
+                if (!link) return;
+                try {
+                  await navigator.clipboard.writeText(link);
+                  toast({ title: previewCopy.familyCopied, tone: "success" });
+                  funnel("Family preview shared");
+                } catch {
+                  toast({ title: link, tone: "info" });
+                }
+              }}
+            >
+              {previewCopy.familyCopy}
             </Button>
-          ) : (
-            <Button loading disabled>
-              {previewCopy.familySend}
-            </Button>
-          )}
-          <Button
-            variant="secondary"
-            leadingIcon={<Copy aria-hidden />}
-            disabled={!link}
-            onClick={async () => {
-              if (!link) return;
-              try {
-                await navigator.clipboard.writeText(link);
-                toast({ title: previewCopy.familyCopied, tone: "success" });
-                funnel("Family preview shared");
-              } catch {
-                toast({ title: link, tone: "info" });
-              }
-            }}
-          >
-            {previewCopy.familyCopy}
-          </Button>
-        </div>
-      )}
+          </div>
+        )}
+      </SaveSheet>
     </Card>
   );
 }

@@ -25,6 +25,14 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
   resendIn: (seconds) => `${seconds} সেকেন্ড পরে নতুন কোড পাঠান`,
   resent: "নতুন কোড আসছে",
   changeNumber: "নম্বর বদলান",
+  emailLabel: "ইমেল",
+  emailHint: "আমরা ইমেলে একটি কোড পাঠাব। কোনো পাসওয়ার্ড লাগবে না।",
+  emailPlaceholder: "you@example.com",
+  emailCode: "ইমেলে কোড পাঠান",
+  codeSentEmail: (masked) =>
+    `আমরা ${masked}-এ কোড পাঠিয়েছি। এক মিনিট লাগতে পারে, Promotions আর Spam-ও দেখুন।`,
+  codeLabelEmail: "ইমেলে আসা কোড",
+  changeEmail: "ইমেল বদলান",
   previewNote: "প্রিভিউ মোড: যেকোনো নম্বর চলবে, কোড হল 123456।",
   terms: {
     before: "এগিয়ে গেলে আপনি আমাদের ",
@@ -68,6 +76,11 @@ export const signInCopy: Translation<typeof en.signInCopy> = {
     unavailable: "এই মুহূর্তে সাইন ইন করা যাচ্ছে না। একটু পরে আবার চেষ্টা করুন।",
     unknown: "কিছু একটা গোলমাল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
     google: "Google সাইন ইন শেষ হয়নি। অনুগ্রহ করে আবার চেষ্টা করুন।",
+    "email-required": "আপনার ইমেল ঠিকানা লিখুন",
+    "email-invalid": "এটি ঠিক ইমেল ঠিকানা মনে হচ্ছে না। একবার দেখে নিন।",
+    "email-code": "কোডের সব সংখ্যা লিখুন",
+    "bad-email-code": "কোডটি ভুল বা পুরোনো হয়ে গেছে। ইমেল দেখুন বা নতুন কোড চান।",
+    "email-failed": "ইমেল পাঠানো গেল না। ঠিকানা দেখুন, অথবা Google দিয়ে সাইন ইন করুন।",
   },
 };
 
@@ -82,7 +95,7 @@ export const profileCopy: Translation<typeof en.profileCopy> = {
   languageHint:
     "ইংরেজি, হিন্দি, মারাঠি, গুজরাটি, বাংলা আর তামিল বেছে নিলে অ্যাপ এখনই বদলে যায়; অন্য ভাষাগুলো অনুবাদ তৈরি হলেই আসবে। নিমন্ত্রণপত্র যেকোনো ভাষায় হতে পারে।",
   signedInWith: "সাইন ইন করেছেন",
-  methods: { phone: "মোবাইল নম্বর দিয়ে", google: "Google দিয়ে" },
+  methods: { phone: "মোবাইল নম্বর দিয়ে", email: "ইমেল দিয়ে", google: "Google দিয়ে" },
   save: "বদলগুলো সেভ করুন",
   saved: "প্রোফাইল সেভ হয়েছে",
   signOut: "সাইন আউট",
@@ -220,4 +233,11 @@ export const invitesCopy: Translation<typeof en.invitesCopy> = {
     body: "একটি অনুষ্ঠান আর ডিজাইন বেছে নিন; প্রথম নিমন্ত্রণ তৈরি করতে মোটামুটি পাঁচ মিনিট লাগে।",
     action: "প্রথম নিমন্ত্রণ তৈরি করুন",
   },
+};
+
+export const saveCopy: Translation<typeof en.saveCopy> = {
+  title: "আপনার নিমন্ত্রণ সেভ করুন",
+  intro:
+    "সাইন ইন করে এর লিংক পান, পরিবারকে পাঠান আর যেকোনো ফোনে খুলুন। বিনামূল্যে, কোনো পাসওয়ার্ড নেই।",
+  close: "বন্ধ করুন",
 };

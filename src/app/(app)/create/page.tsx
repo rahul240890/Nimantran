@@ -6,6 +6,8 @@ import { PageTransition } from "@/components/motion/page-transition";
 import { editorText } from "@/i18n/copy/editor";
 import { getLocale, getText } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
+import { signInOptions } from "@/lib/auth/mode";
+import { SignInOptionsProvider } from "@/components/account/save-sheet";
 import { isCategoryId } from "@/lib/categories/catalog";
 import { isInviteFormat } from "@/lib/editor/formats";
 import { designById, WEDDING_KIND_ENTRIES } from "@/lib/gallery/catalog";
@@ -98,19 +100,21 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
 
   return (
     <PageTransition>
-      <Editor
-        // A new ?invite= or ?new= while the editor is open starts it over
-        key={[wanted, fresh === "1"].join("|")}
-        signedIn={Boolean(account)}
-        initialInvite={initialInvite}
-        fresh={fresh === "1"}
-        missing={Boolean(wanted && !initialInvite)}
-        openPublish={Boolean(initialInvite) && publish === "1"}
-        openGate={Boolean(initialInvite) && gate === "1"}
-        openPreview={Boolean(initialInvite) && preview === "1"}
-        // Changing an invite happens on its design's page, once it's open on this device
-        openEdit={Boolean(initialInvite) && publish !== "1" && gate !== "1" && preview !== "1"}
-      />
+      <SignInOptionsProvider value={signInOptions()}>
+        <Editor
+          // A new ?invite= or ?new= while the editor is open starts it over
+          key={[wanted, fresh === "1"].join("|")}
+          signedIn={Boolean(account)}
+          initialInvite={initialInvite}
+          fresh={fresh === "1"}
+          missing={Boolean(wanted && !initialInvite)}
+          openPublish={Boolean(initialInvite) && publish === "1"}
+          openGate={Boolean(initialInvite) && gate === "1"}
+          openPreview={Boolean(initialInvite) && preview === "1"}
+          // Changing an invite happens on its design's page, once it's open on this device
+          openEdit={Boolean(initialInvite) && publish !== "1" && gate !== "1" && preview !== "1"}
+        />
+      </SignInOptionsProvider>
     </PageTransition>
   );
 }

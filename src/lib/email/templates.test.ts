@@ -138,3 +138,14 @@ describe("stop links", () => {
     );
   });
 });
+
+describe("the sign-in code email", () => {
+  it("puts the code in the subject and large in the body", async () => {
+    const { signInCodeEmail } = await import("./templates");
+    const email = signInCodeEmail(brand, "482913", 60);
+    expect(email.subject).toBe("482913 is your Shubh Invitation code");
+    expect(email.html).toContain("482913");
+    expect(email.text).toContain("482913");
+    expect(email.text).toContain("60 minutes");
+  });
+});

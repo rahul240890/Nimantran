@@ -2,14 +2,17 @@
 
 import { headers } from "next/headers";
 import { profileSchema, safeNext, type Account, type AuthFailure } from "@/lib/auth/account";
-import { phoneSignIn } from "@/lib/auth/mode";
+import { isEmailCode, normalizeEmail, type EmailError } from "@/lib/auth/email";
+import { emailSignIn, phoneSignIn } from "@/lib/auth/mode";
 import { isOtp, normalizePhone } from "@/lib/auth/phone";
 import {
   getAccount,
   googleSignInUrl,
+  sendEmailCode as emailTheCode,
   sendPhoneCode,
   signOut as endSession,
   updateProfile,
+  verifyEmailCode as checkEmailCode,
   verifyPhoneCode,
 } from "@/lib/auth/server";
 import { deleteAccountData } from "@/lib/auth/delete-account";
@@ -49,6 +52,38 @@ export async function verifyCode(
   const phone = normalizePhone(String(phoneInput ?? ""));
   if ("error" in phone || !isOtp(String(code ?? ""))) return { status: "invalid" };
   const result = await verifyPhoneCode(phone.phone, code);
+  if (!result.ok) return { status: "failed", error: result.error };
+  return {
+    status: "signed-in",
+    name: result.value.name,
+    language: result.value.language,
+    next: safeNext(next),
+  };
+}
+
+export type SendEmailCodeResult =
+  | { status: "sent"; email: string; length: number }
+  | { status: "invalid"; error: EmailError }
+  | { status: "failed"; error: AuthFailure };
+
+export async function sendEmailCode(input: string): Promise<SendEmailCodeResult> {
+  if (!emailSignIn()) return { status: "failed", error: "provider-off" };
+  const parsed = normalizeEmail(String(input ?? ""));
+  if ("error" in parsed) return { status: "invalid", error: parsed.error };
+  const result = await emailTheCode(parsed.email);
+  return result.ok
+    ? { status: "sent", email: parsed.email, length: result.value }
+    : { status: "failed", error: result.error };
+}
+
+export async function verifyEmailCode(
+  emailInput: string,
+  code: string,
+  next: string,
+): Promise<VerifyCodeResult> {
+  const email = normalizeEmail(String(emailInput ?? ""));
+  if ("error" in email || !isEmailCode(String(code ?? ""))) return { status: "invalid" };
+  const result = await checkEmailCode(email.email, code);
   if (!result.ok) return { status: "failed", error: result.error };
   return {
     status: "signed-in",

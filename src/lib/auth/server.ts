@@ -6,6 +6,7 @@ import { welcomeAfterSignIn } from "@/lib/email/notify";
 import { supabaseServer } from "@/lib/supabase/server";
 import type { Account, AuthFailure, Profile } from "./account";
 import { ACCOUNT_HINT_COOKIE, encodeAccountHint } from "./hint";
+import { sendSignInCode } from "./email-code";
 import { PREVIEW_CODE, authMode } from "./mode";
 import { PREVIEW_COOKIE, openPreviewSession, sealPreviewSession } from "./preview-session";
 
@@ -45,7 +46,7 @@ export function accountFromUser(user: User): Account {
     email: user.email || null,
     avatarUrl: typeof meta.avatar_url === "string" ? meta.avatar_url : null,
     language: isLocale(meta.language) ? meta.language : "en",
-    method: user.app_metadata?.provider === "google" ? "google" : "phone",
+    method: user.app_metadata?.provider === "google" ? "google" : user.phone ? "phone" : "email",
   };
 }
 
@@ -67,6 +68,7 @@ export function authFailure(error: {
       return "sms-failed";
     case "otp_disabled":
     case "phone_provider_disabled":
+    case "email_provider_disabled":
     case "provider_disabled":
       return "provider-off";
   }
@@ -132,6 +134,42 @@ export async function verifyPhoneCode(phone: string, code: string): Promise<Resu
   if (error || !data.user) return fail(error ? authFailure(error) : "unknown");
   const account = accountFromUser(data.user);
   await writeHint(account);
+  return ok(account);
+}
+
+/** Emails a sign-in code; answers with the code's length, which Supabase's settings decide. */
+export async function sendEmailCode(email: string): Promise<Result<number>> {
+  if (authMode() === "preview") return ok(PREVIEW_CODE.length);
+  const sent = await sendSignInCode(email);
+  return sent.ok ? ok(sent.length) : fail(sent.error);
+}
+
+export async function verifyEmailCode(email: string, code: string): Promise<Result<Account>> {
+  if (authMode() === "preview") {
+    if (code !== PREVIEW_CODE) return fail("bad-code");
+    const existing = await openPreviewSession((await cookies()).get(PREVIEW_COOKIE)?.value);
+    const account: Account =
+      existing?.email === email
+        ? existing
+        : {
+            id: `preview-${email.replace(/[^a-z0-9]/g, "")}`.slice(0, 60),
+            name: "",
+            phone: null,
+            email,
+            avatarUrl: null,
+            language: "en",
+            method: "email",
+          };
+    await startPreviewSession(account);
+    return ok(account);
+  }
+  const supabase = await supabaseServer();
+  if (!supabase) return fail("unavailable");
+  const { data, error } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
+  if (error || !data.user) return fail(error ? authFailure(error) : "unknown");
+  const account = accountFromUser(data.user);
+  await writeHint(account);
+  welcomeAfterSignIn(data.user);
   return ok(account);
 }
 
