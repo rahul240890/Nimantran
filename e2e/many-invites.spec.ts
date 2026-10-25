@@ -78,6 +78,8 @@ test.describe("many invitations", () => {
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
     await seeInvitation(page);
     await expect(editorBar(page)).toHaveText("Publish");
+    // Saved to the account on its own, a moment after the change
+    await expect(page.getByText("Saved to your account")).toBeVisible({ timeout: 15_000 });
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });
@@ -100,6 +102,8 @@ test.describe("many invitations", () => {
     await expect(held).toHaveCount(0);
     await seeInvitation(page);
     await expect(editorBar(page)).toHaveText("Publish");
+    // Saved to the account on its own, a moment after the change
+    await expect(page.getByText("Saved to your account")).toBeVisible({ timeout: 15_000 });
     await page.goto("/invites");
     await expect(page.getByRole("heading", { name: "Riya & Arjun" })).toHaveCount(2);
   });
