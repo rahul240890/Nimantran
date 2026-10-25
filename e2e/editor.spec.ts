@@ -128,6 +128,66 @@ for (const colorScheme of ["light", "dark"] as const) {
 test.describe("invite editor", () => {
   test.use({ reducedMotion: "reduce" });
 
+  test("the design shows large, its gate first, in the card's one language and without a price", async ({
+    page,
+  }, info) => {
+    await open(page, "/create/noor-bagh?category=wedding");
+    // An invite from before a second card language was taken away
+    await page.evaluate(() => {
+      const draft = JSON.parse(localStorage.getItem("nimantran-invite-draft")!);
+      localStorage.setItem(
+        "nimantran-invite-draft",
+        JSON.stringify({ ...draft, languages: ["en", "gu"] }),
+      );
+    });
+    await open(page, "/create/noor-bagh?category=wedding");
+    await fillNames(page, ["Aditya", "Priya"]);
+    // One language: no switch over the design, and the second is gone from the invite
+    await expect(page.getByRole("radiogroup", { name: "Card language" })).toHaveCount(1);
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => JSON.parse(localStorage.getItem("nimantran-invite-draft")!).languages as string[],
+        ),
+      )
+      .toEqual(["en"]);
+    // The price is with the packages, not beside the design's name
+    await expect(page.locator('section[aria-labelledby="design-name"] [data-tier]')).toHaveCount(0);
+
+    // The phone is the page's picture
+    const phone = page.getByRole("img", { name: /, as guests see it$/ }).first();
+    await expect(phone).toContainText("Aditya");
+    const height = (await phone.boundingBox())!.height;
+    expect(height).toBeGreaterThan(info.project.name.startsWith("phone") ? 350 : 500);
+
+    // The gate guests open first leads the pages, with the way to change it
+    await page.getByRole("button", { name: "Show the Gate page" }).first().click();
+    await expect(page.getByRole("img", { name: "The Gate page, as guests see it" })).toBeVisible();
+    await expect(phone).toContainText("Open the invitation");
+    await page.getByRole("button", { name: "Change opening gate" }).first().click();
+    const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
+    await dialog.getByRole("button", { name: "Curtains and reveals" }).click();
+    await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
+    await dialog.getByRole("button", { name: "Done" }).click();
+    await expect(phone.locator("[data-opening]")).toHaveAttribute("data-opening", "curtain");
+    await expect(phone).toContainText("Aditya");
+    expect(await noOverflow(page)).toBe(true);
+    expect(await axeFromTop(page)).toEqual([]);
+
+    // On a phone, the small copy floats only while a field is typed in
+    if (info.project.name.startsWith("phone")) {
+      const mini = page.getByRole("button", { name: "Live preview, open it large" });
+      await openPart(page, "Family names");
+      const field = page.locator("#part-family").getByRole("textbox").first();
+      await field.scrollIntoViewIfNeeded();
+      await expect(mini).toHaveCount(0);
+      await field.click();
+      await expect(mini).toBeVisible();
+      await page.locator("#part-family > summary").click();
+      await expect(mini).toHaveCount(0);
+    }
+  });
+
   test("writes an invite on its design's page, previews it, and keeps it after a reload", async ({
     page,
   }) => {

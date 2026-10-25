@@ -194,7 +194,11 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("radio", { name: /Raag Yaman/ })).toBeChecked();
     // How it opens is the last part
     await openPart(page, "Opening gate (cover screen)");
-    await expect(page.getByRole("button", { name: "Change opening gate" })).toBeVisible();
+    await expect(
+      page.getByTestId("gate-summary").getByRole("button", { name: "Change opening gate" }),
+    ).toBeVisible();
+    // The phone above turns to the gate guests open first
+    await expect(page.getByRole("img", { name: "The Gate page, as guests see it" })).toBeVisible();
     await expect(opened).toHaveCount(1);
     // Read from the top: a control scrolled under the sticky header counts as too small
     await page.evaluate(() => window.scrollTo(0, 0));

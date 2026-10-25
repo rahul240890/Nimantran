@@ -652,6 +652,7 @@ export const suiteCopy: Translation<typeof en.suiteCopy> = {
 export const studioCopy: Translation<typeof en.studioCopy> = {
   pagesHint: "আপনি যে পাতা লিখছেন, লিখতে লিখতেই তা এখানে দেখা যায়।",
   pageNames: {
+    gate: "দরজা",
     blessing: "আশীর্বাদ",
     cover: "প্রচ্ছদ",
     couple: "ছবি",

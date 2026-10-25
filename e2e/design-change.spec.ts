@@ -109,7 +109,11 @@ test.describe("changing the design", () => {
 
     // A new gate on the new design
     await openPart(page, "Opening gate (cover screen)");
-    await page.getByRole("button", { name: "Change opening gate" }).click();
+    // The part's own button; the phone above turns to the gate and has one too
+    await page
+      .getByTestId("gate-summary")
+      .getByRole("button", { name: "Change opening gate" })
+      .click();
     const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
     await dialog.getByRole("button", { name: "Curtains and reveals" }).click();
     await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
