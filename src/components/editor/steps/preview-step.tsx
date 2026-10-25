@@ -34,7 +34,6 @@ import { syncDraft } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
 import { photoFailed, usePhotoUrls } from "../use-photo-urls";
 import { GateSummary } from "../gate-chooser";
-import { SecondLanguageSection } from "./second-language";
 import type { StepProps } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
@@ -151,8 +150,8 @@ export function PreviewStep({
         <FamilyPreview signedIn={signedIn} remoteId={draft.remoteId} />
       )}
 
-      {/* After seeing it once: guests can also read it in a second language */}
-      <SecondLanguageSection draft={draft} update={update} />
+      {/* A second language for guests is put away for now (owner, 2026-10-24); an invite
+          that already has one keeps it (second-language.tsx) */}
 
       {signedIn && draft.remoteId && <EditionNotice draft={draft} inviteId={draft.remoteId} />}
 

@@ -22,6 +22,7 @@ import { useLocale, useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
 import {
   draftCategory,
+  draftOpeningStyle,
   includedFunctions,
   type EditorStep,
   type InviteDraft,
@@ -32,8 +33,10 @@ import { changeDesign, startWithDesign, type GalleryChoice } from "@/lib/editor/
 import { inviteDraft } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore } from "@/lib/invites/sync";
 import { funnel } from "@/lib/funnel";
+import { draftShowsScene, draftSuite } from "@/lib/publish/story";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { GateSummary } from "../gate-chooser";
 import { PreviewStage } from "../preview-stage";
 import { SaveStatus } from "../save-status";
 import { CoupleStep, WordsStep } from "../steps/couple-step";
@@ -101,7 +104,8 @@ export function QuickStart({
   /** Other designs for the occasion, drawn on the server (suggested-designs.tsx). */
   more?: ReactNode;
 }) {
-  const { quickCopy, editor, stepCopy, syncCopy, coupleCopy, functionCopy } = useText(editorText);
+  const { quickCopy, editor, stepCopy, syncCopy, coupleCopy, functionCopy, openingCopy } =
+    useText(editorText);
   const locale = useLocale();
   const router = useRouter();
   const still = useReducedMotion();
@@ -122,6 +126,7 @@ export function QuickStart({
   const [arriving, setArriving] = useState(true);
   const [opened, setOpened] = useState<"names" | "when" | null>(null);
   const [previewing, setPreviewing] = useState(false);
+  const [gate, setGate] = useState(false);
   const ready = hydrated && !arriving;
   useDropLostPhotos(draft, update, ready);
   const [page, setPage] = useState("cover");
@@ -300,6 +305,7 @@ export function QuickStart({
     .map((name) => name?.trim())
     .filter(Boolean)
     .join(" & ");
+  const gateStyle = draftOpeningStyle(draft, draftSuite(draft), draftShowsScene(draft));
   const events = includedFunctions(draft)
     .map((id) => functionCopy[id].name)
     .join(", ");
@@ -489,9 +495,27 @@ export function QuickStart({
               >
                 <MusicStep {...stepProps} />
               </Fold>
+              {/* How it opens: the last part, the first thing guests see */}
+              <Fold
+                id="part-gate"
+                group={PARTS}
+                open={false}
+                title={openingCopy.heading}
+                note={openingCopy.styles[gateStyle].name}
+                pageTarget="cover"
+              >
+                <GateSummary
+                  draft={draft}
+                  update={update}
+                  open={gate}
+                  onOpenChange={setGate}
+                  bare
+                />
+              </Fold>
               <DesignPackages
                 designId={designId}
                 tone="paper"
+                extras={draft.categoryId === "wedding" ? "wedding" : "other"}
                 className="border-t border-line pt-4"
               />
               {/* An offer running now on this design, with its code to copy */}

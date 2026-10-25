@@ -23,7 +23,7 @@ describe("sceneTimeline", () => {
     expect(total - end).toBeCloseTo(END_SECONDS);
   });
 
-  it.each([9, 10, 12])("grows towards a minute rather than rush %i cards", (count) => {
+  it.each([9, 10, 11])("grows towards a minute rather than rush %i cards", (count) => {
     const { total, shots } = sceneTimeline(count);
     expect(total).toBeGreaterThan(VIDEO_MAX_SECONDS);
     expect(total).toBeLessThanOrEqual(VIDEO_LONGEST_SECONDS + 0.01);

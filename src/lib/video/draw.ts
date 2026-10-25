@@ -63,8 +63,22 @@ export type VideoScene = {
   palette: (mood: Mood, tone: "light" | "dark" | null) => Palette;
   /** Loaded paintings and photos, by their address. */
   images: ReadonlyMap<string, CanvasImageSource>;
-  /** The closing card. */
-  ending: { brand: string; open: string; link: string };
+  /** The closing card: the invitation's link, then Shubh's sign-off. */
+  ending: VideoEnding;
+};
+
+/**
+ * The closing card's words: where to open the invitation, then Shubh's sign-off. An empty
+ * brand leaves the sign-off out.
+ */
+export type VideoEnding = {
+  open: string;
+  link: string;
+  brand: string;
+  madeWith: string;
+  tagline: string;
+  site: string;
+  handle: string;
 };
 
 /** Every painting and photo a video needs, so they can load before drawing starts. */
@@ -659,9 +673,30 @@ export type EndingScene = Pick<
   "palette" | "suite" | "images" | "copy" | "fonts" | "ending"
 >;
 
+/** When the closing card turns from the invitation's link to Shubh's sign-off. */
+export const ENDING_SIGN_OFF = 3.3;
+/** How long the turn takes: the link fades out, then the sign-off rises in. */
+const ENDING_TURN = 0.5;
+
+type EndingLine = {
+  text: string;
+  family: string;
+  weight?: string;
+  size: number;
+  colour: string;
+  y: number;
+  /** Seconds into the closing card it rises in. */
+  delay: number;
+  spacing?: number;
+  /** Shrinks to fit one line (a link) rather than wrapping. */
+  fit?: boolean;
+};
+
 /**
- * The last seconds: the cover painting dimmed, the names, and where to open the
- * invitation. `local` is the time since the closing card began.
+ * The last seconds (owner, 2026-10-24: short, simple and lovely). First the names and where
+ * to open the invitation; then a quiet sign-off, Shubh's name with a few warm words, the
+ * website and Instagram, so a guest who liked it knows where it came from. The cover
+ * painting stays dimmed under both. `local` is the time since the closing card began.
  */
 export function drawEnding(
   ctx: CanvasRenderingContext2D,
@@ -680,7 +715,7 @@ export function drawEnding(
     ctx.save();
     ctx.filter = "blur(14px)";
     ctx.globalAlpha = alpha * 0.55;
-    zoomAbout(ctx, 1.12);
+    zoomAbout(ctx, 1.12 + 0.03 * Math.min(1, local / 6));
     fillWith(ctx, painting, 0, 0, PAGE_W, PAGE_H);
     ctx.restore();
   }
@@ -701,58 +736,144 @@ export function drawEnding(
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   const cx = PAGE_W / 2;
-  const lines: {
-    text: string;
-    family: string;
-    weight?: string;
-    size: number;
-    colour: string;
-    y: number;
-    delay: number;
-    spacing?: number;
-    /** Shrinks to fit one line (a link) rather than wrapping. */
-    fit?: boolean;
-  }[] = [
-    {
-      text: ending.brand.toLocaleUpperCase(),
-      family: fonts.label,
-      size: 0.8 * REM,
-      colour: colours.goldText,
-      y: PAGE_H * 0.36,
-      delay: 0.1,
-      spacing: 0.3 * 0.8 * REM,
-    },
-    {
-      text: names,
-      family: fonts.display,
-      size: 2.3 * REM,
-      colour: colours.ink,
-      y: PAGE_H * 0.45,
-      delay: 0.3,
-    },
-    {
-      text: ending.open,
-      family: fonts.sans,
-      size: 1.05 * REM,
-      colour: colours.inkMuted,
-      y: PAGE_H * 0.55,
-      delay: 0.6,
-    },
-    {
-      text: ending.link,
-      family: fonts.sans,
-      weight: "600 ",
-      size: 1.1 * REM,
-      colour: colours.goldText,
-      y: PAGE_H * 0.595,
-      delay: 0.8,
-      fit: true,
-    },
-  ];
+  // The sign-off follows only once there is one to show
+  const signs = Boolean(ending.brand);
+  const turn = signs ? Math.max(0, Math.min(1, (local - ENDING_SIGN_OFF) / ENDING_TURN)) : 0;
+  const after = ENDING_SIGN_OFF + ENDING_TURN;
+
+  // The invitation: its names, a gold rule drawn out under them, and its link
+  if (turn < 1) {
+    const fade = 1 - turn;
+    drawEndingLines(
+      ctx,
+      [
+        {
+          text: names,
+          family: fonts.display,
+          size: 2.3 * REM,
+          colour: colours.ink,
+          y: PAGE_H * 0.43,
+          delay: 0.2,
+        },
+        {
+          text: ending.open,
+          family: fonts.sans,
+          size: 1.05 * REM,
+          colour: colours.inkMuted,
+          y: PAGE_H * 0.535,
+          delay: 0.5,
+        },
+        {
+          text: ending.link,
+          family: fonts.sans,
+          weight: "600 ",
+          size: 1.1 * REM,
+          colour: colours.goldText,
+          y: PAGE_H * 0.575,
+          delay: 0.7,
+          fit: true,
+        },
+      ],
+      rise,
+      alpha * fade,
+    );
+    goldRule(ctx, colours.gold, cx, PAGE_H * 0.49, rise(0.35) * 70, alpha * fade);
+  }
+
+  // Shubh's sign-off: "Made with love on", the name as its lockup writes it, the tagline,
+  // and where to find more
+  if (signs && turn > 0) {
+    drawEndingLines(
+      ctx,
+      [
+        {
+          text: ending.madeWith,
+          family: fonts.sans,
+          size: 0.85 * REM,
+          colour: colours.inkMuted,
+          y: PAGE_H * 0.375,
+          delay: after,
+        },
+        {
+          text: ending.brand.split(" ")[0]!.toLocaleUpperCase(),
+          family: fonts.display,
+          size: 2.5 * REM,
+          colour: colours.goldText,
+          y: PAGE_H * 0.425,
+          delay: after + 0.15,
+          spacing: 0.16 * 2.5 * REM,
+        },
+        {
+          text: ending.brand.split(" ").slice(1).join(" ").toLocaleUpperCase(),
+          family: fonts.label,
+          size: 0.75 * REM,
+          colour: colours.ink,
+          y: PAGE_H * 0.466,
+          delay: after + 0.25,
+          spacing: 0.42 * 0.75 * REM,
+        },
+        {
+          text: ending.tagline,
+          family: fonts.display,
+          size: 1.15 * REM,
+          colour: colours.ink,
+          y: PAGE_H * 0.54,
+          delay: after + 0.55,
+        },
+        {
+          text: ending.site,
+          family: fonts.sans,
+          weight: "600 ",
+          size: 1 * REM,
+          colour: colours.goldText,
+          y: PAGE_H * 0.6,
+          delay: after + 0.8,
+          fit: true,
+        },
+        {
+          text: ending.handle,
+          family: fonts.sans,
+          size: 0.85 * REM,
+          colour: colours.inkMuted,
+          y: PAGE_H * 0.63,
+          delay: after + 0.9,
+          fit: true,
+        },
+      ],
+      rise,
+      alpha,
+    );
+    // A small gold diamond on a rule between the name and the words
+    const width = rise(after + 0.4) * 46;
+    goldRule(ctx, colours.gold, cx, PAGE_H * 0.5, width, alpha);
+    const d = rise(after + 0.4) * 3.2;
+    if (d > 0) {
+      ctx.save();
+      ctx.fillStyle = withAlpha(colours.gold, 0.9 * alpha);
+      ctx.beginPath();
+      ctx.moveTo(cx, PAGE_H * 0.5 - d);
+      ctx.lineTo(cx + d, PAGE_H * 0.5);
+      ctx.lineTo(cx, PAGE_H * 0.5 + d);
+      ctx.lineTo(cx - d, PAGE_H * 0.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+  ctx.restore();
+}
+
+/** The closing card's lines, each rising in at its own moment. */
+function drawEndingLines(
+  ctx: CanvasRenderingContext2D,
+  lines: EndingLine[],
+  rise: (delay: number) => number,
+  alpha: number,
+) {
   const room = PAGE_W - 48;
   for (const line of lines) {
     const p = rise(line.delay);
-    if (p <= 0) continue;
+    if (p <= 0 || !line.text.trim()) continue;
     ctx.save();
     ctx.globalAlpha = alpha * p;
     let size = line.size;
@@ -774,13 +895,24 @@ export function drawEnding(
     });
     ctx.restore();
   }
-  // A gold rule under the names, drawn out from the middle
-  const rule = rise(0.45) * 70;
-  ctx.strokeStyle = withAlpha(colours.gold, 0.8 * alpha);
+}
+
+/** A thin gold rule drawn out from the middle, `half` either side. */
+function goldRule(
+  ctx: CanvasRenderingContext2D,
+  gold: string,
+  cx: number,
+  y: number,
+  half: number,
+  alpha: number,
+) {
+  if (half <= 0) return;
+  ctx.save();
+  ctx.strokeStyle = withAlpha(gold, 0.8 * alpha);
   ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.moveTo(cx - rule, PAGE_H * 0.505);
-  ctx.lineTo(cx + rule, PAGE_H * 0.505);
+  ctx.moveTo(cx - half, y);
+  ctx.lineTo(cx + half, y);
   ctx.stroke();
   ctx.restore();
 }

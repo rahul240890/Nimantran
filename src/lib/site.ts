@@ -37,13 +37,18 @@ export const site = {
    * given to search engines as the Organization's sameAs (docs/BRAND_SEO.md).
    */
   social: {
-    instagram: "https://www.instagram.com/shubh.celebration/",
+    instagram: "https://www.instagram.com/shubhinvitations.in/",
     whatsapp: "https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o",
     youtube: "https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw",
   },
   /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
 } as const;
+
+/** Shubh's Instagram as people write it: "@shubhinvitations.in". */
+export function instagramHandle(): string {
+  return `@${new URL(site.social.instagram).pathname.replaceAll("/", "")}`;
+}
 
 /** The brand as a page in this language writes it: "Shubh Invitation", "शुभ इन्विटेशन". */
 export function siteNameIn(locale: UiLocale): string {

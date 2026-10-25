@@ -79,7 +79,13 @@ export function PagePacing({
       <RadioPrimitive.Root
         aria-labelledby="pacing-heading"
         aria-describedby="pacing-summary"
-        value={draft.pageSeconds === null ? AUTO : String(draft.pageSeconds)}
+        // A time no longer offered (4 seconds) now reads as Auto: each page takes its own
+        value={
+          draft.pageSeconds !== null &&
+          (PAGE_SECONDS as readonly number[]).includes(draft.pageSeconds)
+            ? String(draft.pageSeconds)
+            : AUTO
+        }
         onValueChange={(value) =>
           update((current) => ({
             ...current,
