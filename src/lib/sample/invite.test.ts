@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { UI_LOCALES } from "@/i18n/locales";
 import { allDesigns, designById } from "@/lib/gallery/catalog";
 import { storyFamily } from "@/lib/publish/story";
-import { draftCopy, draftFaith } from "@/lib/editor/draft";
+import { draftCopy, draftFaith, includedFunctions } from "@/lib/editor/draft";
 import { sampleFaith, sampleInvite } from "./invite";
 
 const design = (id: string) => {
@@ -12,6 +12,19 @@ const design = (id: string) => {
 };
 
 describe("a design's sample", () => {
+  // Owner, 2026-10-24: a story design's demo from the birthdays played a wedding, haldi and all
+  it("is the occasion it was opened from, when the design is listed for it", () => {
+    const party = sampleInvite(design("panchatantra"), "en", "birthday");
+    expect(party.category).toBe("birthday");
+    expect(includedFunctions(party.draft)).toEqual(["birthday"]);
+    expect(party.draft.content.second).toBe("");
+    // A children's story opens as a birthday on its own too, never a wedding
+    expect(sampleInvite(design("panchatantra"), "en").category).toBe("birthday");
+    // Not listed for it, the design keeps its own occasion
+    expect(sampleInvite(design("rajwada-bagh"), "en", "birthday").category).toBe("wedding");
+    expect(sampleInvite(design("navrang"), "en", "anniversary").category).toBe("anniversary");
+  });
+
   it("blesses in the faith of the weddings it's made for", () => {
     expect(sampleFaith(design("phulkari-haveli"))).toBe("sikh");
     expect(sampleFaith(design("noor-bagh"))).toBe("muslim");

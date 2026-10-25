@@ -29,6 +29,7 @@ Seven painted themes: Rajwada Bagh, Shahi Savari and Kayal, then Noor Bagh (Musl
 5. Mark where its words go in `src/lib/suites/areas.ts`: the calm part of the painting as `[top, bottom, left, right]` percentages (a wall, the sky, still water, the inside of an arch). Check it on a phone screenshot; the words must not cover the art. `/engine/pages?suite=<theme>&lang=gu` shows all of a theme's pages at phone size in any card language. A theme's lettering is its `voice` (regal unless set; `src/lib/suites/lettering.ts`).
 6. List it in that theme's `images` in `src/lib/suites/catalog.ts`, for example `images: { cover: "/suites/kayal/cover.webp" }`.
 7. Make the design cards' own pictures: `npx tsx scripts/card-pictures.ts` (a unit test fails until it is run). The cards never use the image resizer (owner, 2026-10-24: on the free plan it stops making new sizes once its month's allowance is spent, and most cards stayed empty): each card shows a thumbnail of the top three quarters of its painting from `public/cards/<theme>/`, and while that comes in, its tile from one shared blurred sheet. Every other `next/image` picture comes through `src/components/ui/image.tsx`, which shows the picture as it is when the resizer refuses.
+8. A new or repainted opening gate needs its picture for the editor's gate picker: with the site running, `BASE=http://localhost:3000 npx tsx scripts/gate-posters.ts` (a unit test fails until it is run). It photographs every painted gate, closed, from `/engine/gates` into `public/openings/posters/<gate>.webp` and one shared blurred sheet. The picker shows those pictures and plays only the chosen gate live, in the preview beside the list (owner, 2026-10-24: drawing all 200-odd gates live, each with its full-size paintings, made it slow to open); a tap on a picture chooses it.
 
 Painted pages also get a light CSS animation by kind of page (`src/components/invitation/story/page-effects.tsx`, `fx-*` classes in `globals.css`): petals on cover, haldi, mehendi and wedding, dust on family, twinkling lights on sangeet and reception, fireworks on baraat, bobbing lamps on reply. It uses the theme's `--suite-light` and `--suite-accent` colours, ignores taps, and is not drawn in still mode. A new theme gets it with no code change.
 
@@ -48,7 +49,11 @@ A Scene prints the blessing (॥ श्री गणेशाय नमः ॥, 
 
 The welcome shows the couple's photo, or both photos side by side over their names when the host gave one each (owner, 2026-10-24; preview with `&couple=two`). A theme whose photos are laid out as a film (`section-layouts.ts`) shows them as a carousel: each photo comes to the middle by itself every few seconds while the section is on screen, with previous, next and pause, and a swipe still works; a pointer resting on it or a button in focus holds it, and in still mode it only moves when asked.
 
-## Later
+## Which occasions a theme shows for
+
+A wedding theme shows for the steps of the wedding journey it suits (`weddingFit`), a theme painted for an occasion for its own `occasions`. A story theme told without a wedding in it says whose days it is painted for, `storyFor` (owner, 2026-10-24: a birthday listed rose-and-perfume wedding designs, and a wedding kites and toys): `couples` (the wedding journey, anniversaries and Karva Chauth), `children` (birthdays and a baby's days, never a wedding) or `family` (the wedding journey and the home's, festivals', parties', business and graduation days); `STORY_OCCASIONS` in `src/lib/suites/catalog.ts` lists them. Away from the wedding journey a design shows only the pages that occasion's invitation has (`occasionPages`: the blessing where painted, the cover, the family, its one celebration on the reception's painting, the reply), so a birthday's card counts four pages and never shows a haldi, and its Live demo plays that occasion's invitation (`sampleInvite` with the listing's occasion).
+
+## Later## Later
 
 - Faith-specific themes whose art carries the faith: a Nikah garden with jaali and a crescent, a chapel with florals, Anand Karaj. These come with the Muslim, Christian and Sikh packs in Step 23.
 - Guests invited to some functions see only those pages.

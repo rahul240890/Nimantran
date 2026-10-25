@@ -7,6 +7,7 @@ export type AdminPageIcon =
   | "overview"
   | "payments"
   | "designs"
+  | "home"
   | "orders"
   | "coupons"
   | "invites"
@@ -44,6 +45,13 @@ export const ADMIN_PAGES: readonly AdminPage[] = [
     label: "Designs and prices",
     description: "Which designs are Free, Premium or Royal, and what each edition costs.",
     icon: "designs",
+  },
+  {
+    href: "/admin/home",
+    label: "Home page",
+    description:
+      "Which design sections the home page shows, in what order, and with which designs.",
+    icon: "home",
   },
   {
     href: "/admin/orders",

@@ -1,5 +1,14 @@
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import type { FunctionId } from "@/lib/events/functions";
 import type { GalleryDesign } from "@/lib/gallery/catalog";
-import { PAGE_ARTS, SUITES, type PageArt, type SuiteId } from "@/lib/suites/catalog";
+import {
+  PAGE_ARTS,
+  SUITES,
+  isWeddingJourney,
+  pageLook,
+  type PageArt,
+  type SuiteId,
+} from "@/lib/suites/catalog";
 import { scenePage } from "@/lib/suites/scene";
 
 /*
@@ -11,6 +20,28 @@ import { scenePage } from "@/lib/suites/scene";
 export function paintedPages(design: GalleryDesign): { page: PageArt; src: string }[] {
   const { images } = SUITES[design.suite];
   return PAGE_ARTS.flatMap((page) => (images[page] ? [{ page, src: images[page]! }] : []));
+}
+
+/** One of a design's pages, and the celebration it stands for where that is its name. */
+export type DesignPage = { page: PageArt; src: string; celebration?: FunctionId };
+
+/**
+ * The pages a design shows for an occasion (owner, 2026-10-24: a birthday's preview turned
+ * through the haldi, the mehendi and the baraat). The wedding journey shows every page; any
+ * other occasion only the pages its own invitation has: the blessing where one is painted,
+ * the cover, the family, its one celebration (on the reception's painting, named for the
+ * celebration) and the reply.
+ */
+export function occasionPages(design: GalleryDesign, category?: CategoryId): DesignPage[] {
+  const pages = paintedPages(design);
+  if (!category || isWeddingJourney(category)) return pages;
+  const celebration = CATEGORIES[category].functions.primary;
+  const own = pageLook(celebration).art;
+  return (["blessing", "cover", "family", own, "reply"] as const).flatMap((art) => {
+    const page = pages.find((found) => found.page === art);
+    if (!page) return [];
+    return art === own ? [{ ...page, celebration }] : [page];
+  });
 }
 
 /** A Scene theme's painting with the card in place, as its card shows it. */

@@ -34,7 +34,8 @@ test.describe("live samples", () => {
     await page.goto("/");
     await page.evaluate(() => localStorage.clear());
     // Each visit tours the demo designs in an order of its own: Next and Previous walk it
-    await page.getByRole("link", { name: "Open a live invitation" }).click();
+    // (the hero's link; Why Shubh has one too, further down)
+    await page.getByRole("link", { name: "Open a live invitation" }).first().click();
     const demo = /\/sample\/([a-z-]+)\?tour=([a-z0-9]+)$/;
     await expect(page).toHaveURL(demo, { timeout: 15_000 });
     const [, first, seed] = demo.exec(page.url())!;
@@ -100,6 +101,16 @@ test.describe("live samples", () => {
     await expect(page.getByRole("button", { name: "Open the invitation" })).toBeVisible();
   });
 
+  // Owner, 2026-10-24: a story design's demo from the birthdays played a wedding, haldi and all
+  test("a story design opened from the birthdays plays a birthday", async ({ page }) => {
+    await page.goto("/sample/panchatantra?occasion=birthday");
+    await expect(page.getByText("Aanya").first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("Arjun")).toHaveCount(0);
+    for (const wedding of ["Haldi", "Mehendi", "Sangeet", "Baraat"]) {
+      await expect(page.getByText(wedding, { exact: true })).toHaveCount(0);
+    }
+  });
+
   test("a 3D card's page opens its sample", async ({ page }) => {
     await page.goto("/designs/marigold");
     await page.getByRole("link", { name: "See it live as a guest" }).click();
@@ -126,7 +137,7 @@ test.describe("live samples", () => {
   test("Back, and the browser's back, return to where the sample was opened", async ({ page }) => {
     // From the home page's tour: walking on doesn't fill the history
     await page.goto("/");
-    await page.getByRole("link", { name: "Open a live invitation" }).click();
+    await page.getByRole("link", { name: "Open a live invitation" }).first().click();
     await expect(page).toHaveURL(/\/sample\/[a-z-]+\?tour=/, { timeout: 15_000 });
     const first = page.url();
     await page.getByRole("link", { name: "Next design" }).click();
@@ -135,7 +146,7 @@ test.describe("live samples", () => {
     await page.goBack();
     await expect(page).toHaveURL(/\/$/, { timeout: 15_000 });
     // And Back itself
-    await page.getByRole("link", { name: "Open a live invitation" }).click();
+    await page.getByRole("link", { name: "Open a live invitation" }).first().click();
     await expect(page).toHaveURL(/\/sample\/[a-z-]+\?tour=/, { timeout: 15_000 });
     await page.getByRole("link", { name: "Next design" }).click();
     await page.getByRole("link", { name: "Back", exact: true }).click();

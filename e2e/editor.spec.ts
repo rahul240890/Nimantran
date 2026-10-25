@@ -178,6 +178,13 @@ test.describe("invite editor", () => {
     const gate = page.getByRole("region", { name: "Opening gate (cover screen)" });
     await gate.getByRole("button", { name: "Change opening gate" }).click();
     const dialog = page.getByRole("dialog", { name: "Choose your opening gate" });
+    // Owner, 2026-10-24: the picker was heavy to open. Each painted gate is now its small
+    // picture, made ahead, and only the chosen gate plays, in the preview beside the list
+    await expect(dialog.locator("[data-gate-preview] [data-opening]")).toHaveCount(1);
+    await expect(dialog.getByRole("radio").first().locator("img")).toHaveAttribute(
+      "src",
+      /^\/openings\/posters\/[a-z-]+\.webp$/,
+    );
     await dialog.getByRole("button", { name: "Curtains and reveals" }).click();
     await dialog.getByRole("radio", { name: /^Silk curtains/ }).click();
     await dialog.getByRole("button", { name: "Done" }).click();

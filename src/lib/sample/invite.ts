@@ -8,7 +8,7 @@ import { designPhotos } from "@/lib/gallery/photos";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { formatCardDate, isCardLanguage, type CardLanguage } from "@/lib/templates/card-languages";
 import { cardSuggestions } from "@/lib/templates/card-suggestions";
-import type { SuiteId } from "@/lib/suites/catalog";
+import { suiteSuits, type SuiteId } from "@/lib/suites/catalog";
 import type { Faith } from "@/lib/traditions/faith";
 import { SAMPLE_DAYS, SAMPLE_OCCASION_DAY, type SampleFunction } from "./days";
 import { SCENE_PHOTOS, at } from "./drafts";
@@ -59,8 +59,23 @@ function photoCount(design: GalleryDesign, category: CategoryId): number {
   return need === "two" || need === "either" ? 2 : need === "one" || need === "couple" ? 1 : 0;
 }
 
-export function sampleInvite(design: GalleryDesign, locale: UiLocale): SampleInvite {
-  const category = sampleOccasion(design);
+/** Whether a design is listed for an occasion: its theme painted for it, or its card one of it. */
+function designSuits(design: GalleryDesign, category: CategoryId): boolean {
+  if (design.suite !== "classic") return suiteSuits(design.suite, category);
+  return (CATEGORIES[category].templates as readonly string[]).includes(design.template);
+}
+
+/**
+ * The design's sample, for the occasion it was opened from when it is listed for it
+ * (owner, 2026-10-24: a story design's demo from the birthdays played a wedding, haldi and
+ * all), else for its own.
+ */
+export function sampleInvite(
+  design: GalleryDesign,
+  locale: UiLocale,
+  listed?: CategoryId,
+): SampleInvite {
+  const category = listed && designSuits(design, listed) ? listed : sampleOccasion(design);
   // The sample speaks the site's language: each site language is also a card language
   const language: CardLanguage = isCardLanguage(locale) ? locale : "en";
   const sample = galleryText[locale].galleryCopy.sample;

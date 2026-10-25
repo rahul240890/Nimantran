@@ -167,6 +167,7 @@ export function GallerySearch({
                       description={description}
                       href={designHref(design, { category: suiteOccasion(design.suite) })}
                       photos={designPhotos(design, suiteOccasion(design.suite))}
+                      category={suiteOccasion(design.suite)}
                     />
                   </li>
                 );

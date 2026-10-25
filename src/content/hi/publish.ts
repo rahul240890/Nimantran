@@ -133,6 +133,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     play: "तस्वीरें चलाएँ",
     position: (index, total) => `${total} में से तस्वीर ${index}`,
   },
+  previewMark: "झलक · अभी भेजा नहीं गया",
   madeWith: "शुभ इन्विटेशन से बना",
   createYours: "अपना निमंत्रण बनाएँ",
   makeOwnTitle: "क्या आपके यहाँ भी कोई समारोह आने वाला है?",
@@ -269,6 +270,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   notInvited: "यह लिंक उनमें से किसी उत्सव के लिए नहीं है। परिवार से जाँचने को कहें।",
   previewOnly:
     "यह आपका प्रीव्यू है, इसलिए कुछ नहीं भेजा गया। प्रकाशित करने के बाद मेहमान जवाब दे सकेंगे।",
+  previewNotice: "यह झलक है, इसलिए जवाब बंद हैं। निमंत्रण भेजे जाने के बाद मेहमान जवाब दे सकेंगे।",
   full: "इस निमंत्रण पर अभी और जवाब नहीं जुड़ सकते। अपना जवाब सीधे परिवार को भेजें।",
   tooMany:
     "इस नेटवर्क से अभी बहुत सारे नए जवाब आए हैं। कृपया एक घंटे बाद फिर कोशिश करें, या अपना जवाब सीधे परिवार को भेजें।",
@@ -366,9 +368,13 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "प्रीव्यू के विकल्प",
   opening: "आपका निमंत्रण खुल रहा है",
   changeGate: "खुलने वाला द्वार बदलें",
+  marked:
+    "भेजे जाने तक इस झलक की हर स्क्रीन पर ‘झलक’ लिखा रहता है और जवाब बंद रहते हैं। मेहमानों को साफ़ निमंत्रण मिलता है।",
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
   metaTitle: (names) => (names ? `${names}: निमंत्रण की झलक` : "निमंत्रण की झलक"),
   badge: "झलक · अभी मेहमानों को नहीं भेजा गया",
+  metaDescription:
+    "परिवार के देखने के लिए एक झलक। यह अभी मेहमानों को नहीं भेजी गई है, और जवाब बंद हैं।",
 };

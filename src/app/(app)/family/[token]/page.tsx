@@ -1,3 +1,4 @@
+import { Eye } from "lucide-react";
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
@@ -30,8 +31,12 @@ export async function generateMetadata({
 }: PageProps<"/family/[token]">): Promise<Metadata> {
   const { familyCopy } = await getText(publishText);
   const found = await load((await params).token);
+  const title = familyCopy.metaTitle(found ? inviteNames(found.draft) : "");
+  // WhatsApp's card for the link says it is a preview too, before anyone opens it
   return {
-    title: { absolute: familyCopy.metaTitle(found ? inviteNames(found.draft) : "") },
+    title: { absolute: title },
+    description: familyCopy.metaDescription,
+    openGraph: { title, description: familyCopy.metaDescription },
     robots: { index: false, follow: false },
   };
 }
@@ -76,14 +81,17 @@ export default async function FamilyPreviewPage({ params }: PageProps<"/family/[
         questions={draftQuestions(draft)}
         watermark
         preview
+        unsent
         makeHref={makeLikeThisHref(draft, "family")}
       />
-      {/* Never taken for the real thing: it says it hasn't gone to guests yet */}
+      {/* Never taken for the real thing: it says, in marigold above every screen, that it
+          hasn't gone to guests yet */}
       <p
         data-family-preview
-        className="pointer-events-none fixed top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] left-1/2 z-[80] max-w-[calc(100vw-7rem)] -translate-x-1/2 rounded-full bg-night/70 px-3.5 py-1.5 text-center text-xs font-semibold text-card-ivory shadow-raised backdrop-blur-sm print:hidden"
+        className="pointer-events-none fixed top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] left-1/2 z-[80] flex max-w-[calc(100vw-7rem)] -translate-x-1/2 items-center gap-1.5 rounded-full bg-marigold px-3.5 py-1.5 text-center text-xs font-semibold text-on-marigold shadow-overlay ring-2 ring-card-ivory/70"
       >
-        {familyCopy.badge}
+        <Eye aria-hidden className="size-4 shrink-0" />
+        <span>{familyCopy.badge}</span>
       </p>
     </>
   );

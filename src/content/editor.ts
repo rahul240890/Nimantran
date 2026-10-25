@@ -905,7 +905,7 @@ export const previewCopy = {
   /** Before paying, a preview the family can see (lib/invites/family-link.ts). */
   familyTitle: "Show your family first",
   familyBody:
-    "Send them a preview on WhatsApp. They see the invitation as guests will, marked as a preview, and nothing goes to guests until you send it.",
+    "Send them a preview on WhatsApp to check. It says Preview across every screen and replies are off, so it can't go out as the invitation. Guests get it clean once you send it.",
   familySend: "Send to family on WhatsApp",
   familyCopy: "Copy link",
   familyCopied: "Link copied",

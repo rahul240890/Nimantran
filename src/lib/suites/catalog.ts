@@ -611,10 +611,12 @@ export type Suite = {
    */
   occasions?: readonly CategoryId[];
   /**
-   * A story theme told without a wedding in it, so it suits every occasion (but a prayer
-   * meet) as well as the wedding journey; the reception's painting holds the party itself.
+   * A story theme told without a wedding in it, and whose days it is painted for (owner,
+   * 2026-10-24: a birthday listed rose-and-perfume wedding designs, and a wedding kites and
+   * toys): couples, children or families (STORY_OCCASIONS). Its reception's painting holds
+   * the party itself.
    */
-  everyOccasion?: true;
+  storyFor?: readonly StoryAudience[];
   /**
    * The guest page below the painted pages (guest-look.ts): a style, and any touch picked
    * differently from it. Missing keeps the plain details page.
@@ -1635,7 +1637,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/chaand-kalayein/reception.webp",
       reply: "/suites/chaand-kalayein/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // One courtyard tree through India's six seasons
   "ritu-chakra": {
@@ -1664,7 +1666,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/ritu-chakra/reception.webp",
       reply: "/suites/ritu-chakra/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples", "family"],
   },
   // A garland of ragas, a veena resting on every page
   raagmala: {
@@ -1694,7 +1696,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/raagmala/reply.webp",
     },
     tones: { mehendi: "dark", baraat: "dark" },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // The fable forest, its animals gathering page by page
   panchatantra: {
@@ -1723,7 +1725,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/panchatantra/reception.webp",
       reply: "/suites/panchatantra/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // One kite flying from the rooftops to the stars
   "patang-udaan": {
@@ -1752,7 +1754,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/patang-udaan/reception.webp",
       reply: "/suites/patang-udaan/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // River clay becoming a lit lamp
   "diya-ki-kahani": {
@@ -1781,7 +1783,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/diya-ki-kahani/reception.webp",
       reply: "/suites/diya-ki-kahani/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // Silk from the mulberry leaf to a woven sari
   "resham-katha": {
@@ -1810,7 +1812,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/resham-katha/reception.webp",
       reply: "/suites/resham-katha/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // One flower pavilion in nine colours
   navrang: {
@@ -1839,7 +1841,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/navrang/reception.webp",
       reply: "/suites/navrang/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A leaf boat with a marigold, from a glacier spring to the sea
   "nadi-safar": {
@@ -1868,7 +1870,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/nadi-safar/reception.webp",
       reply: "/suites/nadi-safar/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // One golden line that draws the whole world
   "ek-rekha": {
@@ -1897,7 +1899,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/ek-rekha/reception.webp",
       reply: "/suites/ek-rekha/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A journey through India's palaces, a different one on every page, in a sketchbook
   "mahal-yatra": {
@@ -4784,7 +4786,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/kagzi-phool/reply.webp",
     },
     tones: { reply: "light" },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // Blue water lilies on a still pond, in indigo and lilac watercolour
   nilofar: {
@@ -4813,7 +4815,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/nilofar/reception.webp",
       reply: "/suites/nilofar/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // Yellow and peach roses with gold leaf on warm ivory paper
   "sona-gulaab": {
@@ -4842,7 +4844,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/sona-gulaab/reception.webp",
       reply: "/suites/sona-gulaab/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // Only white flowers with dew and sage leaves, light on every page
   shabnam: {
@@ -4872,7 +4874,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/shabnam/reply.webp",
     },
     tones: { sangeet: "light", reception: "light", reply: "light" },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // Deep red and burgundy roses on cream paper, moody and rich
   "surkh-gulaab": {
@@ -4901,7 +4903,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/surkh-gulaab/reception.webp",
       reply: "/suites/surkh-gulaab/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // One crystal perfume bottle on silk, a new note of its scent on every page
   khushboo: {
@@ -4930,7 +4932,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/khushboo/reception.webp",
       reply: "/suites/khushboo/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // Kannauj's rose attar, from the rose fields to the copper stills
   "ruh-gulaab": {
@@ -4959,7 +4961,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/ruh-gulaab/reception.webp",
       reply: "/suites/ruh-gulaab/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A night of oud and incense in an old perfumer's house, dark on every page
   "oud-raat": {
@@ -4996,7 +4998,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       baraat: "dark",
       wedding: "dark",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A silver Mughal rosewater sprinkler in mint and silver
   gulabpash: {
@@ -5026,7 +5028,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/gulabpash/reply.webp",
     },
     tones: { sangeet: "light", reception: "light", reply: "light" },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A vintage dressing table with a perfume atomizer, lilac and gold
   "shringaar-mez": {
@@ -5055,7 +5057,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/shringaar-mez/reception.webp",
       reply: "/suites/shringaar-mez/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // One small white cloud carrying the invitation from the mountains to the door
   meghdoot: {
@@ -5084,7 +5086,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/meghdoot/reception.webp",
       reply: "/suites/meghdoot/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // One marble pavilion on a lotus pool through the eight watches of a day
   "aath-pehar": {
@@ -5113,7 +5115,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/aath-pehar/reception.webp",
       reply: "/suites/aath-pehar/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A sprout growing page by page into a flowering tree with a swing
   "beej-se-bagh": {
@@ -5142,7 +5144,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/beej-se-bagh/reception.webp",
       reply: "/suites/beej-se-bagh/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // Paper pop-up scenes rising out of an open storybook
   "kissa-kitaab": {
@@ -5171,7 +5173,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/kissa-kitaab/reception.webp",
       reply: "/suites/kissa-kitaab/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // An attar maker's chest, one fragrance rising as mist on every page
   "itr-daan": {
@@ -5201,7 +5203,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/itr-daan/reply.webp",
     },
     tones: { sangeet: "light", reply: "light" },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A naturalist's album of Indian birds, a pair on every page
   "pakshi-kosh": {
@@ -5230,7 +5232,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/pakshi-kosh/reception.webp",
       reply: "/suites/pakshi-kosh/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   // A painted toy haveli, a different room on every page
   "gudiya-ghar": {
@@ -5260,7 +5262,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/gudiya-ghar/reply.webp",
     },
     tones: { baraat: "dark" },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // Jaipur's stone observatory from dawn to the stars
   "jantar-mantar": {
@@ -5289,7 +5291,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/jantar-mantar/reception.webp",
       reply: "/suites/jantar-mantar/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // A dyer's courtyard, a new colour drying on every page
   rangrez: {
@@ -5319,7 +5321,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reply: "/suites/rangrez/reply.webp",
     },
     tones: { reply: "light" },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // A day at an old flower market, a different flower on every stall
   "phool-mandi": {
@@ -5348,7 +5350,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/phool-mandi/reception.webp",
       reply: "/suites/phool-mandi/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // A flying carpet carrying the invitation over a city of blue domes
   "udan-khatola": {
@@ -5377,7 +5379,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/udan-khatola/reception.webp",
       reply: "/suites/udan-khatola/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // A painted truck driving the invitation along the roads of India
   "rang-raste": {
@@ -5406,7 +5408,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/rang-raste/reception.webp",
       reply: "/suites/rang-raste/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // A tiny world under a glass dome, a new one on every page
   "kaanch-gumbad": {
@@ -5435,7 +5437,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/kaanch-gumbad/reception.webp",
       reply: "/suites/kaanch-gumbad/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // Coloured chalk drawings on a school blackboard
   "chalk-pati": {
@@ -5472,7 +5474,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       baraat: "dark",
       wedding: "dark",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // Meghalaya's living root bridges over a misty green river
   "jadon-ka-pul": {
@@ -5501,7 +5503,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/jadon-ka-pul/reception.webp",
       reply: "/suites/jadon-ka-pul/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // A clay village of round cottages, soft and bright as a toy
   "gol-matol": {
@@ -5530,7 +5532,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/gol-matol/reception.webp",
       reply: "/suites/gol-matol/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // A rose garden maze, one more turning on every page
   "bhool-bhulaiya": {
@@ -5559,7 +5561,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/bhool-bhulaiya/reception.webp",
       reply: "/suites/bhool-bhulaiya/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // Old railway posters of a journey across India in sunburst colours
   "deco-yatra": {
@@ -5588,7 +5590,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/deco-yatra/reception.webp",
       reply: "/suites/deco-yatra/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["family"],
   },
   // Sunlit water under the sea, coral and pearls on every page
   "gehra-neela": {
@@ -5617,7 +5619,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/gehra-neela/reception.webp",
       reply: "/suites/gehra-neela/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["children"],
   },
   // An ivory and rosewood chess game set in a palace hall
   "shatranj-baazi": {
@@ -5646,7 +5648,7 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       reception: "/suites/shatranj-baazi/reception.webp",
       reply: "/suites/shatranj-baazi/reply.webp",
     },
-    everyOccasion: true,
+    storyFor: ["couples"],
   },
   classic: {
     id: "classic",
@@ -6248,8 +6250,48 @@ const NO_ROKA: readonly SuiteId[] = [
 ];
 
 /** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */
+/** Whose days a story theme told without a wedding in it is painted for. */
+export type StoryAudience = "couples" | "children" | "family";
+
+/**
+ * The occasions beyond the wedding journey each kind of story theme is listed for. Couples'
+ * and families' themes tell the wedding journey too; children's never do.
+ */
+export const STORY_OCCASIONS: Record<StoryAudience, readonly CategoryId[]> = {
+  couples: ["anniversary", "karva-chauth"],
+  children: ["birthday", "baby-shower", "naming-ceremony", "annaprashan", "christening"],
+  family: [
+    "housewarming",
+    "puja",
+    "thread-ceremony",
+    "party",
+    "retirement",
+    "farewell-party",
+    "reunion",
+    "graduation",
+    "shop-opening",
+    "launch",
+    "diwali",
+    "ganesh-chaturthi",
+    "navratri",
+    "eid",
+    "janmashtami",
+    "sankranti",
+    "onam",
+    "lohri",
+    "holi",
+    "christmas",
+    "gudi-padwa",
+    "baisakhi",
+    "bihu",
+    "raksha-bandhan",
+  ],
+};
+
 export function weddingFit(suite: SuiteId): readonly JourneyId[] {
   if (SUITES[suite].occasions) return [];
+  const story = SUITES[suite].storyFor;
+  if (story && !story.includes("couples") && !story.includes("family")) return [];
   return (
     WEDDING_FIT[suite] ??
     WEDDING_JOURNEY.filter((step) => step !== "roka" || !NO_ROKA.includes(suite))
@@ -6258,18 +6300,28 @@ export function weddingFit(suite: SuiteId): readonly JourneyId[] {
 
 /**
  * Whether a theme is painted for an occasion: wedding themes for the steps of the wedding
- * journey they suit, story themes for every occasion but a prayer meet, every other theme for
- * its own occasions only.
+ * journey they suit, story themes for the days of the people they're painted for, every
+ * other theme for its own occasions only.
  */
 export function suiteSuits(suite: SuiteId, category: CategoryId): boolean {
   if (isWeddingJourney(category)) return weddingFit(suite).includes(category);
-  if (SUITES[suite].everyOccasion) return category !== "prayer-meet";
+  const story = SUITES[suite].storyFor;
+  if (story) return story.some((audience) => STORY_OCCASIONS[audience].includes(category));
   return Boolean(SUITES[suite].occasions?.includes(category));
 }
 
-/** The occasion a theme opens with: its own, else the first step of the journey it suits. */
+/**
+ * The occasion a theme opens with: its own, else the first step of the journey it suits,
+ * else (a children's story) a birthday.
+ */
 export function suiteHome(suite: SuiteId): CategoryId {
-  return SUITES[suite].occasions?.[0] ?? weddingFit(suite)[0] ?? "wedding";
+  const story = SUITES[suite].storyFor?.[0];
+  return (
+    SUITES[suite].occasions?.[0] ??
+    weddingFit(suite)[0] ??
+    (story && STORY_OCCASIONS[story][0]) ??
+    "wedding"
+  );
 }
 
 /** Themes painted for one occasion beyond weddings. */

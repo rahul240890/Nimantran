@@ -5,18 +5,20 @@ import { designNamesText } from "@/i18n/copy/design-names";
 import { galleryText } from "@/i18n/copy/gallery";
 import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
-import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
+import { CATEGORIES } from "@/lib/categories/catalog";
+import { allDesigns, occasionDesigns } from "@/lib/gallery/catalog";
+import {
+  newestDesigns,
+  sectionOccasion,
+  shownSections,
+  type HomeSectionId,
+} from "@/lib/gallery/home-sections";
+import { getBestsellers, getHomeSections } from "@/lib/gallery/home-sections-store";
+import { getTrending } from "@/lib/gallery/trending-store";
 import { pagePath } from "@/lib/seo/paths";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { HomeShelvesLater } from "./home-later";
-
-/** The occasions with a row of their own on the home page, the wedding first. */
-const ROWS = [
-  "wedding",
-  "engagement",
-  "birthday",
-  "anniversary",
-] as const satisfies readonly CategoryId[];
+import type { HomeSection } from "./home-shelves";
 
 /** The 3D cards' covers, drawn on the server (see DesignCard). */
 function covers(locale: UiLocale) {
@@ -29,13 +31,54 @@ function covers(locale: UiLocale) {
 }
 
 /**
- * Designs to choose from, the way large shops lay out a catalogue: a row for the wedding,
- * the trending designs, then a row for each main occasion, and the way on to all of them.
+ * Designs to choose from, the way large shops lay out a catalogue: Trending and Best sellers
+ * first, then a section for each main occasion, each a grid ending in View all, and the way
+ * on to all of them. Which sections show, in what order and with which designs is the
+ * master admin's (Admin, Home page; lib/gallery/home-sections.ts).
  */
-export function HomeDesigns({ locale }: { locale: UiLocale }) {
+export async function HomeDesigns({ locale }: { locale: UiLocale }) {
   const { homeRows } = landingText[locale];
-  const { occasionTaglines } = galleryText[locale];
+  const { occasionTaglines, shelfCopy } = galleryText[locale];
   const designsPath = pagePath({ kind: "designs" }, locale);
+  const [settings, { trending }, bestsellers] = await Promise.all([
+    getHomeSections(),
+    getTrending(),
+    getBestsellers(),
+  ]);
+  const everyDesign = allDesigns().length;
+  const own: Record<
+    "trending" | "bestsellers" | "new",
+    { title: string; intro: string; list: string[] }
+  > = {
+    trending: { ...shelfCopy.trending, list: trending },
+    bestsellers: { ...homeRows.bestsellers, list: bestsellers },
+    new: { ...homeRows.newest, list: newestDesigns() },
+  };
+  const sections: HomeSection[] = shownSections(settings).map((id: HomeSectionId) => {
+    const chosen = settings.designs[id] ?? null;
+    const occasion = sectionOccasion(id);
+    if (!occasion) {
+      const kind = own[id as keyof typeof own];
+      return {
+        id,
+        title: kind.title,
+        intro: kind.intro,
+        href: designsPath,
+        designs: chosen ?? kind.list,
+        occasion: null,
+        total: everyDesign,
+      };
+    }
+    return {
+      id,
+      title: CATEGORIES[occasion].names[locale],
+      intro: occasionTaglines[occasion] ?? "",
+      href: pagePath({ kind: "occasion", id: occasion }, locale),
+      designs: chosen,
+      occasion,
+      total: occasionDesigns(occasion).length,
+    };
+  });
   const all = (
     <Link
       href={designsPath}
@@ -67,12 +110,7 @@ export function HomeDesigns({ locale }: { locale: UiLocale }) {
           <div className="max-sm:hidden">{all}</div>
         </div>
         <HomeShelvesLater
-          rows={ROWS.map((occasion) => ({
-            occasion,
-            title: CATEGORIES[occasion].names[locale],
-            intro: occasionTaglines[occasion] ?? "",
-            href: pagePath({ kind: "occasion", id: occasion }, locale),
-          }))}
+          sections={sections}
           covers={covers(locale)}
           names={designNamesText[locale]}
         />

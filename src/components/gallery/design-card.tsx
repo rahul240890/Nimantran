@@ -31,10 +31,10 @@ import { cn } from "@/lib/cn";
 import { samplePath } from "@/lib/sample/paths";
 import { isMoving } from "@/lib/suites/moving";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { CATEGORIES } from "@/lib/categories/catalog";
+import { CATEGORIES, type CategoryId } from "@/lib/categories/catalog";
 import { suiteOccasion, type GalleryDesign } from "@/lib/gallery/catalog";
 import type { PhotoNeed } from "@/lib/gallery/photos";
-import { paintedPages } from "@/lib/gallery/pictures";
+import { occasionPages } from "@/lib/gallery/pictures";
 import type { PageArt } from "@/lib/suites/catalog";
 import { CardPicture } from "./card-picture";
 import { ScenePoster, SceneSample } from "./scene-poster";
@@ -59,6 +59,11 @@ type DesignCardProps = {
    * for its picture's description; the design's own occasion where missing.
    */
   occasion?: string;
+  /**
+   * The occasion it is listed for: away from the wedding journey its pages are only those
+   * that occasion's invitation has (occasionPages), so a birthday never counts a haldi.
+   */
+  category?: CategoryId;
   priority?: boolean;
   /**
    * A card design's cover, drawn on the server: its art uses trigonometry whose last digits
@@ -84,6 +89,7 @@ export function DesignCard({
   sampleHref,
   photos,
   occasion,
+  category,
   priority,
   cover,
   compact = false,
@@ -96,7 +102,7 @@ export function DesignCard({
     occasion ?? CATEGORIES[suiteOccasion(design.suite)].names[locale],
     description,
   );
-  const pages = paintedPages(design);
+  const pages = occasionPages(design, category);
   const scene = design.format === "scene";
   const moving = isMoving(design.suite);
   const painted = pages.length > 0;

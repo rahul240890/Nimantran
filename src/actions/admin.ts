@@ -34,6 +34,7 @@ import { pricingSchema } from "@/lib/plans/pricing-schema";
 import { AUDIENCES, COUPON_CODE, OFFER_ARTS, cleanCouponCode } from "@/lib/plans/offers";
 import { PRICING_TAG, getPricing, savePricing } from "@/lib/plans/pricing";
 import { isSlug } from "@/lib/publish/slug";
+import { HOME_SECTIONS_TAG, saveHomeSections } from "@/lib/gallery/home-sections-store";
 import { TRENDING_TAG, saveTrendingPins } from "@/lib/gallery/trending-store";
 
 /*
@@ -253,6 +254,26 @@ export async function saveTrending(input: unknown): Promise<boolean | null> {
   if (!(await saveTrendingPins(parsed.data, admin.account))) return false;
   revalidateTag(TRENDING_TAG, { expire: 0 });
   revalidatePath("/admin/designs");
+  return true;
+}
+
+/**
+ * The home page's sections (Admin, Home page): which show, in what order, and with which
+ * designs. Read leniently (home-sections.ts), so a stale form can't break the page.
+ */
+export async function saveHomeSectionsSettings(input: unknown): Promise<boolean | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const list = z.array(z.string().max(80)).max(40);
+  const parsed = z
+    .object({ order: list, hidden: list, designs: z.record(z.string().max(40), list) })
+    .safeParse(input);
+  if (!parsed.success) return false;
+  if (!(await saveHomeSections(parsed.data, admin.account))) return false;
+  revalidateTag(HOME_SECTIONS_TAG, { expire: 0 });
+  // The home page in every language, built ahead, shows the new sections straight away
+  for (const locale of UI_LOCALES) revalidatePath(pagePath({ kind: "home" }, locale));
+  revalidatePath("/admin/home");
   return true;
 }
 

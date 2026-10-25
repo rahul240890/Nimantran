@@ -109,8 +109,11 @@ test.describe("finding a design", () => {
     await expect(page.locator("[data-design]")).toHaveCount(30);
     await page.getByRole("button", { name: /^Show all \d+ designs$/ }).click();
     await expect(page.locator('[data-design="gubbara"]')).toBeVisible();
-    // Wedding themes stay with weddings
+    // Wedding themes stay with weddings, the rose-and-perfume stories too (owner, 2026-10-24)
     await expect(page.locator('[data-design="rajwada-bagh"]')).toHaveCount(0);
+    await expect(page.locator('[data-design="sona-gulaab"]')).toHaveCount(0);
+    // A children's story counts only a birthday's pages, never a haldi or a baraat
+    await expect(page.locator('[data-design="panchatantra"]')).toContainText("Story · 4 pages");
     await page
       .locator('[data-design="gubbara"]')
       .getByRole("link", { name: /Use this design/ })
