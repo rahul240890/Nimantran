@@ -44,7 +44,8 @@ for (const colorScheme of ["light", "dark"] as const) {
       await expect(
         page.getByRole("heading", { name: "शुभ इन्विटेशन में साइन इन करें" }),
       ).toBeVisible();
-      await expect(page.getByRole("button", { name: "कोड भेजें" })).toBeVisible();
+      await expect(page.getByRole("button", { name: "कोड भेजें", exact: true })).toBeVisible();
+      await expect(page.getByRole("button", { name: "ईमेल पर कोड भेजें" })).toBeVisible();
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
     });
