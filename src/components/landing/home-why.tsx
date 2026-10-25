@@ -39,10 +39,10 @@ const REST: readonly [Point, LucideIcon][] = [
 const PHONE_PAINTING = "/suites/rajwada-bagh/cover.webp";
 
 /**
- * Why Shubh (owner, 2026-10-24): what a family gets, in plain words, right under the phone
- * that shows how it works. Seeing it before paying leads, on night with a phone showing a
- * real design beside it; paying later sits next to it in marigold; the rest follow as a
- * grid, each a row of sign and words on a phone.
+ * Why Shubh (owner, 2026-10-24): what a family gets, in plain words, once they have seen the
+ * designs (owner, 2026-10-25: after them, not at the top). Seeing it before paying leads, on
+ * night with a phone showing a real design beside it; paying later sits next to it in
+ * marigold; the rest follow as a grid, each a row of sign and words on a phone.
  */
 export function HomeWhy({ locale }: { locale: UiLocale }) {
   const { homeWhy } = landingText[locale];
