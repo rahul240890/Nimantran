@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import type { HostFunction } from "@/lib/guests/list";
 import { useText } from "@/i18n/client";
 import { dashboardText } from "@/i18n/copy/dashboard";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 
 /* Pieces the guest forms share: which celebrations a guest is invited to. */
 
@@ -21,7 +21,7 @@ export function FunctionPicker({
   error: boolean;
 }) {
   const copy = useText(dashboardText).dashboardCopy.form;
-  const { functionCopy } = useText(editorText);
+  const { functionCopy } = useText(functionText);
   const id = useId();
   if (functions.length < 2) return null;
   return (

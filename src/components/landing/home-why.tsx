@@ -82,7 +82,9 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
                 src={PHONE_PAINTING}
                 alt=""
                 fill
-                sizes="10rem"
+                // The hero's phone asks for this painting at its own width (home-flow.tsx), so
+                // asking the same here finds it already in rather than fetching another size
+                sizes="17rem"
                 className="object-cover object-top"
               />
               <span className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night to-transparent" />

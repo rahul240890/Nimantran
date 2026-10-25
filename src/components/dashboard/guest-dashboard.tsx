@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { cardsText } from "@/i18n/copy/cards";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import { editionsText } from "@/i18n/copy/editions";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 import { getText } from "@/i18n/server";
 import { dashboardCounts } from "@/lib/guests/list";
 import { Cohosts } from "./cohosts";
@@ -48,7 +48,7 @@ export async function GuestDashboard({
 }) {
   const copy = (await getText(dashboardText)).dashboardCopy;
   const { cardsCopy } = await getText(cardsText);
-  const { functionCopy } = await getText(editorText);
+  const { functionCopy } = await getText(functionText);
   const { limitCopy, planCopy } = await getText(editionsText);
   const counts = dashboardCounts(view.guests, view.functions);
   return (

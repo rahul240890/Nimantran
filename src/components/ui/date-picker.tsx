@@ -1,76 +1,28 @@
 "use client";
 
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import { format } from "date-fns";
+import { enIN } from "date-fns/locale";
+import dynamic from "next/dynamic";
 import { useId, useState } from "react";
-import { DayPicker, type DayPickerLocale, type Matcher } from "react-day-picker";
-import { enIN } from "react-day-picker/locale";
+import type { DayPickerLocale, Matcher } from "react-day-picker";
 import { cn } from "@/lib/cn";
 import { controlClasses, useField } from "./field";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
 import { useQuiet } from "./quiet";
 
-type CalendarProps = {
-  selected?: Date;
-  onSelect?: (date: Date | undefined) => void;
-  /** Days that cannot be picked, for example `{ before: today }`. */
-  disabled?: Matcher | Matcher[];
-  defaultMonth?: Date;
-  startMonth?: Date;
-  endMonth?: Date;
-  /** Calendar language from `react-day-picker/locale`. Defaults to English (India). */
-  locale?: DayPickerLocale;
-  autoFocus?: boolean;
-  className?: string;
-};
+/** The calendar's code, fetched as a field is about to open rather than with every page. */
+const loadCalendar = () => import("./calendar");
 
-/** A month grid with full keyboard support (arrows, Page Up/Down, Home/End). */
-export function Calendar({ className, locale = enIN, ...props }: CalendarProps) {
-  return (
-    <DayPicker
-      locale={locale}
-      mode="single"
-      showOutsideDays
-      fixedWeeks
-      className={cn("w-fit select-none", className)}
-      classNames={{
-        months: "relative",
-        month: "flex flex-col gap-3",
-        nav: "absolute inset-x-0 top-0 flex items-center justify-between",
-        button_previous:
-          "grid size-11 cursor-pointer place-items-center rounded-md text-ink hover:bg-surface-2 disabled:cursor-not-allowed disabled:text-ink-faint disabled:hover:bg-transparent",
-        button_next:
-          "grid size-11 cursor-pointer place-items-center rounded-md text-ink hover:bg-surface-2 disabled:cursor-not-allowed disabled:text-ink-faint disabled:hover:bg-transparent",
-        month_caption: "flex h-11 items-center justify-center",
-        caption_label: "font-display text-lg",
-        month_grid: "border-collapse",
-        weekdays: "",
-        weekday:
-          "size-11 font-label text-[0.7rem] font-normal tracking-[0.12em] text-ink-muted uppercase",
-        week: "",
-        day: "size-11 p-0.5 text-center",
-        day_button:
-          "size-10 cursor-pointer rounded-full text-base tabular-nums transition-[background-color,transform,box-shadow] duration-150 hover:bg-surface-2 active:scale-90 disabled:cursor-not-allowed",
-        today: "font-bold text-accent-text [&>button]:ring-1 [&>button]:ring-line-control",
-        selected:
-          "[&>button]:bg-marigold [&>button]:font-semibold [&>button]:text-on-marigold [&>button]:shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_2px_0_var(--marigold-edge)] [&>button]:hover:bg-marigold-strong",
-        outside: "text-ink-muted",
-        disabled: "text-ink-faint line-through decoration-ink-faint/60",
-        hidden: "invisible",
-        focused: "",
-      }}
-      components={{
-        Chevron: ({ orientation }) =>
-          orientation === "left" ? (
-            <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
-          ) : (
-            <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
-          ),
-      }}
-      {...props}
-    />
-  );
-}
+/*
+ * The month grid comes in once a field opens (or the pointer or focus nears it), so the
+ * pages with a date field, the guest's reply form among them, don't carry the calendar
+ * until someone picks a day. Meanwhile its space is held, so the popover doesn't jump.
+ */
+const Calendar = dynamic(() => loadCalendar().then((module) => module.Calendar), {
+  ssr: false,
+  loading: () => <span className="block h-[22.5rem] w-[19.25rem] max-w-full" />,
+});
 
 type DatePickerProps = {
   value?: Date;
@@ -90,7 +42,7 @@ export function DatePicker({
   value,
   onValueChange,
   placeholder,
-  locale = enIN,
+  locale,
   disabled,
   disabledDays,
   startMonth,
@@ -103,9 +55,10 @@ export function DatePicker({
   const valueId = useId();
 
   // date-fns rather than Intl, so server and browser always agree and hydration never mismatches
-  const text = value ? format(value, "PPPP", { locale }) : placeholder;
+  const words = locale ?? enIN;
+  const text = value ? format(value, "PPPP", { locale: words }) : placeholder;
   // "Wed, 14 Oct 2026" when the field is too narrow for the weekday and month in full
-  const short = value ? format(value, "EEE, d MMM yyyy", { locale }) : placeholder;
+  const short = value ? format(value, "EEE, d MMM yyyy", { locale: words }) : placeholder;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -117,6 +70,9 @@ export function DatePicker({
           aria-labelledby={field ? `${field.labelId} ${valueId}` : undefined}
           aria-describedby={field?.describedBy}
           data-invalid={field?.invalid || undefined}
+          // The calendar's code starts coming as the host or guest heads for the field
+          onPointerEnter={() => void loadCalendar()}
+          onFocus={() => void loadCalendar()}
           className={cn(
             controlClasses,
             "group @container flex cursor-pointer items-center gap-2.5 text-start data-invalid:border-danger data-[state=open]:border-ring",

@@ -1,7 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { dateLocale } from "@/i18n/dates";
 import type { UiLocale } from "@/i18n/locales";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 import { publishText } from "@/i18n/copy/publish";
 import { familyBlocks } from "@/lib/editor/family";
 import {
@@ -27,7 +27,7 @@ import { formatTime } from "@/lib/time";
  * function cards): its name, local name, date, time or muhurat window, and venue.
  */
 export function storyFunctions(draft: InviteDraft, locale: UiLocale): StoryFunction[] {
-  const { functionCopy } = editorText[locale];
+  const { functionCopy } = functionText[locale];
   const { guestCopy } = publishText[locale];
   const language = draftTradition(draft)?.language ?? "en";
   const words = dateLocale[locale];
@@ -66,7 +66,7 @@ export function cardFunctions<T extends StoryFunction>(
     const muhurat = muhuratName(draft, fn.kind);
     const own = pack !== null && pack.language === language;
     const english = language === "en";
-    const siteNames = editorText[language === "hi" ? "hi" : "en"].functionCopy;
+    const siteNames = functionText[language === "hi" ? "hi" : "en"].functionCopy;
     // A card in another language than its tradition's names each function as that
     // language's own cards do: its tradition's word where it has one, else the plain name
     const plain =

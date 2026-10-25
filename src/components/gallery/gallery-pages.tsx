@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { FeatureRow, LinkPills, PublicShell, type Crumb } from "@/components/seo/public-page";
 import { designNamesText } from "@/i18n/copy/design-names";
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 import { galleryText } from "@/i18n/copy/gallery";
 import { seoText } from "@/i18n/copy/seo";
 import type { UiLocale } from "@/i18n/locales";
@@ -155,11 +155,18 @@ function DesignGallery({
   designs,
   category,
   kind = null,
+  opensPage = true,
 }: {
   locale: UiLocale;
   designs: GalleryDesign[];
   category: CategoryId;
   kind?: WeddingKind | null;
+  /**
+   * Whether the designs open the page, so its first cards load straight away. Under the
+   * wedding page's kinds they sit a phone's few screens down, and loading them first held
+   * back the kinds' paintings on the screen.
+   */
+  opensPage?: boolean;
 }) {
   const formats = [...new Set(designs.map(designFormat))];
   const { galleryCopy, weddingKindCopy } = galleryText[locale];
@@ -188,7 +195,7 @@ function DesignGallery({
                 photos={designPhotos(design, category)}
                 occasion={occasion}
                 category={category}
-                priority={index < 4}
+                priority={opensPage && index < 4}
                 cover={design.suite === "classic" ? cover(design) : undefined}
               />
             </li>
@@ -354,7 +361,7 @@ export function GalleryIndexPage({ locale }: { locale: UiLocale }) {
 export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: UiLocale }) {
   const { seoCopy } = seoText[locale];
   const { galleryCopy } = galleryText[locale];
-  const { functionCopy } = editorText[locale];
+  const { functionCopy } = functionText[locale];
   const category = CATEGORIES[id];
   const words = seoCopy.occasions[id];
   const name = category.names[locale];
@@ -385,7 +392,12 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
         heading={id === "wedding" ? galleryCopy.allWeddingDesigns : galleryCopy.designsHeading}
         intro={galleryCopy.designsCount(designs.length)}
       >
-        <DesignGallery locale={locale} designs={designs} category={id} />
+        <DesignGallery
+          locale={locale}
+          designs={designs}
+          category={id}
+          opensPage={id !== "wedding"}
+        />
       </Shelf>
       <FeatureRow locale={locale} />
       {functions.length > 1 && (

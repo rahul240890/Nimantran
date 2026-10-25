@@ -1,4 +1,4 @@
-import { editorText } from "@/i18n/copy/editor";
+import { functionText } from "@/i18n/copy/functions";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import type { FunctionId } from "@/lib/events/functions";
@@ -22,7 +22,7 @@ export type SampleWords = {
 };
 
 export function sampleWords(locale: UiLocale): SampleWords {
-  const { functionCopy } = editorText[locale];
+  const { functionCopy } = functionText[locale];
   const others = CATEGORY_IDS.filter((id) => !isWeddingJourney(id));
   const kinds = new Set<FunctionId>([
     ...(Object.keys(SAMPLE_DAYS) as SampleFunction[]),

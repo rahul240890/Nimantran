@@ -11,6 +11,8 @@ import SHEET from "./card-sheet.json";
  */
 
 const TILES = new Map(SHEET.pictures.map((key, index) => [key, index]));
+/** Covers with a thumbnail but no tile: the editor's More designs shows them, no card does. */
+const COVERS = new Set(SHEET.covers);
 const [TILE_WIDTH, TILE_HEIGHT] = SHEET.tile as [number, number];
 const CELL_WIDTH = TILE_WIDTH + SHEET.gutter * 2;
 const CELL_HEIGHT = TILE_HEIGHT + SHEET.gutter * 2;
@@ -28,15 +30,17 @@ export const CARD_SHEET = SHEET.sheet;
 export type CardPictureFiles = {
   /** The thumbnail of what the card shows. */
   thumb: string;
-  /** The painting's tile in the shared blurred sheet, drawn to fill its box. */
-  blur: CSSProperties;
+  /** The painting's tile in the shared blurred sheet, drawn to fill its box; none for a cover. */
+  blur: CSSProperties | null;
 };
 
 /** A card picture's thumbnail and blurred tile; none for a painting no card shows. */
 export function cardPictureFiles(src: string): CardPictureFiles | null {
   const key = pictureKey(src);
-  const index = key === null ? undefined : TILES.get(key);
-  if (index === undefined) return null;
+  if (key === null) return null;
+  const index = TILES.get(key);
+  if (index === undefined)
+    return COVERS.has(key) ? { thumb: `/cards/${key}.webp`, blur: null } : null;
   const left = (index % SHEET.columns) * CELL_WIDTH + SHEET.gutter;
   const top = Math.floor(index / SHEET.columns) * CELL_HEIGHT + SHEET.gutter;
   // The sheet drawn so one tile fills the box: a percentage places that point of the sheet
