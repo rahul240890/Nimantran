@@ -18,7 +18,7 @@ Every other email is claimed in `email_log` (`kind`, `ref`) before it goes, so a
 second checkout callback never sends it twice. A failed send frees the claim so the next
 trigger tries again. Code: `src/lib/email/`. Wording and layout: `src/lib/email/templates.ts`.
 
-Sign-in codes (owner, 2026-10-25): Supabase makes the code with `auth.admin.generateLink`, which also makes the account the first time, and the site sends it itself, so Supabase's own mail settings don't matter. The codes are claimed in `email_log` as `sign_in_code` with a hash of the address, and a day's claims are kept. Needs `supabase/migrations/20261025200000_email_sign_in.sql` (in the project files as `supabase-update-email-sign-in.sql`). `EMAIL_SIGN_IN=off` hides it. Code: `src/lib/auth/email-code.ts`.
+Sign-in codes (owner, 2026-10-25): Supabase makes the code with `auth.admin.generateLink`, which also makes the account the first time, and the site sends it itself, so Supabase's own mail settings don't matter. The codes are claimed in `email_log` as `sign_in_code` with a hash of the address, and a day's claims are kept. Needs `supabase/migrations/20261025200000_email_sign_in.sql` (in the project files as `supabase-update-email-sign-in.sql`). It stays off until `EMAIL_SIGN_IN=on` is set in Vercel, after the SQL has run. Code: `src/lib/auth/email-code.ts`.
 
 ## Setting it up
 

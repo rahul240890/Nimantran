@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { phoneSignIn } from "./mode";
+import { emailSignIn, phoneSignIn } from "./mode";
 
 /* Sign-in by mobile number: off on the live site until SMS codes are set up (owner, 2026-10-16). */
 
@@ -32,5 +32,29 @@ describe("sign-in by mobile number", () => {
     vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
     vi.stubEnv("SHUBHDWAR_AUTH_PREVIEW", "");
     expect(phoneSignIn()).toBe(false);
+  });
+});
+
+describe("sign-in by email code", () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it("is off on the live site until EMAIL_SIGN_IN is on and both keys are set", () => {
+    supabase();
+    vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "sb_secret_test");
+    vi.stubEnv("RESEND_API_KEY", "re_test");
+    vi.stubEnv("EMAIL_SIGN_IN", "");
+    expect(emailSignIn()).toBe(false);
+    vi.stubEnv("EMAIL_SIGN_IN", "on");
+    expect(emailSignIn()).toBe(true);
+    vi.stubEnv("RESEND_API_KEY", "");
+    expect(emailSignIn()).toBe(false);
+  });
+
+  it("stays on in preview mode", () => {
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "");
+    vi.stubEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY", "");
+    vi.stubEnv("SHUBHDWAR_AUTH_PREVIEW", "1");
+    vi.stubEnv("VERCEL_ENV", "development");
+    expect(emailSignIn()).toBe(true);
   });
 });

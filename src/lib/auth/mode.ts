@@ -42,15 +42,16 @@ export const PREVIEW_ADMIN_PHONE = "+919999900000";
  * Whether hosts can sign in with a code sent to their email (owner, 2026-10-25: Google alone
  * lost every visitor who reached sign-in). The site makes the code itself and sends it
  * through Resend, so it needs the Supabase secret key and RESEND_API_KEY, both already set
- * for the other emails. EMAIL_SIGN_IN=off hides it again. Preview mode keeps it, with the
- * code 123456.
+ * for the other emails, and the email_log change in supabase-update-email-sign-in.sql. It
+ * stays off until EMAIL_SIGN_IN=on is set in Vercel, after that SQL has run, so the form
+ * never offers codes the site can't send. Preview mode keeps it, with the code 123456.
  */
 export function emailSignIn(): boolean {
   const mode = authMode();
   if (mode === "preview") return true;
   return (
     mode === "supabase" &&
-    process.env.EMAIL_SIGN_IN?.trim() !== "off" &&
+    process.env.EMAIL_SIGN_IN?.trim() === "on" &&
     Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY?.trim()) &&
     Boolean(process.env.RESEND_API_KEY?.trim())
   );
