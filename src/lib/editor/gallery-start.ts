@@ -1,4 +1,4 @@
-import { switchDraft } from "@/lib/invites/sync";
+import { splitOffDraft, switchDraft, syncStore } from "@/lib/invites/sync";
 import { newDraft, withGalleryChoice, type CardLanguage, type InviteDraft } from "./draft";
 import { inviteDraft } from "./store";
 
@@ -44,6 +44,12 @@ export async function startWithDesign(
             withGalleryChoice(sameOccasion ? carriedOver(current) : newDraft(), choice, site),
         })
       : false;
+  // A live invite holding a change its package refused can't save, so it can't be put
+  // away: the open copy, change and all, becomes the new invite, and the live one stays
+  // as guests have it
+  if (!switched && signedIn && !keepsWork && sameOccasion && syncStore.get() === "needs-plan") {
+    splitOffDraft();
+  }
   if (!switched) inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
 }
 

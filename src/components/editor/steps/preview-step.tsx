@@ -14,7 +14,7 @@ import {
   Shirt,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogClose, DialogContent, DialogTrigger } from "@/components/ui/dialog";
@@ -30,7 +30,7 @@ import {
 import { draftProblems } from "@/lib/editor/draft-checks";
 import { inviteNames } from "@/lib/publish/describe";
 import { inviteDraft } from "@/lib/editor/store";
-import { syncDraft } from "@/lib/invites/sync";
+import { syncDraft, syncStore } from "@/lib/invites/sync";
 import { formatTime } from "@/lib/time";
 import { photoFailed, usePhotoUrls } from "../use-photo-urls";
 import { GateSummary } from "../gate-chooser";
@@ -103,10 +103,15 @@ export function PreviewStep({
   const raga = draftTemplate(draft).music.raga;
   const [confirming, setConfirming] = useState(false);
   const [gate, setGate] = useState(openGate);
+  // A change the live invite's package refused (held-back.tsx, above): guests still have the
+  // live copy, so this isn't it, and the guest view and video would only show that copy
+  const held =
+    useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer) ===
+      "needs-plan" && Boolean(draft.slug);
 
   return (
     <div className="flex flex-col gap-6">
-      {problems.length === 0 ? (
+      {held && problems.length === 0 ? null : problems.length === 0 ? (
         <Card
           elevation="flat"
           className="flex-row items-start gap-4 border-success/40 bg-success/5 p-5"
@@ -141,7 +146,7 @@ export function PreviewStep({
         </Card>
       )}
 
-      {signedIn && draft.remoteId && problems.length === 0 && (
+      {signedIn && draft.remoteId && problems.length === 0 && !held && (
         <SeeAsGuest remoteId={draft.remoteId} published={Boolean(draft.slug)} />
       )}
 

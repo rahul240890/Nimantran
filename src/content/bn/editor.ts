@@ -1894,4 +1894,13 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   moreDesignsNote:
     "আপনার নাম, তারিখ আর ছবি সঙ্গেই থাকে। কোনো ডিজাইনে ট্যাপ করে তাতে আপনার নিমন্ত্রণপত্র দেখুন।",
   opening: "ডিজাইন খুলছে…",
+  /** Another design picked under a live invite: a new invitation, or the live one changed. */
+  pickTitle: (design) => (design ? `${design} কীসের জন্য?` : "এই ডিজাইন কীসের জন্য?"),
+  pickNew: "নতুন নিমন্ত্রণপত্র",
+  pickNewBody:
+    "আপনার নাম, তারিখ, জায়গা, পরিবার, ছবি আর লেখা সঙ্গেই আসে। আপনার লাইভ নিমন্ত্রণপত্রটি অতিথিদের কাছে যেমন আছে তেমনই থাকবে।",
+  pickLive: "আপনার লাইভ নিমন্ত্রণপত্র",
+  pickLiveBody:
+    "একই লিংক, অতিথি আর উত্তর, এই ডিজাইনে। আপনার প্যাকেজে এটি না থাকলে, প্যাকেজ বেছে নেওয়া পর্যন্ত অতিথিরা আগের ডিজাইনই দেখবেন।",
+  pickClose: "বন্ধ করুন",
 };

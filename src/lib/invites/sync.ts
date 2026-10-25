@@ -164,6 +164,20 @@ export async function switchDraft(
   return true;
 }
 
+/**
+ * The draft open now, as it is on this device, becomes a new invite with no link, and the
+ * one it came from stays in the account as last saved: for a change to a live invite its
+ * package refused (another design, most often), so the host can publish it on its own
+ * instead (owner, 2026-10-25).
+ */
+export function splitOffDraft() {
+  const current = inviteDraft.get().draft;
+  if (current.remoteId) shelvePhotos(current.remoteId, current.photos);
+  held = null;
+  inviteDraft.replace({ ...current, remoteId: null, slug: null, updatedAt: Date.now() });
+  set("idle");
+}
+
 /** The account's photos, then any on this device that haven't been uploaded yet. */
 function mergePhotos(account: InviteDraft["photos"], device: InviteDraft["photos"]) {
   const known = new Set(account.map((photo) => photo.id));
