@@ -16,9 +16,10 @@ async function visit(page: Page, path = "/") {
 /** Below 1280px the tabs live in the menu button. */
 const isNarrow = (page: Page) => page.viewportSize()!.width < 1280;
 
-/** The phone's steps, and the one showing now. */
-const steps = (page: Page) => page.locator("[data-flow-live] ol").getByRole("button");
-const currentStep = (page: Page) => page.locator('[data-flow-live] ol button[aria-current="step"]');
+/** The row of features under the phone, and the one on screen now. */
+const features = (page: Page) => page.locator("[data-flow-live] ol").getByRole("button");
+const currentFeature = (page: Page) =>
+  page.locator('[data-flow-live] ol button[aria-current="true"]');
 
 for (const colorScheme of ["light", "dark"] as const) {
   test.describe(`landing page, ${colorScheme} theme`, () => {
@@ -116,16 +117,24 @@ test.describe("landing page", () => {
     await expect(page).toHaveURL(/\/invitations$/);
   });
 
-  test("the phone's steps say how it works, and any step can be chosen", async ({ page }) => {
+  test("the row lists every feature in order, and any feature can be chosen", async ({ page }) => {
     await visit(page);
-    await expect(steps(page)).toHaveCount(6);
-    await expect(currentStep(page)).toHaveAccessibleName(/Choose a design/);
+    await expect(features(page)).toHaveText([
+      "Make it free, pay later",
+      "One link to share",
+      "Ready-made invitation videos",
+      "In your language",
+      "Your music in invitations and videos",
+      "Import contacts in a minute with AI",
+      "Your photos, beautifully framed",
+    ]);
+    await expect(currentFeature(page)).toHaveAccessibleName(/Make it free/);
     // Still mode: nothing moves on by itself
     await page.waitForTimeout(4000);
-    await expect(currentStep(page)).toHaveAccessibleName(/Choose a design/);
-    await steps(page).nth(4).click();
-    await expect(currentStep(page)).toHaveAccessibleName(/Send on WhatsApp/);
-    await expect(page.locator("[data-flow-live]")).toHaveAttribute("data-flow-step", "4");
+    await expect(currentFeature(page)).toHaveAccessibleName(/Make it free/);
+    await features(page).nth(5).click();
+    await expect(currentFeature(page)).toHaveAccessibleName(/Import contacts/);
+    await expect(page.locator("[data-flow-live]")).toHaveAttribute("data-flow-step", "5");
   });
 
   test("the occasions lead to their designs", async ({ page }) => {
@@ -291,7 +300,7 @@ test.describe("landing page", () => {
     test(`the home page reads well in its language, ${path}`, async ({ page }) => {
       await visit(page, path);
       expect(await noOverflow(page)).toBe(true);
-      await expect(steps(page)).toHaveCount(6);
+      await expect(features(page)).toHaveCount(7);
       expect((await axe(page).analyze()).violations).toEqual([]);
     });
   }
@@ -300,14 +309,15 @@ test.describe("landing page", () => {
 test.describe("landing page motion", () => {
   test.use({ reducedMotion: "no-preference" });
 
-  test("the phone moves on to the next step by itself, and Pause holds it", async ({ page }) => {
+  test("the phone moves on to the next feature by itself, and Pause holds it", async ({ page }) => {
     await visit(page);
-    await page.locator("[data-flow-live]").scrollIntoViewIfNeeded();
-    await expect(currentStep(page)).toHaveAccessibleName(/Add your details/, { timeout: 8000 });
+    await expect(currentFeature(page)).toHaveAccessibleName(/One link to share/, {
+      timeout: 8000,
+    });
     await page.getByRole("button", { name: "Pause" }).click();
-    const held = await currentStep(page).textContent();
+    const held = await currentFeature(page).textContent();
     await page.waitForTimeout(4500);
-    await expect(currentStep(page)).toHaveText(held!);
+    await expect(currentFeature(page)).toHaveText(held!);
     await page.getByRole("button", { name: "Play" }).click();
     await expect(page.getByRole("button", { name: "Pause" })).toBeVisible();
   });
