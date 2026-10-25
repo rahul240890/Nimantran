@@ -2177,5 +2177,7 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   pickEvents: "तुमचे कार्यक्रम",
   moreEvents: "आणखी कार्यक्रम",
   moreDesigns: (occasion) => `आणखी ${occasion} डिझाइन`,
+  moreDesignsNote:
+    "तुमची नावे, तारखा आणि फोटो सोबत येतात. डिझाइनवर टॅप करून त्यात तुमचे निमंत्रण पाहा.",
   opening: "डिझाइन उघडत आहे…",
 };
