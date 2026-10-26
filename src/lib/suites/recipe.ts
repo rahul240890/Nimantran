@@ -164,6 +164,12 @@ export const recipeSchema = z
      * the celebrations showed twice, on the pages and again below).
      */
     pages: z.boolean().optional(),
+    /**
+     * What stays below the painted pages: every section, or only the reply (owner,
+     * 2026-10-26: the pages carry the whole invitation, full screen, and one page below
+     * keeps the reply and the site's own footer).
+     */
+    below: z.enum(["sections", "reply"]).optional(),
   })
   .strict();
 export type RecipeChoice = z.infer<typeof recipeSchema>;
@@ -178,6 +184,7 @@ export type GuestRecipe = {
   flowers: FlowerBlessing;
   lamp: LampBlessing;
   pages: boolean;
+  below: "sections" | "reply";
 };
 
 /** Collections whose themes read as one kind of invitation, whatever their page style. */
@@ -216,5 +223,7 @@ export function guestRecipe(suite: SuiteId, look: GuestLook): GuestRecipe {
     flowers: choice.flowers ?? dealt.flowers,
     lamp: choice.lamp ?? dealt.lamp,
     pages: choice.pages ?? true,
+    // Only the reply when the pages carry the rest; a page down keeps every section
+    below: choice.pages === false ? "sections" : (choice.below ?? "sections"),
   };
 }

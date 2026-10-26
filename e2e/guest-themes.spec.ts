@@ -71,12 +71,23 @@ for (const suite of THEMES) {
         await page.goto(`/engine/guest?suite=${suite}`);
         const themed = page.locator(".guest-themed");
         await expect(themed).toHaveAttribute("data-suite", suite);
-        await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
-        await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
         // Laid out as the theme's recipe gives (recipe.ts)
         const recipe = guestRecipe(suite, guestLook(suite)!);
         const { layouts, versions } = recipe;
         await expect(themed).toHaveAttribute("data-family", recipe.family);
+        if (recipe.below === "reply") {
+          // The painted pages carry the invitation: below them only the reply, after the photos
+          await expect(page.getByRole("heading", { name: "The celebrations" })).toHaveCount(0);
+          await expect(page.getByRole("heading", { name: "Save the date" })).toHaveCount(0);
+          await expect(page.locator('section[aria-labelledby="guest-welcome"]')).toHaveCount(0);
+          await page.locator("#rsvp").scrollIntoViewIfNeeded();
+          await expect(page.locator("#rsvp")).toBeVisible();
+          expect(await noOverflow(page)).toBe(true);
+          expect((await axe(page).analyze()).violations).toEqual([]);
+          return;
+        }
+        await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
+        await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
         const date = page.locator('section[aria-labelledby="guest-save-date"]');
         if (versions.date === "layout")
           await expect(date).toHaveAttribute("data-layout", layouts.date);
@@ -175,7 +186,7 @@ for (const suite of THEMES) {
 }
 
 test("a Hindi card's guest page reads Hindi on an English site", async ({ page }) => {
-  await page.goto("/engine/guest?suite=rajwada-bagh&lang=hi");
+  await page.goto("/engine/guest?suite=kayal&lang=hi");
   const themed = page.locator(".guest-themed");
   await expect(themed.getByText("आप सादर आमंत्रित हैं")).toBeVisible();
   // The month in Hindi, wherever the date version sets it (a calendar page heads it with the year)
@@ -185,7 +196,7 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
     await expect(themed.getByText(english, { exact: false })).toHaveCount(0);
   }
   // The buttons around the card speak the card's language too
-  const way = blessings("rajwada-bagh").flowers;
+  const way = blessings("kayal").flowers;
   await expect(
     page.getByRole("button", { name: hiGuestCopy.themed.flowers[way].give }),
   ).toBeVisible();
@@ -200,8 +211,8 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
 test("the welcome shows both photos when the couple gave one each, and the photos turn by themselves", async ({
   page,
 }) => {
-  expect(sectionLayouts("rajwada-bagh").photos).toBe("film");
-  await page.goto("/engine/guest?suite=rajwada-bagh&couple=two");
+  expect(sectionLayouts("kayal").photos).toBe("film");
+  await page.goto("/engine/guest?suite=kayal&couple=two");
   const welcome = page.locator('section[aria-labelledby="guest-welcome"]');
   await expect(welcome.locator("figure")).toHaveCount(2);
   await expect(welcome.locator("figcaption")).toHaveText(["Arjun", "Sia"]);
@@ -229,7 +240,7 @@ test("the welcome shows both photos when the couple gave one each, and the photo
 
 test("in still mode the photos stay put and have no pause", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
+  await page.goto("/engine/guest?suite=kayal&couple=one");
   const photos = page.getByRole("group", { name: "Photos" });
   await photos.scrollIntoViewIfNeeded();
   const counter = photos.locator("p[aria-live]");

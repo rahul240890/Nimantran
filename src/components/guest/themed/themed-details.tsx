@@ -121,7 +121,7 @@ export function ThemedDetails({
         <Dusk
           before={welcome.length}
           photos={photos}
-          family={family}
+          family={recipe.below === "reply" ? [] : family}
           familyLang={familyLang}
           look={look}
           lang={lang}
@@ -141,6 +141,15 @@ export function ThemedDetails({
     ),
   };
 
+  // When the pages carry the invitation, only the reply stays below them, after the host's
+  // own photos where they gave more than the pages hold
+  const shown: readonly GuestSection[] =
+    recipe.below === "reply"
+      ? photos.length > 0
+        ? ["dusk", "night"]
+        : ["night"]
+      : recipe.sections;
+
   return (
     <div
       ref={top}
@@ -152,7 +161,7 @@ export function ThemedDetails({
     >
       <RecipeContext value={recipe}>
         <FlowerDefs />
-        {recipe.sections.map((section) => (
+        {shown.map((section) => (
           <Fragment key={section}>{sections[section]()}</Fragment>
         ))}
         {onScreen && <FloatingMusic music={music} />}

@@ -123,19 +123,37 @@ test.describe("publish and share", () => {
     expect((await preview.body()).byteLength).toBeLessThan(300_000);
     // Versioned, so the CDN keeps it and WhatsApp gets it at once
     expect(preview.headers()["cache-control"]).toContain("s-maxage=31536000");
-    const haldi = guest.getByRole("article", { name: "Haldi" });
+    // Rajwada Bagh tells every celebration on its own painted page, turned one by one
+    await guest.getByRole("button", { name: "Open the invitation" }).click();
+    const pages = guest.getByRole("dialog");
+    const turnTo = async (id: string) => {
+      const shown = pages.locator(`[data-page="${id}"]:not([inert])`);
+      for (let turn = 0; turn < 12 && !(await shown.isVisible()); turn++) {
+        await guest.keyboard.press("ArrowRight");
+        await guest.waitForTimeout(200);
+      }
+      await expect(shown).toBeVisible();
+      return shown;
+    };
+    const haldi = await turnTo("fn-haldi");
     await expect(haldi.getByText("Wednesday, 14 October 2026")).toBeVisible();
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();
-    const directions = await haldi.getByRole("link", { name: "Directions" }).getAttribute("href");
+    const directions = await haldi.getByRole("link", { name: /Directions/ }).getAttribute("href");
     expect(directions).toContain("google.com/maps");
-    const wedding = guest.getByRole("article", { name: "Wedding" });
+    // The dress code is on the wedding's page, with its calendar
+    const wedding = await turnTo("fn-wedding");
     await expect(wedding.getByText("Traditional Indian")).toBeVisible();
-    await wedding.getByRole("button", { name: "Add to calendar" }).click();
-    const ics = await guest.getByRole("menuitem", { name: /Apple/ }).getAttribute("href");
-    const calendar = await guest.request.get(ics!);
-    expect(await calendar.text()).toContain("DTSTART:20261015T130000Z");
+    const calendar = (await wedding.getByRole("link", { name: /calendar/i }).getAttribute("href"))!;
+    if (calendar.includes("google.com"))
+      expect(decodeURIComponent(calendar)).toContain("20261015T130000Z");
+    else
+      expect(await (await guest.request.get(calendar)).text()).toContain(
+        "DTSTART:20261015T130000Z",
+      );
+    // Below the pages, one page for the reply (the family's photo is on the couple's page)
     await guest.keyboard.press("Escape");
-    await expect(guest.getByRole("img", { name: "Photo 1 from the family" })).toBeVisible();
+    await guest.locator("#rsvp").scrollIntoViewIfNeeded();
+    await expect(guest.locator("#rsvp")).toBeVisible();
     expect(await noOverflow(guest)).toBe(true);
     expect((await axe(guest).analyze()).violations).toEqual([]);
 

@@ -56,9 +56,9 @@ test.describe("live samples", () => {
     await page.goto("/sample/rajwada-bagh?tour=abc");
     await expect(page).toHaveTitle(/Sample invitation: Rajwada Bagh/);
 
-    // It opens straight onto the one page down (no pages to turn), and the reply is on it
     await page.getByRole("button", { name: "Open the invitation" }).click();
-    await expect(page.locator("#guest-welcome")).toBeInViewport({ timeout: 15_000 });
+    await expect(page.getByRole("dialog", { name: /one page at a time/ })).toBeVisible();
+    await page.keyboard.press("Escape");
 
     const sent: string[] = [];
     page.on("request", (request) => {

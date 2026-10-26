@@ -50,14 +50,7 @@ import {
   type TypeRole,
   type Voice,
 } from "@/lib/suites/lettering";
-import {
-  SUITES,
-  hasGodAtTop,
-  paintedTone,
-  pageLook,
-  type PageTurn,
-  type SuiteId,
-} from "@/lib/suites/catalog";
+import { SUITES, hasGodAtTop, paintedTone, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import { PAINTING_ASPECT, photoPage } from "@/lib/suites/photo-frames";
 import { revealFor } from "@/lib/suites/reveal";
@@ -137,37 +130,13 @@ const LINE_COLOUR: Record<TypeRole, string> = {
   label: "text-card-gold-text",
 };
 
-/* The page coming in, and (for turns that move it) the page going out */
-const TURN_CLASS: Record<PageTurn, string> = {
-  fade: "suite-turn-fade",
-  arch: "suite-turn-arch",
-  sweep: "suite-turn-sweep",
-  ripple: "suite-turn-ripple",
-  push: "suite-turn-push",
-  fly: "suite-turn-fly",
-  doors: "suite-turn-doors",
-  book: "suite-turn-book",
-  petals: "suite-turn-petals",
-  glow: "suite-turn-glow",
-};
-const LEAVE_CLASS: Partial<Record<PageTurn, string>> = {
-  push: "suite-leave-push",
-  fly: "suite-leave-fly",
-  doors: "suite-leave-doors",
-  book: "suite-leave-book",
-  glow: "suite-leave-glow",
-};
-/** The page going out stays over the new one while it opens (doors) or turns over (book). */
-const LEAVES_ON_TOP: readonly PageTurn[] = ["doors", "book"];
-/** Where each page flies in from, by its place in the story: right, below, left, above. */
-const FLY_FROM = [
-  ["70%", "10%", "8deg"],
-  ["0%", "80%", "-6deg"],
-  ["-70%", "-5%", "-9deg"],
-  ["5%", "-80%", "5deg"],
-] as const;
+/**
+ * How far a dragged page must have turned, as a share of a whole turn, to carry on over when
+ * let go; less, and it falls back flat. A quick flick turns it whatever the share.
+ */
+const DRAG_COMMIT = 0.28;
 /** How long the page underneath stays while the next one turns over it. */
-const TURN_MS = 1300;
+const TURN_MS = 1100;
 /** A press held this long pauses the pages, as in a reel; letting go carries on. */
 const HOLD_MS = 220;
 
@@ -216,12 +185,16 @@ export function StoryPlayer({
   );
 
   // `forward` says which way the guest went, and `at` where they tapped (as % of the page)
+  // `start` is how far a dragged page had already turned when the guest let it go
   const [turn, setTurn] = useState<{
     index: number;
     from: number | null;
     forward: boolean;
     at: { x: number; y: number } | null;
+    start?: number;
   }>({ index: 0, from: null, forward: true, at: null });
+  // A page the guest is turning by hand: which page it uncovers, which way, and how far
+  const [drag, setDrag] = useState<{ to: number; forward: boolean; p: number } | null>(null);
   const index = turn.index;
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -234,14 +207,14 @@ export function StoryPlayer({
   const image = images[index];
   const { ready: painted, loaded: arrived } = usePainting(image);
   const blur = usePaintingBlur(image);
-  const running = !still && !paused && !hidden && !held && painted && arrived;
+  const running = !still && !paused && !hidden && !held && !drag && painted && arrived;
 
   const go = useCallback(
-    (to: number, at: { x: number; y: number } | null = null) =>
+    (to: number, at: { x: number; y: number } | null = null, start = 0) =>
       setTurn((t) =>
         to === t.index || to < 0 || to >= beats.length
           ? t
-          : { index: to, from: still ? null : t.index, forward: to > t.index, at },
+          : { index: to, from: still ? null : t.index, forward: to > t.index, at, start },
       ),
     [beats.length, still],
   );
@@ -325,19 +298,20 @@ export function StoryPlayer({
   if (!beat || !mounted) return null;
   const rtl = typeof document !== "undefined" && document.documentElement.dir === "rtl";
   const look = pageLook(beat.scene);
-  const pages = turn.from !== null && beats[turn.from] ? [turn.from, index] : [index];
-  const turning = pages.length > 1;
+  const pages = drag
+    ? [index, drag.to]
+    : turn.from !== null && beats[turn.from]
+      ? [turn.from, index]
+      : [index];
+  const turning = !drag && pages.length > 1;
   // Which way the page moves on screen: on with the reading direction, or back against it
   const dir = turn.forward !== rtl ? 1 : -1;
-  const [flyX, flyY, flyR] = FLY_FROM[index % FLY_FROM.length]!;
   const turnStyle = {
     "--turn-dir": dir,
     "--turn-x": `${turn.at?.x ?? 50}%`,
     "--turn-y": `${turn.at?.y ?? 50}%`,
-    "--book-hinge": dir > 0 ? "left" : "right",
-    "--fly-x": dir > 0 ? flyX : `calc(${flyX} * -1)`,
-    "--fly-y": flyY,
-    "--fly-r": flyR,
+    // How far over the leaf is: as the finger has it, or where a let-go page carries on from
+    "--leaf": drag ? drag.p : (turn.start ?? 0),
   } as CSSProperties;
 
   return createPortal(
@@ -392,7 +366,8 @@ export function StoryPlayer({
       )}
 
       <div
-        className="[container-type:size] relative h-full w-full overflow-hidden select-none [-webkit-touch-callout:none] md:max-w-[min(100%,calc(100dvh*768/1365))] md:shadow-overlay"
+        data-paper={(drag ? drag.forward : turn.forward) ? "on" : "back"}
+        className="paper-stage [container-type:size] relative h-full w-full overflow-hidden select-none [-webkit-touch-callout:none] md:max-w-[min(100%,calc(100dvh*768/1365))] md:shadow-overlay"
         style={turnStyle}
         onPointerDown={(event) => {
           swipe.current = { x: event.clientX, y: event.clientY, swiped: false };
@@ -403,8 +378,39 @@ export function StoryPlayer({
             setHeld(true);
           }, HOLD_MS);
         }}
+        onPointerMove={(event) => {
+          const start = swipe.current;
+          if (!start || still || held) return;
+          const dx = event.clientX - start.x;
+          const dy = event.clientY - start.y;
+          if (!drag && (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy) * 1.2)) return;
+          // Dragging sideways takes hold of the page: it follows the finger, like paper
+          const forward = dx < 0 !== rtl;
+          const to = drag ? drag.to : forward ? index + 1 : index - 1;
+          if (to < 0 || to >= beats.length || (drag && drag.forward !== forward)) return;
+          if (!drag) {
+            if (holdTimer.current !== null) window.clearTimeout(holdTimer.current);
+            holdTimer.current = null;
+            start.swiped = true;
+            event.currentTarget.setPointerCapture(event.pointerId);
+          }
+          const width = event.currentTarget.getBoundingClientRect().width;
+          setDrag({ to, forward, p: Math.min(0.97, Math.abs(dx) / (width * 0.9)) });
+        }}
         onPointerUp={(event) => {
           letGo();
+          if (drag) {
+            // Far enough over, it carries on turning; not, it falls back flat
+            if (drag.p >= DRAG_COMMIT) {
+              go(drag.to, null, drag.p);
+              setDrag(null);
+            } else {
+              const back = drag;
+              setDrag({ ...back, p: 0 });
+              window.setTimeout(() => setDrag((d) => (d && d.p === 0 ? null : d)), 280);
+            }
+            return;
+          }
           const start = swipe.current;
           if (!start || start.swiped) return;
           const dx = event.clientX - start.x;
@@ -416,7 +422,10 @@ export function StoryPlayer({
             else previous();
           }
         }}
-        onPointerCancel={letGo}
+        onPointerCancel={() => {
+          letGo();
+          setDrag(null);
+        }}
         onPointerLeave={letGo}
         onContextMenu={(event) => {
           // A long press on a phone pauses, rather than opening the picture's menu
@@ -461,27 +470,55 @@ export function StoryPlayer({
         {(painted ? pages : pages.filter((i) => i !== index)).map((i) => {
           const b = beats[i]!;
           const current = i === index;
+          // Every page turns as paper does (owner, 2026-10-26): going on, the page being left
+          // folds back from its edge, its plain back showing, until the next page is all
+          // there; going back, the earlier page unfolds over this one. Dragged, the fold
+          // follows the finger
+          const dragLeaf = drag && (drag.forward ? current : i === drag.to);
+          const leaf = dragLeaf || (turning && (turn.forward ? !current : current));
+          const forward = drag ? drag.forward : turn.forward;
           return (
-            <StoryPage
+            <div
               key={b.id}
-              beat={b}
-              copy={copy}
-              suite={suiteId}
-              textBox={textBox}
-              type={type}
-              still={still}
-              reply={last && current && !onCarryOn ? reply : null}
-              carryOn={last && current ? onCarryOn : undefined}
-              labels={labels}
-              onReply={onDone}
-              inert={!current}
-              lang={lang}
+              data-leaf={leaf ? (forward ? "out" : "in") : undefined}
+              data-dragging={dragLeaf ? "" : undefined}
+              data-turning={leaf && !drag ? "" : undefined}
               className={cn(
-                turning && (current ? TURN_CLASS[suite.turn] : LEAVE_CLASS[suite.turn]),
+                "paper-page absolute inset-0",
+                leaf && "z-[2]",
                 !current && "pointer-events-none",
-                !current && LEAVES_ON_TOP.includes(suite.turn) && "z-[2]",
               )}
-            />
+            >
+              <StoryPage
+                beat={b}
+                copy={copy}
+                suite={suiteId}
+                textBox={textBox}
+                type={type}
+                still={still}
+                reply={last && current && !onCarryOn ? reply : null}
+                carryOn={last && current ? onCarryOn : undefined}
+                labels={labels}
+                onReply={onDone}
+                inert={!current}
+                lang={lang}
+                className="paper-front"
+              />
+              {leaf && (
+                <>
+                  <span aria-hidden className="paper-cast pointer-events-none absolute inset-y-0" />
+                  <span
+                    aria-hidden
+                    className="paper-back pointer-events-none absolute inset-y-0"
+                    style={
+                      images[i]
+                        ? ({ "--paper-image": `url("${images[i]}")` } as CSSProperties)
+                        : undefined
+                    }
+                  />
+                </>
+              )}
+            </div>
           );
         })}
         {turning && suite.turn === "petals" && <PetalShower key={`petals-${index}`} />}

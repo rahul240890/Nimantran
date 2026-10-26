@@ -648,16 +648,17 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     template: "emerald",
     traditions: ["north-hindu"],
     guest: { style: "palace" },
-    // Royal Palace pilot (owner, 2026-10-26): a darbar welcome, then moments the guest
-    // touches, as the invitations guests pass around do: gold foil scratched off the date,
-    // and each celebration a painted card under turmeric, henna or gold to rub away, on deep
-    // maroon; the reply in a bound guest register
+    // Royal Palace pilot (owner, 2026-10-26): a darbar welcome, the date on a calendar page,
+    // a corridor of doors for the celebrations, and the reply in a bound guest register.
+    // The touch moments and one page down (moments.tsx) were tried and set aside: the owner
+    // wants the painted pages, turned like paper, to carry the invitation
     recipe: {
       family: "royal",
       sections: ["welcome", "date", "events", "flowers", "dusk", "night"],
-      layouts: { family: "cards" },
-      versions: { welcome: "darbar", date: "scratch", events: "cards", reply: "register" },
-      pages: false,
+      layouts: { date: "calendar", family: "cards" },
+      versions: { welcome: "darbar", events: "rooms", reply: "register" },
+      // The pages carry everything, full screen; below them only the reply and the footer
+      below: "reply",
     },
     images: {
       cover: "/suites/rajwada-bagh/cover.webp",

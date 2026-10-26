@@ -9981,3 +9981,127 @@ html:has(.guest-snap) {
 [data-quiet] .mt-6 {
   margin-top: 1rem;
 }
+
+/*
+ * Paper page turns (story-player.tsx; owner, 2026-10-26: every design turns its pages as a
+ * real card or book does). The page folds back from its free edge (--fold, 0 flat to 1 over):
+ * the folded part lies back across it showing plain card stock with the painting faintly
+ * through, and casts its shadow on the page coming into view. Dragged, the fold follows the
+ * finger (--leaf); let go, it carries on from there.
+ */
+@property --fold {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+.paper-page[data-leaf="out"] {
+  --fold: 1;
+}
+.paper-page[data-leaf="in"] {
+  --fold: 0;
+}
+/* The part of the page not yet folded over */
+.paper-page[data-leaf] > .paper-front {
+  clip-path: inset(0 calc(var(--fold) * 100%) 0 0);
+}
+[dir="rtl"] .paper-page[data-leaf] > .paper-front {
+  clip-path: inset(0 0 0 calc(var(--fold) * 100%));
+}
+/*
+ * The folded part, lying back over the page: as wide as the fold has gone, its plain card
+ * back showing the painting faintly through, lit at the free edge and creased at the fold.
+ * Its shadow falls on the page it leaves.
+ */
+.paper-back {
+  left: calc((1 - 2 * var(--fold)) * 100%);
+  width: calc(var(--fold) * 100%);
+  background:
+    linear-gradient(
+      to right,
+      color-mix(in oklab, var(--card-ivory) 70%, white) 0%,
+      transparent 35%,
+      transparent 70%,
+      rgb(0 0 0 / 0.12) 92%,
+      rgb(0 0 0 / 0.24) 100%
+    ),
+    var(--card-ivory);
+  box-shadow: -0.75rem 0 1.75rem rgb(0 0 0 / 0.28);
+  overflow: hidden;
+}
+.paper-back::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 100cqw;
+  background: var(--paper-image) center / cover no-repeat;
+  transform: scaleX(-1);
+  opacity: 0.12;
+  filter: grayscale(0.4) blur(1px);
+}
+/* The shadow the lifted page casts on the page coming into view, just past the fold */
+.paper-cast {
+  left: calc((1 - var(--fold)) * 100%);
+  width: 14%;
+  background: linear-gradient(to right, rgb(0 0 0 / 0.42), transparent);
+  opacity: calc(min(1, (1 - var(--fold)) * 3) * min(1, var(--fold) * 8));
+}
+[dir="rtl"] .paper-back {
+  left: auto;
+  right: calc((1 - 2 * var(--fold)) * 100%);
+  background:
+    linear-gradient(
+      to left,
+      color-mix(in oklab, var(--card-ivory) 70%, white) 0%,
+      transparent 35%,
+      transparent 70%,
+      rgb(0 0 0 / 0.12) 92%,
+      rgb(0 0 0 / 0.24) 100%
+    ),
+    var(--card-ivory);
+  box-shadow: 0.75rem 0 1.75rem rgb(0 0 0 / 0.28);
+}
+[dir="rtl"] .paper-back::before {
+  inset: 0 auto 0 0;
+}
+[dir="rtl"] .paper-cast {
+  left: auto;
+  right: calc((1 - var(--fold)) * 100%);
+  background: linear-gradient(to left, rgb(0 0 0 / 0.42), transparent);
+}
+
+/* By hand: the fold where the finger has it, easing after it */
+.paper-page[data-leaf="out"][data-dragging] {
+  --fold: var(--leaf, 0);
+}
+.paper-page[data-leaf="in"][data-dragging] {
+  --fold: calc(1 - var(--leaf, 0));
+}
+.paper-page[data-dragging] {
+  transition: --fold 140ms ease-out;
+}
+
+/* On its own: from where it was (or flat) right over, or back down flat */
+@media (prefers-reduced-motion: no-preference) {
+  .paper-page[data-leaf="out"][data-turning] {
+    animation: paper-out 950ms cubic-bezier(0.45, 0.05, 0.3, 1) both;
+  }
+  .paper-page[data-leaf="in"][data-turning] {
+    animation: paper-in 950ms cubic-bezier(0.45, 0.05, 0.3, 1) both;
+  }
+}
+@keyframes paper-out {
+  from {
+    --fold: var(--leaf, 0);
+  }
+  to {
+    --fold: 1;
+  }
+}
+@keyframes paper-in {
+  from {
+    --fold: calc(1 - var(--leaf, 0));
+  }
+  to {
+    --fold: 0;
+  }
+}
