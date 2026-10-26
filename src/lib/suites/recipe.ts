@@ -73,6 +73,46 @@ export const REQUIRED_SECTIONS = [
 /** The order every page had before recipes. */
 export const DEFAULT_ORDER: readonly GuestSection[] = GUEST_SECTIONS;
 
+/**
+ * The versions of each section beyond the layouts above (owner, 2026-10-26: the sections
+ * looked alike from design to design). The first of each is the page as it was; the rest
+ * are drawn for one experience family each, and a theme's recipe picks them.
+ */
+export const SECTION_VERSIONS = {
+  /**
+   * The welcome: names under a garland; a magazine's masthead with the names set large; a
+   * love letter on paper; or the names under a palace's great arch.
+   */
+  welcome: ["garland", "masthead", "letter", "darbar"],
+  /** Save the date in one of the layouts above, or one oversized number on plain paper. */
+  date: ["layout", "oversized"],
+  /**
+   * The celebrations: each in its own hour as before; numbered chapters, one after another
+   * on one page; or doors along a palace corridor, each opening on its celebration.
+   */
+  events: ["hours", "chapters", "rooms"],
+  /** The end: a light to give before the reply, or the reply alone. */
+  night: ["lamps", "quiet"],
+  /**
+   * The reply's paper: the theme's card; a bound guest register; a handwritten note; or a
+   * plain form between two rules.
+   */
+  reply: ["card", "register", "note", "form"],
+  /**
+   * What dresses the whole page: flowers, garlands and the sky through the day; or
+   * editorial, plain paper with fine rules and nothing drifting.
+   */
+  finish: ["flowers", "editorial"],
+} as const;
+export type SectionVersions = {
+  [P in keyof typeof SECTION_VERSIONS]: (typeof SECTION_VERSIONS)[P][number];
+};
+
+/** Every version as it was before recipes. */
+const FIRST_VERSIONS = Object.fromEntries(
+  Object.entries(SECTION_VERSIONS).map(([part, versions]) => [part, versions[0]]),
+) as SectionVersions;
+
 const ALL_BOXES = [...new Set(Object.values(EVENT_BOXES).flat())] as [EventBox, ...EventBox[]];
 
 const sectionsSchema = z
@@ -99,6 +139,17 @@ export const recipeSchema = z
       })
       .strict()
       .optional(),
+    versions: z
+      .object({
+        welcome: z.enum(SECTION_VERSIONS.welcome).optional(),
+        date: z.enum(SECTION_VERSIONS.date).optional(),
+        events: z.enum(SECTION_VERSIONS.events).optional(),
+        night: z.enum(SECTION_VERSIONS.night).optional(),
+        reply: z.enum(SECTION_VERSIONS.reply).optional(),
+        finish: z.enum(SECTION_VERSIONS.finish).optional(),
+      })
+      .strict()
+      .optional(),
     box: z.enum(ALL_BOXES).optional(),
     flowers: z.enum(FLOWER_BLESSINGS).optional(),
     lamp: z.enum(LAMP_BLESSINGS).optional(),
@@ -111,6 +162,7 @@ export type GuestRecipe = {
   family: Family;
   sections: readonly GuestSection[];
   layouts: SectionLayouts;
+  versions: SectionVersions;
   box: EventBox;
   flowers: FlowerBlessing;
   lamp: LampBlessing;
@@ -147,6 +199,7 @@ export function guestRecipe(suite: SuiteId, look: GuestLook): GuestRecipe {
     family: choice.family ?? defaultFamily(suite, look),
     sections: choice.sections ?? DEFAULT_ORDER,
     layouts: { ...sectionLayouts(suite), ...choice.layouts },
+    versions: { ...FIRST_VERSIONS, ...choice.versions },
     box,
     flowers: choice.flowers ?? dealt.flowers,
     lamp: choice.lamp ?? dealt.lamp,

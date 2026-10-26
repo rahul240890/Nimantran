@@ -648,6 +648,14 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     template: "emerald",
     traditions: ["north-hindu"],
     guest: { style: "palace" },
+    // Royal Palace pilot (owner, 2026-10-26): a darbar welcome, the date on a calendar page,
+    // a corridor of doors for the celebrations, and the reply in a bound guest register
+    recipe: {
+      family: "royal",
+      sections: ["welcome", "date", "events", "flowers", "dusk", "night"],
+      layouts: { date: "calendar", family: "cards" },
+      versions: { welcome: "darbar", events: "rooms", reply: "register" },
+    },
     images: {
       cover: "/suites/rajwada-bagh/cover.webp",
       family: "/suites/rajwada-bagh/family.webp",
@@ -898,6 +906,21 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       secondFlower: "rose",
       lamp: "lanterns",
       pattern: "jaali",
+    },
+    // Modern Editorial pilot (owner, 2026-10-26): a masthead, one oversized date, numbered
+    // chapters, a plain form, and no flowers or lamps anywhere on the page
+    recipe: {
+      family: "editorial",
+      sections: ["welcome", "date", "events", "dusk", "night"],
+      layouts: { photos: "mosaic", family: "scroll" },
+      versions: {
+        welcome: "masthead",
+        date: "oversized",
+        events: "chapters",
+        night: "quiet",
+        reply: "form",
+        finish: "editorial",
+      },
     },
     images: {
       cover: "/suites/ivory-arch/cover.webp",
@@ -1313,6 +1336,15 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       secondFlower: "jasmine",
       lamp: "lanterns",
       pattern: "jaali",
+    },
+    // Floral Romance pilot (owner, 2026-10-26): a love letter for the welcome, the date in a
+    // floor pattern, every celebration along one thread, and a handwritten note to reply
+    recipe: {
+      family: "floral",
+      sections: ["welcome", "flowers", "date", "events", "dusk", "night"],
+      layouts: { date: "medallion", hours: "timeline", photos: "polaroids", family: "scroll" },
+      versions: { welcome: "letter", reply: "note" },
+      flowers: "branch",
     },
     images: {
       cover: "/suites/chinar/cover.webp",

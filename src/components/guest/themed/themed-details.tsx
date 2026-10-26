@@ -17,12 +17,15 @@ import { Celebrations } from "./sections/celebrations";
 import { Dusk } from "./sections/dusk";
 import { GiveFlowers } from "./sections/give-flowers";
 import { Night } from "./sections/night";
-import type { Music } from "./sections/parts";
-import { SaveTheDate } from "./sections/save-the-date";
+import { EventsChapters, EventsRooms } from "./sections/events-versions";
+import { RecipeContext, type Music } from "./sections/parts";
+import { DateOversized, SaveTheDate } from "./sections/save-the-date";
 import { Welcome } from "./sections/welcome";
+import { WelcomeDarbar, WelcomeLetter, WelcomeMasthead } from "./sections/welcome-versions";
 import { useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
 import "@/app/guest-blessings.css";
+import "@/app/guest-families.css";
 
 /**
  * The guest page below a painted theme's pages (Step 12q). Scrolling down, the guest meets
@@ -75,11 +78,19 @@ export function ThemedDetails({
   const [burst, setBurst] = useState(0);
   const flowers = [look.flower, look.secondFlower] as const;
   const recipe = guestRecipe(suite, look);
-  const { layouts } = recipe;
+  const { layouts, versions } = recipe;
+  const welcomeProps = { copy, lang, look, photos: welcome };
+  const eventProps = { suite, look, lang, functions, days, allIcsUrl, box: recipe.box };
 
   // The registry: every section a recipe can name, drawn in the version it picks
   const sections: Record<GuestSection, () => ReactNode> = {
-    welcome: () => <Welcome copy={copy} lang={lang} look={look} photos={welcome} />,
+    welcome: () =>
+      ({
+        garland: <Welcome {...welcomeProps} />,
+        masthead: <WelcomeMasthead {...welcomeProps} />,
+        letter: <WelcomeLetter {...welcomeProps} />,
+        darbar: <WelcomeDarbar {...welcomeProps} />,
+      })[versions.welcome],
     flowers: () => (
       <GiveFlowers
         way={recipe.flowers}
@@ -90,19 +101,19 @@ export function ThemedDetails({
         }}
       />
     ),
-    date: () => main && <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />,
-    events: () => (
-      <Celebrations
-        suite={suite}
-        look={look}
-        lang={lang}
-        functions={functions}
-        days={days}
-        allIcsUrl={allIcsUrl}
-        layouts={layouts}
-        box={recipe.box}
-      />
-    ),
+    date: () =>
+      main &&
+      (versions.date === "oversized" ? (
+        <DateOversized main={main} lang={lang} />
+      ) : (
+        <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />
+      )),
+    events: () =>
+      ({
+        hours: <Celebrations {...eventProps} layouts={layouts} />,
+        chapters: <EventsChapters {...eventProps} />,
+        rooms: <EventsRooms {...eventProps} />,
+      })[versions.events],
     dusk: () =>
       (photos.length > 0 || family.length > 0) && (
         <Dusk
@@ -115,7 +126,17 @@ export function ThemedDetails({
           layouts={layouts}
         />
       ),
-    night: () => <Night copy={copy} lang={lang} look={look} way={recipe.lamp} reply={reply} />,
+    night: () => (
+      <Night
+        copy={copy}
+        lang={lang}
+        look={look}
+        way={recipe.lamp}
+        reply={reply}
+        quiet={versions.night === "quiet"}
+        paper={versions.reply}
+      />
+    ),
   };
 
   return (
@@ -124,14 +145,17 @@ export function ThemedDetails({
       data-suite={suite}
       data-guest={look.style}
       data-family={recipe.family}
+      data-finish={versions.finish}
       className="guest-themed relative isolate overflow-clip"
     >
-      <FlowerDefs />
-      {recipe.sections.map((section) => (
-        <Fragment key={section}>{sections[section]()}</Fragment>
-      ))}
-      {onScreen && <FloatingMusic music={music} />}
-      <PetalShower flowers={flowers} burst={burst} />
+      <RecipeContext value={recipe}>
+        <FlowerDefs />
+        {recipe.sections.map((section) => (
+          <Fragment key={section}>{sections[section]()}</Fragment>
+        ))}
+        {onScreen && <FloatingMusic music={music} />}
+        <PetalShower flowers={flowers} burst={burst} />
+      </RecipeContext>
     </div>
   );
 }

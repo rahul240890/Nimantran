@@ -4,6 +4,8 @@ import { designOpening } from "../src/lib/opening/catalog";
 import { guestCopy } from "../src/content/publish";
 import { guestCopy as hiGuestCopy } from "../src/content/hi/publish";
 import { blessings } from "../src/lib/suites/blessings";
+import { guestLook } from "../src/lib/suites/guest-look";
+import { guestRecipe } from "../src/lib/suites/recipe";
 import { sectionLayouts } from "../src/lib/suites/section-layouts";
 import { noOverflow } from "./invite-helpers";
 
@@ -71,35 +73,57 @@ for (const suite of THEMES) {
         await expect(themed).toHaveAttribute("data-suite", suite);
         await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
         await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
-        // Each celebration takes its own hour's light
-        await expect(page.locator("li.guest-hour[data-mood]")).toHaveCount(3);
-        // Laid out in the theme's own mix of layouts
-        const layouts = sectionLayouts(suite);
-        await expect(page.locator('section[aria-labelledby="guest-save-date"]')).toHaveAttribute(
-          "data-layout",
-          layouts.date,
-        );
-        await expect(page.locator("ol:has(> li.guest-hour)")).toHaveAttribute(
-          "data-layout",
-          layouts.hours,
-        );
+        // Laid out as the theme's recipe gives (recipe.ts)
+        const recipe = guestRecipe(suite, guestLook(suite)!);
+        const { layouts, versions } = recipe;
+        await expect(themed).toHaveAttribute("data-family", recipe.family);
+        const date = page.locator('section[aria-labelledby="guest-save-date"]');
+        if (versions.date === "layout")
+          await expect(date).toHaveAttribute("data-layout", layouts.date);
+        else await expect(date).toHaveAttribute("data-date", versions.date);
+        if (versions.events === "hours") {
+          // Each celebration takes its own hour's light
+          await expect(page.locator("li.guest-hour[data-mood]")).toHaveCount(3);
+          await expect(page.locator("ol:has(> li.guest-hour)")).toHaveAttribute(
+            "data-layout",
+            layouts.hours,
+          );
+        }
+        if (versions.events === "chapters")
+          await expect(page.locator('[data-events="chapters"] li')).toHaveCount(3);
+        if (versions.events === "rooms") {
+          // A door for each celebration; opening one shows its room
+          const doors = page.getByRole("tab");
+          await expect(doors).toHaveCount(3);
+          await doors.nth(1).click();
+          await expect(doors.nth(1)).toHaveAttribute("aria-selected", "true");
+          await expect(page.getByRole("tabpanel").getByRole("heading", { level: 3 })).toHaveText(
+            "Sangeet",
+          );
+          await page.keyboard.press("ArrowRight");
+          await expect(doors.nth(2)).toBeFocused();
+          await expect(doors.nth(2)).toHaveAttribute("aria-selected", "true");
+        }
         await expect(page.locator('section[aria-labelledby="guest-family"]')).toHaveAttribute(
           "data-layout",
           layouts.family,
         );
 
-        // The theme's own ways of giving flowers and light (blessings.ts)
-        const ways = blessings(suite);
-        const flowers = guestCopy.themed.flowers[ways.flowers];
-        await page.getByRole("button", { name: flowers.give }).click();
-        await expect(page.getByText(flowers.given)).toBeVisible();
+        // The theme's own ways of giving flowers and light (blessings.ts), where it gives them
+        if (recipe.sections.includes("flowers")) {
+          const flowers = guestCopy.themed.flowers[recipe.flowers];
+          await page.getByRole("button", { name: flowers.give }).click();
+          await expect(page.getByText(flowers.given)).toBeVisible();
+        } else await page.locator("#guest-welcome").click();
 
-        const light = guestCopy.themed.lights[ways.lamp];
-        const lamps = page.getByRole("button", { name: light.give, exact: true });
-        await lamps.click();
-        await expect(page.getByText(light.given)).toBeVisible();
-        await expect(lamps).toHaveAttribute("aria-pressed", "true");
-        await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
+        if (versions.night === "lamps") {
+          const light = guestCopy.themed.lights[recipe.lamp];
+          const lamps = page.getByRole("button", { name: light.give, exact: true });
+          await lamps.click();
+          await expect(page.getByText(light.given)).toBeVisible();
+          await expect(lamps).toHaveAttribute("aria-pressed", "true");
+          await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
+        }
 
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
         // The guest's first tap (the flowers) started the music
@@ -116,7 +140,8 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
   await page.goto("/engine/guest?suite=rajwada-bagh&lang=hi");
   const themed = page.locator(".guest-themed");
   await expect(themed.getByText("आप सादर आमंत्रित हैं")).toBeVisible();
-  await expect(themed.getByText("नवंबर", { exact: true })).toBeVisible();
+  // The month in Hindi, wherever the date version sets it (a calendar page heads it with the year)
+  await expect(themed.getByText("नवंबर").first()).toBeVisible();
   await expect(themed.getByRole("heading", { name: "उत्सव" })).toBeVisible();
   for (const english of ["You are invited", "Save the date", "The celebrations", "November"]) {
     await expect(themed.getByText(english, { exact: false })).toHaveCount(0);

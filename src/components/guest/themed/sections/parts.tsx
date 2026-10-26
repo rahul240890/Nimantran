@@ -1,8 +1,9 @@
 "use client";
 
-import { useSyncExternalStore, type ReactNode } from "react";
+import { createContext, useContext, useSyncExternalStore, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import type { GuestLook } from "@/lib/suites/guest-look";
+import type { GuestRecipe, SectionVersions } from "@/lib/suites/recipe";
 import { FlowerFrame, Garland } from "../flowers";
 import { Bunting, Festoon, PalaceSkyline } from "../scenery";
 import { useInView } from "../use-in-view";
@@ -21,6 +22,14 @@ export const useMounted = () =>
     () => false,
   );
 
+/** The theme's recipe, for the pieces below that dress themselves by it. */
+export const RecipeContext = createContext<GuestRecipe | null>(null);
+
+/** How the whole page is dressed: flowers through the day, or plain editorial paper. */
+export function useFinish(): SectionVersions["finish"] {
+  return useContext(RecipeContext)?.versions.finish ?? "flowers";
+}
+
 export type Music = { playing: boolean; toggle: () => void };
 
 /** A section's small label, a flower and its title. */
@@ -35,6 +44,23 @@ export function Heading({
   label: string;
   title: string;
 }) {
+  const finish = useFinish();
+  if (finish === "editorial")
+    // A magazine's section head: a fine rule, the label, then the title set large
+    return (
+      <div lang={lang} className="guest-ed-head mx-auto flex w-full max-w-5xl flex-col gap-3">
+        <p className="flex items-center gap-4 font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+          <span aria-hidden className="guest-ed-rule w-10 shrink-0" />
+          {label}
+        </p>
+        <h2
+          id={id}
+          className="font-display text-[2.25rem] leading-[1.05] text-balance break-words text-ink sm:text-[3.5rem]"
+        >
+          {title}
+        </h2>
+      </div>
+    );
   return (
     <div lang={lang} className="flex flex-col items-center gap-2 text-center">
       <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">{label}</p>
@@ -74,6 +100,16 @@ export function Framed({
   children: ReactNode;
   className?: string;
 }) {
+  const finish = useFinish();
+  if (finish === "editorial")
+    // A plain print with a hairline, as a magazine sets its photographs
+    return (
+      <div className={cn("relative", className)}>
+        <div data-shape="print" className="guest-frame relative aspect-[4/5] overflow-hidden">
+          {children}
+        </div>
+      </div>
+    );
   const shape = look.style === "garden" || look.style === "party" ? "ring" : "arch";
   return (
     <div className={cn("relative", className)}>
@@ -87,6 +123,8 @@ export function Framed({
 
 /** The scenery along the foot of a section: water, a skyline, or nothing at a party. */
 export function Ground({ look, className }: { look: GuestLook; className?: string }) {
+  const finish = useFinish();
+  if (finish === "editorial") return null;
   if (look.style === "garden") return <span aria-hidden className={cn("guest-water", className)} />;
   if (look.style === "party") return null;
   return <PalaceSkyline className={cn("guest-skyline", className)} />;
@@ -97,6 +135,14 @@ export function Ground({ look, className }: { look: GuestLook; className?: strin
  * procession, a kasavu border by the water, coloured bulbs at a party.
  */
 export function Divider({ look }: { look: GuestLook }) {
+  const finish = useFinish();
+  if (finish === "editorial")
+    return (
+      <span
+        aria-hidden
+        className="guest-ed-rule absolute inset-x-4 top-0 mx-auto max-w-5xl sm:inset-x-6"
+      />
+    );
   if (look.style === "garden")
     return <span aria-hidden className="guest-kasavu absolute inset-x-0 top-0" />;
   if (look.style === "procession")

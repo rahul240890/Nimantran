@@ -6358,9 +6358,10 @@
   --guest-jewel: var(--suite-accent-text);
 }
 
-/* Dark words on the morning and daytime light, and on the cloth cards */
+/* Dark words on the morning and daytime light, on the cloth cards, and on editorial paper */
 .guest-sky[data-mood="dawn"],
 .guest-sky[data-mood="day"],
+.guest-themed[data-finish="editorial"] .guest-sky,
 .guest-card,
 .guest-date-disc {
   color-scheme: light;

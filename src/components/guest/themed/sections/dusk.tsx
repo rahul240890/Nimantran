@@ -19,7 +19,7 @@ import { CARD_THEMED_WORDS } from "@/lib/templates/themed-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { PetalDrift } from "../flowers";
 import { useOnScreen } from "../use-in-view";
-import { Divider, Framed, Heading, Reveal } from "./parts";
+import { Divider, Framed, Heading, Reveal, useFinish } from "./parts";
 
 /** How long each photo shows before the next comes by itself. */
 const PHOTO_MS = 4500;
@@ -235,11 +235,14 @@ export function Dusk({
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
+  const finish = useFinish();
   const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
   return (
     <div data-mood="dusk" className="guest-sky relative isolate pb-16">
       <Divider look={look} />
-      <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
+      {finish !== "editorial" && (
+        <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
+      )}
       {photos.length > 0 && (
         <section
           aria-labelledby="guest-photos"

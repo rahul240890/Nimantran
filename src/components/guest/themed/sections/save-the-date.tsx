@@ -7,7 +7,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { FloorArt, Houseboat } from "../scenery";
 import { useInView } from "../use-in-view";
-import { Heading, useMounted } from "./parts";
+import { Heading, Reveal, useMounted } from "./parts";
 
 /** Monday to Sunday in a known week, for a calendar page's head in the card's language. */
 const WEEK = [1, 2, 3, 4, 5, 6, 7].map((day) => new Date(Date.UTC(2024, 0, day)));
@@ -142,6 +142,56 @@ export function SaveTheDate({
       {main.venue && layout !== "ticket" && (
         <p className="mt-8 text-center font-display text-2xl text-balance text-ink">{main.venue}</p>
       )}
+    </section>
+  );
+}
+
+/**
+ * Editorial: the day as one oversized number on plain paper, the month, year and weekday
+ * set small beside it under a fine rule, and the venue last.
+ */
+export function DateOversized({
+  main,
+  lang,
+}: {
+  main: { date: string; venue: string };
+  lang: CardLanguage;
+}) {
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const day = parseISO(main.date);
+  const month = cardMonth(main.date, lang);
+  const longDay = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "long", timeZone: "UTC" });
+  return (
+    <section
+      aria-labelledby="guest-save-date"
+      data-mood="day"
+      data-tour="8"
+      data-date="oversized"
+      className="guest-sky guest-sky-flat relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
+    >
+      <Heading
+        id="guest-save-date"
+        lang={lang}
+        label={cardWords.saveDateLabel}
+        title={cardWords.saveDate}
+      />
+      <Reveal className="guest-stagger mx-auto mt-10 grid w-full max-w-5xl items-end gap-6 sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-10">
+        <p
+          lang={lang}
+          className="font-display text-[clamp(8rem,42vw,17rem)] leading-[0.8] text-ink tabular-nums"
+        >
+          {format(day, "d")}
+        </p>
+        <div lang={lang} className="guest-ed-top flex flex-col gap-2 pt-4 sm:mb-4">
+          <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+            {longDay.format(new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())))}
+          </p>
+          <p className="font-display text-3xl leading-tight text-ink sm:text-4xl">
+            {month} <span className="tabular-nums">{format(day, "yyyy")}</span>
+          </p>
+          {main.venue && <p className="text-lg text-balance text-ink-muted">{main.venue}</p>}
+        </div>
+      </Reveal>
     </section>
   );
 }
