@@ -91,11 +91,6 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   packagesHeading: "এই ডিজাইনের প্যাকেজ",
   packageFree: "বিনামূল্যে",
   comparePackages: "প্যাকেজগুলো তুলনা করুন",
-  packageExtras: {
-    heading: "প্যাকেজের দামেই অন্তর্ভুক্ত",
-    video: "স্ট্যাটাস আর রিলসের জন্য WhatsApp ভিডিও",
-    cards: "সেভ দ্য ডেট ও ধন্যবাদ কার্ড",
-  },
   packageSet: { wedding: "বিয়ের সেট", other: "পুরো সেট" },
   seeSample: "অতিথি হয়ে লাইভ দেখুন",
   liveDemo: "লাইভ ডেমো",

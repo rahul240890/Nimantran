@@ -66,16 +66,17 @@ function legacyHref(
 }
 
 /*
- * Preview and publish. An invite is written on its design's own page (/create/<design>), so
- * here: ?invite=<id> opens an invite from My invites, then its design's page, or with
- * &publish=1 (back from choosing its package) its preview and Publish dialog, with &gate=1
- * its preview with the opening gate to change, with &preview=1 its preview; ?new=1 starts another, keeping the open one in
- * the account, from the gallery. Older links naming a design, occasion or tradition go to
- * that design's page or the gallery.
+ * The way into the editor from elsewhere. An invite is written, previewed and published on
+ * its design's own page (/create/<design>), so here: ?invite=<id> opens an invite from My
+ * invites and goes to its design's page, with &publish=1 (back from choosing its package)
+ * its Publish dialog open there, with &gate=1 at How it opens; &preview=1 (an older Back
+ * from the video) is its page too. ?new=1 starts another, keeping the open one in the
+ * account, from the gallery. Older links naming a design, occasion or tradition go to that
+ * design's page or the gallery.
  */
 export default async function CreatePage({ searchParams }: PageProps<"/create">) {
   const params = await searchParams;
-  const { invite, new: fresh, publish, gate, preview } = params;
+  const { invite, new: fresh, publish, gate } = params;
   const account = await getAccount();
   const wanted = typeof invite === "string" ? invite : null;
   if (wanted && !account) {
@@ -107,9 +108,6 @@ export default async function CreatePage({ searchParams }: PageProps<"/create">)
         missing={Boolean(wanted && !initialInvite)}
         openPublish={Boolean(initialInvite) && publish === "1"}
         openGate={Boolean(initialInvite) && gate === "1"}
-        openPreview={Boolean(initialInvite) && preview === "1"}
-        // Changing an invite happens on its design's page, once it's open on this device
-        openEdit={Boolean(initialInvite) && publish !== "1" && gate !== "1" && preview !== "1"}
       />
     </PageTransition>
   );

@@ -1,17 +1,27 @@
 "use client";
 
-import { ArrowLeft, ArrowRight, Eye, LoaderCircle, PlayCircle, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Clapperboard,
+  Eye,
+  Images,
+  LoaderCircle,
+  LogIn,
+  PlayCircle,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { AccountMenu } from "@/components/account/account-menu";
 import { Logo } from "@/components/brand/logo";
 import { SocialIcon } from "@/components/brand/social-links";
+import { EditionNotice } from "@/components/editions/edition-notice";
 import { PreviewOffers } from "@/components/offers/preview-offers";
+import { PublishButton } from "@/components/publish/publish-button";
 import { TrustLine } from "@/components/reviews/trust-line";
 import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
-import { helpPath } from "@/components/shell/nav-links";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
 import { HeldBackNotice } from "@/components/editions/held-back";
@@ -19,7 +29,9 @@ import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { Quiet } from "@/components/ui/quiet";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
+import { cardsText } from "@/i18n/copy/cards";
 import { editorText } from "@/i18n/copy/editor";
+import { publishText } from "@/i18n/copy/publish";
 import {
   cardLanguages,
   draftCategory,
@@ -34,9 +46,11 @@ import { changeDesign, startWithDesign, type GalleryChoice } from "@/lib/editor/
 import { inviteDraft } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore } from "@/lib/invites/sync";
 import { funnel } from "@/lib/funnel";
+import { site } from "@/lib/site";
 import { draftShowsScene, draftSuite } from "@/lib/publish/story";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { FamilyPreview } from "../family-preview";
 import { GateSummary } from "../gate-chooser";
 import { GATE_PAGE, PreviewStage } from "../preview-stage";
 import { SaveStatus } from "../save-status";
@@ -82,9 +96,11 @@ const CHECKED: readonly EditorStep[] = ["couple", "words", "functions"];
  * Beside it, every part of the editor for the occasion: the card's language and the names,
  * when and where, then the family, photos, card words, and music and replies, folded until
  * opened. The page is quiet (components/ui/quiet.tsx): no helper words, small type, close
- * together. See my invitation opens the editor's preview, where it is published and paid
- * for, on the same draft, so nothing is typed twice. Other designs for the occasion sit
- * underneath to compare with.
+ * together. Once the names and dates are in, everything else is here too (owner,
+ * 2026-10-25: the summary page after it only repeated it): under the design, the invitation
+ * as guests see it, its video and its save-the-date and thank-you cards; at the end, the
+ * link for the family; and in the bar, Publish, then Share. Other designs for the occasion
+ * sit underneath to compare with.
  */
 export function QuickStart({
   designId,
@@ -95,6 +111,7 @@ export function QuickStart({
   missing = false,
   backHref,
   sampleHref,
+  openPublish = false,
   more,
 }: {
   designId: string;
@@ -110,12 +127,16 @@ export function QuickStart({
   backHref: string;
   /** The design as a guest gets it. */
   sampleHref: string;
+  /** Back from choosing a package (?publish=1): the Publish dialog opens. */
+  openPublish?: boolean;
   /** Other designs for the occasion, drawn on the server (suggested-designs.tsx). */
   more?: ReactNode;
 }) {
   const { quickCopy, editor, stepCopy, syncCopy, coupleCopy, functionCopy, openingCopy } =
     useText(editorText);
   const locale = useLocale();
+  const { publishCopy } = useText(publishText);
+  const { cardsCopy } = useText(cardsText);
   const router = useRouter();
   const still = useReducedMotion();
   const wide = useMediaQuery("(min-width: 64rem)");
@@ -298,46 +319,77 @@ export function QuickStart({
   };
 
   const form = useRef<HTMLFormElement>(null);
-  const leave = (step: EditorStep) => {
-    update((current) => ({ ...current, step }));
-    inviteDraft.flush();
-    router.push("/create");
-  };
+  // The names, dates and places guests can't do without: once they're right, the rest of
+  // the editor's work shows (the guests' view, the video, the cards, Publish)
+  const filled = CHECKED.every((step) => Object.keys(stepErrors(draft, step)).length === 0);
+  // A change the live invite's package refused (held-back.tsx): the account's copy is the
+  // live one as guests have it, so the guests' view, video and cards would show that one
+  const held = sync === "needs-plan" && Boolean(draft.slug);
   // Signed in, Preview is the guests' own view, saved first: the gate chosen here, the
   // welcome, every page and the music (owner, 2026-10-25: a gate changed on this page didn't
-  // show in the pages-only preview). Without an account it stays the quick look at the pages
-  const [toGuests, setToGuests] = useState(false);
-  const guestPreview = async () => {
-    setToGuests(true);
+  // show in the pages-only preview). Without an account it stays the quick look at the pages.
+  // The video and the cards open the same way, saved first
+  const [opening, setOpening] = useState<"preview" | "video" | "cards" | null>(null);
+  const openSaved = async (to: "preview" | "video" | "cards") => {
+    setOpening(to);
     inviteDraft.flush();
     // A change the live invite's package refused isn't in the account: the account's copy
     // is the live one as guests have it, so the quick look shows this one instead
     const saved = await syncDraft();
-    const id = inviteDraft.get().draft.remoteId;
+    const current = inviteDraft.get().draft;
+    const id = current.remoteId;
     if (id && saved !== "needs-plan") {
-      router.push(`/invites/${id}/preview?from=design`);
+      router.push(
+        to === "preview"
+          ? `/invites/${id}/preview`
+          : // A live invite's video is on its share page, with the link it ends on
+            `/invites/${id}/${to === "video" && current.slug ? "share" : to}`,
+      );
       return;
     }
-    setToGuests(false);
-    setPreviewing(true);
+    setOpening(null);
+    if (to === "preview") setPreviewing(true);
+    else toast({ title: publishCopy.saveFailed, tone: "error" });
   };
-  const see = () => {
+  // Counted once a visit: the names, dates and places are in (the old preview's step)
+  const counted = useRef(false);
+  useEffect(() => {
+    if (!ready || !filled || counted.current) return;
+    counted.current = true;
+    funnel("Details filled", { category: draft.categoryId });
+  }, [ready, filled, draft.categoryId]);
+  // Fetch the pages' code ahead, so a tap opens them straight away
+  useEffect(() => {
+    if (!ready || !signedIn || !filled || !draft.remoteId) return;
+    router.prefetch(`/invites/${draft.remoteId}/preview`);
+    router.prefetch(`/invites/${draft.remoteId}/video`);
+  }, [ready, signedIn, filled, draft.remoteId, router]);
+  // Shows what's missing, the first of it opened and in view; true when nothing is
+  const check = () => {
     const problems = Object.assign({}, ...CHECKED.map((step) => stepErrors(draft, step)));
-    if (Object.keys(problems).length > 0) {
-      setChecking(true);
-      requestAnimationFrame(() => {
-        const first = form.current?.querySelector<HTMLElement>(
-          '[aria-invalid="true"], [data-invalid]',
-        );
-        // A field folded away opens first, so it can be seen and typed in
-        first?.closest("details")?.setAttribute("open", "");
-        first?.focus();
-        first?.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
-      });
-      return;
-    }
-    leave("preview");
+    if (Object.keys(problems).length === 0) return true;
+    setChecking(true);
+    requestAnimationFrame(() => {
+      const first = form.current?.querySelector<HTMLElement>(
+        '[aria-invalid="true"], [data-invalid]',
+      );
+      // A field folded away opens first, so it can be seen and typed in
+      first?.closest("details")?.setAttribute("open", "");
+      first?.focus();
+      first?.scrollIntoView({ block: "center", behavior: still ? "auto" : "smooth" });
+    });
+    return false;
   };
+  // Back from choosing a package (?publish=1): the dialog opens once, and the address
+  // forgets it so a reload doesn't open it again
+  const [publishing] = useState(openPublish);
+  useEffect(() => {
+    if (!ready || !openPublish) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete("publish");
+    window.history.replaceState(window.history.state, "", url);
+  }, [ready, openPublish]);
+  const signInHere = `/sign-in?next=${encodeURIComponent(designPageHref(draft))}`;
 
   // What's in the names and the events, beside their titles while folded
   const names = [draft.content.first, draft.content.second]
@@ -428,20 +480,24 @@ export function QuickStart({
               <TierBadge designId={designId} variant="plain" paid={paidOn(designId)} />
             )}
           </div>
-          {/* The demo plays the design with sample names; the preview is the family's own */}
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="secondary">
-              <Link href={sampleHref} prefetch={false} data-watch-live>
-                <PlayCircle aria-hidden className="text-accent-text" />
-                {quickCopy.watch}
-              </Link>
-            </Button>
+          {/* Until the names and dates are in, the demo plays the design with sample names;
+              then the family's own: as guests see it, as a video, and as its cards */}
+          <div className="flex flex-wrap gap-2" data-try-it>
+            {!(ready && filled) && (
+              <Button asChild variant="secondary">
+                <Link href={sampleHref} prefetch={false} data-watch-live>
+                  <PlayCircle aria-hidden className="text-accent-text" />
+                  {quickCopy.watch}
+                </Link>
+              </Button>
+            )}
             {ready && signedIn && (
               <Button
                 variant="secondary"
                 leadingIcon={<Eye aria-hidden />}
-                loading={toGuests}
-                onClick={() => void guestPreview()}
+                loading={opening === "preview"}
+                disabled={opening !== null}
+                onClick={() => (held ? setPreviewing(true) : void openSaved("preview"))}
                 data-own-preview
               >
                 {quickCopy.preview}
@@ -466,7 +522,54 @@ export function QuickStart({
                 </SheetContent>
               </Sheet>
             )}
+            {/* Made from the saved invite, so they wait while a change is held back */}
+            {ready && filled && !held && (
+              <>
+                {signedIn ? (
+                  <Button
+                    variant="secondary"
+                    leadingIcon={<Clapperboard aria-hidden />}
+                    loading={opening === "video"}
+                    disabled={opening !== null}
+                    onClick={() => void openSaved("video")}
+                    data-try-video
+                  >
+                    {quickCopy.video}
+                  </Button>
+                ) : (
+                  <Button asChild variant="secondary">
+                    <Link href={signInHere} data-try-video>
+                      <Clapperboard aria-hidden />
+                      {quickCopy.video}
+                    </Link>
+                  </Button>
+                )}
+                {signedIn ? (
+                  <Button
+                    variant="secondary"
+                    leadingIcon={<Images aria-hidden />}
+                    loading={opening === "cards"}
+                    disabled={opening !== null}
+                    onClick={() => void openSaved("cards")}
+                    aria-label={cardsCopy.open}
+                    data-try-cards
+                  >
+                    {quickCopy.cards}
+                  </Button>
+                ) : (
+                  <Button asChild variant="secondary">
+                    <Link href={signInHere} aria-label={cardsCopy.open} data-try-cards>
+                      <Images aria-hidden />
+                      {quickCopy.cards}
+                    </Link>
+                  </Button>
+                )}
+              </>
+            )}
           </div>
+          {ready && filled && !signedIn && (
+            <p className="text-xs text-ink-muted">{quickCopy.signInToTry}</p>
+          )}
           <TrustLine />
         </section>
 
@@ -486,7 +589,7 @@ export function QuickStart({
           }}
           onSubmit={(event) => {
             event.preventDefault();
-            see();
+            check();
           }}
           className="flex min-w-0 flex-col gap-5 lg:max-w-2xl"
         >
@@ -573,6 +676,17 @@ export function QuickStart({
                   bare
                 />
               </Fold>
+              {/* Before it goes out: the family's look first, and what its package doesn't cover */}
+              {filled && !draft.slug && (!signedIn || draft.remoteId) && (
+                <FamilyPreview
+                  signedIn={signedIn}
+                  remoteId={draft.remoteId}
+                  signInNext={designPageHref(draft)}
+                />
+              )}
+              {signedIn && draft.remoteId && (
+                <EditionNotice draft={draft} inviteId={draft.remoteId} />
+              )}
               <DesignPackages
                 designId={designId}
                 tone="paper"
@@ -581,19 +695,24 @@ export function QuickStart({
               />
               {/* An offer running now on this design, with its code to copy */}
               <PreviewOffers designId={designId} tone="paper" />
-              <a
-                href={helpPath(locale, "make", designId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center gap-2 self-start rounded-full border border-success/40 bg-success/10 px-4 text-sm font-semibold text-ink transition-colors hover:bg-success/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-              >
-                <SocialIcon channel="whatsapp" className="size-4 text-success" />
-                {quickCopy.make}
-              </a>
+              {/* We'll make it for them, on Instagram (owner, 2026-10-25); once the line in
+                  the bar below shows, it's said there only */}
+              {!(stalled && !makeHidden) && (
+                <a
+                  href={site.social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-make-link
+                  className="inline-flex min-h-11 items-center gap-2 self-start rounded-full border border-line bg-surface px-4 text-sm font-semibold text-ink transition-colors hover:bg-surface-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                >
+                  <SocialIcon channel="instagram" className="size-4 text-accent-text" />
+                  {quickCopy.make}
+                </a>
+              )}
             </Quiet>
           )}
 
-          {/* See my invitation stays in reach on a phone */}
+          {/* Publish stays in reach on a phone */}
           <div className="sticky bottom-0 z-30 -mx-4 mt-auto flex flex-col gap-2 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-t-lg lg:border-x lg:px-4">
             {errorCount > 0 && (
               <p
@@ -607,11 +726,11 @@ export function QuickStart({
             {stalled && !makeHidden && errorCount === 0 && (
               <div
                 data-make-nudge
-                className="flex animate-fade-in items-center gap-1 rounded-md border border-success/40 bg-success/10 ps-3"
+                className="flex animate-fade-in items-center gap-1 rounded-md border border-line bg-surface ps-3"
               >
-                <SocialIcon channel="whatsapp" className="size-4 shrink-0 text-success" />
+                <SocialIcon channel="instagram" className="size-4 shrink-0 text-accent-text" />
                 <a
-                  href={helpPath(locale, "make", designId)}
+                  href={site.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex min-h-11 flex-1 items-center rounded-sm px-1 text-sm font-semibold text-ink underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -628,17 +747,35 @@ export function QuickStart({
                 </button>
               </div>
             )}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              <Button
-                type="submit"
-                size="lg"
-                disabled={!ready}
-                trailingIcon={<ArrowRight aria-hidden className="rtl:rotate-180" />}
-                className="max-sm:w-full"
-              >
-                {quickCopy.see}
-              </Button>
-              <p className="text-xs text-ink-muted">{quickCopy.nothingToPay}</p>
+            {/* Publish once it's right (the packages first when it has none), then Share */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1" data-editor-bar>
+              {ready && !signedIn ? (
+                // Publishing needs an account: what's missing is shown first, then sign in
+                <Button
+                  size="lg"
+                  leadingIcon={<LogIn aria-hidden />}
+                  className="max-sm:w-full"
+                  onClick={() => check() && router.push(signInHere)}
+                >
+                  {publishCopy.signInToPublish}
+                </Button>
+              ) : ready ? (
+                <PublishButton
+                  draft={draft}
+                  signedIn={signedIn}
+                  size="lg"
+                  className="max-sm:w-full"
+                  autoOpen={publishing}
+                  signInNext={designPageHref(draft)}
+                  onNotReady={() => {
+                    if (check()) toast({ title: publishCopy.finishFirst, tone: "error" });
+                  }}
+                />
+              ) : (
+                <Button size="lg" disabled className="max-sm:w-full">
+                  {publishCopy.publish}
+                </Button>
+              )}
             </div>
           </div>
         </form>

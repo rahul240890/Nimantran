@@ -54,13 +54,14 @@ export async function videoSupport(codecs: VideoCodecs = SHARE_CODECS): Promise<
 }
 
 /**
- * Draws and encodes every frame, reporting progress from 0 to 1. Stops, without a file,
+ * Draws and encodes every frame, reporting progress from 0 to 1 with the canvas the frames
+ * are drawn on, so a page can show the video as it's being made. Stops, without a file,
  * when `signal` aborts.
  */
 export async function makeVideo(
   film: VideoFilm,
   music: MusicChoice | null,
-  onProgress: (done: number) => void,
+  onProgress: (done: number, frame?: HTMLCanvasElement) => void,
   signal: AbortSignal,
   codecs: VideoCodecs = SHARE_CODECS,
 ): Promise<Blob> {
@@ -99,7 +100,7 @@ export async function makeVideo(
       film.draw(ctx, at);
       await video.add(at, 1 / FRAME_RATE);
       if (frame % 6 === 0) {
-        onProgress(0.03 + (0.95 * frame) / frames);
+        onProgress(0.03 + (0.95 * frame) / frames, canvas);
         // Let the page repaint the progress bar
         await new Promise((resolve) => setTimeout(resolve, 0));
       }

@@ -34,7 +34,7 @@ export default async function InvitePreviewPage({
   searchParams,
 }: PageProps<"/invites/[id]/preview">) {
   const { id } = await params;
-  const { frame, full, from } = await searchParams;
+  const { frame, full } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/preview`)}`);
@@ -74,7 +74,7 @@ export default async function InvitePreviewPage({
   const next = draft.slug
     ? { href: `/invites/${id}/share`, label: hostPreviewCopy.share }
     : {
-        href: free ? `/invites/${id}/edition?publish=1` : `/create?invite=${id}&publish=1`,
+        href: free ? `/invites/${id}/edition?publish=1` : `${designPageHref(draft)}&publish=1`,
         label: hostPreviewCopy.next,
       };
 
@@ -84,15 +84,10 @@ export default async function InvitePreviewPage({
       full={full === "1"}
       frameSrc={`/invites/${id}/preview?frame=1`}
       fullHref={`/invites/${id}/preview?full=1`}
-      // Opened from the design's page, its way back and its gate lead there again
-      back={{
-        href: from === "design" ? designPageHref(draft) : `/create?invite=${id}`,
-        label: hostPreviewCopy.back,
-      }}
+      // The design's page is the whole editor: the way back and the gate lead there
+      back={{ href: designPageHref(draft), label: hostPreviewCopy.back }}
       next={next}
-      gateHref={
-        from === "design" ? `${designPageHref(draft)}#part-gate` : `/create?invite=${id}&gate=1`
-      }
+      gateHref={`${designPageHref(draft)}#part-gate`}
       published={Boolean(draft.slug)}
       marked={free && !draft.slug}
       copy={hostPreviewCopy}

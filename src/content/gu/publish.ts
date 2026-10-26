@@ -27,6 +27,8 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   cancel: "હજુ નહીં",
   close: "બંધ કરો",
   failed: "પ્રકાશિત થઈ શક્યું નહીં. ઇન્ટરનેટ તપાસો અને ફરી પ્રયત્ન કરો.",
+  /** Opening the video or the cards from the editor, which saves first. */
+  saveFailed: "હમણાં સેવ થઈ શક્યું નહીં. ઇન્ટરનેટ તપાસો અને ફરી પ્રયત્ન કરો.",
   notReady: "મોકલતાં પહેલાં હજુ કેટલાંક પગલાં પૂરાં કરવાનાં બાકી છે.",
   published: "તમારું આમંત્રણ લાઇવ છે",
 };
@@ -282,6 +284,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   stop: "રોકો",
   stopped: "વીડિયો રોક્યો",
   ready: "તમારો વીડિયો તૈયાર છે",
+  keepsGoing: "ઇચ્છો તો આ પેજ છોડી દો: વીડિયો બનતો રહેશે.",
+  watch: "જુઓ",
+  hideAway: "છુપાવો",
   changed: "આ વીડિયો બન્યા પછી તમારું આમંત્રણ બદલાયું છે. ફેરફારો ઉમેરવા માટે તેને ફરી બનાવો.",
   finishing: "તમે બનાવેલો વીડિયો પૂરો થઈ રહ્યો છે, જેથી તે તમારા આમંત્રણની લિંક પર પૂરો થાય.",
   unfinished:

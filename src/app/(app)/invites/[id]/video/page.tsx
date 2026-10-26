@@ -10,6 +10,7 @@ import { publishText } from "@/i18n/copy/publish";
 import { getLocale, getText } from "@/i18n/server";
 import { authMode } from "@/lib/auth/mode";
 import { getAccount } from "@/lib/auth/server";
+import { designPageHref } from "@/lib/editor/design-page";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
@@ -60,16 +61,16 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
   const publishHref =
     active && plan.watermark
       ? `/invites/${id}/edition?publish=1`
-      : `/create?invite=${id}&publish=1`;
+      : `${designPageHref(draft)}&publish=1`;
 
   return (
     <PageTransition>
       <AccountShell>
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 sm:px-6 sm:py-14">
           <div className="-ms-2 flex flex-wrap items-center gap-x-4">
-            {/* Back to where it was watched from: the invite's preview, to publish or share */}
+            {/* Back to the design's page, the whole editor, to publish or share */}
             <Link
-              href={`/create?invite=${id}&preview=1`}
+              href={designPageHref(draft)}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
             >
               <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
@@ -77,7 +78,7 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
             </Link>
             {/* The video opens with the gate: changing it here makes the next one with the new */}
             <Link
-              href={`/create?invite=${id}&gate=1`}
+              href={`${designPageHref(draft)}#part-gate`}
               className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-semibold text-accent-text transition-colors hover:text-ink"
             >
               <DoorOpen aria-hidden className="size-4" />

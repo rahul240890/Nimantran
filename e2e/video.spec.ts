@@ -8,7 +8,7 @@ test.describe("invitation video", () => {
 
   test("a host watches the video before publishing", async ({ page }, info) => {
     await writeInvite(page, numberFor(info), ["Kabir", "Meera"]);
-    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await page.locator("[data-try-video]").click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
     const card = page.locator("[data-video-card]");
     await expect(card.getByRole("heading", { name: "Invitation video" })).toBeVisible();
@@ -27,6 +27,49 @@ test.describe("invitation video", () => {
     }
   });
 
+  test("a video being made keeps going on the design's page, and says when it's ready", async ({
+    page,
+  }, info) => {
+    // Making the whole video takes minutes in a test browser
+    test.setTimeout(600_000);
+    await writeInvite(page, numberFor(info), ["Dev", "Anika"]);
+    await page.locator("[data-try-video]").click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
+    const card = page.locator("[data-video-card]");
+    const make = card.getByRole("button", { name: /^Make video/ });
+    const unsupported = card.getByText("This browser can't make videos.", { exact: false });
+    await expect(make.or(unsupported)).toBeVisible({ timeout: 30_000 });
+    if (await unsupported.isVisible()) return;
+    await make.click();
+    await expect(card.getByRole("progressbar")).toBeVisible();
+    await expect(card.getByText("Leave this page if you like: it keeps going.")).toBeVisible();
+
+    // Back on the design's page, it carries on in the corner, then says it's ready
+    await page.getByRole("link", { name: "Back to your invite" }).click();
+    await expect(page).toHaveURL(/\/create\/[a-z-]+\?/);
+    const away = page.locator("[data-video-away]");
+    await expect(away).toBeVisible();
+    await expect(away.getByText(/^Making your video: \d+%$|^Your video is ready$/)).toBeVisible();
+    // It carries on while the host is away from its page
+    const percent = async () => Number(/(\d+)%/.exec((await away.textContent()) ?? "")?.[1] ?? 100);
+    const before = await percent();
+    await expect.poll(percent, { timeout: 60_000 }).toBeGreaterThan(before);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).include("[data-video-away]").analyze()).violations).toEqual([]);
+    const shots = process.env.VIDEO_SHOTS;
+    if (shots) {
+      await page.screenshot({ path: `${shots}/video-away-${info.project.name}-light.png` });
+      await page.emulateMedia({ colorScheme: "dark" });
+      await page.screenshot({ path: `${shots}/video-away-${info.project.name}-dark.png` });
+      await page.emulateMedia({ colorScheme: "light" });
+    }
+    await expect(away.getByText("Your video is ready")).toBeVisible({ timeout: 480_000 });
+    await away.getByRole("link", { name: "Watch" }).last().click();
+    await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video#invitation-video$/);
+    await expect(card.getByText("Your video is ready")).toBeVisible();
+    await expect(away).toHaveCount(0);
+  });
+
   test("the Celebration package makes the video preview right on its card", async ({
     page,
     context,
@@ -35,7 +78,7 @@ test.describe("invitation video", () => {
       { name: "shubh-preview-checkout", value: "on", url: info.project.use.baseURL! },
     ]);
     await writeInvite(page, numberFor(info), ["Ishaan", "Riya"]);
-    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await page.locator("[data-try-video]").click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
     const id = new URL(page.url()).pathname.split("/")[2];
     await page.goto(`/invites/${id}/edition`);
@@ -82,7 +125,7 @@ test.describe("invitation video", () => {
     page,
   }, info) => {
     await writeInvite(page, numberFor(info), ["Rohan", "Tara"]);
-    await page.getByRole("button", { name: "Watch it as a video" }).click();
+    await page.locator("[data-try-video]").click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/video$/);
     const card = page.locator("[data-video-card]");
     const [id, ...tail] = (await card.getAttribute("data-video-key"))!.split(":");

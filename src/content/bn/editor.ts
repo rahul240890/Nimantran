@@ -8,44 +8,10 @@ import { designNames } from "./design-names";
 export const editor: Translation<typeof en.editor> = {
   metaTitle: "আপনার নিমন্ত্রণপত্র তৈরি করুন",
   metaDescription: "3D ডিজাইন বেছে নিন, নাম আর অনুষ্ঠান যোগ করুন, তারপর নিমন্ত্রণপত্রটি দেখে নিন।",
-  headerLabel: "নিমন্ত্রণ এডিটর",
   opening: "আপনার নিমন্ত্রণ খুলছে…",
-  progressLabel: "নিমন্ত্রণের অগ্রগতি",
-  progress: (step, total) => `${total}টির মধ্যে ধাপ ${step}`,
-  done: "সম্পূর্ণ",
-  designChosen: "আপনার ডিজাইন",
-  changeDesign: "ডিজাইন বদলান",
-  stages: { design: "ডিজাইন", details: "আপনার তথ্য", preview: "প্রিভিউ ও পাঠান" },
-  sections: {
-    label: "আপনার তথ্য, ছয়টি ভাগে",
-    open: (part, summary, state) =>
-      `${part}: ${summary}${state === "done" ? ", সম্পূর্ণ" : state === "check" ? ", একবার দেখে নিন" : ""}। খুলুন`,
-    done: "সম্পূর্ণ",
-    check: "একবার দেখে নিন",
-    edit: "বদলান",
-    names: (names) => (names.length ? names.join(" ও ") : "নাম যোগ করুন"),
-    functions: (names) =>
-      names.length === 0
-        ? "আপনার অনুষ্ঠানগুলি বেছে নিন"
-        : names.length <= 3
-          ? names.join(", ")
-          : `${names.slice(0, 2).join(", ")} এবং আরও ${names.length - 2}টি`,
-    family: (filled) =>
-      filled ? "পরিবারের তথ্য যোগ হয়েছে" : "ঐচ্ছিক: বাবা-মা, আশীর্বাদ আর নিমন্ত্রণকর্তা",
-    photos: (photos) => (photos === 0 ? "এখনও কোনো ছবি নেই" : `${photos}টি ছবি`),
-    words: (own) => (own ? "আপনার নিজের লেখা" : "আপনার অনুষ্ঠানের জন্য লেখা"),
-    music: (own, questions) =>
-      `${own ? "আপনার নিজের গান" : "ডিজাইনের সংগীত"} · ${questions === 0 ? "আর কোনো প্রশ্ন নেই" : `${questions}টি প্রশ্ন`}`,
-  },
-  back: "পিছনে",
-  next: "এগিয়ে চলুন",
-  toPreview: "নিমন্ত্রণপত্র দেখুন",
-  preview: "নিমন্ত্রণপত্রের প্রিভিউ",
-  showPreview: "প্রিভিউ",
   previewTitle: "আপনার নিমন্ত্রণপত্র",
   livePreview: "লাইভ প্রিভিউ, বড় করে দেখুন",
   hideLivePreview: "লাইভ প্রিভিউ লুকান",
-  showLivePreview: "লাইভ প্রিভিউ দেখান",
   close: "বন্ধ করুন",
   optional: "ঐচ্ছিক",
   characters: (used, max) => `${max}টির মধ্যে ${used}টি অক্ষর`,
@@ -593,17 +559,6 @@ export const occasionCopy: Translation<typeof en.occasionCopy> = {
 };
 
 export const previewCopy: Translation<typeof en.previewCopy> = {
-  ready: "আপনার নিমন্ত্রণপত্র তৈরি",
-  live: "আপনার নিমন্ত্রণপত্র লাইভ",
-  liveBody: (link) =>
-    `অতিথিরা এটি ${link}-এ খোলেন। এখানে যা বদলাবেন, সেখানে সঙ্গে সঙ্গে দেখা যাবে।`,
-  readyBody:
-    "এটি এই ডিভাইসে সেভ হয়েছে। নিজের অ্যাকাউন্টে রাখতে আর প্রকাশ করতে সাইন ইন করুন, তারপর লিংকটি WhatsApp-এ পাঠান।",
-  readyBodyAccount:
-    "ছবি সমেত এটি আপনার অ্যাকাউন্টে সেভ হয়েছে। আগে অতিথিদের চোখে দেখে নিন, তারপর লিংক পেতে প্রকাশ করুন।",
-  seeAsGuest: "অতিথিদের চোখে দেখুন",
-  watchVideo: "ভিডিও হিসেবে দেখুন",
-  seeAsGuestBody: "পুরো নিমন্ত্রণপত্র, পুরো স্ক্রিনে: খোলা, সংগীত, প্রতিটি পাতা আর উত্তরের ফর্ম।",
   familyTitle: "আগে পরিবারকে দেখান",
   familyBody:
     "দেখে নেওয়ার জন্য তাঁদের WhatsApp-এ একটি ঝলক পাঠান। প্রতিটি স্ক্রিনে ‘ঝলক’ লেখা থাকে আর উত্তর বন্ধ থাকে, তাই এটি নিমন্ত্রণপত্র হিসেবে পাঠানো যায় না। আপনি পাঠালে অতিথিরা পরিষ্কার নিমন্ত্রণপত্র পান।",
@@ -616,27 +571,6 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
   familySignIn: "পাঠাতে সাইন ইন করুন",
   familyMessage: (url) =>
     `আমাদের নিমন্ত্রণপত্রের একটি ঝলক। দেখে জানান কেমন লাগল, তারপর আমরা পাঠাব: ${url}`,
-  notReady: "কয়েকটি তথ্য বাকি আছে",
-  fix: (label) => `${label} সম্পূর্ণ করুন`,
-  occasionHeading: "উপলক্ষ",
-  namesHeading: "নাম",
-  functionsHeading: "অনুষ্ঠান",
-  photosHeading: "ছবি",
-  noPhotos: "কোনো ছবি যোগ করা হয়নি",
-  musicHeading: "সংগীত",
-  playsOnOpen: "অতিথিরা কার্ড খুললেই বাজে",
-  dressCode: "পোশাকবিধি",
-  edit: "বদলান",
-  editStep: (label) => `${label} বদলান`,
-  startOver: "নতুন নিমন্ত্রণ শুরু করুন",
-  startOverTitle: "নতুন নিমন্ত্রণ শুরু করবেন?",
-  startOverBody: "এতে এই ডিভাইসে সেভ করা নাম, অনুষ্ঠান আর ছবি মুছে যাবে।",
-  startOverConfirm: "মুছে নতুন করে শুরু করুন",
-  startOverKeepBody:
-    "এই নিমন্ত্রণটি আমার নিমন্ত্রণ-এ থাকবে, যখন খুশি ফিরে আসতে পারবেন। নতুনটি খালি থেকে শুরু হবে।",
-  startOverKeepConfirm: "নতুন নিমন্ত্রণ শুরু করুন",
-  cancel: "এই নিমন্ত্রণটিই রাখুন",
-  cleared: "নতুন নিমন্ত্রণ শুরু হয়েছে",
 };
 
 export const suiteCopy: Translation<typeof en.suiteCopy> = {
@@ -1884,8 +1818,9 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   familyIntro: "চাইলে: বাবা-মা, আশীর্বাদ আর অতিথিরা কাকে ফোন করবেন",
   photosTitle: "আপনার ছবি",
   photosIntro: "চাইলে: ডিজাইনে আপনার ছবির জন্য ফ্রেম আছে",
-  see: "আমার নিমন্ত্রণপত্র দেখুন",
-  nothingToPay: "এখন কিছু দিতে হবে না",
+  video: "ভিডিও",
+  cards: "কার্ড",
+  signInToTry: "ভিডিও আর কার্ড বানাতে সাইন ইন করুন।",
   more: "আরও বিকল্প",
   moreIntro: "নিজের গান, কথা, খোলার দরজা আর প্রশ্ন",
   make: "সময় কম? আমরা আপনার হয়ে বানিয়ে দেব",

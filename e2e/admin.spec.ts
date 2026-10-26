@@ -157,9 +157,10 @@ test.describe("packages", () => {
 
     const id = new URL(page.url()).pathname.split("/")[2];
 
+    // Back to the design's page, which opens the Publish dialog
     await expect(page.getByRole("link", { name: "Publish your invite" })).toHaveAttribute(
       "href",
-      `/create?invite=${id}&publish=1`,
+      new RegExp(`^/create/[a-z0-9-]+\\?.*invite=${id}&publish=1$`),
     );
 
     // The payment in the account's history, with its receipt and the spreadsheet

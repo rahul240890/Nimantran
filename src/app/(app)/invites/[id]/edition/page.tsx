@@ -40,6 +40,7 @@ import {
   planNeeded,
   planShortfalls,
 } from "@/lib/plans/catalog";
+import { designPageHref } from "@/lib/editor/design-page";
 import { allDesignIds, designTier, draftDesignId } from "@/lib/plans/design-defaults";
 import { offerArtImage, offersFor, pricesFor } from "@/lib/plans/offers";
 import { offerValue } from "@/components/offers/offer-value";
@@ -145,7 +146,7 @@ export default async function EditionPage({
   // switched on every invite publishes with everything, so it's ready as it is.
   const ready = !active || planShortfalls(draft, current, design).length === 0;
   const publishHref =
-    publish === "1" && !draft.slug && owner ? `/create?invite=${id}&publish=1` : null;
+    publish === "1" && !draft.slug && owner ? `${designPageHref(draft)}&publish=1` : null;
 
   return (
     <PageTransition>
@@ -153,7 +154,7 @@ export default async function EditionPage({
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="flex flex-col gap-4">
             <Link
-              href={publishHref ? `/create?invite=${id}` : `/invites/${id}`}
+              href={publishHref ? designPageHref(draft) : `/invites/${id}`}
               className="-ms-2 inline-flex min-h-11 items-center gap-1.5 self-start rounded-md px-2 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
             >
               <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />

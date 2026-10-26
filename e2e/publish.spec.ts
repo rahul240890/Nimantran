@@ -201,14 +201,16 @@ test.describe("publish and share", () => {
       timeout: 30_000,
     });
     await seeInvitation(laptop);
+    await openPart(laptop, "Your photos");
     // The photo's link comes from the account by a server action, slow on a busy runner
-    await expect(laptop.getByRole("img", { name: "Photo 1" })).toBeVisible({ timeout: 30_000 });
+    const photo = laptop
+      .getByRole("button", { name: /^Change: / })
+      .first()
+      .locator("img")
+      .first();
+    await expect(photo).toBeVisible({ timeout: 30_000 });
     await expect
-      .poll(() =>
-        laptop
-          .getByRole("img", { name: "Photo 1" })
-          .evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0),
-      )
+      .poll(() => photo.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0))
       .toBe(true);
   });
 
@@ -218,9 +220,7 @@ test.describe("publish and share", () => {
   }, info) => {
     const number = numberFor(info);
     await writeInvite(page, number, ["Ishaan", "Tara"]);
-    // The preview's Edit opens Music & replies on the design's page
-    await page.getByRole("button", { name: "Edit music" }).click();
-    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?.*#part-music$/);
+    await openPart(page, "Music & replies");
     await page.getByRole("radio", { name: "Your own music" }).click();
     await expect(page.getByText("Only songs you have the right to use.")).toBeVisible();
     await page.locator('input[accept^="audio"]').setInputFiles({
@@ -257,7 +257,7 @@ test.describe("publish and share", () => {
     expect(await noOverflow(page)).toBe(true);
     expect((await axe(page).analyze()).violations).toEqual([]);
     await seeInvitation(page);
-    await expect(page.getByText(/Shehnai at dawn/)).toBeVisible();
+    await expect(page.getByText(/Shehnai at dawn/).first()).toBeVisible();
 
     await page.clock.runFor(2_000);
     await expect

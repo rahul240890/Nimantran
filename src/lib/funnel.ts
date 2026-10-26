@@ -14,7 +14,7 @@ export type FunnelStep =
   | "Design previewed"
   | "Details opened"
   | "Editor opened"
-  | "Preview reached"
+  | "Details filled"
   | "Checkout started"
   | "Payment completed"
   | "Invite published"
@@ -27,7 +27,7 @@ const STEP_KEYS: Partial<Record<FunnelStep, StepKey>> = {
   "Sample opened": "sample",
   "Details opened": "details",
   "Editor opened": "editor",
-  "Preview reached": "preview",
+  "Details filled": "preview",
   "Checkout started": "checkout",
   "Payment completed": "paid",
   "Invite published": "published",

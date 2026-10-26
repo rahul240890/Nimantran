@@ -73,6 +73,7 @@ import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
 import { filmedWelcome, welcomeScene } from "@/lib/opening/catalog";
 import { instagramHandle, site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { LiveFrame } from "./live-frame";
 import "@/components/invitation/type/fonts.css";
 
 type VideoCardProps = {
@@ -234,6 +235,8 @@ export function VideoCard(props: VideoCardProps) {
               className="size-full"
             />
           )}
+          {/* Being made: the frames as they're drawn, so the video is seen coming */}
+          {state.step === "making" && <LiveFrame frame={state.frame} done={state.done} />}
           {shownMarked && (
             <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-night/65 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.18em] text-card-ivory uppercase">
               {videoCopy.preview}
@@ -278,6 +281,7 @@ export function VideoCard(props: VideoCardProps) {
                 {videoCopy.making(percent)}
               </p>
               {finishing && <p className="text-sm text-ink-muted">{videoCopy.finishing}</p>}
+              <p className="text-sm text-ink-muted">{videoCopy.keepsGoing}</p>
               <Button
                 variant="secondary"
                 size="sm"
@@ -496,13 +500,22 @@ function useInviteVideo({
       music: playing,
     };
     try {
-      await makeKept(key, made, async (onProgress, signal) => {
-        const [{ makeVideo }, ready] = await Promise.all([import("@/lib/video/encode"), prepare()]);
-        const film = marked
-          ? withWatermark(ready.film, videoCopy.mark, await loadWatermarkLook())
-          : ready.film;
-        return makeVideo(film, withMusic, onProgress, signal, codecs);
-      });
+      await makeKept(
+        key,
+        made,
+        async (onProgress, signal) => {
+          const [{ makeVideo }, ready] = await Promise.all([
+            import("@/lib/video/encode"),
+            prepare(),
+          ]);
+          const film = marked
+            ? withWatermark(ready.film, videoCopy.mark, await loadWatermarkLook())
+            : ready.film;
+          return makeVideo(film, withMusic, onProgress, signal, codecs);
+        },
+        // Where the other pages send the host to watch it, once made
+        `${window.location.pathname}${window.location.search}`,
+      );
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         toast({ title: videoCopy.stopped });

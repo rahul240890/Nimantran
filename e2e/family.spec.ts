@@ -24,8 +24,8 @@ async function writeAndPreview(page: Page) {
   await wedding.getByRole("combobox", { name: /Starts at/ }).click();
   await page.getByRole("option", { name: "6:30 pm" }).click();
   await wedding.getByRole("textbox", { name: /^Venue/ }).fill("Taj Falaknuma, Hyderabad");
-  await page.getByRole("button", { name: "See my invitation" }).click();
-  await expect(page.getByText("Your invitation is ready")).toBeVisible({ timeout: 15_000 });
+  // The design's page is the whole editor: once the details are in, the rest shows there
+  await expect(page.locator("[data-try-video]")).toBeVisible({ timeout: 15_000 });
 }
 
 test.describe("family preview links", () => {
@@ -92,9 +92,10 @@ test.describe("family preview links", () => {
     await page.goto(DESIGN);
     await writeAndPreview(page);
     const card = page.locator("[data-family-share]");
+    // Signing in comes back to the design's page
     await expect(card.getByRole("link", { name: "Sign in to share" })).toHaveAttribute(
       "href",
-      "/sign-in?next=%2Fcreate",
+      `/sign-in?next=${encodeURIComponent(DESIGN)}`,
     );
   });
 });

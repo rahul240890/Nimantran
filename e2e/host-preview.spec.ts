@@ -13,7 +13,7 @@ test.describe("host preview", () => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 390, height: 844 });
     await writeInvite(page, numberFor(info), ["Kabir", "Anaya"]);
-    await page.getByRole("button", { name: "See it as your guests will" }).click();
+    await page.getByRole("button", { name: "Preview", exact: true }).click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview$/);
     const id = new URL(page.url()).pathname.split("/")[2];
 

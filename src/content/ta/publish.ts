@@ -28,6 +28,8 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   cancel: "இப்போது வேண்டாம்",
   close: "மூடவும்",
   failed: "வெளியிட முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
+  /** Opening the video or the cards from the editor, which saves first. */
+  saveFailed: "இப்போது சேமிக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
   notReady: "இதை அனுப்பும் முன் சில படிகளை இன்னும் முடிக்க வேண்டும்.",
   published: "உங்கள் அழைப்பிதழ் இப்போது லைவ்",
 };
@@ -360,6 +362,10 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   stop: "நிறுத்தவும்",
   stopped: "வீடியோ நிறுத்தப்பட்டது",
   ready: "உங்கள் வீடியோ தயார்",
+  keepsGoing:
+    "விரும்பினால் இந்தப் பக்கத்தை விட்டுச் செல்லுங்கள்: வீடியோ உருவாகிக்கொண்டே இருக்கும்.",
+  watch: "பார்",
+  hideAway: "மறை",
   changed:
     "இந்த வீடியோ உருவான பிறகு உங்கள் அழைப்பிதழ் மாறியுள்ளது. மாற்றங்களைச் சேர்க்க மீண்டும் உருவாக்கவும்.",
   finishing:

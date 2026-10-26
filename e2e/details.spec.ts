@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { firstName, openPart } from "./invite-helpers";
+import { editorBar, firstName, openPart, seeInvitation } from "./invite-helpers";
 
 /* A design's own page (update 4): the design on top, one short form below. */
 
@@ -75,7 +75,7 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("radio", { name: /ગુજરાતી/ })).toBeChecked({ timeout: 30_000 });
   });
 
-  test("the names appear on the design, and See my invitation opens its preview", async ({
+  test("the names appear on the design, and once the dates are in, its video and cards", async ({
     page,
   }) => {
     await open(page);
@@ -86,24 +86,21 @@ test.describe("a design's page", () => {
     ).toBeVisible();
 
     // Nothing more filled in: the wedding's date, time and venue are asked for
-    await page.getByRole("button", { name: "See my invitation" }).click();
+    await editorBar(page).click();
     const problems = page.getByRole("alert").filter({ hasText: /need your attention/ });
     await expect(problems).toHaveText("3 things need your attention");
     await expect(page).toHaveURL(/\/create\/rajwada-bagh/);
+    await expect(page.locator("[data-try-video]")).toHaveCount(0);
 
     await fillWedding(page);
     await expect(problems).toHaveCount(0);
-    await page.getByRole("button", { name: "See my invitation" }).click();
-    await expect(page).toHaveURL(/\/create$/);
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Here's what your guests will see",
-      { timeout: 15_000 },
-    );
-    await expect(page.getByText("Your invitation is ready")).toBeVisible();
-
-    // Back goes to the design's page, with everything as it was, not to the steps
-    await page.getByRole("button", { name: "Back" }).click();
-    await expect(page).toHaveURL(/\/create\/rajwada-bagh\?category=wedding$/);
+    // No page after this one: the video, the cards and Publish are here (owner, 2026-10-25)
+    await seeInvitation(page);
+    await expect(page.getByRole("link", { name: "Watch demo" })).toHaveCount(0);
+    await expect(page.getByText("Sign in to make its video and cards.")).toBeVisible();
+    await editorBar(page).click();
+    await expect(page).toHaveURL(/\/sign-in\?next=/);
+    await page.goBack();
     await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
     await openPart(page, "When and where");
     await expect(
@@ -235,8 +232,10 @@ test.describe("a design's page", () => {
     expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
     await page.keyboard.press("Escape");
     await expect(preview).toHaveCount(0);
+    // We'll make it for you: once, straight to Instagram (owner, 2026-10-25)
     const make = page.getByRole("link", { name: /We'll make it for you/ });
-    await expect(make).toHaveAttribute("href", "/help/whatsapp?for=make&design=rajwada-bagh");
+    await expect(make).toHaveCount(1);
+    await expect(make).toHaveAttribute("href", "https://www.instagram.com/shubhinvitations.in/");
     await expect(make).toHaveAttribute("target", "_blank");
   });
 

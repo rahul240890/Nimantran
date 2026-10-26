@@ -41,6 +41,9 @@ export function PublishButton({
   signedIn,
   onNotReady,
   autoOpen = false,
+  size,
+  signInNext = "/create",
+  className,
 }: {
   draft: InviteDraft;
   signedIn: boolean;
@@ -48,6 +51,10 @@ export function PublishButton({
   onNotReady: () => void;
   /** Open the dialog straight away: the host is back from choosing a package. */
   autoOpen?: boolean;
+  size?: "lg";
+  /** Where signing in comes back to: the design's page the button is on. */
+  signInNext?: string;
+  className?: string;
 }) {
   const { publishCopy } = useText(publishText);
   const router = useRouter();
@@ -77,8 +84,8 @@ export function PublishButton({
 
   if (!signedIn) {
     return (
-      <Button asChild>
-        <Link href={`/sign-in?next=${encodeURIComponent("/create")}`}>
+      <Button asChild size={size} className={className}>
+        <Link href={`/sign-in?next=${encodeURIComponent(signInNext)}`}>
           <LogIn aria-hidden />
           {publishCopy.signInToPublish}
         </Link>
@@ -88,7 +95,7 @@ export function PublishButton({
 
   if (draft.slug && draft.remoteId) {
     return (
-      <Button asChild>
+      <Button asChild size={size} className={className}>
         <Link href={`/invites/${draft.remoteId}/share`}>
           <Send aria-hidden className="rtl:-scale-x-100" />
           {publishCopy.share}
@@ -99,7 +106,13 @@ export function PublishButton({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <Button leadingIcon={<Globe aria-hidden />} loading={gating} onClick={() => void start()}>
+      <Button
+        size={size}
+        className={className}
+        leadingIcon={<Globe aria-hidden />}
+        loading={gating}
+        onClick={() => void start()}
+      >
         {publishCopy.publish}
       </Button>
       {open && <PublishDialog draft={draft} onClose={() => setOpen(false)} />}
