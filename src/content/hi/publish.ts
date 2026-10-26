@@ -195,6 +195,14 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "संगीत चलाएँ", pause: "संगीत रोकें" },
+    reveal: {
+      button: "खोलें",
+      date: "तारीख देखने के लिए सोना खुरचें",
+      turmeric: "हल्दी हटाइए",
+      henna: "मेहंदी पोंछिए",
+      gold: "सोना खुरचिए",
+      petals: "पंखुड़ियाँ हटाइए",
+    },
     lampsLabel: "जोड़े के लिए एक दीप जलाएँ",
     lights: {
       diyas: { give: "दीये जलाएँ", given: "धन्यवाद। आपके दीये उनके लिए जगमगा रहे हैं।" },

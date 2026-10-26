@@ -215,6 +215,14 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "இசையை இயக்கவும்", pause: "இசையை நிறுத்தவும்" },
+    reveal: {
+      button: "திறக்கவும்",
+      date: "தேதியைக் காண தங்கத்தைச் சுரண்டவும்",
+      turmeric: "மஞ்சளைத் தேய்த்து நீக்கவும்",
+      henna: "மருதாணியைத் துடைக்கவும்",
+      gold: "தங்கத்தைச் சுரண்டவும்",
+      petals: "இதழ்களை விலக்கவும்",
+    },
     lampsLabel: "மணமக்களுக்காக ஒரு விளக்கு ஏற்றுங்கள்",
     lights: {
       diyas: {

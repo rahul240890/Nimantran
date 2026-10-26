@@ -35,13 +35,10 @@ test.describe("host preview", () => {
     if (shots) await page.screenshot({ path: `${shots}/preview-phone-menu.png` });
     await page.keyboard.press("Escape");
 
-    // The pages play over the whole screen like a reel, with the music, pause and close only
+    // Opened, the invitation runs on down one page (Rajwada Bagh turns no pages), the menu
+    // still at hand
     await page.getByRole("button", { name: "Open the invitation" }).click();
-    const story = page.locator("[data-story-beat]");
-    await expect(story).toBeVisible({ timeout: 15_000 });
-    await expect(page.getByRole("button", { name: "Pause the pages" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Skip to the card" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Next page" })).toHaveCSS("opacity", "0");
+    await expect(page.locator("#guest-welcome")).toBeInViewport({ timeout: 15_000 });
     await expect(menu).toBeVisible();
     if (shots) await page.screenshot({ path: `${shots}/preview-phone-pages.png` });
     // It opens in place: switching to full screen blanked the screen for seconds
@@ -65,7 +62,7 @@ test.describe("host preview", () => {
     ).toEqual([]);
     if (shots) await page.screenshot({ path: `${shots}/preview-desktop.png` });
     await phone.getByRole("button", { name: "Open the invitation" }).click();
-    await expect(phone.locator("[data-story-beat]")).toBeVisible({ timeout: 15_000 });
+    await expect(phone.locator("#guest-welcome")).toBeInViewport({ timeout: 15_000 });
     if (shots) {
       await page.waitForTimeout(4_000);
       await page.screenshot({ path: `${shots}/preview-desktop-pages.png` });

@@ -22,6 +22,7 @@ import {
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
+import { guestRecipe } from "@/lib/suites/recipe";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { PreviewMark } from "@/components/guest/preview-mark";
 import { WatermarkLayer } from "@/components/guest/watermark";
@@ -443,7 +444,9 @@ export function GuestView({
                 after={
                   scene
                     ? { kind: "enter", onEnter: () => setEntered(true) }
-                    : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
+                    : look && !guestRecipe(suite, look).pages
+                      ? { kind: "below" }
+                      : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
                 }
               />
             )}

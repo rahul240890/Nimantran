@@ -178,6 +178,14 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       whirl: { give: "પાંખડીઓનો વમળ ફેરવો", given: "આપની પાંખડીઓ ઘૂમતી ઘૂમતી તેમની પાસે જાય છે." },
     },
     music: { play: "સંગીત વગાડો", pause: "સંગીત રોકો" },
+    reveal: {
+      button: "ખોલો",
+      date: "તારીખ જોવા સોનું ઘસો",
+      turmeric: "હળદર ઘસીને હટાવો",
+      henna: "મહેંદી લૂછી નાખો",
+      gold: "સોનું ઘસો",
+      petals: "પાંખડીઓ હટાવો",
+    },
     lampsLabel: "જોડી માટે એક દીવો પ્રગટાવો",
     lights: {
       diyas: { give: "દીવા પ્રગટાવો", given: "આભાર. આપના દીવા તેમના માટે ઝળહળી રહ્યા છે." },

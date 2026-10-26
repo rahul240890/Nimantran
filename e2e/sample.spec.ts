@@ -56,9 +56,9 @@ test.describe("live samples", () => {
     await page.goto("/sample/rajwada-bagh?tour=abc");
     await expect(page).toHaveTitle(/Sample invitation: Rajwada Bagh/);
 
+    // It opens straight onto the one page down (no pages to turn), and the reply is on it
     await page.getByRole("button", { name: "Open the invitation" }).click();
-    await expect(page.getByRole("dialog", { name: /one page at a time/ })).toBeVisible();
-    await page.keyboard.press("Escape");
+    await expect(page.locator("#guest-welcome")).toBeInViewport({ timeout: 15_000 });
 
     const sent: string[] = [];
     page.on("request", (request) => {
@@ -174,11 +174,12 @@ test.describe("a painting on a slow connection", () => {
     // The family page's painting is held back until the test lets it through
     let release = () => {};
     const held = new Promise<void>((resolve) => (release = resolve));
-    await page.route("**/suites/rajwada-bagh/family.webp", async (route) => {
+    // Shahi Savari still turns its pages; Rajwada Bagh runs as one page down (recipe.ts)
+    await page.route("**/suites/shahi-savari/family.webp", async (route) => {
       await held;
       await route.continue();
     });
-    await page.goto("/sample/rajwada-bagh");
+    await page.goto("/sample/shahi-savari");
     await page.getByRole("button", { name: "Open the invitation" }).click();
     const story = page.locator("[data-story-beat]");
     await expect(story).toHaveAttribute("data-story-beat", "cover", { timeout: 20_000 });
@@ -203,7 +204,7 @@ test.describe("a painting on a slow connection", () => {
     // The painting comes in, and the page goes on in its own time
     release();
     await expect(loading).toHaveCount(0);
-    await expect(family.locator('img[src$="/suites/rajwada-bagh/family.webp"]')).toBeVisible();
+    await expect(family.locator('img[src$="/suites/shahi-savari/family.webp"]')).toBeVisible();
     await expect(story).not.toHaveAttribute("data-story-beat", "family", {
       timeout: (seconds + 5) * 1000,
     });

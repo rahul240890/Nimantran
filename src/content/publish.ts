@@ -210,6 +210,15 @@ export const guestCopy = {
       },
     },
     music: { play: "Play the music", pause: "Pause the music" },
+    /** The covers a guest rubs away to find the date and each celebration (scratch-cover.tsx). */
+    reveal: {
+      button: "Reveal",
+      date: "Scratch the gold to see the date",
+      turmeric: "Rub off the turmeric",
+      henna: "Wipe away the henna",
+      gold: "Scratch away the gold",
+      petals: "Brush away the petals",
+    },
     lampsLabel: "Light a lamp for the couple",
     /** The light a guest gives at night, one way per theme (blessings.ts). */
     lights: {

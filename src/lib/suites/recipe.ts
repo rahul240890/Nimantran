@@ -84,13 +84,18 @@ export const SECTION_VERSIONS = {
    * love letter on paper; or the names under a palace's great arch.
    */
   welcome: ["garland", "masthead", "letter", "darbar"],
-  /** Save the date in one of the layouts above, or one oversized number on plain paper. */
-  date: ["layout", "oversized"],
+  /**
+   * Save the date in one of the layouts above; one oversized number on plain paper; or gold
+   * foil the guest scratches away to find the day, month and year in three medallions.
+   */
+  date: ["layout", "oversized", "scratch"],
   /**
    * The celebrations: each in its own hour as before; numbered chapters, one after another
-   * on one page; or doors along a palace corridor, each opening on its celebration.
+   * on one page; doors along a palace corridor, each opening on its celebration; or each
+   * celebration as its own painted card under a cover the guest rubs away (turmeric over the
+   * haldi, henna over the mehendi, gold over the wedding).
    */
-  events: ["hours", "chapters", "rooms"],
+  events: ["hours", "chapters", "rooms", "cards"],
   /** The end: a light to give before the reply, or the reply alone. */
   night: ["lamps", "quiet"],
   /**
@@ -153,6 +158,12 @@ export const recipeSchema = z
     box: z.enum(ALL_BOXES).optional(),
     flowers: z.enum(FLOWER_BLESSINGS).optional(),
     lamp: z.enum(LAMP_BLESSINGS).optional(),
+    /**
+     * Whether the painted pages play after the opening, sideways one by one, before this
+     * page. False runs the invitation as one page down from the opening (owner, 2026-10-26:
+     * the celebrations showed twice, on the pages and again below).
+     */
+    pages: z.boolean().optional(),
   })
   .strict();
 export type RecipeChoice = z.infer<typeof recipeSchema>;
@@ -166,6 +177,7 @@ export type GuestRecipe = {
   box: EventBox;
   flowers: FlowerBlessing;
   lamp: LampBlessing;
+  pages: boolean;
 };
 
 /** Collections whose themes read as one kind of invitation, whatever their page style. */
@@ -203,5 +215,6 @@ export function guestRecipe(suite: SuiteId, look: GuestLook): GuestRecipe {
     box,
     flowers: choice.flowers ?? dealt.flowers,
     lamp: choice.lamp ?? dealt.lamp,
+    pages: choice.pages ?? true,
   };
 }

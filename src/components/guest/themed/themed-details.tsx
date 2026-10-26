@@ -18,6 +18,7 @@ import { Dusk } from "./sections/dusk";
 import { GiveFlowers } from "./sections/give-flowers";
 import { Night } from "./sections/night";
 import { EventsChapters, EventsRooms } from "./sections/events-versions";
+import { DateScratch, EventsCards } from "./sections/moments";
 import { RecipeContext, type Music } from "./sections/parts";
 import { DateOversized, SaveTheDate } from "./sections/save-the-date";
 import { Welcome } from "./sections/welcome";
@@ -103,16 +104,17 @@ export function ThemedDetails({
     ),
     date: () =>
       main &&
-      (versions.date === "oversized" ? (
-        <DateOversized main={main} lang={lang} />
-      ) : (
-        <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />
-      )),
+      {
+        layout: <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />,
+        oversized: <DateOversized main={main} lang={lang} />,
+        scratch: <DateScratch main={main} lang={lang} />,
+      }[versions.date],
     events: () =>
       ({
         hours: <Celebrations {...eventProps} layouts={layouts} />,
         chapters: <EventsChapters {...eventProps} />,
         rooms: <EventsRooms {...eventProps} />,
+        cards: <EventsCards {...eventProps} />,
       })[versions.events],
     dusk: () =>
       (photos.length > 0 || family.length > 0) && (

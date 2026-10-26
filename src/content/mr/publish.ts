@@ -190,6 +190,14 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "संगीत लावा", pause: "संगीत थांबवा" },
+    reveal: {
+      button: "उघडा",
+      date: "तारीख पाहण्यासाठी सोनेरी थर खरवडा",
+      turmeric: "हळद पुसून टाका",
+      henna: "मेंदी पुसून टाका",
+      gold: "सोनेरी थर खरवडा",
+      petals: "पाकळ्या बाजूला करा",
+    },
     lampsLabel: "जोडप्यासाठी एक दिवा लावा",
     lights: {
       diyas: { give: "दिवे लावा", given: "धन्यवाद. तुमचे दिवे त्यांच्यासाठी उजळले आहेत." },

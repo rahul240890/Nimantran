@@ -227,3 +227,198 @@
     margin-top: 0;
   }
 }
+
+/*
+ * The covers a guest rubs away (scratch-cover.tsx). The hint and the button sit on the
+ * cover in its own colours, and the whole cover fades once enough of it is gone.
+ */
+.scratch-sheet {
+  transition: opacity 700ms ease;
+}
+[data-state="falling"] > .scratch-sheet,
+[data-state="falling"] > .scratch-hint,
+[data-state="falling"] > .scratch-button {
+  opacity: 0;
+  pointer-events: none;
+}
+.scratch-hint {
+  transition: opacity 300ms ease;
+  text-shadow: 0 1px 0 color-mix(in oklab, white 35%, transparent);
+}
+[data-state="rubbing"] > .scratch-hint {
+  opacity: 0;
+}
+[data-cover="turmeric"] > .scratch-hint {
+  color: var(--reveal-henna-deep);
+}
+[data-cover="henna"] > .scratch-hint,
+[data-cover="petals"] > .scratch-hint {
+  color: var(--flower-jasmine);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 0.6);
+}
+[data-cover="gold"] > .scratch-hint {
+  color: var(--reveal-gold-deep);
+}
+.scratch-button {
+  background: color-mix(in oklab, var(--flower-jasmine) 92%, transparent);
+  color: var(--reveal-henna-deep);
+  box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.55);
+  transition: opacity 300ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scratch-sheet,
+  .scratch-hint,
+  .scratch-button {
+    transition: none;
+  }
+}
+
+/*
+ * The jewel ground the touch moments sit on (moments.tsx): deep maroon, lit with gold from
+ * above and figured with a faint gold lattice, in light words.
+ */
+.guest-themed .guest-sky[data-mood="jewel"] {
+  --paper: var(--jewel-ground-deep);
+  --surface: color-mix(in oklab, var(--jewel-ground) 82%, var(--reveal-gold-light));
+  --surface-2: color-mix(in oklab, var(--jewel-ground) 70%, var(--reveal-gold-light));
+  --line: color-mix(in oklab, var(--reveal-gold) 55%, var(--jewel-ground));
+  --line-strong: color-mix(in oklab, var(--reveal-gold) 80%, var(--jewel-ground));
+  --line-control: var(--reveal-gold);
+  --ink: var(--card-ivory);
+  --ink-muted: color-mix(in oklab, var(--card-ivory) 82%, var(--jewel-ground));
+  --ink-faint: color-mix(in oklab, var(--card-ivory) 64%, var(--jewel-ground));
+  --accent-text: var(--reveal-gold-light);
+  --ring: var(--reveal-gold-light);
+  --on-marigold: var(--jewel-ground-deep);
+  background-color: var(--jewel-ground);
+  background-image:
+    radial-gradient(
+      48rem 30rem at 50% 0%,
+      color-mix(in oklab, var(--reveal-gold) 26%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in oklab, var(--reveal-gold) 22%, transparent) 0 1.4px,
+      transparent 2px
+    ),
+    linear-gradient(180deg, var(--jewel-ground), var(--jewel-ground-deep));
+  background-size:
+    auto,
+    1.75rem 1.75rem,
+    auto;
+}
+
+/* The date's foil card: ivory beneath, three gilt medallions and the palace in line */
+.guest-foil {
+  box-shadow:
+    0 0 0 1px var(--reveal-gold),
+    0 0 0 6px var(--jewel-ground-deep),
+    0 0 0 7px var(--reveal-gold),
+    0 34px 60px -30px rgb(0 0 0 / 0.7);
+}
+.guest-foil-face {
+  background: radial-gradient(
+    circle at 50% 35%,
+    var(--card-ivory) 0 45%,
+    color-mix(in oklab, var(--card-ivory) 88%, var(--reveal-gold)) 100%
+  );
+}
+.guest-foil-medal {
+  background: var(--card-ivory);
+  box-shadow:
+    inset 0 0 0 2px var(--reveal-gold),
+    inset 0 0 0 6px var(--card-ivory),
+    inset 0 0 0 7px color-mix(in oklab, var(--reveal-gold) 60%, transparent),
+    0 10px 24px -12px rgb(0 0 0 / 0.45);
+}
+.guest-foil-skyline {
+  color: color-mix(in oklab, var(--reveal-gold) 55%, transparent);
+  opacity: 0.6;
+}
+
+/* A celebration's painted card: gilt edged twice, its words on an ivory arch */
+.guest-invite {
+  box-shadow:
+    0 0 0 1px var(--reveal-gold),
+    0 0 0 6px var(--jewel-ground-deep),
+    0 0 0 7px var(--reveal-gold),
+    0 34px 60px -30px rgb(0 0 0 / 0.75);
+}
+.guest-invite-panel {
+  background: color-mix(in oklab, var(--card-ivory) 86%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  box-shadow:
+    inset 0 0 0 1px var(--reveal-gold),
+    inset 0 0 0 5px color-mix(in oklab, var(--card-ivory) 60%, transparent),
+    inset 0 0 0 6px color-mix(in oklab, var(--reveal-gold) 55%, transparent);
+}
+.guest-invite-rule {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--reveal-gold), transparent);
+}
+@media (min-width: 48rem) {
+  /* A gilt thread down the middle, joining the cards */
+  .guest-invite-line::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in oklab, var(--reveal-gold) 60%, transparent) 8% 92%,
+      transparent
+    );
+  }
+}
+
+/* The painting drifts a little as the card passes up the screen, as if seen through a window */
+.guest-invite-art {
+  scale: 1.12;
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .guest-invite-art {
+      animation: guest-invite-pan linear both;
+      animation-timeline: view();
+    }
+  }
+}
+@keyframes guest-invite-pan {
+  from {
+    translate: 0 -5%;
+  }
+  to {
+    translate: 0 5%;
+  }
+}
+/* Once revealed, a gleam of light crosses the card */
+@media (prefers-reduced-motion: no-preference) {
+  .guest-invite[data-state="open"]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 35%,
+      color-mix(in oklab, var(--reveal-gold-light) 55%, transparent) 50%,
+      transparent 65%
+    );
+    background-size: 250% 100%;
+    animation: guest-gleam 1.4s ease-out 1 both;
+  }
+}
+@keyframes guest-gleam {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}

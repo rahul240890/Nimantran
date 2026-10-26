@@ -104,6 +104,44 @@ for (const suite of THEMES) {
           await expect(doors.nth(2)).toBeFocused();
           await expect(doors.nth(2)).toHaveAttribute("aria-selected", "true");
         }
+        if (versions.events === "cards") {
+          // Each celebration a painted card under its own cover, revealed in one tap
+          const cards = page.locator('[data-events="cards"] li');
+          await expect(cards).toHaveCount(3);
+          await expect(cards.first().locator("[data-cover]")).toHaveAttribute(
+            "data-cover",
+            "turmeric",
+          );
+          await cards.first().getByRole("button", { name: guestCopy.themed.reveal.button }).click();
+          await expect(cards.first().locator("[data-cover]")).toHaveAttribute("data-state", "open");
+          await expect(cards.first().locator("canvas")).toHaveCount(0);
+        }
+        if (versions.date === "scratch") {
+          // The date under gold foil: rubbing enough of it away lets the rest fall
+          const foil = date.locator("canvas");
+          await foil.scrollIntoViewIfNeeded();
+          // The page snaps a section into place after a scroll: rub once it has settled
+          let box = (await foil.boundingBox())!;
+          await expect
+            .poll(async () => {
+              const was = box.y;
+              box = (await foil.boundingBox())!;
+              return box.y === was;
+            })
+            .toBe(true);
+          // Clear of the foil's rounded corners, back and forth down its whole height
+          const inset = 28;
+          await page.mouse.move(box.x + inset, box.y + inset);
+          await page.mouse.down();
+          for (let row = 0; row <= 12; row++) {
+            const y = box.y + inset + ((box.height - inset * 2) * row) / 12;
+            const x = row % 2 ? box.x + inset : box.x + box.width - inset;
+            await page.mouse.move(x, y, { steps: 6 });
+          }
+          await page.mouse.up();
+          await expect(date.locator("[data-cover]")).toHaveAttribute("data-state", "open");
+          await expect(date.locator('[data-medal="day"]')).toBeVisible();
+        }
         await expect(page.locator('section[aria-labelledby="guest-family"]')).toHaveAttribute(
           "data-layout",
           layouts.family,
@@ -241,6 +279,10 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
   }
 }
 
+// A painted design that still turns its pages after the opening (Rajwada Bagh runs as one
+// page down instead, recipe.ts `pages`)
+const PAGED = "shahi-savari";
+
 // Every opening style (Step 12w), with and without a god, in both colour themes
 for (const [style, god] of [
   ["palace", "ganesha"],
@@ -253,9 +295,7 @@ for (const [style, god] of [
   for (const colorScheme of ["light", "dark"] as const) {
     test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
-      await page.goto(
-        `/engine/guest?suite=rajwada-bagh&opening=${style}${god ? `&god=${god}` : ""}`,
-      );
+      await page.goto(`/engine/guest?suite=${PAGED}&opening=${style}${god ? `&god=${god}` : ""}`);
       const opening = page.locator(`[data-opening="${style}"]`);
       await expect(opening).toHaveAttribute("data-doorway", "closed");
       await expect(opening.getByRole("heading", { level: 1 })).toContainText("Arjun");
@@ -288,7 +328,7 @@ for (const [i, [style, god, faith]] of (
   ] as const
 ).entries()) {
   const colorScheme = i % 2 === 0 ? "light" : "dark";
-  const suite = ["rajwada-bagh", "kayal", "noor-bagh", "gubbara"][i % 4];
+  const suite = [PAGED, "kayal", "noor-bagh", "gubbara"][i % 4];
   test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
     await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
     const chosen = `${god ? `&god=${god}` : ""}${faith ? `&faith=${faith}` : ""}`;
@@ -311,7 +351,7 @@ test("the welcome before the pages", async ({ page }) => {
   // The page's clock is held, so the welcome waits while it is checked
   await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
   await page.clock.pauseAt(new Date("2026-10-01T10:00:05+05:30"));
-  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
+  await page.goto(`/engine/guest?suite=${PAGED}&opening=palace`);
   await page.getByRole("button", { name: "Open the invitation" }).click();
   // It waits a moment for the screen to settle after going full screen, then opens once its
   // paintings have loaded. They load in real time while the page's clock is held, so the
@@ -395,7 +435,7 @@ test("the music starts on the first tap, and the invitation opens again at the e
     });
   });
   await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
-  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
+  await page.goto(`/engine/guest?suite=${PAGED}&opening=palace`);
   const open = page.getByRole("button", { name: "Open the invitation", exact: true });
   await expect(open).toBeVisible();
   // A tap anywhere before the gate is enough to start the music

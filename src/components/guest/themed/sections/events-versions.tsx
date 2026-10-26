@@ -36,7 +36,7 @@ type EventsProps = {
 };
 
 /** "Add every celebration to my calendar", when there is more than one. */
-function AddAll({ allIcsUrl }: { allIcsUrl: string | null }) {
+export function AddAll({ allIcsUrl }: { allIcsUrl: string | null }) {
   const { guestCopy } = useGuestText();
   if (!allIcsUrl) return null;
   return (
