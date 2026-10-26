@@ -128,6 +128,8 @@ test.describe("publish and share", () => {
     await expect(haldi.getByText("Family home, Banjara Hills")).toBeVisible();
     const directions = await haldi.getByRole("link", { name: "Directions" }).getAttribute("href");
     expect(directions).toContain("google.com/maps");
+    // Rajwada Bagh shows one celebration at a time behind its doors: open the wedding's
+    await guest.getByRole("tab", { name: /Wedding/ }).click();
     const wedding = guest.getByRole("article", { name: "Wedding" });
     await expect(wedding.getByText("Traditional Indian")).toBeVisible();
     await wedding.getByRole("button", { name: "Add to calendar" }).click();
