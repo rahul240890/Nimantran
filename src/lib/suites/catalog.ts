@@ -14,6 +14,7 @@ import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { GuestLookChoice } from "./guest-look";
+import type { RecipeChoice } from "./recipe";
 
 /**
  * Illustrated cards: a painted couple (or family) instead of photos, the words in the
@@ -622,6 +623,11 @@ export type Suite = {
    * differently from it. Missing keeps the plain details page.
    */
   guest?: GuestLookChoice;
+  /**
+   * The guest page's recipe (recipe.ts): its experience family, the order of its sections
+   * and the version of each. Missing keeps the one the theme showed before recipes.
+   */
+  recipe?: RecipeChoice;
   /** How its words are lettered (lettering.ts); missing is regal, the palaces' serif. */
   voice?: Voice;
   /**
