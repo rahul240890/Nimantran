@@ -191,14 +191,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "গান চালান", pause: "গান থামান" },
-    reveal: {
-      button: "খুলুন",
-      date: "তারিখ দেখতে সোনালি পরত ঘষুন",
-      turmeric: "হলুদ ঘষে তুলুন",
-      henna: "মেহেন্দি মুছে ফেলুন",
-      gold: "সোনালি পরত ঘষুন",
-      petals: "পাপড়ি সরিয়ে দিন",
-    },
     lampsLabel: "নবদম্পতির জন্য একটি প্রদীপ জ্বালান",
     lights: {
       diyas: { give: "প্রদীপ জ্বালান", given: "ধন্যবাদ। আপনার প্রদীপ তাঁদের জন্য জ্বলছে।" },
@@ -232,7 +224,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   heading: "আপনি আসবেন তো?",
-  intro: "প্রতিটি অনুষ্ঠানের জন্য উত্তর দিন। এই পাতা থেকে যেকোনো সময় উত্তর বদলাতে পারবেন।",
+  intro: "শুধু আপনার নাম আর আপনি আসতে পারবেন কিনা জানান। উত্তর এখানে যেকোনো সময় বদলাতে পারবেন।",
   yourName: "আপনার নাম",
   namePlaceholder: "পরিবার যে নামে আপনাকে চেনে",
   nameRequired: "অনুগ্রহ করে আপনার নাম লিখুন",
@@ -244,6 +236,10 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   },
   statusGroup: (name) => `${name}-এর জন্য আপনার উত্তর`,
   chooseOne: "একটি উত্তর বেছে নিন",
+  answerGroup: "আপনি আসছেন তো?",
+  answers: { attending: "হ্যাঁ, অবশ্যই আসব", declined: "দুঃখিত, আসতে পারব না" },
+  thanksComing: "আপনার সঙ্গে আনন্দ ভাগ করে নেওয়ার অপেক্ষায় রইল পরিবার।",
+  thanksMissed: "আপনার অভাব অনুভব করব। আশীর্বাদের জন্য ধন্যবাদ।",
   adults: "প্রাপ্তবয়স্ক",
   children: "শিশু",
   fewer: (what) => `${what} কমান`,

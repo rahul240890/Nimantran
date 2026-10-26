@@ -1,27 +1,23 @@
 import type { SuiteId } from "./catalog";
 
 /*
- * How each part of the guest page below a painted theme is laid out (themed-details.tsx).
- * Every part has a few layouts and each theme gets its own mix, picked from its id, so two
- * themes side by side in the gallery rarely give their guests the same page: one shows the
- * date in a floor pattern and its celebrations on a timeline, the next a calendar page and
- * a deck of cards. The theme's colours, flowers and lamps stay its own either way.
+ * How the guest page below a painted theme's pages is laid out (themed-details.tsx). The
+ * pages tell the invitation, so below them come only the day's timeline, the photos and the
+ * reply (owner, 2026-10-26: nothing shown twice, and no blank paintings for a background).
+ * Each part has a few layouts and each theme gets its own mix, picked from its id, on a
+ * ground of the theme's own colours, so two themes side by side rarely look alike.
  */
 
 export const SECTION_LAYOUTS = {
-  /** Save the date: drawn in a floor pattern, a calendar page, or a ticket. */
-  date: ["medallion", "calendar", "ticket"],
-  /** The day's plan above the celebrations: cards, a timeline, or tiles. */
-  plan: ["cards", "timeline", "tiles"],
   /**
-   * Each celebration's hour: painting beside the card, the card over the painting, sides
-   * that alternate, or every celebration strung on one thread through the day.
+   * Every celebration on one timeline: a thread with numbered beads, sides that alternate
+   * along a centre line, cloth cards joined by a dotted line, or a diary with the day large.
    */
-  hours: ["split", "overlay", "zigzag", "timeline"],
-  /** The photos at dusk: a film to scroll, polaroids on a table, or a mosaic. */
+  timeline: ["thread", "alternate", "cards", "diary"],
+  /** The photos: a film to scroll, polaroids on a table, or a mosaic. */
   photos: ["film", "polaroids", "mosaic"],
-  /** The family: cards, one scroll with ornaments between, or ribbons. */
-  family: ["cards", "scroll", "ribbons"],
+  /** The ground, in the theme's colours: plain cloth, cloth blending into its sky, or deep. */
+  ground: ["cloth", "blend", "deep"],
 } as const;
 
 export type SectionPart = keyof typeof SECTION_LAYOUTS;
@@ -43,11 +39,5 @@ export function sectionLayouts(suite: SuiteId): SectionLayouts {
     const options = SECTION_LAYOUTS[part];
     return options[hash(`${suite}:${part}`) % options.length] as SectionLayouts[P];
   };
-  return {
-    date: pick("date"),
-    plan: pick("plan"),
-    hours: pick("hours"),
-    photos: pick("photos"),
-    family: pick("family"),
-  };
+  return { timeline: pick("timeline"), photos: pick("photos"), ground: pick("ground") };
 }

@@ -210,15 +210,6 @@ export const guestCopy = {
       },
     },
     music: { play: "Play the music", pause: "Pause the music" },
-    /** The covers a guest rubs away to find the date and each celebration (scratch-cover.tsx). */
-    reveal: {
-      button: "Reveal",
-      date: "Scratch the gold to see the date",
-      turmeric: "Rub off the turmeric",
-      henna: "Wipe away the henna",
-      gold: "Scratch away the gold",
-      petals: "Brush away the petals",
-    },
     lampsLabel: "Light a lamp for the couple",
     /** The light a guest gives at night, one way per theme (blessings.ts). */
     lights: {
@@ -283,7 +274,8 @@ export const guestCopy = {
 
 export const rsvpCopy = {
   heading: "Will you join us?",
-  intro: "Reply for each celebration. You can change your answer any time from this page.",
+  intro:
+    "Tell the family your name and whether you can come. You can change your reply here any time.",
   yourName: "Your name",
   namePlaceholder: "As the family knows you",
   nameRequired: "Please enter your name",
@@ -295,6 +287,10 @@ export const rsvpCopy = {
   },
   statusGroup: (name: string) => `Your reply for the ${name}`,
   chooseOne: "Choose a reply",
+  answerGroup: "Will you be there?",
+  answers: { attending: "Yes, I'll be there", declined: "Sorry, I can't come" },
+  thanksComing: "The family can't wait to celebrate with you.",
+  thanksMissed: "You will be missed. Thank you for your blessings.",
   adults: "Adults",
   children: "Children",
   fewer: (what: string) => `Fewer ${what.toLowerCase()}`,

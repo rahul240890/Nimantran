@@ -14,7 +14,6 @@ import type { FunctionId } from "@/lib/events/functions";
 import type { TemplateId } from "@/lib/templates/ids";
 import type { TraditionId } from "@/lib/traditions/schema";
 import type { GuestLookChoice } from "./guest-look";
-import type { RecipeChoice } from "./recipe";
 
 /**
  * Illustrated cards: a painted couple (or family) instead of photos, the words in the
@@ -623,11 +622,6 @@ export type Suite = {
    * differently from it. Missing keeps the plain details page.
    */
   guest?: GuestLookChoice;
-  /**
-   * The guest page's recipe (recipe.ts): its experience family, the order of its sections
-   * and the version of each. Missing keeps the one the theme showed before recipes.
-   */
-  recipe?: RecipeChoice;
   /** How its words are lettered (lettering.ts); missing is regal, the palaces' serif. */
   voice?: Voice;
   /**
@@ -648,18 +642,6 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
     template: "emerald",
     traditions: ["north-hindu"],
     guest: { style: "palace" },
-    // Royal Palace pilot (owner, 2026-10-26): a darbar welcome, the date on a calendar page,
-    // a corridor of doors for the celebrations, and the reply in a bound guest register.
-    // The touch moments and one page down (moments.tsx) were tried and set aside: the owner
-    // wants the painted pages, turned like paper, to carry the invitation
-    recipe: {
-      family: "royal",
-      sections: ["welcome", "date", "events", "flowers", "dusk", "night"],
-      layouts: { date: "calendar", family: "cards" },
-      versions: { welcome: "darbar", events: "rooms", reply: "register" },
-      // The pages carry everything, full screen; below them only the reply and the footer
-      below: "reply",
-    },
     images: {
       cover: "/suites/rajwada-bagh/cover.webp",
       family: "/suites/rajwada-bagh/family.webp",
@@ -910,21 +892,6 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       secondFlower: "rose",
       lamp: "lanterns",
       pattern: "jaali",
-    },
-    // Modern Editorial pilot (owner, 2026-10-26): a masthead, one oversized date, numbered
-    // chapters, a plain form, and no flowers or lamps anywhere on the page
-    recipe: {
-      family: "editorial",
-      sections: ["welcome", "date", "events", "dusk", "night"],
-      layouts: { photos: "mosaic", family: "scroll" },
-      versions: {
-        welcome: "masthead",
-        date: "oversized",
-        events: "chapters",
-        night: "quiet",
-        reply: "form",
-        finish: "editorial",
-      },
     },
     images: {
       cover: "/suites/ivory-arch/cover.webp",
@@ -1340,15 +1307,6 @@ const PAINTED: Record<Exclude<SuiteId, SceneThemeId>, Suite> = {
       secondFlower: "jasmine",
       lamp: "lanterns",
       pattern: "jaali",
-    },
-    // Floral Romance pilot (owner, 2026-10-26): a love letter for the welcome, the date in a
-    // floor pattern, every celebration along one thread, and a handwritten note to reply
-    recipe: {
-      family: "floral",
-      sections: ["welcome", "flowers", "date", "events", "dusk", "night"],
-      layouts: { date: "medallion", hours: "timeline", photos: "polaroids", family: "scroll" },
-      versions: { welcome: "letter", reply: "note" },
-      flowers: "branch",
     },
     images: {
       cover: "/suites/chinar/cover.webp",

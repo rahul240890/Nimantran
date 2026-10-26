@@ -16,25 +16,14 @@ import type { GuestFunction } from "./guest-view";
  * A function's when, where, dress code and parking, with one-tap directions, a map the
  * guest opens when they want it (nothing loads from Google before), and "add to calendar".
  */
-export function FunctionFacts({
-  fn,
-  onCard = false,
-}: {
-  fn: GuestFunction;
-  /**
-   * The day, time and place are already lettered on the celebration's card beside these
-   * (moments.tsx): only the rest shows, the address, dress code and parking, so nothing reads
-   * twice (owner, 2026-10-26).
-   */
-  onCard?: boolean;
-}) {
+export function FunctionFacts({ fn }: { fn: GuestFunction }) {
   const { guestCopy } = useGuestText();
   const [mapOpen, setMapOpen] = useState(false);
   const mapId = useId();
   return (
     <>
       <dl className="flex flex-col gap-3">
-        {fn.date && !onCard && (
+        {fn.date && (
           <div className="flex items-start gap-3">
             <dt className="mt-0.5 shrink-0">
               <Clock aria-hidden className="size-5 text-accent-text" />
@@ -54,14 +43,14 @@ export function FunctionFacts({
             </dd>
           </div>
         )}
-        {(onCard ? fn.address : fn.venue || fn.address) && (
+        {(fn.venue || fn.address) && (
           <div className="flex items-start gap-3">
             <dt className="mt-0.5 shrink-0">
               <MapPin aria-hidden className="size-5 text-accent-text" />
               <span className="sr-only">{guestCopy.where}</span>
             </dt>
             <dd className="min-w-0 break-words">
-              {fn.venue && !onCard && <span className="block font-semibold">{fn.venue}</span>}
+              {fn.venue && <span className="block font-semibold">{fn.venue}</span>}
               {fn.address && <span className="block text-ink-muted">{fn.address}</span>}
             </dd>
           </div>

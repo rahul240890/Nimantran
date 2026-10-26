@@ -195,14 +195,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "संगीत चलाएँ", pause: "संगीत रोकें" },
-    reveal: {
-      button: "खोलें",
-      date: "तारीख देखने के लिए सोना खुरचें",
-      turmeric: "हल्दी हटाइए",
-      henna: "मेहंदी पोंछिए",
-      gold: "सोना खुरचिए",
-      petals: "पंखुड़ियाँ हटाइए",
-    },
     lampsLabel: "जोड़े के लिए एक दीप जलाएँ",
     lights: {
       diyas: { give: "दीये जलाएँ", given: "धन्यवाद। आपके दीये उनके लिए जगमगा रहे हैं।" },
@@ -248,7 +240,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   heading: "क्या आप पधारेंगे?",
-  intro: "हर उत्सव के लिए जवाब दें। आप कभी भी इसी पेज से अपना जवाब बदल सकते हैं।",
+  intro: "अपना नाम बताइए और यह कि आप आ पाएँगे या नहीं। जवाब यहीं कभी भी बदल सकते हैं।",
   yourName: "आपका नाम",
   namePlaceholder: "जैसे परिवार आपको जानता है",
   nameRequired: "कृपया अपना नाम लिखें",
@@ -260,6 +252,10 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   },
   statusGroup: (name) => `${name} के लिए आपका जवाब`,
   chooseOne: "एक जवाब चुनें",
+  answerGroup: "क्या आप पधारेंगे?",
+  answers: { attending: "हाँ, ज़रूर आएँगे", declined: "क्षमा करें, नहीं आ पाएँगे" },
+  thanksComing: "परिवार आपके साथ उत्सव मनाने की राह देख रहा है।",
+  thanksMissed: "आपकी कमी खलेगी। आपके आशीर्वाद के लिए धन्यवाद।",
   adults: "बड़े",
   children: "बच्चे",
   fewer: (what) => `${what} कम करें`,

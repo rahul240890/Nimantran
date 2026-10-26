@@ -1,11 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { designOpening } from "../src/lib/opening/catalog";
-import { guestCopy } from "../src/content/publish";
-import { guestCopy as hiGuestCopy } from "../src/content/hi/publish";
-import { blessings } from "../src/lib/suites/blessings";
-import { guestLook } from "../src/lib/suites/guest-look";
-import { guestRecipe } from "../src/lib/suites/recipe";
 import { sectionLayouts } from "../src/lib/suites/section-layouts";
 import { noOverflow } from "./invite-helpers";
 
@@ -67,116 +62,30 @@ for (const suite of THEMES) {
     test.describe(`${suite} guest page, ${colorScheme} theme`, () => {
       test.use({ colorScheme, reducedMotion: "reduce" });
 
-      test("walks through the day, showers flowers and lights the lamps", async ({ page }) => {
-        await page.goto(`/engine/guest?suite=${suite}`);
+      test("lists the day once on its timeline, then the photos and the reply", async ({
+        page,
+      }) => {
+        await page.goto(`/engine/guest?suite=${suite}&couple=one`);
         const themed = page.locator(".guest-themed");
         await expect(themed).toHaveAttribute("data-suite", suite);
-        // Laid out as the theme's recipe gives (recipe.ts)
-        const recipe = guestRecipe(suite, guestLook(suite)!);
-        const { layouts, versions } = recipe;
-        await expect(themed).toHaveAttribute("data-family", recipe.family);
-        if (recipe.below === "reply") {
-          // The painted pages carry the invitation: below them only the reply, after the photos
-          await expect(page.getByRole("heading", { name: "The celebrations" })).toHaveCount(0);
-          await expect(page.getByRole("heading", { name: "Save the date" })).toHaveCount(0);
-          await expect(page.locator('section[aria-labelledby="guest-welcome"]')).toHaveCount(0);
-          await page.locator("#rsvp").scrollIntoViewIfNeeded();
-          await expect(page.locator("#rsvp")).toBeVisible();
-          expect(await noOverflow(page)).toBe(true);
-          expect((await axe(page).analyze()).violations).toEqual([]);
-          return;
-        }
+        // On a ground of the theme's own colours, laid out in its own mix (section-layouts.ts)
+        const layouts = sectionLayouts(suite);
+        await expect(themed).toHaveAttribute("data-ground", layouts.ground);
         await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
-        await expect(page.getByRole("heading", { name: "Save the date" })).toBeVisible();
-        const date = page.locator('section[aria-labelledby="guest-save-date"]');
-        if (versions.date === "layout")
-          await expect(date).toHaveAttribute("data-layout", layouts.date);
-        else await expect(date).toHaveAttribute("data-date", versions.date);
-        if (versions.events === "hours") {
-          // Each celebration takes its own hour's light
-          await expect(page.locator("li.guest-hour[data-mood]")).toHaveCount(3);
-          await expect(page.locator("ol:has(> li.guest-hour)")).toHaveAttribute(
-            "data-layout",
-            layouts.hours,
-          );
-        }
-        if (versions.events === "chapters")
-          await expect(page.locator('[data-events="chapters"] li')).toHaveCount(3);
-        if (versions.events === "rooms") {
-          // A door for each celebration; opening one shows its room
-          const doors = page.getByRole("tab");
-          await expect(doors).toHaveCount(3);
-          await doors.nth(1).click();
-          await expect(doors.nth(1)).toHaveAttribute("aria-selected", "true");
-          await expect(page.getByRole("tabpanel").getByRole("heading", { level: 3 })).toHaveText(
-            "Sangeet",
-          );
-          await page.keyboard.press("ArrowRight");
-          await expect(doors.nth(2)).toBeFocused();
-          await expect(doors.nth(2)).toHaveAttribute("aria-selected", "true");
-        }
-        if (versions.events === "cards") {
-          // Each celebration a painted card under its own cover, revealed in one tap
-          const cards = page.locator('[data-events="cards"] li');
-          await expect(cards).toHaveCount(3);
-          await expect(cards.first().locator("[data-cover]")).toHaveAttribute(
-            "data-cover",
-            "turmeric",
-          );
-          await cards.first().getByRole("button", { name: guestCopy.themed.reveal.button }).click();
-          await expect(cards.first().locator("[data-cover]")).toHaveAttribute("data-state", "open");
-          await expect(cards.first().locator("canvas")).toHaveCount(0);
-        }
-        if (versions.date === "scratch") {
-          // The date under gold foil: rubbing enough of it away lets the rest fall
-          const foil = date.locator("canvas");
-          await foil.scrollIntoViewIfNeeded();
-          // The page snaps a section into place after a scroll: rub once it has settled
-          let box = (await foil.boundingBox())!;
-          await expect
-            .poll(async () => {
-              const was = box.y;
-              box = (await foil.boundingBox())!;
-              return box.y === was;
-            })
-            .toBe(true);
-          // Clear of the foil's rounded corners, back and forth down its whole height
-          const inset = 28;
-          await page.mouse.move(box.x + inset, box.y + inset);
-          await page.mouse.down();
-          for (let row = 0; row <= 12; row++) {
-            const y = box.y + inset + ((box.height - inset * 2) * row) / 12;
-            const x = row % 2 ? box.x + inset : box.x + box.width - inset;
-            await page.mouse.move(x, y, { steps: 6 });
-          }
-          await page.mouse.up();
-          await expect(date.locator("[data-cover]")).toHaveAttribute("data-state", "open");
-          await expect(date.locator('[data-medal="day"]')).toBeVisible();
-        }
-        await expect(page.locator('section[aria-labelledby="guest-family"]')).toHaveAttribute(
-          "data-layout",
-          layouts.family,
-        );
+        await expect(page.locator(`[data-timeline="${layouts.timeline}"] > li`)).toHaveCount(3);
+        // Each named as the design's tradition names it, the Sangeet in the middle
+        await expect(themed.getByRole("heading", { level: 3 })).toHaveCount(3);
+        await expect(themed.getByRole("heading", { level: 3 }).nth(1)).toContainText("Sangeet");
+        // Nothing the pages above already tell comes again below
+        for (const name of ["Save the date", "With love from the family"])
+          await expect(themed.getByRole("heading", { name })).toHaveCount(0);
+        await expect(page.locator(`section[data-layout="${layouts.photos}"]`)).toBeVisible();
 
-        // The theme's own ways of giving flowers and light (blessings.ts), where it gives them
-        if (recipe.sections.includes("flowers")) {
-          const flowers = guestCopy.themed.flowers[recipe.flowers];
-          await page.getByRole("button", { name: flowers.give }).click();
-          await expect(page.getByText(flowers.given)).toBeVisible();
-        } else await page.locator("#guest-welcome").click();
-
-        if (versions.night === "lamps") {
-          const light = guestCopy.themed.lights[recipe.lamp];
-          const lamps = page.getByRole("button", { name: light.give, exact: true });
-          await lamps.click();
-          await expect(page.getByText(light.given)).toBeVisible();
-          await expect(lamps).toHaveAttribute("aria-pressed", "true");
-          await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
-        }
-
+        // The reply asks only who and whether
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
-        // The guest's first tap (the flowers) started the music
-        await expect(page.getByRole("button", { name: /Pause the music/ }).last()).toBeVisible();
+        const reply = page.locator("#rsvp");
+        await expect(reply.getByRole("textbox")).toHaveCount(1);
+        await expect(reply.getByRole("radio")).toHaveCount(2);
 
         expect(await noOverflow(page)).toBe(true);
         expect((await axe(page).analyze()).violations).toEqual([]);
@@ -186,71 +95,55 @@ for (const suite of THEMES) {
 }
 
 test("a Hindi card's guest page reads Hindi on an English site", async ({ page }) => {
+  // Kayal's timeline is a deck of cards, each with its month on a seal
+  expect(sectionLayouts("kayal").timeline).toBe("cards");
   await page.goto("/engine/guest?suite=kayal&lang=hi");
   const themed = page.locator(".guest-themed");
-  await expect(themed.getByText("आप सादर आमंत्रित हैं")).toBeVisible();
-  // The month in Hindi, wherever the date version sets it (a calendar page heads it with the year)
-  await expect(themed.getByText("नवंबर").first()).toBeVisible();
   await expect(themed.getByRole("heading", { name: "उत्सव" })).toBeVisible();
-  for (const english of ["You are invited", "Save the date", "The celebrations", "November"]) {
+  await expect(themed.getByText("नवंबर").first()).toBeVisible();
+  for (const english of ["The celebrations", "November"]) {
     await expect(themed.getByText(english, { exact: false })).toHaveCount(0);
   }
-  // The buttons around the card speak the card's language too
-  const way = blessings("kayal").flowers;
-  await expect(
-    page.getByRole("button", { name: hiGuestCopy.themed.flowers[way].give }),
-  ).toBeVisible();
-  await expect(page.getByRole("button", { name: guestCopy.themed.flowers[way].give })).toHaveCount(
-    0,
-  );
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 
-// Owner, 2026-10-24: a couple with one photo each saw only the first, and guests had to
-// scroll sideways through the photos
-test("the welcome shows both photos when the couple gave one each, and the photos turn by themselves", async ({
-  page,
-}) => {
-  expect(sectionLayouts("kayal").photos).toBe("film");
-  await page.goto("/engine/guest?suite=kayal&couple=two");
-  const welcome = page.locator('section[aria-labelledby="guest-welcome"]');
-  await expect(welcome.locator("figure")).toHaveCount(2);
-  await expect(welcome.locator("figcaption")).toHaveText(["Arjun", "Sia"]);
-  await expect(welcome.getByRole("img", { name: guestCopy.photoAlt(2) })).toBeVisible();
-
+// Owner, 2026-10-24: guests had to scroll sideways through the photos
+test("the photos turn by themselves", async ({ page }) => {
+  expect(sectionLayouts("rajwada-bagh").photos).toBe("film");
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=two");
   const photos = page.getByRole("group", { name: "Photos" });
   await photos.scrollIntoViewIfNeeded();
   const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 2");
+  await expect(counter).toContainText("Photo 1 of 4");
   // It moves on by itself while on screen, unless the guest's pointer rests on it
   await page.mouse.move(1, 1);
-  await expect(counter).toContainText("Photo 2 of 2", { timeout: 9_000 });
+  await expect(counter).toContainText("Photo 2 of 4", { timeout: 9_000 });
   await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 1 of 2");
+  await expect(counter).toContainText("Photo 3 of 4");
   await photos.getByRole("button", { name: "Previous photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 2");
+  await expect(counter).toContainText("Photo 2 of 4");
   await photos.getByRole("button", { name: "Pause the photos" }).click();
   await expect(photos.getByRole("button", { name: "Play the photos" })).toBeVisible();
   await page.mouse.move(1, 1);
   await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 2 of 2");
+  await expect(counter).toContainText("Photo 2 of 4");
   expect(await noOverflow(page)).toBe(true);
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 
 test("in still mode the photos stay put and have no pause", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/engine/guest?suite=kayal&couple=one");
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
   const photos = page.getByRole("group", { name: "Photos" });
   await photos.scrollIntoViewIfNeeded();
   const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 3");
+  await expect(counter).toContainText("Photo 1 of 4");
   await expect(photos.getByRole("button", { name: "Pause the photos" })).toHaveCount(0);
   await page.mouse.move(1, 1);
   await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 1 of 3");
+  await expect(counter).toContainText("Photo 1 of 4");
   await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 3");
+  await expect(counter).toContainText("Photo 2 of 4");
 });
 
 for (const suite of ["rajwada-bagh", "kayal"] as const) {
@@ -290,10 +183,6 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
   }
 }
 
-// A painted design that still turns its pages after the opening (Rajwada Bagh runs as one
-// page down instead, recipe.ts `pages`)
-const PAGED = "shahi-savari";
-
 // Every opening style (Step 12w), with and without a god, in both colour themes
 for (const [style, god] of [
   ["palace", "ganesha"],
@@ -306,7 +195,9 @@ for (const [style, god] of [
   for (const colorScheme of ["light", "dark"] as const) {
     test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
       await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
-      await page.goto(`/engine/guest?suite=${PAGED}&opening=${style}${god ? `&god=${god}` : ""}`);
+      await page.goto(
+        `/engine/guest?suite=rajwada-bagh&opening=${style}${god ? `&god=${god}` : ""}`,
+      );
       const opening = page.locator(`[data-opening="${style}"]`);
       await expect(opening).toHaveAttribute("data-doorway", "closed");
       await expect(opening.getByRole("heading", { level: 1 })).toContainText("Arjun");
@@ -339,7 +230,7 @@ for (const [i, [style, god, faith]] of (
   ] as const
 ).entries()) {
   const colorScheme = i % 2 === 0 ? "light" : "dark";
-  const suite = [PAGED, "kayal", "noor-bagh", "gubbara"][i % 4];
+  const suite = ["rajwada-bagh", "kayal", "noor-bagh", "gubbara"][i % 4];
   test(`the ${style} opening, ${colorScheme} theme`, async ({ page }) => {
     await page.emulateMedia({ colorScheme, reducedMotion: "reduce" });
     const chosen = `${god ? `&god=${god}` : ""}${faith ? `&faith=${faith}` : ""}`;
@@ -362,7 +253,7 @@ test("the welcome before the pages", async ({ page }) => {
   // The page's clock is held, so the welcome waits while it is checked
   await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
   await page.clock.pauseAt(new Date("2026-10-01T10:00:05+05:30"));
-  await page.goto(`/engine/guest?suite=${PAGED}&opening=palace`);
+  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
   await page.getByRole("button", { name: "Open the invitation" }).click();
   // It waits a moment for the screen to settle after going full screen, then opens once its
   // paintings have loaded. They load in real time while the page's clock is held, so the
@@ -446,7 +337,7 @@ test("the music starts on the first tap, and the invitation opens again at the e
     });
   });
   await page.clock.install({ time: new Date("2026-10-01T10:00:00+05:30") });
-  await page.goto(`/engine/guest?suite=${PAGED}&opening=palace`);
+  await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
   const open = page.getByRole("button", { name: "Open the invitation", exact: true });
   await expect(open).toBeVisible();
   // A tap anywhere before the gate is enough to start the music

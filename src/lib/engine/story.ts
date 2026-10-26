@@ -25,8 +25,6 @@ export type StoryFunction = {
   time: string;
   muhurat: { text: string; lang: string } | null;
   venue: string;
-  /** What to wear, from the host, on the guest page (owner, 2026-10-26: the pages carry it all). */
-  dressCode?: string;
   /** "In 5 days", "Tomorrow" or "Today" on the guest page, in the card's language. */
   countdown?: string;
   /** Directions and the calendar, on the guest page (the editor's preview has none). */
@@ -397,7 +395,6 @@ export function storyBeats({
         ...(fn.muhurat && fn.time ? line(fn.muhurat.text, "small", fn.muhurat.lang) : []),
         ...line(fn.time, "body"),
         ...line(fn.venue, "venue"),
-        ...line(fn.dressCode ?? "", "small"),
       ]),
     );
     const maps = fn.mapsUrl ?? null;

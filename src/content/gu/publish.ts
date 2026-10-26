@@ -178,14 +178,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       whirl: { give: "પાંખડીઓનો વમળ ફેરવો", given: "આપની પાંખડીઓ ઘૂમતી ઘૂમતી તેમની પાસે જાય છે." },
     },
     music: { play: "સંગીત વગાડો", pause: "સંગીત રોકો" },
-    reveal: {
-      button: "ખોલો",
-      date: "તારીખ જોવા સોનું ઘસો",
-      turmeric: "હળદર ઘસીને હટાવો",
-      henna: "મહેંદી લૂછી નાખો",
-      gold: "સોનું ઘસો",
-      petals: "પાંખડીઓ હટાવો",
-    },
     lampsLabel: "જોડી માટે એક દીવો પ્રગટાવો",
     lights: {
       diyas: { give: "દીવા પ્રગટાવો", given: "આભાર. આપના દીવા તેમના માટે ઝળહળી રહ્યા છે." },
@@ -222,7 +214,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   heading: "આપ જરૂર પધારશો ને?",
-  intro: "દરેક પ્રસંગ માટે જવાબ આપો. આપ આ પાના પરથી ગમે ત્યારે જવાબ બદલી શકો છો.",
+  intro: "આપનું નામ અને આપ આવી શકશો કે નહીં, એટલું જ જણાવો. જવાબ અહીં ગમે ત્યારે બદલી શકાય છે.",
   yourName: "આપનું નામ",
   namePlaceholder: "પરિવાર આપને જે નામથી ઓળખે છે",
   nameRequired: "કૃપા કરી આપનું નામ લખો",
@@ -234,6 +226,10 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   },
   statusGroup: (name) => `${name} માટે આપનો જવાબ`,
   chooseOne: "એક જવાબ પસંદ કરો",
+  answerGroup: "શું આપ પધારશો?",
+  answers: { attending: "હા, જરૂર આવીશું", declined: "માફ કરશો, આવી શકીશું નહીં" },
+  thanksComing: "પરિવાર આપની સાથે ઉજવણી કરવા આતુર છે.",
+  thanksMissed: "આપની ખોટ સાલશે. આપના આશીર્વાદ બદલ આભાર.",
   adults: "મોટા",
   children: "બાળકો",
   fewer: (what) => `${what} ઓછા કરો`,

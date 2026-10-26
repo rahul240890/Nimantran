@@ -215,14 +215,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
       },
     },
     music: { play: "இசையை இயக்கவும்", pause: "இசையை நிறுத்தவும்" },
-    reveal: {
-      button: "திறக்கவும்",
-      date: "தேதியைக் காண தங்கத்தைச் சுரண்டவும்",
-      turmeric: "மஞ்சளைத் தேய்த்து நீக்கவும்",
-      henna: "மருதாணியைத் துடைக்கவும்",
-      gold: "தங்கத்தைச் சுரண்டவும்",
-      petals: "இதழ்களை விலக்கவும்",
-    },
     lampsLabel: "மணமக்களுக்காக ஒரு விளக்கு ஏற்றுங்கள்",
     lights: {
       diyas: {
@@ -296,7 +288,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   heading: "நீங்கள் வருவீர்களா?",
   intro:
-    "ஒவ்வொரு நிகழ்ச்சிக்கும் பதில் அளிக்கவும். இந்தப் பக்கத்திலிருந்து எப்போது வேண்டுமானாலும் பதிலை மாற்றலாம்.",
+    "உங்கள் பெயரையும், வர இயலுமா என்பதையும் மட்டும் சொல்லுங்கள். பதிலை இங்கே எப்போது வேண்டுமானாலும் மாற்றலாம்.",
   yourName: "உங்கள் பெயர்",
   namePlaceholder: "குடும்பத்தினருக்குத் தெரிந்த பெயர்",
   nameRequired: "உங்கள் பெயரை உள்ளிடவும்",
@@ -308,6 +300,10 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   },
   statusGroup: (name) => `${name} நிகழ்ச்சிக்கான உங்கள் பதில்`,
   chooseOne: "ஒரு பதிலைத் தேர்ந்தெடுக்கவும்",
+  answerGroup: "நீங்கள் வருவீர்களா?",
+  answers: { attending: "ஆம், நிச்சயம் வருகிறேன்", declined: "மன்னிக்கவும், வர இயலாது" },
+  thanksComing: "உங்களுடன் கொண்டாடக் குடும்பம் ஆவலுடன் காத்திருக்கிறது.",
+  thanksMissed: "உங்கள் வருகை இல்லாதது குறையாக இருக்கும். உங்கள் ஆசிகளுக்கு நன்றி.",
   adults: "பெரியவர்கள்",
   children: "குழந்தைகள்",
   fewer: (what) => `${what} குறைக்கவும்`,

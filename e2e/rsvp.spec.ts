@@ -28,17 +28,13 @@ test.describe("guest RSVP", () => {
 
       // Sending with nothing filled in points at what's missing
       await form.getByRole("button", { name: "Send reply" }).click();
-      await expect(form.getByRole("alert")).toHaveText("3 answers still need you.");
+      await expect(form.getByRole("alert")).toHaveText("2 answers still need you.");
       await expect(form.getByRole("textbox", { name: /Your name/ })).toBeFocused();
 
       await form.getByRole("textbox", { name: /Your name/ }).fill("Rohan Mehta");
-      await form.getByRole("button", { name: "Coming to everything" }).click();
-      const wedding = form.getByRole("radiogroup", { name: "Your reply for the Wedding" });
-      await expect(wedding.getByRole("radio", { name: /^Coming$/ })).toBeChecked();
-      await form.getByRole("button", { name: "More children" }).last().click();
-      await form.getByRole("combobox", { name: /Meal/ }).click();
-      await guest.getByRole("option", { name: "Jain" }).click();
-      await form.getByRole("textbox", { name: /A note for the family/ }).fill("See you there!");
+      // Just a name and whether they are coming: no counts, meals or notes (owner, 2026-10-26)
+      await expect(form.getByRole("textbox")).toHaveCount(1);
+      await form.getByRole("radio", { name: "Yes, I'll be there" }).click();
       expect(await noOverflow(guest)).toBe(true);
       expect((await axe(guest).analyze()).violations).toEqual([]);
 
@@ -51,9 +47,7 @@ test.describe("guest RSVP", () => {
       await form.getByRole("button", { name: "Send reply" }).click();
 
       await expect(form.getByRole("heading", { name: "Thank you, Rohan!" })).toBeFocused();
-      await expect(form.getByRole("listitem").filter({ hasText: "Wedding" })).toContainText(
-        "Coming · 2 people",
-      );
+      await expect(form.getByText("The family can't wait to celebrate with you.")).toBeVisible();
       // A guest with a celebration of their own starts from this design, counted as a guest
       const likeThis = /^\/(create\/[a-z0-9-]+\?category=wedding&|\?)utm_source=guest$/;
       await expect(
@@ -70,21 +64,19 @@ test.describe("guest RSVP", () => {
       await guest.reload();
       await expect(form.getByRole("heading", { name: "Thank you, Rohan!" })).toBeVisible();
       await form.getByRole("button", { name: "Change my reply" }).click();
-      await form
-        .getByRole("radiogroup", { name: "Your reply for the Haldi" })
-        .getByRole("radio", { name: /^Can't come$/ })
-        .click();
+      await expect(form.getByRole("radio", { name: "Yes, I'll be there" })).toBeChecked();
+      await form.getByRole("radio", { name: "Sorry, I can't come" }).click();
       await form.getByRole("button", { name: "Update reply" }).click();
-      await expect(form.getByRole("listitem").filter({ hasText: "Haldi" })).toContainText(
-        "Can't come",
-      );
+      await expect(
+        form.getByText("You will be missed. Thank you for your blessings."),
+      ).toBeVisible();
 
       await page.reload();
       await expect(replies.getByText("Rohan Mehta")).toBeVisible();
-      await expect(replies.getByText("See you there!")).toBeVisible();
+      // One answer for every celebration they were invited to
       await expect(
         replies.getByRole("listitem").filter({ hasText: "Wedding" }).first(),
-      ).toContainText("2 coming");
+      ).toContainText("1 can't come");
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
       await context.close();

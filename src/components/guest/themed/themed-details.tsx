@@ -1,74 +1,67 @@
 "use client";
 
-import { Fragment, useState, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { GuestFunction } from "@/components/guest/guest-view";
-import type { FamilyBlock } from "@/components/guest/family-words";
-import type { GuestPhoto } from "@/components/guest/guest-photo";
-import { useGuestText } from "@/components/guest/guest-language";
-import { MusicBars } from "@/components/invitation/music-bars";
 import type { FunctionId } from "@/lib/events/functions";
+import { useGuestText } from "@/components/guest/guest-language";
+import { cn } from "@/lib/cn";
+import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
+import { MusicBars } from "@/components/invitation/music-bars";
+import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import type { SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
-import { guestRecipe, type GuestSection } from "@/lib/suites/recipe";
+import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
-import type { CardCopy } from "@/lib/templates/content";
-import { FlowerDefs, PetalShower } from "./flowers";
-import { Celebrations } from "./sections/celebrations";
-import { Dusk } from "./sections/dusk";
-import { GiveFlowers } from "./sections/give-flowers";
-import { Night } from "./sections/night";
-import { EventsChapters, EventsRooms } from "./sections/events-versions";
-import { DateScratch, EventsCards } from "./sections/moments";
-import { RecipeContext, type Music } from "./sections/parts";
-import { DateOversized, SaveTheDate } from "./sections/save-the-date";
-import { Welcome } from "./sections/welcome";
-import { WelcomeDarbar, WelcomeLetter, WelcomeMasthead } from "./sections/welcome-versions";
-import { useOnScreen } from "./use-in-view";
+import { CARD_THEMED_WORDS } from "@/lib/templates/themed-words";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { FlowerDefs, FlowerFrame, Garland, PetalDrift } from "./flowers";
+import { EventsTimeline } from "./timeline";
+import { useInView, useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
-import "@/app/guest-blessings.css";
-import "@/app/guest-families.css";
+
+const noSubscribe = () => () => {};
+/** True in the browser once hydrated: sections wait to play their entrance only there. */
+const useMounted = () =>
+  useSyncExternalStore(
+    noSubscribe,
+    () => true,
+    () => false,
+  );
+
+type Music = { playing: boolean; toggle: () => void };
+
+/** Each ground's colours come from one hour of the theme's day: its day, dawn or night. */
+const GROUND_MOODS = { cloth: "day", blend: "dawn", deep: "night" } as const;
 
 /**
- * The guest page below a painted theme's pages (Step 12q). Scrolling down, the guest meets
- * the theme's sections in the order its recipe gives (recipe.ts): a welcome, flowers to
- * give the family, the date, each celebration, photos and family, and a light to give
- * before the reply. Each section is drawn in the version the recipe names, in the theme's
- * own colours, flowers and lamps (its `GuestLook`); the sections live in ./sections, one
- * file each.
+ * The guest page below a painted theme's pages (owner, 2026-10-26). The pages tell the
+ * invitation, so nothing here repeats them: the day's timeline, every celebration listed
+ * once with what a guest needs on the day; the photos the family shared; and the reply,
+ * just a name and whether they are coming. It sits on a ground of the theme's own colours
+ * (plain, blended or deep; section-layouts.ts), never a painting, with the theme's garland
+ * at the top and petals drifting down.
  */
 export function ThemedDetails({
   suite,
   look,
-  copy,
   lang,
   functions,
   days,
-  main,
-  welcome,
   photos,
-  family,
-  familyLang,
   allIcsUrl,
   music,
   reply,
 }: {
   suite: SuiteId;
   look: GuestLook;
-  /** The card's words, in the card's language. */
-  copy: CardCopy;
   /** The card's language: the page's own words follow it, like the pages above. */
   lang: CardLanguage;
   functions: readonly GuestFunction[];
-  /** Each celebration's date (YYYY-MM-DD), for the date seals and stubs on its box. */
+  /** Each celebration's date (YYYY-MM-DD), for its day on the timeline. */
   days: Readonly<Partial<Record<FunctionId, string>>>;
-  /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
-  main: { date: string; venue: string } | null;
-  /** The photos the welcome shows: the couple's, or one each, from the design's own frames. */
-  welcome: readonly GuestPhoto[];
-  /** The other photos, for the gallery at dusk: each photo shows once on the page. */
+  /** Every photo the family shared. */
   photos: readonly GuestPhoto[];
-  family: readonly FamilyBlock[];
-  familyLang: string | undefined;
   allIcsUrl: string | null;
   music: Music;
   /** The reply form, drawn in the theme's colours. */
@@ -76,97 +69,428 @@ export function ThemedDetails({
 }) {
   // The music button floats while the guest reads this page
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
-  const [burst, setBurst] = useState(0);
-  const flowers = [look.flower, look.secondFlower] as const;
-  const recipe = guestRecipe(suite, look);
-  const { layouts, versions } = recipe;
-  const welcomeProps = { copy, lang, look, photos: welcome };
-  const eventProps = { suite, look, lang, functions, days, allIcsUrl, box: recipe.box };
-
-  // The registry: every section a recipe can name, drawn in the version it picks
-  const sections: Record<GuestSection, () => ReactNode> = {
-    welcome: () =>
-      ({
-        garland: <Welcome {...welcomeProps} />,
-        masthead: <WelcomeMasthead {...welcomeProps} />,
-        letter: <WelcomeLetter {...welcomeProps} />,
-        darbar: <WelcomeDarbar {...welcomeProps} />,
-      })[versions.welcome],
-    flowers: () => (
-      <GiveFlowers
-        way={recipe.flowers}
-        look={look}
-        lang={lang}
-        onGive={() => {
-          if (recipe.flowers === "shower") setBurst((was) => was + 1);
-        }}
-      />
-    ),
-    date: () =>
-      main &&
-      {
-        layout: <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />,
-        oversized: <DateOversized main={main} lang={lang} />,
-        scratch: <DateScratch main={main} lang={lang} />,
-      }[versions.date],
-    events: () =>
-      ({
-        hours: <Celebrations {...eventProps} layouts={layouts} />,
-        chapters: <EventsChapters {...eventProps} />,
-        rooms: <EventsRooms {...eventProps} />,
-        cards: <EventsCards {...eventProps} />,
-      })[versions.events],
-    dusk: () =>
-      (photos.length > 0 || family.length > 0) && (
-        <Dusk
-          before={welcome.length}
-          photos={photos}
-          family={recipe.below === "reply" ? [] : family}
-          familyLang={familyLang}
-          look={look}
-          lang={lang}
-          layouts={layouts}
-        />
-      ),
-    night: () => (
-      <Night
-        copy={copy}
-        lang={lang}
-        look={look}
-        way={recipe.lamp}
-        reply={reply}
-        quiet={versions.night === "quiet"}
-        paper={versions.reply}
-      />
-    ),
-  };
-
-  // When the pages carry the invitation, only the reply stays below them, after the host's
-  // own photos where they gave more than the pages hold
-  const shown: readonly GuestSection[] =
-    recipe.below === "reply"
-      ? photos.length > 0
-        ? ["dusk", "night"]
-        : ["night"]
-      : recipe.sections;
+  const { rsvpCopy } = useGuestText();
+  const cardWords = CARD_THEMED_WORDS[lang];
+  // Each theme lays its parts out its own way, on its own ground (section-layouts.ts)
+  const layouts = sectionLayouts(suite);
 
   return (
     <div
       ref={top}
       data-suite={suite}
       data-guest={look.style}
-      data-family={recipe.family}
-      data-finish={versions.finish}
-      className="guest-themed relative isolate overflow-clip"
+      data-ground={layouts.ground}
+      // The hour whose light the ground takes its sky colours from (globals.css)
+      data-mood={GROUND_MOODS[layouts.ground]}
+      className="guest-themed guest-ground relative isolate overflow-clip"
     >
-      <RecipeContext value={recipe}>
-        <FlowerDefs />
-        {shown.map((section) => (
-          <Fragment key={section}>{sections[section]()}</Fragment>
+      <FlowerDefs />
+      <Garland
+        flower={look.flower}
+        second={look.secondFlower}
+        className="guest-garland relative z-10 h-20 w-full sm:h-28"
+      />
+      <PetalDrift flowers={[look.flower, look.secondFlower]} count={8} />
+
+      <section
+        aria-labelledby="guest-functions"
+        data-tour={functions.length > 1 ? "6" : "8"}
+        data-layout={layouts.timeline}
+        className="relative px-4 pt-6 pb-16 sm:px-6 sm:pb-24"
+      >
+        <Heading
+          id="guest-functions"
+          lang={lang}
+          label={cardWords.eventsLabel}
+          title={cardWords.celebrations}
+        />
+        <div className="mt-12">
+          <EventsTimeline
+            functions={functions}
+            days={days}
+            lang={lang}
+            layout={layouts.timeline}
+            allIcsUrl={allIcsUrl}
+          />
+        </div>
+      </section>
+
+      {photos.length > 0 && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <Memories photos={photos} look={look} lang={lang} layouts={layouts} />
+        </>
+      )}
+
+      {reply && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <section
+            id="rsvp"
+            aria-labelledby="guest-rsvp"
+            data-tour="end"
+            className="relative flex min-h-svh scroll-mt-4 flex-col justify-center px-4 pt-12 pb-12 sm:px-6 sm:pb-16"
+          >
+            <Reveal className="guest-card mx-auto flex w-full max-w-xl flex-col gap-6 px-5 py-9 sm:px-10">
+              <Heading
+                id="guest-rsvp"
+                lang={lang}
+                label={cardWords.replyLabel}
+                title={cardWords.joinUs}
+              />
+              <p className="-mt-3 text-center text-ink-muted">{rsvpCopy.intro}</p>
+              {reply}
+            </Reveal>
+          </section>
+        </>
+      )}
+      <p
+        lang={lang}
+        data-snap
+        className="relative px-6 pt-6 pb-32 text-center font-display text-xl text-balance text-ink-muted sm:pb-40"
+      >
+        {cardWords.closing}
+      </p>
+      {onScreen && <FloatingMusic music={music} />}
+    </div>
+  );
+}
+
+/** A section's small label, a flower and its title. */
+function Heading({
+  id,
+  lang,
+  label,
+  title,
+}: {
+  id?: string;
+  lang: string;
+  label: string;
+  title: string;
+}) {
+  return (
+    <div lang={lang} className="flex flex-col items-center gap-2 text-center">
+      <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">{label}</p>
+      <h2
+        id={id}
+        className="font-display text-[2rem] leading-tight text-balance break-words text-ink sm:text-[2.75rem]"
+      >
+        {title}
+      </h2>
+      <span aria-hidden className="guest-rule" />
+    </div>
+  );
+}
+
+/** Plays its entrance (the style's own, in globals.css) once scrolled into view. */
+function Reveal({ className, children }: { className?: string; children: ReactNode }) {
+  const [ref, seen] = useInView<HTMLDivElement>();
+  const mounted = useMounted();
+  return (
+    <div
+      ref={ref}
+      data-reveal={mounted ? (seen ? "in" : "wait") : undefined}
+      className={cn("guest-reveal", className)}
+    >
+      {children}
+    </div>
+  );
+}
+
+/** The frame a photo or painting hangs in: an arch in a palace, an oval by the water. */
+function Framed({
+  look,
+  children,
+  className,
+}: {
+  look: GuestLook;
+  children: ReactNode;
+  className?: string;
+}) {
+  const shape = look.style === "garden" || look.style === "party" ? "ring" : "arch";
+  return (
+    <div className={cn("relative", className)}>
+      <div data-shape={shape} className="guest-frame relative aspect-[4/5] overflow-hidden">
+        {children}
+      </div>
+      <FlowerFrame shape={shape} flower={look.flower} second={look.secondFlower} />
+    </div>
+  );
+}
+
+/** How long each photo shows before the next comes by itself. */
+const PHOTO_MS = 4500;
+
+/** Scrolls the carousel so its photo at `index` sits in the middle. */
+function centre(list: HTMLElement, index: number, smooth: boolean) {
+  const item = list.children[index] as HTMLElement | undefined;
+  if (!item) return;
+  list.scrollTo({
+    left: item.offsetLeft - (list.clientWidth - item.offsetWidth) / 2,
+    behavior: smooth ? "smooth" : "auto",
+  });
+}
+
+/** The photo nearest the middle of the strip. */
+function nearestPhoto(list: HTMLElement): number {
+  const middle = list.scrollLeft + list.clientWidth / 2;
+  let nearest = 0;
+  let gap = Infinity;
+  Array.from(list.children).forEach((child, i) => {
+    const item = child as HTMLElement;
+    const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
+    if (distance < gap) {
+      gap = distance;
+      nearest = i;
+    }
+  });
+  return nearest;
+}
+
+/**
+ * The photos one after another (owner, 2026-10-24: guests had to scroll sideways to find
+ * them): each comes to the middle by itself while the section is on screen, and the guest
+ * can step back and forward, swipe, or pause. Hovering or a button in focus holds it, and
+ * in still mode nothing moves by itself.
+ */
+function PhotoCarousel({
+  photos,
+  before,
+  look,
+}: {
+  photos: readonly GuestPhoto[];
+  /** How many photos the welcome already shows, so these count on from there. */
+  before: number;
+  look: GuestLook;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.carousel;
+  const track = useRef<HTMLUListElement>(null);
+  const [area, onScreen] = useOnScreen<HTMLDivElement>();
+  const still = useReducedMotion();
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const [holding, setHolding] = useState(false);
+  // The photo the strip is gliding to by itself; its scrolling on the way says nothing
+  const aim = useRef<number | null>(null);
+  const count = photos.length;
+  const playing = !still && !paused && count > 1;
+
+  useEffect(() => {
+    if (!playing || holding || !onScreen) return;
+    const timer = setTimeout(() => {
+      const next = (index + 1) % count;
+      aim.current = next;
+      if (track.current) centre(track.current, next, true);
+      setIndex(next);
+    }, PHOTO_MS);
+    return () => clearTimeout(timer);
+  }, [playing, holding, onScreen, index, count]);
+
+  const go = (to: number) => {
+    const next = (to + count) % count;
+    aim.current = next;
+    if (track.current) centre(track.current, next, !still);
+    setIndex(next);
+  };
+  // A swipe settles on a photo; the counter follows it
+  const settle = () => {
+    const list = track.current;
+    if (!list || aim.current !== null) return;
+    const nearest = nearestPhoto(list);
+    if (nearest !== index) setIndex(nearest);
+  };
+  // A glide that stopped short (a Next pressed before the last glide began, on a slow phone)
+  // goes the rest of the way at once, so the photo shown is always the one counted
+  const arrive = () => {
+    const list = track.current;
+    const target = aim.current;
+    aim.current = null;
+    if (list && target !== null && nearestPhoto(list) !== target) centre(list, target, false);
+  };
+  // The guest's own swipe, wheel or key: the counter follows the strip again
+  const takeOver = () => {
+    aim.current = null;
+  };
+
+  return (
+    <div
+      ref={area}
+      role="group"
+      aria-roledescription={words.label}
+      aria-labelledby="guest-photos"
+      className="mt-10 flex flex-col items-center gap-4"
+      onPointerEnter={() => setHolding(true)}
+      onPointerLeave={() => setHolding(false)}
+      onFocus={() => setHolding(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setHolding(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+          event.preventDefault();
+          const back =
+            (event.key === "ArrowLeft") !==
+            (getComputedStyle(event.currentTarget).direction === "rtl");
+          go(index + (back ? -1 : 1));
+        }
+      }}
+    >
+      {/* Focusable so a keyboard can reach the scrolling strip; its arrow keys turn the photos */}
+      <ul
+        ref={track}
+        tabIndex={0}
+        onScroll={settle}
+        onScrollEnd={arrive}
+        onPointerDown={takeOver}
+        onWheel={takeOver}
+        onKeyDown={takeOver}
+        className="guest-gallery flex w-full snap-x snap-mandatory gap-8 overflow-x-auto px-[calc(50%-min(31vw,7.5rem))] pt-8 pb-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:gap-10"
+      >
+        {photos.map((photo, i) => (
+          <li
+            key={photo.id}
+            data-current={i === index || undefined}
+            aria-hidden={i !== index || undefined}
+            className="guest-photo guest-slide w-[min(62vw,15rem)] shrink-0 snap-center"
+          >
+            <Framed look={look}>
+              <FramedPhoto
+                photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                alt={guestCopy.photoAlt(i + before + 1)}
+                frameAspect={GALLERY_ASPECT}
+                lazy={Math.abs(i - index) > 1}
+                className="size-full"
+              />
+            </Framed>
+          </li>
         ))}
-        {onScreen && <FloatingMusic music={music} />}
-        <PetalShower flowers={flowers} burst={burst} />
-      </RecipeContext>
+      </ul>
+      {count > 1 && (
+        <div className="flex items-center gap-3">
+          {!still && (
+            <button
+              type="button"
+              onClick={() => setPaused((was) => !was)}
+              aria-label={paused ? words.play : words.pause}
+              className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+              {paused ? (
+                <Play aria-hidden className="size-4 fill-current rtl:-scale-x-100" />
+              ) : (
+                <Pause aria-hidden className="size-4 fill-current" />
+              )}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => go(index - 1)}
+            aria-label={words.previous}
+            className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
+          </button>
+          <p
+            aria-live={playing && !holding ? "off" : "polite"}
+            className="min-w-14 text-center font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
+          >
+            <span aria-hidden>{`${index + 1} / ${count}`}</span>
+            <span className="sr-only">{words.position(index + 1, count)}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => go(index + 1)}
+            aria-label={words.next}
+            className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          >
+            <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The photos the family shared, as the theme lays them out: a film, polaroids or a mosaic. */
+function Memories({
+  photos,
+  look,
+  lang,
+  layouts,
+}: {
+  photos: readonly GuestPhoto[];
+  look: GuestLook;
+  lang: CardLanguage;
+  layouts: SectionLayouts;
+}) {
+  const { guestCopy } = useGuestText();
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const before = 0;
+  return (
+    <div className="relative isolate pb-10">
+      {photos.length > 0 && (
+        <section
+          aria-labelledby="guest-photos"
+          data-tour="9"
+          data-layout={layouts.photos}
+          className={cn(
+            "relative flex min-h-svh flex-col justify-center pt-20",
+            // The carousel's buttons stay clear of the floating music button
+            layouts.photos === "film" ? "pb-24" : "pb-6",
+          )}
+        >
+          <div className="px-4 sm:px-6">
+            <Heading
+              id="guest-photos"
+              lang={lang}
+              label={cardWords.photosLabel}
+              title={cardWords.photos}
+            />
+          </div>
+          {layouts.photos !== "film" && (
+            <Reveal className="mx-auto mt-10 w-full max-w-4xl px-4 sm:px-6">
+              <ul
+                className={cn(
+                  layouts.photos === "polaroids" &&
+                    "flex flex-wrap justify-center gap-x-4 gap-y-8 pt-2 pb-6",
+                  layouts.photos === "mosaic" && "grid grid-cols-2 gap-3 sm:grid-cols-3",
+                )}
+              >
+                {photos.map((photo, index) => (
+                  <li
+                    key={photo.id}
+                    className={cn(
+                      layouts.photos === "polaroids" &&
+                        "guest-polaroid w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
+                      layouts.photos === "mosaic" &&
+                        "guest-mosaic overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
+                    )}
+                    style={
+                      layouts.photos === "polaroids"
+                        ? { rotate: `${[-3, 2, -1.5, 3, -2.5, 1.5][index % 6]}deg` }
+                        : undefined
+                    }
+                  >
+                    <FramedPhoto
+                      photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                      alt={guestCopy.photoAlt(index + before + 1)}
+                      frameAspect={GALLERY_ASPECT}
+                      lazy
+                      className={cn(
+                        "w-full",
+                        layouts.photos === "polaroids" ? "aspect-[4/5]" : "aspect-[4/5] h-full",
+                      )}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          )}
+          {layouts.photos === "film" && (
+            <PhotoCarousel photos={photos} before={before} look={look} />
+          )}
+        </section>
+      )}
     </div>
   );
 }

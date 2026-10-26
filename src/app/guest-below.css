@@ -1,0 +1,210 @@
+/*
+ * The guest page below the pages (themed-details.tsx, timeline.tsx; owner, 2026-10-26).
+ * Grounds of the theme's own colours instead of paintings: plain cloth, cloth blending
+ * into the theme's sky, or its deep colour lit by its jewel (globals.css points the site's
+ * tokens at each). The timeline uses only the site's tokens, so it reads on every ground
+ * and on the plain page of a design without a guest look.
+ */
+.guest-ground[data-ground="cloth"] {
+  background:
+    radial-gradient(
+      60rem 26rem at 50% 0,
+      color-mix(in oklab, var(--guest-gilt) 18%, transparent),
+      transparent 70%
+    ),
+    var(--guest-cloth);
+}
+.guest-ground[data-ground="blend"] {
+  background:
+    radial-gradient(
+      44rem 22rem at 85% 8%,
+      color-mix(in oklab, var(--suite-glow) 40%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      var(--guest-cloth) 0%,
+      color-mix(in oklab, var(--guest-cloth) 78%, var(--suite-sky-bottom)) 55%,
+      color-mix(in oklab, var(--guest-cloth) 72%, var(--suite-sky-top)) 100%
+    );
+}
+.guest-ground[data-ground="deep"] {
+  background:
+    radial-gradient(
+      50rem 28rem at 50% 0,
+      color-mix(in oklab, var(--guest-jewel) 30%, transparent),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      var(--suite-near),
+      color-mix(in oklab, var(--suite-near) 82%, var(--guest-jewel))
+    );
+}
+/* A fine band of the theme's gilt between the timeline, the photos and the reply */
+.guest-band {
+  display: block;
+  height: 1px;
+  width: min(20rem, 60%);
+  margin-inline: auto;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--guest-gilt, var(--line-strong)),
+    transparent
+  );
+}
+
+/* The timeline: one list, drawn four ways */
+.guest-timeline-list {
+  --mark: 2.75rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 44rem;
+  gap: 2.75rem;
+}
+.guest-timeline-item {
+  display: grid;
+  grid-template-columns: var(--mark) minmax(0, 1fr);
+  column-gap: 1.25rem;
+  align-items: start;
+}
+/* The line itself, from each mark down to the next */
+.guest-timeline-item:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: calc(var(--mark) / 2 - 1px);
+  top: var(--mark);
+  bottom: -2.75rem;
+  width: 2px;
+  background: color-mix(in oklab, var(--accent-text) 45%, transparent);
+}
+.guest-timeline-mark {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  width: var(--mark);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  color: var(--accent-text);
+  background: var(--surface);
+  box-shadow:
+    0 0 0 2px color-mix(in oklab, var(--accent-text) 70%, transparent),
+    0 0 0 6px var(--surface),
+    0 0 0 7px color-mix(in oklab, var(--accent-text) 30%, transparent);
+  font-size: 1.25rem;
+}
+
+/* Cards: each on its cloth, its day on a seal, joined by a dotted line */
+[data-timeline="cards"] {
+  --mark: 4.75rem;
+}
+[data-timeline="cards"] .guest-timeline-item:not(:last-child)::before {
+  width: 0;
+  background: none;
+  border-inline-start: 2px dotted color-mix(in oklab, var(--accent-text) 60%, transparent);
+}
+[data-timeline="cards"] .guest-timeline-mark {
+  gap: 0.2rem;
+  padding-inline: 0.2rem;
+  border-radius: 1rem;
+  font-size: 1.6rem;
+  color: var(--on-marigold);
+  background: var(--marigold);
+  box-shadow: 0 10px 22px -12px rgb(0 0 0 / 0.55);
+}
+
+/* Diary: the day large in its own column, each celebration ruled off from the next */
+[data-timeline="diary"] {
+  --mark: 5.5rem;
+  gap: 0;
+}
+[data-timeline="diary"] .guest-timeline-item {
+  padding-block: 1.75rem;
+  border-top: 1px solid var(--line-strong);
+}
+[data-timeline="diary"] .guest-timeline-item:last-child {
+  border-bottom: 1px solid var(--line-strong);
+}
+[data-timeline="diary"] .guest-timeline-item::before {
+  display: none;
+}
+[data-timeline="diary"] .guest-timeline-mark {
+  aspect-ratio: auto;
+  border-radius: 0;
+  gap: 0.35rem;
+  background: none;
+  box-shadow: none;
+  font-size: 2.75rem;
+  border-inline-end: 1px solid var(--line-strong);
+  padding-inline-end: 0.75rem;
+}
+
+/* Alternate: on wider screens a centre line, the celebrations taking turns either side */
+@media (min-width: 48rem) {
+  [data-timeline="alternate"] {
+    max-width: 64rem;
+    gap: 1.5rem;
+  }
+  [data-timeline="alternate"] .guest-timeline-item {
+    grid-template-columns: minmax(0, 1fr) var(--mark) minmax(0, 1fr);
+    column-gap: 2rem;
+  }
+  [data-timeline="alternate"] .guest-timeline-item::before {
+    inset-inline-start: calc(50% - 1px);
+    top: 0;
+    bottom: -1.5rem;
+  }
+  [data-timeline="alternate"] .guest-timeline-item:last-child::before {
+    content: "";
+    bottom: auto;
+    height: var(--mark);
+  }
+  [data-timeline="alternate"] .guest-timeline-mark {
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+  }
+  [data-timeline="alternate"] [data-side="near"] .guest-timeline-body {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: end;
+    align-items: flex-end;
+  }
+  [data-timeline="alternate"] [data-side="far"] .guest-timeline-body {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  [data-timeline="alternate"] [data-side="near"] .guest-timeline-body dl > div {
+    flex-direction: row-reverse;
+  }
+  [data-timeline="alternate"] [data-side="near"] .guest-timeline-body > div {
+    justify-content: flex-end;
+  }
+}
+
+/* Each celebration rises into place as it comes on screen */
+@media (prefers-reduced-motion: no-preference) {
+  .guest-timeline-item {
+    animation: timeline-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+@keyframes timeline-rise {
+  from {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+/* A seal is small: its month in tighter letters, so a long month fits */
+[data-timeline="cards"] .guest-timeline-mark > :last-child {
+  max-width: 100%;
+  font-size: 0.55rem;
+  letter-spacing: 0.06em;
+  overflow-wrap: anywhere;
+}

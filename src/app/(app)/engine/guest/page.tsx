@@ -114,7 +114,6 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       photos={shown}
       allIcsUrl={null}
       rsvpFunctions={rsvpFunctions}
-      questions={[]}
       previewNow={previewNow}
       holdWelcome={hold === "1"}
       preview={unsent === "1"}
