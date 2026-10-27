@@ -27,6 +27,7 @@ export function ScratchCard({
   hint,
   label,
   onReveal,
+  round = false,
   children,
   className,
 }: {
@@ -35,6 +36,8 @@ export function ScratchCard({
   /** The foil's name for a keyboard, such as "Show the date". */
   label: string;
   onReveal: () => void;
+  /** A round card: only the foil inside the circle counts, as the corners can't be reached. */
+  round?: boolean;
   /** What lies under the foil. */
   children: ReactNode;
   className?: string;
@@ -105,14 +108,21 @@ export function ScratchCard({
   const cleared = (area: HTMLCanvasElement) => {
     const context = area.getContext("2d", { willReadFrequently: true });
     if (!context || area.width === 0) return 0;
-    const { data } = context.getImageData(0, 0, area.width, area.height);
+    const { width, height } = area;
+    const { data } = context.getImageData(0, 0, width, height);
     let clear = 0;
     let all = 0;
     for (let i = 3; i < data.length; i += 32) {
+      if (round) {
+        const pixel = (i - 3) / 4;
+        const x = ((pixel % width) / width) * 2 - 1;
+        const y = (Math.floor(pixel / width) / height) * 2 - 1;
+        if (x * x + y * y > 1) continue;
+      }
       all++;
       if (data[i] === 0) clear++;
     }
-    return clear / all;
+    return all === 0 ? 0 : clear / all;
   };
 
   const scratch = (x: number, y: number) => {

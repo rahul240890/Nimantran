@@ -62,7 +62,7 @@ for (const suite of THEMES) {
     test.describe(`${suite} guest page, ${colorScheme} theme`, () => {
       test.use({ colorScheme, reducedMotion: "reduce" });
 
-      test("welcomes the guest, lists the day once on its timeline, then the photos and the reply", async ({
+      test("welcomes the guest, lists the day once on its timeline, and keeps every other part", async ({
         page,
       }) => {
         await page.goto(`/engine/guest?suite=${suite}&couple=one`);
@@ -79,10 +79,25 @@ for (const suite of THEMES) {
         // Each named as the design's tradition names it, the Sangeet in the middle
         await expect(themed.getByRole("heading", { level: 3 })).toHaveCount(3);
         await expect(themed.getByRole("heading", { level: 3 }).nth(1)).toContainText("Sangeet");
-        // Nothing the pages above already tell comes again below
-        for (const name of ["Save the date", "With love from the family"])
-          await expect(themed.getByRole("heading", { name })).toHaveCount(0);
-        await expect(page.locator(`section[data-layout="${layouts.photos}"]`)).toBeVisible();
+        // Only the celebrations fold into the timeline: every other part keeps its section,
+        // laid out the theme's own way (owner, 2026-10-27)
+        await expect(themed.getByRole("heading", { name: "Send them your flowers" })).toBeVisible();
+        await expect(themed.getByRole("heading", { name: "Save the date" })).toBeVisible();
+        await expect(
+          page.locator(`section[aria-labelledby="guest-save-date"][data-layout="${layouts.date}"]`),
+        ).toBeVisible();
+        await expect(
+          page.locator(`section[aria-labelledby="guest-photos"][data-layout="${layouts.photos}"]`),
+        ).toBeVisible();
+        await expect(
+          themed.getByRole("heading", { name: "With love from the family" }),
+        ).toBeVisible();
+        await expect(
+          page.locator(`section[aria-labelledby="guest-family"][data-layout="${layouts.family}"]`),
+        ).toBeVisible();
+        await expect(
+          themed.getByRole("region", { name: "Light a lamp for the couple" }),
+        ).toBeVisible();
 
         // The reply asks only who and whether
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
@@ -180,11 +195,14 @@ test("the guest scratches the date free", async ({ page }) => {
   await foil.scrollIntoViewIfNeeded();
   await expect(foil).toContainText("Scratch to reveal the date");
   const box = (await foil.boundingBox())!;
-  // Rubbed side to side, top to bottom, as a finger would
+  // Rubbed side to side, top to bottom, as a finger would, inside the card whatever its
+  // shape (a disc on this theme)
   for (let y = 8; y < box.height; y += 18) {
-    await page.mouse.move(box.x + 6, box.y + y);
+    const across = (box.width / 2) * Math.sqrt(1 - ((2 * y) / box.height - 1) ** 2) - 4;
+    if (across < 4) continue;
+    await page.mouse.move(box.x + box.width / 2 - across, box.y + y);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width - 6, box.y + y, { steps: 16 });
+    await page.mouse.move(box.x + box.width / 2 + across, box.y + y, { steps: 16 });
     await page.mouse.up();
   }
   await expect(foil).toBeHidden();

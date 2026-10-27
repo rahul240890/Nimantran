@@ -1,28 +1,41 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Pause, Play, X } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { ChevronLeft, ChevronRight, Flower2, Pause, Play, X } from "lucide-react";
 import { Dialog as DialogPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import type { FunctionId } from "@/lib/events/functions";
+import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
+import {
+  FamilyWords,
+  pairedSide,
+  useNamesFit,
+  type FamilyBlock,
+} from "@/components/guest/family-words";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
+import { blessings, type FlowerBlessing, type LampBlessing } from "@/lib/suites/blessings";
 import type { SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
-import { CARD_THEMED_WORDS } from "@/lib/templates/themed-words";
+import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { FlowerStage } from "./flower-blessing";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
 import { GiftWrap } from "./gift-wrap";
+import { LampStage } from "./lamp-blessing";
+import { FloorArt, Houseboat } from "./scenery";
 import { ScratchCard } from "./scratch-card";
 import { EventsTimeline } from "./timeline";
 import { useInView, useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
+import "@/app/guest-blessings.css";
 
 const noSubscribe = () => () => {};
 /** True in the browser once hydrated: sections wait to play their entrance only there. */
@@ -39,14 +52,15 @@ type Music = { playing: boolean; toggle: () => void };
 const GROUND_MOODS = { cloth: "day", blend: "dawn", deep: "night" } as const;
 
 /**
- * The guest page below a painted theme's pages (owner, 2026-10-26). The pages tell the
- * invitation, so nothing here repeats them: the welcome, the names with the couple's
- * photos; the day's timeline, every celebration listed once with what a guest needs on the
- * day; the rest of the photos the family shared, each opening full screen; and the reply,
- * just a name and whether they are coming, met with a shower of petals when it is a yes.
- * It sits on a ground of the theme's own colours (plain, blended or deep;
- * section-layouts.ts), never a painting, with the theme's garland at the top and petals
- * drifting down.
+ * The guest page below a painted theme's pages (owner, 2026-10-26 and 2026-10-27). Every
+ * celebration is told once, on the day's timeline, never a screen each; everything else
+ * keeps its section: the welcome, the names with the couple's photos; flowers to give in
+ * the theme's own way; the date under gold foil to scratch free; the timeline, with what a
+ * guest needs on the day; the rest of the photos, each opening full screen; the family; a
+ * lamp to light with the blessing; and the reply, just a name and whether they are coming,
+ * met with a shower of petals when it is a yes. It sits on a ground of the theme's own
+ * colours (plain, blended or deep; section-layouts.ts), never a painting, with the theme's
+ * garland at the top and petals drifting down.
  */
 export function ThemedDetails({
   suite,
@@ -55,8 +69,11 @@ export function ThemedDetails({
   lang,
   functions,
   days,
+  main,
   welcome,
   photos,
+  family,
+  familyLang,
   allIcsUrl,
   previewNow,
   cheer,
@@ -72,10 +89,15 @@ export function ThemedDetails({
   functions: readonly (GuestFunction & { countdown?: string })[];
   /** Each celebration's date (YYYY-MM-DD), for its day on the timeline. */
   days: Readonly<Partial<Record<FunctionId, string>>>;
+  /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
+  main: { date: string; venue: string } | null;
   /** The photos the welcome shows: the couple's, or one each. */
   welcome: readonly GuestPhoto[];
   /** The rest of the photos the family shared. */
   photos: readonly GuestPhoto[];
+  /** The family's blocks (blessings, parents, hosts), in the language the guest reads. */
+  family: readonly FamilyBlock[];
+  familyLang: string | undefined;
   allIcsUrl: string | null;
   /** A fixed moment, for review pages. */
   previewNow?: number;
@@ -91,8 +113,11 @@ export function ThemedDetails({
   const cardWords = CARD_THEMED_WORDS[lang];
   // Each theme lays its parts out its own way, on its own ground (section-layouts.ts)
   const layouts = sectionLayouts(suite);
-  // Petals for each "yes" to the reply, and when the date is scratched free
+  // ...and gives its own flowers and lamps (blessings.ts)
+  const ways = blessings(suite);
+  // Petals for each "yes" to the reply, when the date is scratched free, and for flowers
   const [revealed, setRevealed] = useState(0);
+  const celebrate = () => setRevealed((was) => was + 1);
 
   return (
     <div
@@ -113,13 +138,28 @@ export function ThemedDetails({
       <PetalDrift flowers={[look.flower, look.secondFlower]} count={8} />
       <PetalShower flowers={[look.flower, look.secondFlower]} burst={cheer + revealed} />
 
-      <Welcome
-        copy={copy}
-        lang={lang}
+      <Welcome copy={copy} lang={lang} look={look} photos={welcome} />
+      <span aria-hidden className="guest-band" />
+      <GiveFlowers
+        way={ways.flowers}
         look={look}
-        photos={welcome}
-        onReveal={() => setRevealed((was) => was + 1)}
+        lang={lang}
+        onGive={() => {
+          if (ways.flowers === "shower") celebrate();
+        }}
       />
+      {main && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <SaveTheDate
+            main={main}
+            look={look}
+            lang={lang}
+            layout={layouts.date}
+            onReveal={celebrate}
+          />
+        </>
+      )}
       <span aria-hidden className="guest-band" />
 
       <section
@@ -158,6 +198,16 @@ export function ThemedDetails({
           />
         </>
       )}
+
+      {family.length > 0 && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <Family family={family} familyLang={familyLang} lang={lang} layout={layouts.family} />
+        </>
+      )}
+
+      <span aria-hidden className="guest-band" />
+      <Blessing copy={copy} lang={lang} look={look} way={ways.lamp} />
 
       {reply && (
         <>
@@ -243,15 +293,12 @@ function Welcome({
   lang,
   look,
   photos,
-  onReveal,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   /** The couple together, or one each, by the names in the card's order. */
   photos: readonly GuestPhoto[];
-  /** Called when the guest has scratched the date free. */
-  onReveal: () => void;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
@@ -289,24 +336,6 @@ function Welcome({
                 <p key={text}>{text}</p>
               ))}
             </div>
-          )}
-          {/* The date under the theme's gold foil, for the guest to scratch free */}
-          {copy.date && (
-            <ScratchCard
-              hint={guestCopy.scratch.date}
-              label={guestCopy.scratch.showDate}
-              onReveal={onReveal}
-              className="guest-card mt-2 w-full max-w-xs"
-            >
-              <div lang={lang} className="flex flex-col items-center gap-1 px-5 py-5 text-center">
-                <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
-                  {cardWords.saveDate}
-                </p>
-                <p className="font-display text-2xl leading-tight text-balance text-ink">
-                  {copy.date}
-                </p>
-              </div>
-            </ScratchCard>
           )}
         </Reveal>
 
@@ -357,6 +386,219 @@ function Welcome({
           </Reveal>
         )}
       </div>
+    </section>
+  );
+}
+
+/**
+ * The flowers the guest gives after the welcome, in this theme's own way (blessings.ts):
+ * a drawing that moves each time they give, and words that thank them.
+ */
+function GiveFlowers({
+  way,
+  look,
+  lang,
+  onGive,
+}: {
+  way: FlowerBlessing;
+  look: GuestLook;
+  lang: CardLanguage;
+  onGive: () => void;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.themed;
+  const gift = words.flowers[way];
+  const [given, setGiven] = useState(0);
+  return (
+    <section
+      aria-labelledby="guest-flowers"
+      data-tour="8"
+      className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+    >
+      <Reveal className="guest-stagger mx-auto flex w-full max-w-3xl flex-col items-center gap-5 text-center sm:gap-6">
+        <Heading
+          id="guest-flowers"
+          lang={lang}
+          label={words.flowersLabel}
+          title={words.flowersTitle}
+        />
+        <FlowerStage
+          way={way}
+          flower={look.flower}
+          second={look.secondFlower}
+          given={given}
+          className="bl-stage w-full max-w-[34rem]"
+        />
+        <Button
+          onClick={() => {
+            setGiven((was) => was + 1);
+            onGive();
+          }}
+          size="lg"
+          className="max-w-full rounded-full"
+        >
+          <Flower2 aria-hidden />
+          {gift.give}
+        </Button>
+        <p aria-live="polite" className="-mt-2 min-h-6 text-sm text-balance text-ink-muted">
+          {given > 0 ? gift.given : ""}
+        </p>
+      </Reveal>
+    </section>
+  );
+}
+
+/** Monday to Sunday in a known week, for a calendar page's head in the card's language. */
+const WEEK = [1, 2, 3, 4, 5, 6, 7].map((day) => new Date(Date.UTC(2024, 0, day)));
+
+/** The days of the date's month, Monday first, with blanks before the first. */
+function monthGrid(date: Date): (number | null)[] {
+  const first = new Date(Date.UTC(date.getFullYear(), date.getMonth(), 1));
+  const blanks = (first.getUTCDay() + 6) % 7;
+  const days = new Date(Date.UTC(date.getFullYear(), date.getMonth() + 1, 0)).getUTCDate();
+  return [
+    ...Array.from({ length: blanks }, () => null),
+    ...Array.from({ length: days }, (_, i) => i + 1),
+  ];
+}
+
+/**
+ * Save the date, in the theme's own way: drawn in a floor pattern, a calendar page or a
+ * ticket, under the theme's gold foil for the guest to scratch free (owner, 2026-10-27).
+ */
+function SaveTheDate({
+  main,
+  look,
+  lang,
+  layout,
+  onReveal,
+}: {
+  main: { date: string; venue: string };
+  look: GuestLook;
+  lang: CardLanguage;
+  layout: SectionLayouts["date"];
+  /** Called when the guest has scratched the date free. */
+  onReveal: () => void;
+}) {
+  const { guestCopy } = useGuestText();
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const day = parseISO(main.date);
+  const [ref, seen] = useInView<HTMLDivElement>("0px 0px -20% 0px");
+  const mounted = useMounted();
+  const month = cardMonth(main.date, lang);
+  const weekday = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "narrow", timeZone: "UTC" });
+  const longDay = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "long", timeZone: "UTC" });
+  const dayName = longDay.format(
+    new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())),
+  );
+  const reveal = mounted ? (seen ? "in" : "wait") : undefined;
+  const foil = { hint: guestCopy.scratch.date, label: guestCopy.scratch.showDate, onReveal };
+  return (
+    <section
+      aria-labelledby="guest-save-date"
+      data-tour="8"
+      data-layout={layout}
+      className="relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
+    >
+      {look.style === "garden" && (
+        <Houseboat className="guest-boat absolute bottom-6 -z-10 w-40 sm:w-56" />
+      )}
+      <Heading
+        id="guest-save-date"
+        lang={lang}
+        label={cardWords.saveDateLabel}
+        title={cardWords.saveDate}
+      />
+      {layout === "medallion" && (
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem,56svh)] place-items-center"
+        >
+          <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
+          <ScratchCard
+            {...foil}
+            round
+            className="guest-date-disc grid aspect-square w-[48%] place-content-center rounded-full text-center"
+          >
+            <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase sm:text-xs">
+              {month}
+            </p>
+            <p className="font-display text-[3.4rem] leading-none text-ink tabular-nums sm:text-[4.5rem]">
+              {format(day, "d")}
+            </p>
+            <p className="font-label text-sm tracking-[0.3em] text-accent-text">
+              {format(day, "yyyy")}
+            </p>
+          </ScratchCard>
+        </div>
+      )}
+      {layout === "calendar" && (
+        // A page torn from the month's calendar, the day ringed in flowers
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          lang={lang}
+          className="guest-reveal mx-auto mt-10 w-[min(88vw,24rem)]"
+        >
+          <ScratchCard {...foil} className="guest-card guest-calendar px-5 pt-6 pb-7">
+            <p className="text-center font-display text-2xl text-ink">
+              {month} <span className="text-accent-text tabular-nums">{format(day, "yyyy")}</span>
+            </p>
+            <div aria-hidden className="mt-4 grid grid-cols-7 gap-y-1.5 text-center">
+              {WEEK.map((date) => (
+                <span key={date.getTime()} className="font-label text-[0.7rem] text-ink-muted">
+                  {weekday.format(date)}
+                </span>
+              ))}
+              {monthGrid(day).map((number, index) => (
+                <span
+                  key={index}
+                  data-day={number === day.getDate() ? "chosen" : undefined}
+                  className="guest-calendar-day mx-auto grid size-9 place-items-center rounded-full text-sm text-ink tabular-nums"
+                >
+                  {number}
+                </span>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-sm text-ink-muted">
+              {dayName}, {format(day, "d")} {month}
+            </p>
+          </ScratchCard>
+        </div>
+      )}
+      {layout === "ticket" && (
+        // A ticket to the day: the date large on the stub, the place on the counterfoil
+        <div
+          ref={ref}
+          data-reveal={reveal}
+          lang={lang}
+          className="guest-reveal mx-auto mt-10 w-[min(92vw,30rem)]"
+        >
+          <ScratchCard {...foil} className="guest-ticket grid grid-cols-[auto_1fr] items-stretch">
+            <div className="guest-ticket-stub flex flex-col items-center justify-center px-5 py-6 text-center">
+              <p className="font-display text-[3.6rem] leading-none text-ink tabular-nums">
+                {format(day, "d")}
+              </p>
+              <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase">
+                {month}
+              </p>
+            </div>
+            <div className="guest-ticket-body flex flex-col justify-center gap-1 px-5 py-6">
+              <p className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
+                {dayName}
+              </p>
+              <p className="font-display text-2xl leading-tight text-ink tabular-nums">
+                {format(day, "yyyy")}
+              </p>
+              {main.venue && <p className="text-sm text-balance text-ink-muted">{main.venue}</p>}
+            </div>
+          </ScratchCard>
+        </div>
+      )}
+      {main.venue && layout !== "ticket" && (
+        <p className="mt-8 text-center font-display text-2xl text-balance text-ink">{main.venue}</p>
+      )}
     </section>
   );
 }
@@ -899,6 +1141,130 @@ function ViewerStrip({
         </div>
       )}
     </div>
+  );
+}
+
+/** The family, in the theme's own way: cards, ribbons, or one scroll with ornaments between. */
+function Family({
+  family,
+  familyLang,
+  lang,
+  layout,
+}: {
+  family: readonly FamilyBlock[];
+  familyLang: string | undefined;
+  lang: CardLanguage;
+  layout: SectionLayouts["family"];
+}) {
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
+  return (
+    <section
+      aria-labelledby="guest-family"
+      data-tour="9"
+      data-layout={layout}
+      className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+    >
+      <Heading
+        id="guest-family"
+        lang={lang}
+        label={cardWords.familyLabel}
+        title={cardWords.family}
+      />
+      <Reveal className="mx-auto mt-10 w-full max-w-4xl">
+        <dl
+          ref={names}
+          lang={familyLang}
+          className={cn(
+            "guest-stagger",
+            layout === "scroll"
+              ? "guest-card guest-scroll mx-auto flex max-w-xl flex-col items-center gap-0 px-6 py-10"
+              : "flex flex-wrap justify-center gap-6",
+          )}
+        >
+          {family.map((block, index) => (
+            <div
+              key={block.id}
+              className={cn(
+                "flex w-full flex-col items-center gap-2 text-center",
+                layout === "cards" && "guest-card guest-family px-6 py-8",
+                layout === "ribbons" && "guest-ribbon-block px-4 pt-2 pb-6",
+                layout === "scroll" && "py-5",
+                // Both sides' parents side by side; the blessings and hosts each a full row
+                layout !== "scroll" && pairedSide(family, block) && "sm:w-[calc(50%-0.75rem)]",
+              )}
+            >
+              {layout === "scroll" && index > 0 && <span aria-hidden className="guest-rule mb-4" />}
+              <dt
+                className={cn(
+                  "font-label text-xs tracking-[0.25em] uppercase",
+                  layout === "ribbons" ? "guest-ribbon px-6 py-2" : "text-accent-text",
+                )}
+              >
+                {block.title}
+              </dt>
+              <FamilyWords
+                block={block}
+                className="font-display text-xl text-ink"
+                soft="text-ink-muted"
+              />
+            </div>
+          ))}
+        </dl>
+      </Reveal>
+    </section>
+  );
+}
+
+/** The blessing, and lamps the guest lights for the couple in the theme's own way. */
+function Blessing({
+  copy,
+  lang,
+  look,
+  way,
+}: {
+  copy: CardCopy;
+  lang: CardLanguage;
+  look: GuestLook;
+  way: LampBlessing;
+}) {
+  const { guestCopy } = useGuestText();
+  const light = guestCopy.themed.lights[way];
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const [lit, setLit] = useState(false);
+  return (
+    <section
+      aria-label={guestCopy.themed.lampsLabel}
+      data-tour="7"
+      data-lit={lit || undefined}
+      className="guest-night relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+    >
+      <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+          {cardWords.blessingLabel}
+        </p>
+        {copy.blessing && (
+          <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
+            {copy.blessing}
+          </p>
+        )}
+        <div className="guest-lamps flex w-full justify-center">
+          <LampStage way={way} flower={look.flower} />
+        </div>
+        <Button
+          variant={lit ? "secondary" : "primary"}
+          size="lg"
+          onClick={() => setLit((was) => !was)}
+          aria-pressed={lit}
+          className="rounded-full"
+        >
+          {light.give}
+        </Button>
+        <p aria-live="polite" className="min-h-6 text-sm text-balance text-ink-muted">
+          {lit ? light.given : ""}
+        </p>
+      </Reveal>
+    </section>
   );
 }
 

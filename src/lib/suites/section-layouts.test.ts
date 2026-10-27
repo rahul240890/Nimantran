@@ -24,8 +24,8 @@ describe("each theme's guest page layout", () => {
 
   it("gives most themes a page of their own", () => {
     const pages = new Set(SUITE_IDS.map((suite) => JSON.stringify(sectionLayouts(suite))));
-    // 36 mixes for over 370 themes: nearly every mix is in use, not a handful of pages
+    // 324 mixes for over 370 themes: most of the mixes are in use, not a handful of pages
     // shared by everyone
-    expect(pages.size).toBeGreaterThan(30);
+    expect(pages.size).toBeGreaterThan(Math.min(SUITE_IDS.length / 2, (324 * 3) / 4));
   });
 });

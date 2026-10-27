@@ -11,6 +11,12 @@ import { GuestTour } from "@/components/guest/guest-tour";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
+import {
+  FamilyWords,
+  pairedSide,
+  useNamesFit,
+  type FamilyBlock,
+} from "@/components/guest/family-words";
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
@@ -69,7 +75,8 @@ import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale } from "@/i18n/client";
 import { guestText } from "@/i18n/copy/guest";
-import { GuestLanguage } from "@/components/guest/guest-language";
+import { GuestLanguage, useGuestText } from "@/components/guest/guest-language";
+import { cn } from "@/lib/cn";
 
 const noSubscribe = () => () => {};
 
@@ -453,8 +460,15 @@ export function GuestView({
                   lang={language}
                   functions={told}
                   days={days}
+                  main={
+                    mainKind && mainDate
+                      ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
+                      : null
+                  }
                   welcome={placed.welcome}
                   photos={placed.rest}
+                  family={storyFamily(draft, language)}
+                  familyLang={language}
                   allIcsUrl={allIcsUrl}
                   previewNow={previewNow}
                   cheer={cheer}
@@ -463,6 +477,8 @@ export function GuestView({
                 />
               ) : (
                 <>
+                  <FamilyWording family={storyFamily(draft, language)} lang={language} />
+
                   {/* The pages above tell the invitation; below, the day once on a timeline */}
                   <section
                     aria-labelledby="guest-functions"
@@ -628,5 +644,37 @@ export function GuestView({
         </div>
       </div>
     </GuestLanguage>
+  );
+}
+
+/** The family's labelled wording (blessings, parents, hosts, whom to call), when written. */
+function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang: string }) {
+  const { guestCopy } = useGuestText();
+  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
+  if (family.length === 0) return null;
+  return (
+    <section
+      aria-labelledby="guest-family"
+      data-tour
+      className="flex min-h-svh flex-col justify-center px-4 py-12 sm:px-6"
+    >
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-6 rounded-xl border border-line bg-surface px-5 py-8 text-center shadow-raised sm:px-10">
+        <h2 id="guest-family" className="font-display text-2xl leading-tight">
+          {guestCopy.family}
+        </h2>
+        {/* Both sides' parents side by side, the blessings above and the hosts below them */}
+        <dl ref={names} lang={lang} className="grid w-full gap-5 sm:grid-cols-2">
+          {family.map((block) => (
+            <div
+              key={block.id}
+              className={cn("flex flex-col gap-1", !pairedSide(family, block) && "sm:col-span-2")}
+            >
+              <dt className="text-sm text-accent-text">{block.title}</dt>
+              <FamilyWords block={block} className="text-lg" soft="text-ink-muted" />
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
   );
 }

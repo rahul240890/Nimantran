@@ -2,8 +2,8 @@
 
 import {
   CalendarPlus,
-  CircleCheck,
-  CircleX,
+  Check,
+  HandHeart,
   Lock,
   MessageCircle,
   PartyPopper,
@@ -11,16 +11,17 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
+import { RadioGroup as RadioPrimitive } from "radix-ui";
 import { useEffect, useRef, useState } from "react";
 import { sendReply } from "@/actions/rsvp";
 import { guestReply, knownToken, storeToken } from "@/components/guest/guest-reply";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import type { FunctionId } from "@/lib/events/functions";
 import type { GuestReply } from "@/lib/invites/rsvp";
 import { useGuestText } from "@/components/guest/guest-language";
+import "@/app/guest-below.css";
 
 export type RsvpFunction = {
   /** The function's id for replies. */
@@ -44,6 +45,10 @@ function answerOf(reply: GuestReply): Answer | null {
  * answer for every celebration they are invited to, with no counts, questions or notes. No
  * sign-in: the first reply returns a private token, kept on this device (or carried in a
  * personal link as ?g=), which lets the guest change it later.
+ *
+ * Drawn as a little card of its own (owner, 2026-10-27): the answer first, as two large
+ * tiles that pop when chosen, then the name, and a seal stamped on the thanks
+ * (guest-below.css).
  */
 export function RsvpForm({
   slug,
@@ -193,29 +198,34 @@ export function RsvpForm({
         : `https://wa.me/?text=${encodeURIComponent(
             `${rsvpCopy.shareMessage} ${window.location.origin}${sample ? window.location.pathname : `/i/${slug}`}`,
           )}`;
+    const coming = sent.answer === "attending";
     return (
-      <div className="flex flex-col gap-5 rounded-xl border border-success/40 bg-success/5 p-5 sm:p-7">
-        <div className="flex items-start gap-4">
-          <PartyPopper aria-hidden className="mt-1 size-7 shrink-0 text-success" />
-          <div className="flex min-w-0 flex-col gap-1">
-            <h3
-              ref={thanks}
-              tabIndex={-1}
-              className="font-display text-2xl leading-tight break-words outline-none"
-            >
-              {rsvpCopy.thanksTitle(sent.name.split(" ")[0] ?? sent.name)}
-            </h3>
-            <p className="text-ink-muted">
-              {sent.answer === "attending" ? rsvpCopy.thanksComing : rsvpCopy.thanksMissed}
-            </p>
-            <p className="text-sm text-ink-muted">
-              {sample ? rsvpCopy.sampleSent : rsvpCopy.thanksBody}
-            </p>
-          </div>
+      <div className="flex flex-col items-center gap-5 text-center">
+        <span
+          aria-hidden
+          data-answer={sent.answer}
+          className="guest-reply-seal grid size-20 shrink-0 place-items-center rounded-full"
+        >
+          {coming ? <PartyPopper className="size-9" /> : <HandHeart className="size-9" />}
+        </span>
+        <div className="flex min-w-0 flex-col gap-2">
+          <h3
+            ref={thanks}
+            tabIndex={-1}
+            className="font-display text-2xl leading-tight break-words outline-none sm:text-3xl"
+          >
+            {rsvpCopy.thanksTitle(sent.name.split(" ")[0] ?? sent.name)}
+          </h3>
+          <p className="text-lg text-balance text-ink">
+            {coming ? rsvpCopy.thanksComing : rsvpCopy.thanksMissed}
+          </p>
+          <p className="text-sm text-balance text-ink-muted">
+            {sample ? rsvpCopy.sampleSent : rsvpCopy.thanksBody}
+          </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          {sent.answer === "attending" && calendarUrl && (
-            <Button asChild variant="secondary">
+        <div className="flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center">
+          {coming && calendarUrl && (
+            <Button asChild variant="secondary" className="rounded-full">
               <a href={calendarUrl} download>
                 <CalendarPlus aria-hidden />
                 {guestCopy.addAll}
@@ -223,7 +233,7 @@ export function RsvpForm({
             </Button>
           )}
           {shareUrl && (
-            <Button asChild variant="secondary">
+            <Button asChild variant="secondary" className="rounded-full">
               <a href={shareUrl} target="_blank" rel="noopener noreferrer">
                 <MessageCircle aria-hidden />
                 {rsvpCopy.share}
@@ -233,6 +243,7 @@ export function RsvpForm({
           <Button
             variant="ghost"
             leadingIcon={<Pencil aria-hidden />}
+            className="rounded-full"
             onClick={() => {
               focusNext.current = "name";
               setSent(null);
@@ -242,7 +253,10 @@ export function RsvpForm({
           </Button>
         </div>
         {makeHref && !preview && !sample && (
-          <p data-make-like-this className="border-t border-success/30 pt-4 text-sm text-ink-muted">
+          <p
+            data-make-like-this
+            className="w-full border-t border-line pt-4 text-sm text-ink-muted"
+          >
             {guestCopy.makeOwnTitle}{" "}
             <Link
               href={makeHref}
@@ -286,6 +300,49 @@ export function RsvpForm({
           autoComplete="off"
         />
       </div>
+      <fieldset className="flex flex-col gap-3">
+        <legend className="mb-3 w-full text-center font-display text-xl text-ink">
+          {rsvpCopy.answerGroup}
+        </legend>
+        <RadioPrimitive.Root
+          aria-label={rsvpCopy.answerGroup}
+          aria-invalid={(checked && !answer) || undefined}
+          orientation="horizontal"
+          value={answer ?? ""}
+          onValueChange={(value) => setAnswer(value as Answer)}
+          className="grid grid-cols-[repeat(auto-fit,minmax(7rem,1fr))] gap-3"
+        >
+          {(["attending", "declined"] as const).map((value) => (
+            <RadioPrimitive.Item
+              key={value}
+              value={value}
+              data-answer={value}
+              className="guest-reply-choice group/choice relative flex min-h-32 cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-[1.5px] border-line bg-surface px-3 py-5 text-center text-ink transition-[border-color,background-color,box-shadow,transform] duration-200 hover:border-line-strong focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring active:scale-[0.98]"
+            >
+              <span
+                aria-hidden
+                className="guest-reply-tick absolute end-2.5 top-2.5 grid size-6 place-items-center rounded-full bg-marigold text-on-marigold"
+              >
+                <Check className="size-3.5" strokeWidth={3} />
+              </span>
+              <span aria-hidden className="guest-reply-icon text-accent-text">
+                {value === "attending" ? (
+                  <PartyPopper className="size-9" strokeWidth={1.6} />
+                ) : (
+                  <HandHeart className="size-9" strokeWidth={1.6} />
+                )}
+              </span>
+              <span className="text-base leading-snug font-semibold text-balance break-words [&:lang(ta)]:text-sm">
+                {rsvpCopy.answers[value]}
+              </span>
+            </RadioPrimitive.Item>
+          ))}
+        </RadioPrimitive.Root>
+        {checked && !answer && (
+          <p className="text-center text-sm font-medium text-danger">{rsvpCopy.chooseOne}</p>
+        )}
+      </fieldset>
+
       <Field
         label={rsvpCopy.yourName}
         required
@@ -300,23 +357,6 @@ export function RsvpForm({
           placeholder={rsvpCopy.namePlaceholder}
         />
       </Field>
-
-      <fieldset className="flex flex-col gap-3">
-        <legend className="mb-3 font-semibold">{rsvpCopy.answerGroup}</legend>
-        <RadioGroup
-          label={rsvpCopy.answerGroup}
-          variant="card"
-          value={answer ?? ""}
-          invalid={checked && !answer}
-          onValueChange={(value) => setAnswer(value as Answer)}
-        >
-          <RadioItem value="attending" icon={<CircleCheck />} label={rsvpCopy.answers.attending} />
-          <RadioItem value="declined" icon={<CircleX />} label={rsvpCopy.answers.declined} />
-        </RadioGroup>
-        {checked && !answer && (
-          <p className="text-sm font-medium text-danger">{rsvpCopy.chooseOne}</p>
-        )}
-      </fieldset>
 
       {checked && problems > 0 && (
         <p
@@ -340,7 +380,7 @@ export function RsvpForm({
         size="lg"
         loading={busy}
         leadingIcon={<Send aria-hidden className="rtl:-scale-x-100" />}
-        className="self-stretch sm:self-start"
+        className="self-stretch rounded-full"
       >
         {replied ? rsvpCopy.update : rsvpCopy.send}
       </Button>
