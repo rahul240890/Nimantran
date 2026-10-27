@@ -42,7 +42,7 @@ export default async function InviteVideoPage({ params }: PageProps<"/invites/[i
   if (draft.slug) redirect(`/invites/${id}/share`);
 
   const [urls, active, edition, locale, origin, { videoCopy }] = await Promise.all([
-    store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
+    store.photoUrls(account, id, draft.music.clip).catch(() => ({}) as Record<string, string>),
     editionsActive(),
     invitePlan(account, id),
     getLocale(),

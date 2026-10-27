@@ -1,5 +1,8 @@
+import { invitePhotoUrls } from "@/actions/invites";
 import { splitOffDraft, switchDraft, syncStore } from "@/lib/invites/sync";
 import { newDraft, withGalleryChoice, type CardLanguage, type InviteDraft } from "./draft";
+import type { MusicClip } from "./music-clip";
+import { loadPhoto, savePhoto } from "./photos";
 import { inviteDraft } from "./store";
 
 /** A design chosen in the gallery: its occasion, tradition, page theme, card and form. */
@@ -10,8 +13,48 @@ export type GalleryChoice = Parameters<typeof withGalleryChoice>[1];
  * carried over, so nothing is typed again (owner, 2026-10-24). It has no link and isn't in
  * the account until it saves.
  */
-export function carriedOver(draft: InviteDraft): InviteDraft {
-  return { ...draft, remoteId: null, slug: null, updatedAt: Date.now() };
+export function carriedOver(
+  draft: InviteDraft,
+  clip: MusicClip | null = draft.music.clip,
+): InviteDraft {
+  return {
+    ...draft,
+    music: { ...draft.music, clip },
+    remoteId: null,
+    slug: null,
+    updatedAt: Date.now(),
+  };
+}
+
+function newId(): string {
+  return typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+}
+
+/**
+ * The host's song for a new invite written from another, as a file of its own. Sharing the
+ * old invite's file took it away from that invite in the account, so one of the two played
+ * the raga while still naming the song (owner, 2026-10-27). The song comes from this device,
+ * else from the account; when neither has it the invite keeps naming the old file.
+ */
+export async function copiedClip(draft: InviteDraft): Promise<MusicClip | null> {
+  const clip = draft.music.clip;
+  if (!clip) return null;
+  try {
+    let blob = await loadPhoto(clip.id).catch(() => null);
+    if (!blob && draft.remoteId) {
+      const url = (await invitePhotoUrls(draft.remoteId))?.[clip.id];
+      const response = url ? await fetch(url).catch(() => null) : null;
+      blob = response?.ok ? await response.blob() : null;
+    }
+    if (!blob) return clip;
+    const id = newId();
+    await savePhoto(id, blob);
+    return { ...clip, id };
+  } catch {
+    return clip;
+  }
 }
 
 /**
@@ -44,14 +87,15 @@ export async function startWithDesign(
     return;
   }
   const keepsWork = current.slug === null && sameOccasion;
-  const switched =
-    signedIn && current.updatedAt !== 0 && !keepsWork
-      ? await switchDraft(null, {
-          signedIn,
-          fresh: () =>
-            withGalleryChoice(sameOccasion ? carriedOver(current) : newDraft(), choice, site),
-        })
-      : false;
+  const startsAnother = signedIn && current.updatedAt !== 0 && !keepsWork;
+  const clip = startsAnother && sameOccasion ? await copiedClip(current) : null;
+  const switched = startsAnother
+    ? await switchDraft(null, {
+        signedIn,
+        fresh: () =>
+          withGalleryChoice(sameOccasion ? carriedOver(current, clip) : newDraft(), choice, site),
+      })
+    : false;
   if (!switched) inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
 }
 

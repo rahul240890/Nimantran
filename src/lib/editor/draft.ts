@@ -208,11 +208,16 @@ export function withGalleryChoice(
   if (choice.faith !== undefined) {
     next = { ...next, tradition: { ...next.tradition, faith: choice.faith } };
   }
+  // Another design opens with its own gate: the one picked for the last design was chosen
+  // for that design's look, not this one's (owner, 2026-10-27)
+  const templateId = choice.template ?? next.templateId;
+  const sameDesign = draft.suite === choice.suite && draft.templateId === templateId;
   return {
     ...next,
+    opening: sameDesign ? next.opening : { ...next.opening, style: null },
     suite: choice.suite,
     format: choice.format ?? "story",
-    templateId: choice.template ?? next.templateId,
+    templateId,
     languages,
     // An invite with its names in shows itself in the new design; a new one asks the names
     step: next.content.first?.trim() ? "preview" : "couple",

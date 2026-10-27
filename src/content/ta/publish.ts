@@ -428,8 +428,6 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "முன்னோட்ட விருப்பங்கள்",
   opening: "உங்கள் அழைப்பிதழ் திறக்கிறது",
   changeGate: "திறக்கும் வாயிலை மாற்றவும்",
-  marked:
-    "அனுப்பப்படும் வரை இந்த முன்னோட்டத்தின் ஒவ்வொரு திரையிலும் ‘முன்னோட்டம்’ என்று இருக்கும், பதில்கள் முடக்கப்பட்டிருக்கும். விருந்தினர்களுக்குத் தெளிவான அழைப்பிதழ் கிடைக்கும்.",
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {

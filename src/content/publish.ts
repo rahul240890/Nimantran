@@ -411,8 +411,6 @@ export const hostPreviewCopy = {
   menu: "Preview options",
   opening: "Opening your invitation",
   changeGate: "Change the opening gate",
-  marked:
-    "Until it's sent, this preview says Preview across every screen and replies are off. Guests get the invitation clean.",
 } as const;
 
 /** A family preview link (/family/<token>): the invitation before it is sent. */
