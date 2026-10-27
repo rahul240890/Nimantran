@@ -26,12 +26,19 @@ import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import type { StoryFunction, StoryPhoto } from "@/lib/engine/story";
+import type {
+  LineStyle,
+  StoryBeat,
+  StoryFunction,
+  StoryLine,
+  StoryPhoto,
+} from "@/lib/engine/story";
 import type { PageType } from "@/lib/editor/type";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { fitScale } from "@/lib/suites/fit";
 import { keepDate, type Voice } from "@/lib/suites/lettering";
-import { sceneLine } from "@/lib/suites/scene-type";
+import { sceneLine, type SceneRole } from "@/lib/suites/scene-type";
+import { sceneFamilyCards, slotLines } from "@/lib/suites/scene-family";
 import { PAINTING_ASPECT, photoBox, photoWindows, type FrameBox } from "@/lib/suites/photo-frames";
 import { frameAspectOf } from "@/lib/editor/photo-fit";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
@@ -66,11 +73,14 @@ import "@/app/reveals.css";
  * painting's light follows the function in the slot: gold for a haldi morning, dusk for a
  * baraat, night with twinkling lights for a sangeet. Tap the slot to hold a function.
  * With reduced motion nothing moves by itself; the arrows step through the functions.
+ * Before the functions the family's pages take their turns, dealt into as many cards as
+ * the slot needs, so the scene tells everything the pages do.
  */
 
-/** The slot's opening card (the blessing, the line, or both) or one function. */
+/** The slot's opening card (the blessing, the line, or both), a family card, or one function. */
 type SceneItem =
   | { kind: "line"; text: string; blessing: string }
+  | { kind: "family"; lines: readonly StoryLine[] }
   | { kind: "function"; fn: StoryFunction }
   | { kind: "closing"; title: string; text: string };
 
@@ -194,6 +204,11 @@ export type OneSceneProps = {
   copy: CardCopy;
   lang: string;
   functions: readonly StoryFunction[];
+  /**
+   * The story's pages, as the host left them: the family's (the blessings, both sides'
+   * parents, the hosts, the day) come into the slot before the functions.
+   */
+  pages?: readonly StoryBeat[];
   photos: readonly StoryPhoto[];
   /** Above the painting: the guest's greeting, the card's language. */
   header?: ReactNode;
@@ -238,6 +253,7 @@ export function OneScene({
   copy,
   lang,
   functions,
+  pages = [],
   photos,
   header,
   extra,
@@ -286,6 +302,10 @@ export function OneScene({
     ...(slotLine || slotBlessing
       ? [{ kind: "line" as const, text: slotLine, blessing: slotBlessing }]
       : []),
+    ...sceneFamilyCards(pages, slotLines(page), copy.line).map((lines) => ({
+      kind: "family" as const,
+      lines,
+    })),
     ...functions.map((fn) => ({ kind: "function" as const, fn })),
     ...(closing ? [{ kind: "closing" as const, ...closing }] : []),
   ];
@@ -656,7 +676,9 @@ export function OneScene({
           <p className="sr-only" aria-live={playing ? "off" : "polite"}>
             {shownFn
               ? `${words.position(index + 1, count)}: ${shownFn.name}, ${[shownFn.date, shownFn.time, shownFn.venue].filter(Boolean).join(", ")}`
-              : ""}
+              : current?.kind === "family"
+                ? `${words.position(index + 1, count)}: ${current.lines.map((each) => each.text).join(", ")}`
+                : ""}
           </p>
         </div>
 
@@ -961,6 +983,26 @@ function revealUnits(text: string): number {
   return words.reduce((sum, word) => sum + letters(word).length, 0);
 }
 
+/** How each of a family page's lines is set in the slot. */
+const FAMILY_ROLE: Record<LineStyle, SceneRole> = {
+  symbol: "family-label",
+  label: "family-label",
+  script: "blessing-card",
+  display: "function",
+  date: "date",
+  joiner: "detail",
+  body: "family-names",
+  small: "detail",
+  venue: "venue",
+};
+
+const FAMILY_TONE: Partial<Record<LineStyle, string>> = {
+  label: "text-card-gold-text",
+  symbol: "text-card-gold-text",
+  script: "text-card-accent-text",
+  small: "text-card-ink-muted",
+};
+
 /** One function (or the opening line) on the slot's own card, arriving or leaving. */
 function SlotCard({
   item,
@@ -993,9 +1035,11 @@ function SlotCard({
   const key =
     item.kind === "line"
       ? `${item.blessing}|${item.text}`
-      : item.kind === "closing"
-        ? `${item.title}|${item.text}`
-        : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
+      : item.kind === "family"
+        ? item.lines.map((each) => each.text).join("|")
+        : item.kind === "closing"
+          ? `${item.title}|${item.text}`
+          : [item.fn.name, item.fn.date, item.fn.time, item.fn.venue, item.fn.countdown].join("|");
   // A painted card's words fit its writing area; a drawn card's, the card inside its padding
   // A painted card's writing area is fixed by its painting, so its words may set a little smaller
   useFit(painted ? face : card, words, `${key}${lang}${JSON.stringify(type ?? null)}`, {
@@ -1014,7 +1058,9 @@ function SlotCard({
       ? item.blessing || item.text
       : item.kind === "closing"
         ? item.title
-        : "";
+        : item.kind === "family"
+          ? (item.lines[0]?.text ?? "")
+          : "";
   const units = Math.max(1, revealUnits(title));
   const step = Math.min(LETTER_MS, LETTERS_MS / units);
   const after = REVEAL_AT_MS + units * step + 120;
@@ -1115,6 +1161,31 @@ function SlotCard({
                 </p>
               )}
             </>
+          ) : item.kind === "family" ? (
+            // The family's words as their page sets them: each title small over its names
+            item.lines.map((each, i) => (
+              <p
+                key={i}
+                lang={each.lang ?? lang}
+                className={cn(
+                  "max-w-full text-balance",
+                  FAMILY_TONE[each.style],
+                  // A new block keeps a little apart from the one above it
+                  i > 0 && each.style === "label" && "mt-[0.7em]",
+                  i > 0 && rise(next(Math.min(i, 4)))[0],
+                )}
+                style={
+                  i > 0
+                    ? rise(
+                        next(Math.min(i, 4)),
+                        sceneLine(voice, FAMILY_ROLE[each.style], each.lang ?? lang, type),
+                      )[1]
+                    : sceneLine(voice, FAMILY_ROLE[each.style], each.lang ?? lang, type)
+                }
+              >
+                {i === 0 ? write(each.text) : each.text}
+              </p>
+            ))
           ) : item.kind === "closing" ? (
             <>
               {/* The last card: the welcome large, a rule, then the family's few warm words */}
