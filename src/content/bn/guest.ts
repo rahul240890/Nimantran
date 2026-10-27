@@ -67,6 +67,12 @@ export const guestText: GuestText = {
       close: "ছবি বন্ধ করুন",
       viewer: "পরিবারের ছবি",
     },
+    scratch: {
+      date: "তারিখ দেখতে ঘষুন",
+      showDate: "তারিখ দেখান",
+      unwrap: (index) => `ছবি ${index} খুলুন`,
+      tap: "খুলতে ছুঁয়ে দেখুন",
+    },
     previewMark: "ঝলক · এখনও পাঠানো হয়নি",
     madeWith: `${site.name} দিয়ে তৈরি`,
     createYours: "নিজের নিমন্ত্রণপত্র তৈরি করুন",

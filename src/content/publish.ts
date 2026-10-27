@@ -140,6 +140,13 @@ export const guestCopy = {
     close: "Close the photos",
     viewer: "Photos from the family",
   },
+  /** Scratch to reveal the date, and photos wrapped like gifts. */
+  scratch: {
+    date: "Scratch to reveal the date",
+    showDate: "Show the date",
+    unwrap: (index: number) => `Unwrap photo ${index}`,
+    tap: "Tap to unwrap",
+  },
   previewMark: "Preview · Not sent yet",
   madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",

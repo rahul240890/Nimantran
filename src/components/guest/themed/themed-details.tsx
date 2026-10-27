@@ -18,6 +18,8 @@ import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS } from "@/lib/templates/themed-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
+import { GiftWrap } from "./gift-wrap";
+import { ScratchCard } from "./scratch-card";
 import { EventsTimeline } from "./timeline";
 import { useInView, useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
@@ -89,6 +91,8 @@ export function ThemedDetails({
   const cardWords = CARD_THEMED_WORDS[lang];
   // Each theme lays its parts out its own way, on its own ground (section-layouts.ts)
   const layouts = sectionLayouts(suite);
+  // Petals for each "yes" to the reply, and when the date is scratched free
+  const [revealed, setRevealed] = useState(0);
 
   return (
     <div
@@ -107,9 +111,15 @@ export function ThemedDetails({
         className="guest-garland relative z-10 h-20 w-full sm:h-28"
       />
       <PetalDrift flowers={[look.flower, look.secondFlower]} count={8} />
-      <PetalShower flowers={[look.flower, look.secondFlower]} burst={cheer} />
+      <PetalShower flowers={[look.flower, look.secondFlower]} burst={cheer + revealed} />
 
-      <Welcome copy={copy} lang={lang} look={look} photos={welcome} />
+      <Welcome
+        copy={copy}
+        lang={lang}
+        look={look}
+        photos={welcome}
+        onReveal={() => setRevealed((was) => was + 1)}
+      />
       <span aria-hidden className="guest-band" />
 
       <section
@@ -233,12 +243,15 @@ function Welcome({
   lang,
   look,
   photos,
+  onReveal,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   /** The couple together, or one each, by the names in the card's order. */
   photos: readonly GuestPhoto[];
+  /** Called when the guest has scratched the date free. */
+  onReveal: () => void;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
@@ -277,10 +290,23 @@ function Welcome({
               ))}
             </div>
           )}
+          {/* The date under the theme's gold foil, for the guest to scratch free */}
           {copy.date && (
-            <p lang={lang} className="guest-date-chip font-display text-xl text-ink">
-              {copy.date}
-            </p>
+            <ScratchCard
+              hint={guestCopy.scratch.date}
+              label={guestCopy.scratch.showDate}
+              onReveal={onReveal}
+              className="guest-card mt-2 w-full max-w-xs"
+            >
+              <div lang={lang} className="flex flex-col items-center gap-1 px-5 py-5 text-center">
+                <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+                  {cardWords.saveDate}
+                </p>
+                <p className="font-display text-2xl leading-tight text-balance text-ink">
+                  {copy.date}
+                </p>
+              </div>
+            </ScratchCard>
           )}
         </Reveal>
 
@@ -396,6 +422,7 @@ function PhotoCarousel({
   before,
   look,
   onOpen,
+  wrap,
 }: {
   photos: readonly GuestPhoto[];
   /** How many photos the welcome already shows, so these count on from there. */
@@ -403,6 +430,8 @@ function PhotoCarousel({
   look: GuestLook;
   /** Opens the photo at this index full screen. */
   onOpen: (index: number) => void;
+  /** The photos still wrapped like gifts, and how they are unwrapped. */
+  wrap: Wrapping;
 }) {
   const { guestCopy } = useGuestText();
   const words = guestCopy.carousel;
@@ -495,13 +524,7 @@ function PhotoCarousel({
             aria-hidden={i !== index || undefined}
             className="guest-photo guest-slide w-[min(62vw,15rem)] shrink-0 snap-center"
           >
-            <button
-              type="button"
-              tabIndex={i === index ? 0 : -1}
-              onClick={() => onOpen(i)}
-              aria-label={words.open(i + before + 1)}
-              className="block w-full cursor-zoom-in rounded-[inherit] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
-            >
+            {wrap.wrapped(i) ? (
               <Framed look={look}>
                 <FramedPhoto
                   photo={{ src: photo.url, alt: "", fit: photo.fit }}
@@ -510,8 +533,33 @@ function PhotoCarousel({
                   lazy={Math.abs(i - index) > 1}
                   className="size-full"
                 />
+                <GiftWrap
+                  label={guestCopy.scratch.unwrap(i + before + 1)}
+                  hint={guestCopy.scratch.tap}
+                  tabIndex={i === index ? 0 : -1}
+                  onOpen={() => wrap.unwrap(i)}
+                />
               </Framed>
-            </button>
+            ) : (
+              <button
+                data-photo={i}
+                type="button"
+                tabIndex={i === index ? 0 : -1}
+                onClick={() => onOpen(i)}
+                aria-label={words.open(i + before + 1)}
+                className="block w-full cursor-zoom-in rounded-[inherit] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              >
+                <Framed look={look}>
+                  <FramedPhoto
+                    photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                    alt=""
+                    frameAspect={GALLERY_ASPECT}
+                    lazy={Math.abs(i - index) > 1}
+                    className="size-full"
+                  />
+                </Framed>
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -560,6 +608,12 @@ function PhotoCarousel({
   );
 }
 
+/** Which photos are still wrapped like gifts, and how one is unwrapped. */
+type Wrapping = {
+  wrapped: (index: number) => boolean;
+  unwrap: (index: number) => void;
+};
+
 /** The photos the family shared, as the theme lays them out: a film, polaroids or a mosaic. */
 function Memories({
   photos,
@@ -579,10 +633,26 @@ function Memories({
   const cardWords = CARD_THEMED_WORDS[lang];
   // The photo open full screen, if any
   const [viewing, setViewing] = useState<number | null>(null);
+  // Every other photo comes wrapped like a gift, until the guest unwraps it
+  const [unwrapped, setUnwrapped] = useState<readonly number[]>([]);
+  const section = useRef<HTMLElement>(null);
+  const wrap: Wrapping = {
+    wrapped: (index) => index % 2 === 1 && !unwrapped.includes(index),
+    unwrap: (index) => setUnwrapped((was) => [...was, index]),
+  };
+  // Focus stays with the photo once its paper has gone
+  const last = unwrapped.at(-1);
+  useEffect(() => {
+    if (last === undefined) return;
+    section.current
+      ?.querySelector<HTMLButtonElement>(`[data-photo="${last}"]`)
+      ?.focus({ preventScroll: true });
+  }, [last]);
   return (
     <div className="relative isolate pb-10">
       {photos.length > 0 && (
         <section
+          ref={section}
           aria-labelledby="guest-photos"
           data-tour="9"
           data-layout={layouts.photos}
@@ -614,9 +684,9 @@ function Memories({
                     key={photo.id}
                     className={cn(
                       layouts.photos === "polaroids" &&
-                        "guest-polaroid w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
+                        "guest-polaroid relative w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
                       layouts.photos === "mosaic" &&
-                        "guest-mosaic overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
+                        "guest-mosaic relative overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
                     )}
                     style={
                       layouts.photos === "polaroids"
@@ -624,8 +694,18 @@ function Memories({
                         : undefined
                     }
                   >
+                    {wrap.wrapped(index) && (
+                      <GiftWrap
+                        label={guestCopy.scratch.unwrap(index + before + 1)}
+                        hint={guestCopy.scratch.tap}
+                        onOpen={() => wrap.unwrap(index)}
+                      />
+                    )}
                     <button
+                      data-photo={index}
                       type="button"
+                      tabIndex={wrap.wrapped(index) ? -1 : undefined}
+                      aria-hidden={wrap.wrapped(index) || undefined}
                       onClick={() => setViewing(index)}
                       aria-label={guestCopy.carousel.open(index + before + 1)}
                       className="block size-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
@@ -647,7 +727,13 @@ function Memories({
             </Reveal>
           )}
           {layouts.photos === "film" && (
-            <PhotoCarousel photos={photos} before={before} look={look} onOpen={setViewing} />
+            <PhotoCarousel
+              photos={photos}
+              before={before}
+              look={look}
+              onOpen={setViewing}
+              wrap={wrap}
+            />
           )}
         </section>
       )}

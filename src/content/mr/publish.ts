@@ -136,6 +136,12 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     close: "फोटो बंद करा",
     viewer: "कुटुंबाचे फोटो",
   },
+  scratch: {
+    date: "तारीख पाहण्यासाठी खरवडा",
+    showDate: "तारीख दाखवा",
+    unwrap: (index) => `फोटो ${index} उघडा`,
+    tap: "उघडण्यासाठी स्पर्श करा",
+  },
   previewMark: "झलक · अजून पाठवलेले नाही",
   madeWith: "शुभ इन्व्हिटेशनने बनवलेले",
   createYours: "आपले स्वतःचे निमंत्रण बनवा",

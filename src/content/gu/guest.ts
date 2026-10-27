@@ -66,6 +66,12 @@ export const guestText: GuestText = {
       close: "ફોટા બંધ કરો",
       viewer: "પરિવારના ફોટા",
     },
+    scratch: {
+      date: "તારીખ જોવા ઘસો",
+      showDate: "તારીખ બતાવો",
+      unwrap: (index) => `ફોટો ${index} ખોલો`,
+      tap: "ખોલવા માટે સ્પર્શ કરો",
+    },
     previewMark: "ઝલક · હજી મોકલ્યું નથી",
     madeWith: `${site.name} વડે બનાવેલું`,
     createYours: "આપનું પોતાનું આમંત્રણ બનાવો",

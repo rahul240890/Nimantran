@@ -171,6 +171,42 @@ test("a photo opens full screen", async ({ page }) => {
   await expect(viewer).toHaveCount(0);
 });
 
+// Owner, 2026-10-27: the date under gold foil, scratched free with a finger
+test("the guest scratches the date free", async ({ page }) => {
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
+  const foil = page.getByRole("button", { name: "Show the date" });
+  await foil.scrollIntoViewIfNeeded();
+  await expect(foil).toContainText("Scratch to reveal the date");
+  const box = (await foil.boundingBox())!;
+  // Rubbed side to side, top to bottom, as a finger would
+  for (let y = 8; y < box.height; y += 18) {
+    await page.mouse.move(box.x + 6, box.y + y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 6, box.y + y, { steps: 16 });
+    await page.mouse.up();
+  }
+  await expect(foil).toBeHidden();
+  await expect(page.locator(".guest-scratch")).toContainText("November");
+});
+
+test("a keyboard shows the date, and wrapped photos unwrap", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/engine/guest?suite=gubbara&couple=one");
+  const foil = page.getByRole("button", { name: "Show the date" });
+  await foil.focus();
+  await page.keyboard.press("Enter");
+  await expect(foil).toBeHidden();
+  // Every other photo comes wrapped like a gift
+  expect(sectionLayouts("gubbara").photos).toBe("mosaic");
+  const wrapped = page.getByRole("button", { name: "Unwrap photo 3" });
+  await wrapped.scrollIntoViewIfNeeded();
+  expect((await axe(page).analyze()).violations).toEqual([]);
+  await wrapped.click();
+  await expect(wrapped).toHaveCount(0);
+  const photo = page.getByRole("button", { name: "Open photo 3 full screen" });
+  await expect(photo).toBeFocused();
+});
+
 // Owner, 2026-10-27: on the day, the celebration on now glows at the top of the timeline
 test("on the day the celebration on now comes first, with directions", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
