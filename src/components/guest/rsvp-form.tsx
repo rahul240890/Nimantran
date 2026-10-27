@@ -140,10 +140,12 @@ export function RsvpForm({
     setChecked(true);
     setError(null);
     if (problems > 0) {
+      // The first answer missing, in the form's order: the choice (its first tile), then the name
       requestAnimationFrame(() => {
-        document
-          .querySelector<HTMLElement>("#rsvp [aria-invalid='true']")
-          ?.focus({ preventScroll: false });
+        const missing = document.querySelector<HTMLElement>("#rsvp [aria-invalid='true']");
+        (missing?.querySelector<HTMLElement>("[role='radio']") ?? missing)?.focus({
+          preventScroll: false,
+        });
       });
       return;
     }

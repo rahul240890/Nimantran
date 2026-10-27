@@ -29,7 +29,8 @@ test.describe("guest RSVP", () => {
       // Sending with nothing filled in points at what's missing
       await form.getByRole("button", { name: "Send reply" }).click();
       await expect(form.getByRole("alert")).toHaveText("2 answers still need you.");
-      await expect(form.getByRole("textbox", { name: /Your name/ })).toBeFocused();
+      // The answer comes first on the card, so focus goes to its first tile
+      await expect(form.getByRole("radio", { name: "Yes, I'll be there" })).toBeFocused();
 
       await form.getByRole("textbox", { name: /Your name/ }).fill("Rohan Mehta");
       // Just a name and whether they are coming: no counts, meals or notes (owner, 2026-10-26)
