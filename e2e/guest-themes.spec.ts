@@ -201,7 +201,12 @@ for (const suite of ["rajwada-bagh", "kayal"] as const) {
       const first = await slot.innerText();
       await page.getByRole("button", { name: "Next celebration" }).click();
       await expect(slot).not.toHaveText(first);
-      await expect(page.getByRole("link", { name: /^Directions:/ })).toBeVisible();
+      // The family's cards come before the celebrations, then each celebration's directions
+      const directions = page.getByRole("link", { name: /^Directions:/ });
+      for (let i = 0; i < 12 && !(await directions.isVisible()); i++) {
+        await page.getByRole("button", { name: "Next celebration" }).click();
+      }
+      await expect(directions).toBeVisible();
       await expect(page.getByRole("link", { name: "Reply to the invitation" })).toBeVisible();
       // The painting's light follows the celebration in the slot
       const moods = new Set<string | null>([await scene.getAttribute("data-scene-mood")]);
