@@ -381,8 +381,6 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "प्रिव्ह्यूचे पर्याय",
   opening: "तुमचे निमंत्रण उघडत आहे",
   changeGate: "उघडणारे प्रवेशद्वार बदला",
-  marked:
-    "पाठवेपर्यंत या झलकेच्या प्रत्येक स्क्रीनवर ‘झलक’ लिहिलेले असते आणि उत्तरे बंद असतात. पाहुण्यांना स्वच्छ निमंत्रण मिळते.",
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {

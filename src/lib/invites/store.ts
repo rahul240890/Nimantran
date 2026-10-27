@@ -57,8 +57,15 @@ type InviteStore = {
     clip: Pick<MusicClip, "id" | "type">,
     file: Blob,
   ): Promise<boolean>;
-  /** Short-lived links to an invite's photos and music clip, by id. */
-  photoUrls(account: Account, id: string): Promise<Record<string, string>>;
+  /**
+   * Short-lived links to an invite's photos and music clip, by id. Given the clip the draft
+   * names, its file is linked by its place even when the account lists it under another invite.
+   */
+  photoUrls(
+    account: Account,
+    id: string,
+    clip?: Pick<MusicClip, "id" | "type"> | null,
+  ): Promise<Record<string, string>>;
   slugAvailable(slug: string): Promise<boolean>;
   publish(account: Account, id: string, slug: string): Promise<PublishResult>;
   unpublish(account: Account, id: string): Promise<boolean>;
@@ -378,9 +385,19 @@ const supabaseStore: InviteStore = {
     return !error;
   },
 
-  async photoUrls(_account, id) {
+  async photoUrls(_account, id, clip) {
     const supabase = await supabaseServer();
-    return supabase ? mediaUrls(supabase, id) : {};
+    if (!supabase) return {};
+    const urls = await mediaUrls(supabase, id);
+    // Invites written from another once shared its song's file in the account, and the
+    // account lists it under only one of them; the file itself is still in its place
+    if (clip && !urls[clip.id]) {
+      const { data } = await supabase.storage
+        .from(BUCKET)
+        .createSignedUrl(clipPath(id, clip), PHOTO_LINK_SECONDS);
+      if (data?.signedUrl) urls[clip.id] = data.signedUrl;
+    }
+    return urls;
   },
 
   async slugAvailable(slug) {

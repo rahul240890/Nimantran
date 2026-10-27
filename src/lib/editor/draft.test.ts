@@ -595,4 +595,13 @@ describe("the opening gate", () => {
     expect(draftOpeningStyle(changed, "classic", false)).toBe(picked);
     expect(draftOwnOpening(changed, "classic", false)).toBe(own);
   });
+
+  it("opens another design with its own gate, not the last design's pick", () => {
+    const draft = { ...newDraft(), suite: "classic" } as InviteDraft;
+    const picked = { ...draft, opening: { ...draft.opening, style: "curtain" } } as InviteDraft;
+    const same = { category: null, tradition: null, suite: "classic", template: null } as const;
+    expect(withGalleryChoice(picked, same).opening.style).toBe("curtain");
+    const other = { ...same, suite: "rajwada-bagh" } as const;
+    expect(withGalleryChoice(picked, other).opening.style).toBeNull();
+  });
 });

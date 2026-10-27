@@ -103,7 +103,7 @@ export default async function EditionPage({
     getText(editionsText),
     checkoutCoupons().catch(() => []),
     getPricing(),
-    store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
+    store.photoUrls(account, id, draft.music.clip).catch(() => ({}) as Record<string, string>),
     requestOrigin(),
     // Without the host's history, offers kept to some people simply don't apply
     buyerHistory(account).catch(() => null),

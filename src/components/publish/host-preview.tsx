@@ -39,7 +39,6 @@ export type HostPreviewCopy = {
   fullScreen: string;
   menu: string;
   changeGate: string;
-  marked: string;
 };
 
 /**
@@ -58,7 +57,6 @@ export function HostPreview({
   next,
   gateHref,
   published,
-  marked,
   copy,
   children,
 }: {
@@ -72,8 +70,6 @@ export function HostPreview({
   gateHref: string;
   /** The invite is live: the next step is sharing it rather than publishing. */
   published: boolean;
-  /** Not paid for yet: the guest page carries the preview mark, and the notes say why. */
-  marked: boolean;
   copy: HostPreviewCopy;
   /** The guest page. */
   children: ReactNode;
@@ -110,15 +106,6 @@ export function HostPreview({
         <div className="flex max-w-sm flex-col gap-5">
           <h1 className="font-display text-[1.9rem] leading-tight">{copy.heading}</h1>
           <p className="text-ink-muted">{copy.body}</p>
-          {marked && (
-            <p
-              data-preview-note
-              className="flex items-start gap-2.5 rounded-lg border border-marigold/50 bg-marigold/10 p-3.5 text-sm text-ink"
-            >
-              <Eye aria-hidden className="mt-0.5 size-4.5 shrink-0 text-accent-text" />
-              {copy.marked}
-            </p>
-          )}
           <div className="flex flex-col gap-3">
             <Button asChild size="lg">
               <Link href={next.href}>
