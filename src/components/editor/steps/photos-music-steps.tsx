@@ -18,7 +18,6 @@ import { IconButton } from "@/components/ui/icon-button";
 import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Hint } from "@/components/ui/quiet";
 import { photoAspect, type CoupleLayout } from "@/lib/editor/couple-photos";
 import type { PhotoCrop } from "@/lib/editor/photo-fit";
@@ -30,13 +29,7 @@ import {
   framedDesign,
 } from "@/lib/publish/frames";
 import { FramePreview, PhotoAdjust } from "../photo-adjust";
-import {
-  ASKABLE_QUESTIONS,
-  designMusic,
-  draftPeople,
-  draftQuestions,
-  MAX_PHOTOS,
-} from "@/lib/editor/draft";
+import { designMusic, draftPeople, MAX_PHOTOS } from "@/lib/editor/draft";
 import { deletePhoto, PHOTO_ACCEPT, preparePhoto, savePhoto } from "@/lib/editor/photos";
 import { cn } from "@/lib/cn";
 import {
@@ -55,7 +48,6 @@ import { draftShowsScene } from "@/lib/publish/story";
 import type { MusicClip } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
-import { categoriesText } from "@/i18n/copy/categories";
 import { editorText } from "@/i18n/copy/editor";
 
 function newId(): string {
@@ -577,46 +569,6 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   );
 }
 
-function Questions({ draft, update }: Pick<StepProps, "draft" | "update">) {
-  const { questionLabels } = useText(categoriesText);
-  const { extrasCopy } = useText(editorText);
-  const asked = draftQuestions(draft);
-  return (
-    <section
-      aria-labelledby="questions-heading"
-      className="flex flex-col gap-3 border-t border-line pt-6"
-    >
-      <div className="flex flex-col gap-1">
-        <h2 id="questions-heading" className="font-display text-xl">
-          {extrasCopy.questionsHeading}
-        </h2>
-        <Hint>{extrasCopy.questionsHint}</Hint>
-      </div>
-      <ul aria-labelledby="questions-heading" className="flex flex-col">
-        {ASKABLE_QUESTIONS.map((id) => (
-          <li key={id}>
-            <Checkbox
-              label={questionLabels[id]}
-              description={extrasCopy.questionHints[id]}
-              checked={asked.includes(id)}
-              onCheckedChange={(checked) =>
-                update((current) => {
-                  const now = draftQuestions(current);
-                  const next = checked === true ? [...now, id] : now.filter((q) => q !== id);
-                  return {
-                    ...current,
-                    questions: ASKABLE_QUESTIONS.filter((q) => next.includes(q)),
-                  };
-                })
-              }
-            />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 /** The first section of a step needs no rule above it. */
 const sections =
   "flex flex-col gap-8 [&>section:first-child]:border-t-0 [&>section:first-child]:pt-0";
@@ -635,14 +587,14 @@ export function PhotosStep({ draft, update }: StepProps) {
 }
 
 /**
- * The music and replies section: what plays, what the reply asks, and whom to call. How it
+ * The music and replies section: what plays and whom to call (the reply asks only who is
+ * coming, owner 2026-10-26). How it
  * opens is its own part, the last on a design's page (owner, 2026-10-24).
  */
 export function MusicStep({ draft, update }: StepProps) {
   return (
     <div className={sections}>
       <Music draft={draft} update={update} />
-      <Questions draft={draft} update={update} />
       <section className="flex flex-col gap-3 border-t border-line pt-6" data-page-target="family">
         <ContactsSection draft={draft} update={update} />
       </section>

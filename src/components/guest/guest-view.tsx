@@ -1,18 +1,16 @@
 "use client";
 
-import { ArrowRight, CalendarPlus, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 import Link from "next/link";
 import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { SocialLinks } from "@/components/brand/social-links";
-import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { GuestTour } from "@/components/guest/guest-tour";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
-import { FunctionFacts } from "@/components/guest/function-facts";
 import {
   FamilyWords,
   pairedSide,
@@ -22,6 +20,7 @@ import {
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
 import { ThemedDetails } from "@/components/guest/themed/themed-details";
+import { EventsTimeline } from "@/components/guest/themed/timeline";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
@@ -41,7 +40,6 @@ import {
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
-import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
@@ -78,6 +76,7 @@ import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale } from "@/i18n/client";
 import { guestText } from "@/i18n/copy/guest";
 import { GuestLanguage, useGuestText } from "@/components/guest/guest-language";
+import { cn } from "@/lib/cn";
 
 const noSubscribe = () => () => {};
 
@@ -115,7 +114,6 @@ type GuestViewProps = {
   clipUrl?: string | null;
   allIcsUrl: string | null;
   rsvpFunctions: RsvpFunction[];
-  questions: RsvpQuestionId[];
   /** A Free invite once payments are on: "Made with Shubh" across the pages (Step 17). */
   watermark?: boolean;
   /** A fixed moment for the event-day banner, on review pages. */
@@ -140,7 +138,6 @@ export function GuestView({
   clipUrl = null,
   allIcsUrl,
   rsvpFunctions,
-  questions,
   watermark = false,
   previewNow,
   preview = false,
@@ -164,11 +161,17 @@ export function GuestView({
   const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
-  const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  // (a review page's fixed moment when it has one)
+  const liveToday = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  const today = previewNow === undefined ? liveToday : todayInIndia(new Date(previewNow));
   // The pages and the details below them, named and dated as the card names and dates them
   const details = useMemo(
     () => cardFunctions(functions, draft, language),
     [functions, draft, language],
+  );
+  const days = useMemo(
+    () => Object.fromEntries(details.map((fn) => [fn.kind, draft.functions[fn.kind].date])),
+    [details, draft],
   );
   const told = useMemo(
     () =>
@@ -341,18 +344,19 @@ export function GuestView({
   const replayable = Boolean(scene) || opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
-  // The family's blocks in the language the guest is reading
-  const family = storyFamily(draft, language);
+  // Each "yes" to the reply, for the shower of petals that answers it
+  const [cheer, setCheer] = useState(0);
   const rsvp =
     rsvpFunctions.length > 0 ? (
       <RsvpForm
         slug={slug}
         functions={replyFunctions}
-        questions={questions}
         preview={preview}
         sayPreview={unsent}
         sample={sample}
         makeHref={makeHref}
+        calendarUrl={allIcsUrl}
+        onComing={() => setCheer((was) => was + 1)}
       />
     ) : null;
 
@@ -454,10 +458,8 @@ export function GuestView({
                   look={look}
                   copy={copy}
                   lang={language}
-                  functions={details}
-                  days={Object.fromEntries(
-                    details.map((fn) => [fn.kind, draft.functions[fn.kind].date]),
-                  )}
+                  functions={told}
+                  days={days}
                   main={
                     mainKind && mainDate
                       ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
@@ -465,45 +467,39 @@ export function GuestView({
                   }
                   welcome={placed.welcome}
                   photos={placed.rest}
-                  family={family}
+                  family={storyFamily(draft, language)}
                   familyLang={language}
                   allIcsUrl={allIcsUrl}
+                  previewNow={previewNow}
+                  cheer={cheer}
                   music={music}
                   reply={rsvp}
                 />
               ) : (
                 <>
-                  <FamilyWording family={family} lang={language} />
+                  <FamilyWording family={storyFamily(draft, language)} lang={language} />
 
+                  {/* The pages above tell the invitation; below, the day once on a timeline */}
                   <section
                     aria-labelledby="guest-functions"
                     data-tour
                     className="flex min-h-svh flex-col justify-center border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
                   >
-                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                      <div className="flex flex-wrap items-end justify-between gap-4">
-                        <h2
-                          id="guest-functions"
-                          className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                        >
-                          {guestCopy.functions}
-                        </h2>
-                        {allIcsUrl && (
-                          <Button asChild variant="secondary">
-                            <a href={allIcsUrl} download>
-                              <CalendarPlus aria-hidden />
-                              {guestCopy.addAll}
-                            </a>
-                          </Button>
-                        )}
-                      </div>
-                      <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-                        {details.map((fn) => (
-                          <li key={fn.kind}>
-                            <FunctionCard fn={fn} />
-                          </li>
-                        ))}
-                      </ol>
+                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-10">
+                      <h2
+                        id="guest-functions"
+                        className="text-center font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                      >
+                        {guestCopy.functions}
+                      </h2>
+                      <EventsTimeline
+                        functions={told}
+                        days={days}
+                        lang={language}
+                        layout="thread"
+                        allIcsUrl={allIcsUrl}
+                        previewNow={previewNow}
+                      />
                     </div>
                   </section>
 
@@ -680,25 +676,5 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
         </dl>
       </div>
     </section>
-  );
-}
-
-function FunctionCard({ fn }: { fn: GuestFunction }) {
-  const headingId = `fn-${fn.kind}`;
-  return (
-    <article
-      aria-labelledby={headingId}
-      className="flex h-full flex-col gap-4 rounded-lg border border-line bg-surface p-5 shadow-raised sm:p-6"
-    >
-      <h3 id={headingId} className="flex flex-col font-display text-2xl leading-tight">
-        {fn.name}
-        {fn.localName && (
-          <span lang={fn.localName.lang} className="font-sans text-lg text-accent-text">
-            {fn.localName.text}
-          </span>
-        )}
-      </h3>
-      <FunctionFacts fn={fn} />
-    </article>
   );
 }

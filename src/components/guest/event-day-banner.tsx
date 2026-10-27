@@ -19,6 +19,12 @@ function subscribe(callback: () => void) {
 const clock = () => Math.floor(Date.now() / TICK_MS) * TICK_MS;
 const noClock = () => null;
 
+/** The time now, ticking every half minute; null until the page is in the browser. */
+export function useEventDayClock(previewNow?: number): number | null {
+  const live = useSyncExternalStore(subscribe, clock, noClock);
+  return previewNow ?? live;
+}
+
 /**
  * On the day, a strip at the top of the guest's page: the function on now, or the next one
  * later today, with one tap to directions. Shown only in the browser, where the time is
@@ -34,8 +40,7 @@ export function EventDayBanner({
 }) {
   const { guestCopy } = useGuestText();
   const words = guestCopy.eventDay;
-  const live = useSyncExternalStore(subscribe, clock, noClock);
-  const now = previewNow ?? live;
+  const now = useEventDayClock(previewNow);
   const [hidden, setHidden] = useState<string | null>(null);
   if (now === null) return null;
   const status = eventDayStatus(functions, now);

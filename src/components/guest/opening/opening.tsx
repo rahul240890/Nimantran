@@ -400,6 +400,24 @@ export function Opening({
   const layout = OPENING_LAYOUT[style];
   // The words in the theme's own lettering, as on the pages inside; the host's face wins
   const face = openingFace(suite, lang);
+  // The place a painted opening opens onto: behind the frame on a wide screen, and behind
+  // the names when the opening has opened
+  const beyond: string | null =
+    gate || tied || depth || bloom || fresh || themed || cover
+      ? gate
+        ? `/openings/gates/${style}/beyond.webp`
+        : tied
+          ? tiedBeyond(style)
+          : depth
+            ? depthBeyond(style)
+            : bloom
+              ? bloomBeyond(style)
+              : fresh
+                ? freshBackdrop(style)
+                : themed
+                  ? `/suites/${style}/scene.webp`
+                  : (cover as string)
+      : null;
 
   // The invitation follows the opening; in still mode it comes at once
   const latest = useRef(after);
@@ -522,24 +540,10 @@ export function Opening({
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
-        {gate || tied || depth || bloom || fresh || themed || cover ? (
+        {beyond ? (
           <Image
             // A painted opening's own place beyond, so the wide screen matches it
-            src={
-              gate
-                ? `/openings/gates/${style}/beyond.webp`
-                : tied
-                  ? tiedBeyond(style)
-                  : depth
-                    ? depthBeyond(style)
-                    : bloom
-                      ? bloomBeyond(style)
-                      : fresh
-                        ? freshBackdrop(style)
-                        : themed
-                          ? `/suites/${style}/scene.webp`
-                          : (cover as string)
-            }
+            src={beyond}
             alt=""
             fill
             unoptimized
@@ -668,6 +672,7 @@ export function Opening({
             script={face("script", type.words)}
             skip={guestCopy.doorway.skip}
             over={fresh}
+            backdrop={beyond ?? undefined}
             onSkip={goIn}
           />
         )}

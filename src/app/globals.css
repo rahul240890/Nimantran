@@ -6361,6 +6361,8 @@
 /* Dark words on the morning and daytime light, and on the cloth cards */
 .guest-sky[data-mood="dawn"],
 .guest-sky[data-mood="day"],
+.guest-ground[data-ground="cloth"],
+.guest-ground[data-ground="blend"],
 .guest-card,
 .guest-date-disc {
   color-scheme: light;
@@ -6396,7 +6398,8 @@
 }
 /* Light words in the dusk and night */
 .guest-sky[data-mood="dusk"],
-.guest-sky[data-mood="night"] {
+.guest-sky[data-mood="night"],
+.guest-ground[data-ground="deep"] {
   color-scheme: dark;
   --paper: var(--suite-near);
   --surface: color-mix(in oklab, var(--suite-near) 75%, var(--suite-sky-top));
@@ -8885,6 +8888,77 @@ html:has(.guest-snap) {
     color-mix(in oklab, var(--open-plate) 82%, transparent) 55%,
     color-mix(in oklab, var(--open-plate) 30%, transparent) 100%
   );
+}
+/*
+ * Over the place the opening opened onto (owner, 2026-10-26): the same painting stays, so
+ * there is no blank between; it draws slowly nearer and softens while light blooms out
+ * from behind the names, gold glints and petals fall. The words sit on that light.
+ */
+.opening-welcome.opening-welcome[data-over="place"] {
+  background: var(--open-deep);
+  animation-name: welcome-centre-in;
+}
+.welcome-place {
+  animation: welcome-near 9s cubic-bezier(0.2, 0.6, 0.3, 1) both;
+}
+.welcome-halo {
+  background: radial-gradient(
+    ellipse 95% 50% at 50% 44%,
+    color-mix(in oklab, var(--open-plate) 96%, transparent) 0 42%,
+    color-mix(in oklab, var(--open-plate) 82%, transparent) 62%,
+    color-mix(in oklab, var(--open-light) 26%, transparent) 86%,
+    transparent 100%
+  );
+  animation: welcome-halo-in 1600ms cubic-bezier(0.2, 0.7, 0.2, 1) 150ms both;
+}
+.welcome-glint {
+  width: 1.4cqw;
+  aspect-ratio: 1;
+  background: radial-gradient(circle, var(--open-gilt-bright) 0 30%, transparent 70%);
+  box-shadow: 0 0 1.6cqw 0.4cqw color-mix(in oklab, var(--open-gilt-bright) 55%, transparent);
+  opacity: 0;
+  animation: welcome-glint 2.6s ease-in-out calc(600ms + var(--i) * 230ms) infinite;
+}
+@keyframes welcome-near {
+  from {
+    scale: 1;
+    filter: blur(0);
+  }
+  to {
+    scale: 1.14;
+    filter: blur(1.5px) saturate(1.1);
+  }
+}
+@keyframes welcome-halo-in {
+  from {
+    opacity: 0;
+    scale: 0.35;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+@keyframes welcome-glint {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  50% {
+    opacity: 1;
+    scale: 1.2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .welcome-place,
+  .welcome-halo,
+  .welcome-glint {
+    animation: none;
+  }
+  .welcome-glint {
+    opacity: 0;
+  }
 }
 /* A template's painted centre: the picture its opening revealed, placed as the opening's
    layers are, with the words in its empty field (opening-welcome.tsx) */
