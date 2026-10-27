@@ -62,7 +62,7 @@ for (const suite of THEMES) {
     test.describe(`${suite} guest page, ${colorScheme} theme`, () => {
       test.use({ colorScheme, reducedMotion: "reduce" });
 
-      test("lists the day once on its timeline, then the photos and the reply", async ({
+      test("welcomes the guest, lists the day once on its timeline, then the photos and the reply", async ({
         page,
       }) => {
         await page.goto(`/engine/guest?suite=${suite}&couple=one`);
@@ -71,6 +71,9 @@ for (const suite of THEMES) {
         // On a ground of the theme's own colours, laid out in its own mix (section-layouts.ts)
         const layouts = sectionLayouts(suite);
         await expect(themed).toHaveAttribute("data-ground", layouts.ground);
+        // First the welcome: the names, with the couple's photo
+        await expect(themed.locator("h2#guest-welcome")).not.toBeEmpty();
+        await expect(themed.locator(".guest-welcome-photos")).toBeVisible();
         await expect(page.getByRole("heading", { name: "The celebrations" })).toBeVisible();
         await expect(page.locator(`[data-timeline="${layouts.timeline}"] > li`)).toHaveCount(3);
         // Each named as the design's tradition names it, the Sangeet in the middle
@@ -110,23 +113,23 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
 // Owner, 2026-10-24: guests had to scroll sideways through the photos
 test("the photos turn by themselves", async ({ page }) => {
   expect(sectionLayouts("rajwada-bagh").photos).toBe("film");
-  await page.goto("/engine/guest?suite=rajwada-bagh&couple=two");
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
   const photos = page.getByRole("group", { name: "Photos" });
   await photos.scrollIntoViewIfNeeded();
   const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 4");
+  await expect(counter).toContainText("Photo 1 of 3");
   // It moves on by itself while on screen, unless the guest's pointer rests on it
   await page.mouse.move(1, 1);
-  await expect(counter).toContainText("Photo 2 of 4", { timeout: 9_000 });
+  await expect(counter).toContainText("Photo 2 of 3", { timeout: 9_000 });
   await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 3 of 4");
+  await expect(counter).toContainText("Photo 3 of 3");
   await photos.getByRole("button", { name: "Previous photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 4");
+  await expect(counter).toContainText("Photo 2 of 3");
   await photos.getByRole("button", { name: "Pause the photos" }).click();
   await expect(photos.getByRole("button", { name: "Play the photos" })).toBeVisible();
   await page.mouse.move(1, 1);
   await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 2 of 4");
+  await expect(counter).toContainText("Photo 2 of 3");
   expect(await noOverflow(page)).toBe(true);
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
@@ -137,13 +140,67 @@ test("in still mode the photos stay put and have no pause", async ({ page }) => 
   const photos = page.getByRole("group", { name: "Photos" });
   await photos.scrollIntoViewIfNeeded();
   const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 4");
+  await expect(counter).toContainText("Photo 1 of 3");
   await expect(photos.getByRole("button", { name: "Pause the photos" })).toHaveCount(0);
   await page.mouse.move(1, 1);
   await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 1 of 4");
+  await expect(counter).toContainText("Photo 1 of 3");
   await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 4");
+  await expect(counter).toContainText("Photo 2 of 3");
+});
+
+// Owner, 2026-10-27: a photo opens full screen, and the guest can go on through the others
+test("a photo opens full screen", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
+  // The couple's photo is in the welcome, so the photos below count on from 2
+  await page.locator("#guest-photos").scrollIntoViewIfNeeded();
+  await page.getByRole("button", { name: "Open photo 2 full screen" }).click();
+  const viewer = page.getByRole("dialog", { name: "Photos from the family" });
+  await expect(viewer).toBeVisible();
+  await expect(viewer.getByRole("img", { name: "Photo 2 from the family" })).toBeVisible();
+  const counter = viewer.locator("p[aria-live]");
+  await expect(counter).toContainText("Photo 1 of 3");
+  await page.keyboard.press("ArrowRight");
+  await expect(counter).toContainText("Photo 2 of 3");
+  await viewer.getByRole("button", { name: "Next photo" }).click();
+  await expect(counter).toContainText("Photo 3 of 3");
+  await expect(viewer.getByRole("button", { name: "Next photo" })).toBeDisabled();
+  expect((await axe(page).analyze()).violations).toEqual([]);
+  await page.keyboard.press("Escape");
+  await expect(viewer).toHaveCount(0);
+});
+
+// Owner, 2026-10-27: on the day, the celebration on now glows at the top of the timeline
+test("on the day the celebration on now comes first, with directions", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/engine/guest?suite=sakura&now=2026-11-19T20:00");
+  const today = page.locator(".guest-today");
+  await expect(today).toContainText("Happening now");
+  await expect(today).toContainText("Sangeet");
+  await expect(today.getByRole("link", { name: "Directions" })).toBeVisible();
+  const on = page.locator('.guest-timeline-item[data-today="now"]');
+  await expect(on).toHaveCount(1);
+  await expect(on.getByRole("heading", { level: 3 })).toContainText("Sangeet");
+  // The ones still to come say how far off they are, from that day
+  await expect(page.locator(".guest-timeline-item").last()).toContainText("Tomorrow");
+  expect(await noOverflow(page)).toBe(true);
+  expect((await axe(page).analyze()).violations).toEqual([]);
+});
+
+// Owner, 2026-10-27: a yes is met with petals, and the guest can pass the invitation on
+test("after a yes, the guest can share the invitation on WhatsApp", async ({ page }) => {
+  await page.goto("/sample/rajwada-bagh");
+  await page.locator("#rsvp").scrollIntoViewIfNeeded();
+  await page.getByRole("textbox", { name: /Your name/ }).fill("Priya Mehta");
+  await page.getByRole("radio", { name: "Yes, I'll be there" }).click();
+  await page.getByRole("button", { name: "Send reply" }).click();
+  await expect(page.getByRole("heading", { name: "Thank you, Priya!" })).toBeVisible();
+  const share = page.getByRole("link", { name: "Share on WhatsApp" });
+  await expect(share).toHaveAttribute(
+    "href",
+    /^https:\/\/wa\.me\/\?text=.*%2Fsample%2Frajwada-bagh$/,
+  );
 });
 
 for (const suite of ["rajwada-bagh", "kayal"] as const) {

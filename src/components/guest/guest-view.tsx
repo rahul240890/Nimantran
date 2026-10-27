@@ -155,7 +155,9 @@ export function GuestView({
   const guestName = useGuestName(slug);
   const replies = rsvpFunctions.length > 0;
   // Today in India, for "In 5 days" on each event page; only known in the browser
-  const today = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  // (a review page's fixed moment when it has one)
+  const liveToday = useSyncExternalStore(noSubscribe, todayInIndia, () => null);
+  const today = previewNow === undefined ? liveToday : todayInIndia(new Date(previewNow));
   // The pages and the details below them, named and dated as the card names and dates them
   const details = useMemo(
     () => cardFunctions(functions, draft, language),
@@ -336,6 +338,8 @@ export function GuestView({
   const replayable = Boolean(scene) || opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
+  // Each "yes" to the reply, for the shower of petals that answers it
+  const [cheer, setCheer] = useState(0);
   const rsvp =
     rsvpFunctions.length > 0 ? (
       <RsvpForm
@@ -344,6 +348,8 @@ export function GuestView({
         preview={preview}
         sample={sample}
         makeHref={makeHref}
+        calendarUrl={allIcsUrl}
+        onComing={() => setCheer((was) => was + 1)}
       />
     ) : null;
 
@@ -444,11 +450,15 @@ export function GuestView({
                 <ThemedDetails
                   suite={suite}
                   look={look}
+                  copy={copy}
                   lang={language}
-                  functions={details}
+                  functions={told}
                   days={days}
-                  photos={placed.all}
+                  welcome={placed.welcome}
+                  photos={placed.rest}
                   allIcsUrl={allIcsUrl}
+                  previewNow={previewNow}
+                  cheer={cheer}
                   music={music}
                   reply={rsvp}
                 />
@@ -468,11 +478,12 @@ export function GuestView({
                         {guestCopy.functions}
                       </h2>
                       <EventsTimeline
-                        functions={details}
+                        functions={told}
                         days={days}
                         lang={language}
                         layout="thread"
                         allIcsUrl={allIcsUrl}
+                        previewNow={previewNow}
                       />
                     </div>
                   </section>

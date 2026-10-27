@@ -1,6 +1,15 @@
 "use client";
 
-import { CircleCheck, CircleX, Lock, PartyPopper, Pencil, Send } from "lucide-react";
+import {
+  CalendarPlus,
+  CircleCheck,
+  CircleX,
+  Lock,
+  MessageCircle,
+  PartyPopper,
+  Pencil,
+  Send,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { sendReply } from "@/actions/rsvp";
@@ -42,6 +51,8 @@ export function RsvpForm({
   preview = false,
   sample = false,
   makeHref = null,
+  calendarUrl = null,
+  onComing,
 }: {
   slug: string;
   functions: RsvpFunction[];
@@ -51,6 +62,10 @@ export function RsvpForm({
   sample?: boolean;
   /** On a live invitation: after replying, a guest can make one like it. */
   makeHref?: string | null;
+  /** Every celebration in one calendar file, offered once the guest says they are coming. */
+  calendarUrl?: string | null;
+  /** Called when the guest says they are coming, for the page to celebrate with them. */
+  onComing?: () => void;
 }) {
   const { rsvpCopy, guestCopy } = useGuestText();
   const [token, setToken] = useState<string | null>(null);
@@ -104,6 +119,13 @@ export function RsvpForm({
   }, [slug]);
 
   const nameMissing = !name.trim();
+  // The thanks, after a reply went through; a yes gets the page's petals too
+  const thank = () => {
+    focusNext.current = "thanks";
+    setSent({ name: name.trim(), answer: answer! });
+    setReplied(true);
+    if (answer === "attending") onComing?.();
+  };
   const problems = (nameMissing ? 1 : 0) + (answer ? 0 : 1);
 
   const submit = async () => {
@@ -122,9 +144,7 @@ export function RsvpForm({
       return;
     }
     if (sample) {
-      focusNext.current = "thanks";
-      setSent({ name: name.trim(), answer: answer! });
-      setReplied(true);
+      thank();
       return;
     }
     setBusy(true);
@@ -158,12 +178,18 @@ export function RsvpForm({
     }
     setToken(result.token);
     storeToken(slug, result.token);
-    focusNext.current = "thanks";
-    setSent({ name: name.trim(), answer: answer! });
-    setReplied(true);
+    thank();
   };
 
   if (sent) {
+    // The invitation's own public address to pass on in WhatsApp, never the guest's private
+    // ?g= link or a family member's own page; a sample passes on the sample
+    const shareUrl =
+      typeof window === "undefined"
+        ? null
+        : `https://wa.me/?text=${encodeURIComponent(
+            `${rsvpCopy.shareMessage} ${window.location.origin}${sample ? window.location.pathname : `/i/${slug}`}`,
+          )}`;
     return (
       <div className="flex flex-col gap-5 rounded-xl border border-success/40 bg-success/5 p-5 sm:p-7">
         <div className="flex items-start gap-4">
@@ -184,17 +210,34 @@ export function RsvpForm({
             </p>
           </div>
         </div>
-        <Button
-          variant="secondary"
-          leadingIcon={<Pencil aria-hidden />}
-          className="self-start"
-          onClick={() => {
-            focusNext.current = "name";
-            setSent(null);
-          }}
-        >
-          {rsvpCopy.change}
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          {sent.answer === "attending" && calendarUrl && (
+            <Button asChild variant="secondary">
+              <a href={calendarUrl} download>
+                <CalendarPlus aria-hidden />
+                {guestCopy.addAll}
+              </a>
+            </Button>
+          )}
+          {shareUrl && (
+            <Button asChild variant="secondary">
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer">
+                <MessageCircle aria-hidden />
+                {rsvpCopy.share}
+              </a>
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            leadingIcon={<Pencil aria-hidden />}
+            onClick={() => {
+              focusNext.current = "name";
+              setSent(null);
+            }}
+          >
+            {rsvpCopy.change}
+          </Button>
+        </div>
         {makeHref && !preview && !sample && (
           <p data-make-like-this className="border-t border-success/30 pt-4 text-sm text-ink-muted">
             {guestCopy.makeOwnTitle}{" "}
