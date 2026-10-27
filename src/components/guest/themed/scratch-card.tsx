@@ -47,7 +47,7 @@ export function ScratchCard({
   // Paints the foil: the theme's gilt, a sheen of its cloth and a scatter of glints
   useEffect(() => {
     const area = canvas.current;
-    const context = area?.getContext("2d");
+    const context = area?.getContext("2d", { willReadFrequently: true });
     if (!area || !context) return;
     const paint = () => {
       const scale = window.devicePixelRatio || 1;
@@ -103,7 +103,7 @@ export function ScratchCard({
 
   // How much of the foil is gone, from every eighth pixel
   const cleared = (area: HTMLCanvasElement) => {
-    const context = area.getContext("2d");
+    const context = area.getContext("2d", { willReadFrequently: true });
     if (!context || area.width === 0) return 0;
     const { data } = context.getImageData(0, 0, area.width, area.height);
     let clear = 0;
@@ -117,7 +117,7 @@ export function ScratchCard({
 
   const scratch = (x: number, y: number) => {
     const area = canvas.current;
-    const context = area?.getContext("2d");
+    const context = area?.getContext("2d", { willReadFrequently: true });
     if (!area || !context) return;
     const box = area.getBoundingClientRect();
     const scale = area.width / box.width;

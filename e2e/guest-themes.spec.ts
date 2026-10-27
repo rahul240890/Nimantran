@@ -173,6 +173,8 @@ test("a photo opens full screen", async ({ page }) => {
 
 // Owner, 2026-10-27: the date under gold foil, scratched free with a finger
 test("the guest scratches the date free", async ({ page }) => {
+  // Still, so the page's own motion never keeps the pointer waiting on a slow machine
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/engine/guest?suite=rajwada-bagh&couple=one");
   const foil = page.getByRole("button", { name: "Show the date" });
   await foil.scrollIntoViewIfNeeded();
