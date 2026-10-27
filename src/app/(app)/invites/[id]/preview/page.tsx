@@ -43,7 +43,7 @@ export default async function InvitePreviewPage({
   if (!store || !draft) notFound();
 
   const [urls, active, edition, locale, { hostPreviewCopy }] = await Promise.all([
-    store.photoUrls(account, id).catch(() => ({}) as Record<string, string>),
+    store.photoUrls(account, id, draft.music.clip).catch(() => ({}) as Record<string, string>),
     editionsActive(),
     invitePlan(account, id),
     getLocale(),
@@ -89,7 +89,6 @@ export default async function InvitePreviewPage({
       next={next}
       gateHref={`${designPageHref(draft)}#part-gate`}
       published={Boolean(draft.slug)}
-      marked={free && !draft.slug}
       copy={hostPreviewCopy}
     >
       <GuestView
@@ -102,9 +101,8 @@ export default async function InvitePreviewPage({
         rsvpFunctions={rsvpFunctions}
         questions={draftQuestions(draft)}
         watermark={free}
+        // The host sees it as guests will, with no "Preview" written over it (owner, 2026-10-27)
         preview
-        // Before its package is chosen, a recording of the preview can't stand in for it either
-        unsent={free && !draft.slug}
       />
     </HostPreview>
   );

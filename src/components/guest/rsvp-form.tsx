@@ -106,6 +106,7 @@ export function RsvpForm({
   functions: allFunctions,
   questions,
   preview = false,
+  sayPreview = false,
   sample = false,
   makeHref = null,
 }: {
@@ -114,6 +115,8 @@ export function RsvpForm({
   questions: RsvpQuestionId[];
   /** The host's own look before publishing: the form works, but nothing is sent. */
   preview?: boolean;
+  /** Says so above the form, for a family preview link that could be passed on to guests. */
+  sayPreview?: boolean;
   /** A design's public sample: the reply goes through to the thanks, and nothing is sent. */
   sample?: boolean;
   /** On a live invitation: after replying, a guest can make one like it. */
@@ -335,8 +338,9 @@ export function RsvpForm({
       }}
       className="flex flex-col gap-6"
     >
-      {/* Said before anything is filled in, so nobody takes a preview for the real thing */}
-      {preview && (
+      {/* Said before anything is filled in, so nobody takes a family link for the real thing;
+          the host's own preview stays as guests will see it (owner, 2026-10-27) */}
+      {preview && sayPreview && (
         <p
           data-preview-replies
           className="flex items-start gap-3 rounded-lg border border-marigold/50 bg-marigold/10 p-4 text-sm font-medium text-ink"

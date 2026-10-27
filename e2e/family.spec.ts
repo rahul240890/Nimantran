@@ -61,12 +61,10 @@ test.describe("family preview links", () => {
       "Preview · not sent to guests yet",
     );
     // Owner, 2026-10-24: a preview passed on to every guest mustn't stand in for the
-    // invitation, so it says so across every screen, its replies say they are off before
-    // anything is filled in, and WhatsApp's card for the link says it too
-    await expect(family.locator("[data-preview-mark]")).toHaveCount(1);
-    await expect(family.locator("[data-preview-mark] p").first()).toContainText(
-      "Preview · Not sent yet",
-    );
+    // invitation, so its one badge says so, its replies say they are off before anything is
+    // filled in, and WhatsApp's card for the link says it too. Since 2026-10-27 "Preview"
+    // no longer runs across every screen
+    await expect(family.locator("[data-preview-mark]")).toHaveCount(0);
     await expect(family.locator("[data-preview-replies]")).toHaveText(/replies are off/);
     await expect(family.locator('meta[property="og:description"]')).toHaveAttribute(
       "content",

@@ -358,8 +358,6 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
   menu: "প্রিভিউয়ের বিকল্প",
   opening: "আপনার নিমন্ত্রণপত্র খুলছে",
   changeGate: "খোলার দরজা বদলান",
-  marked:
-    "পাঠানো না হওয়া পর্যন্ত এই ঝলকের প্রতিটি স্ক্রিনে ‘ঝলক’ লেখা থাকে আর উত্তর বন্ধ থাকে। অতিথিরা পরিষ্কার নিমন্ত্রণপত্র পান।",
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
