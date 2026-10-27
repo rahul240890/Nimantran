@@ -16,7 +16,7 @@ import {
   type WelcomeScene,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
-import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
+import { SAMPLE_PHOTOS, SCENE_PHOTOS, at, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
 import { isFaith } from "@/lib/traditions/faith";
 
 export const metadata: Metadata = {
@@ -37,7 +37,17 @@ export const metadata: Metadata = {
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  * ?couple=two gives the couple one photo each, as a host can, and ?couple=one one together.
  * ?unsent=1 shows it as a family preview link does: marked Preview, with replies off.
+ * ?full=1 shows a fuller wedding for a walk-through: four celebrations (the Mehendi too)
+ * and eight photos.
  */
+
+/** Four more stand-in photos for ?full=1. */
+const MORE_PHOTOS = [
+  "/suites/sakura/reception.webp",
+  "/suites/chinar/baraat.webp",
+  "/suites/sakura/haldi.webp",
+  "/suites/chinar/family.webp",
+].map((url, index) => ({ id: `more-${index}`, url, width: 768, height: 1365 }));
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
   const {
     suite: asked,
@@ -53,7 +63,9 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     faith,
     couple,
     unsent,
+    full,
   } = await searchParams;
+  const fuller = full === "1";
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
       ? Date.parse(`${now}:00+05:30`)
@@ -63,12 +75,28 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
   const scene = format === "scene";
   const sceneCount = count === "0" ? 0 : count === "1" ? 1 : 2;
   const language = isCardLanguage(lang) ? lang : "en";
-  const sample = sampleDraft(suite, language === "hi");
+  const plain = sampleDraft(suite, language === "hi");
+  const sample: InviteDraft = fuller
+    ? {
+        ...plain,
+        functions: {
+          ...plain.functions,
+          mehendi: {
+            ...at("2026-11-18", "16:00", "The courtyard, Ajit Bhawan", "Residency Road"),
+            dressCode: "Shades of green",
+          },
+        },
+      }
+    : plain;
   const base: InviteDraft = {
     ...sample,
     languages: language === "en" ? sample.languages : [language],
   };
-  const shown = scene ? SCENE_PHOTOS.slice(0, sceneCount) : SAMPLE_PHOTOS;
+  const shown = scene
+    ? SCENE_PHOTOS.slice(0, sceneCount)
+    : fuller
+      ? [...SAMPLE_PHOTOS, ...MORE_PHOTOS]
+      : SAMPLE_PHOTOS;
   const turns = Number(turn);
   const sampled = scene ? sceneDraft(base, sceneCount) : base;
   const placed: InviteDraft =
