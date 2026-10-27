@@ -138,7 +138,7 @@ export function ScratchCard({
   };
 
   return (
-    <div className={cn("guest-scratch relative isolate overflow-hidden", className)}>
+    <div className={cn("guest-scratch relative isolate overflow-hidden select-none", className)}>
       {children}
       {state !== "gone" && (
         <div
@@ -148,6 +148,8 @@ export function ScratchCard({
           data-state={state}
           className="guest-scratch-foil absolute inset-0 cursor-grab touch-none select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
           onPointerDown={(event) => {
+            // Rubbing never selects the words underneath
+            event.preventDefault();
             event.currentTarget.setPointerCapture(event.pointerId);
             last.current = null;
             scratch(event.clientX, event.clientY);
