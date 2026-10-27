@@ -39,7 +39,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   kayal: {
     cover: [20, 28],
-    family: [21, 38, 4, 30],
+    family: [21, 44, 4, 30],
     haldi: [34, 30, 4, 26],
     mehendi: [26, 32, 32, 3],
     sangeet: [52, 16],

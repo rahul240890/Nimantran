@@ -15,11 +15,13 @@ import {
   keepDate,
   lettering,
   lineSpace,
+  roleOf,
   roleSize,
   placeMarkAt,
   ruleAt,
   type TypeRole,
 } from "@/lib/suites/lettering";
+import { FIT_MAX, FIT_ROOM, fitGrowth } from "@/lib/suites/fit";
 import { SUITES, pageLook, paintedTone, type Mood, type SuiteId } from "@/lib/suites/catalog";
 import { photoBox, photoPage } from "@/lib/suites/photo-frames";
 import { photoPlacement, type PhotoFit } from "@/lib/editor/photo-fit";
@@ -414,14 +416,16 @@ function drawWords(
   const padY = boxed || printed ? 6 * cq : 0;
   const sacred = beat.symbol && scene.copy.symbol ? SYMBOLS[scene.copy.symbol] : null;
 
-  // Lay the words out, shrinking them together if the page's area is too small
-  let fit = 1;
+  // Lay the words out, shrinking them together if the page's area is too small; a page of
+  // reading words starts larger, to fill its calm space as the live page does (fit.ts)
+  const grow = fitGrowth(beat.lines.map((line) => roleOf(beat, line.style)));
+  let fit = grow;
   let placed: Placed[] = [];
   let height = 0;
-  for (let attempt = 0; attempt < 8; attempt++) {
+  for (let attempt = 0; attempt < 20; attempt++) {
     placed = [];
     if (sacred) {
-      const size = Math.min(7.5 * REM, Math.max(4 * REM, 22 * cq)) * fit;
+      const size = Math.min(7.5 * REM, Math.max(4 * REM, 22 * cq)) * Math.min(fit, FIT_MAX);
       placed.push({
         kind: "symbol",
         lines: [],
@@ -440,7 +444,7 @@ function drawWords(
       const name = beat.scene === "cover" && line.style === "display";
       const lang = line.lang ?? scene.lang;
       const style = styleOf(line.style, name, cq, scene, colours, lang);
-      const size = style.size * fit;
+      const size = style.size * (style.role === "label" ? Math.min(fit, FIT_MAX) : fit);
       const font = `${style.prefix}${size}px ${style.family}`;
       ctx.font = font;
       ctx.letterSpacing = `${style.spacing * size}px`;
@@ -468,7 +472,7 @@ function drawWords(
       });
     }
     height = placed.reduce((sum, item) => sum + item.space + item.height, 0) + padY * 2;
-    if (height <= areaH || fit <= 0.6) break;
+    if (height <= areaH * (fit > FIT_MAX ? FIT_ROOM : 1) || fit <= 0.6) break;
     fit *= 0.92;
   }
 

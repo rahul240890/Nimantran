@@ -37,7 +37,16 @@ import { useCalendarLink } from "@/lib/publish/calendar-link";
 import type { PageType } from "@/lib/editor/type";
 import { lineDelay, type StoryBeat } from "@/lib/engine/story";
 import { textArea, type TextArea } from "@/lib/suites/areas";
-import { FIT_KEEP_NAMES, fitScale } from "@/lib/suites/fit";
+import {
+  FIT_HELD,
+  FIT_HELD_GAIN,
+  FIT_KEEP_NAMES,
+  FIT_MAX,
+  FIT_PHOTO,
+  FIT_ROOM,
+  fitGrowth,
+  fitScale,
+} from "@/lib/suites/fit";
 import {
   ROLES,
   keepDate,
@@ -748,7 +757,9 @@ function lineStyle(
     fontFamily: own ?? set.family,
     fontWeight: names && type?.bold ? 700 : own ? undefined : set.weight,
     ...(names && type?.italic ? { fontStyle: "italic" } : {}),
-    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * var(--story-fit, 1))`,
+    // Small headings ("With the blessings of") grow no further than the theme's own
+    // proportions: spaced wide, they would reach the art where an arch narrows
+    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${role === "label" ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"})`,
     lineHeight: set.leading,
     letterSpacing:
       name && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",
@@ -873,6 +884,12 @@ export function StoryPage({
   });
   const fitArea = useRef<HTMLDivElement>(null);
   const fitWords = useRef<HTMLDivElement>(null);
+  // A page of reading words (the family, a memory, a tahuko) grows to fill its calm space,
+  // and the names under the photos fill the plain wall beneath the frames
+  const grow = Math.max(
+    fitGrowth(beat.lines.map((line) => roleOf(beat, line.style))),
+    frames ? FIT_PHOTO : 0,
+  );
   const fitKey = JSON.stringify([
     beat.lines,
     type,
@@ -903,7 +920,8 @@ export function StoryPage({
         const height = bottom + parseFloat(getComputedStyle(inner).paddingBottom || "0");
         // Each line on its own: the glow behind printed words reaches past the edges on purpose
         return (
-          height <= outer.clientHeight + 1 &&
+          // Grown past the theme's own size, the words keep a margin of the calm space clear
+          height <= outer.clientHeight * (scale > FIT_MAX ? FIT_ROOM : 1) + 1 &&
           // The sacred symbol is drawn in its own square, so its width never decides the fit
           lines.every(
             (line) =>
@@ -913,12 +931,16 @@ export function StoryPage({
       };
       delete inner.dataset.overflow;
       delete inner.dataset.loose;
-      let { scale, overflow } = fitScale(fits);
-      // Names kept whole that leave the words too small may break after their first words
-      if (scale < FIT_KEEP_NAMES && inner.querySelector(".story-keep")) {
+      const range = { max: grow, steps: grow > FIT_MAX ? 9 : 7 };
+      let { scale, overflow } = fitScale(fits, range);
+      // Names kept whole that leave the words too small may break after their first words,
+      // and so may a long name that holds a page of reading words well under its full size
+      const held = grow > FIT_MAX && scale < grow * FIT_HELD;
+      if ((scale < FIT_KEEP_NAMES || held) && inner.querySelector(".story-keep")) {
         inner.dataset.loose = "true";
-        const loose = fitScale(fits);
-        if (loose.scale > scale || (overflow && !loose.overflow)) ({ scale, overflow } = loose);
+        const loose = fitScale(fits, range);
+        const better = held && scale >= FIT_KEEP_NAMES ? scale * FIT_HELD_GAIN : scale;
+        if (loose.scale > better || (overflow && !loose.overflow)) ({ scale, overflow } = loose);
         else delete inner.dataset.loose;
       }
       inner.style.setProperty("--story-fit", String(scale));
@@ -941,7 +963,7 @@ export function StoryPage({
       inner.removeEventListener("animationend", fit);
       document.fonts?.removeEventListener("loadingdone", fit);
     };
-  }, [fitKey]);
+  }, [fitKey, grow]);
 
   return (
     <div
@@ -1017,9 +1039,10 @@ export function StoryPage({
               className="story-print-haze absolute -inset-x-[12%] -inset-y-[18%] -z-10"
             />
           )}
+          {/* The god stays its own size when a page of reading words grows round it */}
           {sacred && (
             <span
-              className="story-line story-symbol mb-[1cqmin] flex size-[calc(clamp(calc(4rem*var(--type-floor,1)),22cqmin,7.5rem)*var(--story-fit,1))] shrink-0 items-center justify-center"
+              className="story-line story-symbol mb-[1cqmin] flex size-[calc(clamp(calc(4rem*var(--type-floor,1)),22cqmin,7.5rem)*min(var(--story-fit,1),1.25))] shrink-0 items-center justify-center"
               style={delay(0)}
             >
               {sacred.kind === "art" ? (
@@ -1033,7 +1056,7 @@ export function StoryPage({
                 <span
                   aria-hidden
                   className={cn(
-                    "block text-center text-[length:calc(clamp(calc(3.4rem*var(--type-floor,1)),20cqmin,6.5rem)*var(--story-fit,1)*var(--glyph-scale,1))] leading-none whitespace-nowrap text-card-accent-text",
+                    "block text-center text-[length:calc(clamp(calc(3.4rem*var(--type-floor,1)),20cqmin,6.5rem)*min(var(--story-fit,1),1.25)*var(--glyph-scale,1))] leading-none whitespace-nowrap text-card-accent-text",
                     sacred.font === "display" ? "font-card-display" : "font-sans",
                   )}
                   style={{ "--glyph-scale": glyphScale(sacred) } as CSSProperties}
