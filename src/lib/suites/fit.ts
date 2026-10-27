@@ -12,9 +12,9 @@ export const FIT_MIN = 0.6;
 export const FIT_MAX = 1.25;
 /**
  * The most a page of reading words may grow: a family page of parents' names, a memory or
- * a tahuko fills its calm space until its largest line is about as large as a heading.
+ * a tahuko fills its calm space, its largest line staying a step below the couple's names.
  */
-export const FIT_GROW = 2.2;
+export const FIT_GROW = 1.9;
 /** The names under a couple's photos may grow this far into the plain wall below the frames. */
 export const FIT_PHOTO = 1.6;
 /** Words grown past FIT_MAX fill at most this share of the calm space's height. */
@@ -23,8 +23,8 @@ export const FIT_ROOM = 0.9;
 /**
  * How far a page's words may grow, from the largest kind of line on it. A page of names or
  * a function's title keeps the theme's proportions (FIT_MAX); a page set only in reading
- * words grows until its largest line would stand as large as a page's heading, so the
- * parents' names on a family page don't sit small in an empty arch.
+ * words grows towards a page heading's size (no further than FIT_GROW), so the parents'
+ * names on a family page don't sit small in an empty arch.
  */
 export function fitGrowth(roles: readonly TypeRole[]): number {
   const largest = Math.max(0, ...roles.map((role) => ROLES[role].fluid));
