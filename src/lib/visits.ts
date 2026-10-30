@@ -42,7 +42,7 @@ export type Agent = {
 };
 
 const BOT =
-  /bot|crawl|spider|slurp|archiver|facebookexternalhit|whatsapp|telegram|preview|headless|lighthouse|pagespeed|vercel|curl|wget|python|axios|node-fetch|go-http/i;
+  /bot|crawl|spider|slurp|archiver|facebookexternalhit|whatsapp|telegram|preview|headless|lightpanda|phantom|puppeteer|playwright|selenium|lighthouse|pagespeed|vercel|curl|wget|python|axios|node-fetch|go-http/i;
 
 /** Crawlers, link previews and scripts, which aren't people visiting. */
 export function isBot(agent: string | null | undefined): boolean {
@@ -125,6 +125,8 @@ export function campaignSource(source: unknown): string | null {
 }
 
 function send(beacon: VisitBeacon | StepBeacon): void {
+  // Browsers driven by a script say so, even when they dress up as Chrome
+  if (navigator.webdriver) return;
   const body = JSON.stringify(beacon);
   if (!navigator.sendBeacon?.("/api/visit", new Blob([body], { type: "application/json" }))) {
     void fetch("/api/visit", { method: "POST", body, keepalive: true }).catch(() => {});

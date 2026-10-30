@@ -44,13 +44,17 @@ export function loadPainting(src: string): Promise<void> {
   const image = new window.Image();
   image.decoding = "async";
   image.src = src;
-  const done = image
-    .decode()
-    .catch(() => {})
-    .then(() => {
-      loaded.add(src);
-      changed();
-    });
+  // Some browsers (headless ones among them) have no decode(); loading is enough there
+  const ready =
+    typeof image.decode === "function"
+      ? image.decode().catch(() => {})
+      : new Promise<void>((resolve) => {
+          image.onload = image.onerror = () => resolve();
+        });
+  const done = ready.then(() => {
+    loaded.add(src);
+    changed();
+  });
   started.set(src, done);
   return done;
 }
