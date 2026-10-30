@@ -1,12 +1,14 @@
 import { after } from "next/server";
 import { countableUrl } from "@/lib/analytics";
 import { sendAlert } from "@/lib/errors/alert";
+import { isBot } from "@/lib/visits";
 
 /*
  * Receives browser error reports (lib/errors/report.ts), writes each to the server logs as
  * one line of JSON, and emails the ones that aren't the browser's own noise to whoever
- * looks after the site (lib/errors/alert.ts). Nothing is stored; malformed or oversized
- * reports are dropped.
+ * looks after the site (lib/errors/alert.ts). Bots and headless browsers are logged but never
+ * emailed: what breaks in a scraper isn't something a visitor saw. Nothing is stored;
+ * malformed or oversized reports are dropped.
  */
 
 const MAX_BYTES = 4096;
@@ -43,6 +45,7 @@ export async function POST(request: Request) {
       agent,
     }),
   );
+  if (isBot(agent)) return new Response(null, { status: 204 });
   after(() =>
     sendAlert({
       where: "browser",
