@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FIT_MAX, FIT_MIN, fitScale } from "./fit";
+import { FIT_GROW, FIT_MAX, FIT_MIN, fitGrowth, fitScale } from "./fit";
 
 describe("fitting words to a painting", () => {
   it("grows short words up to the most, never past it", () => {
@@ -22,5 +22,26 @@ describe("fitting words to a painting", () => {
       const { scale } = fitScale((scale) => scale <= limit, { steps: 12 });
       expect(scale).toBeLessThanOrEqual(limit);
     }
+  });
+});
+
+describe("how far a page's words may grow", () => {
+  it("keeps a page of names or a function's title to the theme's proportions", () => {
+    expect(fitGrowth(["names", "joiner", "names"])).toBe(FIT_MAX);
+    expect(fitGrowth(["display", "date", "venue"])).toBe(FIT_MAX);
+  });
+
+  it("lets a family page of reading words grow to fill its calm space", () => {
+    expect(fitGrowth(["body", "label", "body", "small"])).toBe(FIT_GROW);
+  });
+
+  it("grows a page with a day on it less than one of reading words only", () => {
+    const withDay = fitGrowth(["body", "label", "date"]);
+    expect(withDay).toBeGreaterThan(FIT_MAX);
+    expect(withDay).toBeLessThan(FIT_GROW);
+  });
+
+  it("treats an empty page as any other", () => {
+    expect(fitGrowth([])).toBe(FIT_MAX);
   });
 });
