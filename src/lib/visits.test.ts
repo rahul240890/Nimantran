@@ -13,6 +13,7 @@ describe("visits", () => {
     expect(isBot(ANDROID)).toBe(false);
     expect(isBot("Mozilla/5.0 (compatible; Googlebot/2.1)")).toBe(true);
     expect(isBot("WhatsApp/2.23.20.0")).toBe(true);
+    expect(isBot("Lightpanda/1.0")).toBe(true);
     expect(isBot(null)).toBe(true);
   });
 

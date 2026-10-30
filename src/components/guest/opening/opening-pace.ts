@@ -26,7 +26,8 @@ function styleUrls(root: HTMLElement): string[] {
 
 /** Settles once the image has loaded (or failed) and is decoded, ready to draw at once. */
 function settled(img: HTMLImageElement): Promise<unknown> {
-  const decode = () => img.decode().catch(() => {});
+  const decode = () =>
+    typeof img.decode === "function" ? img.decode().catch(() => {}) : Promise.resolve();
   if (img.complete) return decode();
   return new Promise((resolve) => {
     img.addEventListener("load", resolve, { once: true });
