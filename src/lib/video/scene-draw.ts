@@ -32,6 +32,8 @@ import {
   type Palette,
 } from "./draw";
 import { shotsAt, type SceneShot, type SceneTimeline } from "./scene-timeline";
+import { drawMovingLayers, movingVideoImages } from "./moving-draw";
+import { photoDrift } from "./motion";
 import { CROSSFADE } from "./timeline";
 
 /** What the slot carries in turn: its opening card (the blessing, the line, or both), or a celebration. */
@@ -56,6 +58,7 @@ const CQW = PAGE_W / 100;
 export function sceneVideoImages(film: Pick<SceneFilm, "page" | "photos" | "suite">): string[] {
   const urls = new Set<string>([film.page.image]);
   if (film.page.card) urls.add(film.page.card.image);
+  for (const url of film.page.moving ? movingVideoImages(film.page.moving) : []) urls.add(url);
   for (const photo of film.photos) urls.add(photo.src);
   const cover = SUITES[film.suite].images.cover;
   if (cover) urls.add(cover);
@@ -90,9 +93,11 @@ function drawScene(ctx: CanvasRenderingContext2D, film: SceneFilm, seconds: numb
   const base = film.palette(mood, null);
   ctx.fillStyle = base.paper;
   ctx.fillRect(0, 0, PAGE_W, PAGE_H);
-  drawPhotos(ctx, film, base);
+  drawPhotos(ctx, film, base, seconds);
   const painting = film.images.get(page.image);
   if (painting) fillWith(ctx, painting, 0, 0, PAGE_W, PAGE_H);
+  // A moving scene plays its layers over the flat painting, as the live scene does
+  if (page.moving) drawMovingLayers(ctx, page.moving, film.images, seconds);
 
   // The light of the celebration on the card, eased over from the one before
   if (before && change < 1) drawLight(ctx, film, moodOf(film, before), 1 - change);
@@ -137,7 +142,12 @@ const px = ([x, y, w, h]: FrameBox) => ({
 });
 
 /** The photos under the painting, or a small gilt flower in a frame still waiting for one. */
-function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Palette) {
+function drawPhotos(
+  ctx: CanvasRenderingContext2D,
+  film: SceneFilm,
+  colours: Palette,
+  seconds: number,
+) {
   // One photo on a two-frame painting shows through both frames, as the live scene shows it
   photoWindows(film.page.frames, film.photos.length).forEach((frame, i) => {
     const [x, y, w, h] = frame;
@@ -146,8 +156,16 @@ function drawPhotos(ctx: CanvasRenderingContext2D, film: SceneFilm, colours: Pal
     const src = film.photos[i]?.src;
     const photo = src ? film.images.get(src) : undefined;
     if (photo) {
-      // As the host placed it, or with the faces kept high, as the live scene shows it
+      // As the host placed it, or with the faces kept high, as the live scene shows it,
+      // drifting slowly closer through the whole video
+      const t = Math.min(1, seconds / Math.max(film.timeline.end, 1));
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(box.x, box.y, box.w, box.h);
+      ctx.clip();
+      photoDrift(ctx, box, t, i);
       drawFittedPhoto(ctx, photo, box.x, box.y, box.w, box.h, film.photos[i]?.fit);
+      ctx.restore();
       return;
     }
     ctx.fillStyle = colours.paper;
