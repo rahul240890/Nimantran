@@ -3,7 +3,7 @@ import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { getLocale } from "@/i18n/server";
 import { editorText } from "@/i18n/copy/editor";
-import { includedFunctions, type InviteDraft } from "@/lib/editor/draft";
+import { ASKABLE_QUESTIONS, includedFunctions, type InviteDraft } from "@/lib/editor/draft";
 import { isCardLanguage } from "@/lib/templates/card-languages";
 import { guestGuide } from "@/lib/publish/event-day";
 import { storyFunctions } from "@/lib/publish/story";
@@ -37,6 +37,7 @@ export const metadata: Metadata = {
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  * ?couple=two gives the couple one photo each, as a host can, and ?couple=one one together.
  * ?unsent=1 shows it as a family preview link does: marked Preview, with replies off.
+ * ?questions=all asks every question a host can tick, to review the reply form with them.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
   const {
@@ -53,6 +54,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     faith,
     couple,
     unsent,
+    questions: asking,
   } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
@@ -114,7 +116,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       photos={shown}
       allIcsUrl={null}
       rsvpFunctions={rsvpFunctions}
-      questions={[]}
+      questions={asking === "all" ? ASKABLE_QUESTIONS : []}
       previewNow={previewNow}
       holdWelcome={hold === "1"}
       preview={unsent === "1"}

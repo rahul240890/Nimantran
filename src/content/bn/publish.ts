@@ -228,6 +228,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   yourName: "আপনার নাম",
   namePlaceholder: "পরিবার যে নামে আপনাকে চেনে",
   nameRequired: "অনুগ্রহ করে আপনার নাম লিখুন",
+  celebrations: "অনুষ্ঠান",
   acceptAll: "সব অনুষ্ঠানে আসছি",
   statuses: {
     attending: { label: "সানন্দে আসছি", short: "আসছি" },

@@ -13,7 +13,8 @@ import {
   Send,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { RadioGroup as RadioPrimitive } from "radix-ui";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { sendReply } from "@/actions/rsvp";
 import { guestReply, knownToken, storeToken } from "@/components/guest/guest-reply";
 import { Button } from "@/components/ui/button";
@@ -21,8 +22,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
 import { IconButton } from "@/components/ui/icon-button";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioItem } from "@/components/ui/radio-group";
-import { Select } from "@/components/ui/select";
+import { Quiet } from "@/components/ui/quiet";
 import { Textarea } from "@/components/ui/textarea";
 import { RSVP_QUESTIONS } from "@/lib/categories/questions";
 import type { RsvpQuestionId } from "@/lib/categories/schema";
@@ -69,30 +69,147 @@ function Counter({
   const { rsvpCopy } = useGuestText();
   const id = useId();
   return (
-    <div role="group" aria-labelledby={id} className="flex items-center justify-between gap-3">
-      <span id={id} className="font-semibold">
+    <div role="group" aria-labelledby={id} className="flex flex-col items-start gap-1">
+      <span id={id} className="text-xs text-ink-muted">
         {label}
       </span>
-      <span className="flex items-center gap-2">
+      <span className="flex items-center rounded-full border border-line-strong bg-surface">
         <IconButton
           label={rsvpCopy.fewer(label)}
           icon={<Minus />}
           size="sm"
+          variant="ghost"
+          showTooltip={false}
+          className="rounded-full [&_svg]:size-4"
           disabled={value <= min}
           onClick={() => onChange(Math.max(min, value - 1))}
         />
-        <output aria-live="polite" className="w-8 text-center text-lg font-semibold tabular-nums">
+        <output aria-live="polite" className="w-6 text-center font-semibold tabular-nums">
           {value}
         </output>
         <IconButton
           label={rsvpCopy.more(label)}
           icon={<Plus />}
           size="sm"
+          variant="ghost"
+          showTooltip={false}
+          className="rounded-full [&_svg]:size-4"
           disabled={value >= MAX_PEOPLE}
           onClick={() => onChange(Math.min(MAX_PEOPLE, value + 1))}
         />
       </span>
     </div>
+  );
+}
+
+/** Each reply in its own colour once chosen, so a guest sees at a glance what they said. */
+const statusChosen = {
+  attending: "data-[state=checked]:border-success data-[state=checked]:bg-success/12",
+  maybe: "data-[state=checked]:border-marigold data-[state=checked]:bg-marigold/18",
+  declined: "data-[state=checked]:border-danger data-[state=checked]:bg-danger/10",
+} as const;
+const statusIconChosen = {
+  attending: "group-data-[state=checked]/reply:text-success",
+  maybe: "group-data-[state=checked]/reply:text-accent-text",
+  declined: "group-data-[state=checked]/reply:text-danger",
+} as const;
+
+/** Coming, Maybe or Can't come for one celebration: three pills side by side. */
+function ReplyChoice({
+  label,
+  value,
+  invalid,
+  onChange,
+}: {
+  label: string;
+  value: ReplyStatus | null;
+  invalid: boolean;
+  onChange: (status: ReplyStatus) => void;
+}) {
+  const { rsvpCopy } = useGuestText();
+  return (
+    <RadioPrimitive.Root
+      aria-label={label}
+      aria-invalid={invalid || undefined}
+      orientation="horizontal"
+      value={value ?? ""}
+      onValueChange={(status) => onChange(status as ReplyStatus)}
+      className="grid grid-cols-3 gap-2"
+    >
+      {(["attending", "maybe", "declined"] as const).map((status) => (
+        <RadioPrimitive.Item
+          key={status}
+          value={status}
+          className={cn(
+            "group/reply flex min-h-11 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-full border bg-surface px-2 py-1.5 text-center text-sm leading-tight font-semibold text-ink",
+            invalid ? "border-danger" : "border-line-strong",
+            "transition-[background-color,border-color] duration-150 hover:border-ink-muted",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+            // Tamil words run long and don't hyphenate: on the narrowest phones they set smaller
+            "max-[399px]:[&:lang(ta)]:text-xs",
+            statusChosen[status],
+          )}
+        >
+          <span
+            aria-hidden
+            className={cn(
+              "hidden shrink-0 text-ink-muted min-[480px]:inline [&_svg]:size-4",
+              statusIconChosen[status],
+            )}
+          >
+            {statusIcons[status]}
+          </span>
+          <span className="min-w-0">{rsvpCopy.statuses[status].short}</span>
+        </RadioPrimitive.Item>
+      ))}
+    </RadioPrimitive.Root>
+  );
+}
+
+/** A yes-or-no or a short list of choices, as pills that wrap. */
+function Pills({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <RadioPrimitive.Root
+      aria-label={label}
+      orientation="horizontal"
+      value={value}
+      onValueChange={onChange}
+      className="flex flex-wrap gap-2"
+    >
+      {options.map((option) => (
+        <RadioPrimitive.Item
+          key={option.value}
+          value={option.value}
+          className={cn(
+            "inline-flex min-h-11 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-4 text-sm font-semibold text-ink",
+            "transition-[background-color,border-color] duration-150 hover:border-ink-muted",
+            "data-[state=checked]:border-marigold data-[state=checked]:bg-marigold/18",
+            "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+          )}
+        >
+          {option.label}
+        </RadioPrimitive.Item>
+      ))}
+    </RadioPrimitive.Root>
+  );
+}
+
+/** A small heading over a part of the form. */
+function PartHeading({ id, children }: { id?: string; children: ReactNode }) {
+  return (
+    <h3 id={id} className="font-label text-xs tracking-[0.18em] text-ink-muted uppercase">
+      {children}
+    </h3>
   );
 }
 
@@ -211,9 +328,11 @@ export function RsvpForm({
     setError(null);
     if (problems > 0) {
       requestAnimationFrame(() => {
-        document
-          .querySelector<HTMLElement>("#rsvp [aria-invalid='true']")
-          ?.focus({ preventScroll: false });
+        const invalid = document.querySelector<HTMLElement>("#rsvp [aria-invalid='true']");
+        const target = invalid?.matches("input, textarea, button")
+          ? invalid
+          : invalid?.querySelector<HTMLElement>("button");
+        target?.focus({ preventScroll: false });
       });
       return;
     }
@@ -330,179 +449,169 @@ export function RsvpForm({
   }
 
   return (
-    <form
-      noValidate
-      onSubmit={(event) => {
-        event.preventDefault();
-        void submit();
-      }}
-      className="flex flex-col gap-6"
-    >
-      {/* Said before anything is filled in, so nobody takes a family link for the real thing;
+    <Quiet>
+      <form
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          void submit();
+        }}
+        className="flex flex-col gap-7"
+      >
+        {/* Said before anything is filled in, so nobody takes a family link for the real thing;
           the host's own preview stays as guests will see it (owner, 2026-10-27) */}
-      {preview && sayPreview && (
-        <p
-          data-preview-replies
-          className="flex items-start gap-3 rounded-lg border border-marigold/50 bg-marigold/10 p-4 text-sm font-medium text-ink"
+        {preview && sayPreview && (
+          <p
+            data-preview-replies
+            className="flex items-start gap-3 rounded-lg border border-marigold/50 bg-marigold/10 p-4 text-sm font-medium text-ink"
+          >
+            <Lock aria-hidden className="mt-0.5 size-4.5 shrink-0 text-accent-text" />
+            {rsvpCopy.previewNotice}
+          </p>
+        )}
+        <div aria-hidden className="sr-only">
+          <input
+            ref={trap}
+            type="text"
+            name="website"
+            aria-label="Website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </div>
+        <Field
+          label={rsvpCopy.yourName}
+          required
+          error={checked && nameMissing ? rsvpCopy.nameRequired : undefined}
         >
-          <Lock aria-hidden className="mt-0.5 size-4.5 shrink-0 text-accent-text" />
-          {rsvpCopy.previewNotice}
-        </p>
-      )}
-      <div aria-hidden className="sr-only">
-        <input
-          ref={trap}
-          type="text"
-          name="website"
-          aria-label="Website"
-          tabIndex={-1}
-          autoComplete="off"
-        />
-      </div>
-      <Field
-        label={rsvpCopy.yourName}
-        required
-        error={checked && nameMissing ? rsvpCopy.nameRequired : undefined}
-      >
-        <Input
-          ref={nameInput}
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          maxLength={80}
-          autoComplete="name"
-          placeholder={rsvpCopy.namePlaceholder}
-        />
-      </Field>
+          <Input
+            ref={nameInput}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            maxLength={80}
+            autoComplete="name"
+            placeholder={rsvpCopy.namePlaceholder}
+          />
+        </Field>
 
-      {functions.length > 1 && (
-        <Button
-          variant="secondary"
-          leadingIcon={<CircleCheck aria-hidden />}
-          className="h-auto min-h-12 max-w-full self-start py-2 whitespace-normal"
-          onClick={acceptAll}
-        >
-          {rsvpCopy.acceptAll}
-        </Button>
-      )}
-
-      <ol className="flex flex-col gap-4">
-        {functions.map((fn) => {
-          const choice = choiceOf(fn.id);
-          const missing = checked && !choice.status;
-          const headingId = `rsvp-${fn.kind}`;
-          return (
-            <li
-              key={fn.id}
-              className={cn(
-                "flex flex-col gap-3 rounded-lg border bg-surface p-4 shadow-raised sm:p-5",
-                missing ? "border-danger" : "border-line",
-              )}
-            >
-              <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                <h3 id={headingId} className="font-display text-xl leading-tight">
-                  {fn.name}
-                </h3>
-                {fn.date && (
-                  <span className="text-sm text-ink-muted">
-                    {formatCardDayMonth(fn.date, language)}
-                  </span>
-                )}
-              </div>
-              <RadioGroup
-                label={rsvpCopy.statusGroup(fn.name)}
-                variant="segment"
-                orientation="horizontal"
-                value={choice.status ?? ""}
-                invalid={missing}
-                onValueChange={(status) => set(fn.id, { status: status as ReplyStatus })}
+        <section aria-labelledby="rsvp-celebrations" className="flex flex-col">
+          <div className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 border-b border-line pb-1">
+            <PartHeading id="rsvp-celebrations">{rsvpCopy.celebrations}</PartHeading>
+            {functions.length > 1 && (
+              <button
+                type="button"
+                onClick={acceptAll}
+                className="-me-2 inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-semibold text-accent-text hover:underline hover:underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
               >
-                {(["attending", "maybe", "declined"] as const).map((status) => (
-                  <RadioItem
-                    key={status}
-                    value={status}
-                    icon={statusIcons[status]}
-                    label={rsvpCopy.statuses[status].short}
+                <CircleCheck aria-hidden className="size-4" />
+                {rsvpCopy.acceptAll}
+              </button>
+            )}
+          </div>
+          <ol className="flex flex-col divide-y divide-line">
+            {functions.map((fn) => {
+              const choice = choiceOf(fn.id);
+              const missing = checked && !choice.status;
+              return (
+                <li key={fn.id} className="flex flex-col gap-3 py-4">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
+                    <h4 className="font-display text-lg leading-snug break-words">{fn.name}</h4>
+                    {fn.date && (
+                      <span className="text-xs text-ink-muted">
+                        {formatCardDayMonth(fn.date, language)}
+                      </span>
+                    )}
+                  </div>
+                  <ReplyChoice
+                    label={rsvpCopy.statusGroup(fn.name)}
+                    value={choice.status}
+                    invalid={missing}
+                    onChange={(status) => set(fn.id, { status })}
                   />
-                ))}
-              </RadioGroup>
-              {missing && <p className="text-sm font-medium text-danger">{rsvpCopy.chooseOne}</p>}
-              {choice.status && choice.status !== "declined" && (
-                <div className="grid gap-3 border-t border-line pt-4 sm:grid-cols-2 sm:gap-6">
-                  <Counter
-                    label={rsvpCopy.adults}
-                    value={choice.adults}
-                    min={choice.children > 0 ? 0 : 1}
-                    onChange={(adults) => set(fn.id, { adults })}
-                  />
-                  <Counter
-                    label={rsvpCopy.children}
-                    value={choice.children}
-                    min={0}
-                    onChange={(children) =>
-                      set(fn.id, {
-                        children,
-                        adults: children === 0 ? Math.max(1, choice.adults) : choice.adults,
-                      })
-                    }
-                  />
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ol>
+                  {missing && (
+                    <p className="text-sm font-medium text-danger">{rsvpCopy.chooseOne}</p>
+                  )}
+                  {choice.status && choice.status !== "declined" && (
+                    <div className="flex flex-wrap gap-x-6 gap-y-3">
+                      <Counter
+                        label={rsvpCopy.adults}
+                        value={choice.adults}
+                        min={choice.children > 0 ? 0 : 1}
+                        onChange={(adults) => set(fn.id, { adults })}
+                      />
+                      <Counter
+                        label={rsvpCopy.children}
+                        value={choice.children}
+                        min={0}
+                        onChange={(children) =>
+                          set(fn.id, {
+                            children,
+                            adults: children === 0 ? Math.max(1, choice.adults) : choice.adults,
+                          })
+                        }
+                      />
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ol>
+        </section>
 
-      {questions.length > 0 && (
-        <fieldset className="flex flex-col gap-4">
-          <legend className="mb-4 font-display text-xl">{rsvpCopy.questionsHeading}</legend>
-          {questions.map((id) => (
-            <Question
-              key={id}
-              id={id}
-              value={answers[id] ?? ""}
-              onChange={(value) => setAnswers((current) => ({ ...current, [id]: value }))}
-            />
-          ))}
-        </fieldset>
-      )}
+        {questions.length > 0 && (
+          <section aria-labelledby="rsvp-details" className="flex flex-col gap-4">
+            <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
+              <PartHeading id="rsvp-details">{rsvpCopy.questionsHeading}</PartHeading>
+              <span className="text-xs text-ink-muted">{rsvpCopy.optional}</span>
+            </div>
+            {questions.map((id) => (
+              <Question
+                key={id}
+                id={id}
+                value={answers[id] ?? ""}
+                onChange={(value) => setAnswers((current) => ({ ...current, [id]: value }))}
+              />
+            ))}
+          </section>
+        )}
 
-      <Field label={rsvpCopy.message} optionalLabel={rsvpCopy.optional}>
-        <Textarea
-          value={message}
-          onChange={(event) => setMessage(event.target.value)}
-          maxLength={280}
-          rows={3}
-          placeholder={rsvpCopy.messagePlaceholder}
-        />
-      </Field>
+        <Field label={rsvpCopy.message} optionalLabel={rsvpCopy.optional}>
+          <Textarea
+            value={message}
+            onChange={(event) => setMessage(event.target.value)}
+            maxLength={280}
+            rows={2}
+            placeholder={rsvpCopy.messagePlaceholder}
+          />
+        </Field>
 
-      {checked && problems > 0 && (
-        <p
-          role="alert"
-          className="rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+        {checked && problems > 0 && (
+          <p
+            role="alert"
+            className="rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+          >
+            {rsvpCopy.fixErrors(problems)}
+          </p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
+          >
+            {error}
+          </p>
+        )}
+
+        <Button
+          type="submit"
+          loading={busy}
+          leadingIcon={<Send aria-hidden className="rtl:-scale-x-100" />}
+          className="min-h-12 w-full"
         >
-          {rsvpCopy.fixErrors(problems)}
-        </p>
-      )}
-      {error && (
-        <p
-          role="alert"
-          className="rounded-md border border-danger/35 bg-danger/10 px-4 py-3 text-sm font-medium text-danger"
-        >
-          {error}
-        </p>
-      )}
-
-      <Button
-        type="submit"
-        size="lg"
-        loading={busy}
-        leadingIcon={<Send aria-hidden className="rtl:-scale-x-100" />}
-        className="self-stretch sm:self-start"
-      >
-        {replied ? rsvpCopy.update : rsvpCopy.send}
-      </Button>
-    </form>
+          {replied ? rsvpCopy.update : rsvpCopy.send}
+        </Button>
+      </form>
+    </Quiet>
   );
 }
 
@@ -519,39 +628,29 @@ function Question({
   const language = useGuestLanguage();
   const spec = RSVP_QUESTIONS[id];
   const label = questionLabels[id];
-  if (spec.kind === "choice") {
-    return (
-      <Field label={label} optionalLabel={rsvpCopy.optional}>
-        <Select
-          value={value || undefined}
-          onValueChange={onChange}
-          placeholder={rsvpCopy.choose}
-          options={(spec.options ?? []).map((option) => ({
+  if (spec.kind === "choice" || spec.kind === "yes-no") {
+    const options =
+      spec.kind === "choice"
+        ? (spec.options ?? []).map((option) => ({
             value: option,
             label: rsvpCopy.meal[option as keyof typeof rsvpCopy.meal] ?? option,
-          }))}
-        />
-      </Field>
-    );
-  }
-  if (spec.kind === "yes-no") {
+          }))
+        : [
+            { value: "yes", label: rsvpCopy.yes },
+            { value: "no", label: rsvpCopy.no },
+          ];
     return (
-      <div className="flex flex-col gap-1">
-        <span aria-hidden className="font-semibold">
+      <div className="flex flex-col gap-2">
+        <span aria-hidden className="text-sm font-semibold text-ink">
           {label}
-          {/* Optional, like every other question, so nobody thinks it holds up the reply */}
-          <span className="ms-2 text-sm font-normal text-ink-muted">{rsvpCopy.optional}</span>
         </span>
-        <RadioGroup label={label} orientation="horizontal" value={value} onValueChange={onChange}>
-          <RadioItem value="yes" label={rsvpCopy.yes} />
-          <RadioItem value="no" label={rsvpCopy.no} />
-        </RadioGroup>
+        <Pills label={label} value={value} options={options} onChange={onChange} />
       </div>
     );
   }
   if (spec.kind === "date") {
     return (
-      <Field label={label} optionalLabel={rsvpCopy.optional}>
+      <Field label={label}>
         <DatePicker
           locale={PICKER_LOCALES[language]}
           value={value ? parseISO(value) : undefined}
@@ -562,7 +661,7 @@ function Question({
     );
   }
   return (
-    <Field label={label} optionalLabel={rsvpCopy.optional}>
+    <Field label={label}>
       <Input
         value={value}
         onChange={(event) => onChange(event.target.value)}

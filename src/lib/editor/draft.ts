@@ -641,8 +641,12 @@ export function coupleValue(draft: InviteDraft, template: Template, id: SlotId):
  */
 export const ASKABLE_QUESTIONS = RSVP_QUESTION_IDS.filter((id) => id !== "message");
 
-/** The questions this invite's RSVP asks, in a fixed order. */
+/**
+ * The questions this invite's RSVP asks, in a fixed order. A new invite asks none: the reply
+ * itself is enough, and the host ticks food, stay or pickup only if they need them (owner,
+ * 2026-11-03). A saved or published invite keeps the questions stored with it.
+ */
 export function draftQuestions(draft: InviteDraft): RsvpQuestionId[] {
-  const chosen: readonly RsvpQuestionId[] = draft.questions ?? draftCategory(draft).rsvpQuestions;
+  const chosen: readonly RsvpQuestionId[] = draft.questions ?? [];
   return ASKABLE_QUESTIONS.filter((id) => chosen.includes(id));
 }

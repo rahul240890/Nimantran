@@ -292,6 +292,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   yourName: "உங்கள் பெயர்",
   namePlaceholder: "குடும்பத்தினருக்குத் தெரிந்த பெயர்",
   nameRequired: "உங்கள் பெயரை உள்ளிடவும்",
+  celebrations: "நிகழ்ச்சிகள்",
   acceptAll: "எல்லாவற்றுக்கும் வருகிறோம்",
   statuses: {
     attending: { label: "மகிழ்ச்சியுடன் வருகிறோம்", short: "வருவோம்" },
