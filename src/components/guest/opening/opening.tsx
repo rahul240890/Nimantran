@@ -518,7 +518,7 @@ export function Opening({
       data-opening={style}
       style={{ "--story-scale": type.scale } as CSSProperties}
       data-invitation
-      className="opening-page relative isolate flex min-h-svh items-center justify-center overflow-hidden"
+      className="opening-page relative isolate flex min-h-dvh items-center justify-center overflow-hidden"
     >
       {/* Around the frame on a wide screen: the painting softly, or the theme's own colours */}
       <div aria-hidden className="absolute inset-0 -z-10 max-sm:hidden">
@@ -553,7 +553,7 @@ export function Opening({
       <div
         ref={stage}
         data-open={open}
-        className="opening-stage [container-type:size] relative h-svh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
+        className="opening-stage [container-type:size] relative h-dvh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
         <OpeningArt style={style} cover={cover} />
         {open && !still && <OpeningPetals />}
