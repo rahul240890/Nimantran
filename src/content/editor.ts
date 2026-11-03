@@ -1957,5 +1957,10 @@ export const quickCopy = {
   pickLive: "Your live invitation",
   pickLiveBody:
     "The same link, guests and replies, in this design. If your package doesn't cover it, guests keep the design they have until you choose one.",
+  pickNewPaidBody:
+    "Your names, dates, places, family, photos and words come with it. The invitation you paid for stays as it is, ready to publish.",
+  pickPaid: "The invitation you paid for",
+  pickPaidBody:
+    "The same invitation in this design. Your package covers the design you bought it for, so this one asks for its own package when you publish.",
   pickClose: "Close",
 } as const;
