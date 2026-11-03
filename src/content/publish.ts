@@ -136,6 +136,16 @@ export const guestCopy = {
     pause: "Pause the photos",
     play: "Play the photos",
     position: (index: number, total: number) => `Photo ${index} of ${total}`,
+    open: (index: number) => `Open photo ${index} full screen`,
+    close: "Close the photos",
+    viewer: "Photos from the family",
+  },
+  /** Scratch to reveal the date, and photos wrapped like gifts. */
+  scratch: {
+    date: "Scratch to reveal the date",
+    showDate: "Show the date",
+    unwrap: (index: number) => `Unwrap photo ${index}`,
+    tap: "Tap to unwrap",
   },
   previewMark: "Preview · Not sent yet",
   madeWith: `Made with ${site.shortName}`,
@@ -274,7 +284,8 @@ export const guestCopy = {
 
 export const rsvpCopy = {
   heading: "Will you join us?",
-  intro: "Reply for each celebration. You can change your answer any time from this page.",
+  intro:
+    "Tell the family your name and whether you can come. You can change your reply here any time.",
   yourName: "Your name",
   namePlaceholder: "As the family knows you",
   nameRequired: "Please enter your name",
@@ -286,6 +297,12 @@ export const rsvpCopy = {
   },
   statusGroup: (name: string) => `Your reply for the ${name}`,
   chooseOne: "Choose a reply",
+  answerGroup: "Will you be there?",
+  answers: { attending: "Yes, I'll be there", declined: "Sorry, I can't come" },
+  thanksComing: "The family can't wait to celebrate with you.",
+  thanksMissed: "You will be missed. Thank you for your blessings.",
+  share: "Share on WhatsApp",
+  shareMessage: "Here is the invitation:",
   adults: "Adults",
   children: "Children",
   fewer: (what: string) => `Fewer ${what.toLowerCase()}`,

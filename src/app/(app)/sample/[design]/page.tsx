@@ -119,7 +119,6 @@ export default async function SamplePage({ params, searchParams }: PageProps<"/s
         photos={photos}
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
-        questions={[]}
         sample
       />
     </>

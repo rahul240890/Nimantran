@@ -9,7 +9,7 @@ import { publishText } from "@/i18n/copy/publish";
 import { getLocale, getText } from "@/i18n/server";
 import { getAccount } from "@/lib/auth/server";
 import { designPageHref } from "@/lib/editor/design-page";
-import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
+import { includedFunctions } from "@/lib/editor/draft";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteStore } from "@/lib/invites/store";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
@@ -99,7 +99,6 @@ export default async function InvitePreviewPage({
         clipUrl={clip ? (urls[clip.id] ?? null) : null}
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
-        questions={draftQuestions(draft)}
         watermark={free}
         // The host sees it as guests will, with no "Preview" written over it (owner, 2026-10-27)
         preview

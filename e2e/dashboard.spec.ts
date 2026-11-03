@@ -71,7 +71,7 @@ test.describe("host dashboard", () => {
     await expect(greeting).toContainText("Nani");
     const form = guest.locator("#rsvp");
     await form.getByRole("textbox", { name: /Your name/ }).fill("Nani ji");
-    await form.getByRole("button", { name: "Coming to everything" }).click();
+    await form.getByRole("radio", { name: "Yes, I'll be there" }).click();
     await form.getByRole("button", { name: "Send reply" }).click();
     await expect(form.getByRole("heading", { name: /Thank you/ })).toBeVisible();
     await guestContext.close();

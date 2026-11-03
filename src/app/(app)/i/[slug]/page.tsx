@@ -5,7 +5,7 @@ import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { getLocale } from "@/i18n/server";
-import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
+import { includedFunctions } from "@/lib/editor/draft";
 import { makeLikeThisHref } from "@/lib/gallery/make-like-this";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { COVER_ALT, COVER_SIZE, coverPath } from "@/lib/og/cover";
@@ -105,7 +105,6 @@ export default async function InvitePage({ params }: PageProps<"/i/[slug]">) {
       clipUrl={invite.clipUrl}
       allIcsUrl={entries.length > 1 ? `/i/${invite.slug}/calendar` : null}
       rsvpFunctions={rsvpFunctions}
-      questions={draftQuestions(draft)}
       watermark={watermark}
       makeHref={makeLikeThisHref(draft)}
     />

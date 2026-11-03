@@ -1,8 +1,8 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, ChevronLeft, ChevronRight, Flower2, Pause, Play } from "lucide-react";
-import { Image } from "@/components/ui/image";
+import { ChevronLeft, ChevronRight, Flower2, Pause, Play, X } from "lucide-react";
+import { Dialog as DialogPrimitive } from "radix-ui";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import type { FunctionId } from "@/lib/events/functions";
@@ -19,19 +19,20 @@ import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo"
 import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { blessings, type FlowerBlessing, type LampBlessing } from "@/lib/suites/blessings";
-import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
-import { eventBox, type EventBox as Box } from "@/lib/suites/event-boxes";
+import type { SuiteId } from "@/lib/suites/catalog";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { EventBox } from "./event-box";
 import { FlowerStage } from "./flower-blessing";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
+import { GiftWrap } from "./gift-wrap";
 import { LampStage } from "./lamp-blessing";
-import { Balloons, Bunting, Festoon, FloorArt, Houseboat, PalaceSkyline, Palm } from "./scenery";
+import { FloorArt, Houseboat } from "./scenery";
+import { ScratchCard } from "./scratch-card";
+import { EventsTimeline } from "./timeline";
 import { useInView, useOnScreen } from "./use-in-view";
 import "@/app/guest-sections.css";
 import "@/app/guest-blessings.css";
@@ -47,14 +48,19 @@ const useMounted = () =>
 
 type Music = { playing: boolean; toggle: () => void };
 
+/** Each ground's colours come from one hour of the theme's day: its day, dawn or night. */
+const GROUND_MOODS = { cloth: "day", blend: "dawn", deep: "night" } as const;
+
 /**
- * The guest page below a painted theme's pages (Step 12q). Scrolling down, the guest lives
- * through the day in the theme's own colours: a dawn welcome under a garland, then
- * flowers to give the family in the theme's own way; the date drawn in a floor pattern by
- * day; each celebration in its own hour; photos and family at dusk; and at night, a light
- * to give before the reply (each theme's two ways are in blessings.ts). Palace themes hang torans over arches and a skyline; garden themes
- * sit by the water with palms, a houseboat and a brass lamp. Every choice comes from the
- * theme's `GuestLook`, so a new theme gets all of this by naming a style.
+ * The guest page below a painted theme's pages (owner, 2026-10-26 and 2026-10-27). Every
+ * celebration is told once, on the day's timeline, never a screen each; everything else
+ * keeps its section: the welcome, the names with the couple's photos; flowers to give in
+ * the theme's own way; the date under gold foil to scratch free; the timeline, with what a
+ * guest needs on the day; the rest of the photos, each opening full screen; the family; a
+ * lamp to light with the blessing; and the reply, just a name and whether they are coming,
+ * met with a shower of petals when it is a yes. It sits on a ground of the theme's own
+ * colours (plain, blended or deep; section-layouts.ts), never a painting, with the theme's
+ * garland at the top and petals drifting down.
  */
 export function ThemedDetails({
   suite,
@@ -69,81 +75,170 @@ export function ThemedDetails({
   family,
   familyLang,
   allIcsUrl,
+  previewNow,
+  cheer,
   music,
   reply,
 }: {
   suite: SuiteId;
   look: GuestLook;
-  /** The card's words, in the card's language. */
   copy: CardCopy;
   /** The card's language: the page's own words follow it, like the pages above. */
   lang: CardLanguage;
-  functions: readonly GuestFunction[];
-  /** Each celebration's date (YYYY-MM-DD), for the date seals and stubs on its box. */
+  /** With how far off each is ("In 5 days"), once the browser knows today. */
+  functions: readonly (GuestFunction & { countdown?: string })[];
+  /** Each celebration's date (YYYY-MM-DD), for its day on the timeline. */
   days: Readonly<Partial<Record<FunctionId, string>>>;
   /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
   main: { date: string; venue: string } | null;
-  /** The photos the welcome shows: the couple's, or one each, from the design's own frames. */
+  /** The photos the welcome shows: the couple's, or one each. */
   welcome: readonly GuestPhoto[];
-  /** The other photos, for the gallery at dusk: each photo shows once on the page. */
+  /** The rest of the photos the family shared. */
   photos: readonly GuestPhoto[];
+  /** The family's blocks (blessings, parents, hosts), in the language the guest reads. */
   family: readonly FamilyBlock[];
   familyLang: string | undefined;
   allIcsUrl: string | null;
+  /** A fixed moment, for review pages. */
+  previewNow?: number;
+  /** Counts each "yes" to the reply, for a shower of petals. */
+  cheer: number;
   music: Music;
   /** The reply form, drawn in the theme's colours. */
   reply: ReactNode;
 }) {
   // The music button floats while the guest reads this page
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
-  const [burst, setBurst] = useState(0);
-  const flowers = [look.flower, look.secondFlower] as const;
-  // Each theme lays its parts out its own way (section-layouts.ts), and gives its own way
+  const { rsvpCopy } = useGuestText();
+  const cardWords = CARD_THEMED_WORDS[lang];
+  // Each theme lays its parts out its own way, on its own ground (section-layouts.ts)
   const layouts = sectionLayouts(suite);
+  // ...and gives its own flowers and lamps (blessings.ts)
   const ways = blessings(suite);
+  // Petals for each "yes" to the reply, when the date is scratched free, and for flowers
+  const [revealed, setRevealed] = useState(0);
+  const celebrate = () => setRevealed((was) => was + 1);
 
   return (
     <div
       ref={top}
       data-suite={suite}
       data-guest={look.style}
-      className="guest-themed relative isolate overflow-clip"
+      data-ground={layouts.ground}
+      // The hour whose light the ground takes its sky colours from (globals.css)
+      data-mood={GROUND_MOODS[layouts.ground]}
+      className="guest-themed guest-ground relative isolate overflow-clip"
     >
       <FlowerDefs />
+      <Garland
+        flower={look.flower}
+        second={look.secondFlower}
+        className="guest-garland relative z-10 h-20 w-full sm:h-28"
+      />
+      <PetalDrift flowers={[look.flower, look.secondFlower]} count={8} />
+      <PetalShower flowers={[look.flower, look.secondFlower]} burst={cheer + revealed} />
+
       <Welcome copy={copy} lang={lang} look={look} photos={welcome} />
+      <span aria-hidden className="guest-band" />
       <GiveFlowers
         way={ways.flowers}
         look={look}
         lang={lang}
         onGive={() => {
-          if (ways.flowers === "shower") setBurst((was) => was + 1);
+          if (ways.flowers === "shower") celebrate();
         }}
       />
-      {main && <SaveTheDate main={main} look={look} lang={lang} layout={layouts.date} />}
-      <Celebrations
-        suite={suite}
-        look={look}
-        lang={lang}
-        functions={functions}
-        days={days}
-        allIcsUrl={allIcsUrl}
-        layouts={layouts}
-        box={eventBox(suite, look.style)}
-      />
-      {(photos.length > 0 || family.length > 0) && (
-        <Dusk
-          before={welcome.length}
-          photos={photos}
-          family={family}
-          familyLang={familyLang}
-          look={look}
-          lang={lang}
-          layouts={layouts}
-        />
+      {main && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <SaveTheDate
+            main={main}
+            look={look}
+            lang={lang}
+            layout={layouts.date}
+            onReveal={celebrate}
+          />
+        </>
       )}
-      <Night copy={copy} lang={lang} look={look} way={ways.lamp} reply={reply} />
+      <span aria-hidden className="guest-band" />
+
+      <section
+        aria-labelledby="guest-functions"
+        data-tour={functions.length > 1 ? "6" : "8"}
+        data-layout={layouts.timeline}
+        className="relative px-4 pt-16 pb-16 sm:px-6 sm:pt-20 sm:pb-24"
+      >
+        <Heading
+          id="guest-functions"
+          lang={lang}
+          label={cardWords.eventsLabel}
+          title={cardWords.celebrations}
+        />
+        <div className="mt-12">
+          <EventsTimeline
+            functions={functions}
+            days={days}
+            lang={lang}
+            layout={layouts.timeline}
+            allIcsUrl={allIcsUrl}
+            previewNow={previewNow}
+          />
+        </div>
+      </section>
+
+      {photos.length > 0 && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <Memories
+            photos={photos}
+            before={welcome.length}
+            look={look}
+            lang={lang}
+            layouts={layouts}
+          />
+        </>
+      )}
+
+      {family.length > 0 && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <Family family={family} familyLang={familyLang} lang={lang} layout={layouts.family} />
+        </>
+      )}
+
+      <span aria-hidden className="guest-band" />
+      <Blessing copy={copy} lang={lang} look={look} way={ways.lamp} />
+
+      {reply && (
+        <>
+          <span aria-hidden className="guest-band" />
+          <section
+            id="rsvp"
+            aria-labelledby="guest-rsvp"
+            data-tour="end"
+            className="relative flex min-h-svh scroll-mt-4 flex-col justify-center px-4 pt-12 pb-12 sm:px-6 sm:pb-16"
+          >
+            <Reveal className="guest-card mx-auto flex w-full max-w-xl flex-col gap-6 px-5 py-9 sm:px-10">
+              <Heading
+                id="guest-rsvp"
+                lang={lang}
+                label={cardWords.replyLabel}
+                title={cardWords.joinUs}
+              />
+              <p className="-mt-3 text-center text-ink-muted">{rsvpCopy.intro}</p>
+              {reply}
+            </Reveal>
+          </section>
+        </>
+      )}
+      <p
+        lang={lang}
+        data-snap
+        className="relative px-6 pt-6 pb-32 text-center font-display text-xl text-balance text-ink-muted sm:pb-40"
+      >
+        {cardWords.closing}
+      </p>
       {onScreen && <FloatingMusic music={music} />}
-      <PetalShower flowers={flowers} burst={burst} />
     </div>
   );
 }
@@ -189,55 +284,10 @@ function Reveal({ className, children }: { className?: string; children: ReactNo
   );
 }
 
-/** The frame a photo or painting hangs in: an arch in a palace, an oval by the water. */
-function Framed({
-  look,
-  children,
-  className,
-}: {
-  look: GuestLook;
-  children: ReactNode;
-  className?: string;
-}) {
-  const shape = look.style === "garden" || look.style === "party" ? "ring" : "arch";
-  return (
-    <div className={cn("relative", className)}>
-      <div data-shape={shape} className="guest-frame relative aspect-[4/5] overflow-hidden">
-        {children}
-      </div>
-      <FlowerFrame shape={shape} flower={look.flower} second={look.secondFlower} />
-    </div>
-  );
-}
-
-/** The scenery along the foot of a section: water, a skyline, or nothing at a party. */
-function Ground({ look, className }: { look: GuestLook; className?: string }) {
-  if (look.style === "garden") return <span aria-hidden className={cn("guest-water", className)} />;
-  if (look.style === "party") return null;
-  return <PalaceSkyline className={cn("guest-skyline", className)} />;
-}
-
 /**
- * What hangs between the hours: a garland in a palace, mirror-work bunting on a
- * procession, a kasavu border by the water, coloured bulbs at a party.
+ * The welcome, first below the pages (owner, 2026-10-27): who invites the guest, the names
+ * and the couple's photos, on the theme's own ground, with a halo of its gilt behind them.
  */
-function Divider({ look }: { look: GuestLook }) {
-  if (look.style === "garden")
-    return <span aria-hidden className="guest-kasavu absolute inset-x-0 top-0" />;
-  if (look.style === "procession")
-    return <Bunting className="guest-garland absolute inset-x-0 top-0 h-12 w-full sm:h-16" />;
-  if (look.style === "party")
-    return <Festoon className="guest-festoon absolute inset-x-0 top-0 h-10 w-full sm:h-14" />;
-  return (
-    <Garland
-      flower={look.flower}
-      second={look.secondFlower}
-      swags={8}
-      className="guest-garland absolute inset-x-0 top-0 h-14 w-full sm:h-20"
-    />
-  );
-}
-
 function Welcome({
   copy,
   lang,
@@ -253,32 +303,15 @@ function Welcome({
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
-  const welcome = [copy.families, copy.line].filter((text) => text.trim());
-  const garden = look.style === "garden";
+  const lines = [copy.families, copy.line].filter((text) => text.trim());
 
   return (
     <section
       aria-labelledby="guest-welcome"
-      data-mood="dawn"
       data-tour="8"
-      className="guest-sky relative isolate flex min-h-svh flex-col pb-28 sm:pb-36"
+      className="relative flex min-h-svh flex-col justify-center px-4 pt-4 pb-16 sm:px-6 sm:pb-24"
     >
-      <Garland
-        flower={look.flower}
-        second={look.secondFlower}
-        className="guest-garland relative z-10 h-24 w-full sm:h-32 lg:h-40"
-      />
-      <PetalDrift flowers={[look.flower, look.secondFlower]} />
-      {look.style === "party" && <Balloons className="guest-balloons absolute inset-0 -z-10" />}
-      {garden && (
-        <>
-          <Palm className="guest-palm absolute -start-10 bottom-8 -z-10 h-72 sm:h-96" />
-          <Palm flip className="guest-palm absolute -end-10 bottom-8 -z-10 h-64 sm:h-88" />
-        </>
-      )}
-      <Ground look={look} className="absolute inset-x-0 bottom-0 -z-10 h-24 w-full sm:h-32" />
-
-      <div className="mx-auto my-auto grid w-full max-w-6xl items-center gap-8 px-4 pt-4 sm:gap-12 sm:px-6 sm:pt-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] lg:gap-16">
         <Reveal className="guest-stagger flex flex-col items-center gap-4 text-center sm:gap-5 lg:items-start lg:text-start">
           <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
             {cardWords.invitedTo}
@@ -296,20 +329,18 @@ function Welcome({
               </>
             )}
           </h2>
-          <div lang={lang} className="flex max-w-md flex-col gap-2 text-lg text-ink-muted">
-            {welcome.map((text) => (
-              <p key={text}>{text}</p>
-            ))}
-          </div>
-          {copy.date && (
-            <p lang={lang} className="guest-date-chip font-display text-xl text-ink">
-              {copy.date}
-            </p>
+          <span aria-hidden className="guest-rule" />
+          {lines.length > 0 && (
+            <div lang={lang} className="flex max-w-md flex-col gap-2 text-lg text-ink-muted">
+              {lines.map((text) => (
+                <p key={text}>{text}</p>
+              ))}
+            </div>
           )}
         </Reveal>
 
         {photos.length === 1 && (
-          <Reveal className="mx-auto w-[min(64vw,22rem,calc(40svh*0.8))] lg:me-8">
+          <Reveal className="guest-welcome-photos mx-auto w-[min(64vw,22rem,calc(40svh*0.8))] lg:me-8">
             <Framed look={look}>
               <FramedPhoto
                 photo={{ src: photos[0]!.url, alt: "", fit: photos[0]!.fit }}
@@ -322,7 +353,7 @@ function Welcome({
         )}
         {/* One each, side by side, each over its own name */}
         {photos.length > 1 && (
-          <Reveal className="mx-auto flex w-full max-w-[28rem] items-start justify-center gap-5 sm:gap-8 lg:me-8">
+          <Reveal className="guest-welcome-photos mx-auto flex w-full max-w-[28rem] items-start justify-center gap-5 sm:gap-8 lg:me-8">
             {photos.slice(0, 2).map((photo, index) => {
               const name = index === 0 ? copy.first : copy.second;
               return (
@@ -359,6 +390,64 @@ function Welcome({
   );
 }
 
+/**
+ * The flowers the guest gives after the welcome, in this theme's own way (blessings.ts):
+ * a drawing that moves each time they give, and words that thank them.
+ */
+function GiveFlowers({
+  way,
+  look,
+  lang,
+  onGive,
+}: {
+  way: FlowerBlessing;
+  look: GuestLook;
+  lang: CardLanguage;
+  onGive: () => void;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.themed;
+  const gift = words.flowers[way];
+  const [given, setGiven] = useState(0);
+  return (
+    <section
+      aria-labelledby="guest-flowers"
+      data-tour="8"
+      className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+    >
+      <Reveal className="guest-stagger mx-auto flex w-full max-w-3xl flex-col items-center gap-5 text-center sm:gap-6">
+        <Heading
+          id="guest-flowers"
+          lang={lang}
+          label={words.flowersLabel}
+          title={words.flowersTitle}
+        />
+        <FlowerStage
+          way={way}
+          flower={look.flower}
+          second={look.secondFlower}
+          given={given}
+          className="bl-stage w-full max-w-[34rem]"
+        />
+        <Button
+          onClick={() => {
+            setGiven((was) => was + 1);
+            onGive();
+          }}
+          size="lg"
+          className="max-w-full rounded-full"
+        >
+          <Flower2 aria-hidden />
+          {gift.give}
+        </Button>
+        <p aria-live="polite" className="-mt-2 min-h-6 text-sm text-balance text-ink-muted">
+          {given > 0 ? gift.given : ""}
+        </p>
+      </Reveal>
+    </section>
+  );
+}
+
 /** Monday to Sunday in a known week, for a calendar page's head in the card's language. */
 const WEEK = [1, 2, 3, 4, 5, 6, 7].map((day) => new Date(Date.UTC(2024, 0, day)));
 
@@ -373,17 +462,25 @@ function monthGrid(date: Date): (number | null)[] {
   ];
 }
 
+/**
+ * Save the date, in the theme's own way: drawn in a floor pattern, a calendar page or a
+ * ticket, under the theme's gold foil for the guest to scratch free (owner, 2026-10-27).
+ */
 function SaveTheDate({
   main,
   look,
   lang,
   layout,
+  onReveal,
 }: {
   main: { date: string; venue: string };
   look: GuestLook;
   lang: CardLanguage;
   layout: SectionLayouts["date"];
+  /** Called when the guest has scratched the date free. */
+  onReveal: () => void;
 }) {
+  const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const day = parseISO(main.date);
   const [ref, seen] = useInView<HTMLDivElement>("0px 0px -20% 0px");
@@ -391,14 +488,17 @@ function SaveTheDate({
   const month = cardMonth(main.date, lang);
   const weekday = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "narrow", timeZone: "UTC" });
   const longDay = new Intl.DateTimeFormat(`${lang}-IN`, { weekday: "long", timeZone: "UTC" });
+  const dayName = longDay.format(
+    new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())),
+  );
   const reveal = mounted ? (seen ? "in" : "wait") : undefined;
+  const foil = { hint: guestCopy.scratch.date, label: guestCopy.scratch.showDate, onReveal };
   return (
     <section
       aria-labelledby="guest-save-date"
-      data-mood="day"
       data-tour="8"
       data-layout={layout}
-      className="guest-sky relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
+      className="relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6 sm:py-20"
     >
       {look.style === "garden" && (
         <Houseboat className="guest-boat absolute bottom-6 -z-10 w-40 sm:w-56" />
@@ -416,7 +516,11 @@ function SaveTheDate({
           className="guest-medallion relative mx-auto mt-10 grid aspect-square w-[min(88vw,26rem,56svh)] place-items-center"
         >
           <FloorArt pattern={look.pattern} flower={look.flower} second={look.secondFlower} />
-          <div className="guest-date-disc relative grid aspect-square w-[48%] place-content-center rounded-full text-center">
+          <ScratchCard
+            {...foil}
+            round
+            className="guest-date-disc grid aspect-square w-[48%] place-content-center rounded-full text-center"
+          >
             <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase sm:text-xs">
               {month}
             </p>
@@ -426,7 +530,7 @@ function SaveTheDate({
             <p className="font-label text-sm tracking-[0.3em] text-accent-text">
               {format(day, "yyyy")}
             </p>
-          </div>
+          </ScratchCard>
         </div>
       )}
       {layout === "calendar" && (
@@ -435,31 +539,32 @@ function SaveTheDate({
           ref={ref}
           data-reveal={reveal}
           lang={lang}
-          className="guest-reveal guest-card guest-calendar mx-auto mt-10 w-[min(88vw,24rem)] px-5 pt-6 pb-7"
+          className="guest-reveal mx-auto mt-10 w-[min(88vw,24rem)]"
         >
-          <p className="text-center font-display text-2xl text-ink">
-            {month} <span className="text-accent-text tabular-nums">{format(day, "yyyy")}</span>
-          </p>
-          <div aria-hidden className="mt-4 grid grid-cols-7 gap-y-1.5 text-center">
-            {WEEK.map((date) => (
-              <span key={date.getTime()} className="font-label text-[0.7rem] text-ink-muted">
-                {weekday.format(date)}
-              </span>
-            ))}
-            {monthGrid(day).map((number, index) => (
-              <span
-                key={index}
-                data-day={number === day.getDate() ? "chosen" : undefined}
-                className="guest-calendar-day mx-auto grid size-9 place-items-center rounded-full text-sm text-ink tabular-nums"
-              >
-                {number}
-              </span>
-            ))}
-          </div>
-          <p className="mt-4 text-center text-sm text-ink-muted">
-            {longDay.format(new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())))},{" "}
-            {format(day, "d")} {month}
-          </p>
+          <ScratchCard {...foil} className="guest-card guest-calendar px-5 pt-6 pb-7">
+            <p className="text-center font-display text-2xl text-ink">
+              {month} <span className="text-accent-text tabular-nums">{format(day, "yyyy")}</span>
+            </p>
+            <div aria-hidden className="mt-4 grid grid-cols-7 gap-y-1.5 text-center">
+              {WEEK.map((date) => (
+                <span key={date.getTime()} className="font-label text-[0.7rem] text-ink-muted">
+                  {weekday.format(date)}
+                </span>
+              ))}
+              {monthGrid(day).map((number, index) => (
+                <span
+                  key={index}
+                  data-day={number === day.getDate() ? "chosen" : undefined}
+                  className="guest-calendar-day mx-auto grid size-9 place-items-center rounded-full text-sm text-ink tabular-nums"
+                >
+                  {number}
+                </span>
+              ))}
+            </div>
+            <p className="mt-4 text-center text-sm text-ink-muted">
+              {dayName}, {format(day, "d")} {month}
+            </p>
+          </ScratchCard>
         </div>
       )}
       {layout === "ticket" && (
@@ -468,25 +573,27 @@ function SaveTheDate({
           ref={ref}
           data-reveal={reveal}
           lang={lang}
-          className="guest-reveal guest-ticket mx-auto mt-10 grid w-[min(92vw,30rem)] grid-cols-[auto_1fr] items-stretch"
+          className="guest-reveal mx-auto mt-10 w-[min(92vw,30rem)]"
         >
-          <div className="guest-ticket-stub flex flex-col items-center justify-center px-5 py-6 text-center">
-            <p className="font-display text-[3.6rem] leading-none text-ink tabular-nums">
-              {format(day, "d")}
-            </p>
-            <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase">
-              {month}
-            </p>
-          </div>
-          <div className="guest-ticket-body flex flex-col justify-center gap-1 px-5 py-6">
-            <p className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
-              {longDay.format(new Date(Date.UTC(day.getFullYear(), day.getMonth(), day.getDate())))}
-            </p>
-            <p className="font-display text-2xl leading-tight text-ink tabular-nums">
-              {format(day, "yyyy")}
-            </p>
-            {main.venue && <p className="text-sm text-balance text-ink-muted">{main.venue}</p>}
-          </div>
+          <ScratchCard {...foil} className="guest-ticket grid grid-cols-[auto_1fr] items-stretch">
+            <div className="guest-ticket-stub flex flex-col items-center justify-center px-5 py-6 text-center">
+              <p className="font-display text-[3.6rem] leading-none text-ink tabular-nums">
+                {format(day, "d")}
+              </p>
+              <p className="font-label text-[0.7rem] tracking-[0.25em] text-accent-text uppercase">
+                {month}
+              </p>
+            </div>
+            <div className="guest-ticket-body flex flex-col justify-center gap-1 px-5 py-6">
+              <p className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
+                {dayName}
+              </p>
+              <p className="font-display text-2xl leading-tight text-ink tabular-nums">
+                {format(day, "yyyy")}
+              </p>
+              {main.venue && <p className="text-sm text-balance text-ink-muted">{main.venue}</p>}
+            </div>
+          </ScratchCard>
         </div>
       )}
       {main.venue && layout !== "ticket" && (
@@ -496,270 +603,24 @@ function SaveTheDate({
   );
 }
 
-/** Each celebration in its own hour of the day, under its own painting from the theme. */
-function Celebrations({
-  suite,
+/** The frame a photo or painting hangs in: an arch in a palace, an oval by the water. */
+function Framed({
   look,
-  lang,
-  functions,
-  days,
-  allIcsUrl,
-  layouts,
-  box,
+  children,
+  className,
 }: {
-  suite: SuiteId;
   look: GuestLook;
-  lang: CardLanguage;
-  functions: readonly GuestFunction[];
-  days: Readonly<Partial<Record<FunctionId, string>>>;
-  allIcsUrl: string | null;
-  layouts: SectionLayouts;
-  /** The theme's box for each celebration's details (event-boxes.ts). */
-  box: Box;
+  children: ReactNode;
+  className?: string;
 }) {
-  const { guestCopy } = useGuestText();
-  const cardWords = CARD_THEMED_WORDS[lang];
-  const images = SUITES[suite].images;
-  const plan = layouts.plan;
-  // On a timeline the thread itself is the day's plan, so the list above it is left out
-  const line = layouts.hours === "timeline";
+  const shape = look.style === "garden" || look.style === "party" ? "ring" : "arch";
   return (
-    <section aria-labelledby="guest-functions" className="relative isolate">
-      <div
-        data-mood="day"
-        data-tour={functions.length > 1 ? "6" : undefined}
-        className={cn(
-          "guest-sky guest-sky-flat px-4 pt-4 pb-10 sm:px-6",
-          // With more than one celebration, the day's plan fills a screen of its own first
-          functions.length > 1 && "flex min-h-svh flex-col justify-center py-16",
-        )}
-      >
-        <Heading
-          id="guest-functions"
-          lang={lang}
-          label={cardWords.eventsLabel}
-          title={cardWords.celebrations}
-        />
-        {functions.length > 1 && !line && (
-          <Reveal
-            className={cn("mx-auto mt-8 w-full", plan === "tiles" ? "max-w-2xl" : "max-w-md")}
-          >
-            <ol
-              lang={lang}
-              data-layout={plan}
-              className={cn(
-                "guest-stagger",
-                plan === "cards" && "flex flex-col gap-3",
-                plan === "timeline" && "guest-timeline flex flex-col gap-1 ps-2",
-                plan === "tiles" && "grid grid-cols-2 gap-3 sm:grid-cols-3",
-              )}
-            >
-              {functions.map((fn) => (
-                <li key={fn.kind} className={cn(plan === "timeline" && "relative ps-9")}>
-                  {plan === "timeline" && (
-                    <span aria-hidden className="guest-timeline-dot absolute start-0 top-4" />
-                  )}
-                  <a
-                    href={`#fn-${fn.kind}`}
-                    className={cn(
-                      "flex min-h-14 flex-col gap-0.5 transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0",
-                      plan === "cards" && "guest-card items-center px-5 py-3 text-center",
-                      plan === "timeline" && "rounded-xl px-2 py-2.5 text-start",
-                      plan === "tiles" &&
-                        "guest-card guest-tile h-full items-center justify-center px-3 py-5 text-center",
-                    )}
-                  >
-                    <span className="max-w-full font-display text-xl leading-tight break-words text-ink">
-                      {fn.name}
-                    </span>
-                    {(fn.date || fn.time) && (
-                      <span className="text-sm text-ink-muted">
-                        {[fn.date, fn.time].filter(Boolean).join(" · ")}
-                      </span>
-                    )}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
-        )}
-        {line && (
-          <Timeline
-            look={look}
-            box={box}
-            images={images}
-            lang={lang}
-            functions={functions}
-            days={days}
-          />
-        )}
-        {allIcsUrl && (
-          <div className="mt-6 flex justify-center">
-            <Button asChild variant="secondary" className="rounded-full">
-              <a href={allIcsUrl} download>
-                <CalendarPlus aria-hidden />
-                {guestCopy.addAll}
-              </a>
-            </Button>
-          </div>
-        )}
+    <div className={cn("relative", className)}>
+      <div data-shape={shape} className="guest-frame relative aspect-[4/5] overflow-hidden">
+        {children}
       </div>
-      {!line && (
-        <ol data-layout={layouts.hours}>
-          {functions.map((fn, index) => {
-            const { art, mood } = pageLook(fn.kind);
-            const image = images[art] ?? images.cover;
-            const headingId = `fn-${fn.kind}`;
-            const overlay = layouts.hours === "overlay" && Boolean(image);
-            // Zigzag: every other hour sets its painting on the far side
-            const flipped = layouts.hours === "zigzag" && index % 2 === 1;
-            return (
-              <li
-                key={fn.kind}
-                data-mood={mood}
-                data-tour="8"
-                className="guest-sky guest-hour relative isolate flex min-h-svh flex-col justify-center px-4 pt-6 pb-16 sm:px-6 sm:pb-20"
-              >
-                <Divider look={look} />
-                {overlay && image && (
-                  // The hour's painting fills the screen, the card held over it
-                  <div aria-hidden className="guest-hour-backdrop absolute inset-0 -z-10">
-                    <Image
-                      src={image}
-                      alt=""
-                      fill
-                      unoptimized
-                      sizes="100vw"
-                      className="object-cover object-[50%_40%]"
-                    />
-                  </div>
-                )}
-                <Reveal
-                  className={cn(
-                    "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
-                    overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
-                  )}
-                >
-                  {image && !overlay && (
-                    <Framed
-                      look={look}
-                      className={cn(
-                        "guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]",
-                        flipped && "md:order-2",
-                      )}
-                    >
-                      <Image
-                        src={image}
-                        alt=""
-                        fill
-                        unoptimized
-                        sizes="(min-width: 48rem) 20rem, 68vw"
-                        className="object-cover object-[50%_40%]"
-                      />
-                    </Framed>
-                  )}
-                  <EventBox
-                    box={box}
-                    fn={fn}
-                    day={days[fn.kind] ?? ""}
-                    index={index}
-                    count={functions.length}
-                    lang={lang}
-                    headingId={headingId}
-                  />
-                </Reveal>
-              </li>
-            );
-          })}
-        </ol>
-      )}
-    </section>
-  );
-}
-
-/**
- * Every celebration on one thread through the day (guest-sections.css): a bead with the
- * hour's painting at each box, and on wider screens the day and time across the thread.
- */
-function Timeline({
-  look,
-  box,
-  images,
-  lang,
-  functions,
-  days,
-}: {
-  look: GuestLook;
-  box: Box;
-  images: (typeof SUITES)[SuiteId]["images"];
-  lang: CardLanguage;
-  functions: readonly GuestFunction[];
-  days: Readonly<Partial<Record<FunctionId, string>>>;
-}) {
-  return (
-    <ol
-      lang={lang}
-      data-layout="timeline"
-      className="guest-line mx-auto mt-10 flex w-full max-w-5xl flex-col gap-12 sm:gap-16"
-    >
-      {functions.map((fn, index) => {
-        const { art, mood } = pageLook(fn.kind);
-        const image = images[art] ?? images.cover;
-        // Wider screens set every other box on the far side of the thread
-        const far = index % 2 === 1;
-        return (
-          <li
-            key={fn.kind}
-            data-mood={mood}
-            className="guest-hour relative grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-x-4 gap-y-3 md:grid-cols-[minmax(0,1fr)_5.5rem_minmax(0,1fr)] md:gap-x-8"
-          >
-            <span
-              aria-hidden
-              className="guest-line-bead relative col-start-1 row-start-1 md:col-start-2 md:mt-6"
-            >
-              {image && <Image src={image} alt="" fill sizes="5.5rem" className="object-cover" />}
-            </span>
-            {/* Across the thread: the day and time, and wider, the hour's painting under them */}
-            <div
-              className={cn(
-                "col-start-2 row-start-1 flex flex-col gap-6 md:row-start-1 md:mt-6",
-                far ? "md:col-start-1 md:items-end md:text-end" : "md:col-start-3",
-              )}
-            >
-              {(fn.date || fn.time) && (
-                <p className="flex min-h-12 flex-col justify-center md:min-h-22">
-                  <span className="font-display text-xl leading-tight text-ink md:text-2xl">
-                    {fn.date}
-                  </span>
-                  {fn.time && <span className="text-sm text-ink">{fn.time}</span>}
-                </p>
-              )}
-              {image && (
-                <Framed look={look} className="hidden w-[min(100%,12rem)] md:block">
-                  <Image src={image} alt="" fill sizes="12rem" className="object-cover" />
-                </Framed>
-              )}
-            </div>
-            <Reveal
-              className={cn(
-                "col-span-2 col-start-1 row-start-2 md:col-span-1 md:row-start-1",
-                far ? "md:col-start-3" : "md:col-start-1",
-              )}
-            >
-              <EventBox
-                box={box}
-                fn={fn}
-                day={days[fn.kind] ?? ""}
-                index={index}
-                count={functions.length}
-                lang={lang}
-                headingId={`fn-${fn.kind}`}
-              />
-            </Reveal>
-          </li>
-        );
-      })}
-    </ol>
+      <FlowerFrame shape={shape} flower={look.flower} second={look.secondFlower} />
+    </div>
   );
 }
 
@@ -802,11 +663,17 @@ function PhotoCarousel({
   photos,
   before,
   look,
+  onOpen,
+  wrap,
 }: {
   photos: readonly GuestPhoto[];
   /** How many photos the welcome already shows, so these count on from there. */
   before: number;
   look: GuestLook;
+  /** Opens the photo at this index full screen. */
+  onOpen: (index: number) => void;
+  /** The photos still wrapped like gifts, and how they are unwrapped. */
+  wrap: Wrapping;
 }) {
   const { guestCopy } = useGuestText();
   const words = guestCopy.carousel;
@@ -899,15 +766,42 @@ function PhotoCarousel({
             aria-hidden={i !== index || undefined}
             className="guest-photo guest-slide w-[min(62vw,15rem)] shrink-0 snap-center"
           >
-            <Framed look={look}>
-              <FramedPhoto
-                photo={{ src: photo.url, alt: "", fit: photo.fit }}
-                alt={guestCopy.photoAlt(i + before + 1)}
-                frameAspect={GALLERY_ASPECT}
-                lazy={Math.abs(i - index) > 1}
-                className="size-full"
-              />
-            </Framed>
+            {wrap.wrapped(i) ? (
+              <Framed look={look}>
+                <FramedPhoto
+                  photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                  alt=""
+                  frameAspect={GALLERY_ASPECT}
+                  lazy={Math.abs(i - index) > 1}
+                  className="size-full"
+                />
+                <GiftWrap
+                  label={guestCopy.scratch.unwrap(i + before + 1)}
+                  hint={guestCopy.scratch.tap}
+                  tabIndex={i === index ? 0 : -1}
+                  onOpen={() => wrap.unwrap(i)}
+                />
+              </Framed>
+            ) : (
+              <button
+                data-photo={i}
+                type="button"
+                tabIndex={i === index ? 0 : -1}
+                onClick={() => onOpen(i)}
+                aria-label={words.open(i + before + 1)}
+                className="block w-full cursor-zoom-in rounded-[inherit] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              >
+                <Framed look={look}>
+                  <FramedPhoto
+                    photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                    alt=""
+                    frameAspect={GALLERY_ASPECT}
+                    lazy={Math.abs(i - index) > 1}
+                    className="size-full"
+                  />
+                </Framed>
+              </button>
+            )}
           </li>
         ))}
       </ul>
@@ -956,34 +850,51 @@ function PhotoCarousel({
   );
 }
 
-/** Photos and family at dusk, under hanging lamps in a palace or over the water. */
-function Dusk({
-  before,
+/** Which photos are still wrapped like gifts, and how one is unwrapped. */
+type Wrapping = {
+  wrapped: (index: number) => boolean;
+  unwrap: (index: number) => void;
+};
+
+/** The photos the family shared, as the theme lays them out: a film, polaroids or a mosaic. */
+function Memories({
   photos,
-  family,
-  familyLang,
+  before,
   look,
   lang,
   layouts,
 }: {
+  photos: readonly GuestPhoto[];
   /** How many photos the welcome already shows, so these count on from there. */
   before: number;
-  photos: readonly GuestPhoto[];
-  family: readonly FamilyBlock[];
-  familyLang: string | undefined;
   look: GuestLook;
   lang: CardLanguage;
   layouts: SectionLayouts;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
-  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
+  // The photo open full screen, if any
+  const [viewing, setViewing] = useState<number | null>(null);
+  // Every other photo comes wrapped like a gift, until the guest unwraps it
+  const [unwrapped, setUnwrapped] = useState<readonly number[]>([]);
+  const section = useRef<HTMLElement>(null);
+  const wrap: Wrapping = {
+    wrapped: (index) => index % 2 === 1 && !unwrapped.includes(index),
+    unwrap: (index) => setUnwrapped((was) => [...was, index]),
+  };
+  // Focus stays with the photo once its paper has gone
+  const last = unwrapped.at(-1);
+  useEffect(() => {
+    if (last === undefined) return;
+    section.current
+      ?.querySelector<HTMLButtonElement>(`[data-photo="${last}"]`)
+      ?.focus({ preventScroll: true });
+  }, [last]);
   return (
-    <div data-mood="dusk" className="guest-sky relative isolate pb-16">
-      <Divider look={look} />
-      <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
+    <div className="relative isolate pb-10">
       {photos.length > 0 && (
         <section
+          ref={section}
           aria-labelledby="guest-photos"
           data-tour="9"
           data-layout={layouts.photos}
@@ -1015,9 +926,9 @@ function Dusk({
                     key={photo.id}
                     className={cn(
                       layouts.photos === "polaroids" &&
-                        "guest-polaroid w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
+                        "guest-polaroid relative w-[min(42vw,13rem)] shrink-0 p-2 pb-8",
                       layouts.photos === "mosaic" &&
-                        "guest-mosaic overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
+                        "guest-mosaic relative overflow-hidden rounded-xl first:col-span-2 first:row-span-2",
                     )}
                     style={
                       layouts.photos === "polaroids"
@@ -1025,235 +936,335 @@ function Dusk({
                         : undefined
                     }
                   >
-                    <FramedPhoto
-                      photo={{ src: photo.url, alt: "", fit: photo.fit }}
-                      alt={guestCopy.photoAlt(index + before + 1)}
-                      frameAspect={GALLERY_ASPECT}
-                      lazy
-                      className={cn(
-                        "w-full",
-                        layouts.photos === "polaroids" ? "aspect-[4/5]" : "aspect-[4/5] h-full",
-                      )}
-                    />
+                    {wrap.wrapped(index) && (
+                      <GiftWrap
+                        label={guestCopy.scratch.unwrap(index + before + 1)}
+                        hint={guestCopy.scratch.tap}
+                        onOpen={() => wrap.unwrap(index)}
+                      />
+                    )}
+                    <button
+                      data-photo={index}
+                      type="button"
+                      tabIndex={wrap.wrapped(index) ? -1 : undefined}
+                      aria-hidden={wrap.wrapped(index) || undefined}
+                      onClick={() => setViewing(index)}
+                      aria-label={guestCopy.carousel.open(index + before + 1)}
+                      className="block size-full cursor-zoom-in focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+                    >
+                      <FramedPhoto
+                        photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                        alt=""
+                        frameAspect={GALLERY_ASPECT}
+                        lazy
+                        className={cn(
+                          "w-full",
+                          layouts.photos === "polaroids" ? "aspect-[4/5]" : "aspect-[4/5] h-full",
+                        )}
+                      />
+                    </button>
                   </li>
                 ))}
               </ul>
             </Reveal>
           )}
           {layouts.photos === "film" && (
-            <PhotoCarousel photos={photos} before={before} look={look} />
+            <PhotoCarousel
+              photos={photos}
+              before={before}
+              look={look}
+              onOpen={setViewing}
+              wrap={wrap}
+            />
           )}
         </section>
       )}
-      {family.length > 0 && (
-        <section
-          aria-labelledby="guest-family"
-          data-tour="9"
-          data-layout={layouts.family}
-          className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+      <PhotoViewer
+        photos={photos}
+        before={before}
+        start={viewing}
+        onClose={() => setViewing(null)}
+      />
+    </div>
+  );
+}
+
+/**
+ * A photo full screen (owner, 2026-10-27), whole and uncropped: swipe, or step with the
+ * buttons or arrow keys, to the others. Escape or Close goes back to where the guest was.
+ */
+function PhotoViewer({
+  photos,
+  before,
+  start,
+  onClose,
+}: {
+  photos: readonly GuestPhoto[];
+  before: number;
+  /** The photo to open on, or null when closed. */
+  start: number | null;
+  onClose: () => void;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.carousel;
+  return (
+    <DialogPrimitive.Root
+      open={start !== null}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Content
+          aria-describedby={undefined}
+          className="guest-viewer fixed inset-0 z-50 flex flex-col text-card-ivory outline-none data-[state=closed]:animate-fade-out data-[state=open]:animate-fade-in"
         >
-          <Heading
-            id="guest-family"
-            lang={lang}
-            label={cardWords.familyLabel}
-            title={cardWords.family}
-          />
-          <Reveal className="mx-auto mt-10 w-full max-w-4xl">
-            <dl
-              ref={names}
-              lang={familyLang}
-              className={cn(
-                "guest-stagger",
-                layouts.family === "scroll"
-                  ? "guest-card guest-scroll mx-auto flex max-w-xl flex-col items-center gap-0 px-6 py-10"
-                  : "flex flex-wrap justify-center gap-6",
-              )}
+          <div className="flex items-center justify-between gap-3 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-6">
+            <DialogPrimitive.Title className="ps-2 font-label text-xs tracking-[0.2em] uppercase">
+              {words.viewer}
+            </DialogPrimitive.Title>
+            <DialogPrimitive.Close
+              aria-label={words.close}
+              className="guest-viewer-button grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
             >
-              {family.map((block, index) => (
-                <div
-                  key={block.id}
-                  className={cn(
-                    "flex w-full flex-col items-center gap-2 text-center",
-                    layouts.family === "cards" && "guest-card guest-family px-6 py-8",
-                    layouts.family === "ribbons" && "guest-ribbon-block px-4 pt-2 pb-6",
-                    layouts.family === "scroll" && "py-5",
-                    // Both sides' parents side by side; the blessings and hosts each a full row
-                    layouts.family !== "scroll" &&
-                      pairedSide(family, block) &&
-                      "sm:w-[calc(50%-0.75rem)]",
-                  )}
-                >
-                  {layouts.family === "scroll" && index > 0 && (
-                    <span aria-hidden className="guest-rule mb-4" />
-                  )}
-                  <dt
-                    className={cn(
-                      "font-label text-xs tracking-[0.25em] uppercase",
-                      layouts.family === "ribbons" ? "guest-ribbon px-6 py-2" : "text-accent-text",
-                    )}
-                  >
-                    {block.title}
-                  </dt>
-                  <FamilyWords
-                    block={block}
-                    className="font-display text-xl text-ink"
-                    soft="text-ink-muted"
-                  />
-                </div>
-              ))}
-            </dl>
-          </Reveal>
-        </section>
+              <X aria-hidden className="size-5" />
+            </DialogPrimitive.Close>
+          </div>
+          {start !== null && <ViewerStrip photos={photos} before={before} start={start} />}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
+function ViewerStrip({
+  photos,
+  before,
+  start,
+}: {
+  photos: readonly GuestPhoto[];
+  before: number;
+  start: number;
+}) {
+  const { guestCopy } = useGuestText();
+  const words = guestCopy.carousel;
+  const still = useReducedMotion();
+  const track = useRef<HTMLUListElement>(null);
+  const [index, setIndex] = useState(start);
+  const count = photos.length;
+
+  // Opens on the photo the guest tapped
+  useEffect(() => {
+    if (track.current) centre(track.current, start, false);
+  }, [start]);
+
+  const go = (to: number) => {
+    const next = Math.min(Math.max(to, 0), count - 1);
+    if (track.current) centre(track.current, next, !still);
+    setIndex(next);
+  };
+
+  // The arrow keys step through the photos wherever focus is in the viewer
+  useEffect(() => {
+    const step = (event: KeyboardEvent) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      const list = track.current;
+      if (!list) return;
+      event.preventDefault();
+      const back = (event.key === "ArrowLeft") !== (getComputedStyle(list).direction === "rtl");
+      const next = Math.min(Math.max(index + (back ? -1 : 1), 0), count - 1);
+      centre(list, next, !still);
+      setIndex(next);
+    };
+    window.addEventListener("keydown", step);
+    return () => window.removeEventListener("keydown", step);
+  }, [index, count, still]);
+
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <ul
+        ref={track}
+        onScroll={() => {
+          if (!track.current) return;
+          const nearest = nearestPhoto(track.current);
+          if (nearest !== index) setIndex(nearest);
+        }}
+        // Focusable so a keyboard can reach the scrolling strip
+        tabIndex={0}
+        className="guest-gallery flex min-h-0 flex-1 snap-x snap-mandatory overflow-x-auto focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
+      >
+        {photos.map((photo, i) => (
+          <li
+            key={photo.id}
+            aria-hidden={i !== index || undefined}
+            className="flex w-full shrink-0 snap-center items-center justify-center p-3 sm:p-8"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- the family's own photo, whole */}
+            <img
+              src={photo.url}
+              alt={guestCopy.photoAlt(i + before + 1)}
+              loading={Math.abs(i - index) > 1 ? "lazy" : undefined}
+              decoding="async"
+              draggable={false}
+              className="max-h-full max-w-full rounded-md object-contain select-none"
+            />
+          </li>
+        ))}
+      </ul>
+      {count > 1 && (
+        <div className="flex items-center justify-center gap-4 px-3 pt-2 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            onClick={() => go(index - 1)}
+            disabled={index === 0}
+            aria-label={words.previous}
+            className="guest-viewer-button grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:opacity-40"
+          >
+            <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
+          </button>
+          <p
+            aria-live="polite"
+            className="min-w-14 text-center font-label text-xs tracking-[0.2em] uppercase"
+          >
+            <span aria-hidden>{`${index + 1} / ${count}`}</span>
+            <span className="sr-only">{words.position(index + 1, count)}</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => go(index + 1)}
+            disabled={index === count - 1}
+            aria-label={words.next}
+            className="guest-viewer-button grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default disabled:opacity-40"
+          >
+            <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
+          </button>
+        </div>
       )}
     </div>
   );
 }
 
-/** Night: lamps the guest lights for the couple, the blessing, and the reply. */
-/**
- * The flowers the guest gives after the welcome, in this theme's own way (blessings.ts):
- * a drawing that moves each time they give, and words that thank them.
- */
-function GiveFlowers({
-  way,
-  look,
+/** The family, in the theme's own way: cards, ribbons, or one scroll with ornaments between. */
+function Family({
+  family,
+  familyLang,
   lang,
-  onGive,
+  layout,
 }: {
-  way: FlowerBlessing;
-  look: GuestLook;
+  family: readonly FamilyBlock[];
+  familyLang: string | undefined;
   lang: CardLanguage;
-  onGive: () => void;
+  layout: SectionLayouts["family"];
 }) {
-  const { guestCopy } = useGuestText();
-  const words = guestCopy.themed;
-  const gift = words.flowers[way];
-  const [given, setGiven] = useState(0);
+  const cardWords = CARD_THEMED_WORDS[lang];
+  const names = useNamesFit<HTMLDListElement>(family.map((block) => block.text).join("|"));
   return (
     <section
-      aria-labelledby="guest-flowers"
-      data-mood="dawn"
-      data-tour="8"
-      className="guest-sky relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
+      aria-labelledby="guest-family"
+      data-tour="9"
+      data-layout={layout}
+      className="relative flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
     >
-      <PetalDrift flowers={[look.secondFlower, look.flower]} count={8} />
-      <Reveal className="guest-stagger mx-auto flex w-full max-w-3xl flex-col items-center gap-5 text-center sm:gap-6">
-        <Heading
-          id="guest-flowers"
-          lang={lang}
-          label={words.flowersLabel}
-          title={words.flowersTitle}
-        />
-        <FlowerStage
-          way={way}
-          flower={look.flower}
-          second={look.secondFlower}
-          given={given}
-          className="bl-stage w-full max-w-[34rem]"
-        />
-        <Button
-          onClick={() => {
-            setGiven((was) => was + 1);
-            onGive();
-          }}
-          size="lg"
-          className="max-w-full rounded-full"
+      <Heading
+        id="guest-family"
+        lang={lang}
+        label={cardWords.familyLabel}
+        title={cardWords.family}
+      />
+      <Reveal className="mx-auto mt-10 w-full max-w-4xl">
+        <dl
+          ref={names}
+          lang={familyLang}
+          className={cn(
+            "guest-stagger",
+            layout === "scroll"
+              ? "guest-card guest-scroll mx-auto flex max-w-xl flex-col items-center gap-0 px-6 py-10"
+              : "flex flex-wrap justify-center gap-6",
+          )}
         >
-          <Flower2 aria-hidden />
-          {gift.give}
-        </Button>
-        <p aria-live="polite" className="-mt-2 min-h-6 text-sm text-balance text-ink-muted">
-          {given > 0 ? gift.given : ""}
-        </p>
+          {family.map((block, index) => (
+            <div
+              key={block.id}
+              className={cn(
+                "flex w-full flex-col items-center gap-2 text-center",
+                layout === "cards" && "guest-card guest-family px-6 py-8",
+                layout === "ribbons" && "guest-ribbon-block px-4 pt-2 pb-6",
+                layout === "scroll" && "py-5",
+                // Both sides' parents side by side; the blessings and hosts each a full row
+                layout !== "scroll" && pairedSide(family, block) && "sm:w-[calc(50%-0.75rem)]",
+              )}
+            >
+              {layout === "scroll" && index > 0 && <span aria-hidden className="guest-rule mb-4" />}
+              <dt
+                className={cn(
+                  "font-label text-xs tracking-[0.25em] uppercase",
+                  layout === "ribbons" ? "guest-ribbon px-6 py-2" : "text-accent-text",
+                )}
+              >
+                {block.title}
+              </dt>
+              <FamilyWords
+                block={block}
+                className="font-display text-xl text-ink"
+                soft="text-ink-muted"
+              />
+            </div>
+          ))}
+        </dl>
       </Reveal>
     </section>
   );
 }
 
-function Night({
+/** The blessing, and lamps the guest lights for the couple in the theme's own way. */
+function Blessing({
   copy,
   lang,
   look,
   way,
-  reply,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   way: LampBlessing;
-  reply: ReactNode;
 }) {
-  const { guestCopy, rsvpCopy } = useGuestText();
-  const words = guestCopy.themed;
-  const light = words.lights[way];
+  const { guestCopy } = useGuestText();
+  const light = guestCopy.themed.lights[way];
   const cardWords = CARD_THEMED_WORDS[lang];
   const [lit, setLit] = useState(false);
   return (
-    <div
-      data-mood="night"
+    <section
+      aria-label={guestCopy.themed.lampsLabel}
+      data-tour="7"
       data-lit={lit || undefined}
-      className="guest-sky guest-night relative isolate pb-10"
+      className="guest-night relative isolate flex min-h-svh flex-col justify-center px-4 py-16 sm:px-6"
     >
-      <Festoon className="guest-festoon h-12 w-full sm:h-16" />
-      <section
-        aria-label={words.lampsLabel}
-        data-tour="7"
-        className="relative flex min-h-svh flex-col justify-center px-4 pt-10 pb-6 sm:px-6"
-      >
-        <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-          <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
-            {cardWords.blessingLabel}
+      <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
+          {cardWords.blessingLabel}
+        </p>
+        {copy.blessing && (
+          <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
+            {copy.blessing}
           </p>
-          {copy.blessing && (
-            <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
-              {copy.blessing}
-            </p>
-          )}
-          <div className="guest-lamps flex w-full justify-center">
-            <LampStage way={way} flower={look.flower} />
-          </div>
-          <Button
-            variant={lit ? "secondary" : "primary"}
-            size="lg"
-            onClick={() => setLit((was) => !was)}
-            aria-pressed={lit}
-            className="rounded-full"
-          >
-            {light.give}
-          </Button>
-          <p aria-live="polite" className="min-h-6 text-sm text-balance text-ink-muted">
-            {lit ? light.given : ""}
-          </p>
-        </Reveal>
-      </section>
-      {reply && (
-        <section
-          id="rsvp"
-          aria-labelledby="guest-rsvp"
-          data-tour="end"
-          className="relative flex min-h-svh scroll-mt-4 flex-col justify-center px-4 pt-6 pb-12 sm:px-6 sm:pb-16"
+        )}
+        <div className="guest-lamps flex w-full justify-center">
+          <LampStage way={way} flower={look.flower} />
+        </div>
+        <Button
+          variant={lit ? "secondary" : "primary"}
+          size="lg"
+          onClick={() => setLit((was) => !was)}
+          aria-pressed={lit}
+          className="rounded-full"
         >
-          <Reveal className="guest-card mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-9 sm:px-10">
-            <Heading
-              id="guest-rsvp"
-              lang={lang}
-              label={cardWords.replyLabel}
-              title={cardWords.joinUs}
-            />
-            <p className="-mt-3 text-center text-ink-muted">{rsvpCopy.intro}</p>
-            {reply}
-          </Reveal>
-        </section>
-      )}
-      <p
-        lang={lang}
-        data-snap
-        className="relative px-6 pt-10 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
-      >
-        {cardWords.closing}
-      </p>
-      <Ground look={look} className="absolute inset-x-0 bottom-0 -z-10 h-28 w-full sm:h-36" />
-    </div>
+          {light.give}
+        </Button>
+        <p aria-live="polite" className="min-h-6 text-sm text-balance text-ink-muted">
+          {lit ? light.given : ""}
+        </p>
+      </Reveal>
+    </section>
   );
 }
 

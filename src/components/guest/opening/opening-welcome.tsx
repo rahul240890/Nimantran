@@ -58,6 +58,23 @@ function Petals({ count = 14 }: { count?: number }) {
   ));
 }
 
+/** Points of gold light that glint here and there around the names. */
+function Sparkles({ count = 16 }: { count?: number }) {
+  return range(count).map((i) => (
+    <span
+      key={i}
+      className="welcome-glint absolute rounded-full"
+      style={
+        {
+          left: `${spread(i, 41, 7, 86, 7)}%`,
+          top: `${spread(i, 29, 11, 80, 8)}%`,
+          "--i": i,
+        } as CSSProperties
+      }
+    />
+  ));
+}
+
 /** A palace's welcome: a toran sways in over sun rays that turn slowly behind the names. */
 function Royal() {
   return (
@@ -338,6 +355,7 @@ export function OpeningWelcome({
   seconds,
   over = false,
   centre,
+  backdrop,
   onSkip,
 }: {
   scene: WelcomeScene;
@@ -356,12 +374,19 @@ export function OpeningWelcome({
    * with the words in its empty field.
    */
   centre?: WelcomeCentre;
+  /**
+   * The place the opening opened onto (owner, 2026-10-26: the screen went blank once the
+   * gates opened). The names come up over it in a bloom of light, the painting drawing
+   * slowly nearer with petals falling, so the guest walks on in rather than into a blank.
+   */
+  backdrop?: string;
   onSkip: () => void;
 }) {
   const words = CARD_GREETING_WORDS[lang];
   const joiner = !copy.second.trim() ? "" : !copy.joiner || copy.joiner === "&" ? "&" : copy.joiner;
   // Over a painting the words sit on a veil of card stock, so they are always ink
-  const dark = centre ? Boolean(centre.dark) : darkWelcome(scene) && !over;
+  const onto = !centre && backdrop ? backdrop : null;
+  const dark = centre ? Boolean(centre.dark) : darkWelcome(scene) && !over && !onto;
   const Art = ART[scene];
   const button = useRef<HTMLButtonElement>(null);
   useEffect(() => button.current?.focus({ preventScroll: true }), []);
@@ -374,7 +399,7 @@ export function OpeningWelcome({
       lang={lang}
       data-testid="opening-welcome"
       data-welcome={centre ? "centre" : scene}
-      data-over={over && !centre ? "art" : undefined}
+      data-over={onto ? "place" : over && !centre ? "art" : undefined}
       data-tone={dark ? "dark" : "light"}
       onClick={onSkip}
       className="opening-welcome absolute inset-0 z-40 overflow-hidden"
@@ -391,6 +416,15 @@ export function OpeningWelcome({
               className="object-cover"
             />
           </div>
+        ) : onto ? (
+          <>
+            <div className="welcome-place absolute inset-0">
+              <Image src={onto} alt="" fill unoptimized sizes="100vw" className="object-cover" />
+            </div>
+            <span className="welcome-halo absolute inset-0" />
+            <Sparkles />
+            <Petals count={18} />
+          </>
         ) : (
           <Art />
         )}
