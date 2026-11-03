@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  Clapperboard,
-  Eye,
-  Images,
-  LoaderCircle,
-  LogIn,
-  PlayCircle,
-  X,
-} from "lucide-react";
+import { ArrowLeft, Clapperboard, Globe, Images, LoaderCircle, PlayCircle, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
@@ -23,7 +14,7 @@ import { TrustLine } from "@/components/reviews/trust-line";
 import { DesignPackages } from "@/components/pricing/design-packages";
 import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent } from "@/components/ui/dialog";
 import { HeldBackNotice } from "@/components/editions/held-back";
 import { usePaidOn } from "@/components/editions/use-invite-edition";
 import { Quiet } from "@/components/ui/quiet";
@@ -47,6 +38,7 @@ import { inviteDraft } from "@/lib/editor/store";
 import { switchDraft, syncDraft, syncStore } from "@/lib/invites/sync";
 import { funnel } from "@/lib/funnel";
 import { site } from "@/lib/site";
+import { publishNext, tryHref } from "@/lib/try/views";
 import { draftShowsScene, draftSuite } from "@/lib/publish/story";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -112,6 +104,7 @@ export function QuickStart({
   backHref,
   sampleHref,
   openPublish = false,
+  startPublish = false,
   more,
 }: {
   designId: string;
@@ -129,6 +122,8 @@ export function QuickStart({
   sampleHref: string;
   /** Back from choosing a package (?publish=1): the Publish dialog opens. */
   openPublish?: boolean;
+  /** Back from signing in to publish (?go=publish): publishing carries on, packages first. */
+  startPublish?: boolean;
   /** Other designs for the occasion, drawn on the server (suggested-designs.tsx). */
   more?: ReactNode;
 }) {
@@ -159,7 +154,9 @@ export function QuickStart({
   const [gate, setGate] = useState(false);
   const ready = hydrated && !arriving;
   useDropLostPhotos(draft, update, ready);
-  const [page, setPage] = useState("cover");
+  // The design opens on its gate, as guests first meet it (owner, 2026-11-03), until a field
+  // turns it to its page
+  const [page, setPage] = useState(GATE_PAGE);
   const [checking, setChecking] = useState(false);
   const errors = checking
     ? Object.assign({}, ...CHECKED.map((step) => stepErrors(draft, step)))
@@ -281,6 +278,25 @@ export function QuickStart({
   // field is typed in, so the names can still be seen arriving on it; tapping it brings the
   // design back up
   const stage = useRef<HTMLDivElement>(null);
+  // The bar at a phone's foot sits over the page: the page keeps room for it, as tall as it is
+  const bar = useRef<HTMLDivElement>(null);
+  const [barHeight, setBarHeight] = useState(0);
+  useEffect(() => {
+    const node = bar.current;
+    if (!node) return;
+    const observer = new ResizeObserver(() => setBarHeight(node.offsetHeight));
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+  // A field or part scrolled to (a tap, the keyboard, what's missing) stops above that bar
+  useEffect(() => {
+    if (wide || !barHeight) return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = `${barHeight}px`;
+    return () => {
+      root.style.scrollPaddingBottom = "";
+    };
+  }, [wide, barHeight]);
   const [stageSeen, setStageSeen] = useState(true);
   const [miniHidden, setMiniHidden] = useState(false);
   // Only while typing (owner, 2026-10-25): otherwise it sat over the parts' titles and choices
@@ -383,13 +399,78 @@ export function QuickStart({
   // Back from choosing a package (?publish=1): the dialog opens once, and the address
   // forgets it so a reload doesn't open it again
   const [publishing] = useState(openPublish);
+  const [carryOn] = useState(startPublish);
   useEffect(() => {
-    if (!ready || !openPublish) return;
+    if (!ready || !(openPublish || startPublish)) return;
     const url = new URL(window.location.href);
     url.searchParams.delete("publish");
+    url.searchParams.delete("go");
     window.history.replaceState(window.history.state, "", url);
-  }, [ready, openPublish]);
-  const signInHere = `/sign-in?next=${encodeURIComponent(designPageHref(draft))}`;
+  }, [ready, openPublish, startPublish]);
+
+  // The website, video and cards, tried before signing in too (owner, 2026-11-03: the family
+  // should feel all of it first): signed out they open from this browser's copy, with the
+  // mark (/try/...); signed in, from the account's, saved first. The video and cards are
+  // made from the names and dates, so until those are in, what's missing shows instead
+  const tryOpen = (to: "preview" | "video" | "cards") => {
+    if (to !== "preview" && !check()) return;
+    if (!signedIn) {
+      inviteDraft.flush();
+      router.push(tryHref(to === "preview" ? "website" : to));
+      return;
+    }
+    if (to === "preview" && held) setPreviewing(true);
+    else void openSaved(to);
+  };
+  /** The website, video and cards buttons: beside the design, or in the bar on a phone. */
+  const tryButtons = (bar: boolean) => {
+    const look = bar
+      ? "h-auto min-h-12 flex-col gap-0.5 px-1 py-1.5 text-xs [&_svg]:size-5"
+      : undefined;
+    return (
+      <>
+        <Button
+          variant="secondary"
+          leadingIcon={<Globe aria-hidden />}
+          loading={opening === "preview"}
+          disabled={opening !== null}
+          onClick={() => tryOpen("preview")}
+          className={look}
+          data-own-preview
+        >
+          {quickCopy.preview}
+        </Button>
+        {/* Made from the saved invite, so they wait while a change is held back */}
+        {filled && !held && (
+          <>
+            <Button
+              variant="secondary"
+              leadingIcon={<Clapperboard aria-hidden />}
+              loading={opening === "video"}
+              disabled={opening !== null}
+              onClick={() => tryOpen("video")}
+              className={look}
+              data-try-video
+            >
+              {quickCopy.video}
+            </Button>
+            <Button
+              variant="secondary"
+              leadingIcon={<Images aria-hidden />}
+              loading={opening === "cards"}
+              disabled={opening !== null}
+              onClick={() => tryOpen("cards")}
+              aria-label={cardsCopy.open}
+              className={look}
+              data-try-cards
+            >
+              {quickCopy.cards}
+            </Button>
+          </>
+        )}
+      </>
+    );
+  };
 
   // What's in the names and the events, beside their titles while folded
   const names = [draft.content.first, draft.content.second]
@@ -491,27 +572,11 @@ export function QuickStart({
                 </Link>
               </Button>
             )}
-            {ready && signedIn && (
-              <Button
-                variant="secondary"
-                leadingIcon={<Eye aria-hidden />}
-                loading={opening === "preview"}
-                disabled={opening !== null}
-                onClick={() => (held ? setPreviewing(true) : void openSaved("preview"))}
-                data-own-preview
-              >
-                {quickCopy.preview}
-              </Button>
-            )}
+            {/* On a phone they're in the bar at the foot, always in reach */}
+            {ready && wide && tryButtons(false)}
             {ready && (
+              // The quick look, while the account can't show a change held back
               <Sheet open={previewing} onOpenChange={setPreviewing}>
-                {!signedIn && (
-                  <SheetTrigger asChild>
-                    <Button variant="secondary" leadingIcon={<Eye aria-hidden />} data-own-preview>
-                      {quickCopy.preview}
-                    </Button>
-                  </SheetTrigger>
-                )}
                 <SheetContent title={editor.previewTitle} closeLabel={editor.close}>
                   <PreviewStage
                     draft={draft}
@@ -522,54 +587,8 @@ export function QuickStart({
                 </SheetContent>
               </Sheet>
             )}
-            {/* Made from the saved invite, so they wait while a change is held back */}
-            {ready && filled && !held && (
-              <>
-                {signedIn ? (
-                  <Button
-                    variant="secondary"
-                    leadingIcon={<Clapperboard aria-hidden />}
-                    loading={opening === "video"}
-                    disabled={opening !== null}
-                    onClick={() => void openSaved("video")}
-                    data-try-video
-                  >
-                    {quickCopy.video}
-                  </Button>
-                ) : (
-                  <Button asChild variant="secondary">
-                    <Link href={signInHere} data-try-video>
-                      <Clapperboard aria-hidden />
-                      {quickCopy.video}
-                    </Link>
-                  </Button>
-                )}
-                {signedIn ? (
-                  <Button
-                    variant="secondary"
-                    leadingIcon={<Images aria-hidden />}
-                    loading={opening === "cards"}
-                    disabled={opening !== null}
-                    onClick={() => void openSaved("cards")}
-                    aria-label={cardsCopy.open}
-                    data-try-cards
-                  >
-                    {quickCopy.cards}
-                  </Button>
-                ) : (
-                  <Button asChild variant="secondary">
-                    <Link href={signInHere} aria-label={cardsCopy.open} data-try-cards>
-                      <Images aria-hidden />
-                      {quickCopy.cards}
-                    </Link>
-                  </Button>
-                )}
-              </>
-            )}
           </div>
-          {ready && filled && !signedIn && (
-            <p className="text-xs text-ink-muted">{quickCopy.signInToTry}</p>
-          )}
+          {ready && !signedIn && <p className="text-xs text-ink-muted">{quickCopy.tryNote}</p>}
           <TrustLine />
         </section>
 
@@ -712,8 +731,12 @@ export function QuickStart({
             </Quiet>
           )}
 
-          {/* Publish stays in reach on a phone */}
-          <div className="sticky bottom-0 z-30 -mx-4 mt-auto flex flex-col gap-2 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md sm:-mx-6 sm:px-6 lg:mx-0 lg:rounded-t-lg lg:border-x lg:px-4">
+          {/* Publish stays in reach: on a phone the bar is always at the screen's foot, with
+              the website, video and cards beside it (owner, 2026-11-03) */}
+          <div
+            ref={bar}
+            className="bottom-0 z-30 mt-auto flex flex-col gap-2 border-t border-line bg-paper/90 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-md max-lg:fixed max-lg:inset-x-0 sm:px-6 lg:sticky lg:rounded-t-lg lg:border-x lg:px-4"
+          >
             {errorCount > 0 && (
               <p
                 role="alert"
@@ -747,26 +770,24 @@ export function QuickStart({
                 </button>
               </div>
             )}
-            {/* Publish once it's right (the packages first when it has none), then Share */}
+            {/* A phone's way to the website, video and cards, beside Publish (owner, 2026-11-03) */}
+            {ready && !wide && (
+              <div className="grid auto-cols-fr grid-flow-col gap-2" data-try-bar>
+                {tryButtons(true)}
+              </div>
+            )}
+            {/* Publish once it's right (the packages first when it has none), then Share;
+                signed out, the account is asked for on the tap and publishing carries on */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1" data-editor-bar>
-              {ready && !signedIn ? (
-                // Publishing needs an account: what's missing is shown first, then sign in
-                <Button
-                  size="lg"
-                  leadingIcon={<LogIn aria-hidden />}
-                  className="max-sm:w-full"
-                  onClick={() => check() && router.push(signInHere)}
-                >
-                  {publishCopy.signInToPublish}
-                </Button>
-              ) : ready ? (
+              {ready ? (
                 <PublishButton
                   draft={draft}
                   signedIn={signedIn}
                   size="lg"
                   className="max-sm:w-full"
                   autoOpen={publishing}
-                  signInNext={designPageHref(draft)}
+                  autoStart={carryOn}
+                  signInNext={signedIn ? designPageHref(draft) : publishNext(draft)}
                   onNotReady={() => {
                     if (check()) toast({ title: publishCopy.finishFirst, tone: "error" });
                   }}
@@ -782,6 +803,8 @@ export function QuickStart({
       </main>
       {/* On a live invite, another design asks first: a new invitation, or this one changed */}
       <DesignChoice live={ready && Boolean(draft.slug)}>{more}</DesignChoice>
+      {/* Room at the foot of a phone's page for the bar over it */}
+      <div aria-hidden className="shrink-0 lg:hidden" style={{ height: barHeight }} />
 
       {/* Phones: the design, small, while it is out of view, until put away */}
       {ready && !wide && !stageSeen && typing && !miniHidden && (

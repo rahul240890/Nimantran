@@ -50,7 +50,7 @@ export default async function DesignStartPage({
   const { design: id } = await params;
   const design = designById(id);
   if (!design) notFound();
-  const { category, tradition, faith, kind, invite, publish } = await searchParams;
+  const { category, tradition, faith, kind, invite, publish, go } = await searchParams;
   const locale = await getLocale();
   const occasion = isCategoryId(category) ? category : suiteOccasion(design.suite);
   const weddingKind = (WEDDING_KINDS as readonly string[]).includes(String(kind))
@@ -105,6 +105,8 @@ export default async function DesignStartPage({
         sampleHref={samplePath(design.id, { occasion, kind: weddingKind })}
         // Back from choosing a package, its Publish dialog opens
         openPublish={Boolean(initialInvite) && publish === "1"}
+        // Back from signing in to publish (Publish signed out): publishing carries on
+        startPublish={Boolean(account) && go === "publish"}
         more={
           <SuggestedDesigns
             current={design.id}
