@@ -24,6 +24,7 @@ import {
   withTradition as followTradition,
   type InviteDraft,
 } from "./draft";
+import { FLUTE_URL } from "./music-clip";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { TEMPLATES } from "@/lib/templates/catalog";
 import type { OpeningGod } from "@/lib/opening/catalog";
@@ -108,9 +109,28 @@ describe("invite draft", () => {
     expect(draftProblems(strict)).toEqual([]);
   });
 
+  it("plays the flute song on every design until the host picks a raga", () => {
+    const draft = complete();
+    draft.suite = "kashi";
+    expect(draft.music.track).toBe("flute");
+    expect(draftTemplate(draft).music).toEqual({
+      raga: "bhairavi",
+      lead: "shehnai",
+      tempo: 58,
+      clip: FLUTE_URL,
+      loop: true,
+    });
+    // Drafts saved before the flute keep the raga their host chose, else take the flute
+    const old = { ...draft, music: { raga: "bhupali", playOnOpen: true, clip: null } };
+    expect(parseDraft(old)?.music.track).toBe("raga");
+    const plain = { ...draft, music: { raga: null, playOnOpen: true, clip: null } };
+    expect(parseDraft(plain)?.music.track).toBe("flute");
+  });
+
   it("plays the theme's own music, or the chosen raga its own way", () => {
     const draft = complete();
     draft.suite = "kashi";
+    draft.music.track = "raga";
     // Kashi plays Bhairavi on Bismillah Khan's shehnai, slowly
     expect(draftTemplate(draft).music).toEqual({ raga: "bhairavi", lead: "shehnai", tempo: 58 });
     draft.music.raga = "bhairavi";

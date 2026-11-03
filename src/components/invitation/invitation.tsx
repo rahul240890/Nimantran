@@ -271,8 +271,11 @@ export function Invitation({
   }, [onStatus, state, level, detected?.level, current?.reason]);
 
   // Music: composed live, so it costs no data; loaded only when first played
-  const { raga, tempo, clip } = template.music;
-  const music = useMemo(() => ({ raga, tempo, clip }), [raga, tempo, clip]);
+  const { raga, tempo, lead, taal, clip, loop } = template.music;
+  const music = useMemo(
+    () => ({ raga, tempo, lead, taal, clip, loop }),
+    [raga, tempo, lead, taal, clip, loop],
+  );
   const player = useRef<MusicPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
   const playMusic = useCallback(async () => {

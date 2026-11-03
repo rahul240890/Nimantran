@@ -10,6 +10,17 @@ import type { Template } from "@/lib/templates/schema";
  * uploads to the event's folder in the event-media bucket.
  */
 
+/**
+ * What an invite plays when the host hasn't added their own music: the site's flute song
+ * (Apna Bana Le, a flute cover the owner chose on 2026-11-03), every design's default, or
+ * one of the ragas composed live.
+ */
+export const MUSIC_TRACKS = ["flute", "raga"] as const;
+export type MusicTrack = (typeof MUSIC_TRACKS)[number];
+
+/** The flute song, trimmed and re-encoded for phones (96 kb/s AAC, 2 min 29 s). */
+export const FLUTE_URL = "/media/music/flute.m4a";
+
 export const CLIP_TYPES = ["audio/mp4", "audio/wav"] as const;
 export type ClipType = (typeof CLIP_TYPES)[number];
 
@@ -42,7 +53,11 @@ export function clipPath(eventId: string, clip: Pick<MusicClip, "id" | "type">):
 
 /** The design playing the host's clip; the design unchanged without one. */
 export function withClip(template: Template, url: string | null | undefined): Template {
-  return url ? { ...template, music: { ...template.music, clip: url } } : template;
+  if (!url) return template;
+  // The host's clip is cut to the invitation's length: it plays once, never round again
+  const music = { ...template.music, clip: url };
+  delete music.loop;
+  return { ...template, music };
 }
 
 /** A picked file's name, trimmed to fit and without its extension. */

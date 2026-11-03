@@ -337,9 +337,9 @@ export const videoCopy = {
   loading: "Getting your video ready",
   back: "Back to your invite",
   heading: "Invitation video",
-  body: "Your invitation as a vertical video with its raga: the opening as guests see it, the welcome with your names, then every page. Share it on WhatsApp, Instagram or anywhere else. It's made on this phone or computer, so nothing is uploaded, and it stays here when you come back.",
+  body: "Your invitation as a vertical video with its music: the opening as guests see it, the welcome with your names, then every page. Share it on WhatsApp, Instagram or anywhere else. It's made on this phone or computer, so nothing is uploaded, and it stays here when you come back.",
   poster: "The video's first moment",
-  music: "With the raga",
+  music: "With the music",
   make: "Make video",
   making: (percent: number) => `Making your video: ${percent}%`,
   stop: "Stop",
@@ -375,7 +375,7 @@ export const videoCopy = {
   unsupported:
     "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",
   noSound:
-    "This browser can't add music to videos, so the video will be silent. Chrome or Edge add the raga.",
+    "This browser can't add music to videos, so the video will be silent. Chrome or Edge add the music.",
   mark: `Made with ${site.shortName}`,
   makePreview: "Make a free preview",
   preview: "Free preview",
