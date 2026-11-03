@@ -377,6 +377,7 @@ export function GuestView({
                 copy={copy}
                 lang={language}
                 functions={told}
+                pages={story.beats}
                 photos={scenePhotos}
                 reply={story.reply ?? null}
                 closing={closing}

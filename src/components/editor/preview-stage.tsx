@@ -135,51 +135,6 @@ export function PreviewStage({
   // One Scene (pilot): the whole invitation on one painting instead of the pages
   const scenePhotos = useCouplePhotos(draft, deferredCopy, true);
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
-  const sceneView = scene && (
-    <div className={cn("flex min-h-0 flex-col items-center gap-3", mini ? className : "flex-1")}>
-      <div className="relative isolate aspect-[9/19] h-full max-h-full min-h-0 max-w-full overflow-hidden rounded-[2.2rem] border-[6px] border-night bg-night shadow-overlay">
-        {atGate && lead ? (
-          lead.screen
-        ) : (
-          <OneScene
-            suite={suite}
-            page={scene}
-            copy={deferredCopy}
-            lang={language}
-            functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
-            photos={scenePhotos}
-            reply={null}
-            type={type}
-            framed
-            miniature
-            still={mini}
-            focus={page.startsWith("fn-") ? page.slice(3) : null}
-          />
-        )}
-      </div>
-      {/* The gate, then the one painting behind it */}
-      {!mini && lead && (
-        <div className="flex shrink-0 items-center justify-center gap-2">
-          <ul aria-label={studioCopy.pageList} className="flex gap-1.5 px-1 py-1">
-            {[lead.id, "cover"].map((id) => (
-              <li key={id} className="shrink-0">
-                <button
-                  type="button"
-                  aria-pressed={atGate === (id === GATE_PAGE)}
-                  aria-label={studioCopy.showPage(pageName(id === GATE_PAGE ? id : "invite"))}
-                  onClick={() => onPage(id)}
-                  className={pageChip(atGate === (id === GATE_PAGE))}
-                >
-                  {pageName(id === GATE_PAGE ? id : "invite")}
-                </button>
-              </li>
-            ))}
-          </ul>
-          {atGate && gateTool}
-        </div>
-      )}
-    </div>
-  );
   // The pages as the invite writes them, then with the host's own words and placement
   const written = useMemo(() => {
     const functions = JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>;
@@ -221,6 +176,53 @@ export function PreviewStage({
   const beats = useMemo(
     () => applyPages(written, JSON.parse(pagesKey) as DraftPages, language, pageSeconds),
     [written, pagesKey, language, pageSeconds],
+  );
+
+  const sceneView = scene && (
+    <div className={cn("flex min-h-0 flex-col items-center gap-3", mini ? className : "flex-1")}>
+      <div className="relative isolate aspect-[9/19] h-full max-h-full min-h-0 max-w-full overflow-hidden rounded-[2.2rem] border-[6px] border-night bg-night shadow-overlay">
+        {atGate && lead ? (
+          lead.screen
+        ) : (
+          <OneScene
+            suite={suite}
+            page={scene}
+            copy={deferredCopy}
+            lang={language}
+            functions={JSON.parse(functionsKey) as ReturnType<typeof storyFunctions>}
+            pages={beats}
+            photos={scenePhotos}
+            reply={null}
+            type={type}
+            framed
+            miniature
+            still={mini}
+            focus={page.startsWith("fn-") ? page.slice(3) : null}
+          />
+        )}
+      </div>
+      {/* The gate, then the one painting behind it */}
+      {!mini && lead && (
+        <div className="flex shrink-0 items-center justify-center gap-2">
+          <ul aria-label={studioCopy.pageList} className="flex gap-1.5 px-1 py-1">
+            {[lead.id, "cover"].map((id) => (
+              <li key={id} className="shrink-0">
+                <button
+                  type="button"
+                  aria-pressed={atGate === (id === GATE_PAGE)}
+                  aria-label={studioCopy.showPage(pageName(id === GATE_PAGE ? id : "invite"))}
+                  onClick={() => onPage(id)}
+                  className={pageChip(atGate === (id === GATE_PAGE))}
+                >
+                  {pageName(id === GATE_PAGE ? id : "invite")}
+                </button>
+              </li>
+            ))}
+          </ul>
+          {atGate && gateTool}
+        </div>
+      )}
+    </div>
   );
 
   const clipUrl = useClipUrl(draft);
