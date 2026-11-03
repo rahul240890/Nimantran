@@ -14,9 +14,11 @@ export const metadata: Metadata = {
  * with sample names, family and functions in ?lang=<card language>, so the typesetting of
  * a theme can be checked in every script at once. ?box=1 shows the box behind the words,
  * ?w=<px> sets the phones' width and ?mini=1 shows them as the editor's small phone does.
+ * ?blessing=<words> sets the invocation over the names, and ?god=1 gives it the painted
+ * god's page before the cover, to check how a host's own invocation sits.
  */
 export default async function PagesSheetPage({ searchParams }: PageProps<"/engine/pages">) {
-  const { suite, lang, box, w, mini } = await searchParams;
+  const { suite, lang, box, w, mini, blessing, god } = await searchParams;
   const width = Number(w);
   return (
     <PageSheet
@@ -25,6 +27,8 @@ export default async function PagesSheetPage({ searchParams }: PageProps<"/engin
       textBox={box === "1"}
       width={Number.isFinite(width) && width >= 140 && width <= 600 ? width : 390}
       miniature={mini === "1"}
+      blessing={typeof blessing === "string" ? blessing.slice(0, 80) : undefined}
+      blessingPage={god === "1"}
     />
   );
 }

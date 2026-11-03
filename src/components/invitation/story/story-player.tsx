@@ -57,6 +57,8 @@ import {
   ruleAt,
   leadingScale,
   lineShare,
+  oneLine,
+  ONE_LINE_MIN,
   roleSizeCss,
   type TypeRole,
   type Voice,
@@ -762,7 +764,8 @@ function lineStyle(
     ...(names && type?.italic ? { fontStyle: "italic" } : {}),
     // Small headings ("With the blessings of") grow no further than the theme's own
     // proportions: spaced wide, they would reach the art where an arch narrows
-    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${role === "label" ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"})`,
+    // A line kept to one line shrinks on its own by --line-fit (StoryPage's fit)
+    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${role === "label" ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"} * var(--line-fit, 1))`,
     lineHeight: Number((set.leading * leading).toFixed(3)),
     letterSpacing:
       name && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",
@@ -915,6 +918,18 @@ export function StoryPage({
     const fit = () => {
       if (outer.clientHeight === 0) return;
       const lines = [...inner.querySelectorAll<HTMLElement>(".story-line")];
+      // A line kept to one line (an invocation, a small heading) starts at its full size and
+      // on one line again, each time the page is fitted
+      const single = lines.filter((line) => line.classList.contains("story-one"));
+      for (const line of single) {
+        line.style.removeProperty("--line-fit");
+        delete line.dataset.wrap;
+      }
+      // Kept to one line, it shrinks on its own after the page's fit, so its width never
+      // holds the page back
+      const unbound = (line: HTMLElement) =>
+        line.classList.contains("story-symbol") ||
+        (line.classList.contains("story-one") && line.dataset.wrap !== "true");
       const fits = (scale: number) => {
         inner.style.setProperty("--story-fit", String(scale));
         // The words' height from their layout, not scrollHeight: lines rising in are still
@@ -926,28 +941,53 @@ export function StoryPage({
           // Grown past the theme's own size, the words keep a margin of the calm space clear
           height <= outer.clientHeight * fitRoom(scale) + 1 &&
           // The sacred symbol is drawn in its own square, so its width never decides the fit
-          lines.every(
-            (line) =>
-              line.classList.contains("story-symbol") || line.scrollWidth <= line.clientWidth + 1,
-          )
+          lines.every((line) => unbound(line) || line.scrollWidth <= line.clientWidth + 1)
         );
       };
-      delete inner.dataset.overflow;
-      delete inner.dataset.loose;
-      const range = { max: grow, steps: grow > FIT_MAX ? 9 : 7 };
-      let { scale, overflow } = fitScale(fits, range);
-      // Names kept whole that leave the words too small may break after their first words,
-      // and so may a long name that holds a page of reading words well under its full size
-      const held = grow > FIT_MAX && scale < grow * FIT_HELD;
-      if ((scale < FIT_KEEP_NAMES || held) && inner.querySelector(".story-keep")) {
-        inner.dataset.loose = "true";
-        const loose = fitScale(fits, range);
-        const better = held && scale >= FIT_KEEP_NAMES ? scale * FIT_HELD_GAIN : scale;
-        if (loose.scale > better || (overflow && !loose.overflow)) ({ scale, overflow } = loose);
-        else delete inner.dataset.loose;
+      const place = () => {
+        delete inner.dataset.overflow;
+        delete inner.dataset.loose;
+        const range = { max: grow, steps: grow > FIT_MAX ? 9 : 7 };
+        let { scale, overflow } = fitScale(fits, range);
+        // Names kept whole that leave the words too small may break after their first words,
+        // and so may a long name that holds a page of reading words well under its full size
+        const held = grow > FIT_MAX && scale < grow * FIT_HELD;
+        if ((scale < FIT_KEEP_NAMES || held) && inner.querySelector(".story-keep")) {
+          inner.dataset.loose = "true";
+          const loose = fitScale(fits, range);
+          const better = held && scale >= FIT_KEEP_NAMES ? scale * FIT_HELD_GAIN : scale;
+          if (loose.scale > better || (overflow && !loose.overflow)) ({ scale, overflow } = loose);
+          else delete inner.dataset.loose;
+        }
+        inner.style.setProperty("--story-fit", String(scale));
+        if (overflow) inner.dataset.overflow = "true";
+        return overflow;
+      };
+      let overflow = place();
+      // Each line kept whole shrinks just enough to fit the width; one that would shrink
+      // too far to read wraps after all, and the page is fitted again with it wrapping
+      let wrapped = false;
+      for (const line of single) {
+        if (line.scrollWidth <= line.clientWidth + 1) continue;
+        const share = Math.floor((line.clientWidth / line.scrollWidth) * 100) / 100;
+        if (share >= ONE_LINE_MIN) line.style.setProperty("--line-fit", String(share));
+        else {
+          line.dataset.wrap = "true";
+          wrapped = true;
+        }
       }
-      inner.style.setProperty("--story-fit", String(scale));
-      if (overflow) inner.dataset.overflow = "true";
+      if (wrapped) {
+        overflow = place();
+        // A wrapped heading breaks once, evenly, rather than leave a lone word on a third line
+        for (const line of single) {
+          if (line.dataset.wrap !== "true") continue;
+          const twoLines = () =>
+            line.offsetHeight <= parseFloat(getComputedStyle(line).lineHeight) * 2.5;
+          for (let fit = 0.95; !twoLines() && fit >= ONE_LINE_MIN; fit -= 0.05) {
+            line.style.setProperty("--line-fit", fit.toFixed(2));
+          }
+        }
+      }
       overflowed.current?.(overflow);
     };
     fit();
@@ -1099,6 +1139,7 @@ export function StoryPage({
                   lang={line.lang}
                   className={cn(
                     "story-line text-balance",
+                    oneLine(beat, i) && "story-one",
                     // The names arrive in the theme's way instead of rising in with the rest
                     reveal && nameLines.includes(i) && "reveal-line",
                     LINE_COLOUR[role],

@@ -24,16 +24,27 @@ export function PageSheet({
   textBox,
   width = 390,
   miniature = false,
+  blessing,
+  blessingPage = false,
 }: {
   suite: SuiteId;
   language: CardLanguage;
   textBox: boolean;
   width?: number;
   miniature?: boolean;
+  blessing?: string;
+  blessingPage?: boolean;
 }) {
   const locale = useLocale();
   const { uiStrings } = useText(uiText);
-  const draft = useMemo(() => sampleDraft(suite, language), [suite, language]);
+  const draft = useMemo(() => {
+    const sample = sampleDraft(suite, language);
+    return {
+      ...sample,
+      blessingPage: blessingPage || sample.blessingPage,
+      content: blessing === undefined ? sample.content : { ...sample.content, blessing },
+    };
+  }, [suite, language, blessing, blessingPage]);
   const copy = useMemo(() => draftCopy(draft, language), [draft, language]);
   const beats = useMemo(
     () =>

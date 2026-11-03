@@ -335,6 +335,32 @@ export function lineSpace(beat: StoryBeat, index: number, symbol: boolean): numb
  * pages stack many short lines (a heading, "Son of", the parents, their town), and the gaps
  * between them, not the art, were what held their names small; elsewhere lines keep theirs.
  */
+/** The longest line, in characters, that is kept to one line by shrinking it. */
+const ONE_LINE_MAX = 40;
+/** A line kept whole never shrinks below this share of its size; past it, it wraps. */
+export const ONE_LINE_MIN = 0.55;
+
+/**
+ * Whether a line reads as one phrase that must not break: the invocation over the names or
+ * under the god (Shri Ganeshaya Namah, ॥ श्री गणेशाय नमः ॥), a small heading (With the
+ * blessings of, Save the date) and a function's name. Such a line shrinks on its own to fit
+ * the width rather than wrap (owner, 2026-11-03: an invocation broken in two looks wrong).
+ * Names, days, places and sentences wrap as before.
+ */
+export function oneLine(beat: StoryBeat, index: number): boolean {
+  const line = beat.lines[index];
+  if (!line || [...line.text].length > ONE_LINE_MAX) return false;
+  const role = roleOf(beat, line.style);
+  if (role === "label") return true;
+  // The invocation: the first line of a cover or of the god's page, set in the flowing hand
+  if (role === "script") {
+    const first = beat.lines.findIndex((other) => other.style === "script");
+    return (beat.scene === "cover" || beat.scene === "blessing") && index === first;
+  }
+  // A function's name ("Haldi", "Anniversary dinner")
+  return role === "display" && isFunctionScene(beat);
+}
+
 /**
  * How much of the words' width a line may take: names run the full width, and reading lines
  * keep clear of the art's edges, all but the family's names, which are why the page is read.
