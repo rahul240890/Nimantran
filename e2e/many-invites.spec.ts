@@ -146,9 +146,8 @@ test.describe("many invitations", () => {
     await expect(page).toHaveURL(new RegExp(`/invites/${id}/preview$`), {
       timeout: 30_000,
     });
-    const guest = info.project.name.startsWith("phone")
-      ? page
-      : page.frameLocator('[data-testid="host-preview-phone"]');
+    // Full screen on every screen, as a guest's link opens
+    const guest = page;
     await expect(guest.locator("[data-opening]").first()).toHaveAttribute(
       "data-opening",
       "curtain",

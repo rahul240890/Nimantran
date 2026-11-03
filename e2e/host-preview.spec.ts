@@ -1,12 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { axe, noOverflow, numberFor, writeInvite } from "./invite-helpers";
 
-/* The host sees the invite exactly as a guest will: edge to edge on a phone, in a phone on a computer. */
+/* The host sees the invite exactly as a guest will: edge to edge on every screen, in a phone when asked. */
 
 const shots = process.env.HOST_PREVIEW_SHOTS;
 
 test.describe("host preview", () => {
-  test("a phone shows the guest page edge to edge, a computer shows it in a phone", async ({
+  test("the guest page opens edge to edge on a phone and a computer, in a phone when asked", async ({
     page,
   }, info) => {
     // Writing the invite takes most of the time
@@ -47,9 +47,15 @@ test.describe("host preview", () => {
     // It opens in place: switching to full screen blanked the screen for seconds
     expect(await page.evaluate(() => Boolean(document.fullscreenElement))).toBe(false);
 
-    // On a computer: the same page inside a phone, with the notes and next step beside it
+    // On a computer it opens full screen too, as a guest's link does (owner, 2026-11-03)
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`/invites/${id}/preview`);
+    await expect(page.locator("[data-opening]")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole("button", { name: "Website options" })).toBeVisible();
+    await expect(page.locator('[data-testid="host-preview-phone"]')).toHaveCount(0);
+
+    // Asked for the phone: the same page inside a phone, with the notes and next step beside it
+    await page.goto(`/invites/${id}/preview?phone=1`);
     await expect(page.getByRole("heading", { name: "Your invitation website" })).toBeVisible();
     const phone = page.frameLocator('[data-testid="host-preview-phone"]');
     await expect(phone.getByRole("button", { name: "Open the invitation" })).toBeVisible({
@@ -71,7 +77,7 @@ test.describe("host preview", () => {
 
     // Full screen on a computer is the guest page itself
     await page.getByRole("link", { name: "See it full screen" }).click();
-    await expect(page).toHaveURL(/full=1/);
+    await expect(page).toHaveURL(new RegExp(`/invites/${id}/preview$`));
     await expect(page.locator("[data-opening]")).toBeVisible();
     await expect(page.getByRole("button", { name: "Website options" })).toBeVisible();
   });
