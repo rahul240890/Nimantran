@@ -36,8 +36,8 @@ test.describe("guest RSVP", () => {
       const wedding = form.getByRole("radiogroup", { name: "Your reply for the Wedding" });
       await expect(wedding.getByRole("radio", { name: /^Coming$/ })).toBeChecked();
       await form.getByRole("button", { name: "More children" }).last().click();
-      await form.getByRole("combobox", { name: /Meal/ }).click();
-      await guest.getByRole("option", { name: "Jain" }).click();
+      // A new invitation asks only for the reply: food, stay and pickup are the host's to tick
+      await expect(form.getByRole("radiogroup", { name: /Meal/ })).toHaveCount(0);
       await form.getByRole("textbox", { name: /A note for the family/ }).fill("See you there!");
       expect(await noOverflow(guest)).toBe(true);
       expect((await axe(guest).analyze()).violations).toEqual([]);

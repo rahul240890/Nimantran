@@ -204,12 +204,15 @@ function Pills({
   );
 }
 
-/** A small heading over a part of the form. */
+/**
+ * A small label over a part of the form, naming its section. Not a heading, so the guest
+ * page's own headings (such as the celebrations above) stay the only ones with their words.
+ */
 function PartHeading({ id, children }: { id?: string; children: ReactNode }) {
   return (
-    <h3 id={id} className="font-label text-xs tracking-[0.18em] text-ink-muted uppercase">
+    <p id={id} className="font-label text-xs tracking-[0.18em] text-ink-muted uppercase">
       {children}
-    </h3>
+    </p>
   );
 }
 
@@ -494,7 +497,7 @@ export function RsvpForm({
           />
         </Field>
 
-        <section aria-labelledby="rsvp-celebrations" className="flex flex-col">
+        <div role="group" aria-labelledby="rsvp-celebrations" className="flex flex-col">
           <div className="flex min-h-11 flex-wrap items-center justify-between gap-x-4 border-b border-line pb-1">
             <PartHeading id="rsvp-celebrations">{rsvpCopy.celebrations}</PartHeading>
             {functions.length > 1 && (
@@ -515,7 +518,7 @@ export function RsvpForm({
               return (
                 <li key={fn.id} className="flex flex-col gap-3 py-4">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <h4 className="font-display text-lg leading-snug break-words">{fn.name}</h4>
+                    <h3 className="font-display text-lg leading-snug break-words">{fn.name}</h3>
                     {fn.date && (
                       <span className="text-xs text-ink-muted">
                         {formatCardDayMonth(fn.date, language)}
@@ -556,10 +559,10 @@ export function RsvpForm({
               );
             })}
           </ol>
-        </section>
+        </div>
 
         {questions.length > 0 && (
-          <section aria-labelledby="rsvp-details" className="flex flex-col gap-4">
+          <div role="group" aria-labelledby="rsvp-details" className="flex flex-col gap-4">
             <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
               <PartHeading id="rsvp-details">{rsvpCopy.questionsHeading}</PartHeading>
               <span className="text-xs text-ink-muted">{rsvpCopy.optional}</span>
@@ -572,7 +575,7 @@ export function RsvpForm({
                 onChange={(value) => setAnswers((current) => ({ ...current, [id]: value }))}
               />
             ))}
-          </section>
+          </div>
         )}
 
         <Field label={rsvpCopy.message} optionalLabel={rsvpCopy.optional}>
