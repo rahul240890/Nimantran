@@ -273,12 +273,29 @@ export function roleOf(beat: StoryBeat, style: LineStyle): TypeRole {
   return style === "symbol" ? "label" : style;
 }
 
+const isFunctionScene = (beat: StoryBeat) =>
+  (FUNCTION_IDS as readonly string[]).includes(beat.scene);
+
+/**
+ * Off a function's page, the same fine rule sits under a small heading set over the day or
+ * the names ("Save the date" on the invitation's page and on the save the date card), so
+ * the heading reads as a heading rather than trailing into the day below it.
+ */
+function saveTheDateRule(beat: StoryBeat): number {
+  return beat.lines.findIndex(
+    (line, i) =>
+      i > 0 &&
+      beat.lines[i - 1]!.style === "label" &&
+      (line.style === "date" || line.style === "display"),
+  );
+}
+
 /**
  * Where a function's page draws its fine rule between its name and its day: before the
  * first line after the name (a local name in its own script stays with it), or nowhere.
  */
 export function ruleAt(beat: StoryBeat): number {
-  if (!(FUNCTION_IDS as readonly string[]).includes(beat.scene)) return -1;
+  if (!isFunctionScene(beat)) return saveTheDateRule(beat);
   const hero = beat.lines.findIndex((line) => line.style === "display");
   if (hero < 0) return -1;
   let after = hero + 1;
@@ -291,6 +308,7 @@ export function ruleAt(beat: StoryBeat): number {
  * venue, when a day or an hour stands above it, or nowhere.
  */
 export function placeMarkAt(beat: StoryBeat): number {
+  if (!isFunctionScene(beat)) return -1;
   const rule = ruleAt(beat);
   if (rule < 0) return -1;
   const venue = beat.lines.findIndex((line) => line.style === "venue");
@@ -307,7 +325,28 @@ export function lineSpace(beat: StoryBeat, index: number, symbol: boolean): numb
   // On the family page "Son of", the parents' names and their town read as one group
   const pair = new Set([role, previous]);
   if (beat.scene === "family" && pair.has("small") && pair.has("body")) return 0.5;
+  // Each family's heading sits a little closer on the family pages, so their names can grow
+  if (beat.scene === "family" && role === "label") return 3;
   return spaceBefore(role, previous);
+}
+
+/**
+ * How much tighter a page sets its reading lines than the theme's own leading. The family
+ * pages stack many short lines (a heading, "Son of", the parents, their town), and the gaps
+ * between them, not the art, were what held their names small; elsewhere lines keep theirs.
+ */
+/**
+ * How much of the words' width a line may take: names run the full width, and reading lines
+ * keep clear of the art's edges, all but the family's names, which are why the page is read.
+ */
+export function lineShare(beat: StoryBeat, role: TypeRole): number {
+  if (ROLES[role].face === "names" && role !== "date") return 1;
+  // A family's names are set in the calm space itself, so they may run nearly its width
+  return beat.scene === "family" && (role === "body" || role === "label") ? 0.96 : 0.88;
+}
+
+export function leadingScale(beat: StoryBeat, role: TypeRole): number {
+  return beat.scene === "family" && ROLES[role].face === "words" ? 0.88 : 1;
 }
 
 /**

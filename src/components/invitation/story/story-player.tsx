@@ -43,8 +43,8 @@ import {
   FIT_KEEP_NAMES,
   FIT_MAX,
   FIT_PHOTO,
-  FIT_ROOM,
   fitGrowth,
+  fitRoom,
   fitScale,
 } from "@/lib/suites/fit";
 import {
@@ -55,6 +55,8 @@ import {
   roleOf,
   placeMarkAt,
   ruleAt,
+  leadingScale,
+  lineShare,
   roleSizeCss,
   type TypeRole,
   type Voice,
@@ -746,6 +748,7 @@ function lineStyle(
   lang: string | undefined,
   type: PageType | undefined,
   space: number,
+  leading = 1,
 ): CSSProperties {
   const set = lettering(voice, role, lang);
   const names = ROLES[role].face === "names";
@@ -760,7 +763,7 @@ function lineStyle(
     // Small headings ("With the blessings of") grow no further than the theme's own
     // proportions: spaced wide, they would reach the art where an arch narrows
     fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${role === "label" ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"})`,
-    lineHeight: set.leading,
+    lineHeight: Number((set.leading * leading).toFixed(3)),
     letterSpacing:
       name && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",
     ...(set.upper || (name && type?.capitals) ? { textTransform: "uppercase" } : {}),
@@ -921,7 +924,7 @@ export function StoryPage({
         // Each line on its own: the glow behind printed words reaches past the edges on purpose
         return (
           // Grown past the theme's own size, the words keep a margin of the calm space clear
-          height <= outer.clientHeight * (scale > FIT_MAX ? FIT_ROOM : 1) + 1 &&
+          height <= outer.clientHeight * fitRoom(scale) + 1 &&
           // The sacred symbol is drawn in its own square, so its width never decides the fit
           lines.every(
             (line) =>
@@ -1028,7 +1031,12 @@ export function StoryPage({
             "story-fit relative flex max-h-full w-[min(100%,36rem)] flex-col [font-variant-numeric:lining-nums]",
             layout?.align === "start" ? "items-start text-start" : "items-center text-center",
             printed
-              ? "story-print isolate px-[5cqmin] py-[6cqmin]"
+              ? cn(
+                  "story-print isolate px-[5cqmin]",
+                  // The family pages' many short lines need the calm space more than a margin
+                  // inside the haze, which reaches well past the words anyway
+                  beat.scene === "family" ? "py-[3cqmin]" : "py-[6cqmin]",
+                )
               : themed &&
                   "rounded-[1.75rem] border border-card-gold/70 bg-card-ivory/90 px-[6cqmin] py-[6cqmin] shadow-overlay backdrop-blur-md",
           )}
@@ -1093,11 +1101,11 @@ export function StoryPage({
                     "story-line text-balance",
                     // The names arrive in the theme's way instead of rising in with the rest
                     reveal && nameLines.includes(i) && "reveal-line",
-                    // Names may run the full width; reading lines keep clear of the art's edges
-                    ROLES[role].face === "names" && role !== "date" ? "max-w-full" : "max-w-[88%]",
                     LINE_COLOUR[role],
                   )}
                   style={{
+                    // Names run the full width; reading lines keep clear of the art's edges
+                    maxWidth: `${lineShare(beat, role) * 100}%`,
                     ...delay(i + offset),
                     ...lineStyle(
                       voice,
@@ -1105,6 +1113,7 @@ export function StoryPage({
                       line.lang ?? lang,
                       type,
                       lineSpace(beat, i, Boolean(sacred)),
+                      leadingScale(beat, role),
                     ),
                   }}
                 >
