@@ -77,6 +77,22 @@ describe("MusicPlayer", () => {
     player.dispose();
   });
 
+  it("starts afresh on the next tap after the phone refuses to start its sound", async () => {
+    const player = new MusicPlayer(RAGA);
+    const refuse = vi
+      .spyOn(FakeContext.prototype, "resume")
+      .mockRejectedValueOnce(new Error("Failed to start the audio device"));
+    await expect(player.play()).rejects.toThrow("Failed to start the audio device");
+    expect(player.isPlaying).toBe(false);
+    expect(FakeContext.made[0]!.state).toBe("closed");
+    refuse.mockRestore();
+    await player.play();
+    expect(player.isPlaying).toBe(true);
+    expect(FakeContext.made).toHaveLength(2);
+    expect(FakeContext.made[1]!.state).toBe("running");
+    player.dispose();
+  });
+
   it("wakes the sound at the tap but makes no notes until the lead is over", async () => {
     const player = new MusicPlayer(RAGA);
     await player.play(1);

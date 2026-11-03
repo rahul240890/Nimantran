@@ -307,7 +307,8 @@ export function Invitation({
         player.current.pause();
       } else if (document.visibilityState === "visible" && resumeOnShow.current) {
         resumeOnShow.current = false;
-        void player.current?.play();
+        // Without a tap a phone may refuse: the button shows the music off until the next one
+        player.current?.play().catch(() => setPlaying(false));
       }
     };
     document.addEventListener("visibilitychange", onVisibility);
