@@ -94,7 +94,9 @@ export class MusicPlayer {
   }
 
   setTrack(music: MusicChoice) {
-    const switching = (music.clip ?? null) !== (this.music.clip ?? null);
+    const switching =
+      (music.clip ?? null) !== (this.music.clip ?? null) ||
+      (music.loop === true) !== (this.music.loop === true);
     const resume = switching && this.playing;
     if (resume) this.pause();
     if (switching) this.dropClip();
@@ -125,6 +127,8 @@ export class MusicPlayer {
       const clip = new Audio();
       clip.preload = "auto";
       clip.src = this.music.clip!;
+      // The site's own song is shorter than a long invitation, so it comes round again
+      clip.loop = this.music.loop === true;
       clip.addEventListener("ended", () => {
         if (this.clip !== clip) return;
         this.playing = false;

@@ -422,8 +422,12 @@ export const extrasCopy = {
   cancelPhoto: "Cancel",
   closePhoto: "Close",
   musicHeading: "Music",
-  musicHint: "A raga composed live as the card opens, or your own song.",
-  musicSource: { raga: "A raga", own: "Your own music" },
+  musicHint:
+    "A flute song on every design, a raga composed live as the card opens, or your own song.",
+  musicSource: { flute: "Flute", raga: "A raga", own: "Your own music" },
+  fluteName: "Apna Bana Le, on flute",
+  fluteBadge: "Default",
+  fluteNote: "Plays on every design unless you choose a raga or your own music.",
   chooseSong: "Choose a song",
   /** Under the upload button: the formats, and that uploading is the host's word. */
   songNote: "MP3 or M4A. Only songs you have the right to use.",

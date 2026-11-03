@@ -63,7 +63,12 @@ describe("music clips", () => {
     const old = { ...newDraft(), music: { raga: "yaman", playOnOpen: true } };
     expect(parseDraft(old)?.music.clip).toBeNull();
     const broken = { ...newDraft(), music: { raga: null, playOnOpen: true, clip: { id: 1 } } };
-    expect(parseDraft(broken)?.music).toEqual({ raga: null, playOnOpen: true, clip: null });
+    expect(parseDraft(broken)?.music).toEqual({
+      track: "flute",
+      raga: null,
+      playOnOpen: true,
+      clip: null,
+    });
     const withOne = { ...newDraft(), music: { raga: null, playOnOpen: true, clip } };
     expect(parseDraft(withOne)?.music.clip).toEqual(clip);
   });

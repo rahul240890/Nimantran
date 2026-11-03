@@ -23,7 +23,7 @@ function sample(): InviteDraft {
         dressCode: "Pastels",
       },
     },
-    music: { raga: null, playOnOpen: false, clip: null },
+    music: { track: "flute", raga: null, playOnOpen: false, clip: null },
   };
 }
 
