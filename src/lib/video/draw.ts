@@ -21,6 +21,8 @@ import {
   ruleAt,
   leadingScale,
   lineShare,
+  oneLine,
+  ONE_LINE_MIN,
   type TypeRole,
 } from "@/lib/suites/lettering";
 import { FIT_MAX, fitGrowth, fitRoom } from "@/lib/suites/fit";
@@ -446,15 +448,26 @@ function drawWords(
       const name = beat.scene === "cover" && line.style === "display";
       const lang = line.lang ?? scene.lang;
       const style = styleOf(line.style, name, cq, scene, colours, lang);
-      const size = style.size * (style.role === "label" ? Math.min(fit, FIT_MAX) : fit);
+      let size = style.size * (style.role === "label" ? Math.min(fit, FIT_MAX) : fit);
       const lineHeight = style.lineHeight * leadingScale(beat, style.role);
-      const font = `${style.prefix}${size}px ${style.family}`;
+      let font = `${style.prefix}${size}px ${style.family}`;
       ctx.font = font;
       ctx.letterSpacing = `${style.spacing * size}px`;
       const said = style.role === "date" ? keepDate(line.text) : line.text;
       const text = style.upper ? said.toLocaleUpperCase(lang) : said;
       // Reading lines keep clear of the art's edges, as on the live pages
-      const lines = wrap(ctx, text, (boxW - padX * 2) * lineShare(beat, style.role));
+      const room = (boxW - padX * 2) * lineShare(beat, style.role);
+      // An invocation or a small heading shrinks to stay on one line, as on the live pages
+      if (oneLine(beat, index)) {
+        const share = Math.floor((room / ctx.measureText(text).width) * 100) / 100;
+        if (share < 1 && share >= ONE_LINE_MIN) {
+          size *= share;
+          font = `${style.prefix}${size}px ${style.family}`;
+          ctx.font = font;
+          ctx.letterSpacing = `${style.spacing * size}px`;
+        }
+      }
+      const lines = wrap(ctx, text, room);
       placed.push({
         kind: "text",
         lines,

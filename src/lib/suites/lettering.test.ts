@@ -9,6 +9,7 @@ import {
   leadingScale,
   lettering,
   lineShare,
+  oneLine,
   lineSpace,
   placeMarkAt,
   roleOf,
@@ -215,5 +216,57 @@ describe("the family pages' spacing", () => {
     expect(lineShare(family, "body")).toBeGreaterThan(lineShare(page("reply", []), "body"));
     expect(lineShare(family, "label")).toBeGreaterThan(lineShare(family, "small"));
     expect(lineShare(page("cover", []), "names")).toBe(1);
+  });
+});
+
+describe("lines kept to one line", () => {
+  const cover = page("cover", [
+    { text: "Shri Ganeshaya Namah", style: "script" },
+    { text: "Arjun", style: "display" },
+    { text: "&", style: "joiner" },
+    { text: "Meenakshi", style: "display" },
+  ]);
+
+  it("keeps the invocation over the names whole, in any script", () => {
+    expect(oneLine(cover, 0)).toBe(true);
+    const hindi = page("blessing", [{ text: "॥ श्री गणेशाय नमः ॥", style: "script" }]);
+    expect(oneLine(hindi, 0)).toBe(true);
+  });
+
+  it("lets the couple's names, days and places wrap as before", () => {
+    expect(oneLine(cover, 1)).toBe(false);
+    const haldi = page("haldi", [
+      { text: "Haldi", style: "display" },
+      { text: "Wednesday, 18 November 2026", style: "date" },
+      { text: "Sharma Niwas, Sardarpura", style: "venue" },
+    ]);
+    expect(oneLine(haldi, 0)).toBe(true);
+    expect(oneLine(haldi, 1)).toBe(false);
+    expect(oneLine(haldi, 2)).toBe(false);
+  });
+
+  it("keeps small headings whole, but not a long blessing written as a sentence", () => {
+    const family = page("family", [
+      { text: "With the blessings of", style: "label" },
+      { text: "Smt. Kamla Devi", style: "body" },
+    ]);
+    expect(oneLine(family, 0)).toBe(true);
+    expect(oneLine(family, 1)).toBe(false);
+    const long = page("cover", [
+      {
+        text: "Vakratunda Mahakaya Suryakoti Samaprabha, Nirvighnam Kuru Me Deva",
+        style: "script",
+      },
+    ]);
+    expect(oneLine(long, 0)).toBe(false);
+  });
+
+  it("keeps a closing page's warm words free to wrap", () => {
+    const reply = page("reply", [
+      { text: "Your presence, our blessing", style: "display" },
+      { text: "With love", style: "script" },
+    ]);
+    expect(oneLine(reply, 0)).toBe(false);
+    expect(oneLine(reply, 1)).toBe(false);
   });
 });
