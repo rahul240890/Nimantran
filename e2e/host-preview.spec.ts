@@ -13,7 +13,7 @@ test.describe("host preview", () => {
     test.setTimeout(120_000);
     await page.setViewportSize({ width: 390, height: 844 });
     await writeInvite(page, numberFor(info), ["Kabir", "Anaya"]);
-    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await page.getByRole("button", { name: "Website", exact: true }).click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview$/);
     const id = new URL(page.url()).pathname.split("/")[2];
 
@@ -26,7 +26,7 @@ test.describe("host preview", () => {
     const box = (await stage.boundingBox())!;
     expect(box.width).toBe(390);
     expect(box.height).toBe(844);
-    const menu = page.getByRole("button", { name: "Preview options" });
+    const menu = page.getByRole("button", { name: "Website options" });
     await expect(menu).toBeVisible();
     expect(await noOverflow(page)).toBe(true);
     if (shots) await page.screenshot({ path: `${shots}/preview-phone.png` });
@@ -50,15 +50,13 @@ test.describe("host preview", () => {
     // On a computer: the same page inside a phone, with the notes and next step beside it
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto(`/invites/${id}/preview`);
-    await expect(
-      page.getByRole("heading", { name: "This is what your guests will see" }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Your invitation website" })).toBeVisible();
     const phone = page.frameLocator('[data-testid="host-preview-phone"]');
     await expect(phone.getByRole("button", { name: "Open the invitation" })).toBeVisible({
       timeout: 15_000,
     });
     // Nothing of the host's inside the phone
-    await expect(phone.getByRole("button", { name: "Preview options" })).toHaveCount(0);
+    await expect(phone.getByRole("button", { name: "Website options" })).toHaveCount(0);
     // The guest page inside the phone is checked on its own pages; here, the host's frame round it
     expect(
       (await axe(page).exclude('[data-testid="host-preview-phone"]').analyze()).violations,
@@ -75,6 +73,6 @@ test.describe("host preview", () => {
     await page.getByRole("link", { name: "See it full screen" }).click();
     await expect(page).toHaveURL(/full=1/);
     await expect(page.locator("[data-opening]")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Preview options" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Website options" })).toBeVisible();
   });
 });

@@ -1917,7 +1917,7 @@ export const quickCopy = {
   back: "Back",
   watch: "Watch demo",
   /** Opens the invitation with the family's own names, as guests will see it. */
-  preview: "Preview",
+  preview: "Website",
   free: "Free to try. Pay only when you send.",
   eyebrow: "Make it yours",
   title: "Your invitation in a few minutes",
@@ -1934,7 +1934,8 @@ export const quickCopy = {
   /** Once the names and dates are in: the invitation's video and its cards, from the editor. */
   video: "Video",
   cards: "Cards",
-  signInToTry: "Sign in to make its video and cards.",
+  tryNote:
+    "Try the website, video and cards free. They carry the Shubh Invitation mark until you publish.",
   more: "More options",
   moreIntro: "Your own song, wording, opening gate and questions",
   make: "Short on time? We'll make it for you",

@@ -399,17 +399,19 @@ export const videoCopy = {
 } as const;
 
 export const hostPreviewCopy = {
-  metaTitle: "Your invite, as guests will see it",
-  label: "Preview: this is what your guests will see",
+  metaTitle: "Your invitation website",
+  label: "Your invitation website, as guests open it from your link",
   back: "Keep editing",
   next: "Choose a package and publish",
   share: "Share your invite",
-  heading: "This is what your guests will see",
-  body: "Guests tap your link in WhatsApp and the invitation fills their phone screen like a reel, with your music. Press Open the invitation on the phone to watch it the way they will.",
+  heading: "Your invitation website",
+  body: "This is the web link your guests get. They tap it in WhatsApp and the invitation fills their phone like a reel, with your music. Press Open the invitation on the phone to watch it the way they will.",
   phone: "Your invitation on a phone",
   fullScreen: "See it full screen",
-  menu: "Preview options",
+  menu: "Website options",
   opening: "Opening your invitation",
+  linkLabel: "Your link",
+  markNote: "Shown with the Shubh Invitation mark until you publish",
   changeGate: "Change the opening gate",
 } as const;
 
@@ -419,4 +421,18 @@ export const familyCopy = {
   badge: "Preview · not sent to guests yet",
   metaDescription:
     "A preview for the family to check. It hasn't been sent to guests yet, and replies are off.",
+} as const;
+
+/** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */
+export const tryCopy = {
+  videoTitle: "Your invitation video",
+  videoIntro:
+    "Watch your whole invitation as a video, free. It carries the Shubh Invitation mark until you publish.",
+  cardsIntro:
+    "Your save-the-date and thank-you cards, free to see. They carry the Shubh Invitation mark until you publish.",
+  back: "Keep editing",
+  emptyTitle: "Choose a design first",
+  emptyBody:
+    "Pick a design and type your names, and your website, video and cards are ready to see here.",
+  emptyAction: "See designs",
 } as const;

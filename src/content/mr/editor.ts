@@ -1849,7 +1849,7 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   metaTitle: (name) => `आपले निमंत्रण बनवा: ${name}`,
   back: "मागे",
   watch: "डेमो पाहा",
-  preview: "प्रीव्ह्यू",
+  preview: "वेबसाइट",
   free: "वापरून पाहणे मोफत. पैसे फक्त पाठवताना.",
   eyebrow: "ते आपले बनवा",
   title: "काही मिनिटांत आपले निमंत्रण",
@@ -1865,7 +1865,8 @@ export const quickCopy: Translation<typeof en.quickCopy> = {
   photosIntro: "हवे असल्यास: डिझाइनमध्ये आपल्या फोटोसाठी फ्रेम आहे",
   video: "व्हिडिओ",
   cards: "कार्ड",
-  signInToTry: "व्हिडिओ आणि कार्ड बनवण्यासाठी साइन इन करा.",
+  tryNote:
+    "वेबसाइट, व्हिडिओ आणि कार्ड मोफत पाहा. प्रकाशित करेपर्यंत त्यांवर शुभ इन्व्हिटेशनची खूण असते.",
   more: "आणखी पर्याय",
   moreIntro: "आपले गाणे, शब्द, उघडण्याचे दार आणि प्रश्न",
   make: "वेळ कमी आहे? आम्ही आपल्यासाठी बनवू",
