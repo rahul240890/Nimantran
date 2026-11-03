@@ -199,6 +199,10 @@ export class MusicPlayer {
     } catch (error) {
       // Put away (and closed) while it woke: nothing more to play
       if (this.ctx !== ctx) return;
+      // The phone refused to start its sound ("Failed to start the audio device" on an
+      // iPhone back from the background, or after a call): a refused context stays stuck,
+      // so the next tap builds a fresh one
+      this.dropContext();
       throw error;
     }
     if (this.ctx !== ctx) return;
@@ -274,8 +278,16 @@ export class MusicPlayer {
     window.clearTimeout(this.waiting);
     this.playing = false;
     this.dropClip();
+    this.dropContext();
+  }
+
+  private dropContext() {
     if (this.ctx && this.ctx.state !== "closed") this.ctx.close().catch(() => undefined);
     this.ctx = null;
+    this.master = null;
+    this.bus = null;
+    this.reverb = null;
+    this.score = null;
     this.buffers.clear();
   }
 
