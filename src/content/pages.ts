@@ -196,8 +196,10 @@ export const offersCopy = {
     codeHint: "Type this code when you choose a package.",
     noOfferTitle: "Make it free, pay when you send",
     noOfferBody: "Make your whole invitation free and see every part of it first.",
-    heading: "Everything for your invitation, in one place",
-    intro: "Make it free and see every part before you publish. Pay only when you send it.",
+    eyebrow: "All in one",
+    heading: "Website, video and cards, all in one package",
+    intro:
+      "One invitation gives you all three, in your language and with your music. No need to go anywhere else. Make it free and see it all before you publish.",
     features: [
       {
         id: "website",

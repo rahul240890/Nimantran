@@ -46,17 +46,17 @@ const DELAY_MS = 1400;
 type FeatureId = "website" | "video" | "cards" | "music" | "language" | "preview";
 
 /**
- * The paintings. Null shows a painted-look placeholder: a medallion with the feature's sign.
- * Each one the owner sends goes in public/welcome/ under its id and is named here.
+ * The paintings, in public/welcome/. A feature whose painting is null shows a placeholder:
+ * a medallion with the feature's sign on a soft wash.
  */
-const HERO_ART = "/occasions/festival.webp";
+const HERO_ART = "/welcome/hero.webp";
 const FEATURE_ART: Record<FeatureId, string | null> = {
-  website: null,
-  video: null,
-  cards: null,
-  music: null,
-  language: null,
-  preview: null,
+  website: "/welcome/website.webp",
+  video: "/welcome/video.webp",
+  cards: "/welcome/cards.webp",
+  music: "/welcome/music.webp",
+  language: "/welcome/language.webp",
+  preview: "/welcome/preview.webp",
 };
 
 const ICONS: Record<FeatureId, LucideIcon> = {
@@ -152,6 +152,10 @@ function WelcomeDialog({
 
             <div className="flex min-h-0 flex-col md:overflow-y-auto">
               <div className="flex flex-col gap-2 px-5 pt-5 sm:px-7 sm:pt-7 md:pe-16">
+                <p className="inline-flex items-center gap-1.5 self-start rounded-full bg-marigold/15 px-3 py-1 font-label text-xs tracking-[0.14em] text-accent-text uppercase">
+                  <Sparkles aria-hidden className="size-3.5" />
+                  {copy.eyebrow}
+                </p>
                 <DialogPrimitive.Title className="font-display text-2xl leading-tight text-balance sm:text-3xl">
                   {copy.heading}
                 </DialogPrimitive.Title>
