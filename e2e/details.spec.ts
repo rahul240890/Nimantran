@@ -75,7 +75,7 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("radio", { name: /ગુજરાતી/ })).toBeChecked({ timeout: 30_000 });
   });
 
-  test("the names appear on the design, and once the dates are in, its video and cards", async ({
+  test("the names appear on the design, and once the dates are in, its video and cards open", async ({
     page,
   }) => {
     await open(page);
@@ -90,7 +90,11 @@ test.describe("a design's page", () => {
     const problems = page.getByRole("alert").filter({ hasText: /need your attention/ });
     await expect(problems).toHaveText("3 things need your attention");
     await expect(page).toHaveURL(/\/create\/rajwada-bagh/);
-    await expect(page.locator("[data-try-video]")).toHaveCount(0);
+    // The video and cards show on every design from the start; a tap shows what's missing
+    await page.locator("[data-try-video]").click();
+    await expect(problems).toHaveText("3 things need your attention");
+    await expect(page).toHaveURL(/\/create\/rajwada-bagh/);
+    await expect(page.locator("[data-try-cards]")).toBeVisible();
 
     await fillWedding(page);
     await expect(problems).toHaveCount(0);
