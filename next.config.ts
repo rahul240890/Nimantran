@@ -34,9 +34,10 @@ const nextConfig: NextConfig = {
         { key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" },
       ],
     })),
-    // The host's preview plays the guest page inside a phone on its own page (wide screens)
-    {
-      source: "/invites/:id/preview",
+    // The host's preview plays the guest page inside a phone on its own page (wide screens),
+    // signed in or tried before signing in
+    ...["/invites/:id/preview", "/try/website"].map((source) => ({
+      source,
       headers: [
         { key: "X-Frame-Options", value: "SAMEORIGIN" },
         {
@@ -44,7 +45,7 @@ const nextConfig: NextConfig = {
           value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'",
         },
       ],
-    },
+    })),
   ],
   images: {
     // 480 sits between 384 and 640, so a phone's hero cards (about 430px wide) aren't sent at 640

@@ -16,6 +16,7 @@ import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
 import { draftDesignId } from "@/lib/plans/design-defaults";
 import { guestGuide } from "@/lib/publish/event-day";
+import { suggestSlug } from "@/lib/publish/slug";
 import { storyFunctions } from "@/lib/publish/story";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -89,6 +90,15 @@ export default async function InvitePreviewPage({
       next={next}
       gateHref={`${designPageHref(draft)}#part-gate`}
       published={Boolean(draft.slug)}
+      // The web address guests get: the live one, or the one made from the names to publish
+      link={`/i/${
+        draft.slug ??
+        suggestSlug({
+          first: draft.content.first ?? "",
+          second: draft.content.second ?? "",
+          categoryId: draft.categoryId,
+        })
+      }`}
       copy={hostPreviewCopy}
     >
       <GuestView

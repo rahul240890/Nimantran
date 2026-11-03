@@ -233,7 +233,7 @@ test.describe("invite editor", () => {
     await expect(phone).toContainText("15 October 2026");
     // The demo's sample names give way to the family's own video and cards
     await expect(page.getByRole("link", { name: "Watch demo" })).toHaveCount(0);
-    await expect(editorBar(page)).toHaveText("Sign in to publish");
+    await expect(editorBar(page)).toHaveText("Publish");
 
     // The opening gate changes here, and its fold shows the new one at once
     await openPart(page, "Opening gate (cover screen)");
@@ -614,7 +614,7 @@ test.describe("invite editor", () => {
       expect(await noOverflow(page)).toBe(true);
       await seeInvitation(page);
       // The way to publish stays in the bar
-      await expect(editorBar(page)).toHaveText("Sign in to publish");
+      await expect(editorBar(page)).toHaveText("Publish");
       expect(await noOverflow(page)).toBe(true);
       await context.close();
     }
