@@ -185,6 +185,10 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("button", { name: /Add photos/ }).first()).toBeVisible();
     await openPart(page, "Music & replies");
     await expect(page.getByRole("radio", { name: /Your own music/ })).toBeVisible();
+    // The flute song is every design's default; the ragas are one tap away
+    await expect(page.getByRole("radio", { name: "Flute" })).toBeChecked();
+    await expect(page.getByRole("button", { name: /Listen to Apna Bana Le/ })).toBeVisible();
+    await page.getByRole("radio", { name: "A raga" }).click();
     // Every raga plays on its own button and is chosen by its name
     await expect(page.getByRole("button", { name: "Listen to Raag Yaman" })).toBeVisible();
     await page.getByRole("radio", { name: /Raag Yaman/ }).click();

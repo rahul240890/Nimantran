@@ -219,6 +219,7 @@ test.describe("invite editor", () => {
       .setInputFiles({ name: "more.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByRole("img", { name: "Photo 1" })).toBeVisible();
     await openPart(page, "Music & replies");
+    await page.getByRole("radio", { name: "A raga" }).click();
     await page.getByRole("radio", { name: /Raag Bhupali/ }).click();
     await seeInvitation(page);
 
