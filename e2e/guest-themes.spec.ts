@@ -386,7 +386,12 @@ test("the music starts on the first tap, and the invitation opens again at the e
   const again = page.locator("[data-tour-controls]").getByRole("button", {
     name: "Watch the invitation again",
   });
-  for (let i = 0; i < 60 && !(await again.isVisible()); i++) await page.clock.runFor(5000);
+  // Each move scrolls smoothly, in real time, while the test's clock jumps on: the scroll
+  // is given a moment to land, or the next move fires before it has and starts it again
+  for (let i = 0; i < 60 && !(await again.isVisible()); i++) {
+    await page.clock.runFor(5000);
+    await page.waitForTimeout(250);
+  }
   await expect(again).toBeVisible();
   await again.click();
   await page.clock.runFor(1500);
