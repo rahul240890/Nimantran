@@ -19,9 +19,11 @@ import {
   roleSize,
   placeMarkAt,
   ruleAt,
+  leadingScale,
+  lineShare,
   type TypeRole,
 } from "@/lib/suites/lettering";
-import { FIT_MAX, FIT_ROOM, fitGrowth } from "@/lib/suites/fit";
+import { FIT_MAX, fitGrowth, fitRoom } from "@/lib/suites/fit";
 import { SUITES, pageLook, paintedTone, type Mood, type SuiteId } from "@/lib/suites/catalog";
 import { photoBox, photoPage } from "@/lib/suites/photo-frames";
 import { photoPlacement, type PhotoFit } from "@/lib/editor/photo-fit";
@@ -413,7 +415,7 @@ function drawWords(
   const boxW = Math.min(areaW, 36 * REM);
   const boxed = !printed && SUITES[scene.suite].art !== "card";
   const padX = boxed ? 6 * cq : printed ? 4 * cq : 0;
-  const padY = boxed || printed ? 6 * cq : 0;
+  const padY = boxed ? 6 * cq : printed ? (beat.scene === "family" ? 3 : 6) * cq : 0;
   const sacred = beat.symbol && scene.copy.symbol ? SYMBOLS[scene.copy.symbol] : null;
 
   // Lay the words out, shrinking them together if the page's area is too small; a page of
@@ -445,23 +447,23 @@ function drawWords(
       const lang = line.lang ?? scene.lang;
       const style = styleOf(line.style, name, cq, scene, colours, lang);
       const size = style.size * (style.role === "label" ? Math.min(fit, FIT_MAX) : fit);
+      const lineHeight = style.lineHeight * leadingScale(beat, style.role);
       const font = `${style.prefix}${size}px ${style.family}`;
       ctx.font = font;
       ctx.letterSpacing = `${style.spacing * size}px`;
       const said = style.role === "date" ? keepDate(line.text) : line.text;
       const text = style.upper ? said.toLocaleUpperCase(lang) : said;
       // Reading lines keep clear of the art's edges, as on the live pages
-      const full = ROLES[style.role].face === "names" && style.role !== "date";
-      const lines = wrap(ctx, text, (boxW - padX * 2) * (full ? 1 : 0.88));
+      const lines = wrap(ctx, text, (boxW - padX * 2) * lineShare(beat, style.role));
       placed.push({
         kind: "text",
         lines,
         font,
         size,
-        height: lines.length * size * style.lineHeight,
+        height: lines.length * size * lineHeight,
         colour: style.colour,
         spacing: style.spacing * size,
-        lineHeight: style.lineHeight,
+        lineHeight,
         space:
           (lineSpace(beat, index, Boolean(sacred)) +
             (index === rule ? 2.2 : index === mark ? 1.6 : 0)) *
@@ -472,7 +474,7 @@ function drawWords(
       });
     }
     height = placed.reduce((sum, item) => sum + item.space + item.height, 0) + padY * 2;
-    if (height <= areaH * (fit > FIT_MAX ? FIT_ROOM : 1) || fit <= 0.6) break;
+    if (height <= areaH * fitRoom(fit) || fit <= 0.6) break;
     fit *= 0.92;
   }
 

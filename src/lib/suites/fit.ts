@@ -12,13 +12,24 @@ export const FIT_MIN = 0.6;
 export const FIT_MAX = 1.25;
 /**
  * The most a page of reading words may grow: a family page of parents' names, a memory or
- * a tahuko fills its calm space, its largest line staying a step below the couple's names.
+ * a tahuko fills its calm space, about as large as a page's heading and still well below the
+ * couple's names on the cover (owner, 2026-11-03: the family's words read too small at 1.9).
  */
-export const FIT_GROW = 1.9;
+export const FIT_GROW = 2.2;
 /** The names under a couple's photos may grow this far into the plain wall below the frames. */
 export const FIT_PHOTO = 1.6;
-/** Words grown past FIT_MAX fill at most this share of the calm space's height. */
+/** Words grown to FIT_GROW fill at most this share of the calm space's height. */
 export const FIT_ROOM = 0.9;
+
+/**
+ * The share of the calm space's height the words may fill at `scale`: all of it up to the
+ * theme's own size, then a margin that widens evenly to FIT_ROOM at FIT_GROW. Even, not in
+ * one step, so a full page grows past FIT_MAX instead of stopping just under it.
+ */
+export function fitRoom(scale: number): number {
+  const past = (scale - FIT_MAX) / (FIT_GROW - FIT_MAX);
+  return 1 - (1 - FIT_ROOM) * Math.min(1, Math.max(0, past));
+}
 
 /**
  * How far a page's words may grow, from the largest kind of line on it. A page of names or
@@ -42,7 +53,7 @@ export const FIT_KEEP_NAMES = 0.75;
  * On a page of reading words, a name kept whole that holds the page below this share of how
  * far it may grow may break too, when breaking lets the words grow by FIT_HELD_GAIN or more.
  */
-export const FIT_HELD = 0.8;
+export const FIT_HELD = 0.9;
 export const FIT_HELD_GAIN = 1.1;
 
 /**
