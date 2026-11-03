@@ -6876,6 +6876,9 @@
  */
 html:has(.guest-snap) {
   scroll-snap-type: y mandatory;
+  /* Behind the invitation, where a phone pulls past its top or under its bars: the
+     opening's night, never the site's cream or an empty white */
+  background-color: var(--night);
 }
 .guest-snap :is([data-tour], [data-snap]) {
   scroll-snap-align: start;

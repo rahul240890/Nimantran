@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { guestViewport } from "@/components/root-html";
 import { designWords } from "@/components/gallery/design-words";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
@@ -24,6 +25,9 @@ import type { WeddingKind } from "@/lib/gallery/catalog";
  * nothing saved, and replies thank the visitor without going anywhere. Previous and Next
  * walk the home page's tour, or the designs of the listing it was opened from (browse.ts).
  */
+
+// The browser's bars take the invitation's night, so it reads as the whole screen
+export const viewport = guestViewport;
 
 export async function generateMetadata({
   params,
