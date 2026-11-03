@@ -452,6 +452,8 @@ test.describe("invite editor", () => {
     await dialog.getByRole("button", { name: "Done" }).click();
 
     await page.reload();
+    // The design opens on its gate (owner, 2026-11-03); the cover is a tap away
+    await page.getByRole("button", { name: "Show the Cover page" }).first().click();
     await page.getByRole("button", { name: "Edit this page" }).first().click();
     const again = page.getByRole("dialog", { name: "The Cover page" });
     await expect(again.getByRole("textbox", { name: /^Line \d+$/ }).last()).toHaveValue(

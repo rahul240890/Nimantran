@@ -288,6 +288,15 @@ export function QuickStart({
     observer.observe(node);
     return () => observer.disconnect();
   }, []);
+  // A field or part scrolled to (a tap, the keyboard, what's missing) stops above that bar
+  useEffect(() => {
+    if (wide || !barHeight) return;
+    const root = document.documentElement;
+    root.style.scrollPaddingBottom = `${barHeight}px`;
+    return () => {
+      root.style.scrollPaddingBottom = "";
+    };
+  }, [wide, barHeight]);
   const [stageSeen, setStageSeen] = useState(true);
   const [miniHidden, setMiniHidden] = useState(false);
   // Only while typing (owner, 2026-10-25): otherwise it sat over the parts' titles and choices
