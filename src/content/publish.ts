@@ -278,6 +278,8 @@ export const rsvpCopy = {
   yourName: "Your name",
   namePlaceholder: "As the family knows you",
   nameRequired: "Please enter your name",
+  /** Over the list of celebrations the guest replies to. */
+  celebrations: "Celebrations",
   acceptAll: "Coming to everything",
   statuses: {
     attending: { label: "Joyfully accept", short: "Coming" },
