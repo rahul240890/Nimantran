@@ -186,4 +186,49 @@ export const offersCopy = {
     items.length < 2
       ? (items[0] ?? "")
       : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`,
+  /** The popup a visitor sees once, on their first visit: the offer running now and what Shubh makes. */
+  welcome: {
+    label: "Welcome to Shubh Invitation",
+    close: "Close",
+    later: "Maybe later",
+    start: "Start free",
+    allOffers: "See every offer",
+    codeHint: "Type this code when you choose a package.",
+    noOfferTitle: "Make it free, pay when you send",
+    noOfferBody: "Make your whole invitation free and see every part of it first.",
+    heading: "Everything for your invitation, in one place",
+    intro: "Make it free and see every part before you publish. Pay only when you send it.",
+    features: [
+      {
+        id: "website",
+        title: "Invitation website",
+        body: "One link with every function, its map and replies.",
+      },
+      {
+        id: "video",
+        title: "Wedding videos",
+        body: "Full-HD videos for WhatsApp Status and Reels.",
+      },
+      {
+        id: "cards",
+        title: "Invitation cards",
+        body: "Painted cards to share on WhatsApp or print.",
+      },
+      {
+        id: "music",
+        title: "Your music",
+        body: "A tune chosen for your design, or your own song.",
+      },
+      {
+        id: "language",
+        title: "Your language",
+        body: "Six Indian languages, or two on one card.",
+      },
+      {
+        id: "preview",
+        title: "Preview it all",
+        body: "See the website, video and cards before you publish.",
+      },
+    ],
+  },
 } as const;

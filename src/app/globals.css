@@ -5049,6 +5049,7 @@
   --animate-petal-sway: petal-sway 3.6s ease-in-out infinite alternate;
   --animate-sound-bar: sound-bar 0.9s ease-in-out infinite alternate;
   --animate-flicker: flicker 1.7s ease-in-out infinite alternate;
+  --animate-welcome-drift: welcome-drift 18s ease-in-out infinite alternate;
 }
 
 /*
@@ -5512,6 +5513,16 @@
   }
   100% {
     transform: translateX(120%);
+  }
+}
+
+/* The welcome popup's painting leans in slowly while it is open */
+@keyframes welcome-drift {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08) translateY(-1.5%);
   }
 }
 

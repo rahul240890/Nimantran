@@ -9,6 +9,7 @@ import { HomeWhy } from "./home-why";
 import { HomeOffers } from "@/components/offers/offers";
 import { HomeReviews } from "@/components/reviews/home-reviews";
 import { OfferBar } from "@/components/offers/offer-bar";
+import { WelcomeOffer } from "@/components/offers/welcome-offer";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
 import { siteMenu } from "@/components/shell/site-menu";
@@ -30,6 +31,7 @@ export function HomePage({ locale }: { locale: UiLocale }) {
         <SiteHeader menu={siteMenu(locale)} />
         {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
         <OfferBar />
+        <WelcomeOffer />
         <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
           <Hero locale={locale} />
           <HomeOccasions locale={locale} />
