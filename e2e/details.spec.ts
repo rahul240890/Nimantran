@@ -97,9 +97,19 @@ test.describe("a design's page", () => {
     // No page after this one: the video, the cards and Publish are here (owner, 2026-10-25)
     await seeInvitation(page);
     await expect(page.getByRole("link", { name: "Watch demo" })).toHaveCount(0);
-    await expect(page.getByText("Sign in to make its video and cards.")).toBeVisible();
+    // Owner, 2026-11-03: everything is tried before signing in, with the mark; Publish asks
+    // for the account only on the tap, and signing in carries on to publish
+    await expect(page.getByText(/Try the website, video and cards free/)).toBeVisible();
+    await expect(editorBar(page)).toHaveText("Publish");
+    await page.locator("[data-try-video]").click();
+    await expect(page).toHaveURL(/\/try\/video$/);
+    await expect(page.getByRole("heading", { name: "Your invitation video" })).toBeVisible();
+    await page.getByRole("link", { name: "Keep editing" }).click();
+    await page.locator("[data-try-cards]").click();
+    await expect(page).toHaveURL(/\/try\/cards$/);
+    await page.getByRole("link", { name: "Keep editing" }).click();
     await editorBar(page).click();
-    await expect(page).toHaveURL(/\/sign-in\?next=/);
+    await expect(page).toHaveURL(/\/sign-in\?next=.*go%3Dpublish/);
     await page.goBack();
     await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
     await openPart(page, "When and where");
@@ -185,6 +195,10 @@ test.describe("a design's page", () => {
     await expect(page.getByRole("button", { name: /Add photos/ }).first()).toBeVisible();
     await openPart(page, "Music & replies");
     await expect(page.getByRole("radio", { name: /Your own music/ })).toBeVisible();
+    // The flute song is every design's default; the ragas are one tap away
+    await expect(page.getByRole("radio", { name: "Flute" })).toBeChecked();
+    await expect(page.getByRole("button", { name: /Listen to Apna Bana Le/ })).toBeVisible();
+    await page.getByRole("radio", { name: "A raga" }).click();
     // Every raga plays on its own button and is chosen by its name
     await expect(page.getByRole("button", { name: "Listen to Raag Yaman" })).toBeVisible();
     await page.getByRole("radio", { name: /Raag Yaman/ }).click();
@@ -226,12 +240,16 @@ test.describe("a design's page", () => {
     );
     // The preview is the invitation as it stands, with the names typed
     await fillNames(page);
-    await page.getByRole("button", { name: "Preview", exact: true }).click();
-    const preview = page.getByRole("dialog", { name: "Your invitation" });
-    await expect(preview.getByRole("img", { name: /, as guests see it$/ })).toContainText("Aditya");
-    expect((await axe(page).include("[role=dialog]").analyze()).violations).toEqual([]);
-    await page.keyboard.press("Escape");
-    await expect(preview).toHaveCount(0);
+    // Signed out, Website is the invitation's own website as guests open it from the link,
+    // from this browser's copy, with the mark and the link it will have (owner, 2026-11-03)
+    await page.getByRole("button", { name: "Website", exact: true }).click();
+    await expect(page).toHaveURL(/\/try\/website$/);
+    // A phone shows it edge to edge, mark and all; a computer inside a phone
+    await expect(
+      page.locator('[data-watermark-tiled], [data-testid="host-preview-phone"]').first(),
+    ).toBeAttached({ timeout: 15_000 });
+    await page.goBack();
+    await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
     // We'll make it for you: once, straight to Instagram (owner, 2026-10-25)
     const make = page.getByRole("link", { name: /We'll make it for you/ });
     await expect(make).toHaveCount(1);

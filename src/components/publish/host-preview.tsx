@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, DoorOpen, Eye, Globe, Maximize2, Send } from "lucide-react";
+import { ArrowLeft, DoorOpen, Globe, LockKeyhole, Maximize2, Send } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useSyncExternalStore, type ReactNode } from "react";
 import { Button, buttonClasses } from "@/components/ui/button";
@@ -39,7 +39,41 @@ export type HostPreviewCopy = {
   fullScreen: string;
   menu: string;
   changeGate: string;
+  linkLabel: string;
+  markNote: string;
 };
+
+const noSubscribe = () => () => {};
+
+/** This site's address as the browser has it, for the link the invitation gets. */
+function useHost(): string {
+  return useSyncExternalStore(
+    noSubscribe,
+    () => window.location.host,
+    () => "",
+  );
+}
+
+/**
+ * The invitation's web address, as a browser's address bar shows it (owner, 2026-11-03: the
+ * host should feel they get a website, a real link, not a "preview").
+ */
+function AddressBar({ path, label }: { path: string; label: string }) {
+  const host = useHost();
+  return (
+    <p
+      data-testid="host-preview-address"
+      className="flex min-h-9 w-full min-w-0 items-center gap-2 rounded-full bg-surface px-3.5 text-sm text-ink-muted ring-1 ring-line"
+    >
+      <LockKeyhole aria-hidden className="size-3.5 shrink-0 text-success" />
+      <span className="sr-only">{label}: </span>
+      <span className="min-w-0 truncate">
+        {host}
+        <span className="font-semibold text-ink">{path}</span>
+      </span>
+    </p>
+  );
+}
 
 /**
  * The host's look at the invite, as guests will get it. On a phone (or when asked for full
@@ -57,6 +91,9 @@ export function HostPreview({
   next,
   gateHref,
   published,
+  link,
+  marked = false,
+  nextIcon,
   copy,
   children,
 }: {
@@ -70,6 +107,12 @@ export function HostPreview({
   gateHref: string;
   /** The invite is live: the next step is sharing it rather than publishing. */
   published: boolean;
+  /** The invitation's own web address on this site ("/i/aarav-weds-meera"), as guests get it. */
+  link?: string;
+  /** Tried before signing in: it carries the mark until it is published. */
+  marked?: boolean;
+  /** The next step's icon, in place of Publish's or Share's. */
+  nextIcon?: typeof Globe;
   copy: HostPreviewCopy;
   /** The guest page. */
   children: ReactNode;
@@ -85,7 +128,7 @@ export function HostPreview({
     return () => cancelAnimationFrame(tick);
   }, [wide]);
   if (frame) return children;
-  const NextIcon = published ? Send : Globe;
+  const NextIcon = nextIcon ?? (published ? Send : Globe);
 
   // Until the browser says how wide it is, a plain page rather than the wrong layout
   if (wide === null) return <div className="min-h-dvh bg-paper" />;
@@ -93,19 +136,27 @@ export function HostPreview({
   if (wide && !full) {
     return (
       <div className="flex min-h-dvh items-center justify-center gap-12 bg-paper px-8 py-6">
-        <div className="shrink-0 rounded-[2.6rem] bg-night p-2.5 shadow-overlay ring-1 ring-line">
-          <iframe
-            src={frameSrc}
-            title={copy.phone}
-            allow="autoplay; fullscreen"
-            data-testid="host-preview-phone"
-            className="block w-[390px] rounded-[2rem] bg-night"
-            style={{ height: "min(844px, calc(100dvh - 4rem))" }}
-          />
+        <div className="flex w-[410px] shrink-0 flex-col gap-3">
+          {link && <AddressBar path={link} label={copy.linkLabel} />}
+          <div className="rounded-[2.6rem] bg-night p-2.5 shadow-overlay ring-1 ring-line">
+            <iframe
+              src={frameSrc}
+              title={copy.phone}
+              allow="autoplay; fullscreen"
+              data-testid="host-preview-phone"
+              className="block w-[390px] rounded-[2rem] bg-night"
+              style={{
+                height: link
+                  ? "min(844px, calc(100dvh - 7rem))"
+                  : "min(844px, calc(100dvh - 4rem))",
+              }}
+            />
+          </div>
         </div>
         <div className="flex max-w-sm flex-col gap-5">
           <h1 className="font-display text-[1.9rem] leading-tight">{copy.heading}</h1>
           <p className="text-ink-muted">{copy.body}</p>
+          {marked && <p className="text-sm text-ink-muted">{copy.markNote}.</p>}
           <div className="flex flex-col gap-3">
             <Button asChild size="lg">
               <Link href={next.href}>
@@ -151,11 +202,13 @@ export function HostPreview({
               "size-11 rounded-full border-transparent bg-night/45 px-0 text-card-ivory shadow-none backdrop-blur-sm hover:bg-night/65 hover:text-card-ivory data-[state=open]:bg-night/65",
             )}
           >
-            <Eye aria-hidden />
+            <Globe aria-hidden />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="z-[90] w-72">
-            <DropdownMenuLabel className="font-sans text-sm leading-snug tracking-normal normal-case">
+            <DropdownMenuLabel className="flex flex-col gap-2 font-sans text-sm leading-snug tracking-normal normal-case">
               {copy.label}
+              {link && <AddressBar path={link} label={copy.linkLabel} />}
+              {marked && <span className="text-xs text-ink-muted">{copy.markNote}</span>}
             </DropdownMenuLabel>
             <DropdownMenuItem asChild className="ps-3">
               <Link href={next.href}>

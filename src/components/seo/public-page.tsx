@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { OfferBar } from "@/components/offers/offer-bar";
+import { WelcomeOffer } from "@/components/offers/welcome-offer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -44,6 +45,7 @@ export function PublicShell({
       <SiteHeader menu={siteMenu(locale)} />
       {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
       <OfferBar />
+      <WelcomeOffer />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
         <nav
           aria-label={seoCopy.breadcrumbs}

@@ -43,8 +43,11 @@ const SOFT_LEVEL = 0.4;
  * off keeps it off for the rest of the visit.
  */
 export function useRagaMusic(template: Template) {
-  const { raga, tempo, clip } = template.music;
-  const music = useMemo(() => ({ raga, tempo, clip }), [raga, tempo, clip]);
+  const { raga, tempo, lead, taal, clip, loop } = template.music;
+  const music = useMemo(
+    () => ({ raga, tempo, lead, taal, clip, loop }),
+    [raga, tempo, lead, taal, clip, loop],
+  );
   const player = useRef<MusicPlayer | null>(null);
   const [playing, setPlaying] = useState(false);
   const latestMusic = useRef(music);
@@ -107,7 +110,8 @@ export function useRagaMusic(template: Template) {
         player.current.pause(0);
       } else if (document.visibilityState === "visible" && resumeOnShow.current) {
         resumeOnShow.current = false;
-        void player.current?.play();
+        // Without a tap a phone may refuse: the button shows the music off until the next one
+        player.current?.play().catch(() => setPlaying(false));
       }
     };
     document.addEventListener("visibilitychange", onVisibility);

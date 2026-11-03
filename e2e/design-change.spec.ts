@@ -116,7 +116,7 @@ test.describe("changing the design", () => {
     await expect(page.locator("#part-gate")).toContainText("Silk curtains");
 
     // Preview, signed in, is the guests' own view: it opens with that gate
-    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await page.getByRole("button", { name: "Website", exact: true }).click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview$/);
     const guest = info.project.name.startsWith("phone")
       ? page
@@ -129,7 +129,7 @@ test.describe("changing the design", () => {
     // Its way back is the design's page
     const back = page.getByRole("link", { name: "Keep editing" });
     if (info.project.name.startsWith("phone")) {
-      await page.getByRole("button", { name: "Preview options" }).click();
+      await page.getByRole("button", { name: "Website options" }).click();
       await expect(page.getByRole("menuitem", { name: "Keep editing" })).toHaveAttribute(
         "href",
         /^\/create\/[a-z0-9-]+\?.*invite=/,

@@ -6,7 +6,9 @@ import { SUITE_IDS, SUITES } from "./catalog";
 import {
   VOICES,
   keepDate,
+  leadingScale,
   lettering,
+  lineShare,
   lineSpace,
   placeMarkAt,
   roleOf,
@@ -164,5 +166,54 @@ describe("a function's day and place", () => {
     ]);
     expect(placeMarkAt(placeOnly)).toBe(-1);
     expect(placeMarkAt(page("reply", [{ text: "Sharma Niwas", style: "venue" }]))).toBe(-1);
+  });
+});
+
+describe("the save the date heading", () => {
+  it("has the fine rule under it, over the day on the invitation's page", () => {
+    const invite = page("family", [
+      { text: "request the honour of your presence", style: "body" },
+      { text: "Save the date", style: "label" },
+      { text: "Friday, 20 November 2026", style: "date" },
+    ]);
+    expect(ruleAt(invite)).toBe(2);
+    expect(lineSpace(invite, 2, false)).toBe(2.2);
+  });
+
+  it("has it over the names on the save the date card, with no second mark", () => {
+    const card = page("cover", [
+      { text: "Save the date", style: "label" },
+      { text: "Arjun", style: "display" },
+      { text: "&", style: "joiner" },
+      { text: "Meenakshi", style: "display" },
+      { text: "20 November 2026", style: "date" },
+      { text: "Jodhpur", style: "venue" },
+    ]);
+    expect(ruleAt(card)).toBe(1);
+    expect(placeMarkAt(card)).toBe(-1);
+  });
+
+  it("leaves the family's own headings without one", () => {
+    const family = page("family", [
+      { text: "With the blessings of", style: "label" },
+      { text: "Smt. Kamla Devi", style: "body" },
+    ]);
+    expect(ruleAt(family)).toBe(-1);
+  });
+});
+
+describe("the family pages' spacing", () => {
+  it("sets reading lines a little tighter there, and nowhere else", () => {
+    const family = page("family", []);
+    expect(leadingScale(family, "body")).toBeLessThan(1);
+    expect(leadingScale(family, "date")).toBe(1);
+    expect(leadingScale(page("reply", []), "body")).toBe(1);
+  });
+
+  it("lets the family's names and headings run nearly the calm space's width", () => {
+    const family = page("family", []);
+    expect(lineShare(family, "body")).toBeGreaterThan(lineShare(page("reply", []), "body"));
+    expect(lineShare(family, "label")).toBeGreaterThan(lineShare(family, "small"));
+    expect(lineShare(page("cover", []), "names")).toBe(1);
   });
 });

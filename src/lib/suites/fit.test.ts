@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FIT_GROW, FIT_MAX, FIT_MIN, fitGrowth, fitScale } from "./fit";
+import { FIT_GROW, FIT_MAX, FIT_MIN, FIT_ROOM, fitGrowth, fitRoom, fitScale } from "./fit";
 
 describe("fitting words to a painting", () => {
   it("grows short words up to the most, never past it", () => {
@@ -43,5 +43,23 @@ describe("how far a page's words may grow", () => {
 
   it("treats an empty page as any other", () => {
     expect(fitGrowth([])).toBe(FIT_MAX);
+  });
+});
+
+describe("the room grown words leave", () => {
+  it("fills the calm space up to the theme's size, then widens its margin evenly", () => {
+    expect(fitRoom(1)).toBe(1);
+    expect(fitRoom(FIT_MAX)).toBe(1);
+    expect(fitRoom(FIT_GROW)).toBeCloseTo(FIT_ROOM);
+    const mid = fitRoom((FIT_MAX + FIT_GROW) / 2);
+    expect(mid).toBeLessThan(1);
+    expect(mid).toBeGreaterThan(FIT_ROOM);
+  });
+
+  it("never lets a little more size need less height", () => {
+    // Height grows with the scale, so scale × room must not fall as the scale rises
+    for (let s = FIT_MAX; s < FIT_GROW; s += 0.05) {
+      expect((s + 0.05) / fitRoom(s + 0.05)).toBeGreaterThan(s / fitRoom(s));
+    }
   });
 });

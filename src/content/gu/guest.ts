@@ -159,6 +159,7 @@ export const guestText: GuestText = {
     yourName: "આપનું નામ",
     namePlaceholder: "પરિવાર આપને જે નામથી ઓળખે છે",
     nameRequired: "કૃપા કરી આપનું નામ લખો",
+    celebrations: "પ્રસંગો",
     acceptAll: "બધા પ્રસંગોમાં આવીએ છીએ",
     statuses: {
       attending: { label: "આનંદ સાથે આવીશું", short: "આવીએ છીએ" },

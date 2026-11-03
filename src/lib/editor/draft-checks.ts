@@ -5,7 +5,7 @@ import { z } from "zod";
 import { COUPLE_LAYOUTS, noCouplePhotos } from "./couple-photos";
 import { MAX_TILT, MAX_ZOOM, MIN_ZOOM } from "./photo-fit";
 import { SUITE_IDS } from "@/lib/suites/catalog";
-import { clipSchema } from "./music-clip";
+import { MUSIC_TRACKS, clipSchema, type MusicTrack } from "./music-clip";
 import { FONT_IDS, NAME_COLOURS, TYPE_SIZES, defaultType, type TypeStyle } from "./type";
 import { GUIDE_RULES, noFunctionGuide } from "./guide";
 import {
@@ -202,13 +202,23 @@ export const draftSchema = z.object({
   photos: z.array(photoSchema).max(MAX_PHOTOS).catch([]),
   music: z
     .object({
-      /** null plays the design's own raga. */
+      /**
+       * What plays without the host's own clip: the site's flute song, every design's
+       * default (owner, 2026-11-03), or a raga. Drafts from before it play the flute unless
+       * the host had chosen a raga.
+       */
+      track: z.enum(MUSIC_TRACKS).optional().catch(undefined),
+      /** The raga, when the track is a raga; null plays the design's own. */
       raga: z.enum(RAGA_IDS).nullable().catch(null),
       playOnOpen: z.boolean().catch(true),
       /** The host's own short music clip, played instead of the raga. */
       clip: clipSchema.nullable().catch(null),
     })
-    .catch({ raga: null, playOnOpen: true, clip: null }),
+    .transform(({ track, ...music }) => ({
+      ...music,
+      track: track ?? ((music.raga ? "raga" : "flute") as MusicTrack),
+    }))
+    .catch({ track: "flute" as MusicTrack, raga: null, playOnOpen: true, clip: null }),
   updatedAt: z.number().catch(0),
   /** The event this draft is saved as in the signed-in person's account (Step 8). */
   remoteId: z.uuid().nullable().catch(null),

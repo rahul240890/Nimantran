@@ -94,7 +94,9 @@ export class MusicPlayer {
   }
 
   setTrack(music: MusicChoice) {
-    const switching = (music.clip ?? null) !== (this.music.clip ?? null);
+    const switching =
+      (music.clip ?? null) !== (this.music.clip ?? null) ||
+      (music.loop === true) !== (this.music.loop === true);
     const resume = switching && this.playing;
     if (resume) this.pause();
     if (switching) this.dropClip();
@@ -125,6 +127,8 @@ export class MusicPlayer {
       const clip = new Audio();
       clip.preload = "auto";
       clip.src = this.music.clip!;
+      // The site's own song is shorter than a long invitation, so it comes round again
+      clip.loop = this.music.loop === true;
       clip.addEventListener("ended", () => {
         if (this.clip !== clip) return;
         this.playing = false;
@@ -199,6 +203,10 @@ export class MusicPlayer {
     } catch (error) {
       // Put away (and closed) while it woke: nothing more to play
       if (this.ctx !== ctx) return;
+      // The phone refused to start its sound ("Failed to start the audio device" on an
+      // iPhone back from the background, or after a call): a refused context stays stuck,
+      // so the next tap builds a fresh one
+      this.dropContext();
       throw error;
     }
     if (this.ctx !== ctx) return;
@@ -274,8 +282,16 @@ export class MusicPlayer {
     window.clearTimeout(this.waiting);
     this.playing = false;
     this.dropClip();
+    this.dropContext();
+  }
+
+  private dropContext() {
     if (this.ctx && this.ctx.state !== "closed") this.ctx.close().catch(() => undefined);
     this.ctx = null;
+    this.master = null;
+    this.bus = null;
+    this.reverb = null;
+    this.score = null;
     this.buffers.clear();
   }
 

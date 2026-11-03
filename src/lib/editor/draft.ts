@@ -25,6 +25,7 @@ import { noCouplePhotos } from "./couple-photos";
 import { noFamily } from "./family";
 import { noPages } from "./pages";
 import { defaultType } from "./type";
+import { FLUTE_URL } from "./music-clip";
 import {
   noOpening,
   openingGod,
@@ -117,7 +118,7 @@ export function newDraft(
     content: {},
     functions: defaultFunctions(categoryId),
     photos: [],
-    music: { raga: null, playOnOpen: true, clip: null },
+    music: { track: "flute", raga: null, playOnOpen: true, clip: null },
     updatedAt: 0,
     remoteId: null,
     slug: null,
@@ -328,9 +329,15 @@ const withMusic = new Map<string, Template>();
 export function draftTemplate(draft: InviteDraft): Template {
   const template = TEMPLATES[draft.templateId];
   const own = designMusic(draft);
-  const { raga } = draft.music;
+  const { raga, track } = draft.music;
+  // Every design plays the flute song unless the host chose a raga (owner, 2026-11-03).
   // Another raga is played its own way, not with this design's instrument or tempo
-  const music = !raga || raga === own.raga ? own : { raga };
+  const music =
+    track === "flute"
+      ? { ...own, clip: FLUTE_URL, loop: true }
+      : !raga || raga === own.raga
+        ? own
+        : { raga };
   if (music === template.music) return template;
   const id = `${template.id}:${JSON.stringify(music)}`;
   let found = withMusic.get(id);
@@ -641,8 +648,12 @@ export function coupleValue(draft: InviteDraft, template: Template, id: SlotId):
  */
 export const ASKABLE_QUESTIONS = RSVP_QUESTION_IDS.filter((id) => id !== "message");
 
-/** The questions this invite's RSVP asks, in a fixed order. */
+/**
+ * The questions this invite's RSVP asks, in a fixed order. A new invite asks none: the reply
+ * itself is enough, and the host ticks food, stay or pickup only if they need them (owner,
+ * 2026-11-03). A saved or published invite keeps the questions stored with it.
+ */
 export function draftQuestions(draft: InviteDraft): RsvpQuestionId[] {
-  const chosen: readonly RsvpQuestionId[] = draft.questions ?? draftCategory(draft).rsvpQuestions;
+  const chosen: readonly RsvpQuestionId[] = draft.questions ?? [];
   return ASKABLE_QUESTIONS.filter((id) => chosen.includes(id));
 }

@@ -244,6 +244,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   yourName: "आपका नाम",
   namePlaceholder: "जैसे परिवार आपको जानता है",
   nameRequired: "कृपया अपना नाम लिखें",
+  celebrations: "उत्सव",
   acceptAll: "सबमें आ रहे हैं",
   statuses: {
     attending: { label: "सहर्ष स्वीकार", short: "आ रहे हैं" },
@@ -361,17 +362,19 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
-  metaTitle: "आपका निमंत्रण, जैसा मेहमान देखेंगे",
-  label: "प्रीव्यू: आपके मेहमान यही देखेंगे",
+  metaTitle: "आपके निमंत्रण की वेबसाइट",
+  label: "आपके निमंत्रण की वेबसाइट, जैसे मेहमान आपके लिंक से खोलेंगे",
   back: "बदलाव जारी रखें",
   next: "पैकेज चुनें और प्रकाशित करें",
   share: "निमंत्रण भेजें",
-  heading: "आपके मेहमान यही देखेंगे",
-  body: "मेहमान WhatsApp में आपका लिंक खोलते हैं और निमंत्रण रील की तरह पूरे फ़ोन पर आपके संगीत के साथ चलता है। फ़ोन में निमंत्रण खोलें दबाकर इसे वैसे ही देखें जैसे वे देखेंगे।",
+  heading: "आपके निमंत्रण की वेबसाइट",
+  body: "यही वेब लिंक आपके मेहमानों को मिलेगा। वे WhatsApp में इसे खोलते हैं और निमंत्रण रील की तरह पूरे फ़ोन पर आपके संगीत के साथ चलता है। फ़ोन में निमंत्रण खोलें दबाकर इसे वैसे ही देखें जैसे वे देखेंगे।",
   phone: "फ़ोन पर आपका निमंत्रण",
   fullScreen: "पूरी स्क्रीन पर देखें",
-  menu: "प्रीव्यू के विकल्प",
+  menu: "वेबसाइट के विकल्प",
   opening: "आपका निमंत्रण खुल रहा है",
+  linkLabel: "आपका लिंक",
+  markNote: "प्रकाशित करने तक इस पर शुभ इन्विटेशन का निशान रहेगा",
   changeGate: "खुलने वाला द्वार बदलें",
 };
 
@@ -380,4 +383,18 @@ export const familyCopy: Translation<typeof en.familyCopy> = {
   badge: "झलक · अभी मेहमानों को नहीं भेजा गया",
   metaDescription:
     "परिवार के देखने के लिए एक झलक। यह अभी मेहमानों को नहीं भेजी गई है, और जवाब बंद हैं।",
+};
+
+/** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */
+export const tryCopy: Translation<typeof en.tryCopy> = {
+  videoTitle: "आपके निमंत्रण का वीडियो",
+  videoIntro:
+    "अपना पूरा निमंत्रण वीडियो की तरह मुफ़्त में देखें। प्रकाशित करने तक इस पर शुभ इन्विटेशन का निशान रहता है।",
+  cardsIntro:
+    "आपके सेव द डेट और धन्यवाद कार्ड, देखने के लिए मुफ़्त। प्रकाशित करने तक इन पर शुभ इन्विटेशन का निशान रहता है।",
+  back: "बदलाव जारी रखें",
+  emptyTitle: "पहले एक डिज़ाइन चुनें",
+  emptyBody:
+    "डिज़ाइन चुनकर अपने नाम लिखें, फिर आपकी वेबसाइट, वीडियो और कार्ड यहाँ देखने के लिए तैयार होंगे।",
+  emptyAction: "डिज़ाइन देखें",
 };

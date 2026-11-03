@@ -9,6 +9,7 @@ import {
   LoaderCircle,
   Music2,
   Trash2,
+  Wind,
   Upload,
   X,
 } from "lucide-react";
@@ -49,12 +50,13 @@ import {
   usePhotoUrls,
 } from "../use-photo-urls";
 import { OwnMusic } from "../own-music";
+import { FluteTrack } from "../flute-track";
 import { RagaList } from "../raga-list";
 import { useSongLengths } from "../song-times";
 import { PagePacing } from "../page-pacing";
 import { ContactsSection } from "./family-section";
 import { draftShowsScene } from "@/lib/publish/story";
-import type { MusicClip } from "@/lib/editor/music-clip";
+import type { MusicClip, MusicTrack } from "@/lib/editor/music-clip";
 import type { StepProps } from "./types";
 import { useText } from "@/i18n/client";
 import { categoriesText } from "@/i18n/copy/categories";
@@ -553,8 +555,9 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
   const songs = useSongLengths(draft);
   // "Your own music" stays chosen while the host picks a song, before any clip exists
   const [ownChosen, setOwnChosen] = useState(clip !== null);
-  const source = clip || ownChosen ? "own" : "raga";
-  // Going back to a raga keeps the clip on this device, so switching again brings it back
+  const source = clip || ownChosen ? "own" : draft.music.track;
+  // Going back to the flute or a raga keeps the clip on this device, so switching again
+  // brings it back
   const setAside = useRef<MusicClip | null>(null);
   const setClip = (next: MusicClip | null) =>
     update((current) => ({ ...current, music: { ...current.music, clip: next } }));
@@ -581,13 +584,15 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
             if (!clip && setAside.current) setClip(setAside.current);
           } else {
             setOwnChosen(false);
-            if (clip) {
-              setAside.current = clip;
-              setClip(null);
-            }
+            if (clip) setAside.current = clip;
+            update((current) => ({
+              ...current,
+              music: { ...current.music, track: next as MusicTrack, clip: null },
+            }));
           }
         }}
       >
+        <RadioItem value="flute" label={extrasCopy.musicSource.flute} icon={<Wind aria-hidden />} />
         <RadioItem value="raga" label={extrasCopy.musicSource.raga} icon={<Music2 aria-hidden />} />
         <RadioItem value="own" label={extrasCopy.musicSource.own} icon={<Upload aria-hidden />} />
       </RadioGroup>
@@ -601,6 +606,8 @@ function Music({ draft, update }: Pick<StepProps, "draft" | "update">) {
             setClip(next);
           }}
         />
+      ) : source === "flute" ? (
+        <FluteTrack />
       ) : (
         <RagaList
           label={extrasCopy.musicHeading}

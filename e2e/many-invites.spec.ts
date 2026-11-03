@@ -142,7 +142,7 @@ test.describe("many invitations", () => {
     await gates.getByRole("radio", { name: /^Silk curtains/ }).click();
     await gates.getByRole("button", { name: "Done" }).click();
     await expect(page.locator("[data-held-back]")).toHaveCount(0);
-    await page.getByRole("button", { name: "Preview", exact: true }).click();
+    await page.getByRole("button", { name: "Website", exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`/invites/${id}/preview$`), {
       timeout: 30_000,
     });

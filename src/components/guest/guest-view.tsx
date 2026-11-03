@@ -124,8 +124,11 @@ type GuestViewProps = {
   allIcsUrl: string | null;
   rsvpFunctions: RsvpFunction[];
   questions: RsvpQuestionId[];
-  /** A Free invite once payments are on: "Made with Shubh" across the pages (Step 17). */
-  watermark?: boolean;
+  /**
+   * A Free invite once payments are on: "Made with Shubh" across the pages (Step 17).
+   * "tiled" is the invitation tried before signing in: the brand's name across the screen too.
+   */
+  watermark?: boolean | "tiled";
   /** A fixed moment for the event-day banner, on review pages. */
   previewNow?: number;
   /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
@@ -386,7 +389,7 @@ export function GuestView({
       >
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
-          {watermark && <WatermarkLayer />}
+          {watermark && <WatermarkLayer tiled={watermark === "tiled"} />}
           <main id="main" className="flex flex-1 flex-col">
             {scene && !showOpening ? (
               <OneScene

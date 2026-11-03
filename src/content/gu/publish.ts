@@ -218,6 +218,7 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   yourName: "આપનું નામ",
   namePlaceholder: "પરિવાર આપને જે નામથી ઓળખે છે",
   nameRequired: "કૃપા કરી આપનું નામ લખો",
+  celebrations: "પ્રસંગો",
   acceptAll: "બધા પ્રસંગોમાં આવીએ છીએ",
   statuses: {
     attending: { label: "આનંદ સાથે આવીશું", short: "આવીએ છીએ" },
@@ -334,17 +335,19 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
 };
 
 export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
-  metaTitle: "તમારું આમંત્રણ, મહેમાનો જોશે તેવું",
-  label: "પ્રીવ્યૂ: તમારા મહેમાનોને આ જ દેખાશે",
+  metaTitle: "તમારા આમંત્રણની વેબસાઇટ",
+  label: "તમારા આમંત્રણની વેબસાઇટ, મહેમાનો તમારી લિંકથી ખોલશે તેવી",
   back: "ફેરફાર ચાલુ રાખો",
   next: "પૅકેજ પસંદ કરો અને પ્રકાશિત કરો",
   share: "આમંત્રણ શેર કરો",
-  heading: "તમારા મહેમાનોને આ જ દેખાશે",
-  body: "મહેમાનો WhatsApp માં તમારી લિંક પર ટૅપ કરે છે અને આમંત્રણ રીલની જેમ આખા ફોન પર તમારા સંગીત સાથે ચાલે છે. ફોનમાં ‘આમંત્રણ ખોલો’ દબાવીને તેને એ જ રીતે જુઓ જેમ તેઓ જોશે.",
+  heading: "તમારા આમંત્રણની વેબસાઇટ",
+  body: "આ જ વેબ લિંક તમારા મહેમાનોને મળશે. તેઓ WhatsApp માં તેના પર ટૅપ કરે છે અને આમંત્રણ રીલની જેમ આખા ફોન પર તમારા સંગીત સાથે ચાલે છે. ફોનમાં ‘આમંત્રણ ખોલો’ દબાવીને તેને એ જ રીતે જુઓ જેમ તેઓ જોશે.",
   phone: "ફોન પર તમારું આમંત્રણ",
   fullScreen: "પૂરી સ્ક્રીન પર જુઓ",
-  menu: "પ્રીવ્યૂના વિકલ્પો",
+  menu: "વેબસાઇટના વિકલ્પો",
   opening: "તમારું આમંત્રણ ખૂલી રહ્યું છે",
+  linkLabel: "તમારી લિંક",
+  markNote: "પ્રકાશિત કરો ત્યાં સુધી આના પર શુભ ઇન્વિટેશનનું નિશાન રહેશે",
   changeGate: "ખૂલતો દરવાજો બદલો",
 };
 
@@ -352,4 +355,18 @@ export const familyCopy: Translation<typeof en.familyCopy> = {
   metaTitle: (names) => (names ? `${names}: આમંત્રણની ઝલક` : "આમંત્રણની ઝલક"),
   badge: "ઝલક · હજી મહેમાનોને મોકલ્યું નથી",
   metaDescription: "પરિવારને જોવા માટે એક ઝલક. તે હજી મહેમાનોને મોકલાઈ નથી, અને જવાબ બંધ છે.",
+};
+
+/** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */
+export const tryCopy: Translation<typeof en.tryCopy> = {
+  videoTitle: "તમારા આમંત્રણનો વીડિયો",
+  videoIntro:
+    "તમારું આખું આમંત્રણ વીડિયો તરીકે મફતમાં જુઓ. પ્રકાશિત કરો ત્યાં સુધી તેના પર શુભ ઇન્વિટેશનનું નિશાન રહે છે.",
+  cardsIntro:
+    "તમારા સેવ ધ ડેટ અને આભાર કાર્ડ, જોવા માટે મફત. પ્રકાશિત કરો ત્યાં સુધી તેના પર શુભ ઇન્વિટેશનનું નિશાન રહે છે.",
+  back: "ફેરફાર ચાલુ રાખો",
+  emptyTitle: "પહેલાં એક ડિઝાઇન પસંદ કરો",
+  emptyBody:
+    "ડિઝાઇન પસંદ કરો અને તમારા નામ લખો, પછી તમારી વેબસાઇટ, વીડિયો અને કાર્ડ અહીં જોવા તૈયાર હશે.",
+  emptyAction: "ડિઝાઇન જુઓ",
 };

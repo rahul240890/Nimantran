@@ -425,8 +425,12 @@ export const extrasCopy = {
   cancelPhoto: "Cancel",
   closePhoto: "Close",
   musicHeading: "Music",
-  musicHint: "A raga composed live as the card opens, or your own song.",
-  musicSource: { raga: "A raga", own: "Your own music" },
+  musicHint:
+    "A flute song on every design, a raga composed live as the card opens, or your own song.",
+  musicSource: { flute: "Flute", raga: "A raga", own: "Your own music" },
+  fluteName: "Apna Bana Le, on flute",
+  fluteBadge: "Default",
+  fluteNote: "Plays on every design unless you choose a raga or your own music.",
   chooseSong: "Choose a song",
   /** Under the upload button: the formats, and that uploading is the host's word. */
   songNote: "MP3 or M4A. Only songs you have the right to use.",
@@ -1916,7 +1920,7 @@ export const quickCopy = {
   back: "Back",
   watch: "Watch demo",
   /** Opens the invitation with the family's own names, as guests will see it. */
-  preview: "Preview",
+  preview: "Website",
   free: "Free to try. Pay only when you send.",
   eyebrow: "Make it yours",
   title: "Your invitation in a few minutes",
@@ -1933,7 +1937,8 @@ export const quickCopy = {
   /** Once the names and dates are in: the invitation's video and its cards, from the editor. */
   video: "Video",
   cards: "Cards",
-  signInToTry: "Sign in to make its video and cards.",
+  tryNote:
+    "Try the website, video and cards free. They carry the Shubh Invitation mark until you publish.",
   more: "More options",
   moreIntro: "Your own song, wording, opening gate and questions",
   make: "Short on time? We'll make it for you",

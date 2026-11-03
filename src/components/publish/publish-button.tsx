@@ -1,18 +1,9 @@
 "use client";
 
-import {
-  Check,
-  CircleAlert,
-  Globe,
-  LoaderCircle,
-  LogIn,
-  PencilLine,
-  Send,
-  Sparkles,
-} from "lucide-react";
+import { Check, CircleAlert, Globe, LoaderCircle, PencilLine, Send, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { needsPackage } from "@/actions/checkout";
 import { checkSlug, publishInvite, type PublishOutcome, type SlugCheck } from "@/actions/invites";
 import { Button } from "@/components/ui/button";
@@ -35,12 +26,16 @@ type SlugState = { slug: string; result: SlugCheck } | null;
 /**
  * The last step's main action: publish the invite, or share it once it's live. An invite
  * without a package goes to the three packages first and comes back here to publish.
+ * Signed out it is the same Publish (owner, 2026-11-03: no "Sign in to publish" while the
+ * family is still trying it): the account is asked for on the tap, and signing in comes
+ * back here to carry on publishing (`autoStart`).
  */
 export function PublishButton({
   draft,
   signedIn,
   onNotReady,
   autoOpen = false,
+  autoStart = false,
   size,
   signInNext = "/create",
   className,
@@ -51,8 +46,10 @@ export function PublishButton({
   onNotReady: () => void;
   /** Open the dialog straight away: the host is back from choosing a package. */
   autoOpen?: boolean;
+  /** Start publishing straight away, packages first: the host is back from signing in. */
+  autoStart?: boolean;
   size?: "lg";
-  /** Where signing in comes back to: the design's page the button is on. */
+  /** Where signing in comes back to, to carry on publishing: the design's page it is on. */
   signInNext?: string;
   className?: string;
 }) {
@@ -82,13 +79,31 @@ export function PublishButton({
     setOpen(true);
   };
 
+  // Back from signing in to publish: it carries on once, through the packages as ever
+  const started = useRef(false);
+  useEffect(() => {
+    if (!autoStart || !signedIn || started.current || draft.slug) return;
+    started.current = true;
+    void start();
+    // Once, as the page arrives
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoStart, signedIn]);
+
   if (!signedIn) {
+    // What's missing is shown first; then the account, which comes back here to publish
     return (
-      <Button asChild size={size} className={className}>
-        <Link href={`/sign-in?next=${encodeURIComponent(signInNext)}`}>
-          <LogIn aria-hidden />
-          {publishCopy.signInToPublish}
-        </Link>
+      <Button
+        size={size}
+        className={className}
+        leadingIcon={<Globe aria-hidden />}
+        data-publish-signed-out
+        onClick={() => {
+          if (draftProblems(draft).length > 0) return onNotReady();
+          inviteDraft.flush();
+          router.push(`/sign-in?next=${encodeURIComponent(signInNext)}`);
+        }}
+      >
+        {publishCopy.publish}
       </Button>
     );
   }

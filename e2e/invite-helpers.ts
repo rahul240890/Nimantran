@@ -106,7 +106,7 @@ export async function openPart(page: Page, title: string) {
 export const firstName = (page: Page) => page.locator('input[data-slot="first"]');
 
 /**
- * The main button in the design page's bar: Publish, Share once live, or Sign in to publish.
+ * The main button in the design page's bar: Publish, or Share once live (signed out, Publish asks for the account).
  * Clicked while names or dates are missing, it shows them.
  */
 export const editorBar = (page: Page) => page.locator("[data-editor-bar]").getByRole("button");

@@ -677,7 +677,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   hashiya: {
     cover: [24, 25, 20, 20],
-    family: [12, 61, 12, 12],
+    family: [12, 55, 12, 12],
     haldi: [37, 38, 12, 12],
     mehendi: [23, 33, 20, 20],
     sangeet: [12, 50, 8, 8],
@@ -776,7 +776,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   nirmal: {
     cover: [19, 32, 14, 14],
-    family: [12, 61, 6, 6],
+    family: [12, 54, 6, 6],
     haldi: [35, 28, 13, 14],
     mehendi: [22, 30, 16, 16],
     sangeet: [12, 60, 10, 10],
@@ -787,7 +787,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   shola: {
     cover: [23, 39, 12, 13],
-    family: [12, 58, 6, 6],
+    family: [12, 56, 6, 6],
     haldi: [18, 42, 15, 6],
     mehendi: [26, 26, 14, 14],
     sangeet: [10, 58, 8, 8],
@@ -820,7 +820,7 @@ const AREAS: Partial<Record<SuiteId, Partial<Record<PageArt, Inset>>>> = {
   },
   "tasveer-khana": {
     cover: [26, 38, 6, 6],
-    family: [12, 59, 6, 6],
+    family: [12, 52, 6, 6],
     haldi: [24, 41, 14, 12],
     mehendi: [37, 34, 6, 9],
     sangeet: [12, 51, 14, 6],

@@ -76,6 +76,8 @@ export const templateSchema = z.object({
      * catalogue: the editor and the guest page add it to the invite's design (music-clip.ts).
      */
     clip: z.string().optional(),
+    /** The clip starts again at its end: the site's own song, which isn't cut to fit. */
+    loop: z.boolean().optional(),
   }),
   /** The slots this design shows, each with its sample wording (English). */
   slots: z
