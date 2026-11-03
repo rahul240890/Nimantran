@@ -118,24 +118,18 @@ test.describe("changing the design", () => {
     // Preview, signed in, is the guests' own view: it opens with that gate
     await page.getByRole("button", { name: "Website", exact: true }).click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/preview$/);
-    const guest = info.project.name.startsWith("phone")
-      ? page
-      : page.frameLocator('[data-testid="host-preview-phone"]');
+    // Full screen on every screen, as a guest's link opens
+    const guest = page;
     await expect(guest.locator("[data-opening]").first()).toHaveAttribute(
       "data-opening",
       "curtain",
       { timeout: 15_000 },
     );
     // Its way back is the design's page
-    const back = page.getByRole("link", { name: "Keep editing" });
-    if (info.project.name.startsWith("phone")) {
-      await page.getByRole("button", { name: "Website options" }).click();
-      await expect(page.getByRole("menuitem", { name: "Keep editing" })).toHaveAttribute(
-        "href",
-        /^\/create\/[a-z0-9-]+\?.*invite=/,
-      );
-    } else {
-      await expect(back).toHaveAttribute("href", /^\/create\/[a-z0-9-]+\?.*invite=/);
-    }
+    await page.getByRole("button", { name: "Website options" }).click();
+    await expect(page.getByRole("menuitem", { name: "Keep editing" })).toHaveAttribute(
+      "href",
+      /^\/create\/[a-z0-9-]+\?.*invite=/,
+    );
   });
 });

@@ -62,6 +62,16 @@ export const rootViewport: Viewport = {
   ],
 };
 
+/**
+ * A guest's invitation: the browser's own bars (the status bar, Safari's and Chrome's address
+ * bars) take the night of the opening rather than the site's cream, so the invitation reads
+ * as the whole screen from its first frame.
+ */
+export const guestViewport: Viewport = {
+  ...rootViewport,
+  themeColor: "#120f24",
+};
+
 export function RootHtml({
   locale,
   pricing,

@@ -1,13 +1,20 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { AccountShell } from "@/components/account/account-shell";
 import { PageTransition } from "@/components/motion/page-transition";
+import { guestViewport, rootViewport } from "@/components/root-html";
 import { TryView } from "@/components/try/try-view";
 import { cardsText } from "@/i18n/copy/cards";
 import { publishText } from "@/i18n/copy/publish";
 import { getText } from "@/i18n/server";
 import { authMode } from "@/lib/auth/mode";
 import { isTryView } from "@/lib/try/views";
+
+// The website's browser bars take the invitation's night, as on the guests' own link
+export async function generateViewport({ params }: PageProps<"/try/[view]">): Promise<Viewport> {
+  const { view } = await params;
+  return view === "website" ? guestViewport : rootViewport;
+}
 
 export async function generateMetadata({ params }: PageProps<"/try/[view]">): Promise<Metadata> {
   const { view } = await params;
@@ -35,10 +42,10 @@ export async function generateMetadata({ params }: PageProps<"/try/[view]">): Pr
 export default async function TryPage({ params, searchParams }: PageProps<"/try/[view]">) {
   const { view } = await params;
   if (!isTryView(view)) notFound();
-  const { frame, full } = await searchParams;
+  const { frame, phone } = await searchParams;
 
   if (view === "website")
-    return <TryView view="website" frame={frame === "1"} full={full === "1"} />;
+    return <TryView view="website" frame={frame === "1"} phone={phone === "1"} />;
   return (
     <PageTransition>
       <AccountShell>

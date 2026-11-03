@@ -4,6 +4,7 @@ import { z } from "zod";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { HostPreview } from "@/components/publish/host-preview";
+import { guestViewport } from "@/components/root-html";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { getLocale, getText } from "@/i18n/server";
@@ -19,6 +20,9 @@ import { guestGuide } from "@/lib/publish/event-day";
 import { suggestSlug } from "@/lib/publish/slug";
 import { storyFunctions } from "@/lib/publish/story";
 
+// The browser's bars take the invitation's night, as on the guests' own link
+export const viewport = guestViewport;
+
 export async function generateMetadata(): Promise<Metadata> {
   const { hostPreviewCopy } = await getText(publishText);
   return { title: hostPreviewCopy.metaTitle, robots: { index: false, follow: false } };
@@ -27,15 +31,15 @@ export async function generateMetadata(): Promise<Metadata> {
 /*
  * The host's look at an invite, before or after publishing: the whole guest page as guests
  * will see it (the opening, the music, every page and the reply form), with the corner mark
- * a free invite carries. On a wide screen it plays inside a phone (?frame=1 is that inner
- * page); ?full=1 shows it edge to edge. Replies aren't sent from here.
+ * a free invite carries, edge to edge on every screen. ?phone=1 plays it inside a phone on
+ * a wide screen (?frame=1 is that inner page). Replies aren't sent from here.
  */
 export default async function InvitePreviewPage({
   params,
   searchParams,
 }: PageProps<"/invites/[id]/preview">) {
   const { id } = await params;
-  const { frame, full } = await searchParams;
+  const { frame, phone } = await searchParams;
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/preview`)}`);
@@ -82,9 +86,9 @@ export default async function InvitePreviewPage({
   return (
     <HostPreview
       frame={frame === "1"}
-      full={full === "1"}
+      phone={phone === "1"}
       frameSrc={`/invites/${id}/preview?frame=1`}
-      fullHref={`/invites/${id}/preview?full=1`}
+      fullHref={`/invites/${id}/preview`}
       // The design's page is the whole editor: the way back and the gate lead there
       back={{ href: designPageHref(draft), label: hostPreviewCopy.back }}
       next={next}

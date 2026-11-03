@@ -76,15 +76,16 @@ function AddressBar({ path, label }: { path: string; label: string }) {
 }
 
 /**
- * The host's look at the invite, as guests will get it. On a phone (or when asked for full
- * screen) it is the guest page itself, edge to edge, with one small round button in the
- * corner for the way back. On a wide screen the guest page plays inside a phone-sized
- * frame of its own, so the host sees exactly the phone a guest holds, with the notes and
- * the next step beside it. `frame` is that inner page, with nothing of the host's.
+ * The host's look at the invite, as guests will get it: the guest page itself, edge to edge
+ * on every screen (owner, 2026-11-03: Website opens full screen, on a laptop's demo too),
+ * with one small round button in the corner for the way back. Asked for the phone
+ * (`phone`), a wide screen plays the guest page inside a phone-sized frame of its own, with
+ * the notes and the next step beside it. `frame` is that inner page, with nothing of the
+ * host's.
  */
 export function HostPreview({
   frame,
-  full,
+  phone,
   frameSrc,
   fullHref,
   back,
@@ -98,7 +99,8 @@ export function HostPreview({
   children,
 }: {
   frame: boolean;
-  full: boolean;
+  /** On a wide screen, inside a phone with the notes beside it rather than full screen. */
+  phone: boolean;
   frameSrc: string;
   fullHref: string;
   back: Action;
@@ -119,21 +121,24 @@ export function HostPreview({
 }) {
   const wide = useWide();
   // Start at the page's top, as a guest's tap on the link would: coming from the editor part
-  // way down would otherwise keep its scroll, as the page only comes in once its width is known
+  // way down would otherwise keep its scroll
+  const known = !phone || wide !== null;
   useEffect(() => {
-    if (wide === null) return;
+    if (!known) return;
     let tick = requestAnimationFrame(() => {
       tick = requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "instant" }));
     });
     return () => cancelAnimationFrame(tick);
-  }, [wide]);
+  }, [known]);
   if (frame) return children;
   const NextIcon = nextIcon ?? (published ? Send : Globe);
 
-  // Until the browser says how wide it is, a plain page rather than the wrong layout
-  if (wide === null) return <div className="min-h-dvh bg-paper" />;
+  // Asked for the phone, until the browser says how wide it is: the opening's dark stage
+  // rather than the wrong layout or an empty page. Full screen needs no width, so it
+  // comes at once
+  if (phone && wide === null) return <div className="min-h-dvh bg-night" />;
 
-  if (wide && !full) {
+  if (phone && wide) {
     return (
       <div className="flex min-h-dvh items-center justify-center gap-12 bg-paper px-8 py-6">
         <div className="flex w-[410px] shrink-0 flex-col gap-3">

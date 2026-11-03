@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { guestViewport } from "@/components/root-html";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { editorText } from "@/i18n/copy/editor";
@@ -28,6 +29,9 @@ import { storyFunctions } from "@/lib/publish/story";
  * A guest's invitation: the doorway (or the 3D card), each function with directions and calendar, then the
  * reply form.
  */
+
+// The browser's bars take the invitation's night, so it reads as the whole screen
+export const viewport = guestViewport;
 
 export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Promise<Metadata> {
   const { slug } = await params;
