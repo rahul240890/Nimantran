@@ -244,10 +244,10 @@ test.describe("a design's page", () => {
     // from this browser's copy, with the mark and the link it will have (owner, 2026-11-03)
     await page.getByRole("button", { name: "Website", exact: true }).click();
     await expect(page).toHaveURL(/\/try\/website$/);
-    // A phone shows it edge to edge, mark and all; a computer inside a phone
-    await expect(
-      page.locator('[data-watermark-tiled], [data-testid="host-preview-phone"]').first(),
-    ).toBeAttached({ timeout: 15_000 });
+    // Edge to edge on every screen, mark and all
+    await expect(page.locator("[data-watermark-tiled]").first()).toBeAttached({
+      timeout: 15_000,
+    });
     await page.goBack();
     await expect(firstName(page)).toHaveValue("Aditya", { timeout: 30_000 });
     // We'll make it for you: once, straight to Instagram (owner, 2026-10-25)

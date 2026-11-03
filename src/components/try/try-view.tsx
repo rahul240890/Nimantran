@@ -8,6 +8,7 @@ import { usePhotoUrls, useClipUrl } from "@/components/editor/use-photo-urls";
 import { GuestView, type GuestFunction } from "@/components/guest/guest-view";
 import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { HostPreview } from "@/components/publish/host-preview";
+import { GuestPreviewLoading } from "@/components/publish/opening-screens";
 import { VideoCard } from "@/components/publish/video-card";
 import { Button } from "@/components/ui/button";
 import { useLocale, useText } from "@/i18n/client";
@@ -37,12 +38,12 @@ const noSubscribe = () => () => {};
 export function TryView({
   view,
   frame = false,
-  full = false,
+  phone = false,
   testCodecs,
 }: {
   view: TryViewName;
   frame?: boolean;
-  full?: boolean;
+  phone?: boolean;
   testCodecs?: boolean;
 }) {
   const { draft } = useSyncExternalStore(
@@ -82,7 +83,7 @@ export function TryView({
         photos={photos}
         clipUrl={clipUrl}
         frame={frame}
-        full={full}
+        phone={phone}
       />
     );
   }
@@ -98,14 +99,14 @@ function TryWebsite({
   photos,
   clipUrl,
   frame,
-  full,
+  phone,
 }: {
   draft: InviteDraft;
   functions: ReturnType<typeof storyFunctions>;
   photos: PublicPhoto[];
   clipUrl: string | null;
   frame: boolean;
-  full: boolean;
+  phone: boolean;
 }) {
   const { hostPreviewCopy, publishCopy } = useText(publishText);
   const { functionCopy } = useText(editorText);
@@ -134,9 +135,9 @@ function TryWebsite({
   return (
     <HostPreview
       frame={frame}
-      full={full}
+      phone={phone}
       frameSrc={`${tryHref("website")}?frame=1`}
-      fullHref={`${tryHref("website")}?full=1`}
+      fullHref={tryHref("website")}
       back={{ href: designPageHref(draft), label: hostPreviewCopy.back }}
       next={{ href: publishAfterSignIn(draft), label: publishCopy.publish }}
       gateHref={`${designPageHref(draft)}#part-gate`}
@@ -272,7 +273,8 @@ function TryCards({ draft, photos }: { draft: InviteDraft; photos: PublicPhoto[]
 }
 
 function TryLoading({ website }: { website: boolean }) {
-  if (website) return <div className="min-h-dvh bg-paper" />;
+  // The website's loading screen is the opening's dark stage, never an empty page
+  if (website) return <GuestPreviewLoading />;
   return (
     <div role="status" className="flex justify-center py-16 text-ink-muted">
       <LoaderCircle aria-hidden className="size-6 animate-spin motion-still:animate-none" />
