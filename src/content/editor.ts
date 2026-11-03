@@ -401,7 +401,6 @@ export const extrasCopy = {
   changePhoto: "Change photo",
   removeFramePhoto: (frame: string) => `Remove: ${frame}`,
   photoDidNotLoad: "This photo didn't load. Remove it and add it again.",
-  removeFramePhotoShort: "Remove",
   framePhotoRemoved: (frame: string) => `Photo removed: ${frame}`,
   galleryHeading: "More photos",
   galleryHint: (max: number) =>

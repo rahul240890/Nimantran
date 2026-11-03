@@ -359,7 +359,6 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   changePhoto: "ছবি বদলান",
   removeFramePhoto: (frame) => `সরান: ${frame}`,
   photoDidNotLoad: "এই ছবিটি খোলেনি। সরিয়ে আবার যোগ করুন।",
-  removeFramePhotoShort: "সরান",
   framePhotoRemoved: (frame) => `ছবি সরানো হয়েছে: ${frame}`,
   galleryHeading: "আরও ছবি",
   galleryHint: (max) =>

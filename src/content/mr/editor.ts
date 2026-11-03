@@ -369,7 +369,6 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   changePhoto: "फोटो बदला",
   removeFramePhoto: (frame) => `काढा: ${frame}`,
   photoDidNotLoad: "हा फोटो उघडला नाही. तो काढून पुन्हा जोडा.",
-  removeFramePhotoShort: "काढा",
   framePhotoRemoved: (frame) => `फोटो काढला: ${frame}`,
   galleryHeading: "आणखी फोटो",
   galleryHint: (max) => `ऐच्छिक. पाहुणे हे निमंत्रणावर पाहू शकतील. एकूण ${max} फोटोंपर्यंत.`,

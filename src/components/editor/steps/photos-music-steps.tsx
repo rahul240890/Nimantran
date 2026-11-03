@@ -286,10 +286,20 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-ink">{name}</span>
                   {id ? (
-                    <Badge tone="gold">
-                      <Check aria-hidden className="size-3" strokeWidth={3} />
-                      {extrasCopy.framePhotoAdded}
-                    </Badge>
+                    <span className="flex items-center gap-1">
+                      <Badge tone="gold">
+                        <Check aria-hidden className="size-3" strokeWidth={3} />
+                        {extrasCopy.framePhotoAdded}
+                      </Badge>
+                      {/* Up here beside its badge, clear of the page's bar along the foot */}
+                      <IconButton
+                        label={extrasCopy.removeFramePhoto(name)}
+                        icon={<Trash2 />}
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => empty(frame)}
+                      />
+                    </span>
                   ) : (
                     <span className="text-xs font-semibold text-ink-muted">
                       {extrasCopy.framePhotoOptional}
@@ -362,16 +372,6 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
                         onSave={(next) => saveCrop(id, next)}
                       />
                     )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      leadingIcon={<Trash2 aria-hidden />}
-                      aria-label={extrasCopy.removeFramePhoto(name)}
-                      disabled={busy}
-                      onClick={() => empty(frame)}
-                    >
-                      {extrasCopy.removeFramePhotoShort}
-                    </Button>
                   </span>
                 )}
                 <input
