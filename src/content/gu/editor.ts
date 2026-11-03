@@ -364,6 +364,10 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   framePhotoAdded: "ઉમેર્યો",
   framePhotoOptional: "વૈકલ્પિક",
   changePhoto: "ફોટો બદલો",
+  removeFramePhoto: (frame) => `કાઢો: ${frame}`,
+  photoDidNotLoad: "આ ફોટો ખૂલ્યો નહીં. તેને કાઢીને ફરી ઉમેરો.",
+  removeFramePhotoShort: "કાઢો",
+  framePhotoRemoved: (frame) => `ફોટો કાઢ્યો: ${frame}`,
   galleryHeading: "વધુ ફોટા",
   galleryHint: (max) => `વૈકલ્પિક. મહેમાનો આમંત્રણ પર આ ફોટા જોઈ શકશે. કુલ ${max} ફોટા સુધી.`,
   coupleFrame: (index, frames) =>

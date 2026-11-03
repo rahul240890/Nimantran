@@ -421,6 +421,10 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   framePhotoAdded: "சேர்க்கப்பட்டது",
   framePhotoOptional: "விருப்பத்திற்கு",
   changePhoto: "புகைப்படத்தை மாற்றவும்",
+  removeFramePhoto: (frame) => `நீக்கவும்: ${frame}`,
+  photoDidNotLoad: "இந்தப் புகைப்படம் திறக்கவில்லை. நீக்கிவிட்டு மீண்டும் சேர்க்கவும்.",
+  removeFramePhotoShort: "நீக்கவும்",
+  framePhotoRemoved: (frame) => `புகைப்படம் நீக்கப்பட்டது: ${frame}`,
   galleryHeading: "மேலும் புகைப்படங்கள்",
   galleryHint: (max) =>
     `விருப்பத்திற்கு. விருந்தினர்கள் அழைப்பிதழில் இவற்றைப் பார்க்கலாம். மொத்தம் ${max} புகைப்படங்கள் வரை.`,

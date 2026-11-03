@@ -399,6 +399,10 @@ export const extrasCopy = {
   framePhotoAdded: "Added",
   framePhotoOptional: "Optional",
   changePhoto: "Change photo",
+  removeFramePhoto: (frame: string) => `Remove: ${frame}`,
+  photoDidNotLoad: "This photo didn't load. Remove it and add it again.",
+  removeFramePhotoShort: "Remove",
+  framePhotoRemoved: (frame: string) => `Photo removed: ${frame}`,
   galleryHeading: "More photos",
   galleryHint: (max: number) =>
     `Optional. Guests can scroll through these on the invitation. Up to ${max} photos in all.`,

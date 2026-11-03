@@ -71,6 +71,7 @@ export function ThemedDetails({
   allIcsUrl,
   music,
   reply,
+  onPhotoFail,
 }: {
   suite: SuiteId;
   look: GuestLook;
@@ -93,6 +94,8 @@ export function ThemedDetails({
   music: Music;
   /** The reply form, drawn in the theme's colours. */
   reply: ReactNode;
+  /** A photo whose file can't be shown, so the page takes it away. */
+  onPhotoFail?: (id: string) => void;
 }) {
   // The music button floats while the guest reads this page
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
@@ -110,7 +113,7 @@ export function ThemedDetails({
       className="guest-themed relative isolate overflow-clip"
     >
       <FlowerDefs />
-      <Welcome copy={copy} lang={lang} look={look} photos={welcome} />
+      <Welcome copy={copy} lang={lang} look={look} photos={welcome} onFail={onPhotoFail} />
       <GiveFlowers
         way={ways.flowers}
         look={look}
@@ -139,6 +142,7 @@ export function ThemedDetails({
           look={look}
           lang={lang}
           layouts={layouts}
+          onFail={onPhotoFail}
         />
       )}
       <Night copy={copy} lang={lang} look={look} way={ways.lamp} reply={reply} />
@@ -243,12 +247,14 @@ function Welcome({
   lang,
   look,
   photos,
+  onFail,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   /** The couple together, or one each, by the names in the card's order. */
   photos: readonly GuestPhoto[];
+  onFail?: (id: string) => void;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
@@ -314,6 +320,7 @@ function Welcome({
               <FramedPhoto
                 photo={{ src: photos[0]!.url, alt: "", fit: photos[0]!.fit }}
                 alt={guestCopy.photoAlt(1)}
+                onFail={onFail && (() => onFail(photos[0]!.id))}
                 frameAspect={GALLERY_ASPECT}
                 className="size-full"
               />
@@ -338,6 +345,7 @@ function Welcome({
                       photo={{ src: photo.url, alt: "", fit: photo.fit }}
                       alt={guestCopy.photoAlt(index + 1)}
                       frameAspect={GALLERY_ASPECT}
+                      onFail={onFail && (() => onFail(photo.id))}
                       className="size-full"
                     />
                   </Framed>
@@ -802,11 +810,13 @@ function PhotoCarousel({
   photos,
   before,
   look,
+  onFail,
 }: {
   photos: readonly GuestPhoto[];
   /** How many photos the welcome already shows, so these count on from there. */
   before: number;
   look: GuestLook;
+  onFail?: (id: string) => void;
 }) {
   const { guestCopy } = useGuestText();
   const words = guestCopy.carousel;
@@ -819,6 +829,8 @@ function PhotoCarousel({
   // The photo the strip is gliding to by itself; its scrolling on the way says nothing
   const aim = useRef<number | null>(null);
   const count = photos.length;
+  // A photo taken away (its file couldn't be shown) never leaves the counter past the end
+  if (count > 0 && index >= count) setIndex(count - 1);
   const playing = !still && !paused && count > 1;
 
   useEffect(() => {
@@ -905,6 +917,7 @@ function PhotoCarousel({
                 alt={guestCopy.photoAlt(i + before + 1)}
                 frameAspect={GALLERY_ASPECT}
                 lazy={Math.abs(i - index) > 1}
+                onFail={onFail && (() => onFail(photo.id))}
                 className="size-full"
               />
             </Framed>
@@ -965,6 +978,7 @@ function Dusk({
   look,
   lang,
   layouts,
+  onFail,
 }: {
   /** How many photos the welcome already shows, so these count on from there. */
   before: number;
@@ -974,6 +988,7 @@ function Dusk({
   look: GuestLook;
   lang: CardLanguage;
   layouts: SectionLayouts;
+  onFail?: (id: string) => void;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
@@ -1030,6 +1045,7 @@ function Dusk({
                       alt={guestCopy.photoAlt(index + before + 1)}
                       frameAspect={GALLERY_ASPECT}
                       lazy
+                      onFail={onFail && (() => onFail(photo.id))}
                       className={cn(
                         "w-full",
                         layouts.photos === "polaroids" ? "aspect-[4/5]" : "aspect-[4/5] h-full",
@@ -1041,7 +1057,7 @@ function Dusk({
             </Reveal>
           )}
           {layouts.photos === "film" && (
-            <PhotoCarousel photos={photos} before={before} look={look} />
+            <PhotoCarousel photos={photos} before={before} look={look} onFail={onFail} />
           )}
         </section>
       )}

@@ -60,6 +60,11 @@ export function photoFailed(id: string) {
   changed.forEach((listener) => listener());
 }
 
+/** Whether a photo has stopped trying to load: nothing here or in the account can show it. */
+export function photoUnavailable(id: string): boolean {
+  return gone.has(id) || gaveUp.has(id);
+}
+
 const REMOTE_TRIES = 3;
 const REMOTE_WAIT_MS = 4_000;
 

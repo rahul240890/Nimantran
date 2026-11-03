@@ -2,7 +2,15 @@
 
 import { ArrowRight, CalendarPlus, RotateCcw } from "lucide-react";
 import Link from "next/link";
-import { startTransition, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import {
+  startTransition,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { BrandMark } from "@/components/brand/brand-mark";
 import { SocialLinks } from "@/components/brand/social-links";
 import { cn } from "@/lib/cn";
@@ -250,24 +258,35 @@ export function GuestView({
   }, [story.beats]);
   // Photos as the host placed them (turned and cropped) wherever the page shows them. A
   // painted theme's welcome shows the design's own couple photo, and its gallery the rest
+  // A photo whose file can't be shown leaves the page, so no frame ever stands empty
+  // (owner, 2026-11-03: a live invitation's first photo showed as a blank frame)
+  const [broken, setBroken] = useState<ReadonlySet<string>>(() => new Set());
+  const photoFailed = useCallback(
+    (id: string) => setBroken((was) => (was.has(id) ? was : new Set(was).add(id))),
+    [],
+  );
   const placed = useMemo(() => {
     const couple = draftCouple(draft);
-    const ids = photos.map((photo) => photo.id);
+    const shown = photos.filter((photo) => photo.url && !broken.has(photo.id));
+    const ids = shown.map((photo) => photo.id);
     const framed = couplePageIds(
       draftShowsScene(draft) ? sceneCouple(couple) : couple,
       ids,
       copy.second,
     );
-    const all: GuestPhoto[] = photos.map((photo) => ({
+    const all: GuestPhoto[] = shown.map((photo) => ({
       ...photo,
-      fit: photoFit(couple, photo.id, photoAspect(photos, photo.id)),
+      fit: photoFit(couple, photo.id, photoAspect(shown, photo.id)),
     }));
     // The couple's photo, or both when the host gave one each (owner, 2026-10-24: the welcome
     // showed only the first of the two)
     const framedPhotos = framed.flatMap((id) => all.find((photo) => photo.id === id) ?? []);
-    const welcome = framedPhotos.length > 0 ? framedPhotos : all.slice(0, 1);
+    // Photos the host put in the design's own frames show only there: with those frames left
+    // empty the welcome has none, and every photo stays in the gallery. Older invites, which
+    // filled frames from the photos in order, still welcome guests with the first
+    const welcome = framedPhotos.length > 0 || couple.strict ? framedPhotos : all.slice(0, 1);
     return { all, welcome, rest: all.filter((photo) => !welcome.includes(photo)) };
-  }, [draft, photos, copy.second]);
+  }, [draft, photos, copy.second, broken]);
   // Every invitation opens full height in the host's chosen style (Step 12x); a Scene can skip it
   const opening = draftOpeningStyle(draft, suite, Boolean(scene));
   const god = draftOpeningGod(draft);
@@ -465,6 +484,7 @@ export function GuestView({
                   }
                   welcome={placed.welcome}
                   photos={placed.rest}
+                  onPhotoFail={photoFailed}
                   family={family}
                   familyLang={language}
                   allIcsUrl={allIcsUrl}
@@ -531,6 +551,7 @@ export function GuestView({
                                 alt={guestCopy.photoAlt(index + 1)}
                                 frameAspect={GALLERY_ASPECT}
                                 lazy
+                                onFail={() => photoFailed(photo.id)}
                                 className="aspect-[4/5] w-full"
                               />
                             </li>

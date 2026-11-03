@@ -357,6 +357,10 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   framePhotoAdded: "যোগ হয়েছে",
   framePhotoOptional: "ঐচ্ছিক",
   changePhoto: "ছবি বদলান",
+  removeFramePhoto: (frame) => `সরান: ${frame}`,
+  photoDidNotLoad: "এই ছবিটি খোলেনি। সরিয়ে আবার যোগ করুন।",
+  removeFramePhotoShort: "সরান",
+  framePhotoRemoved: (frame) => `ছবি সরানো হয়েছে: ${frame}`,
   galleryHeading: "আরও ছবি",
   galleryHint: (max) =>
     `ঐচ্ছিক। অতিথিরা নিমন্ত্রণপত্রে এগুলি স্ক্রোল করে দেখতে পারবেন। মোট ${max}টি ছবি পর্যন্ত।`,
