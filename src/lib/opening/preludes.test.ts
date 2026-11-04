@@ -40,7 +40,8 @@ describe("pickPrelude", () => {
   });
 
   it("never starts a new round with the one just seen", () => {
-    let last = PRELUDES[0] as string;
+    // Nothing is seen before the first pick, so any prelude may come first
+    let last: string | undefined;
     for (let i = 0; i < 40; i++) {
       const next = pickPrelude("hindu");
       expect(next).not.toBe(last);
