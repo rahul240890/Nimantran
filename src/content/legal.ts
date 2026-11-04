@@ -56,7 +56,7 @@ export const privacy: LegalDoc = {
         "From guests, the people who open an invitation:",
         {
           list: [
-            "The reply you send: your name, whether you are coming, how many adults and children, your message, and answers to the host's questions such as meal choice or arrival date.",
+            "The reply you send: your name, your phone number if you give it, whether you are coming, how many people are coming, and your message.",
             "When your personal invitation link was first opened, so the host knows it reached you.",
           ],
         },

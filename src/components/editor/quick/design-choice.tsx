@@ -15,15 +15,24 @@ type Picked = { href: string; name: string };
  * invitation with every detail carried over, or this live invite in the new design, its
  * link and guests kept. Until then the row's links changed the live invite without saying,
  * and a design its package didn't cover was held back while the preview called it live.
- * A draft not yet live just takes the design, as before.
+ * A draft paid for and not yet live asks too (owner, 2026-11-03): taking the design in place
+ * left its package on the old design, so publishing asked for payment again. Any other
+ * draft just takes the design, as before.
  */
-export function DesignChoice({ live, children }: { live: boolean; children: ReactNode }) {
+export function DesignChoice({
+  ask,
+  children,
+}: {
+  /** What the open invite is, when another design should ask first. */
+  ask: "live" | "paid" | null;
+  children: ReactNode;
+}) {
   const { quickCopy } = useText(editorText);
   const router = useRouter();
   const [picked, setPicked] = useState<Picked | null>(null);
 
   const onClick = (event: MouseEvent<HTMLDivElement>) => {
-    if (!live || event.defaultPrevented || event.button !== 0) return;
+    if (!ask || event.defaultPrevented || event.button !== 0) return;
     // A new tab or window opens the page as it is
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     const link = (event.target as Element).closest<HTMLAnchorElement>(
@@ -63,7 +72,9 @@ export function DesignChoice({ live, children }: { live: boolean; children: Reac
               <CopyPlus aria-hidden className="mt-0.5 size-5 shrink-0 text-accent-text" />
               <span className="flex flex-col gap-1">
                 <span className="font-semibold">{quickCopy.pickNew}</span>
-                <span className="text-sm text-ink-muted">{quickCopy.pickNewBody}</span>
+                <span className="text-sm text-ink-muted">
+                  {ask === "paid" ? quickCopy.pickNewPaidBody : quickCopy.pickNewBody}
+                </span>
               </span>
             </button>
             <button
@@ -73,8 +84,12 @@ export function DesignChoice({ live, children }: { live: boolean; children: Reac
             >
               <Send aria-hidden className="mt-0.5 size-5 shrink-0 text-ink-muted" />
               <span className="flex flex-col gap-1">
-                <span className="font-semibold">{quickCopy.pickLive}</span>
-                <span className="text-sm text-ink-muted">{quickCopy.pickLiveBody}</span>
+                <span className="font-semibold">
+                  {ask === "paid" ? quickCopy.pickPaid : quickCopy.pickLive}
+                </span>
+                <span className="text-sm text-ink-muted">
+                  {ask === "paid" ? quickCopy.pickPaidBody : quickCopy.pickLiveBody}
+                </span>
               </span>
             </button>
           </div>
