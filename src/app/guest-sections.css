@@ -25,7 +25,7 @@
   box-shadow:
     0 0 0 3px var(--guest-cloth),
     0 0 0 5px var(--guest-gilt);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Save the date as a ticket: a stub and its counterfoil, torn along the dots */
