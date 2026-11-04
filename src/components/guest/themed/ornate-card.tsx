@@ -4,7 +4,7 @@ import type { GuestFunction } from "@/components/guest/guest-view";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/cn";
 import { functionArt } from "@/lib/events/function-art";
-import type { OrnateBox } from "@/lib/suites/event-boxes";
+import type { EventBox as OrnateBox } from "@/lib/suites/event-boxes";
 import type { GuestFlower } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
 import "@/app/event-cards.css";

@@ -17,6 +17,19 @@
   isolation: isolate;
 }
 
+/*
+ * A colour-card template has no painted theme, so its cards take the template's own card
+ * stock (stockStyle in templates/stock.ts): its gold, accent and ivory.
+ */
+.oc-plain {
+  --guest-gilt: var(--card-gold);
+  --guest-jewel: var(--card-accent);
+  --guest-cloth: var(--card-ivory);
+  --suite-ink: var(--card-ink);
+  --suite-ink-muted: var(--card-ink-muted);
+  --suite-accent-text: var(--card-accent-text);
+}
+
 /* The card itself: the theme's cloth with fine gilt lines inside its edge */
 .oc-card {
   background: var(--oc-cloth);

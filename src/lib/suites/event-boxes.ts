@@ -3,42 +3,23 @@ import type { GuestStyle } from "./guest-look";
 import { hash } from "./section-layouts";
 
 /*
- * The card each celebration's details sit in on the themed guest page (event-box.tsx,
- * ornate-card.tsx, event-cards.css). Palaces, processions and gardens hang their hours in
- * ornate cards (owner, 2026-11-04): a frame with a pearl jhalar and a gilt rod, a jharokha
- * window with its chhatri and bells, a mandap between pillars under a marigold garland, a
- * lotus with flowers in its corners, Kutch mirror-work with tassels, or a temple crest with
- * bells. A party keeps its tickets, stamps and gift tags. Each theme gets one of its
- * style's cards, picked from its id; colours stay the theme's own cloth, gilt and jewel.
+ * The card each celebration's details sit in on the guest page (ornate-card.tsx,
+ * event-cards.css), owner 2026-11-04: a frame with a pearl jhalar and a gilt rod, a
+ * jharokha window with latkans, a mandap between pillars under a garland of flowers, a
+ * soft card with flowers in its corners, Kutch mirror-work with tassels, or a gilt band
+ * with temple bells. Each style of page has its own few cards and each theme gets one,
+ * picked from its id; colours stay the theme's own cloth, gilt and jewel.
  */
 
 export const EVENT_BOXES = {
   palace: ["moti", "jharokha", "mandir"],
   procession: ["mandap", "shisha", "moti"],
   garden: ["kamal", "moti", "mandir"],
-  party: ["ticket", "stamp", "tag"],
+  party: ["kamal", "shisha", "moti"],
 } as const satisfies Record<GuestStyle, readonly string[]>;
 
-export type EventBox = (typeof EVENT_BOXES)[GuestStyle][number];
-
-/** The party's boxes; every other box is an ornate card with the hour's painting in it. */
-export type PartyBox = (typeof EVENT_BOXES)["party"][number];
-export type OrnateBox = Exclude<EventBox, PartyBox>;
-
 export const ORNATE_BOXES = ["moti", "jharokha", "mandir", "mandap", "shisha", "kamal"] as const;
-
-export function isOrnate(box: EventBox): box is OrnateBox {
-  return (ORNATE_BOXES as readonly string[]).includes(box);
-}
-
-/** How a party box's heading shows the celebration's name, number and date. */
-export type BoxHead = "seal" | "stub" | "number";
-
-export const BOX_HEADS: Record<PartyBox, BoxHead> = {
-  ticket: "stub",
-  stamp: "seal",
-  tag: "number",
-};
+export type EventBox = (typeof ORNATE_BOXES)[number];
 
 /** Stirs a hash's bits (MurmurHash3's finish), so the box doesn't follow the other layouts. */
 function stir(h: number): number {
@@ -51,4 +32,9 @@ function stir(h: number): number {
 export function eventBox(suite: SuiteId, style: GuestStyle): EventBox {
   const options = EVENT_BOXES[style];
   return options[stir(hash(`${suite}:box`)) % options.length]!;
+}
+
+/** The card for a colour-card template, which has no painted theme: picked from its id. */
+export function templateBox(templateId: string): EventBox {
+  return ORNATE_BOXES[stir(hash(`${templateId}:box`)) % ORNATE_BOXES.length]!;
 }
