@@ -4,14 +4,20 @@
  * when a page actually uses it, so unused fonts cost a few lines of CSS and nothing more.
  */
 
+@import "@fontsource/rozha-one/400.css";
 @import "@fontsource/playfair-display/400.css";
 @import "@fontsource/playfair-display/700.css";
 @import "@fontsource/playfair-display/400-italic.css";
 @import "@fontsource/playfair-display/700-italic.css";
 @import "@fontsource/cinzel/400.css";
 @import "@fontsource/cinzel/700.css";
+@import "@fontsource/cinzel/500.css";
+@import "@fontsource/cinzel/600.css";
 @import "@fontsource/cormorant-garamond/400.css";
 @import "@fontsource/cormorant-garamond/700.css";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/600.css";
+@import "@fontsource/cormorant-garamond/500-italic.css";
 @import "@fontsource/cormorant-garamond/400-italic.css";
 @import "@fontsource/cormorant-garamond/700-italic.css";
 @import "@fontsource/great-vibes/400.css";
@@ -24,16 +30,19 @@
 @import "@fontsource/kalam/700.css";
 @import "@fontsource/rasa/400.css";
 @import "@fontsource/rasa/700.css";
+@import "@fontsource/rasa/600.css";
 @import "@fontsource/rasa/400-italic.css";
 @import "@fontsource/rasa/700-italic.css";
 @import "@fontsource/mogra/400.css";
 @import "@fontsource/hind-vadodara/400.css";
 @import "@fontsource/hind-vadodara/700.css";
+@import "@fontsource/hind-vadodara/600.css";
 @import "@fontsource/tiro-bangla/400.css";
 @import "@fontsource/tiro-bangla/400-italic.css";
 @import "@fontsource/galada/400.css";
 @import "@fontsource/arima/400.css";
 @import "@fontsource/arima/700.css";
+@import "@fontsource/arima/600.css";
 @import "@fontsource/tiro-tamil/400.css";
 @import "@fontsource/tiro-tamil/400-italic.css";
 @import "@fontsource/alex-brush/400.css";
@@ -41,15 +50,19 @@
 @import "@fontsource/amita/700.css";
 @import "@fontsource/martel/400.css";
 @import "@fontsource/martel/700.css";
+@import "@fontsource/martel/600.css";
 @import "@fontsource/shrikhand/400.css";
 @import "@fontsource/farsan/400.css";
 @import "@fontsource/kumar-one/400.css";
 @import "@fontsource/baloo-bhai-2/400.css";
 @import "@fontsource/baloo-bhai-2/700.css";
+@import "@fontsource/baloo-bhai-2/600.css";
 @import "@fontsource/baloo-da-2/400.css";
 @import "@fontsource/baloo-da-2/700.css";
+@import "@fontsource/baloo-da-2/600.css";
 @import "@fontsource/atma/400.css";
 @import "@fontsource/atma/700.css";
 @import "@fontsource/catamaran/400.css";
 @import "@fontsource/catamaran/700.css";
+@import "@fontsource/catamaran/600.css";
 @import "@fontsource/meera-inimai/400.css";

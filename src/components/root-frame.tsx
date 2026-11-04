@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import "@fontsource-variable/fraunces/wght.css";
 import "@fontsource/noto-serif-devanagari/devanagari-500.css";
 // The lettering invitations keep (globals.css, [data-invitation]); a page downloads a face only when it shows it
-import "@fontsource/rozha-one";
+import "@fontsource/cormorant-garamond/600.css";
+import "@fontsource/cormorant-garamond/600-italic.css";
 import "@fontsource/tenor-sans";
 import "@fontsource-variable/karla";
 import "@fontsource-variable/karla/wght-italic.css";
