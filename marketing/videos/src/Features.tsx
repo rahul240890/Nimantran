@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { createContext, useContext, type CSSProperties, type ReactNode } from "react";
 import {
   AbsoluteFill,
   Html5Audio,
@@ -199,7 +199,11 @@ function usePhoneIn(delay = 4) {
   return { s, y: (1 - s) * 260, opacity: Math.min(1, s * 1.4) };
 }
 
+/** Set by a montage that writes its own words: the demos then leave out their headline and chip. */
+export const Bare = createContext(false);
+
 function Headline({ children, lang }: { children: ReactNode; lang: Lang }) {
+  if (useContext(Bare)) return null;
   return (
     <div style={{ position: "absolute", top: 150, left: 50, right: 50, textAlign: "center" }}>
       <Rise delay={2}>
@@ -232,6 +236,7 @@ function Chip({
   delay: number;
   top?: number;
 }) {
+  if (useContext(Bare)) return null;
   return (
     <div
       style={{
@@ -265,7 +270,7 @@ function Chip({
 }
 
 /** A slow, blurred painting behind everything, so each reel carries its design's colours. */
-function Backdrop({ src }: { src: string }) {
+export function Backdrop({ src }: { src: string }) {
   const frame = useCurrentFrame();
   const z = interpolate(frame, [0, DEMO], [1.15, 1.28], clamp);
   return (
@@ -293,7 +298,7 @@ function Backdrop({ src }: { src: string }) {
 }
 
 /** Gold specks drifting up: a little festive light in every reel. */
-function Sparkles({ count = 22, seed = 1 }: { count?: number; seed?: number }) {
+export function Sparkles({ count = 22, seed = 1 }: { count?: number; seed?: number }) {
   const frame = useCurrentFrame();
   return (
     <AbsoluteFill style={{ pointerEvents: "none" }}>
@@ -1556,7 +1561,7 @@ function GuestNamesDemo({ lang }: { lang: Lang }) {
 
 /* ---------- the reel ---------- */
 
-const DEMOS: Record<FeatureId, (p: { lang: Lang }) => ReactNode> = {
+export const DEMOS: Record<FeatureId, (p: { lang: Lang }) => ReactNode> = {
   language: LanguageDemo,
   free: FreeDemo,
   website: WebsiteDemo,
