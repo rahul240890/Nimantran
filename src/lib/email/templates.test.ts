@@ -26,8 +26,6 @@ const welcome = { features, signedBy: "Ved" };
 const withHelp: Brand = {
   ...brand,
   help: {
-    whatsappUrl: "https://wa.me/917228827010?text=Hi",
-    whatsappLabel: "+91 72288 27010",
     instagramUrl: "https://www.instagram.com/shubhinvitations.in/",
     instagramHandle: "@shubhinvitations.in",
   },
@@ -127,7 +125,8 @@ describe("emails", () => {
       ],
     });
     expect(email.html).toContain("Need help?");
-    expect(email.html).toContain("wa.me/917228827010");
+    expect(email.html).not.toContain("wa.me");
+    expect(email.html).toContain("hello@shubhinvitations.com");
     expect(email.text).toContain("Follow us on Instagram at @shubhinvitations.in");
     expect(email.text).toContain(
       "Grand, ₹1,500 more: https://shubhinvitations.com/invites/x/edition?plan=grand",

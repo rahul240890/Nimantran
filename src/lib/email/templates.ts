@@ -32,11 +32,8 @@ export type Brand = {
   help?: Help;
 };
 
-/** Help by email, WhatsApp chat and Instagram, each left out when it isn't set. */
+/** Help by email and Instagram message. */
 export type Help = {
-  /** A wa.me chat link with a message ready, and the number as people read it. */
-  whatsappUrl: string | null;
-  whatsappLabel: string | null;
   instagramUrl: string;
   /** "@shubhinvitations.in". */
   instagramHandle: string;
@@ -255,7 +252,7 @@ export function welcomeEmail(
     html: plainLayout(
       brand,
       "Your website, video and cards, all from one invitation.",
-      `${plainParagraph(greeting(name))}${plainParagraph(intro)}<ul style="margin:0 0 16px;padding-left:22px">${items}</ul><p style="margin:0 0 14px">Start your invitation: <a href="${escapeHtml(start)}" style="color:${color.accentText}">${escapeHtml(startLabel)}</a></p>${plainParagraph(help)}<p style="margin:20px 0 0">${escapeHtml(details.signedBy)}<br>${escapeHtml(brand.name)}</p>`,
+      `${plainParagraph(greeting(name))}${plainParagraph(intro)}<ul style="margin:0 0 16px;padding-left:22px">${items}</ul><p style="margin:0 0 14px">Try it free, no payment needed: <a href="${escapeHtml(start)}" style="color:${color.accentText}">${escapeHtml(startLabel)}</a></p>${plainParagraph(help)}<p style="margin:20px 0 0">${escapeHtml(details.signedBy)}<br>${escapeHtml(brand.name)}</p>`,
       why,
     ),
     text: [
@@ -265,7 +262,7 @@ export function welcomeEmail(
       "",
       ...details.features.map((feature) => `- ${feature.title}: ${feature.body}`),
       "",
-      `Start your invitation: ${start}`,
+      `Try it free, no payment needed: ${start}`,
       "",
       help,
       "",
@@ -333,9 +330,6 @@ function helpBlock(brand: Brand): string {
   const help = brand.help;
   if (!help) return "";
   const ways = [
-    help.whatsappUrl && help.whatsappLabel
-      ? `WhatsApp: <a href="${escapeHtml(help.whatsappUrl)}" style="color:${color.accentText}">${escapeHtml(help.whatsappLabel)}</a>`
-      : "",
     brand.contactEmail
       ? `Email: <a href="mailto:${escapeHtml(brand.contactEmail)}" style="color:${color.accentText}">${escapeHtml(brand.contactEmail)}</a>`
       : "",
@@ -348,9 +342,6 @@ function helpLines(brand: Brand): string[] {
   const help = brand.help;
   if (!help) return [];
   const ways = [
-    help.whatsappUrl && help.whatsappLabel
-      ? `WhatsApp ${help.whatsappLabel}: ${help.whatsappUrl}`
-      : null,
     brand.contactEmail ? `Email: ${brand.contactEmail}` : null,
     `Instagram: ${help.instagramHandle} ${help.instagramUrl}`,
   ].filter((line): line is string => Boolean(line));

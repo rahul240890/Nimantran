@@ -15,7 +15,6 @@ import { DESIGN_TIERS } from "@/lib/plans/design-tiers";
 import { getPricing } from "@/lib/plans/pricing";
 import { supportWhatsAppUrl } from "@/lib/publish/links";
 import { pagePath } from "@/lib/seo/paths";
-import { site } from "@/lib/site";
 import { faqPage } from "@/lib/seo/structured-data";
 import { cn } from "@/lib/cn";
 import { Block, PageHero, PublicShell, type Crumb } from "./public-page";
@@ -227,7 +226,7 @@ export function ContactPage({
       ["gstin", business.gstin],
     ] as const
   ).filter(([, value]) => value);
-  const whatsapp = supportWhatsAppUrl(business.phone || site.supportPhone, copy.whatsappText);
+  const whatsapp = supportWhatsAppUrl(business.phone, copy.whatsappText);
   return (
     <PublicShell
       locale={locale}

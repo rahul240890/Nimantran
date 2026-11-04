@@ -2,13 +2,11 @@ import "server-only";
 import type { User } from "@supabase/supabase-js";
 import { after } from "next/server";
 import { planCopy } from "@/content/editions";
-import { offersCopy } from "@/content/pages";
 import { authMode } from "@/lib/auth/mode";
 import { getBusiness } from "@/lib/payments/business";
 import { orderWithInvite } from "@/lib/payments/editions";
 import { PAID_PLAN_IDS, planRank, upgradePricePaise, type PaidPlanId } from "@/lib/plans/catalog";
-import { getPricing } from "@/lib/plans/pricing";
-import { supportWhatsAppUrl } from "@/lib/publish/links";
+import { parsePricing } from "@/lib/plans/pricing-schema";
 import { instagramHandle, site } from "@/lib/site";
 import { isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import { supabaseService } from "@/lib/supabase/service";
@@ -49,32 +47,65 @@ const brand = (): Brand => ({
 const SIGNED_BY = `${site.founder.split(" ")[0]}`;
 const WELCOME_FROM = `${SIGNED_BY} from ${site.name}`;
 
-/** The brand with every way to get help: the WhatsApp number from Admin, Business first. */
+/** The brand with the ways to get help: email and an Instagram message. */
 async function brandWithHelp(): Promise<Brand> {
-  const business = await getBusiness().catch(() => null);
-  const phone = business?.phone || site.supportPhone;
-  const digits = phone.replace(/\D/g, "").replace(/^0+/, "").slice(-10);
   return {
     ...brand(),
-    help: {
-      whatsappUrl: supportWhatsAppUrl(phone, `Hello ${site.name}, I need help with my invitation.`),
-      whatsappLabel: digits.length === 10 ? `+91 ${digits.slice(0, 5)} ${digits.slice(5)}` : null,
-      instagramUrl: site.social.instagram,
-      instagramHandle: instagramHandle(),
-    },
+    help: { instagramUrl: site.social.instagram, instagramHandle: instagramHandle() },
   };
 }
 
-/** The six things one invitation gives, from the first-visit popup. */
-const welcomeFeatures = () => offersCopy.welcome.features;
+/**
+ * What one invitation gives, in plain words, for the welcome: the first-visit popup's six
+ * and what people ask about most.
+ */
+export const WELCOME_FEATURES = [
+  {
+    title: "Your own invitation website",
+    body: "One link with every function, the place on a map, and a button for guests to say they're coming.",
+  },
+  {
+    title: "Choose your opening gate",
+    body: "Guests open a painted gate, like a real door, before your invitation appears.",
+  },
+  {
+    title: "Each guest's name on their invitation",
+    body: "Add your guests and every one gets their own invitation with their name on it.",
+  },
+  {
+    title: "Your lettering, style and symbol",
+    body: "Pick the writing style for the names, the look of the card, and the holy symbol at the top.",
+  },
+  {
+    title: "Videos for WhatsApp",
+    body: "A full-HD video of your invitation for WhatsApp Status and Reels.",
+  },
+  {
+    title: "Invitation cards",
+    body: "Painted cards to send on WhatsApp or print.",
+  },
+  {
+    title: "Your music and your language",
+    body: "A tune picked for your design or your own song, in six Indian languages or two on one card.",
+  },
+  {
+    title: "Show your family first",
+    body: "Send a preview to your family so they can check it before you pay.",
+  },
+  {
+    title: "Free to try",
+    body: "Make the whole invitation for free and see every part of it before you pay anything.",
+  },
+] as const;
 
-/** The same six, a few words each, for the reminder. */
+/** The same, a few words each, for the reminder. */
 const SHORT_FEATURES = [
-  "Invitation website with every function, map and replies",
-  "Videos for WhatsApp Status and Reels",
-  "Painted cards to share or print",
-  "Your music and your language",
-  "See it all free before you pay",
+  "Your own invitation website, with replies",
+  "A painted opening gate for your guests",
+  "Each guest's name on their invitation",
+  "Videos for WhatsApp Status and Reels, and painted cards",
+  "Your lettering, music and language",
+  "Show your family first, and see it all free before you pay",
 ] as const;
 
 function service() {
@@ -153,7 +184,7 @@ export function welcomeAfterSignIn(user: User) {
 
 /** The welcome: a plain note with what one invitation gives, signed by a person. */
 export async function welcomeFor(_seed: string, name: string): Promise<Email> {
-  return welcomeEmail(brand(), name, { features: welcomeFeatures(), signedBy: SIGNED_BY });
+  return welcomeEmail(brand(), name, { features: WELCOME_FEATURES, signedBy: SIGNED_BY });
 }
 
 /** The sender name the welcome goes out under. */
@@ -230,7 +261,17 @@ export async function upgradesAfter(
     design: string | null;
   },
 ): Promise<EmailUpgrade[]> {
-  const pricing = await getPricing();
+  // Read the admin's prices straight from the database, never the built-in defaults: if
+  // they can't be read, the receipt shows no packages rather than a wrong price
+  const db = supabaseService();
+  if (!db) return [];
+  const { data, error } = await db
+    .from("app_settings")
+    .select("value")
+    .eq("key", "pricing")
+    .maybeSingle();
+  if (error || !data?.value) return [];
+  const pricing = parsePricing(data.value);
   const have = planCopy[current.plan].name;
   return PAID_PLAN_IDS.filter((id) => planRank(id) > planRank(current.plan)).flatMap((id) => {
     const price = upgradePricePaise(current, id, current.tier, pricing);

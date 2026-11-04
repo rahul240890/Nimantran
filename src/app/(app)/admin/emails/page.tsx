@@ -26,7 +26,7 @@ export default async function EmailsPage() {
     {
       id: "welcome",
       title: "Welcome",
-      when: `Right after someone first signs in with an email address (Google), from "${welcomeFromName}". A plain note with the six things one invitation gives, as in the first-visit popup, and one link, so Gmail files it in Primary.`,
+      when: `Right after someone first signs in with an email address (Google), from "${welcomeFromName}". A plain note with what one invitation gives, in simple words, and one link, so Gmail files it in Primary.`,
       email: await welcomeFor(account.id, account.name),
     },
     {
@@ -42,7 +42,7 @@ export default async function EmailsPage() {
     {
       id: "receipt",
       title: "Receipt",
-      when: "Once a payment is recorded. With help by WhatsApp, email and Instagram, the ask to follow on Instagram, and the bigger packages they can move up to (none after Grand). This sample is a Basic purchase.",
+      when: "Once a payment is recorded. With help by email and Instagram message, the ask to follow on Instagram, and the bigger packages they can move up to at the differences set in Admin, Designs (none after Grand). This sample is a Basic purchase.",
       email: await sampleReceiptFor(account.name),
     },
     {
