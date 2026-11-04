@@ -102,6 +102,16 @@
   --prelude-water: #0c1a33;
   --prelude-fog: #dfe6ee;
 
+  /* What the guest is welcomed with as a tied gate opens (gate-reveal.tsx), both themes */
+  --reveal-brass-dark: #5c3a0c;
+  --reveal-brass: #d39a33;
+  --reveal-brass-light: #fff0b0;
+  --reveal-kumkum: #c4122f;
+  --reveal-rice: #fff8e6;
+  --reveal-flame: #ffcf5a;
+  --reveal-flame-core: #fff6d8;
+  --reveal-rose-water: #ffecf0;
+
   /* Design previews: each launch design has its own stock, the same in both themes */
   --tpl-rose-paper: #f7e4e2;
   --tpl-rose-ink: #4f1628;

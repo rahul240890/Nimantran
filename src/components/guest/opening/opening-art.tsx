@@ -624,14 +624,17 @@ export function OpeningArt({
   style,
   cover,
   sample,
+  rite,
 }: {
   style: OpeningStyle;
   cover?: string;
   /** A small tile in the editor: small files, loaded lazily. */
   sample?: boolean;
+  /** How a tied gate welcomes the guest behind its doors (catalog.ts, welcomeRite). */
+  rite?: "aarti" | "rose";
 }): ReactNode {
   if (isPaintedGate(style)) return <PaintedGateArt gate={style} sample={sample} />;
-  if (isTiedGate(style)) return <TiedGateArt gate={style} sample={sample} />;
+  if (isTiedGate(style)) return <TiedGateArt gate={style} sample={sample} rite={rite} />;
   if (isDepthOpening(style)) return <DepthOpeningArt opening={style} sample={sample} />;
   if (isBloomOpening(style)) return <BloomOpeningArt opening={style} sample={sample} />;
   if (isFreshOpening(style)) return <FreshOpeningArt id={style} sample={sample} />;

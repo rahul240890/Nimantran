@@ -24,6 +24,7 @@ import {
   openingNames,
   tiedBeyond,
   tiedSpec,
+  welcomeRite,
   welcomeScene,
   type OpeningGod,
   type OpeningStyle,
@@ -52,6 +53,8 @@ export const OPEN_MS = 1500 * OPENING_PACE;
  * fresh or themed opening takes as long, its painting going its own way.
  */
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
+/** A painted gate holds a little longer, as evening comes over the place (gate-reveal.tsx). */
+const PAINTED_OPEN_MS = 3000 * OPENING_PACE;
 /** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
 const TIED_OPEN_MS = 3200 * OPENING_PACE;
 /** A depth opening's three frames go by one after another (depth-openings.css). */
@@ -425,9 +428,11 @@ export function Opening({
             ? DEPTH_OPEN_MS
             : bloom
               ? BLOOM_OPEN_MS
-              : gate || fresh || themed
-                ? GATE_OPEN_MS
-                : OPEN_MS,
+              : gate
+                ? PAINTED_OPEN_MS
+                : fresh || themed
+                  ? GATE_OPEN_MS
+                  : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
   }, [open, pages, welcome, still, gate, tied, depth, bloom, fresh, themed]);
@@ -544,7 +549,7 @@ export function Opening({
         data-open={open}
         className="opening-stage [container-type:size] relative h-dvh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
-        <OpeningArt style={style} cover={cover} />
+        <OpeningArt style={style} cover={cover} rite={welcomeRite(god)} />
         {open && !still && <OpeningPetals />}
 
         <div className="absolute inset-0 z-30 flex flex-col">

@@ -1633,6 +1633,33 @@ export function designOpening(
 }
 
 /** The gods painted for us: the owner's own art from the blessing pages, shown whole. */
+/**
+ * How the guest is welcomed as a tied gate opens (gate-reveal.tsx): a family that set a
+ * Hindu or Jain god or symbol over the gate circles an aarti thali for its guest; every
+ * other family, and one that set none, sprinkles rose water, which belongs to no one faith.
+ */
+export function welcomeRite(god: OpeningGod | null): "aarti" | "rose" {
+  return god && AARTI_GODS.has(god) ? "aarti" : "rose";
+}
+const AARTI_GODS: ReadonlySet<string> = new Set([
+  "ganesha",
+  "ganesha-gold",
+  "lakshmi-ganesha",
+  "shrinathji",
+  "venkateswara",
+  "jagannath",
+  "om",
+  "kalash",
+  "swastik",
+  "diya",
+  "prajapati",
+  "suzhi",
+  "shri",
+  "shankh",
+  "kamal",
+  "jain",
+]);
+
 export const PAINTED_GODS = [
   "ganesha",
   "ganesha-gold",
