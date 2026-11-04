@@ -33,9 +33,9 @@ test("Trending and Best sellers come first, and every section is a grid ending i
   await wedding.scrollIntoViewIfNeeded();
   await expect(wedding).toHaveAttribute("data-layout", "grid");
   await expect(wedding.locator("article").first()).toBeVisible();
-  // 16 wedding designs then View all on every screen (owner, 2026-11-04)
+  // 24 wedding designs then View all on every screen (owner, 2026-11-04)
   const cells = wedding.locator("ul > li");
-  await expect(cells.filter({ visible: true })).toHaveCount(16 + 1);
+  await expect(cells.filter({ visible: true })).toHaveCount(24 + 1);
   // Trending and Best sellers show 10; no design shows twice on the page
   for (const id of ["home-trending", "home-bestsellers"]) {
     await designs.locator(`[data-shelf="${id}"]`).scrollIntoViewIfNeeded();

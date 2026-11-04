@@ -40,7 +40,7 @@ describe("home page sections", () => {
           wedding[2],
           birthday.find((id) => !wedding.includes(id)),
         ],
-        trending: Array.from({ length: 20 }, (_, i) => [...known][i]),
+        trending: Array.from({ length: 30 }, (_, i) => [...known][i]),
       },
     });
     // Known sections once each, in the saved order; the rest join after, on only if a default
