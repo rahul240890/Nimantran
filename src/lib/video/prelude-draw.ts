@@ -47,7 +47,7 @@ import {
   type TiedUndo,
   type WelcomeKind,
 } from "@/lib/opening/catalog";
-import { firstGrapheme } from "@/lib/initials";
+import { englishInitial } from "@/lib/initials";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { keepDate, lettering, type TypeRole } from "@/lib/suites/lettering";
 import type { CardCopy } from "@/lib/templates/content";
@@ -1816,8 +1816,8 @@ function drawNames(ctx: Ctx, film: PreludeFilm, top: number) {
   ctx.stroke();
   ctx.restore();
   const initials = joiner
-    ? `${firstGrapheme(copy.first.trim())}&${firstGrapheme(copy.second.trim())}`
-    : firstGrapheme(copy.first.trim());
+    ? `${englishInitial(copy.first)}&${englishInitial(copy.second)}`
+    : englishInitial(copy.first);
   const size = Math.min(6.5 * CQW, 1.9 * REM);
   lifted(ctx, () => {
     ctx.font = face(film, "names", size);

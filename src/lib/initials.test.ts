@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { initials, tintIndex } from "./initials";
+import { englishInitial, initials, tintIndex } from "./initials";
 
 describe("initials", () => {
   it("takes the first and last word", () => {
@@ -9,9 +9,25 @@ describe("initials", () => {
     expect(initials("")).toBe("");
   });
 
-  it("keeps Indic letters whole", () => {
-    // "रा" is ra plus a vowel sign; splitting it would show a broken glyph
-    expect(initials("अनन्या राव")).toBe("अरा");
+  it("is always in English letters, whatever the name's script", () => {
+    expect(initials("अनन्या राव")).toBe("AR");
+    expect(initials("राहुल शर्मा")).toBe("RS");
+  });
+});
+
+describe("englishInitial", () => {
+  it("takes the first English letter of the name as it is said", () => {
+    expect(englishInitial(" rahul")).toBe("R");
+    expect(englishInitial("Nita")).toBe("N");
+    expect(englishInitial("राहुल")).toBe("R");
+    expect(englishInitial("नीता")).toBe("N");
+    expect(englishInitial("आरव")).toBe("A");
+    expect(englishInitial("ज्ञान")).toBe("G");
+    expect(englishInitial("રાહુલ")).toBe("R");
+    expect(englishInitial("নীতা")).toBe("N");
+    expect(englishInitial("செந்தில்")).toBe("S");
+    expect(englishInitial("ਹਰਜੀਤ")).toBe("H");
+    expect(englishInitial("")).toBe("");
   });
 });
 
