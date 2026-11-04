@@ -134,6 +134,14 @@ function makeDrops(): Drop[] {
   });
 }
 
+/**
+ * Automated browsers skip the reveal, as they skip the prelude, so a test's timings don't
+ * hang on WebGL drawn in software; ?reveal=1 shows it to them, to review it.
+ */
+function skipped(): boolean {
+  return navigator.webdriver && new URLSearchParams(window.location.search).get("reveal") !== "1";
+}
+
 /** Whether the opening this layer sits in is open, following the stage's data-open. */
 function useStageOpen(ref: React.RefObject<HTMLElement | null>): boolean {
   const [open, setOpen] = useState(false);
@@ -158,7 +166,7 @@ export function GateRevealPlace({ src, kind }: { src: string; kind: RevealKind }
 
   useEffect(() => {
     const cv = canvas.current;
-    if (!open || still || !cv) return;
+    if (!open || still || !cv || skipped()) return;
     let alive = true;
     let raf = 0;
     const timers: number[] = [];
@@ -442,7 +450,7 @@ export function GateRevealOver({ kind }: { kind: "aarti" | "rose" }) {
 
   useEffect(() => {
     const cv = canvas.current;
-    if (!open || still || !cv) return;
+    if (!open || still || !cv || skipped()) return;
     const g = cv.getContext("2d");
     if (!g) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);

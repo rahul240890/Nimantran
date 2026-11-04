@@ -54,7 +54,7 @@ export const OPEN_MS = 1500 * OPENING_PACE;
  */
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
 /** A painted gate holds a little longer, as evening comes over the place (gate-reveal.tsx). */
-const PAINTED_OPEN_MS = 3000 * OPENING_PACE;
+const PAINTED_OPEN_MS = 2800 * OPENING_PACE;
 /** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
 const TIED_OPEN_MS = 3200 * OPENING_PACE;
 /** A depth opening's three frames go by one after another (depth-openings.css). */
