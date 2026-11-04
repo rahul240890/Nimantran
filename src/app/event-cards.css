@@ -1,8 +1,7 @@
 /*
  * The ornate event cards on the themed guest page (ornate-card.tsx, event-boxes.ts): a
- * pearl jhalar on a gilt rod, a jharokha under its chhatri, a mandap between pillars, a
- * lotus over flowered corners, Kutch mirror-work with tassels, and a temple crest with
- * bells. Each is drawn from the theme's own cloth, gilt and jewel (--guest-* in
+ * pearl jhalar on a gilt rod, a jharokha in jaali, a mandap between pillars, a card with
+ * flowered corners, Kutch mirror-work with tassels, and a gilt band with temple bells. Each is drawn from the theme's own cloth, gilt and jewel (--guest-* in
  * globals.css), and makes its own entrance once it scrolls into view.
  */
 
@@ -32,29 +31,11 @@
   box-shadow: var(--oc-shadow);
 }
 
-/* The hour's painting in its small frame, and the gilt rule under the name */
+/* The celebration's painting, one object on a clear ground, and the gilt rule under the name */
 .oc-art {
-  width: min(60%, 12rem);
+  width: min(48%, 10rem);
   aspect-ratio: 1;
-  overflow: hidden;
-  border-radius: 50% 50% 0.6rem 0.6rem / 42% 42% 0.6rem 0.6rem;
-  box-shadow:
-    0 0 0 3px var(--oc-cloth),
-    0 0 0 4.5px var(--oc-gilt),
-    0 0 0 7px var(--oc-cloth),
-    0 0 0 8px color-mix(in oklab, var(--oc-gilt) 60%, transparent),
-    0 16px 22px -14px rgb(0 0 0 / 0.5);
-}
-.oc[data-box="kamal"] .oc-art {
-  border-radius: 50%;
-}
-.oc[data-box="shisha"] .oc-art {
-  width: min(50%, 10rem);
-  aspect-ratio: 1;
-  border-radius: 50%;
-}
-.oc[data-box="mandap"] .oc-art {
-  border-radius: 0.5rem;
+  filter: drop-shadow(0 10px 12px rgb(0 0 0 / 0.22));
 }
 .oc-rule {
   position: relative;
@@ -246,10 +227,10 @@
   inset-inline-start: 0.2rem;
 }
 
-/* Jharokha: an arched window in a band of jaali, under its chhatri, latkans at its sides */
+/* Jharokha: an arched window in a band of jaali, latkans at its sides */
 .oc[data-box="jharokha"] {
   padding-inline: 1.5rem;
-  margin-top: 3.5rem;
+  margin-top: 1.25rem;
 }
 .oc[data-box="jharokha"] .oc-band {
   padding: 0.55rem;
@@ -262,7 +243,7 @@
     var(--oc-shadow);
 }
 .oc[data-box="jharokha"] .oc-card {
-  padding-top: 3.5rem;
+  padding-top: 3rem;
   border-radius: 50% 50% 0.8rem 0.8rem / 8rem 8rem 0.8rem 0.8rem;
   box-shadow:
     0 0 0 1.5px var(--oc-gilt),
@@ -325,15 +306,15 @@
   inset-inline-end: 0.15rem;
 }
 
-/* Kamal: a soft cloth card, a lotus crest and flowers gathered in every corner */
+/* Kamal: a soft cloth card with flowers gathered in every corner */
 .oc[data-box="kamal"] {
-  margin-top: 3rem;
+  margin-top: 1rem;
 }
 .oc[data-box="kamal"] .oc-band {
   border-radius: 2.25rem;
 }
 .oc[data-box="kamal"] .oc-card {
-  padding-top: 3rem;
+  padding-top: 2.5rem;
   border-radius: 2.25rem;
   background:
     radial-gradient(
@@ -381,9 +362,9 @@
   width: calc(100% - 2.6rem);
 }
 
-/* Mandir: a gilt band, a gopuram crest, rows of kolam dots and temple bells below */
+/* Mandir: a gilt band, rows of kolam dots and temple bells below */
 .oc[data-box="mandir"] {
-  margin-top: 3.25rem;
+  margin-top: 1rem;
 }
 .oc[data-box="mandir"] .oc-band {
   padding: 0.4rem;
@@ -396,7 +377,7 @@
   );
 }
 .oc[data-box="mandir"] .oc-card {
-  padding-top: 3.25rem;
+  padding-top: 2.5rem;
   padding-bottom: 2.75rem;
   border-radius: 0.5rem;
   box-shadow:
@@ -432,12 +413,16 @@
     .guest-reveal[data-reveal="in"]:has(> .oc) {
       animation: oc-fade 500ms ease-out backwards;
     }
-    [data-reveal="wait"] .oc :is(.oc-band, .oc-hang, .oc-crest, .oc-rod, .oc-gem) {
+    [data-reveal="wait"] .oc :is(.oc-band, .oc-hang, .oc-rod, .oc-gem) {
       opacity: 0;
     }
 
     /* The words inside arrive one after another */
-    [data-reveal="in"] .oc :is(.oc-art, .oc-line) {
+    /* The celebration's painting sets down with a little bounce */
+    [data-reveal="in"] .oc .oc-art {
+      animation: oc-set 900ms cubic-bezier(0.3, 1.5, 0.5, 1) 450ms backwards;
+    }
+    [data-reveal="in"] .oc .oc-line {
       animation: oc-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
       animation-delay: 450ms;
     }
@@ -489,13 +474,10 @@
       }
     }
 
-    /* Jharokha: the window opens from the middle, the chhatri settles, the latkans swing */
+    /* Jharokha: the window opens from the middle, the latkans swing */
     [data-reveal="in"] .oc[data-box="jharokha"] {
       .oc-band {
         animation: oc-open 1100ms cubic-bezier(0.6, 0, 0.2, 1) backwards;
-      }
-      .oc-crest {
-        animation: oc-settle 800ms cubic-bezier(0.3, 1.4, 0.5, 1) 500ms backwards;
       }
       .oc-hang {
         animation: oc-fade 600ms ease-out 700ms backwards;
@@ -523,16 +505,10 @@
       }
     }
 
-    /* Kamal: the card floats up, the lotus opens petal by petal, the corners bloom */
+    /* Kamal: the card floats up and the corners bloom */
     [data-reveal="in"] .oc[data-box="kamal"] {
       .oc-band {
         animation: oc-float 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-      }
-      .oc-petal {
-        transform-box: view-box;
-        transform-origin: 60px 58px;
-        animation: oc-petal 800ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards;
-        animation-delay: calc(500ms + var(--i) * 110ms);
       }
       .oc-posy .oc-bloom {
         transform-box: fill-box;
@@ -575,13 +551,10 @@
       }
     }
 
-    /* Mandir: the gopuram rises, the card follows, and the bells ring one after another */
+    /* Mandir: the card rises and the bells ring one after another */
     [data-reveal="in"] .oc[data-box="mandir"] {
       .oc-band {
         animation: oc-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
-      }
-      .oc-crest {
-        animation: oc-settle 800ms cubic-bezier(0.3, 1.4, 0.5, 1) 350ms backwards;
       }
       .oc-bell {
         animation:
@@ -665,22 +638,17 @@
     clip-path: inset(-10% -10% -10% -10%);
   }
 }
-@keyframes oc-settle {
+@keyframes oc-set {
   from {
     opacity: 0;
-    transform: translateY(-1.5rem);
+    scale: 0.6;
+    translate: 0 -0.75rem;
   }
 }
 @keyframes oc-garland {
   from {
     opacity: 0;
     transform: translateY(-2rem) scale(1, 0.6);
-  }
-}
-@keyframes oc-petal {
-  from {
-    opacity: 0;
-    scale: 0.2;
   }
 }
 @keyframes oc-unfurl {

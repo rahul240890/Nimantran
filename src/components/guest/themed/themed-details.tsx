@@ -620,7 +620,7 @@ function Celebrations({
             const image = images[art] ?? images.cover;
             const headingId = `fn-${fn.kind}`;
             const overlay = layouts.hours === "overlay" && Boolean(image);
-            // An ornate card frames the hour's painting itself, at its top
+            // An ornate card carries its own painting, so the hour's isn't hung beside it
             const inCard = ornate && !overlay;
             // Zigzag: every other hour sets its painting on the far side
             const flipped = layouts.hours === "zigzag" && index % 2 === 1;
@@ -677,7 +677,6 @@ function Celebrations({
                     count={functions.length}
                     lang={lang}
                     headingId={headingId}
-                    art={inCard ? image : null}
                     flower={look.flower}
                     second={look.secondFlower}
                   />

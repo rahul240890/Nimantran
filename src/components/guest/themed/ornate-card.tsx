@@ -3,22 +3,24 @@ import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import { Image } from "@/components/ui/image";
 import { cn } from "@/lib/cn";
+import { functionArt } from "@/lib/events/function-art";
 import type { OrnateBox } from "@/lib/suites/event-boxes";
 import type { GuestFlower } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
 import "@/app/event-cards.css";
 
 /**
- * One celebration as an ornate card (owner, 2026-11-04): the hour's painting in a small
- * frame at the top, the name, the day and time, the venue and a pill to the map, all in a
+ * One celebration as an ornate card (owner, 2026-11-04): the celebration's own painting
+ * at the top (a haldi urli, mehendi cones, a dholak: function-art.ts), the name, the day
+ * and time, the venue and a pill to the map, all in a
  * decorated frame the theme hangs its own way (event-boxes.ts):
  *
  * - moti: a lace-cornered frame on a gilt rod, a pearl jhalar swaying below
- * - jharokha: an arched window under a chhatri, latkans hanging at its sides
+ * - jharokha: an arched window in jaali, latkans hanging at its sides
  * - mandap: between two pillars with kalash tops, a garland of the theme's flowers above
- * - kamal: a lotus crest opening over flowers gathered in each corner
+ * - kamal: a soft card with flowers gathered in each corner
  * - shisha: Kutch mirror-work round the edge, tassels hanging below
- * - mandir: a gopuram crest, a kolam border and temple bells that ring as it arrives
+ * - mandir: a gilt band, a kolam border and temple bells that ring as it arrives
  *
  * Everything is drawn from the theme's cloth, gilt and jewel (event-cards.css), so each
  * theme dresses its cards in its own colours. Each card makes its own entrance once it
@@ -30,7 +32,6 @@ export function OrnateCard({
   index,
   count,
   headingId,
-  art,
   flower,
   second,
   className,
@@ -40,8 +41,6 @@ export function OrnateCard({
   index: number;
   count: number;
   headingId: string;
-  /** The hour's painting, framed at the top of the card; none when it fills the screen behind. */
-  art: string | null;
   flower: GuestFlower;
   second: GuestFlower;
   className?: string;
@@ -78,18 +77,16 @@ export function OrnateCard({
           {(box === "moti" || box === "kamal") && (
             <Posies flower={flower} second={second} top={box === "kamal"} />
           )}
-          {art && (
-            <span aria-hidden className="oc-art relative mb-5 block">
-              <Image
-                src={art}
-                alt=""
-                fill
-                unoptimized
-                sizes="13rem"
-                className="object-cover object-[50%_88%]"
-              />
-            </span>
-          )}
+          <span aria-hidden className="oc-art relative mb-3 block">
+            <Image
+              src={functionArt(fn.kind)}
+              alt=""
+              fill
+              unoptimized
+              sizes="10rem"
+              className="object-contain"
+            />
+          </span>
           {count > 1 && (
             <p
               aria-hidden
@@ -145,94 +142,6 @@ function Gem({ bottom = false }: { bottom?: boolean }) {
   );
 }
 
-/** A chhatri: a dome on its plinth, a finial and two small pinnacles. */
-function Chhatri() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 140 74"
-      className="oc-crest pointer-events-none absolute bottom-[calc(100%-1.75rem)] left-1/2 z-[2] h-[4.6rem] w-[8.75rem] -translate-x-1/2"
-    >
-      <path d="M60 12h20M70 2v14" className="oc-gilt-line" />
-      <circle cx="70" cy="4" r="3" className="oc-gilt" />
-      <circle cx="70" cy="11" r="2.4" className="oc-gilt" />
-      <path d="M38 60C38 38 52 22 70 17C88 22 102 38 102 60Z" className="oc-cloth oc-gilt-edge" />
-      <path d="M48 60C48 42 58 29 70 24C82 29 92 42 92 60" className="oc-jewel-line" />
-      <path d="M58 60C58 46 63 35 70 31C77 35 82 46 82 60" className="oc-jewel-line" />
-      <rect x="26" y="58" width="88" height="8" rx="2" className="oc-gilt" />
-      <path d="M14 74V62L20 54L26 62V74ZM114 74V62L120 54L126 62V74Z" className="oc-gilt" />
-      <rect x="6" y="66" width="128" height="8" rx="2" className="oc-deep" />
-      {[18, 34, 50, 70, 90, 106, 122].map((x) => (
-        <circle key={x} cx={x} cy="70" r="1.6" className="oc-pearl" />
-      ))}
-    </svg>
-  );
-}
-
-/** A lotus opening over the card, petal by petal. */
-function Lotus() {
-  const petals = [-72, -48, -24, 0, 24, 48, 72];
-  return (
-    <svg
-      aria-hidden
-      viewBox="-60 -58 120 64"
-      className="oc-crest oc-lotus pointer-events-none absolute bottom-[calc(100%-1.9rem)] left-1/2 z-[2] h-[4.4rem] w-[8.25rem] -translate-x-1/2 overflow-visible"
-    >
-      {petals.map((turn, i) => (
-        <g key={turn} className="oc-petal" style={{ "--i": Math.abs(i - 3) } as CSSProperties}>
-          <path
-            d="M0 0C-11 -12 -10 -34 0 -48C10 -34 11 -12 0 0Z"
-            transform={`rotate(${turn})`}
-            className={cn(i % 2 === 0 ? "oc-jewel" : "oc-cloth", "oc-gilt-edge")}
-          />
-        </g>
-      ))}
-      <path d="M-56 2Q0 -10 56 2Z" className="oc-gilt" />
-      <circle r="5" cy="-6" className="oc-gilt" />
-    </svg>
-  );
-}
-
-/** A gopuram: stepped tiers under a barrel roof with three kalash finials. */
-function Gopuram() {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 150 76"
-      className="oc-crest pointer-events-none absolute bottom-[calc(100%-1.6rem)] left-1/2 z-[2] h-[4.75rem] w-[9.4rem] -translate-x-1/2"
-    >
-      {[
-        [8, 64, 134],
-        [22, 52, 106],
-        [36, 40, 78],
-        [48, 28, 54],
-      ].map(([x, y, w], i) => (
-        <g key={i}>
-          <rect x={x} y={y} width={w} height="12" rx="1.5" className="oc-cloth oc-gilt-edge" />
-          {Array.from({ length: Math.floor(w! / 13) }, (_, j) => (
-            <rect
-              key={j}
-              x={x! + 5 + j * 13}
-              y={y! + 3}
-              width="6"
-              height="7"
-              rx="3"
-              className="oc-jewel"
-            />
-          ))}
-        </g>
-      ))}
-      <path d="M50 28C50 16 60 11 75 11C90 11 100 16 100 28Z" className="oc-gilt" />
-      {[58, 75, 92].map((x) => (
-        <g key={x}>
-          <path d={`M${x} 12v-6`} className="oc-gilt-line" />
-          <ellipse cx={x} cy="5" rx="2.6" ry="3.4" className="oc-gilt" />
-        </g>
-      ))}
-    </svg>
-  );
-}
-
 /** A strip of mirror-work pennants along the top of the shisha card. */
 function Pennants() {
   return (
@@ -255,11 +164,11 @@ function Pennants() {
 
 const CRESTS: Record<OrnateBox, ReactNode> = {
   moti: <Gem />,
-  jharokha: <Chhatri />,
+  jharokha: null,
   mandap: null,
-  kamal: <Lotus />,
+  kamal: null,
   shisha: <Pennants />,
-  mandir: <Gopuram />,
+  mandir: null,
 };
 
 /* ---------- Inside the card ---------- */

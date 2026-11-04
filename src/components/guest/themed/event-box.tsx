@@ -22,7 +22,6 @@ export function EventBox({
   count,
   lang,
   headingId,
-  art = null,
   flower,
   second,
   className,
@@ -35,8 +34,6 @@ export function EventBox({
   count: number;
   lang: CardLanguage;
   headingId: string;
-  /** The hour's painting, which an ornate card frames at its top. */
-  art?: string | null;
   /** The theme's flowers, for an ornate card's garlands and corners. */
   flower: GuestFlower;
   second: GuestFlower;
@@ -50,7 +47,6 @@ export function EventBox({
         index={index}
         count={count}
         headingId={headingId}
-        art={art}
         flower={flower}
         second={second}
         className={className}
