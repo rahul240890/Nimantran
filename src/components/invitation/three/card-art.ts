@@ -29,7 +29,7 @@ const FINISH: Record<Paint, string> = {
 };
 
 export const FONTS = {
-  display: '"Rozha One", Georgia, serif',
+  display: '"Cormorant Garamond", "Tiro Devanagari Hindi", Georgia, serif',
   label: '"Tenor Sans", "Trebuchet MS", sans-serif',
   sans: '"Karla Variable", Karla, system-ui, sans-serif',
 } as const;
@@ -39,8 +39,8 @@ export async function loadCardFonts(copy: CardCopy): Promise<void> {
   if (typeof document === "undefined" || !document.fonts) return;
   const text = Object.values(copy).flat().join(" ");
   await Promise.all([
-    document.fonts.load(`64px ${FONTS.display}`, text),
-    document.fonts.load(`italic 64px ${FONTS.display}`, text),
+    document.fonts.load(`600 64px ${FONTS.display}`, text),
+    document.fonts.load(`italic 600 64px ${FONTS.display}`, text),
     document.fonts.load(`32px ${FONTS.label}`, text),
     document.fonts.load(`italic 32px ${FONTS.sans}`, text),
   ]).catch(() => undefined);
@@ -176,7 +176,9 @@ function drawLayers(p: Painter, stock: ResolvedStock, layers: readonly Layer[], 
 }
 
 function fontString(run: TextRun, px: number) {
-  return `${run.italic ? "italic " : ""}${Math.round(px)}px ${FONTS[run.font]}`;
+  // The names' face at semi-bold, like the guest page's headings (globals.css)
+  const weight = run.font === "display" ? "600 " : "";
+  return `${run.italic ? "italic " : ""}${weight}${Math.round(px)}px ${FONTS[run.font]}`;
 }
 
 /** Writes a laid-out run of words, shrinking it if the real text runs wider than planned. */

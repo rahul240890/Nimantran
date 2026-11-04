@@ -1122,7 +1122,7 @@ function Dusk({
                   </dt>
                   <FamilyWords
                     block={block}
-                    className="font-display text-xl text-ink"
+                    className="font-display text-2xl text-ink"
                     soft="text-ink-muted"
                   />
                 </div>

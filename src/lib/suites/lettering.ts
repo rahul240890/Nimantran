@@ -42,14 +42,15 @@ const RASA = face("Rasa", SERIF, 1.06);
 
 export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>> = {
   // Palaces, courtyards and crafts: a high-contrast serif for the names, inscriptional
-  // capitals for the headings, Rozha One's strong strokes for Devanagari names
+  // capitals for the headings, Tiro's printed strokes for Devanagari names. Every voice
+  // sets its bold faces at semi-bold, never 700 (owner, 2026-11-04: lighter, less crowded)
   regal: {
     names: {
       latin: face("Playfair Display"),
-      devanagari: face("Rozha One"),
-      gujarati: face("Rasa", SERIF, 1.06, 700),
+      devanagari: TIRO_HINDI,
+      gujarati: face("Rasa", SERIF, 1.06, 600),
       bengali: TIRO_BANGLA,
-      tamil: face("Arima", SERIF, 1, 700),
+      tamil: face("Arima", SERIF, 1, 600),
     },
     words: {
       latin: face("Marcellus"),
@@ -59,9 +60,9 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
       tamil: TIRO_TAMIL,
     },
     label: {
-      latin: face("Cinzel", SERIF, 1, 700),
+      latin: face("Cinzel", SERIF, 1, 500),
       devanagari: TIRO_HINDI,
-      gujarati: face("Rasa", SERIF, 1.06, 700),
+      gujarati: face("Rasa", SERIF, 1.06, 600),
       bengali: TIRO_BANGLA,
       tamil: TIRO_TAMIL,
     },
@@ -71,13 +72,13 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
   romantic: {
     names: {
       latin: face("Great Vibes", "cursive", 1.32),
-      devanagari: face("Amita", "cursive", 1, 700),
-      gujarati: face("Rasa", SERIF, 1.06, 700),
+      devanagari: face("Amita", "cursive"),
+      gujarati: face("Rasa", SERIF, 1.06, 600),
       bengali: face("Galada", SERIF, 1.04),
-      tamil: face("Arima", SERIF, 1, 700),
+      tamil: face("Arima", SERIF, 1, 600),
     },
     words: {
-      latin: face("Cormorant Garamond", SERIF, 1.14, 700),
+      latin: face("Cormorant Garamond", SERIF, 1.14, 500),
       devanagari: TIRO_HINDI,
       gujarati: RASA,
       bengali: TIRO_BANGLA,
@@ -86,7 +87,7 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
     label: {
       latin: face("Cinzel", SERIF, 0.96),
       devanagari: TIRO_HINDI,
-      gujarati: face("Rasa", SERIF, 1.06, 700),
+      gujarati: face("Rasa", SERIF, 1.06, 600),
       bengali: TIRO_BANGLA,
       tamil: TIRO_TAMIL,
     },
@@ -94,11 +95,11 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
   // Art deco, night skies and paper-cut: tall roman capitals and clean reading faces
   modern: {
     names: {
-      latin: face("Cinzel", SERIF, 0.92, 700),
-      devanagari: face("Martel", SERIF, 1, 700),
-      gujarati: face("Hind Vadodara", SANS, 1.06, 700),
-      bengali: face("Baloo Da 2", SANS, 1, 700),
-      tamil: face("Catamaran", SANS, 1, 700),
+      latin: face("Cinzel", SERIF, 0.92, 600),
+      devanagari: face("Martel", SERIF, 1, 600),
+      gujarati: face("Hind Vadodara", SANS, 1.06, 600),
+      bengali: face("Baloo Da 2", SANS, 1, 600),
+      tamil: face("Catamaran", SANS, 1, 600),
     },
     words: {
       latin: face("Marcellus"),
@@ -109,20 +110,20 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
     },
     label: {
       latin: face("Marcellus"),
-      devanagari: face("Martel", SERIF, 1, 700),
-      gujarati: face("Hind Vadodara", SANS, 1.06, 700),
-      bengali: face("Baloo Da 2", SANS, 1, 700),
-      tamil: face("Catamaran", SANS, 1, 700),
+      devanagari: face("Martel", SERIF, 1, 600),
+      gujarati: face("Hind Vadodara", SANS, 1.06, 600),
+      bengali: face("Baloo Da 2", SANS, 1, 600),
+      tamil: face("Catamaran", SANS, 1, 600),
     },
   },
   // Birthdays and baby showers: round, friendly letters in every script
   playful: {
     names: {
-      latin: face("Baloo Bhai 2", SANS, 1, 700),
+      latin: face("Baloo Bhai 2", SANS, 1, 600),
       devanagari: face("Yatra One"),
-      gujarati: face("Baloo Bhai 2", SANS, 1.04, 700),
-      bengali: face("Baloo Da 2", SANS, 1, 700),
-      tamil: face("Catamaran", SANS, 1, 700),
+      gujarati: face("Baloo Bhai 2", SANS, 1.04, 600),
+      bengali: face("Baloo Da 2", SANS, 1, 600),
+      tamil: face("Catamaran", SANS, 1, 600),
     },
     words: {
       latin: face("Baloo Bhai 2", SANS),
@@ -132,11 +133,11 @@ export const VOICES: Record<Voice, Record<Face, Record<FontScript, FaceChoice>>>
       tamil: face("Catamaran", SANS),
     },
     label: {
-      latin: face("Baloo Bhai 2", SANS, 1, 700),
-      devanagari: face("Martel", SERIF, 1, 700),
-      gujarati: face("Baloo Bhai 2", SANS, 1.04, 700),
-      bengali: face("Baloo Da 2", SANS, 1, 700),
-      tamil: face("Catamaran", SANS, 1, 700),
+      latin: face("Baloo Bhai 2", SANS, 1, 600),
+      devanagari: face("Martel", SERIF, 1, 600),
+      gujarati: face("Baloo Bhai 2", SANS, 1.04, 600),
+      bengali: face("Baloo Da 2", SANS, 1, 600),
+      tamil: face("Catamaran", SANS, 1, 600),
     },
   },
 };

@@ -63,7 +63,7 @@ const colourGroups: { title: string; swatches: Swatch[] }[] = [
 
 const typeScale = [
   {
-    label: "Display · Rozha One",
+    label: "Display · Cormorant Garamond",
     className: "font-display text-5xl leading-[1.05] sm:text-6xl",
     text: "Aarav & Meera",
   },
@@ -195,7 +195,10 @@ export function Foundations() {
         </div>
       </Specimen>
 
-      <Specimen title="Type" note="Rozha One for names, Karla for reading, Tenor Sans for labels">
+      <Specimen
+        title="Type"
+        note="Cormorant Garamond for names, Karla for reading, Tenor Sans for labels"
+      >
         <dl className="flex flex-col divide-y divide-line">
           {typeScale.map((row) => (
             <div
