@@ -9,6 +9,15 @@ import type { Email } from "./templates";
 
 export const DEFAULT_FROM = "Shubh Invitation <hello@shubhinvitations.com>";
 
+/**
+ * The sender with another name in front of the same address: "Ved from Shubh Invitation
+ * <hello@…>" for the welcome, which reads like a note from a person.
+ */
+export function senderNamed(name: string, from = process.env.EMAIL_FROM?.trim() || DEFAULT_FROM) {
+  const address = from.match(/<([^>]+)>/)?.[1] ?? from;
+  return `${name.replace(/[<>"]/g, "")} <${address}>`;
+}
+
 export const emailConfigured = () => Boolean(process.env.RESEND_API_KEY?.trim());
 
 export type SendResult = { ok: true; id: string | null } | { ok: false; reason: string };
@@ -16,7 +25,7 @@ export type SendResult = { ok: true; id: string | null } | { ok: false; reason: 
 export async function sendEmail(
   to: string | string[],
   email: Email,
-  options: { idempotencyKey: string; headers?: Record<string, string> },
+  options: { idempotencyKey: string; headers?: Record<string, string>; fromName?: string },
 ): Promise<SendResult> {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key) return { ok: false, reason: "not-configured" };
@@ -31,7 +40,9 @@ export async function sendEmail(
         "Idempotency-Key": options.idempotencyKey,
       },
       body: JSON.stringify({
-        from: process.env.EMAIL_FROM?.trim() || DEFAULT_FROM,
+        from: options.fromName
+          ? senderNamed(options.fromName)
+          : process.env.EMAIL_FROM?.trim() || DEFAULT_FROM,
         to: Array.isArray(to) ? to : [to],
         subject: email.subject,
         html: email.html,

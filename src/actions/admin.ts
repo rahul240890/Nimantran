@@ -4,7 +4,13 @@ import { revalidatePath, revalidateTag } from "next/cache";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { getAdmin } from "@/lib/admin/access";
-import { discoverFor, welcomeFor } from "@/lib/email/notify";
+import {
+  discoverFor,
+  sampleReceiptFor,
+  sampleReminderFor,
+  welcomeFor,
+  welcomeFromName,
+} from "@/lib/email/notify";
 import { emailConfigured, sendEmail } from "@/lib/email/send";
 import { stopUrl } from "@/lib/email/stop-link";
 import { site } from "@/lib/site";
@@ -279,7 +285,7 @@ export async function saveHomeSectionsSettings(input: unknown): Promise<boolean 
 
 export type TestEmailResult = "sent" | "invalid" | "not-configured" | "failed";
 
-/** Sends the welcome and the new-designs email, as a new account gets them, to one address. */
+/** Sends every email people get, as this account would get them, to one address. */
 export async function sendTestEmails(to: unknown): Promise<TestEmailResult | null> {
   const admin = await getAdmin();
   if (!admin) return null;
@@ -291,16 +297,19 @@ export async function sendTestEmails(to: unknown): Promise<TestEmailResult | nul
   if (!emailConfigured()) return "not-configured";
   const { account } = admin;
   const secret = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+  const stop = stopUrl(site.url, secret, account.id);
   const emails = [
-    await welcomeFor(account.id, account.name),
-    await discoverFor(account.id, account.name, null, stopUrl(site.url, secret, account.id)),
+    { email: await welcomeFor(account.id, account.name), fromName: welcomeFromName },
+    { email: await sampleReminderFor(account.id, account.name, stop) },
+    { email: await sampleReceiptFor(account.name) },
+    { email: await discoverFor(account.id, account.name, null, stop) },
   ];
   const results = await Promise.all(
-    emails.map((email) =>
+    emails.map(({ email, fromName }) =>
       sendEmail(
         address.data,
         { ...email, subject: `[Test] ${email.subject}` },
-        { idempotencyKey: `test-${randomUUID()}` },
+        { idempotencyKey: `test-${randomUUID()}`, fromName },
       ),
     ),
   );

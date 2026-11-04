@@ -6,7 +6,7 @@ import { pagesText } from "@/i18n/copy/pages";
 import { designHref, paintedDesign, suiteOccasion } from "@/lib/gallery/catalog";
 import { pickNewSuites } from "@/lib/gallery/new-designs";
 import { siteOffers, type SiteOffer } from "@/lib/payments/coupons";
-import { suitePreview } from "@/lib/suites/catalog";
+import { suitePreview, type SuiteId } from "@/lib/suites/catalog";
 import type { EmailDesign, EmailOffer } from "./templates";
 
 /*
@@ -54,15 +54,19 @@ export async function emailOffers(
 /** New painted designs, a different few for each person (seeded by their account). */
 export function emailDesigns(siteUrl: string, seed: string, count: number): EmailDesign[] {
   return pickNewSuites(seed, count).flatMap((suite) => {
-    const image = suitePreview(suite);
-    if (!image) return [];
-    const design = paintedDesign(suite);
-    return [
-      {
-        name: designWords(design, "en").name,
-        image: absolute(siteUrl, image),
-        href: absolute(siteUrl, designHref(design, { category: suiteOccasion(suite) })),
-      },
-    ];
+    const design = emailDesign(siteUrl, suite);
+    return design ? [design] : [];
   });
+}
+
+/** One painted design as an email shows it, opening at href when given (their own invite). */
+export function emailDesign(siteUrl: string, suite: SuiteId, href?: string): EmailDesign | null {
+  const image = suitePreview(suite);
+  if (!image) return null;
+  const design = paintedDesign(suite);
+  return {
+    name: designWords(design, "en").name,
+    image: absolute(siteUrl, image),
+    href: href ?? absolute(siteUrl, designHref(design, { category: suiteOccasion(suite) })),
+  };
 }
