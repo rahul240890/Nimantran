@@ -3,6 +3,8 @@ import "./brand";
 import { FPS, HEIGHT, WIDTH } from "./brand";
 import { DESIGN_IDS, type Lang } from "./designs";
 import { DesignOfTheDay, reelFrames } from "./DesignOfTheDay";
+import { AllFeatures, allFeaturesFrames, HOOKS } from "./AllFeatures";
+import { FEATURE_FRAMES, FEATURE_IDS, FeatureReel } from "./Features";
 import { MeetShubh, TRAILER_FRAMES } from "./MeetShubh";
 
 const LANGS: Lang[] = ["en", "hi"];
@@ -35,6 +37,36 @@ export function Root() {
             defaultProps={{ design, lang }}
           />
         )),
+      )}
+      {FEATURE_IDS.flatMap((feature) =>
+        LANGS.map((lang) => (
+          <Composition
+            key={`feature-${feature}-${lang}`}
+            id={`feature-${feature}-${lang}`}
+            component={FeatureReel}
+            durationInFrames={FEATURE_FRAMES}
+            fps={FPS}
+            width={WIDTH}
+            height={HEIGHT}
+            defaultProps={{ feature, lang }}
+          />
+        )),
+      )}
+      {[false, true].flatMap((bumper) =>
+        HOOKS.flatMap((hook) =>
+          LANGS.map((lang) => (
+            <Composition
+              key={`${bumper ? "bumper" : "all-features"}-${hook}-${lang}`}
+              id={`${bumper ? "bumper" : "all-features"}-${hook}-${lang}`}
+              component={AllFeatures}
+              durationInFrames={allFeaturesFrames(bumper)}
+              fps={FPS}
+              width={WIDTH}
+              height={HEIGHT}
+              defaultProps={{ lang, hook, bumper }}
+            />
+          )),
+        ),
       )}
     </>
   );

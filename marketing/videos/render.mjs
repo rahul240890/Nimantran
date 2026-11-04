@@ -6,6 +6,19 @@ const all = [
   "meet-shubh-en",
   "meet-shubh-hi",
   ...["rajwada-bagh", "kutch-toran", "tanjore"].flatMap((d) => [`dotd-${d}-en`, `dotd-${d}-hi`]),
+  ...[
+    "language",
+    "free",
+    "website",
+    "memories",
+    "one-link",
+    "social",
+    "family-first",
+    "guest-names",
+  ].flatMap((f) => [`feature-${f}-en`, `feature-${f}-hi`]),
+  ...["all-features", "bumper"].flatMap((kind) =>
+    ["sings", "mummy", "alive"].flatMap((hook) => [`${kind}-${hook}-en`, `${kind}-${hook}-hi`]),
+  ),
 ];
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : all;
 for (const id of ids) {
