@@ -413,11 +413,10 @@ test.describe("coupons, invoices and refunds", () => {
     expect(await noOverflow(admin)).toBe(true);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
-    // Admin, Emails draws the new-account emails with the offer in them
+    // Admin, Emails draws the offers email with the offer in it; the welcome is a plain
+    // note with no offers since 2026-11-04 (#241)
     await admin.goto("/admin/emails");
     await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Emails");
-    const welcome = admin.frameLocator('iframe[title="Welcome email"]');
-    await expect(welcome.getByText(code, { exact: true })).toBeVisible();
     await expect(
       admin
         .frameLocator('iframe[title="New designs and offers email"]')

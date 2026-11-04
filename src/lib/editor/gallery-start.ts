@@ -1,3 +1,4 @@
+import { inviteEdition } from "@/actions/checkout";
 import { invitePhotoUrls } from "@/actions/invites";
 import { splitOffDraft, switchDraft, syncStore } from "@/lib/invites/sync";
 import { newDraft, withGalleryChoice, type CardLanguage, type InviteDraft } from "./draft";
@@ -86,7 +87,11 @@ export async function startWithDesign(
     inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
     return;
   }
-  const keepsWork = current.slug === null && sameOccasion;
+  // A draft with a package bought for it is kept as it is too (owner, 2026-11-03): taking
+  // another design in place moved the paid invite off the design its package covers, so
+  // publishing it asked for payment again
+  const paid = signedIn && current.slug === null && sameOccasion && (await hasPackage(current));
+  const keepsWork = current.slug === null && sameOccasion && !paid;
   const startsAnother = signedIn && current.updatedAt !== 0 && !keepsWork;
   const clip = startsAnother && sameOccasion ? await copiedClip(current) : null;
   const switched = startsAnother
@@ -97,6 +102,13 @@ export async function startWithDesign(
       })
     : false;
   if (!switched) inviteDraft.update((draft) => withGalleryChoice(draft, choice, site));
+}
+
+/** Whether the invite has a package bought for it; no when the account can't say. */
+async function hasPackage(draft: InviteDraft): Promise<boolean> {
+  if (!draft.remoteId) return false;
+  const answer = await inviteEdition(draft.remoteId).catch(() => null);
+  return Boolean(answer && answer.paid.plan !== "free");
 }
 
 /**

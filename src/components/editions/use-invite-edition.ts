@@ -57,3 +57,9 @@ export function usePaidOn(inviteId: string | null): (designId: string) => PlanId
   const answer = useInviteEdition(inviteId, null);
   return (designId) => (answer ? editionFor(answer.paid, designId).plan : "free");
 }
+
+/** Whether the invite has any package bought for it, on whichever design. */
+export function useHasPackage(inviteId: string | null): boolean {
+  const answer = useInviteEdition(inviteId, null);
+  return Boolean(answer && answer.paid.plan !== "free");
+}
