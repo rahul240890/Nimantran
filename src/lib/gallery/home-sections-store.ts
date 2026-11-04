@@ -4,14 +4,14 @@ import type { Account } from "@/lib/auth/account";
 import { authMode } from "@/lib/auth/mode";
 import { supabaseServer } from "@/lib/supabase/server";
 import { supabaseService } from "@/lib/supabase/service";
-import { BESTSELLER_DAYS, DEFAULT_BESTSELLERS, bestsellerDesigns } from "./bestsellers";
-import { allDesigns } from "./catalog";
 import {
-  DEFAULT_HOME_SECTIONS,
-  SECTION_PICKS,
-  parseHomeSections,
-  type HomeSections,
-} from "./home-sections";
+  BESTSELLERS_SIZE,
+  BESTSELLER_DAYS,
+  DEFAULT_BESTSELLERS,
+  bestsellerDesigns,
+} from "./bestsellers";
+import { allDesigns } from "./catalog";
+import { DEFAULT_HOME_SECTIONS, parseHomeSections, type HomeSections } from "./home-sections";
 import type { InviteDesign } from "./trending";
 
 /*
@@ -105,5 +105,5 @@ const storedBestsellers = unstable_cache(
 
 /** The best-selling designs, in order; the starting list if the database is away. */
 export async function getBestsellers(): Promise<string[]> {
-  return storedBestsellers().catch(() => DEFAULT_BESTSELLERS.slice(0, SECTION_PICKS));
+  return storedBestsellers().catch(() => DEFAULT_BESTSELLERS.slice(0, BESTSELLERS_SIZE));
 }

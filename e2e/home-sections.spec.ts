@@ -14,7 +14,7 @@ test.use({ reducedMotion: "reduce" });
 
 test("Trending and Best sellers come first, and every section is a grid ending in View all", async ({
   page,
-}, info) => {
+}) => {
   await page.goto("/");
   const designs = page.locator("#designs");
   await designs.scrollIntoViewIfNeeded();
@@ -33,10 +33,19 @@ test("Trending and Best sellers come first, and every section is a grid ending i
   await wedding.scrollIntoViewIfNeeded();
   await expect(wedding).toHaveAttribute("data-layout", "grid");
   await expect(wedding.locator("article").first()).toBeVisible();
-  // 5 designs then View all on a phone, 9 then View all on a wide screen
-  const shown = info.project.name === "phone-320" ? 5 : 9;
+  // 24 wedding designs then View all on every screen (owner, 2026-11-04)
   const cells = wedding.locator("ul > li");
-  await expect(cells.filter({ visible: true })).toHaveCount(shown + 1);
+  await expect(cells.filter({ visible: true })).toHaveCount(24 + 1);
+  // Trending and Best sellers show 10; no design shows twice on the page
+  for (const id of ["home-trending", "home-bestsellers"]) {
+    await designs.locator(`[data-shelf="${id}"]`).scrollIntoViewIfNeeded();
+    await expect(designs.locator(`[data-shelf="${id}"] article`)).toHaveCount(10);
+  }
+  for (const id of order) await designs.locator(`[data-shelf="${id}"]`).scrollIntoViewIfNeeded();
+  const ids = await designs
+    .locator("article[data-design]")
+    .evaluateAll((all) => all.map((card) => card.getAttribute("data-design")));
+  expect(new Set(ids).size).toBe(ids.length);
   const all = cells.last().getByRole("link");
   await expect(all).toHaveAttribute("href", "/invitations/wedding");
   await expect(all).toHaveAccessibleName(/^View all \d+ designs: Wedding$/);

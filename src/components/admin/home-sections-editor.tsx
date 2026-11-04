@@ -13,7 +13,7 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 import {
   SECTION_PICKS,
-  SECTION_SHOWN,
+  sectionSize,
   type HomeSectionId,
   type HomeSections,
 } from "@/lib/gallery/home-sections";
@@ -138,7 +138,7 @@ export function HomeSectionsEditor({
                       {chosen ? "Designs, in order" : "Shows now"}
                     </p>
                     <p className="text-sm text-ink-muted">
-                      {(chosen ?? section.auto).slice(0, SECTION_SHOWN).map(name).join(" · ") ||
+                      {(chosen ?? section.auto).slice(0, sectionSize(id)).map(name).join(" · ") ||
                         "Nothing yet"}
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -172,6 +172,7 @@ export function HomeSectionsEditor({
                   {editing && chosen && (
                     <DesignList
                       sectionTitle={section.title}
+                      shown={sectionSize(id)}
                       list={chosen}
                       choices={section.choices}
                       name={name}
@@ -197,12 +198,15 @@ export function HomeSectionsEditor({
 /** A section's own designs: moved up, taken out, or added by name. */
 function DesignList({
   sectionTitle,
+  shown,
   list,
   choices,
   name,
   onChange,
 }: {
   sectionTitle: string;
+  /** How many the section shows before View all. */
+  shown: number;
   list: string[];
   choices: string[];
   name: (id: string) => string;
@@ -227,7 +231,7 @@ function DesignList({
           >
             <span className="min-w-0 truncate text-sm font-semibold">
               {index + 1}. {name(id)}
-              {index >= SECTION_SHOWN && (
+              {index >= shown && (
                 <span className="font-normal text-ink-muted"> · on View all only</span>
               )}
             </span>

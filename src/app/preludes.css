@@ -1,0 +1,183 @@
+/*
+ * The guest's prelude before the gate (src/components/guest/opening/prelude.tsx): the
+ * shapes its scenes build in SVG and HTML. Like the openings it is art, the same in light
+ * and dark. Reduced motion never shows a prelude, so nothing here needs a still version.
+ */
+
+.prelude-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.prelude-scene {
+  position: absolute;
+  inset: 0;
+}
+
+/* The scene parts down the middle and each half leaves like a door */
+.prelude-half {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 1.7s cubic-bezier(0.55, 0, 0.2, 1),
+    opacity 1.7s ease;
+}
+.prelude-half-l {
+  clip-path: inset(0 50% 0 0);
+  transform-origin: left center;
+}
+.prelude-half-r {
+  clip-path: inset(0 0 0 50%);
+  transform-origin: right center;
+}
+.prelude-half-l.prelude-slide {
+  transform: translateX(-62%);
+}
+.prelude-half-r.prelude-slide {
+  transform: translateX(62%);
+}
+.prelude-half-l.prelude-fold {
+  transform: perspective(900px) rotateY(82deg);
+  opacity: 0.2;
+}
+.prelude-half-r.prelude-fold {
+  transform: perspective(900px) rotateY(-82deg);
+  opacity: 0.2;
+}
+
+/* Kalava thread: the initials' medallions light as the thread circles them */
+.prelude-medal circle {
+  fill: color-mix(in oklab, var(--night) 85%, var(--card-back));
+  stroke: var(--card-gold);
+  stroke-width: 0.5;
+  opacity: 0.3;
+  transition: opacity 0.6s;
+}
+.prelude-medal text {
+  font-family: "Rozha One", Georgia, serif;
+  font-size: 9px;
+  fill: var(--gold-glint);
+  opacity: 0;
+  transition: opacity 0.8s;
+}
+.prelude-medal.prelude-lit circle,
+.prelude-medal.prelude-lit text {
+  opacity: 1;
+}
+.prelude-knot {
+  fill: var(--gold-glint);
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.prelude-knot.prelude-lit {
+  opacity: 1;
+  animation: prelude-pulse 1s ease-in-out infinite;
+}
+@keyframes prelude-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+/* Written for you: handmade paper, upright on any screen */
+.prelude-paper {
+  position: absolute;
+  top: 8%;
+  bottom: 8%;
+  left: 50%;
+  translate: -50% 0;
+  aspect-ratio: 300 / 420;
+  max-width: 88%;
+  border-radius: 3px;
+  background: radial-gradient(
+    120% 90% at 50% 40%,
+    var(--card-ivory),
+    color-mix(in oklab, var(--card-ivory) 85%, var(--card-gold)) 85%
+  );
+  box-shadow: 0 20px 60px -20px var(--night);
+}
+.prelude-paper svg {
+  display: block;
+}
+.prelude-hand {
+  font-size: 44px;
+  text-anchor: middle;
+  stroke-width: 0.7;
+  stroke-dasharray: 420;
+  stroke-dashoffset: 420;
+  fill-opacity: 0;
+}
+.prelude-joiner,
+.prelude-couple {
+  text-anchor: middle;
+  opacity: 0;
+  transition: opacity 0.9s;
+}
+.prelude-joiner {
+  font-size: 20px;
+}
+.prelude-couple {
+  font-size: 24px;
+}
+.prelude-in {
+  opacity: 1;
+}
+.prelude-nib {
+  filter: drop-shadow(0 0 3px var(--card-gold));
+}
+
+/* Misty window: a finger shows where to wipe */
+.prelude-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  translate: -50% 0;
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.prelude-hint.prelude-in {
+  opacity: 1;
+}
+.prelude-finger {
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--night) 60%, transparent);
+  background: color-mix(in oklab, var(--card-ivory) 40%, transparent);
+  animation: prelude-swipe 1.6s ease-in-out infinite;
+}
+@keyframes prelude-swipe {
+  0%,
+  100% {
+    transform: translateX(-2.5rem);
+  }
+  50% {
+    transform: translateX(2.5rem);
+  }
+}
+
+/* The misty window's glass stands over the gate itself, not the theme's painting */
+.prelude[data-prelude="mist"] {
+  background: transparent;
+}
+.prelude[data-prelude="mist"] .prelude-ground {
+  display: none;
+}
+
+/* Over the theme's painting: night gathering at the edges, a warm light in the middle */
+.prelude-glow {
+  background:
+    radial-gradient(
+      60% 42% at 50% 45%,
+      color-mix(in oklab, var(--suite-light) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      120% 90% at 50% 45%,
+      color-mix(in oklab, var(--night) 25%, transparent) 30%,
+      color-mix(in oklab, var(--night) 85%, transparent) 100%
+    );
+}

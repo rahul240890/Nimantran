@@ -1,4 +1,4 @@
-import { firstGrapheme } from "@/lib/initials";
+import { englishInitial } from "@/lib/initials";
 import type { SymbolId } from "@/lib/traditions/schema";
 import { SLOT_IDS, type SlotId } from "./ids";
 import type { Template } from "./schema";
@@ -50,7 +50,7 @@ export function toCardCopy(template: Template, content: TemplateContent = {}): C
   };
 }
 
-/** A name's first letter as a reader sees it, keeping combining marks (मी, not म). */
+/** A name's initial, always an English letter: "मीरा" is "M" (owner, 2026-11-04). */
 export function initialOf(name: string): string {
-  return firstGrapheme(name.trim()).toLocaleUpperCase();
+  return englishInitial(name);
 }

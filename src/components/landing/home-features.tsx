@@ -28,6 +28,7 @@ import {
 } from "react";
 import { SocialIcon } from "@/components/brand/social-links";
 import { cn } from "@/lib/cn";
+import { englishInitial } from "@/lib/initials";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import "./home-features.css";
 
@@ -468,7 +469,7 @@ function ContactsScreen({ copy }: { copy: FeaturesCopy["phone"] }) {
             className="flex items-center gap-2 rounded-lg bg-surface px-2 py-1.5 ring-1 ring-line"
           >
             <span className="grid size-7 shrink-0 place-items-center rounded-full bg-marigold/20 text-[0.7rem] font-semibold text-accent-text">
-              {Array.from(guest.name)[0]}
+              {englishInitial(guest.name)}
             </span>
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-xs font-semibold text-ink">{guest.name}</span>

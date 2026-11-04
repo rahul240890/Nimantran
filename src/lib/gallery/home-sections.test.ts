@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { BESTSELLER_DAYS, DEFAULT_BESTSELLERS, bestsellerDesigns } from "./bestsellers";
+import {
+  BESTSELLERS_SIZE,
+  BESTSELLER_DAYS,
+  DEFAULT_BESTSELLERS,
+  bestsellerDesigns,
+} from "./bestsellers";
 import { allDesigns, occasionDesigns } from "./catalog";
 import {
   DEFAULT_HOME_SECTIONS,
@@ -35,7 +40,7 @@ describe("home page sections", () => {
           wedding[2],
           birthday.find((id) => !wedding.includes(id)),
         ],
-        trending: Array.from({ length: 20 }, (_, i) => [...known][i]),
+        trending: Array.from({ length: 30 }, (_, i) => [...known][i]),
       },
     });
     // Known sections once each, in the saved order; the rest join after, on only if a default
@@ -78,7 +83,7 @@ describe("best sellers", () => {
     expect(list.slice(0, 3)).toEqual(["noor-bagh", "kayal", "rajbari"]);
     expect(list).not.toContain("gone-design");
     expect(new Set(list).size).toBe(list.length);
-    expect(list).toHaveLength(SECTION_PICKS);
+    expect(list).toHaveLength(BESTSELLERS_SIZE);
   });
 
   it("are never empty before there are sales", () => {

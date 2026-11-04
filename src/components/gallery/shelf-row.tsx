@@ -80,6 +80,7 @@ export function ShelfRow({
   priority,
   lazy = false,
   layout = "row",
+  every = false,
 }: {
   id: string;
   title: string;
@@ -100,6 +101,11 @@ export function ShelfRow({
    * grid of 5 designs on a phone, 7 on a laptop and 9 on a wide screen, then View all.
    */
   layout?: "row" | "grid";
+  /**
+   * In a grid: every design given, on every screen, with View all filling the rest of the
+   * last line (Trending and Best sellers 10, the wedding and the engagement 24).
+   */
+  every?: boolean;
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   const label = shelfCopy.viewAllLabel(title, total);
@@ -144,10 +150,10 @@ export function ShelfRow({
   );
 
   if (layout === "grid") {
-    const shown = entries.slice(0, SECTION_SHOWN);
+    const shown = every ? entries : entries.slice(0, SECTION_SHOWN);
     // Fewer on narrower screens, so the grid ends on a full line with View all
     const cell = (index: number) =>
-      cn(index >= 7 ? "max-xl:hidden" : index >= 5 && "max-lg:hidden");
+      every ? undefined : cn(index >= 7 ? "max-xl:hidden" : index >= 5 && "max-lg:hidden");
     return (
       <section
         ref={watch}
@@ -176,11 +182,22 @@ export function ShelfRow({
               </li>
             ),
           )}
-          {href && (
-            <li>
-              <ViewAllTile href={href} label={label} total={total} fill />
-            </li>
-          )}
+          {href &&
+            (every ? (
+              <li className={tileSpan(shown.length).cell}>
+                <ViewAllTile
+                  href={href}
+                  label={label}
+                  total={total}
+                  fill
+                  shape={tileSpan(shown.length).shape}
+                />
+              </li>
+            ) : (
+              <li>
+                <ViewAllTile href={href} label={label} total={total} fill />
+              </li>
+            ))}
         </ul>
       </section>
     );
@@ -230,18 +247,58 @@ export function ShelfRow({
   );
 }
 
+/*
+ * The grid's columns at each width (2, 3, 4 and 5), and the classes for View all to fill
+ * the rest of the last line, written out whole so Tailwind finds them. Alone on a line, it
+ * is a short bar across the grid instead of a tall tile.
+ */
+const GRID_COLUMNS = [2, 3, 4, 5] as const;
+const TILE_SPANS = [
+  ["col-span-1", "col-span-2"],
+  ["sm:col-span-1", "sm:col-span-2", "sm:col-span-3"],
+  ["lg:col-span-1", "lg:col-span-2", "lg:col-span-3", "lg:col-span-4"],
+  ["xl:col-span-1", "xl:col-span-2", "xl:col-span-3", "xl:col-span-4", "xl:col-span-5"],
+] as const;
+const TILE_SHORT = [
+  "min-h-28 flex-row",
+  "sm:min-h-28 sm:flex-row",
+  "lg:min-h-28 lg:flex-row",
+  "xl:min-h-28 xl:flex-row",
+] as const;
+const TILE_TALL = [
+  "min-h-56 flex-col",
+  "sm:min-h-56 sm:flex-col",
+  "lg:min-h-56 lg:flex-col",
+  "xl:min-h-56 xl:flex-col",
+] as const;
+
+/** Where View all sits after `count` designs: the cells it spans, and its shape. */
+export function tileSpan(count: number): { cell: string; shape: string } {
+  const cell: string[] = [];
+  const shape: string[] = [];
+  GRID_COLUMNS.forEach((columns, at) => {
+    const span = columns - (count % columns);
+    cell.push(TILE_SPANS[at]![span - 1]!);
+    shape.push((span === columns ? TILE_SHORT : TILE_TALL)[at]!);
+  });
+  return { cell: cell.join(" "), shape: shape.join(" ") };
+}
+
 /** The last tile of a row or a section: the way on to all its designs. */
 function ViewAllTile({
   href,
   label,
   total,
   fill = false,
+  shape,
 }: {
   href: string;
   label: string;
   total: number;
   /** In a grid: as tall as the design cards beside it, words and price included. */
   fill?: boolean;
+  /** Its height and direction at each width, in place of fill's (tileSpan). */
+  shape?: string;
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   return (
@@ -249,8 +306,8 @@ function ViewAllTile({
       href={href}
       aria-label={label}
       className={cn(
-        "group/more relative isolate flex w-full flex-col",
-        fill ? "h-full min-h-56" : "aspect-[3/4]",
+        "group/more relative isolate flex w-full",
+        shape ? cn("h-full", shape) : fill ? "h-full min-h-56 flex-col" : "aspect-[3/4] flex-col",
         "items-center justify-center gap-3 overflow-hidden rounded-2xl bg-night p-4 text-center shadow-raised ring-1 ring-line transition-[box-shadow,transform] duration-500 ease-out-expo hover:-translate-y-1 hover:shadow-float focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring motion-still:transition-none motion-still:hover:translate-y-0",
       )}
     >

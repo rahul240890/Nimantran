@@ -7,7 +7,10 @@ import { landingText } from "@/i18n/copy/landing";
 import type { UiLocale } from "@/i18n/locales";
 import { CATEGORIES } from "@/lib/categories/catalog";
 import { allDesigns, occasionDesigns } from "@/lib/gallery/catalog";
+import { designCatalog, tierOf } from "@/lib/gallery/filters";
+import { fillHomeSections } from "@/lib/gallery/home-fill";
 import {
+  fixedSize,
   newestDesigns,
   sectionOccasion,
   shownSections,
@@ -15,6 +18,8 @@ import {
 } from "@/lib/gallery/home-sections";
 import { getBestsellers, getHomeSections } from "@/lib/gallery/home-sections-store";
 import { getTrending } from "@/lib/gallery/trending-store";
+import { resolvePricing } from "@/lib/plans/design-defaults";
+import { getPricing } from "@/lib/plans/pricing";
 import { pagePath } from "@/lib/seo/paths";
 import { TEMPLATE_IDS } from "@/lib/templates/ids";
 import { HomeShelvesLater } from "./home-later";
@@ -40,22 +45,34 @@ export async function HomeDesigns({ locale }: { locale: UiLocale }) {
   const { homeRows } = landingText[locale];
   const { occasionTaglines, shelfCopy } = galleryText[locale];
   const designsPath = pagePath({ kind: "designs" }, locale);
-  const [settings, { trending }, bestsellers] = await Promise.all([
+  const [settings, { trending, pinned }, bestsellers, stored] = await Promise.all([
     getHomeSections(),
     getTrending(),
     getBestsellers(),
+    getPricing(),
   ]);
   const everyDesign = allDesigns().length;
-  const own: Record<
-    "trending" | "bestsellers" | "new",
-    { title: string; intro: string; list: string[] }
-  > = {
-    trending: { ...shelfCopy.trending, list: trending },
-    bestsellers: { ...homeRows.bestsellers, list: bestsellers },
-    new: { ...homeRows.newest, list: newestDesigns() },
+  const own: Record<"trending" | "bestsellers" | "new", { title: string; intro: string }> = {
+    trending: shelfCopy.trending,
+    bestsellers: homeRows.bestsellers,
+    new: homeRows.newest,
   };
-  const sections: HomeSection[] = shownSections(settings).map((id: HomeSectionId) => {
-    const chosen = settings.designs[id] ?? null;
+  const shown = shownSections(settings);
+  // Royal and Signature first, and no design twice on the page (home-fill.ts)
+  const pricing = resolvePricing(stored);
+  const filled = fillHomeSections({
+    sections: shown,
+    chosen: settings.designs,
+    trending,
+    pinned,
+    bestsellers,
+    newest: newestDesigns(),
+    entries: designCatalog(),
+    tierOf: (id) => tierOf(pricing, id),
+  });
+  const sections: HomeSection[] = shown.map((id: HomeSectionId) => {
+    const designs = filled[id] ?? [];
+    const fixed = fixedSize(id);
     const occasion = sectionOccasion(id);
     if (!occasion) {
       const kind = own[id as keyof typeof own];
@@ -64,8 +81,8 @@ export async function HomeDesigns({ locale }: { locale: UiLocale }) {
         title: kind.title,
         intro: kind.intro,
         href: designsPath,
-        designs: chosen ?? kind.list,
-        occasion: null,
+        designs,
+        fixed,
         total: everyDesign,
       };
     }
@@ -74,8 +91,8 @@ export async function HomeDesigns({ locale }: { locale: UiLocale }) {
       title: CATEGORIES[occasion].names[locale],
       intro: occasionTaglines[occasion] ?? "",
       href: pagePath({ kind: "occasion", id: occasion }, locale),
-      designs: chosen,
-      occasion,
+      designs,
+      fixed,
       total: occasionDesigns(occasion).length,
     };
   });

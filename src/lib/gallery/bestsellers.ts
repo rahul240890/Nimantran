@@ -1,4 +1,3 @@
-import { SECTION_PICKS } from "./home-sections";
 import { inviteDesignId, type InviteDesign } from "./trending";
 
 /*
@@ -6,6 +5,9 @@ import { inviteDesignId, type InviteDesign } from "./trending";
  * months, then the designs most invitations went live with, then this starting list, so the
  * section is never empty before there are sales to count.
  */
+
+/** How many best sellers are counted; the home page tops its section up (home-fill.ts). */
+export const BESTSELLERS_SIZE = 12;
 
 /** How far back sales and live invitations are counted. */
 export const BESTSELLER_DAYS = 90;
@@ -45,5 +47,5 @@ export function bestsellerDesigns(
   const live = liveInvites.map((invite) => inviteDesignId(invite, known));
   return [...new Set([...byCount(paidDesigns), ...byCount(live), ...DEFAULT_BESTSELLERS])]
     .filter((id) => known.has(id))
-    .slice(0, SECTION_PICKS);
+    .slice(0, BESTSELLERS_SIZE);
 }
