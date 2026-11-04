@@ -36,12 +36,15 @@ import { MusicBars } from "@/components/invitation/music-bars";
 import { OPEN_LEAD_S, musicMuted, useRagaMusic } from "@/components/invitation/use-raga-music";
 import { useStayAwake } from "@/components/guest/use-stay-awake";
 import { OneScene, SceneButton } from "@/components/invitation/scene/one-scene";
+import { GuestPrelude } from "@/components/guest/opening/prelude";
+import { englishInitial } from "@/lib/opening/preludes";
 import { Button } from "@/components/ui/button";
 import { ThemeMenu } from "@/components/ui/theme-toggle";
 import { CardLanguageToggle } from "@/components/invitation/card-language-toggle";
 import {
   cardLanguages,
   draftCopy,
+  draftFaith,
   draftOpeningGod,
   draftOpeningStyle,
   draftTemplate,
@@ -387,6 +390,22 @@ export function GuestView({
         data-invitation
         className="guest-snap flex min-h-dvh flex-col"
       >
+        <GuestPrelude
+          suite={suite}
+          faith={draftFaith(draft)}
+          lang={language}
+          names={{ first: copy.first, second: copy.second, joiner: copy.joiner }}
+          initials={{
+            first: englishInitial(draft.content.first, draft.translation.first, copy.first),
+            second: copy.second
+              ? englishInitial(draft.content.second, draft.translation.second, copy.second)
+              : "",
+          }}
+          greeting={
+            guestName ? { dear: CARD_GREETING_WORDS[language].dear, name: guestName } : null
+          }
+          skipLabel={invitation.skip}
+        />
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
           {watermark && <WatermarkLayer tiled={watermark === "tiled"} />}
