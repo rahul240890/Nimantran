@@ -85,7 +85,7 @@ export default async function HomeSectionsPage() {
       <AdminHeading
         eyebrow="Site"
         title="Home page"
-        intro="The sections of designs on the home page, top to bottom. Switch a section on or off, move it, and choose the designs it shows. A section left to fill itself shows Trending by what hosts choose, Best sellers by what families pay for, or its occasion's designs, Royal and Signature first with at most two others, and never a design another section already shows. Trending and Best sellers show 10, the wedding and the engagement 16; the others show 5 on phones, 7 on laptops and 9 on wide screens, then View all."
+        intro="The sections of designs on the home page, top to bottom. Switch a section on or off, move it, and choose the designs it shows. A section left to fill itself shows Trending by what hosts choose, Best sellers by what families pay for, or its occasion's designs, Royal and Signature first with only a few others (two, or four in the wedding and the engagement), and never a design another section already shows. Trending and Best sellers show 10, the wedding and the engagement 24; the others show 5 on phones, 7 on laptops and 9 on wide screens, then View all."
       />
       <HomeSectionsEditor sections={sections} names={names} saved={saved} />
     </>

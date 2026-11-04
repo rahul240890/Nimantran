@@ -90,6 +90,18 @@
   --card-accent-text: #a14e0c; /* text: 5.1:1 on ivory */
   --card-back: #7d1d3a;
 
+  /* The guest's prelude before the gate (prelude-scenes.ts), the same in both themes */
+  --prelude-henna: #8a3510;
+  --prelude-skin: #f2cfae;
+  --prelude-thread: #c62828;
+  --prelude-thread-stripe: #f9c74f;
+  --prelude-peacock-teal: #1fa39a;
+  --prelude-peacock-blue: #1d4fa3;
+  --prelude-peacock-green: #3f8f3a;
+  --prelude-clay: #b5562a;
+  --prelude-water: #0c1a33;
+  --prelude-fog: #dfe6ee;
+
   /* Design previews: each launch design has its own stock, the same in both themes */
   --tpl-rose-paper: #f7e4e2;
   --tpl-rose-ink: #4f1628;

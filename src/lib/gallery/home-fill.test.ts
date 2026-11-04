@@ -4,8 +4,8 @@ import type { DesignTier } from "@/lib/plans/design-tiers";
 import { DEFAULT_TRENDING } from "./trending";
 import { DEFAULT_BESTSELLERS } from "./bestsellers";
 import { designCatalog, tierOf } from "./filters";
-import { PREMIUM_AT_MOST, favourTiers, fillHomeSections, type HomeFillInput } from "./home-fill";
-import { DEFAULT_SHOWN, newestDesigns, sectionSize } from "./home-sections";
+import { favourTiers, premiumAtMost, fillHomeSections, type HomeFillInput } from "./home-fill";
+import { DEFAULT_SHOWN, newestDesigns, sectionSize, type HomeSectionId } from "./home-sections";
 
 const tier = (id: string) => tierOf(BUILT_PRICING, id);
 const rich = (id: string) => ["royal", "signature"].includes(tier(id));
@@ -21,12 +21,12 @@ const base: HomeFillInput = {
 };
 
 describe("home page sections' designs", () => {
-  it("show 10 in Trending and Best sellers, 16 in the wedding and the engagement", () => {
+  it("show 10 in Trending and Best sellers, 24 in the wedding and the engagement", () => {
     const filled = fillHomeSections(base);
     expect(filled.trending).toHaveLength(10);
     expect(filled.bestsellers).toHaveLength(10);
-    expect(filled.wedding).toHaveLength(16);
-    expect(filled.engagement).toHaveLength(16);
+    expect(filled.wedding).toHaveLength(24);
+    expect(filled.engagement).toHaveLength(24);
     expect(filled.birthday!.length).toBeLessThanOrEqual(sectionSize("birthday"));
   });
 
@@ -35,10 +35,10 @@ describe("home page sections' designs", () => {
     expect(new Set(all).size).toBe(all.length);
   });
 
-  it("lead with Royal and Signature, and take at most two others", () => {
+  it("lead with Royal and Signature, and take only a few others", () => {
     for (const [id, list] of Object.entries(fillHomeSections(base))) {
       expect(list.filter((design) => !rich(design)).length, id).toBeLessThanOrEqual(
-        PREMIUM_AT_MOST,
+        premiumAtMost(id as HomeSectionId),
       );
     }
   });
@@ -49,7 +49,7 @@ describe("home page sections' designs", () => {
     const filled = fillHomeSections({ ...base, chosen });
     expect(filled.engagement).toEqual(chosen.engagement);
     expect(filled.wedding).not.toContain(wedding[0]);
-    expect(filled.wedding).toHaveLength(16);
+    expect(filled.wedding).toHaveLength(24);
     // Trending's pins lead, whatever their tier
     const premium = base.entries.map((entry) => entry.design.id).find((id) => !rich(id))!;
     const pinned = fillHomeSections({ ...base, pinned: [premium], trending: [premium] });

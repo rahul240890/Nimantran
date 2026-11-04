@@ -103,7 +103,7 @@ export function ShelfRow({
   layout?: "row" | "grid";
   /**
    * In a grid: every design given, on every screen, with View all filling the rest of the
-   * last line (Trending and Best sellers 10, the wedding and the engagement 16).
+   * last line (Trending and Best sellers 10, the wedding and the engagement 24).
    */
   every?: boolean;
 }) {
