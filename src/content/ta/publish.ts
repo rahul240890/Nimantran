@@ -31,7 +31,6 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   /** Opening the video or the cards from the editor, which saves first. */
   saveFailed: "இப்போது சேமிக்க முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்து மீண்டும் முயலவும்.",
   notReady: "இதை அனுப்பும் முன் சில படிகளை இன்னும் முடிக்க வேண்டும்.",
-  published: "உங்கள் அழைப்பிதழ் இப்போது லைவ்",
 };
 
 export const shareCopy: Translation<typeof en.shareCopy> = {

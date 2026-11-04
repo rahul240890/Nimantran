@@ -30,7 +30,6 @@ export const publishCopy = {
   /** Opening the video or the cards from the editor, which saves first. */
   saveFailed: "Couldn't save just now. Check your connection and try again.",
   notReady: "Some steps still need finishing before this can go out.",
-  published: "Your invitation is live",
 } as const;
 
 export const shareCopy = {

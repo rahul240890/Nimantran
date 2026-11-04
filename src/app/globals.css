@@ -9928,3 +9928,92 @@ html:has(.guest-snap) {
 [data-quiet] .mt-6 {
   margin-top: 1rem;
 }
+
+/* The celebration when an invitation goes live (src/components/publish/celebration.tsx) */
+@keyframes celebrate-fall {
+  from {
+    transform: translate3d(0, -14vh, 0) rotate(0deg);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.95;
+  }
+  to {
+    transform: translate3d(var(--drift, 4vw), 112vh, 0) rotate(var(--spin, 360deg));
+    opacity: 0;
+  }
+}
+@keyframes celebrate-rise {
+  from {
+    transform: translate3d(0, 112vh, 0) rotate(-4deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  50% {
+    transform: translate3d(calc(var(--drift, 3vw) * 0.5), 50vh, 0) rotate(4deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(var(--drift, 3vw), -30vh, 0) rotate(-3deg);
+    opacity: 0;
+  }
+}
+@keyframes celebrate-bloom {
+  from {
+    transform: scale(0.55) rotate(-6deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05) rotate(1deg);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+@keyframes celebrate-sway {
+  0%,
+  100% {
+    transform: rotate(-1.4deg);
+  }
+  50% {
+    transform: rotate(1.4deg);
+  }
+}
+@keyframes celebrate-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+@keyframes celebrate-drop {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes celebrate-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

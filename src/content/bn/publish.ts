@@ -30,7 +30,6 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   /** Opening the video or the cards from the editor, which saves first. */
   saveFailed: "এখন সেভ করা গেল না। ইন্টারনেট দেখে আবার চেষ্টা করুন।",
   notReady: "পাঠানোর আগে কয়েকটি ধাপ এখনও শেষ করা বাকি।",
-  published: "আপনার নিমন্ত্রণ এখন লাইভ",
 };
 
 export const shareCopy: Translation<typeof en.shareCopy> = {

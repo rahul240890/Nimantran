@@ -30,7 +30,6 @@ export const publishCopy: Translation<typeof en.publishCopy> = {
   /** Opening the video or the cards from the editor, which saves first. */
   saveFailed: "હમણાં સેવ થઈ શક્યું નહીં. ઇન્ટરનેટ તપાસો અને ફરી પ્રયત્ન કરો.",
   notReady: "મોકલતાં પહેલાં હજુ કેટલાંક પગલાં પૂરાં કરવાનાં બાકી છે.",
-  published: "તમારું આમંત્રણ લાઇવ છે",
 };
 
 export const shareCopy: Translation<typeof en.shareCopy> = {

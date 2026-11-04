@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   addDesignPhotos,
   axe,
+  closeCelebration,
   firstName,
   noOverflow,
   numberFor,
@@ -65,6 +66,31 @@ test.describe("publish and share", () => {
     await dialog.getByRole("button", { name: "Publish invitation" }).click();
 
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);
+
+    // The celebration opens once over the share page: the wedding's wishes, the package
+    // and the way to send it, then it lifts away to the share page
+    const celebration = page.getByTestId("celebration");
+    await expect(celebration).toBeVisible();
+    await expect(celebration).toHaveAttribute("data-family", "wedding");
+    await expect(celebration.getByText("Aarav & Meera")).toBeVisible();
+    await expect(
+      celebration.getByRole("heading", { name: /May your new journey be filled with love/ }),
+    ).toBeVisible();
+    await expect(celebration.getByText("Shubh Mangal")).toBeVisible();
+    await expect(celebration.getByTestId("celebration-perks").locator("li")).not.toHaveCount(0);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await celebration.getByRole("button", { name: "Start sharing" }).click();
+    await expect(celebration).toBeHidden();
+    // Once only: a reload stays on the share page, and the button opens it again
+    await page.reload();
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(celebration).toBeHidden();
+    await page.getByTestId("celebration-reopen").click();
+    await expect(celebration).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(celebration).toBeHidden();
+
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Your invitation is ready to send",
     );
@@ -160,6 +186,7 @@ test.describe("publish and share", () => {
     expect((await axe(page).analyze()).violations).toEqual([]);
     await dialog.getByRole("button", { name: "Publish invitation" }).click();
     await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);
+    await closeCelebration(page);
     const link = (await page.getByTestId("invite-link").textContent())!.trim();
     // Taken by an earlier run, it moves on to the occasion's year, or a number
     expect(link).toMatch(/\/i\/rahul-weds-priya(-\d+)?$/);
@@ -399,5 +426,66 @@ test.describe("publish and share", () => {
       "This invitation isn't available",
     );
     expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+
+  // Owner, 2026-11-04: after paying, the celebration shows what the package gives and leaves
+  // out, and suggests the next package by what it adds
+  test("a paid host sees their package and the video suggested next", async ({
+    page,
+    context,
+  }, info) => {
+    await context.addCookies([
+      { name: "shubh-preview-checkout", value: "on", url: info.project.use.baseURL! },
+    ]);
+    await writeInvite(page, numberFor(info), ["Kabir", "Ananya"]);
+    await expect(async () => {
+      await page.getByRole("button", { name: "Publish" }).click();
+      await expect(page).toHaveURL(/\/edition\?publish=1$/, { timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
+    const basic = page.getByRole("article", { name: "Basic" });
+    await basic.getByRole("button", { name: /^Pay / }).click();
+    await page
+      .getByRole("dialog", { name: "Test payment" })
+      .getByRole("button", { name: "Pay (test)" })
+      .click();
+    await expect(basic.getByText("Your package")).toBeVisible();
+    const id = new URL(page.url()).pathname.split("/")[2]!;
+    await page.goto(`/create?invite=${id}&publish=1&quality=2d`);
+    const dialog = page.getByRole("dialog", { name: "Publish your invitation" });
+    await expect(dialog).toBeVisible({ timeout: 30_000 });
+    await dialog.getByRole("button", { name: "Change link" }).click();
+    await dialog
+      .getByRole("textbox", { name: /Invitation link/ })
+      .fill(`kabir-weds-ananya-${Date.now()}`);
+    await expect(dialog.getByText("This link is free.")).toBeVisible();
+    await dialog.getByRole("button", { name: "Publish invitation" }).click();
+
+    const celebration = page.getByTestId("celebration");
+    await expect(celebration).toBeVisible();
+    await expect(celebration.getByRole("heading", { name: "Basic package" })).toBeVisible();
+    const perks = celebration.getByTestId("celebration-perks");
+    await expect(perks.locator('[data-perk="noMark"]')).toBeVisible();
+    const missing = celebration.getByTestId("celebration-missing");
+    await expect(missing.locator('[data-perk="video"]')).toContainText("In Celebration");
+    await expect(missing.locator('[data-perk="cards"]')).toContainText("In Grand");
+    const suggestion = celebration.getByTestId("celebration-suggestion");
+    await expect(suggestion).toHaveAttribute("data-plan", "celebration");
+    await expect(
+      suggestion.getByRole("heading", { name: "Add your WhatsApp video" }),
+    ).toBeVisible();
+    await expect(suggestion.getByRole("link", { name: /^Get Celebration for ₹/ })).toHaveAttribute(
+      "href",
+      `/invites/${id}/edition?plan=celebration`,
+    );
+    await expect(
+      suggestion.getByRole("link", { name: "Watch your video preview" }),
+    ).toHaveAttribute("href", `/invites/${id}/video`);
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+    await celebration.getByRole("button", { name: "Start sharing" }).click();
+    await expect(celebration).toBeHidden();
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Your invitation is ready to send",
+    );
   });
 });

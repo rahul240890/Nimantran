@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { z } from "zod";
 import { AccountShell } from "@/components/account/account-shell";
 import { CardsLink } from "@/components/cards/cards-link";
+import { Celebration } from "@/components/publish/celebration";
 import { PageTransition } from "@/components/motion/page-transition";
 import { RepliesCard } from "@/components/publish/replies-card";
 import { SharePanel } from "@/components/publish/share-panel";
@@ -14,8 +15,28 @@ import { findPublishedInvite } from "@/lib/invites/public";
 import { coverPath } from "@/lib/og/cover";
 import { hostReplies } from "@/lib/invites/rsvp";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
-import { FREE_EDITION, PLANS, editionFor } from "@/lib/plans/catalog";
-import { draftDesignId } from "@/lib/plans/design-defaults";
+import {
+  FREE_EDITION,
+  PLANS,
+  editionFor,
+  formatRupees,
+  inviteLimit,
+  upgradePricePaise,
+  type PlanId,
+} from "@/lib/plans/catalog";
+import { designTier, draftDesignId } from "@/lib/plans/design-defaults";
+import { getPricing } from "@/lib/plans/pricing";
+import { draftFaith } from "@/lib/editor/draft";
+import {
+  CELEBRATE_PARAM,
+  celebrationBlessing,
+  celebrationFamily,
+  nextSuggestion,
+  packagePerks,
+  type Suggestion,
+} from "@/lib/publish/celebrate";
+import { withLink } from "@/lib/publish/message";
+import type { PerkFacts } from "@/content/celebrate";
 import { inviteStore } from "@/lib/invites/store";
 import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
@@ -45,9 +66,13 @@ async function qrSvg(url: string): Promise<string> {
     .replace("<svg ", '<svg aria-hidden="true" focusable="false" ');
 }
 
-export default async function SharePage({ params }: PageProps<"/invites/[id]/share">) {
+export default async function SharePage({
+  params,
+  searchParams,
+}: PageProps<"/invites/[id]/share">) {
   const { shareCopy, guestCopy } = await getText(publishText);
   const { id } = await params;
+  const arrived = (await searchParams)[CELEBRATE_PARAM] === "1";
   if (!z.uuid().safeParse(id).success) notFound();
   const account = await getAccount();
   if (!account) redirect(`/sign-in?next=${encodeURIComponent(`/invites/${id}/share`)}`);
@@ -58,10 +83,11 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
   const url = inviteUrl(await requestOrigin(), draft.slug);
   const locale = await getLocale();
   // The video comes with Celebration and Grand once payments are on (Step 17c)
-  const [active, plan, published] = await Promise.all([
+  const [active, plan, published, pricing] = await Promise.all([
     editionsActive(),
     invitePlan(account, id),
     findPublishedInvite(draft.slug),
+    getPricing(),
   ]);
   // What guests get is the published invite, which is what WhatsApp's preview reads too
   const live = published?.draft ?? draft;
@@ -72,6 +98,36 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
   const occasion = occasionName(live, locale);
   const when = inviteWhen(live, locale);
   const where = inviteWhere(live);
+  const message = shareCopy.message({ names, occasion, when, where });
+  const functions = storyFunctions(live, locale);
+
+  // The celebration: the package as it covers the live design, or everything while payments
+  // are off; and the next package, the first that costs something to move up to
+  const shown = active ? covered.plan : "grand";
+  const facts = (planId: PlanId): PerkFacts => ({
+    guests: inviteLimit(planId, pricing),
+    everyVideo: PLANS[planId].video === "every",
+    albumDays: PLANS[planId].albumDays,
+    cohosts: PLANS[planId].cohosts,
+    listPages: PLANS[planId].listPages,
+  });
+  const perks = packagePerks(shown).map((perk) => ({
+    ...perk,
+    facts: facts(perk.included ? shown : (perk.from ?? shown)),
+  }));
+  const designPrice = designTier(pricing, draftDesignId(live));
+  let suggestion: (Suggestion & { price: string | null }) | null = null;
+  for (let from: PlanId = covered.plan; active;) {
+    const next = nextSuggestion(from, functions.length);
+    if (!next) break;
+    const price = upgradePricePaise(covered, next.plan, designPrice, pricing);
+    if (price !== null) {
+      suggestion = { ...next, price: formatRupees(price) };
+      break;
+    }
+    from = next.plan;
+  }
+  const family = celebrationFamily(live.categoryId);
 
   return (
     <PageTransition>
@@ -87,14 +143,14 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
           }
           previewTitle={guestCopy.metaTitle(names, occasion)}
           previewDescription={guestCopy.metaDescription(when, where)}
-          message={shareCopy.message({ names, occasion, when, where })}
+          message={message}
           qr={await qrSvg(url)}
           replies={<RepliesCard inviteId={id} summary={await hostReplies(account, id)} />}
           video={
             <VideoCard
               inviteId={id}
               draft={live}
-              functions={storyFunctions(live, locale)}
+              functions={functions}
               photos={published?.photos ?? []}
               clipUrl={published?.clipUrl ?? null}
               url={url}
@@ -107,6 +163,20 @@ export default async function SharePage({ params }: PageProps<"/invites/[id]/sha
             />
           }
           cards={<CardsLink inviteId={id} />}
+          celebrate={
+            <Celebration
+              inviteId={id}
+              url={url}
+              names={names}
+              message={withLink(message, url)}
+              family={family}
+              blessing={celebrationBlessing(family, draftFaith(live))}
+              plan={active ? covered.plan : null}
+              perks={perks}
+              suggestion={suggestion}
+              arrived={arrived}
+            />
+          }
         />
       </AccountShell>
     </PageTransition>

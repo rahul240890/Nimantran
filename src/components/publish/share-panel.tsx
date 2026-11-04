@@ -47,6 +47,8 @@ type SharePanelProps = {
   video?: ReactNode;
   /** The way to the save-the-date and thank-you cards (Step 24). */
   cards?: ReactNode;
+  /** The celebration once the invite goes live, and the button that opens it again. */
+  celebrate?: ReactNode;
 };
 
 const noSubscribe = () => () => {};
@@ -74,6 +76,7 @@ export function SharePanel({
   replies,
   video,
   cards,
+  celebrate,
 }: SharePanelProps) {
   const { shareCopy } = useText(publishText);
   const [message, setMessage] = useState(initialMessage);
@@ -123,6 +126,7 @@ export function SharePanel({
           {shareCopy.title}
         </h1>
         <p className="max-w-2xl text-ink-muted">{shareCopy.intro}</p>
+        {celebrate}
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">

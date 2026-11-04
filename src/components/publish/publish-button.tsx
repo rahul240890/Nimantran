@@ -20,6 +20,7 @@ import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { editionsText } from "@/i18n/copy/editions";
 import { funnel } from "@/lib/funnel";
+import { CELEBRATE_PARAM } from "@/lib/publish/celebrate";
 
 type SlugState = { slug: string; result: SlugCheck } | null;
 
@@ -228,9 +229,9 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
     if (outcome.status === "published") {
       funnel("Invite published");
       inviteDraft.update((current) => ({ ...current, slug: outcome.slug }), { touch: false });
-      toast({ title: publishCopy.published, tone: "success" });
       onClose();
-      router.push(`/invites/${remoteId}/share`);
+      // The celebration plays once over the share page (src/components/publish/celebration.tsx)
+      router.push(`/invites/${remoteId}/share?${CELEBRATE_PARAM}=1`);
     } else if (outcome.status === "needs-plan") {
       setNeeds(outcome);
     } else if (outcome.status === "taken") {
