@@ -65,12 +65,12 @@ test.describe("live samples", () => {
       if (serverAction(request)) sent.push(request.url());
     });
     await page.getByLabel("Your name").fill("Priya Mehta");
-    await page.getByRole("button", { name: "Coming to everything" }).click();
+    await page.getByRole("radio", { name: "Joyfully accept" }).click();
     await page.getByRole("button", { name: "Send reply" }).click();
     await expect(page.getByRole("heading", { name: "Thank you, Priya!" })).toBeVisible();
     await expect(page.getByText("This is a sample, so nothing was sent.")).toBeVisible();
-    // Five celebrations, every one answered, and nothing went to the server
-    await expect(page.getByText("Coming · 1 person")).toHaveCount(5);
+    // One answer for all five celebrations, and nothing went to the server
+    await expect(page.getByText("Coming · 1 person")).toHaveCount(1);
     expect(sent).toEqual([]);
 
     await page.getByRole("link", { name: "Choose this design" }).click();

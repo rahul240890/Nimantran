@@ -16,7 +16,7 @@ import { cardsText } from "@/i18n/copy/cards";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { designPageHref } from "@/lib/editor/design-page";
-import { draftQuestions, includedFunctions, type InviteDraft } from "@/lib/editor/draft";
+import { includedFunctions, type InviteDraft } from "@/lib/editor/draft";
 import { inviteDraft } from "@/lib/editor/store";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { inviteNames } from "@/lib/publish/describe";
@@ -154,7 +154,6 @@ function TryWebsite({
         clipUrl={clipUrl}
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
-        questions={draftQuestions(draft)}
         watermark="tiled"
         preview
       />

@@ -71,6 +71,7 @@ export function ThemedDetails({
   allIcsUrl,
   music,
   reply,
+  countdown,
   onPhotoFail,
 }: {
   suite: SuiteId;
@@ -94,6 +95,8 @@ export function ThemedDetails({
   music: Music;
   /** The reply form, drawn in the theme's colours. */
   reply: ReactNode;
+  /** The countdown to the day, after the reply. */
+  countdown?: ReactNode;
   /** A photo whose file can't be shown, so the page takes it away. */
   onPhotoFail?: (id: string) => void;
 }) {
@@ -145,7 +148,14 @@ export function ThemedDetails({
           onFail={onPhotoFail}
         />
       )}
-      <Night copy={copy} lang={lang} look={look} way={ways.lamp} reply={reply} />
+      <Night
+        copy={copy}
+        lang={lang}
+        look={look}
+        way={ways.lamp}
+        reply={reply}
+        countdown={countdown}
+      />
       {onScreen && <FloatingMusic music={music} />}
       <PetalShower flowers={flowers} burst={burst} />
     </div>
@@ -1192,12 +1202,14 @@ function Night({
   look,
   way,
   reply,
+  countdown,
 }: {
   copy: CardCopy;
   lang: CardLanguage;
   look: GuestLook;
   way: LampBlessing;
   reply: ReactNode;
+  countdown?: ReactNode;
 }) {
   const { guestCopy, rsvpCopy } = useGuestText();
   const words = guestCopy.themed;
@@ -1261,6 +1273,7 @@ function Night({
           </Reveal>
         </section>
       )}
+      {countdown}
       <p
         lang={lang}
         data-snap

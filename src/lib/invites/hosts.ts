@@ -211,8 +211,11 @@ function withReplies(
   rows: ReplyRow[],
 ): HostGuest {
   const latest = [...rows].sort((a, b) => b.responded_at.localeCompare(a.responded_at))[0];
+  // A guest who replied from the open link may leave their number with the reply
+  const given = latest?.answers?.phone;
   return {
     ...guest,
+    phone: guest.phone ?? (given && /^\+[1-9]\d{7,14}$/.test(given) ? given : null),
     replies: rows.map((row): GuestReplyRow => ({
       functionId: row.function_id,
       status: row.status,

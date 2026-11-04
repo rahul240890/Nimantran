@@ -111,13 +111,9 @@ test.describe("keyboard only", () => {
     const name = form.getByRole("textbox", { name: /Your name/ });
     await tabTo(guest, name);
     await guest.keyboard.type("Kavya Rao");
-    await tabTo(guest, form.getByRole("button", { name: "Coming to everything" }));
-    await guest.keyboard.press("Enter");
-    await expect(
-      form
-        .getByRole("radiogroup", { name: "Your reply for the Wedding" })
-        .getByRole("radio", { name: /^Coming$/ }),
-    ).toBeChecked();
+    await tabTo(guest, form.getByRole("radio", { name: "Joyfully accept" }));
+    await guest.keyboard.press("Space");
+    await expect(form.getByRole("radio", { name: "Joyfully accept" })).toBeChecked();
     await tabTo(guest, form.getByRole("button", { name: "Send reply" }));
     await guest.keyboard.press("Enter");
 

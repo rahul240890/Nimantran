@@ -28,15 +28,15 @@ test.describe("guest RSVP", () => {
 
       // Sending with nothing filled in points at what's missing
       await form.getByRole("button", { name: "Send reply" }).click();
-      await expect(form.getByRole("alert")).toHaveText("3 answers still need you.");
+      await expect(form.getByRole("alert")).toHaveText("2 answers still need you.");
       await expect(form.getByRole("textbox", { name: /Your name/ })).toBeFocused();
 
       await form.getByRole("textbox", { name: /Your name/ }).fill("Rohan Mehta");
-      await form.getByRole("button", { name: "Coming to everything" }).click();
-      const wedding = form.getByRole("radiogroup", { name: "Your reply for the Wedding" });
-      await expect(wedding.getByRole("radio", { name: /^Coming$/ })).toBeChecked();
-      await form.getByRole("button", { name: "More children" }).last().click();
-      // A new invitation asks only for the reply: food, stay and pickup are the host's to tick
+      await form.getByRole("textbox", { name: /Phone number/ }).fill("98765 43210");
+      await form.getByRole("radio", { name: "Joyfully accept" }).click();
+      await expect(form.getByRole("radio", { name: "Joyfully accept" })).toBeChecked();
+      await form.getByRole("button", { name: "One more guest" }).click();
+      // Only the simple reply: no food, stay or pickup questions (owner, 2026-11-04)
       await expect(form.getByRole("radiogroup", { name: /Meal/ })).toHaveCount(0);
       await form.getByRole("textbox", { name: /A note for the family/ }).fill("See you there!");
       expect(await noOverflow(guest)).toBe(true);
@@ -51,9 +51,7 @@ test.describe("guest RSVP", () => {
       await form.getByRole("button", { name: "Send reply" }).click();
 
       await expect(form.getByRole("heading", { name: "Thank you, Rohan!" })).toBeFocused();
-      await expect(form.getByRole("listitem").filter({ hasText: "Wedding" })).toContainText(
-        "Coming · 2 people",
-      );
+      await expect(form.getByText("Coming · 2 people")).toBeVisible();
       // A guest with a celebration of their own starts from this design, counted as a guest
       const likeThis = /^\/(create\/[a-z0-9-]+\?category=wedding&|\?)utm_source=guest$/;
       await expect(
@@ -70,21 +68,19 @@ test.describe("guest RSVP", () => {
       await guest.reload();
       await expect(form.getByRole("heading", { name: "Thank you, Rohan!" })).toBeVisible();
       await form.getByRole("button", { name: "Change my reply" }).click();
-      await form
-        .getByRole("radiogroup", { name: "Your reply for the Haldi" })
-        .getByRole("radio", { name: /^Can't come$/ })
-        .click();
-      await form.getByRole("button", { name: "Update reply" }).click();
-      await expect(form.getByRole("listitem").filter({ hasText: "Haldi" })).toContainText(
-        "Can't come",
+      await expect(form.getByRole("textbox", { name: /Phone number/ })).toHaveValue(
+        "+91 98765 43210",
       );
+      await form.getByRole("button", { name: "One guest fewer" }).click();
+      await form.getByRole("button", { name: "Update reply" }).click();
+      await expect(form.getByText("Coming · 1 person")).toBeVisible();
 
       await page.reload();
       await expect(replies.getByText("Rohan Mehta")).toBeVisible();
       await expect(replies.getByText("See you there!")).toBeVisible();
       await expect(
         replies.getByRole("listitem").filter({ hasText: "Wedding" }).first(),
-      ).toContainText("2 coming");
+      ).toContainText("1 coming");
       expect(await noOverflow(page)).toBe(true);
       expect((await axe(page).analyze()).violations).toEqual([]);
       await context.close();
