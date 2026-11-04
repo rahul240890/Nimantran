@@ -38,6 +38,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
+import { useClock } from "@/lib/use-clock";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 import { freshBackdrop } from "./opening-fresh";
@@ -64,18 +65,6 @@ const noSubscribe = () => () => {};
 
 const QUIET_LINK =
   "inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm text-card-ivory/90 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring";
-
-/** Seconds since 1970, ticking once a second (once a minute in still mode). */
-function useClock(still: boolean): number | null {
-  return useSyncExternalStore(
-    (onTick) => {
-      const timer = window.setInterval(onTick, still ? 30_000 : 1000);
-      return () => window.clearInterval(timer);
-    },
-    () => Math.floor(Date.now() / (still ? 60_000 : 1000)) * (still ? 60 : 1),
-    () => null,
-  );
-}
 
 /**
  * The time left to the main event, in the card's language: days, hours, minutes and

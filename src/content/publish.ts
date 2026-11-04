@@ -274,7 +274,7 @@ export const guestCopy = {
 
 export const rsvpCopy = {
   heading: "Will you join us?",
-  intro: "Reply for each celebration. You can change your answer any time from this page.",
+  intro: "Let the family know if you can come. You can change your reply any time from this page.",
   yourName: "Your name",
   namePlaceholder: "As the family knows you",
   nameRequired: "Please enter your name",
@@ -320,6 +320,12 @@ export const rsvpCopy = {
     "This is a sample, so nothing was sent. On your own invitation, every reply comes straight to you.",
   change: "Change my reply",
   people: (count: number) => (count === 1 ? "1 person" : `${count} people`),
+  phone: "Phone number",
+  phoneInvalid: "Check the number: 10 digits, or + and the country code",
+  willYouCome: "Will you be there?",
+  guests: "Number of guests",
+  fewerGuests: "One guest fewer",
+  moreGuests: "One more guest",
 } as const;
 
 export const repliesCopy = {

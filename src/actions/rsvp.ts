@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { normalizePhone } from "@/lib/auth/phone";
 import { RSVP_QUESTION_IDS } from "@/lib/categories/ids";
 import {
   findReply,
@@ -35,6 +36,8 @@ const replySchema = z.object({
     .min(1)
     .max(20),
   message: z.string().trim().max(280),
+  /** The guest's phone number, if they gave one; kept with the reply's answers. */
+  phone: z.string().trim().max(20).optional(),
   answers: z.partialRecord(z.enum(RSVP_QUESTION_IDS), z.string().trim().max(120)),
   /** A field people never see: only a bot fills it in. */
   website: z.string().max(0).optional(),
@@ -62,6 +65,11 @@ export async function sendReply(
   const answers = Object.fromEntries(
     Object.entries(parsed.data.answers).filter(([, value]) => value),
   ) as Record<string, string>;
+  if (parsed.data.phone) {
+    const phone = normalizePhone(parsed.data.phone);
+    if ("error" in phone) return { ok: false, reason: "invalid" };
+    answers.phone = phone.phone;
+  }
   const { name, replies, message } = parsed.data;
   const sender = await replySender(slug).catch(() => null);
   return submitReply(slug, known, { name, replies, message, answers }, sender).catch(
