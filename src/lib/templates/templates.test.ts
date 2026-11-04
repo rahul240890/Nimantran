@@ -130,9 +130,9 @@ describe("template content", () => {
     expect(parsed).not.toHaveProperty("blessing");
   });
 
-  it("takes a name's first whole letter", () => {
+  it("takes a name's first letter in English", () => {
     expect(initialOf(" meera")).toBe("M");
-    expect(initialOf("मीरा")).toBe("मी");
+    expect(initialOf("मीरा")).toBe("M");
     expect(initialOf("")).toBe("");
   });
 

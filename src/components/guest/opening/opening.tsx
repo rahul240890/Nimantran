@@ -29,7 +29,7 @@ import {
   type OpeningStyle,
   type WelcomeScene,
 } from "@/lib/opening/catalog";
-import { firstGrapheme } from "@/lib/initials";
+import { englishInitial } from "@/lib/initials";
 import { warmBlurs, warmPaintings } from "@/lib/paintings";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
@@ -316,11 +316,11 @@ function OpeningNames({
         style={nameFace}
       >
         <span className="flex items-baseline gap-[0.12em] text-[clamp(1.35rem,6.5cqw,1.9rem)] leading-none">
-          {firstGrapheme(copy.first.trim())}
+          {englishInitial(copy.first)}
           {joiner && (
             <>
               <span className="opening-joiner text-[0.55em]">&amp;</span>
-              {firstGrapheme(copy.second.trim())}
+              {englishInitial(copy.second)}
             </>
           )}
         </span>
