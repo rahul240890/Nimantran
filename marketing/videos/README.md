@@ -18,10 +18,13 @@ node render.mjs dotd-tanjore-hi   # or just one
 
 ## The series
 
-| Video                                                                           | Composition ids                        | Length  |
-| ------------------------------------------------------------------------------- | -------------------------------------- | ------- |
-| Meet Shubh (trailer)                                                            | `meet-shubh-en`, `meet-shubh-hi`       | 33 s    |
-| Design of the day: one design's gate, cover, function pages and where to try it | `dotd-<design>-en`, `dotd-<design>-hi` | 21–24 s |
+| Video                                                                           | Composition ids                                | Length  |
+| ------------------------------------------------------------------------------- | ---------------------------------------------- | ------- |
+| Meet Shubh (trailer)                                                            | `meet-shubh-en`, `meet-shubh-hi`               | 33 s    |
+| Design of the day: one design's gate, cover, function pages and where to try it | `dotd-<design>-en`, `dotd-<design>-hi`         | 21–24 s |
+| Feature reels: one thing Shubh does, shown on a phone, then the closing card    | `feature-<feature>-en`, `feature-<feature>-hi` | 15 s    |
+
+Feature reels (`src/Features.tsx`): `free` (make it free, pay later), `language`, `website`, `guest-names`, `one-link`, `social` (WhatsApp and Instagram), `family-first` and `memories`. They carry raga music and no voice, so a voiceover can be laid on top for ads.
 
 Design of the day so far: Rajwada Bagh (Rajasthani), Kutch Toran (Gujarati), Tanjore (Tamil). To add one, give it an entry in `src/designs.ts` (its gate and hole from `PAINTED_GATES` in `src/lib/opening/catalog.ts`, its raga from its template, made-up names, and each page's function, time and place), add its folder to `STORIES` and its raga to `RAGAS` in `tools/setup.mjs`, and run `npm run setup`.
 

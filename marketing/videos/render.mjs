@@ -6,6 +6,16 @@ const all = [
   "meet-shubh-en",
   "meet-shubh-hi",
   ...["rajwada-bagh", "kutch-toran", "tanjore"].flatMap((d) => [`dotd-${d}-en`, `dotd-${d}-hi`]),
+  ...[
+    "language",
+    "free",
+    "website",
+    "memories",
+    "one-link",
+    "social",
+    "family-first",
+    "guest-names",
+  ].flatMap((f) => [`feature-${f}-en`, `feature-${f}-hi`]),
 ];
 const ids = process.argv.slice(2).length ? process.argv.slice(2) : all;
 for (const id of ids) {

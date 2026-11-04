@@ -3,6 +3,7 @@ import "./brand";
 import { FPS, HEIGHT, WIDTH } from "./brand";
 import { DESIGN_IDS, type Lang } from "./designs";
 import { DesignOfTheDay, reelFrames } from "./DesignOfTheDay";
+import { FEATURE_FRAMES, FEATURE_IDS, FeatureReel } from "./Features";
 import { MeetShubh, TRAILER_FRAMES } from "./MeetShubh";
 
 const LANGS: Lang[] = ["en", "hi"];
@@ -33,6 +34,20 @@ export function Root() {
             width={WIDTH}
             height={HEIGHT}
             defaultProps={{ design, lang }}
+          />
+        )),
+      )}
+      {FEATURE_IDS.flatMap((feature) =>
+        LANGS.map((lang) => (
+          <Composition
+            key={`feature-${feature}-${lang}`}
+            id={`feature-${feature}-${lang}`}
+            component={FeatureReel}
+            durationInFrames={FEATURE_FRAMES}
+            fps={FPS}
+            width={WIDTH}
+            height={HEIGHT}
+            defaultProps={{ feature, lang }}
           />
         )),
       )}
