@@ -5,13 +5,19 @@ import { sectionOccasion, sectionSize, type HomeSectionId } from "./home-section
 /*
  * What each home page section shows (owner, 2026-11-04). The admin's choices (Admin, Home
  * page, and Trending's pins) show as chosen. A section left to fill itself leads with Royal
- * and Signature designs and takes at most PREMIUM_AT_MOST of the others (Premium, or a free
- * 3D card), spread through it. No design shows twice anywhere on the page: a design the admin
+ * and Signature designs and takes only a few of the others (Premium, or a free 3D card),
+ * spread through it: two in most sections, four in the wedding's and the engagement's 24. No design shows twice anywhere on the page: a design the admin
  * chose stays where they put it, and the sections filling themselves step around it.
  */
 
 /** The most Premium (or free) designs a section that fills itself shows. */
 export const PREMIUM_AT_MOST = 2;
+
+/** The wedding and the engagement show 24, so a few more of them (owner, 2026-11-04). */
+const PREMIUM_IN: Partial<Record<HomeSectionId, number>> = { wedding: 4, engagement: 4 };
+
+/** How many Premium (or free) designs a section that fills itself may show. */
+export const premiumAtMost = (id: HomeSectionId): number => PREMIUM_IN[id] ?? PREMIUM_AT_MOST;
 
 const isRich = (tier: DesignTier) => tier === "royal" || tier === "signature";
 
@@ -109,7 +115,7 @@ export function fillHomeSections(input: HomeFillInput): Partial<Record<HomeSecti
       const pinnedOthers = fixed.filter((design) => !isRich(tierOf(design))).length;
       list = [
         ...fixed,
-        ...favourTiers(candidates, size - fixed.length, tierOf, PREMIUM_AT_MOST - pinnedOthers),
+        ...favourTiers(candidates, size - fixed.length, tierOf, premiumAtMost(id) - pinnedOthers),
       ];
     }
     for (const design of list) seen.add(design);
