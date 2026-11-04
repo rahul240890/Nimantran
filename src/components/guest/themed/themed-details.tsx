@@ -20,7 +20,7 @@ import { MusicBars } from "@/components/invitation/music-bars";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { blessings, type FlowerBlessing, type LampBlessing } from "@/lib/suites/blessings";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
-import { eventBox, type EventBox as Box } from "@/lib/suites/event-boxes";
+import { eventBox, isOrnate, type EventBox as Box } from "@/lib/suites/event-boxes";
 import type { GuestLook } from "@/lib/suites/guest-look";
 import { sectionLayouts, type SectionLayouts } from "@/lib/suites/section-layouts";
 import type { CardLanguage } from "@/lib/templates/card-languages";
@@ -531,6 +531,7 @@ function Celebrations({
   const plan = layouts.plan;
   // On a timeline the thread itself is the day's plan, so the list above it is left out
   const line = layouts.hours === "timeline";
+  const ornate = isOrnate(box);
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
       <div
@@ -619,6 +620,8 @@ function Celebrations({
             const image = images[art] ?? images.cover;
             const headingId = `fn-${fn.kind}`;
             const overlay = layouts.hours === "overlay" && Boolean(image);
+            // An ornate card frames the hour's painting itself, at its top
+            const inCard = ornate && !overlay;
             // Zigzag: every other hour sets its painting on the far side
             const flipped = layouts.hours === "zigzag" && index % 2 === 1;
             return (
@@ -645,10 +648,10 @@ function Celebrations({
                 <Reveal
                   className={cn(
                     "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
-                    overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
+                    overlay || inCard ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
                   )}
                 >
-                  {image && !overlay && (
+                  {image && !overlay && !inCard && (
                     <Framed
                       look={look}
                       className={cn(
@@ -674,6 +677,9 @@ function Celebrations({
                     count={functions.length}
                     lang={lang}
                     headingId={headingId}
+                    art={inCard ? image : null}
+                    flower={look.flower}
+                    second={look.secondFlower}
                   />
                 </Reveal>
               </li>
@@ -762,6 +768,8 @@ function Timeline({
                 count={functions.length}
                 lang={lang}
                 headingId={`fn-${fn.kind}`}
+                flower={look.flower}
+                second={look.secondFlower}
               />
             </Reveal>
           </li>

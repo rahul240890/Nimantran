@@ -1,16 +1,18 @@
 import { format, parseISO } from "date-fns";
-import type { ReactNode } from "react";
 import { FunctionFacts } from "@/components/guest/function-facts";
 import type { GuestFunction } from "@/components/guest/guest-view";
 import { cn } from "@/lib/cn";
-import { BOX_HEADS, type EventBox as Box } from "@/lib/suites/event-boxes";
+import { BOX_HEADS, isOrnate, type EventBox as Box, type PartyBox } from "@/lib/suites/event-boxes";
+import type { GuestFlower } from "@/lib/suites/guest-look";
 import type { CardLanguage } from "@/lib/templates/card-languages";
+import { OrnateCard } from "./ornate-card";
 
 /**
- * One celebration's details in its theme's own box (event-boxes.ts): a jharokha window, a
- * Mughal arch, a mandap roof, a lotus, a scroll, a ticket, a stamp or a gift tag, each
- * with its own heading. The shapes are drawn in guest-sections.css from the theme's cloth,
- * gilt and jewel, so every theme's colours carry over.
+ * One celebration's details in its theme's own box (event-boxes.ts): an ornate card with
+ * the hour's painting in it (ornate-card.tsx), or at a party a ticket, a stamp or a gift
+ * tag, each with its own heading. The shapes are drawn in event-cards.css and
+ * guest-sections.css from the theme's cloth, gilt and jewel, so every theme's colours
+ * carry over.
  */
 export function EventBox({
   box,
@@ -20,6 +22,9 @@ export function EventBox({
   count,
   lang,
   headingId,
+  art = null,
+  flower,
+  second,
   className,
 }: {
   box: Box;
@@ -30,14 +35,30 @@ export function EventBox({
   count: number;
   lang: CardLanguage;
   headingId: string;
+  /** The hour's painting, which an ornate card frames at its top. */
+  art?: string | null;
+  /** The theme's flowers, for an ornate card's garlands and corners. */
+  flower: GuestFlower;
+  second: GuestFlower;
   className?: string;
 }) {
-  const head = (
-    <Head box={box} fn={fn} day={day} index={index} count={count} lang={lang} id={headingId} />
-  );
+  if (isOrnate(box))
+    return (
+      <OrnateCard
+        box={box}
+        fn={fn}
+        index={index}
+        count={count}
+        headingId={headingId}
+        art={art}
+        flower={flower}
+        second={second}
+        className={className}
+      />
+    );
+  const head = <Head box={box} fn={fn} day={day} index={index} lang={lang} id={headingId} />;
   return (
     <div data-box={box} className={cn("guest-box relative w-full", className)}>
-      {CROWNS[box]}
       {box === "tag" && <TagString />}
       <article aria-labelledby={headingId} className="guest-card flex flex-col gap-4 p-5 sm:p-7">
         {box === "ticket" ? (
@@ -49,7 +70,6 @@ export function EventBox({
           </>
         ) : (
           <>
-            {box === "corners" && <Corners />}
             {head}
             <FunctionFacts fn={fn} />
           </>
@@ -78,15 +98,13 @@ function Head({
   fn,
   day,
   index,
-  count,
   lang,
   id,
 }: {
-  box: Box;
+  box: PartyBox;
   fn: GuestFunction;
   day: string;
   index: number;
-  count: number;
   lang: CardLanguage;
   id: string;
 }) {
@@ -142,39 +160,6 @@ function Head({
       </div>
     );
 
-  if (kind === "ribbon")
-    return (
-      <div className="guest-box-head flex flex-col items-center gap-2 pt-2 text-center">
-        <h3
-          id={id}
-          className="guest-box-ribbon font-display text-[1.6rem] leading-tight break-words"
-        >
-          {fn.name}
-        </h3>
-        {fn.localName && (
-          <p lang={fn.localName.lang} className="text-lg text-accent-text">
-            {fn.localName.text}
-          </p>
-        )}
-      </div>
-    );
-
-  if (kind === "rules")
-    return (
-      <div className="guest-box-head flex flex-col items-center gap-2 text-center">
-        {count > 1 && (
-          <p
-            aria-hidden
-            className="font-label text-xs tracking-[0.3em] text-accent-text tabular-nums"
-          >
-            {index + 1} / {count}
-          </p>
-        )}
-        <Name fn={fn} id={id} className="text-[1.9rem] text-ink" />
-        <span aria-hidden className="guest-rule" />
-      </div>
-    );
-
   return (
     <div className="guest-box-head flex items-end gap-3">
       <span aria-hidden className="guest-box-number font-display leading-none tabular-nums">
@@ -182,67 +167,6 @@ function Head({
       </span>
       <Name fn={fn} id={id} className="min-w-0 pb-1 text-[1.75rem] text-ink" />
     </div>
-  );
-}
-
-/*
- * The roofs some boxes wear above their top edge, drawn in the theme's cloth with a gilt
- * line: a Mughal multifoil arch, a stepped mandap with its kalash, and a lotus.
- */
-const ROOFS = {
-  cusped:
-    "M0 48V40C30 40 44 34 56 26A16 16 0 0 1 84 18A20 20 0 0 1 114 8Q118 5 120 0Q122 5 126 8A20 20 0 0 1 156 18A16 16 0 0 1 184 26C196 34 210 40 240 40V48Z",
-  mandap: "M0 48V40H28V32H56V24H84V16H108V10H114Q120 1 126 10H132V16H156V24H184V32H212V40H240V48Z",
-  petal:
-    "M0 48V44C40 44 58 30 78 34C86 20 100 8 120 0C140 8 154 20 162 34C182 30 200 44 240 44V48Z",
-} as const;
-
-function Roof({ shape }: { shape: keyof typeof ROOFS }) {
-  // The line follows the roof only, not its foot along the box
-  const line = ROOFS[shape].replace(/^M0 48V/, "M0 ").replace(/V48Z$/, "");
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 240 48"
-      preserveAspectRatio="none"
-      className="guest-roof pointer-events-none absolute inset-x-0 bottom-[calc(100%-0.5rem)] z-[1] h-12 w-full sm:h-16"
-    >
-      <path d={ROOFS[shape]} className="guest-roof-fill" />
-      <path d={line} className="guest-roof-line" vectorEffect="non-scaling-stroke" />
-    </svg>
-  );
-}
-
-const CROWNS: Partial<Record<Box, ReactNode>> = {
-  cusped: <Roof shape="cusped" />,
-  mandap: <Roof shape="mandap" />,
-  petal: <Roof shape="petal" />,
-};
-
-/** A gilt flourish in each corner. */
-function Corners() {
-  return (
-    <>
-      {["", "-scale-x-100 end-1.5", "-scale-y-100 bottom-1.5", "-scale-100 end-1.5 bottom-1.5"].map(
-        (place) => (
-          <svg
-            key={place}
-            aria-hidden
-            viewBox="0 0 40 40"
-            className={cn(
-              "guest-corner pointer-events-none absolute size-10 sm:size-12",
-              !place.includes("end") && "start-1.5",
-              !place.includes("bottom") && "top-1.5",
-              place,
-            )}
-          >
-            <path d="M3 37V13Q3 3 13 3H37" />
-            <path d="M9 31V16Q9 9 16 9H31" className="guest-corner-thin" />
-            <path d="M15 15l4 4-4 4-4-4z" className="guest-corner-gem" />
-          </svg>
-        ),
-      )}
-    </>
   );
 }
 

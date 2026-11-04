@@ -1,0 +1,723 @@
+/*
+ * The ornate event cards on the themed guest page (ornate-card.tsx, event-boxes.ts): a
+ * pearl jhalar on a gilt rod, a jharokha under its chhatri, a mandap between pillars, a
+ * lotus over flowered corners, Kutch mirror-work with tassels, and a temple crest with
+ * bells. Each is drawn from the theme's own cloth, gilt and jewel (--guest-* in
+ * globals.css), and makes its own entrance once it scrolls into view.
+ */
+
+.oc {
+  --oc-gilt: var(--guest-gilt);
+  --oc-jewel: var(--guest-jewel);
+  --oc-cloth: var(--guest-cloth);
+  --oc-deep: color-mix(in oklab, var(--oc-jewel) 48%, black);
+  --oc-gilt-light: color-mix(in oklab, var(--oc-gilt) 55%, white);
+  --oc-gilt-dark: color-mix(in oklab, var(--oc-gilt) 62%, black);
+  --oc-pearl: color-mix(in oklab, var(--oc-cloth) 35%, white);
+  --oc-shadow: 0 30px 50px -28px rgb(0 0 0 / 0.55);
+  isolation: isolate;
+}
+
+/* The card itself: the theme's cloth with fine gilt lines inside its edge */
+.oc-card {
+  background: var(--oc-cloth);
+  border-radius: 1.4rem;
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 6px var(--oc-cloth),
+    inset 0 0 0 7px color-mix(in oklab, var(--oc-gilt) 65%, transparent);
+}
+.oc-band {
+  border-radius: 1.4rem;
+  box-shadow: var(--oc-shadow);
+}
+
+/* The hour's painting in its small frame, and the gilt rule under the name */
+.oc-art {
+  width: min(60%, 12rem);
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 50% 50% 0.6rem 0.6rem / 42% 42% 0.6rem 0.6rem;
+  box-shadow:
+    0 0 0 3px var(--oc-cloth),
+    0 0 0 4.5px var(--oc-gilt),
+    0 0 0 7px var(--oc-cloth),
+    0 0 0 8px color-mix(in oklab, var(--oc-gilt) 60%, transparent),
+    0 16px 22px -14px rgb(0 0 0 / 0.5);
+}
+.oc[data-box="kamal"] .oc-art {
+  border-radius: 50%;
+}
+.oc[data-box="shisha"] .oc-art {
+  width: min(50%, 10rem);
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+.oc[data-box="mandap"] .oc-art {
+  border-radius: 0.5rem;
+}
+.oc-rule {
+  position: relative;
+  display: block;
+  width: 5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--oc-gilt) 25% 75%, transparent);
+}
+.oc-rule::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.45rem;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  rotate: 45deg;
+  background: var(--oc-gilt);
+}
+
+/* Fills and lines of the drawings */
+.oc-gilt {
+  fill: var(--oc-gilt);
+}
+.oc-jewel {
+  fill: var(--oc-jewel);
+}
+.oc-cloth {
+  fill: var(--oc-cloth);
+}
+.oc-deep {
+  fill: var(--oc-deep);
+}
+.oc-pearl {
+  fill: var(--oc-pearl);
+  stroke: color-mix(in oklab, var(--oc-gilt) 55%, transparent);
+  stroke-width: 0.6;
+}
+.oc-shine {
+  fill: white;
+  opacity: 0.85;
+}
+.oc-gilt-edge {
+  stroke: var(--oc-gilt-dark);
+  stroke-width: 0.9;
+}
+.oc-deep-edge {
+  stroke: var(--oc-gilt-dark);
+  stroke-width: 1;
+}
+.oc-gilt-line,
+.oc-jewel-line,
+.oc-deep-line,
+.oc-tassel-line,
+.oc-chain,
+.oc-stem {
+  fill: none;
+  stroke-linecap: round;
+}
+.oc-gilt-line {
+  stroke: var(--oc-gilt);
+  stroke-width: 1.5;
+}
+.oc-jewel-line {
+  stroke: var(--oc-jewel);
+  stroke-width: 1.4;
+}
+.oc-deep-line {
+  stroke: var(--oc-deep);
+  stroke-width: 1.2;
+}
+.oc-tassel-line {
+  stroke: rgb(0 0 0 / 0.22);
+  stroke-width: 0.8;
+}
+.oc-chain {
+  stroke: var(--oc-gilt);
+  stroke-width: 1.8;
+  stroke-dasharray: 2.4 1.4;
+}
+.oc-stem {
+  stroke: var(--flower-leaf-deep);
+  stroke-width: 1.2;
+}
+.oc-bud {
+  fill: var(--oc-gilt);
+}
+.oc-filigree {
+  opacity: 0.75;
+}
+.oc-filigree path {
+  fill: none;
+  stroke: color-mix(in oklab, var(--oc-jewel) 60%, var(--oc-cloth));
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+.oc-filigree .oc-leaf {
+  fill: color-mix(in oklab, var(--oc-jewel) 30%, var(--oc-cloth));
+  stroke-width: 0.8;
+}
+.oc-filigree .oc-dot {
+  fill: var(--oc-gilt);
+}
+.oc-art,
+.oc-line {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * Moti: a lace-cornered card in a jewel band, a gilt rod at one side (alternating hour by
+ * hour) and a pearl jhalar below.
+ */
+.oc[data-box="moti"] {
+  padding-inline: 0.9rem;
+  margin-top: 1rem;
+}
+.oc[data-box="moti"] .oc-band {
+  padding: 0.6rem;
+  border-radius: 1.9rem;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      transparent 0 5px,
+      color-mix(in oklab, var(--oc-gilt) 22%, transparent) 5px 6px
+    ),
+    color-mix(in oklab, var(--oc-jewel) 42%, var(--oc-cloth));
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 3.5px color-mix(in oklab, var(--oc-jewel) 42%, var(--oc-cloth)),
+    inset 0 0 0 4.5px var(--oc-gilt-light),
+    var(--oc-shadow);
+}
+.oc[data-box="moti"] .oc-card {
+  border-radius: 1.35rem;
+  box-shadow:
+    0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 5px var(--oc-cloth),
+    inset 0 0 0 6px color-mix(in oklab, var(--oc-gilt) 60%, transparent);
+}
+.oc-rod {
+  position: absolute;
+  z-index: 3;
+  top: 14%;
+  bottom: calc(14% + 3rem);
+  inset-inline-end: 0.2rem;
+  width: 0.85rem;
+  border-radius: 999px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 0.9rem,
+      color-mix(in oklab, var(--oc-gilt-dark) 60%, transparent) 0.9rem 1.05rem
+    ),
+    linear-gradient(
+      90deg,
+      var(--oc-gilt-dark),
+      var(--oc-gilt-light) 40%,
+      var(--oc-gilt) 70%,
+      var(--oc-gilt-dark)
+    );
+  box-shadow: 0 8px 14px -6px rgb(0 0 0 / 0.5);
+}
+.oc-rod::before,
+.oc-rod::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 1.3rem;
+  aspect-ratio: 1;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    white,
+    var(--oc-pearl) 35%,
+    color-mix(in oklab, var(--oc-pearl) 70%, var(--oc-gilt)) 100%
+  );
+  box-shadow: 0 0 0 2px var(--oc-gilt);
+}
+.oc-rod::before {
+  top: -1rem;
+}
+.oc-rod::after {
+  bottom: -1rem;
+}
+.oc[data-flip] .oc-rod {
+  inset-inline-end: auto;
+  inset-inline-start: 0.2rem;
+}
+
+/* Jharokha: an arched window in a band of jaali, under its chhatri, latkans at its sides */
+.oc[data-box="jharokha"] {
+  padding-inline: 1.5rem;
+  margin-top: 3.5rem;
+}
+.oc[data-box="jharokha"] .oc-band {
+  padding: 0.55rem;
+  border-radius: 50% 50% 1.2rem 1.2rem / 8.5rem 8.5rem 1.2rem 1.2rem;
+  background:
+    radial-gradient(circle, var(--oc-gilt) 0 1px, transparent 1.6px) 0 0 / 7px 7px,
+    var(--oc-deep);
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    var(--oc-shadow);
+}
+.oc[data-box="jharokha"] .oc-card {
+  padding-top: 3.5rem;
+  border-radius: 50% 50% 0.8rem 0.8rem / 8rem 8rem 0.8rem 0.8rem;
+  box-shadow:
+    0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 6px var(--oc-cloth),
+    inset 0 0 0 7px color-mix(in oklab, var(--oc-gilt) 70%, transparent),
+    inset 0 0 0 10px var(--oc-cloth),
+    inset 0 0 0 11px color-mix(in oklab, var(--oc-jewel) 45%, transparent);
+}
+
+/* Mandap: between two banded pillars with kalash tops, a garland across, a step below */
+.oc[data-box="mandap"] {
+  padding-inline: 1.6rem;
+  margin-top: 3rem;
+}
+.oc[data-box="mandap"] .oc-band {
+  border-radius: 0.5rem;
+}
+.oc[data-box="mandap"] .oc-band::after {
+  content: "";
+  position: absolute;
+  inset-inline: -1.4rem;
+  bottom: -0.9rem;
+  height: 0.9rem;
+  border-radius: 0.2rem;
+  background: linear-gradient(var(--oc-gilt) 0 35%, var(--oc-deep) 35%);
+  box-shadow: 0 10px 14px -8px rgb(0 0 0 / 0.45);
+}
+.oc[data-box="mandap"] .oc-card {
+  padding-top: 3.75rem;
+  border-radius: 0.5rem;
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 6px var(--oc-cloth),
+    inset 0 0 0 7.5px var(--oc-jewel),
+    inset 0 0 0 9px var(--oc-cloth),
+    inset 0 0 0 10px color-mix(in oklab, var(--oc-gilt) 70%, transparent);
+}
+.oc-pillar {
+  position: absolute;
+  z-index: 3;
+  top: 0.4rem;
+  bottom: -0.4rem;
+  width: 1.3rem;
+  border-radius: 0.3rem 0.3rem 0.15rem 0.15rem;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 0.35), transparent 40%, rgb(0 0 0 / 0.28)),
+    repeating-linear-gradient(
+      180deg,
+      var(--oc-gilt) 0 0.45rem,
+      var(--oc-deep) 0.45rem 0.6rem,
+      var(--oc-jewel) 0.6rem 1.5rem,
+      var(--oc-deep) 1.5rem 1.65rem
+    );
+  box-shadow: 0 10px 16px -8px rgb(0 0 0 / 0.5);
+}
+.oc-pillar.start-0 {
+  inset-inline-start: 0.15rem;
+}
+.oc-pillar.end-0 {
+  inset-inline-end: 0.15rem;
+}
+
+/* Kamal: a soft cloth card, a lotus crest and flowers gathered in every corner */
+.oc[data-box="kamal"] {
+  margin-top: 3rem;
+}
+.oc[data-box="kamal"] .oc-band {
+  border-radius: 2.25rem;
+}
+.oc[data-box="kamal"] .oc-card {
+  padding-top: 3rem;
+  border-radius: 2.25rem;
+  background:
+    radial-gradient(
+      ellipse 80% 35% at 50% 0,
+      color-mix(in oklab, var(--oc-jewel) 14%, transparent),
+      transparent
+    ),
+    var(--oc-cloth);
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    inset 0 0 0 7px var(--oc-cloth),
+    inset 0 0 0 8px color-mix(in oklab, var(--oc-gilt) 60%, transparent);
+}
+
+/* Shisha: Kutch mirror-work round the edge, pennants inside the top, tassels below */
+.oc[data-box="shisha"] .oc-band {
+  padding: 0.95rem;
+  border-radius: 0.6rem;
+  background:
+    radial-gradient(
+        circle,
+        var(--oc-pearl) 0 0.17rem,
+        var(--oc-gilt) 0.17rem 0.26rem,
+        transparent 0.28rem
+      )
+      0 0 / 0.95rem 0.95rem round,
+    radial-gradient(circle, var(--oc-gilt-light) 0 1px, transparent 1.6px) 0.475rem 0.475rem /
+      0.95rem 0.95rem,
+    var(--oc-deep);
+  box-shadow:
+    inset 0 0 0 1.5px var(--oc-gilt),
+    var(--oc-shadow);
+}
+.oc[data-box="shisha"] .oc-card {
+  padding-top: 3rem;
+  border-radius: 0.25rem;
+  box-shadow:
+    0 0 0 2px var(--oc-gilt),
+    inset 0 0 0 5px var(--oc-cloth),
+    inset 0 0 0 6px color-mix(in oklab, var(--oc-jewel) 55%, transparent);
+}
+.oc-pennants {
+  left: 1.3rem;
+  top: 1.3rem;
+  width: calc(100% - 2.6rem);
+}
+
+/* Mandir: a gilt band, a gopuram crest, rows of kolam dots and temple bells below */
+.oc[data-box="mandir"] {
+  margin-top: 3.25rem;
+}
+.oc[data-box="mandir"] .oc-band {
+  padding: 0.4rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(
+    160deg,
+    var(--oc-gilt-light),
+    var(--oc-gilt) 40%,
+    var(--oc-gilt-dark)
+  );
+}
+.oc[data-box="mandir"] .oc-card {
+  padding-top: 3.25rem;
+  padding-bottom: 2.75rem;
+  border-radius: 0.5rem;
+  box-shadow:
+    inset 0 0 0 4px var(--oc-cloth),
+    inset 0 0 0 5px var(--oc-deep);
+}
+.oc[data-box="mandir"] .oc-card::before,
+.oc[data-box="mandir"] .oc-card::after {
+  content: "";
+  position: absolute;
+  inset-inline: 1.25rem;
+  height: 0.55rem;
+  background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--oc-jewel) 70%, var(--oc-cloth)) 0 1.6px,
+      transparent 2.2px
+    )
+    0 0 / 0.75rem 0.55rem round;
+  pointer-events: none;
+}
+.oc[data-box="mandir"] .oc-card::before {
+  top: 1rem;
+}
+.oc[data-box="mandir"] .oc-card::after {
+  bottom: 1rem;
+}
+
+/* ---------- Entrances, each card its own, and the hangings' gentle sway ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  :root:not([data-motion="reduce"]) {
+    /* The card makes its own entrance, so the section around it only fades in */
+    .guest-reveal[data-reveal="in"]:has(> .oc) {
+      animation: oc-fade 500ms ease-out backwards;
+    }
+    [data-reveal="wait"] .oc :is(.oc-band, .oc-hang, .oc-crest, .oc-rod, .oc-gem) {
+      opacity: 0;
+    }
+
+    /* The words inside arrive one after another */
+    [data-reveal="in"] .oc :is(.oc-art, .oc-line) {
+      animation: oc-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+      animation-delay: 450ms;
+    }
+    [data-reveal="in"] .oc .oc-line {
+      animation-delay: 650ms;
+    }
+    [data-reveal="in"] .oc .oc-line:last-child {
+      animation-delay: 850ms;
+    }
+    [data-reveal="in"] .oc .oc-rule {
+      animation: oc-draw 800ms ease-out 700ms backwards;
+    }
+
+    /* Everything that hangs sways a little, each strand at its own pace */
+    .oc :is(.oc-strand, .oc-latkan) {
+      transform-box: fill-box;
+      transform-origin: top center;
+      animation: oc-sway 3.6s ease-in-out infinite alternate;
+      animation-delay: calc(var(--i, 0) * -0.7s);
+    }
+    .oc .oc-bell {
+      transform-box: fill-box;
+      transform-origin: top center;
+    }
+
+    /* Moti: the card lowers in, the rod slides down its side, the pearls drop and swing */
+    [data-reveal="in"] .oc[data-box="moti"] {
+      .oc-band {
+        animation: oc-lower 1000ms cubic-bezier(0.2, 0.9, 0.25, 1.05) backwards;
+      }
+      .oc-rod {
+        transform-origin: top;
+        animation: oc-grow-y 700ms ease-out 350ms backwards;
+      }
+      .oc-gem {
+        animation: oc-pop 600ms cubic-bezier(0.3, 1.6, 0.5, 1) 600ms backwards;
+      }
+      .oc-hang .oc-strand {
+        animation:
+          oc-drop 800ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards,
+          oc-sway 3.6s ease-in-out infinite alternate;
+        animation-delay: calc(700ms + var(--i) * 90ms), calc(var(--i) * -0.7s);
+      }
+      .oc-posy .oc-bloom {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: oc-bloom 700ms cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+        animation-delay: calc(800ms + var(--i) * 90ms);
+      }
+    }
+
+    /* Jharokha: the window opens from the middle, the chhatri settles, the latkans swing */
+    [data-reveal="in"] .oc[data-box="jharokha"] {
+      .oc-band {
+        animation: oc-open 1100ms cubic-bezier(0.6, 0, 0.2, 1) backwards;
+      }
+      .oc-crest {
+        animation: oc-settle 800ms cubic-bezier(0.3, 1.4, 0.5, 1) 500ms backwards;
+      }
+      .oc-hang {
+        animation: oc-fade 600ms ease-out 700ms backwards;
+      }
+      .oc-latkan {
+        animation:
+          oc-drop 900ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards,
+          oc-sway 3.6s ease-in-out infinite alternate;
+        animation-delay: calc(900ms + var(--i) * 150ms), calc(var(--i) * -0.7s);
+      }
+    }
+
+    /* Mandap: the pillars rise, the card settles between them, the garland drops on */
+    [data-reveal="in"] .oc[data-box="mandap"] {
+      .oc-pillar {
+        transform-origin: bottom;
+        animation: oc-grow-y 800ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+        animation-delay: calc(var(--i) * 120ms);
+      }
+      .oc-band {
+        animation: oc-rise 800ms cubic-bezier(0.2, 0.8, 0.2, 1) 250ms backwards;
+      }
+      .oc-garland {
+        animation: oc-garland 1000ms cubic-bezier(0.3, 1.5, 0.5, 1) 800ms backwards;
+      }
+    }
+
+    /* Kamal: the card floats up, the lotus opens petal by petal, the corners bloom */
+    [data-reveal="in"] .oc[data-box="kamal"] {
+      .oc-band {
+        animation: oc-float 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+      }
+      .oc-petal {
+        transform-box: view-box;
+        transform-origin: 60px 58px;
+        animation: oc-petal 800ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards;
+        animation-delay: calc(500ms + var(--i) * 110ms);
+      }
+      .oc-posy .oc-bloom {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: oc-bloom 700ms cubic-bezier(0.3, 1.5, 0.5, 1) backwards;
+        animation-delay: calc(800ms + var(--i) * 90ms);
+      }
+    }
+
+    /* Shisha: the cloth unfurls from the top like a hanging, its mirrors catch the light */
+    [data-reveal="in"] .oc[data-box="shisha"] {
+      .oc-band {
+        transform-origin: top;
+        animation: oc-unfurl 1100ms cubic-bezier(0.25, 1.3, 0.5, 1) backwards;
+      }
+      .oc-band::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        border-radius: inherit;
+        background: linear-gradient(
+          110deg,
+          transparent 35%,
+          rgb(255 255 255 / 0.55) 50%,
+          transparent 65%
+        );
+        background-size: 250% 100%;
+        pointer-events: none;
+        animation: oc-glint 1400ms ease-in-out 900ms both;
+      }
+      .oc-pennants {
+        animation: oc-fade 500ms ease-out 700ms backwards;
+      }
+      .oc-hang .oc-strand {
+        animation:
+          oc-drop 800ms cubic-bezier(0.3, 1.4, 0.5, 1) backwards,
+          oc-sway 3.6s ease-in-out infinite alternate;
+        animation-delay: calc(800ms + var(--i) * 100ms), calc(var(--i) * -0.7s);
+      }
+    }
+
+    /* Mandir: the gopuram rises, the card follows, and the bells ring one after another */
+    [data-reveal="in"] .oc[data-box="mandir"] {
+      .oc-band {
+        animation: oc-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+      }
+      .oc-crest {
+        animation: oc-settle 800ms cubic-bezier(0.3, 1.4, 0.5, 1) 350ms backwards;
+      }
+      .oc-bell {
+        animation:
+          oc-ring 1800ms ease-out backwards,
+          oc-sway 4.2s ease-in-out 1800ms infinite alternate;
+        animation-delay: calc(700ms + var(--i) * 140ms), calc(2500ms + var(--i) * -0.8s);
+      }
+    }
+  }
+}
+
+@keyframes oc-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes oc-rise {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+}
+@keyframes oc-float {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    translate: 0 2rem;
+  }
+}
+@keyframes oc-lower {
+  from {
+    opacity: 0;
+    translate: 0 -2rem;
+    scale: 0.96;
+  }
+}
+@keyframes oc-draw {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes oc-grow-y {
+  from {
+    opacity: 0;
+    scale: 1 0;
+  }
+}
+@keyframes oc-pop {
+  from {
+    opacity: 0;
+    scale: 0;
+  }
+}
+@keyframes oc-bloom {
+  from {
+    opacity: 0;
+    scale: 0;
+    rotate: -120deg;
+  }
+}
+@keyframes oc-drop {
+  from {
+    opacity: 0;
+    scale: 1 0;
+  }
+}
+@keyframes oc-sway {
+  from {
+    rotate: -2.5deg;
+  }
+  to {
+    rotate: 2.5deg;
+  }
+}
+@keyframes oc-open {
+  from {
+    clip-path: inset(0 50% 0 50%);
+    opacity: 0.4;
+  }
+  to {
+    clip-path: inset(-10% -10% -10% -10%);
+  }
+}
+@keyframes oc-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-1.5rem);
+  }
+}
+@keyframes oc-garland {
+  from {
+    opacity: 0;
+    transform: translateY(-2rem) scale(1, 0.6);
+  }
+}
+@keyframes oc-petal {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+@keyframes oc-unfurl {
+  from {
+    opacity: 0;
+    transform: perspective(60rem) rotateX(-75deg);
+  }
+}
+@keyframes oc-glint {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+    opacity: 0;
+  }
+}
+@keyframes oc-ring {
+  0% {
+    rotate: 0deg;
+  }
+  15% {
+    rotate: 14deg;
+  }
+  32% {
+    rotate: -11deg;
+  }
+  50% {
+    rotate: 7deg;
+  }
+  68% {
+    rotate: -4deg;
+  }
+  84% {
+    rotate: 2deg;
+  }
+  100% {
+    rotate: 0deg;
+  }
+}

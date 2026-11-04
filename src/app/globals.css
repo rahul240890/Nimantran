@@ -6392,6 +6392,7 @@
 .guest-sky[data-mood="dawn"],
 .guest-sky[data-mood="day"],
 .guest-card,
+.oc-card,
 .guest-date-disc {
   color-scheme: light;
   --paper: var(--guest-cloth);
@@ -6421,6 +6422,7 @@
   --accent-text: color-mix(in oklab, var(--suite-accent-text) 55%, var(--suite-ink));
 }
 .guest-sky .guest-card,
+.guest-sky .oc-card,
 .guest-sky .guest-date-disc {
   --accent-text: var(--suite-accent-text);
 }

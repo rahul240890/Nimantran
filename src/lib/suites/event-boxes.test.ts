@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { SUITE_IDS } from "./catalog";
-import { BOX_HEADS, EVENT_BOXES, eventBox } from "./event-boxes";
+import { BOX_HEADS, EVENT_BOXES, ORNATE_BOXES, eventBox, isOrnate } from "./event-boxes";
 import { GUEST_STYLES, guestLook } from "./guest-look";
 
 describe("each theme's event box", () => {
@@ -19,8 +19,19 @@ describe("each theme's event box", () => {
     }
   });
 
-  it("gives every box a heading", () => {
-    for (const style of GUEST_STYLES)
-      for (const box of EVENT_BOXES[style]) expect(BOX_HEADS[box]).toBeDefined();
+  it("gives every party box a heading, and every other box is an ornate card", () => {
+    for (const box of EVENT_BOXES.party) expect(BOX_HEADS[box]).toBeDefined();
+    for (const style of ["palace", "procession", "garden"] as const)
+      for (const box of EVENT_BOXES[style]) expect(isOrnate(box)).toBe(true);
+  });
+
+  it("hangs every ornate card in some theme", () => {
+    const used = new Set(
+      SUITE_IDS.flatMap((suite) => {
+        const style = guestLook(suite)?.style;
+        return style ? [eventBox(suite, style)] : [];
+      }),
+    );
+    for (const box of ORNATE_BOXES) expect(used, box).toContain(box);
   });
 });
