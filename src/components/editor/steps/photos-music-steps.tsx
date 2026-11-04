@@ -8,6 +8,7 @@ import {
   Images,
   LoaderCircle,
   Music2,
+  Trash2,
   Wind,
   Upload,
   X,
@@ -43,6 +44,7 @@ import { cn } from "@/lib/cn";
 import {
   forgetPhotoUrl,
   photoFailed,
+  photoUnavailable,
   rememberPhotoUrl,
   useClipUrl,
   usePhotoUrls,
@@ -147,6 +149,7 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
   const { add, busy } = usePhotoUpload(draft);
   const [adding, setAdding] = useState<number | null>(null);
   const inputs = useRef<(HTMLInputElement | null)[]>([]);
+  const pickers = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Each frame named for whose photo goes in it, by the names typed on the card
   const first = draft.content.first?.trim();
@@ -195,6 +198,34 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
       },
       { limit: 1, replacing: Boolean(old) },
     ).finally(() => setAdding(null));
+  };
+
+  // Takes the frame's photo out (owner, 2026-11-03: a photo could be changed or adjusted, but
+  // never taken out). The frame stays empty: no other photo takes its place
+  const empty = (frame: number) => {
+    const old = slots[frame];
+    if (!old) return;
+    update((current) => {
+      const now = draftFrameSlots(current);
+      now[frame] = null;
+      const gone = now.includes(old) ? null : old;
+      const crops = { ...current.couplePhotos.crops };
+      if (gone) delete crops[gone];
+      return {
+        ...current,
+        photos: current.photos.filter((p) => p.id !== gone),
+        couplePhotos: {
+          ...draftCouple(current),
+          ids: now.map((id) => id ?? ""),
+          crops,
+          strict: true,
+        },
+      };
+    });
+    if (!slots.some((id, i) => i !== frame && id === old)) forgetPhoto(old);
+    toast({ title: extrasCopy.framePhotoRemoved(frameName(frame)), tone: "success" });
+    // Focus stays in the frame, on its own Add button
+    requestAnimationFrame(() => pickers.current[frame]?.focus());
   };
 
   const saveCrop = (id: string, crop: PhotoCrop | null) =>
@@ -257,10 +288,20 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-sm font-semibold text-ink">{name}</span>
                   {id ? (
-                    <Badge tone="gold">
-                      <Check aria-hidden className="size-3" strokeWidth={3} />
-                      {extrasCopy.framePhotoAdded}
-                    </Badge>
+                    <span className="flex items-center gap-1">
+                      <Badge tone="gold">
+                        <Check aria-hidden className="size-3" strokeWidth={3} />
+                        {extrasCopy.framePhotoAdded}
+                      </Badge>
+                      {/* Up here beside its badge, clear of the page's bar along the foot */}
+                      <IconButton
+                        label={extrasCopy.removeFramePhoto(name)}
+                        icon={<Trash2 />}
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => empty(frame)}
+                      />
+                    </span>
                   ) : (
                     <span className="text-xs font-semibold text-ink-muted">
                       {extrasCopy.framePhotoOptional}
@@ -268,6 +309,9 @@ export function DesignPhotos({ draft, update }: Pick<StepProps, "draft" | "updat
                   )}
                 </span>
                 <button
+                  ref={(node) => {
+                    pickers.current[frame] = node;
+                  }}
                   type="button"
                   aria-label={
                     id ? extrasCopy.changeFramePhoto(name) : extrasCopy.addFramePhoto(name)
@@ -468,6 +512,13 @@ function MorePhotos({ draft, update }: Pick<StepProps, "draft" | "update">) {
                     onError={() => photoFailed(photo.id)}
                     className="size-full object-cover"
                   />
+                ) : photoUnavailable(photo.id) ? (
+                  // A photo nothing can show says so, so the host takes it out rather than
+                  // publish an empty frame
+                  <span className="flex size-full flex-col items-center justify-center gap-2 px-3 text-center text-ink-muted">
+                    <ImageOff aria-hidden className="size-8 text-danger" />
+                    <span className="text-xs font-semibold">{extrasCopy.photoDidNotLoad}</span>
+                  </span>
                 ) : (
                   <span className="grid size-full place-items-center text-ink-faint">
                     <ImageIcon aria-hidden className="size-8" />

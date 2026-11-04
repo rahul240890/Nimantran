@@ -1,4 +1,6 @@
-import type { CSSProperties } from "react";
+"use client";
+
+import { useCallback, type CSSProperties, type SyntheticEvent } from "react";
 import type { StoryPhoto } from "@/lib/engine/story";
 import { cn } from "@/lib/cn";
 import { photoPlacement, turnedAspect, type PhotoFit } from "@/lib/editor/photo-fit";
@@ -46,6 +48,7 @@ export function FramedPhoto({
   lazy = false,
   className,
   style,
+  onFail,
 }: {
   photo: StoryPhoto;
   frameAspect: number;
@@ -54,15 +57,37 @@ export function FramedPhoto({
   lazy?: boolean;
   className?: string;
   style?: CSSProperties;
+  /**
+   * Called when the photo's file can't be shown (a link that has run out, a file that never
+   * finished uploading), so the page can take its frame away rather than show it empty.
+   */
+  onFail?: () => void;
 }) {
   const loading = lazy ? "lazy" : undefined;
+  // A photo that failed before the page came alive fires no error the page can hear, so a
+  // broken one already settled is reported as soon as it is on the page
+  const settled = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (img && onFail && img.complete && img.naturalWidth === 0 && img.currentSrc) onFail();
+    },
+    [onFail],
+  );
+  const failed = onFail ? () => onFail() : undefined;
+  const loaded = onFail
+    ? (event: SyntheticEvent<HTMLImageElement>) => {
+        if (event.currentTarget.naturalWidth === 0) onFail();
+      }
+    : undefined;
   if (!photo.fit) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- the family's own photo, sized by its frame
       <img
+        ref={settled}
         src={photo.src}
         alt={alt}
         loading={loading}
+        onError={failed}
+        onLoad={loaded}
         decoding="async"
         draggable={false}
         className={cn("object-cover select-none", className)}
@@ -82,9 +107,12 @@ export function FramedPhoto({
       <span className="block" style={box}>
         {/* eslint-disable-next-line @next/next/no-img-element -- the family's own photo, placed by them */}
         <img
+          ref={settled}
           src={photo.src}
           alt=""
           loading={loading}
+          onError={failed}
+          onLoad={loaded}
           decoding="async"
           draggable={false}
           className="select-none"

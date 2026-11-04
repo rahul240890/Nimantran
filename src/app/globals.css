@@ -4896,6 +4896,13 @@
 .story-keep-head {
   white-space: nowrap;
 }
+/*
+ * An invocation, a small heading or a function's name reads as one phrase: it stays on one
+ * line and shrinks to fit (story-player.tsx), wrapping only past the smallest readable size
+ */
+.story-one:not([data-wrap]) {
+  white-space: nowrap;
+}
 :is([data-loose], [data-overflow]) > .story-line .story-keep,
 [data-overflow] > .story-line .story-keep-head {
   white-space: normal;

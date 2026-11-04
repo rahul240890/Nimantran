@@ -441,8 +441,10 @@ export function QuickStart({
         >
           {quickCopy.preview}
         </Button>
-        {/* Made from the saved invite, so they wait while a change is held back */}
-        {filled && !held && (
+        {/* On every design from the start (owner, 2026-11-03: "it should show in all"):
+            until the names and dates are in, a tap opens what's missing. Made from the saved
+            invite, so they wait while a change is held back */}
+        {!held && (
           <>
             <Button
               variant="secondary"

@@ -4,12 +4,12 @@ The site sends four emails, through [Resend](https://resend.com) from the
 `shubhinvitations.com` domain. Nothing is sent until `RESEND_API_KEY` is set in Vercel, and
 preview mode never sends.
 
-| Email          | When                                                                                | To                                                                                                                        |
-| -------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Welcome        | Right after a new account's first sign-in                                           | Google sign-ins (phone sign-ins have no email)                                                                            |
-| Receipt        | Once a payment is recorded, by the checkout or Razorpay's webhook                   | The buyer, with a link to the printable invoice                                                                           |
-| Draft reminder | Daily job: a draft with no package, untouched for a day, under 10 days old          | The invite's owner, once per invite, at most once a week, with a "Stop these reminders" link                              |
-| Error alert    | A page breaks on the server, or a browser reports an error that isn't its own noise | `ALERT_EMAIL` (one or more addresses, comma separated), or else every admin's sign-in email; once a day per kind of error |
+| Email          | When                                                                                | To                                                                                                                                                                                                                                                             |
+| -------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Welcome        | Right after a new account's first sign-in                                           | Google sign-ins (phone sign-ins have no email). Sent as "Ved from Shubh Invitation": a plain note with nine features in simple words (`WELCOME_FEATURES` in `src/lib/email/notify.ts`) and one link, no pictures or codes, so Gmail files it in Primary        |
+| Receipt        | Once a payment is recorded, by the checkout or Razorpay's webhook                   | The buyer, with a link to the printable invoice, help (email, Instagram message), the ask to follow on Instagram, and the bigger packages with the difference to pay, read from Admin, Designs prices (none after Grand, and none if the prices can't be read) |
+| Not bought yet | Daily job: a day after signing in, nothing bought, no invite edited for 12 hours    | Once per person, ever (`email_log` kind `draft_reminder`, ref the account). The designs they tried, the features in short, help, and a "Stop these emails" link                                                                                                |
+| Error alert    | A page breaks on the server, or a browser reports an error that isn't its own noise | `ALERT_EMAIL` (one or more addresses, comma separated), or else every admin's sign-in email; once a day per kind of error                                                                                                                                      |
 
 Error alerts are kept to once a day per kind of error by Resend's idempotency key (one key per error and day), and each server sends at most 10 an hour; they aren't written to `email_log`. Code: `src/lib/errors/alert.ts`.
 
@@ -33,9 +33,12 @@ trigger tries again. Code: `src/lib/email/`. Wording and layout: `src/lib/email/
    - `CRON_SECRET` — any long random string; Vercel sends it to the reminder job
    - `EMAIL_FROM` — optional, defaults to `Shubh Invitation <hello@shubhinvitations.com>`
    - `EMAIL_REPLY_TO` — optional, an inbox you read, so replies reach a person
-   - `NEXT_PUBLIC_CONTACT_EMAIL` — optional, shown in the footer of every email
+   - `NEXT_PUBLIC_CONTACT_EMAIL` — optional, shown in the footer of every email and under "Need help?"
    - `ALERT_EMAIL` — optional, where error alerts go instead of the admins' sign-in emails
 5. **Database.** Run `supabase/migrations/20261015090000_emails.sql` once in Supabase's SQL
    Editor.
 6. **Redeploy** so the new variables apply. The reminder job then runs daily at 10:00 IST
    (`vercel.json`); Vercel → Settings → Cron Jobs shows its runs.
+
+Instagram is `site.social.instagram`. Admin, Emails shows every email and
+sends test copies of all of them.

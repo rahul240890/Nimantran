@@ -24,7 +24,20 @@ const color = {
 export type Email = { subject: string; html: string; text: string };
 
 /** Who the email comes from and where its links point. */
-export type Brand = { name: string; siteUrl: string; contactEmail: string | null };
+export type Brand = {
+  name: string;
+  siteUrl: string;
+  contactEmail: string | null;
+  /** Where people get help and follow us, for the receipt and the reminder. */
+  help?: Help;
+};
+
+/** Help by email and Instagram message. */
+export type Help = {
+  instagramUrl: string;
+  /** "@shubhinvitations.in". */
+  instagramHandle: string;
+};
 
 export function escapeHtml(value: string): string {
   return value
@@ -187,45 +200,77 @@ const offerLines = (offers: EmailOffer[]) =>
 
 /* ---------- Welcome ---------- */
 
+/** What one invitation gives, in the words of the first-visit popup (offersCopy.welcome). */
+export type Feature = { title: string; body: string };
+
+/**
+ * A plain note, written like a person would, so Gmail files it in Primary: no pictures, no
+ * offer codes, no button and one link. Offers and designs come later, in the new-designs
+ * email.
+ */
+function plainLayout(brand: Brand, preheader: string, body: string, why: string): string {
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(brand.name)}</title>
+</head>
+<body style="margin:0;padding:0;background:${color.surface};font-family:Helvetica,Arial,sans-serif">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${escapeHtml(preheader)}</div>
+<div style="max-width:560px;margin:0 auto;padding:24px 16px;font-size:16px;line-height:1.6;color:${color.ink}">
+${body}
+<p style="margin:28px 0 0;font-size:13px;line-height:1.6;color:${color.inkMuted}">${escapeHtml(why)}</p>
+</div>
+</body>
+</html>`;
+}
+
+const plainParagraph = (text: string) => `<p style="margin:0 0 14px">${escapeHtml(text)}</p>`;
+
 export function welcomeEmail(
   brand: Brand,
   name: string,
-  extras: { offers?: EmailOffer[]; designs?: EmailDesign[] } = {},
+  details: { features: readonly Feature[]; signedBy: string },
 ): Email {
   const start = link(brand, "/create");
-  const offers = extras.offers ?? [];
-  const designs = extras.designs ?? [];
-  const lines = [
-    `Thank you for joining ${brand.name}. Your invitations live in your account, so you can start one now and finish it whenever you like.`,
-    "Pick a design, add the names, family and each function, then share your link on WhatsApp. Guests open it on any phone and reply in one tap, and you see every reply on your guest list.",
-  ];
-  const first = offers.find((offer) => offer.code);
-  const preheader = first
-    ? `Start free, and take ${first.value} with ${first.code} when you choose a package.`
-    : "Start your first invitation and share it on WhatsApp.";
+  const startLabel = start.replace(/^https?:\/\//, "");
+  const intro = `Thank you for joining ${brand.name}. One invitation here gives you everything, in one place:`;
+  const help = brand.contactEmail
+    ? `If you get stuck, just reply to this email or write to ${brand.contactEmail}. A person reads every message.`
+    : "If you get stuck, just reply to this email. A person reads every reply.";
+  const first = name.trim().split(/\s+/)[0];
   const why = `You're getting this because you just made an account on ${brand.name}.`;
+  const items = details.features
+    .map(
+      (feature) =>
+        `<li style="margin:0 0 6px"><strong>${escapeHtml(feature.title)}</strong>: ${escapeHtml(feature.body)}</li>`,
+    )
+    .join("");
   return {
-    subject: `Welcome to ${brand.name}`,
-    html: layout(
+    subject: first ? `Welcome to ${brand.name}, ${first}` : `Welcome to ${brand.name}`,
+    html: plainLayout(
       brand,
-      preheader,
-      `${heading(`Welcome to ${brand.name}`)}${paragraph(greeting(name))}${lines.map(paragraph).join("")}${button(start, "Start an invitation")}${
-        offers.length
-          ? `${label("Offers for you")}${paragraph("Copy a code and type it when you choose a package for your invitation.")}${offerTickets(brand, offers)}`
-          : ""
-      }${designs.length ? `${label("Designs to start with")}${designGrid(designs)}` : ""}`,
-      { why },
+      "Your website, video and cards, all from one invitation.",
+      `${plainParagraph(greeting(name))}${plainParagraph(intro)}<ul style="margin:0 0 16px;padding-left:22px">${items}</ul><p style="margin:0 0 14px">Try it free, no payment needed: <a href="${escapeHtml(start)}" style="color:${color.accentText}">${escapeHtml(startLabel)}</a></p>${plainParagraph(help)}<p style="margin:20px 0 0">${escapeHtml(details.signedBy)}<br>${escapeHtml(brand.name)}</p>`,
+      why,
     ),
     text: [
       greeting(name),
       "",
-      ...lines.flatMap((line) => [line, ""]),
-      `Start an invitation: ${start}`,
-      ...(offers.length ? ["", "Offers for you:", ...offerLines(offers)] : []),
-      ...(designs.length
-        ? ["", "Designs to start with:", ...designs.map((d) => `${d.name}: ${d.href}`)]
-        : []),
-      textFooter(brand, why),
+      intro,
+      "",
+      ...details.features.map((feature) => `- ${feature.title}: ${feature.body}`),
+      "",
+      `Try it free, no payment needed: ${start}`,
+      "",
+      help,
+      "",
+      details.signedBy,
+      brand.name,
+      "",
+      "--",
+      why,
     ].join("\n"),
   };
 }
@@ -278,6 +323,37 @@ export function discoverEmail(brand: Brand, d: DiscoverDetails): Email {
   };
 }
 
+/* ---------- Help and Instagram ---------- */
+
+/** "Need help?" with each way to reach us, then the ask to follow on Instagram. */
+function helpBlock(brand: Brand): string {
+  const help = brand.help;
+  if (!help) return "";
+  const ways = [
+    brand.contactEmail
+      ? `Email: <a href="mailto:${escapeHtml(brand.contactEmail)}" style="color:${color.accentText}">${escapeHtml(brand.contactEmail)}</a>`
+      : "",
+    `Instagram message: <a href="${escapeHtml(help.instagramUrl)}" style="color:${color.accentText}">${escapeHtml(help.instagramHandle)}</a>`,
+  ].filter(Boolean);
+  return `${label("Need help?")}<p style="margin:0 0 10px;font-size:15px;line-height:1.6;color:${color.ink}">Message us for anything about your invitation or payment. A person replies.</p><p style="margin:0 0 14px;font-size:15px;line-height:1.9;color:${color.ink}">${ways.join("<br>")}</p><p style="margin:0;font-size:15px;line-height:1.6;color:${color.ink}">Follow us on Instagram at <a href="${escapeHtml(help.instagramUrl)}" style="color:${color.accentText};font-weight:700">${escapeHtml(help.instagramHandle)}</a> for new designs, ideas and offers.</p>`;
+}
+
+function helpLines(brand: Brand): string[] {
+  const help = brand.help;
+  if (!help) return [];
+  const ways = [
+    brand.contactEmail ? `Email: ${brand.contactEmail}` : null,
+    `Instagram: ${help.instagramHandle} ${help.instagramUrl}`,
+  ].filter((line): line is string => Boolean(line));
+  return [
+    "",
+    "Need help? Message us for anything about your invitation or payment. A person replies.",
+    ...ways,
+    "",
+    `Follow us on Instagram at ${help.instagramHandle} for new designs, ideas and offers.`,
+  ];
+}
+
 /* ---------- Receipt ---------- */
 
 export type ReceiptDetails = {
@@ -296,7 +372,46 @@ export type ReceiptDetails = {
   paidAt: Date;
   /** Shows the GST lines when the business has a GSTIN. */
   taxInvoice: boolean;
+  /** The bigger packages they can still move to, smallest first; none after the top one. */
+  upgrades?: EmailUpgrade[];
 };
+
+/** A bigger package on the same invitation: what it adds and what it costs now. */
+export type EmailUpgrade = {
+  name: string;
+  /** What it adds to the package they have. */
+  adds: string[];
+  /** The difference to pay now. */
+  pricePaise: number;
+  href: string;
+};
+
+function upgradeBlock(upgrades: EmailUpgrade[]): string {
+  if (!upgrades.length) return "";
+  const cards = upgrades
+    .map(
+      (up) =>
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 12px;border:1px solid ${color.line};border-radius:12px;background:${color.ticket};border-collapse:separate"><tr><td style="padding:16px 18px">
+<p style="margin:0;font-size:17px;font-weight:700;color:${color.ink}">${escapeHtml(up.name)} <span style="font-weight:400;color:${color.inkMuted}">· ${escapeHtml(formatRupees(up.pricePaise))} more</span></p>
+<ul style="margin:8px 0 10px;padding-left:20px;font-size:15px;line-height:1.55;color:${color.ink}">${up.adds.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+<a href="${escapeHtml(up.href)}" style="font-size:15px;font-weight:700;color:${color.accentText}">Move up to ${escapeHtml(up.name)}</a>
+</td></tr></table>`,
+    )
+    .join("");
+  return `${label("Want more for your invitation?")}<p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:${color.ink}">You can move up any time and pay only the difference.</p>${cards}`;
+}
+
+const upgradeLines = (upgrades: EmailUpgrade[]) =>
+  upgrades.length
+    ? [
+        "",
+        "Want more for your invitation? Move up any time and pay only the difference.",
+        ...upgrades.flatMap((up) => [
+          `${up.name}, ${formatRupees(up.pricePaise)} more: ${up.href}`,
+          ...up.adds.map((item) => `  - ${item}`),
+        ]),
+      ]
+    : [];
 
 export function receiptEmail(brand: Brand, r: ReceiptDetails): Email {
   const invoiceUrl = link(brand, `/invoice/${r.orderId}`);
@@ -334,7 +449,7 @@ export function receiptEmail(brand: Brand, r: ReceiptDetails): Email {
     html: layout(
       brand,
       `${formatRupees(r.amountPaise)} paid for the ${r.packageName} package.`,
-      `${heading("Payment received")}${paragraph(greeting(r.buyerName))}${paragraph(thanks)}${rows(items)}${button(invoiceUrl, `View or print ${kind.toLowerCase()}`)}`,
+      `${heading("Payment received")}${paragraph(greeting(r.buyerName))}${paragraph(thanks)}${rows(items)}${button(invoiceUrl, `View or print ${kind.toLowerCase()}`)}${helpBlock(brand)}${upgradeBlock(r.upgrades ?? [])}`,
       { why },
     ),
     text: [
@@ -345,42 +460,77 @@ export function receiptEmail(brand: Brand, r: ReceiptDetails): Email {
       ...items.map(([label, value]) => `${label}: ${value}`),
       "",
       `View or print ${kind.toLowerCase()}: ${invoiceUrl}`,
+      ...helpLines(brand),
+      ...upgradeLines(r.upgrades ?? []),
       textFooter(brand, why),
     ].join("\n"),
   };
 }
 
-/* ---------- Unfinished draft ---------- */
+/* ---------- Not bought yet ---------- */
 
-export type DraftReminderDetails = {
-  eventId: string;
+export type ReminderDetails = {
   hostName: string;
+  /** "Aarav & Meera", or empty before the names are added. */
   names: string;
+  /** The next function's date, or null when none is set. */
+  date: Date | null;
+  /** The designs they tried, newest first; empty when they haven't opened one. */
+  tried: EmailDesign[];
+  /** A few designs to start with, for someone who hasn't tried any. */
+  suggested: EmailDesign[];
+  /** Back to their latest invitation, or to the gallery. */
+  resumeUrl: string;
+  /** What one invitation gives, in a few words each. */
+  features: readonly string[];
   stopUrl: string;
 };
 
-export function draftReminderEmail(brand: Brand, d: DraftReminderDetails): Email {
-  const resume = link(brand, `/create?invite=${encodeURIComponent(d.eventId)}`);
-  const title = d.names ? `${d.names}'s invitation is waiting` : "Your invitation is waiting";
-  const lines = [
-    "You started an invitation and it's saved just as you left it.",
-    "Finish the details, preview it, and share the link with your guests when you're ready. Replies come straight to your guest list.",
-  ];
-  const why = `You're getting this because you started an invitation on ${brand.name}. We send this reminder once for each invitation.`;
+/**
+ * Once per person, the day after they sign in without buying: what one invitation gives,
+ * in short, and the designs they tried, with a way back to their invitation.
+ */
+export function reminderEmail(brand: Brand, d: ReminderDetails): Email {
+  const started = d.tried.length > 0;
+  const whose = d.names ? `${d.names}'s invitation` : "Your invitation";
+  const when = d.date ? ` for ${dated.format(d.date)}` : "";
+  const title = started ? `${whose} is waiting${when}` : "Your invitation, ready in minutes";
+  const intro = started
+    ? "Your invitation is saved just as you left it. Finish it, see every part free, and share it on WhatsApp when you're ready."
+    : "Pick a design, add the names and each function, and see every part free before you pay.";
+  const designs = started ? d.tried : d.suggested;
+  const designsLabel = started
+    ? d.tried.length > 1
+      ? "The designs you tried"
+      : "The design you chose"
+    : "Designs to start with";
+  const action = started ? "Finish your invitation" : "Start your invitation";
+  const why = `You're getting this because you made an account on ${brand.name}. We send this once.`;
+  const stopLabel = "Stop these emails";
   return {
     subject: title,
     html: layout(
       brand,
-      "Pick up where you left off.",
-      `${heading(title)}${paragraph(greeting(d.hostName))}${lines.map(paragraph).join("")}${button(resume, "Finish your invitation")}`,
-      { why, stopUrl: d.stopUrl },
+      "Website, video and cards, all from one invitation.",
+      `${heading(title)}${paragraph(greeting(d.hostName))}${paragraph(intro)}${
+        designs.length ? `${label(designsLabel)}${designGrid(designs)}` : ""
+      }${button(d.resumeUrl, action)}${label("One invitation gives you")}<p style="margin:0 0 4px;font-size:15px;line-height:1.9;color:${color.ink}">${d.features.map((feature) => `✓ ${escapeHtml(feature)}`).join("<br>")}</p>${helpBlock(brand)}`,
+      { why, stopUrl: d.stopUrl, stopLabel },
     ),
     text: [
       greeting(d.hostName),
       "",
-      ...lines.flatMap((line) => [line, ""]),
-      `Finish your invitation: ${resume}`,
-      textFooter(brand, why, d.stopUrl),
+      intro,
+      ...(designs.length
+        ? ["", `${designsLabel}:`, ...designs.map((design) => `${design.name}: ${design.href}`)]
+        : []),
+      "",
+      `${action}: ${d.resumeUrl}`,
+      "",
+      "One invitation gives you:",
+      ...d.features.map((feature) => `- ${feature}`),
+      ...helpLines(brand),
+      textFooter(brand, why, d.stopUrl, stopLabel),
     ].join("\n"),
   };
 }

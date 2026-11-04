@@ -116,6 +116,8 @@ export const editorBar = (page: Page) => page.locator("[data-editor-bar]").getBy
  * offers the invitation's video and cards under the design, and Publish in its bar.
  */
 export async function seeInvitation(page: Page) {
+  // The demo gives way to the family's own once the names and dates are in
+  await expect(page.locator("[data-watch-live]")).toHaveCount(0, { timeout: 15_000 });
   await expect(page.locator("[data-try-video]")).toBeVisible({ timeout: 15_000 });
   await expect(page.locator("[data-try-cards]")).toBeVisible();
 }

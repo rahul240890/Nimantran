@@ -47,10 +47,27 @@ export const DEFAULT_SHOWN: readonly HomeSectionId[] = [
 ];
 
 /** The most designs a section can be given. */
-export const SECTION_PICKS = 12;
+export const SECTION_PICKS = 16;
 
 /** How many a section shows: 5 on a phone, 7 on a laptop and 9 on a wide screen, then View all. */
 export const SECTION_SHOWN = 9;
+
+/**
+ * Sections that show more (owner, 2026-11-04): Trending and Best sellers 10, the wedding and
+ * the engagement 16, on every screen, then View all. The rest keep SECTION_SHOWN.
+ */
+export const SECTION_SIZES: Partial<Record<HomeSectionId, number>> = {
+  trending: 10,
+  bestsellers: 10,
+  wedding: 16,
+  engagement: 16,
+};
+
+/** How many designs a section shows before View all, at most. */
+export const sectionSize = (id: HomeSectionId): number => SECTION_SIZES[id] ?? SECTION_SHOWN;
+
+/** Whether a section shows the same number on every screen (SECTION_SIZES). */
+export const fixedSize = (id: HomeSectionId): boolean => id in SECTION_SIZES;
 
 export type HomeSections = {
   /** Every section, in the order the page shows them. */

@@ -386,11 +386,13 @@ test("the music starts on the first tap, and the invitation opens again at the e
   const again = page.locator("[data-tour-controls]").getByRole("button", {
     name: "Watch the invitation again",
   });
-  // Each move scrolls smoothly, in real time, while the test's clock jumps on: the scroll
-  // is given a moment to land, or the next move fires before it has and starts it again
-  for (let i = 0; i < 60 && !(await again.isVisible()); i++) {
-    await page.clock.runFor(5000);
-    await page.waitForTimeout(250);
+  // Two seconds at a time, with a moment of real time between: the tour's smooth scrolls run
+  // on the browser's own clock, so racing the page's clock ahead of them leaves the tour
+  // reading where a scroll began and taking extra steps (the flute song, unlike the raga,
+  // sets no timers of its own to slow the race down)
+  for (let i = 0; i < 120 && !(await again.isVisible()); i++) {
+    await page.clock.runFor(2000);
+    await page.waitForTimeout(100);
   }
   await expect(again).toBeVisible();
   await again.click();
