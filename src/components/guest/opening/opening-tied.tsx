@@ -2,6 +2,7 @@ import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import "@/app/tied-gates.css";
 import { tiedBeyond, tiedSpec, type TiedGate } from "@/lib/opening/catalog";
+import { GateRevealOver, GateRevealPlace } from "./gate-reveal";
 
 /*
  * A tied gate (the owner's paintings, templates 41 on): the template's centre picture
@@ -10,6 +11,7 @@ import { tiedBeyond, tiedSpec, type TiedGate } from "@/lib/opening/catalog";
  * unties, lifts, flies off, cracks, drops, bursts, slips or spins away), its pieces burst out,
  * then the doors swing, slide or part onto the centre picture. The movement is in CSS
  * (tied-gates.css) and follows the stage's data-open; still mode shows the end of it.
+ * Behind the doors the guest is welcomed with an aarti or rose water (gate-reveal.tsx).
  */
 
 const PIECES = Array.from({ length: 12 }, (_, i) => i);
@@ -26,7 +28,16 @@ function flight(i: number): CSSProperties {
   } as CSSProperties;
 }
 
-export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?: boolean }) {
+export function TiedGateArt({
+  gate,
+  sample = false,
+  rite = "rose",
+}: {
+  gate: TiedGate;
+  sample?: boolean;
+  /** How the guest is welcomed behind the doors (catalog.ts, welcomeRite). */
+  rite?: "aarti" | "rose";
+}) {
   const { move, undo, at, pieces } = tiedSpec(gate);
   const base = `/openings/tied/${gate}`;
   // A small editor tile needs small files; the guest's first screen loads at once
@@ -70,6 +81,7 @@ export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?:
             {...load}
           />
         </div>
+        {!sample && <GateRevealPlace src={tiedBeyond(gate)} kind={rite} />}
         <div className="tied-doors absolute inset-0 [perspective:140cqw]">
           {(["left", "right"] as const).map((side) => (
             <div key={side} className={`tied-door tied-door-${side} absolute inset-y-0 w-1/2`}>
@@ -99,6 +111,7 @@ export function TiedGateArt({ gate, sample = false }: { gate: TiedGate; sample?:
             ))}
           </div>
         )}
+        {!sample && <GateRevealOver kind={rite} />}
       </div>
     </div>
   );
