@@ -5,7 +5,13 @@ import { TestEmailForm } from "@/components/admin/test-email-form";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireAdmin } from "@/lib/admin/access";
-import { discoverFor, welcomeFor } from "@/lib/email/notify";
+import {
+  discoverFor,
+  sampleReceiptFor,
+  sampleReminderFor,
+  welcomeFor,
+  welcomeFromName,
+} from "@/lib/email/notify";
 import { emailConfigured } from "@/lib/email/send";
 import { stopUrl } from "@/lib/email/stop-link";
 import { site } from "@/lib/site";
@@ -20,8 +26,24 @@ export default async function EmailsPage() {
     {
       id: "welcome",
       title: "Welcome",
-      when: "Right after someone first signs in with an email address (Google). With the offers a first booking can use and three new designs.",
+      when: `Right after someone first signs in with an email address (Google), from "${welcomeFromName}". A plain note with the six things one invitation gives, as in the first-visit popup, and one link, so Gmail files it in Primary.`,
       email: await welcomeFor(account.id, account.name),
+    },
+    {
+      id: "reminder",
+      title: "Not bought yet",
+      when: "Once per person, ever, from the daily job: a day after signing in, to anyone who hasn't bought a package and hasn't edited an invite for 12 hours. The designs they tried (yours, here), what one invitation gives in short, and help.",
+      email: await sampleReminderFor(
+        account.id,
+        account.name,
+        stopUrl(site.url, "preview", account.id),
+      ),
+    },
+    {
+      id: "receipt",
+      title: "Receipt",
+      when: "Once a payment is recorded. With help by WhatsApp, email and Instagram, the ask to follow on Instagram, and the bigger packages they can move up to (none after Grand). This sample is a Basic purchase.",
+      email: await sampleReceiptFor(account.name),
     },
     {
       id: "discover",
@@ -41,7 +63,7 @@ export default async function EmailsPage() {
       <AdminHeading
         eyebrow="Marketing"
         title="Emails"
-        intro="What new accounts are sent. Offers come from Admin, Offers, so a new offer shows in the next email. Accounts that signed in with a phone number only have no email address and get none."
+        intro="What people are sent. Offers come from Admin, Offers, so a new offer shows in the next email. Accounts that signed in with a phone number only have no email address and get none."
       />
       <Card>
         <CardHeader>
@@ -53,7 +75,7 @@ export default async function EmailsPage() {
             </Badge>
           </CardTitle>
           <CardDescription>
-            Sends both emails, as your account would get them, with [Test] in the subject.
+            Sends every email here, as your account would get them, with [Test] in the subject.
           </CardDescription>
         </CardHeader>
         <CardBody>

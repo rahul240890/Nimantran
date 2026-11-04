@@ -1,9 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
-import { sendDiscoverEmails, sendDraftReminders } from "@/lib/email/notify";
+import { sendDiscoverEmails, sendReminders } from "@/lib/email/notify";
 
 /*
  * Vercel Cron calls this once a day (vercel.json), sending CRON_SECRET as a bearer token.
- * Each run emails one reminder to hosts whose unpaid draft has sat untouched for a day, and
+ * Each run emails one reminder, once ever, to people a day after signing in who haven't bought, and
  * new designs with the offers running to accounts made three days before.
  */
 
@@ -20,7 +20,7 @@ function authorised(request: Request): boolean {
 
 export async function GET(request: Request) {
   if (!authorised(request)) return new Response("Unauthorised", { status: 401 });
-  const reminders = await sendDraftReminders();
+  const reminders = await sendReminders();
   const discover = await sendDiscoverEmails();
   return Response.json({ reminders, discover });
 }

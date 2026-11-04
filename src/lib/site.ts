@@ -41,6 +41,11 @@ export const site = {
     whatsapp: "https://whatsapp.com/channel/0029VbDJL893rZZZPyZ2q80o",
     youtube: "https://www.youtube.com/channel/UCGcpksufbY45cL9ujZkpyBw",
   },
+  /**
+   * The WhatsApp number people message for help, until Admin, Business has a phone number
+   * (which then wins). Shown in receipts and reminders and on Contact.
+   */
+  supportPhone: "7228827010",
   /** Where people write about their data and the terms (docs/LAUNCH.md); set before launch. */
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || null,
 } as const;
