@@ -16,7 +16,7 @@ import { TierBadge } from "@/components/pricing/tier-badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/dialog";
 import { HeldBackNotice } from "@/components/editions/held-back";
-import { usePaidOn } from "@/components/editions/use-invite-edition";
+import { useHasPackage, usePaidOn } from "@/components/editions/use-invite-edition";
 import { Quiet } from "@/components/ui/quiet";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
@@ -143,6 +143,7 @@ export function QuickStart({
   const sync = useSyncExternalStore(syncStore.subscribe, syncStore.get, syncStore.getServer);
   const update = inviteDraft.update;
   const paidOn = usePaidOn(draft.remoteId ?? null);
+  const paidFor = useHasPackage(draft.remoteId ?? null);
   const hydrated = useSyncExternalStore(
     noSubscribe,
     () => true,
@@ -803,8 +804,11 @@ export function QuickStart({
           </div>
         </form>
       </main>
-      {/* On a live invite, another design asks first: a new invitation, or this one changed */}
-      <DesignChoice live={ready && Boolean(draft.slug)}>{more}</DesignChoice>
+      {/* On a live invite, or one paid for, another design asks first: a new invitation, or
+          this one changed */}
+      <DesignChoice ask={!ready ? null : draft.slug ? "live" : paidFor ? "paid" : null}>
+        {more}
+      </DesignChoice>
       {/* Room at the foot of a phone's page for the bar over it */}
       <div aria-hidden className="shrink-0 lg:hidden" style={{ height: barHeight }} />
 

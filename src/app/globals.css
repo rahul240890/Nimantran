@@ -102,6 +102,16 @@
   --prelude-water: #0c1a33;
   --prelude-fog: #dfe6ee;
 
+  /* What the guest is welcomed with as a tied gate opens (gate-reveal.tsx), both themes */
+  --reveal-brass-dark: #5c3a0c;
+  --reveal-brass: #d39a33;
+  --reveal-brass-light: #fff0b0;
+  --reveal-kumkum: #c4122f;
+  --reveal-rice: #fff8e6;
+  --reveal-flame: #ffcf5a;
+  --reveal-flame-core: #fff6d8;
+  --reveal-rose-water: #ffecf0;
+
   /* Design previews: each launch design has its own stock, the same in both themes */
   --tpl-rose-paper: #f7e4e2;
   --tpl-rose-ink: #4f1628;
@@ -5090,10 +5100,12 @@
   --font-label:
     "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
     "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* The lettering invitations were designed in: their headings, labels and sacred symbols */
+  /* The lettering of invitations: their headings, labels and sacred symbols. Cormorant
+     Garamond at semi-bold and printed Tiro faces for Indian scripts (owner, 2026-11-04:
+     lighter and less crowded than Rozha One) */
   --font-card-display:
-    "Rozha One", "Georgia", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
-    serif;
+    "Cormorant Garamond", "Tiro Devanagari Hindi", "Noto Serif Devanagari", "Rasa", "Tiro Bangla",
+    "Tiro Tamil", "Georgia", serif;
   --font-card-label:
     "Tenor Sans", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2", "Catamaran",
     "Trebuchet MS", system-ui, sans-serif;
@@ -5119,13 +5131,18 @@
   --font-label: var(--font-card-label);
   --text-ui: 1rem;
   --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-  --text-6xl: 3.75rem;
+  --text-xl: 1.1875rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.625rem;
+  --text-4xl: 1.875rem;
+  --text-5xl: 2.375rem;
+  --text-6xl: 2.75rem;
   font-size: 1rem;
+}
+
+/* On an invitation, Karla's semi-bold (a venue, a reply button) reads at medium */
+:where([data-invitation]) .font-semibold {
+  font-weight: 500;
 }
 
 /* Keyframes live outside @theme so page transitions and utilities can always use them */
@@ -5310,17 +5327,25 @@
     }
   }
 
-  /* Headings in Fraunces read best at a medium weight; Karla labels need a little weight to
-     hold up small. Invitations put their own faces' single weight back */
+  /* Headings in Fraunces at its regular weight, Karla labels at medium (owner, 2026-11-04:
+     lighter). Invitations set their own faces' weights */
   :where(.font-display) {
-    font-weight: 500;
+    font-weight: 400;
     /* The Devanagari face comes in this one weight; never a smeared fake bold of it */
     font-synthesis-weight: none;
   }
   :where(.font-label) {
-    font-weight: 600;
+    font-weight: 500;
   }
-  :where([data-invitation]) :where(.font-display, .font-label) {
+  /* Cormorant Garamond holds up at semi-bold; Tenor Sans has one weight. Numbers stand at
+     full height, so a date reads as 13, not as old-style figures */
+  :where([data-invitation]) :where(.font-display),
+  :where(.font-card-display) {
+    font-weight: 600;
+    /* A feature, not font-variant-numeric, so tabular-nums on a countdown keeps it */
+    font-feature-settings: "lnum";
+  }
+  :where([data-invitation]) :where(.font-label) {
     font-weight: 400;
   }
 

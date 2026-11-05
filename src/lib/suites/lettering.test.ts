@@ -45,16 +45,12 @@ describe("lettering on the event pages", () => {
       "Tiro Devanagari Hindi": "tiro-devanagari-hindi",
       "Baloo Bhai 2": "baloo-bhai-2",
       "Baloo Da 2": "baloo-da-2",
-      "Rozha One": "rozha-one",
     };
     for (const voice of Object.values(VOICES)) {
       for (const role of Object.values(voice)) {
         for (const { family, weight } of Object.values(role)) {
           const name = packages[family] ?? family.toLowerCase().replaceAll(" ", "-");
-          const loaded =
-            fontsCss.includes(`@fontsource/${name}/${weight ?? 400}.css`) ||
-            // The site's own display face is loaded for every page
-            family === "Rozha One";
+          const loaded = fontsCss.includes(`@fontsource/${name}/${weight ?? 400}.css`);
           expect(loaded, `${family} ${weight ?? 400}`).toBe(true);
         }
       }

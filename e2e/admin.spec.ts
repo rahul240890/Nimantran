@@ -413,11 +413,13 @@ test.describe("coupons, invoices and refunds", () => {
     expect(await noOverflow(admin)).toBe(true);
     expect((await axe(admin).analyze()).violations).toEqual([]);
 
-    // Admin, Emails draws the new-account emails with the offer in them
+    // Admin, Emails draws every email. The welcome is a plain note with no offer codes (so
+    // Gmail files it in Primary); the new-designs email carries the offer
     await admin.goto("/admin/emails");
     await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Emails");
     const welcome = admin.frameLocator('iframe[title="Welcome email"]');
-    await expect(welcome.getByText(code, { exact: true })).toBeVisible();
+    await expect(welcome.getByText("Free to try", { exact: true })).toBeVisible();
+    await expect(welcome.getByText(code, { exact: true })).toHaveCount(0);
     await expect(
       admin
         .frameLocator('iframe[title="New designs and offers email"]')

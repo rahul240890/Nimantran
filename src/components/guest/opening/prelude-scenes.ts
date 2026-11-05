@@ -312,7 +312,7 @@ function svgEl(name: string, attrs: Record<string, string | number>) {
 }
 
 async function thread(kit: SceneKit) {
-  await fontsReady([`20px ${kit.faces.display}`]);
+  await fontsReady([`600 20px ${kit.faces.display}`]);
   const { colors: c, initials } = kit;
   const pair = Boolean(initials.second);
   const [base, stripe] = pick([
@@ -1361,7 +1361,7 @@ async function diyas(kit: SceneKit) {
 /* 10. Fireworks: bursts light the sky, then two of them spell the couple's initials */
 async function fireworks(kit: SceneKit) {
   const { ctx, w, h, dpr, colors: c, initials } = kit;
-  await fontsReady([`40px ${kit.faces.display}`]);
+  await fontsReady([`600 40px ${kit.faces.display}`]);
   const shades = [c.glint, c.marigold, c.accent, c.teal, c.light, c.ivory];
   type Spark = {
     x: number;
@@ -1406,7 +1406,7 @@ async function fireworks(kit: SceneKit) {
       off.width = w;
       off.height = h;
       const o = off.getContext("2d", { willReadFrequently: true })!;
-      o.font = `${size}px ${kit.faces.display}`;
+      o.font = `600 ${size}px ${kit.faces.display}`;
       o.textAlign = "center";
       o.textBaseline = "middle";
       o.fillText(r.letter, r.x, r.y);

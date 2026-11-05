@@ -150,7 +150,7 @@ export function GuestPrelude({
           names: lettering(voice, "names", language).family,
           hand: lettering("romantic", "names", language).family,
           latinHand: lettering("romantic", "names", "en").family,
-          display: '"Rozha One", Georgia, serif',
+          display: '"Cormorant Garamond", "Tiro Devanagari Hindi", Georgia, serif',
         },
         reveal: () => go(true),
       };

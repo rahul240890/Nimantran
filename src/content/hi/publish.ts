@@ -240,7 +240,7 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
 
 export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
   heading: "क्या आप पधारेंगे?",
-  intro: "हर उत्सव के लिए जवाब दें। आप कभी भी इसी पेज से अपना जवाब बदल सकते हैं।",
+  intro: "परिवार को बताएँ कि आप आ रहे हैं या नहीं। आप कभी भी इसी पेज से अपना जवाब बदल सकते हैं।",
   yourName: "आपका नाम",
   namePlaceholder: "जैसे परिवार आपको जानता है",
   nameRequired: "कृपया अपना नाम लिखें",
@@ -284,6 +284,12 @@ export const rsvpCopy: Translation<typeof en.rsvpCopy> = {
     "यह एक नमूना है, इसलिए कुछ भी नहीं भेजा गया। आपके अपने निमंत्रण पर हर जवाब सीधे आप तक पहुँचता है।",
   change: "अपना जवाब बदलें",
   people: (count) => (count === 1 ? "1 व्यक्ति" : `${count} लोग`),
+  phone: "फ़ोन नंबर",
+  phoneInvalid: "नंबर जाँच लें: 10 अंक, या + और देश का कोड",
+  willYouCome: "क्या आप आएँगे?",
+  guests: "कितने लोग",
+  fewerGuests: "एक व्यक्ति कम",
+  moreGuests: "एक व्यक्ति और",
 };
 
 export const repliesCopy: Translation<typeof en.repliesCopy> = {

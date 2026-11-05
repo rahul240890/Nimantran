@@ -24,6 +24,7 @@ import {
   openingNames,
   tiedBeyond,
   tiedSpec,
+  welcomeRite,
   welcomeScene,
   type OpeningGod,
   type OpeningStyle,
@@ -38,6 +39,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
+import { useClock } from "@/lib/use-clock";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 import { freshBackdrop } from "./opening-fresh";
@@ -51,6 +53,8 @@ export const OPEN_MS = 1500 * OPENING_PACE;
  * fresh or themed opening takes as long, its painting going its own way.
  */
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
+/** A painted gate holds a little longer, as evening comes over the place (gate-reveal.tsx). */
+const PAINTED_OPEN_MS = 2800 * OPENING_PACE;
 /** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
 const TIED_OPEN_MS = 3200 * OPENING_PACE;
 /** A depth opening's three frames go by one after another (depth-openings.css). */
@@ -64,18 +68,6 @@ const noSubscribe = () => () => {};
 
 const QUIET_LINK =
   "inline-flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm text-card-ivory/90 underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring";
-
-/** Seconds since 1970, ticking once a second (once a minute in still mode). */
-function useClock(still: boolean): number | null {
-  return useSyncExternalStore(
-    (onTick) => {
-      const timer = window.setInterval(onTick, still ? 30_000 : 1000);
-      return () => window.clearInterval(timer);
-    },
-    () => Math.floor(Date.now() / (still ? 60_000 : 1000)) * (still ? 60 : 1),
-    () => null,
-  );
-}
 
 /**
  * The time left to the main event, in the card's language: days, hours, minutes and
@@ -436,9 +428,11 @@ export function Opening({
             ? DEPTH_OPEN_MS
             : bloom
               ? BLOOM_OPEN_MS
-              : gate || fresh || themed
-                ? GATE_OPEN_MS
-                : OPEN_MS,
+              : gate
+                ? PAINTED_OPEN_MS
+                : fresh || themed
+                  ? GATE_OPEN_MS
+                  : OPEN_MS,
     );
     return () => window.clearTimeout(timer);
   }, [open, pages, welcome, still, gate, tied, depth, bloom, fresh, themed]);
@@ -555,7 +549,7 @@ export function Opening({
         data-open={open}
         className="opening-stage [container-type:size] relative h-dvh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
-        <OpeningArt style={style} cover={cover} />
+        <OpeningArt style={style} cover={cover} rite={welcomeRite(god)} />
         {open && !still && <OpeningPetals />}
 
         <div className="absolute inset-0 z-30 flex flex-col">

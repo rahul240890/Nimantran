@@ -6,7 +6,7 @@ import type { RsvpFunction } from "@/components/guest/rsvp-form";
 import { editorText } from "@/i18n/copy/editor";
 import { publishText } from "@/i18n/copy/publish";
 import { getLocale, getText } from "@/i18n/server";
-import { draftQuestions, includedFunctions } from "@/lib/editor/draft";
+import { includedFunctions } from "@/lib/editor/draft";
 import { makeLikeThisHref } from "@/lib/gallery/make-like-this";
 import { readFamilyToken } from "@/lib/invites/family-link";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -78,7 +78,6 @@ export default async function FamilyPreviewPage({ params }: PageProps<"/family/[
         clipUrl={clip ? (urls[clip.id] ?? null) : null}
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
-        questions={draftQuestions(draft)}
         watermark
         preview
         unsent

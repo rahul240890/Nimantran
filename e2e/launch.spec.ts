@@ -228,6 +228,9 @@ test.describe("blog", () => {
     await expect(page).toHaveURL(/\/gu\/blog\/kankotri-lakhan$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "gu");
     await expect(page.getByRole("heading", { level: 1 })).toContainText("કંકોતરી લખાણ");
+    // After a client-side step from the list, the list's own alternate can linger in the
+    // head for a moment; wait for the post's one link before reading it
+    await expect(page.locator('link[hreflang="en-IN"]')).toHaveCount(1);
     await expect(page.locator('link[hreflang="en-IN"]')).toHaveAttribute(
       "href",
       /\/blog\/gujarati-wedding-invitation-wording$/,

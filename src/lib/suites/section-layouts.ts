@@ -22,6 +22,11 @@ export const SECTION_LAYOUTS = {
   photos: ["film", "polaroids", "mosaic"],
   /** The family: cards, one scroll with ornaments between, or ribbons. */
   family: ["cards", "scroll", "ribbons"],
+  /**
+   * The countdown at the end of the page: arched frames on a toran, lamps in their niches,
+   * hanging lanterns, flowers in bloom, flip tiles, or rings that fill (owner, 2026-11-04).
+   */
+  countdown: ["toran", "diyas", "lanterns", "bloom", "tiles", "rings"],
 } as const;
 
 export type SectionPart = keyof typeof SECTION_LAYOUTS;
@@ -49,5 +54,6 @@ export function sectionLayouts(suite: SuiteId): SectionLayouts {
     hours: pick("hours"),
     photos: pick("photos"),
     family: pick("family"),
+    countdown: pick("countdown"),
   };
 }

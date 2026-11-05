@@ -945,6 +945,8 @@ export type CountdownWords = {
   today: string;
   tomorrow: string;
   inDays: (n: number) => string;
+  /** The heading over the save-the-date countdown at the end of the guest page. */
+  countingDown: string;
 };
 
 /**
@@ -960,6 +962,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "Today",
     tomorrow: "Tomorrow",
     inDays: (n) => `In ${n} days`,
+    countingDown: "Counting down to the big day",
   },
   hi: {
     days: "दिन",
@@ -969,6 +972,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "आज",
     tomorrow: "कल",
     inDays: (n) => `${n} दिन बाद`,
+    countingDown: "शुभ घड़ी की उलटी गिनती",
   },
   mr: {
     days: "दिवस",
@@ -978,6 +982,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "आज",
     tomorrow: "उद्या",
     inDays: (n) => `${n} दिवसांनी`,
+    countingDown: "शुभ घडीची उलटी गणती",
   },
   gu: {
     days: "દિવસ",
@@ -987,6 +992,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "આજે",
     tomorrow: "આવતીકાલે",
     inDays: (n) => `${n} દિવસ બાકી`,
+    countingDown: "શુભ ઘડીની ઉલટી ગણતરી",
   },
   bn: {
     days: "দিন",
@@ -996,6 +1002,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "আজ",
     tomorrow: "আগামীকাল",
     inDays: (n) => `আর ${n} দিন`,
+    countingDown: "শুভক্ষণের অপেক্ষায়",
   },
   ta: {
     days: "நாள்",
@@ -1005,6 +1012,7 @@ export const CARD_COUNTDOWN_WORDS: Record<CardLanguage, CountdownWords> = {
     today: "இன்று",
     tomorrow: "நாளை",
     inDays: (n) => `இன்னும் ${n} நாட்கள்`,
+    countingDown: "சுபநாளை நோக்கி",
   },
 };
 

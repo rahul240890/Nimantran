@@ -45,7 +45,7 @@ export const motifLabels: Record<MotifId, string> = {
 };
 
 export const fontLabels: Record<FontRole, string> = {
-  display: "Rozha One",
+  display: "Cormorant Garamond",
   label: "Tenor Sans",
   sans: "Karla",
 };

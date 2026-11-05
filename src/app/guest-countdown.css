@@ -1,0 +1,267 @@
+/*
+ * The save-the-date countdown at the end of the guest page (countdown-finale.tsx). It
+ * dresses in the theme's own guest colours (--guest-* in globals.css) below a painted
+ * theme, and in the card's colours anywhere else, so each theme counts down in its gilt,
+ * jewel and cloth.
+ */
+
+.cd {
+  --cd-gilt: var(--guest-gilt, var(--card-gold));
+  --cd-jewel: var(--guest-jewel, var(--card-accent));
+  --cd-cloth: var(--guest-cloth, var(--card-ivory));
+  --cd-ink: var(--suite-ink, var(--card-ink));
+  --cd-deep: color-mix(in oklab, var(--cd-jewel) 42%, black);
+  --cd-flame: var(--flower-lamp, var(--gold-glint));
+  --cd-flame-deep: var(--flower-marigold, var(--marigold));
+  /* Numbers on cloth: the jewel deepened toward the ink, so pale jewels still read */
+  --cd-number: color-mix(in oklab, var(--cd-jewel) 55%, var(--cd-ink));
+}
+
+.cd-row {
+  column-gap: clamp(0.4rem, 2.5vw, 1.25rem);
+}
+.cd-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.cd-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 28rem;
+}
+.cd[data-countdown="toran"] .cd-row,
+.cd[data-countdown="lanterns"] .cd-row {
+  padding-top: 0.5rem;
+}
+
+.cd-piece,
+.cd-tile {
+  container-type: inline-size;
+}
+.cd-num {
+  font-size: 34cqw;
+  color: var(--cd-number);
+  transform: translateY(-50%);
+}
+.cd-tile .cd-num {
+  transform: none;
+}
+.cd[data-countdown="toran"] .cd-num {
+  top: 53%;
+}
+.cd[data-countdown="diyas"] .cd-num {
+  top: 37%;
+  color: var(--cd-cloth);
+}
+.cd[data-countdown="lanterns"] .cd-num {
+  top: 49%;
+}
+.cd[data-countdown="bloom"] .cd-num,
+.cd[data-countdown="rings"] .cd-num {
+  top: 50%;
+  font-size: 30cqw;
+}
+
+/* Fills and lines */
+.cd-cloth {
+  fill: var(--cd-cloth);
+}
+.cd-deep {
+  fill: var(--cd-deep);
+}
+.cd-gilt {
+  fill: var(--cd-gilt);
+}
+.cd-jewel {
+  fill: var(--cd-jewel);
+}
+.cd-gilt-edge {
+  stroke: var(--cd-gilt);
+  stroke-width: 2.5;
+}
+.cd-jewel-edge {
+  fill: none;
+  stroke: var(--cd-jewel);
+  stroke-width: 1.6;
+}
+.cd-gilt-line {
+  stroke: var(--cd-gilt);
+  stroke-width: 1.6;
+}
+.cd-art {
+  filter: drop-shadow(0 10px 14px rgb(0 0 0 / 0.22));
+}
+
+/* The toran's string of beads, and the lanterns' wire */
+.cd-thread {
+  fill: none;
+  stroke: var(--cd-gilt);
+  stroke-width: 1.2;
+}
+.cd-beads {
+  fill: none;
+  stroke: color-mix(in oklab, var(--cd-cloth) 55%, var(--cd-gilt));
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 0 9;
+}
+
+/* The lamp in its niche */
+.cd-glow {
+  fill: var(--cd-flame);
+  opacity: 0.28;
+}
+.cd-flame-outer {
+  fill: var(--cd-flame-deep);
+}
+.cd-flame-core {
+  fill: var(--cd-flame);
+}
+.cd-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: cd-flicker 2.4s ease-in-out infinite;
+}
+@keyframes cd-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(0.94, 1.08);
+  }
+  60% {
+    transform: scale(1.04, 0.95);
+  }
+}
+
+/* The lantern's lit window */
+.cd-window {
+  fill: color-mix(in oklab, var(--cd-cloth) 82%, var(--cd-flame));
+}
+
+/* Frames and lanterns sway a little on their strings, each a beat after the last */
+.cd-sway {
+  transform-box: view-box;
+  transform-origin: 50% 0;
+  animation: cd-sway 5s ease-in-out infinite;
+}
+.cd-cell:nth-child(odd) .cd-sway {
+  animation-delay: -2.5s;
+}
+@keyframes cd-sway {
+  0%,
+  100% {
+    transform: rotate(-1.6deg);
+  }
+  50% {
+    transform: rotate(1.6deg);
+  }
+}
+
+/* The bloom's petals */
+.cd-petal {
+  fill: color-mix(in oklab, var(--cd-jewel) 40%, var(--cd-cloth));
+  stroke-width: 1.4;
+}
+.cd-petal-back {
+  fill: color-mix(in oklab, var(--cd-gilt) 70%, var(--cd-cloth));
+}
+.cd-turn {
+  transform-box: view-box;
+  transform-origin: 50% 50%;
+  animation: cd-turn 60s linear infinite;
+}
+@keyframes cd-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* The dial */
+.cd-track {
+  fill: none;
+  stroke: color-mix(in oklab, var(--cd-gilt) 40%, var(--cd-cloth));
+  stroke-width: 5;
+}
+.cd-fill {
+  fill: none;
+  stroke: var(--cd-jewel);
+  stroke-width: 5;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.6s ease;
+}
+
+/* The flip tile: a card hinged across the middle */
+.cd-tile {
+  aspect-ratio: 4 / 5;
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(
+        to bottom,
+        transparent calc(50% - 0.5px),
+        color-mix(in oklab, var(--cd-gilt) 80%, transparent) calc(50% - 0.5px) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      )
+      no-repeat,
+    linear-gradient(
+      to bottom,
+      color-mix(in oklab, var(--cd-cloth) 90%, var(--cd-gilt)) 50%,
+      var(--cd-cloth) 50%
+    );
+  box-shadow:
+    inset 0 0 0 1px var(--cd-gilt),
+    inset 0 0 0 4px var(--cd-cloth),
+    inset 0 0 0 5px color-mix(in oklab, var(--cd-jewel) 60%, transparent),
+    0 14px 24px -14px rgb(0 0 0 / 0.45);
+  perspective: 20rem;
+}
+.cd-tile::before,
+.cd-tile::after {
+  /* The hinge's two pins */
+  content: "";
+  position: absolute;
+  top: calc(50% - 0.2rem);
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: var(--cd-gilt);
+}
+.cd-tile::before {
+  inset-inline-start: 0.35rem;
+}
+.cd-tile::after {
+  inset-inline-end: 0.35rem;
+}
+.cd-flip {
+  display: block;
+  transform-origin: 50% 50%;
+  animation: cd-flip 0.45s ease-out;
+}
+@keyframes cd-flip {
+  from {
+    transform: rotateX(-80deg);
+    opacity: 0.3;
+  }
+  to {
+    transform: rotateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-flame,
+  .cd-sway,
+  .cd-turn,
+  .cd-flip {
+    animation: none;
+  }
+  .cd-fill {
+    transition: none;
+  }
+}
+/* The site's own Still setting, as motion-still in globals.css */
+[data-motion="reduce"] :is(.cd-flame, .cd-sway, .cd-turn, .cd-flip) {
+  animation: none;
+}
+[data-motion="reduce"] .cd-fill {
+  transition: none;
+}

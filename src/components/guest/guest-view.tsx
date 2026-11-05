@@ -19,6 +19,7 @@ import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { GuestTour } from "@/components/guest/guest-tour";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
+import { CountdownFinale } from "@/components/guest/countdown-finale";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FlowerDefs } from "@/components/guest/themed/flowers";
 import { OrnateCard } from "@/components/guest/themed/ornate-card";
@@ -53,7 +54,6 @@ import {
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
-import type { RsvpQuestionId } from "@/lib/categories/schema";
 import type { FunctionId } from "@/lib/events/functions";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats } from "@/lib/engine/story";
@@ -78,6 +78,7 @@ import type { EventWindow } from "@/lib/publish/event-day";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { templateBox } from "@/lib/suites/event-boxes";
+import { sectionLayouts } from "@/lib/suites/section-layouts";
 import {
   couplePageIds,
   couplePagePhotos,
@@ -129,7 +130,6 @@ type GuestViewProps = {
   clipUrl?: string | null;
   allIcsUrl: string | null;
   rsvpFunctions: RsvpFunction[];
-  questions: RsvpQuestionId[];
   /**
    * A Free invite once payments are on: "Made with Shubh" across the pages (Step 17).
    * "tiled" is the invitation tried before signing in: the brand's name across the screen too.
@@ -157,7 +157,6 @@ export function GuestView({
   clipUrl = null,
   allIcsUrl,
   rsvpFunctions,
-  questions,
   watermark = false,
   previewNow,
   preview = false,
@@ -376,13 +375,23 @@ export function GuestView({
       <RsvpForm
         slug={slug}
         functions={replyFunctions}
-        questions={questions}
         preview={preview}
         sayPreview={unsent}
         sample={sample}
         makeHref={makeHref}
       />
     ) : null;
+
+  // Save the date, counting down at the end of the page in this theme's own way
+  const countdown = main ? (
+    <CountdownFinale
+      style={sectionLayouts(suite).countdown}
+      target={main.at}
+      date={main.date}
+      lang={language}
+      className={look ? undefined : "border-t border-line"}
+    />
+  ) : null;
 
   return (
     <GuestLanguage language={language}>
@@ -512,6 +521,7 @@ export function GuestView({
                   allIcsUrl={allIcsUrl}
                   music={music}
                   reply={rsvp}
+                  countdown={countdown}
                 />
               ) : (
                 <>
@@ -617,6 +627,7 @@ export function GuestView({
                       </div>
                     </section>
                   )}
+                  {countdown}
                 </>
               )}
             </div>
