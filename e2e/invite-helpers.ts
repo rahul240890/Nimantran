@@ -183,6 +183,14 @@ export async function openPublish(page: Page) {
   return dialog;
 }
 
+/** The celebration that opens once over the share page after publishing: lifted away. */
+export async function closeCelebration(page: Page) {
+  const celebration = page.getByTestId("celebration");
+  await expect(celebration).toBeVisible();
+  await celebration.getByRole("button", { name: "Start sharing" }).click();
+  await expect(celebration).toBeHidden();
+}
+
 /** Publishes the invite open in the editor under a unique link; ends on the share page. */
 export async function publish(page: Page, base: string): Promise<string> {
   const dialog = await openPublish(page);
@@ -195,5 +203,6 @@ export async function publish(page: Page, base: string): Promise<string> {
   await expect(dialog.getByText("This link is free.")).toBeVisible();
   await dialog.getByRole("button", { name: "Publish invitation" }).click();
   await expect(page).toHaveURL(/\/invites\/[0-9a-f-]+\/share$/);
+  await closeCelebration(page);
   return new URL((await page.getByTestId("invite-link").textContent())!.trim()).pathname;
 }
