@@ -33,10 +33,10 @@ import {
 import { GATE_SHEET, gatePoster } from "@/lib/opening/posters";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
 
 const NONE = "none";
 const AUTO = "auto";
-const ALL = "all";
 
 /**
  * A gate's tile: a painted gate's small picture made ahead (lib/opening/posters.ts), with its
@@ -131,8 +131,83 @@ function GatePreview({
 }
 
 /**
+ * One kind of gate as a sideways row (owner, 2026-11-05): its name, how many, and arrows on
+ * a wider screen; a phone swipes, with the next gate peeking in at the edge. A tap on a gate
+ * chooses it.
+ */
+function GateShelf({
+  id,
+  title,
+  styles,
+  suite,
+}: {
+  id: string;
+  title: string;
+  styles: readonly OpeningStyle[];
+  suite: SuiteId;
+}) {
+  const { openingCopy } = useText(editorText);
+  const row = useScrollRow();
+  const labels = { back: openingCopy.shelfBack, next: openingCopy.shelfNext };
+  return (
+    <div
+      id={id}
+      role="presentation"
+      // Rows out of sight aren't laid out or painted until scrolled to
+      className="flex scroll-mt-2 flex-col gap-1 [contain-intrinsic-size:auto_14rem] [content-visibility:auto]"
+    >
+      <div className="flex items-center justify-between gap-3 md:min-h-11">
+        <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
+          {title}
+          <span className="ms-2 tracking-normal text-ink-faint tabular-nums">{styles.length}</span>
+        </p>
+        <RowArrows row={row} labels={labels} className="shadow-none" />
+      </div>
+      <ScrollRow
+        row={row}
+        labels={labels}
+        label={title}
+        className="-mx-1 flex snap-x snap-mandatory scroll-px-1 gap-3 overflow-x-auto px-1 pt-1 pb-2"
+      >
+        {styles.map((style) => (
+          <li key={style} className="w-24 shrink-0 snap-start sm:w-28">
+            {/* A tap chooses it: the picture is the choice, with no dot to aim for */}
+            <RadioPrimitive.Item
+              value={style}
+              aria-label={openingCopy.styles[style].name}
+              aria-describedby={`opening-${style}-d`}
+              className={cn(
+                "group/opening relative flex w-full cursor-pointer flex-col gap-1.5 rounded-xl p-1 text-start",
+                "transition-transform duration-200 ease-out-expo hover:-translate-y-0.5 motion-still:transition-none motion-still:hover:translate-y-0",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+              )}
+            >
+              <span className="relative block rounded-lg ring-1 ring-line transition-shadow group-data-[state=checked]/opening:shadow-[0_0_0_3px_var(--marigold)] group-data-[state=checked]/opening:ring-marigold">
+                <GatePicture style={style} suite={suite} />
+                <span
+                  aria-hidden
+                  className="absolute end-1.5 top-1.5 grid size-6 scale-0 place-items-center rounded-full bg-marigold text-on-marigold shadow-raised transition-transform group-data-[state=checked]/opening:scale-100 motion-still:transition-none"
+                >
+                  <Check className="size-4" />
+                </span>
+              </span>
+              <span className="line-clamp-2 min-h-[2lh] px-0.5 text-xs leading-snug font-semibold text-ink sm:text-sm">
+                {openingCopy.styles[style].name}
+              </span>
+              <span id={`opening-${style}-d`} className="sr-only">
+                {openingCopy.styles[style].description}
+              </span>
+            </RadioPrimitive.Item>
+          </li>
+        ))}
+      </ScrollRow>
+    </div>
+  );
+}
+
+/**
  * The editor's choice of the guest's first screen (Step 12x), named for hosts as the opening
- * gate or cover screen: the design's own first, then a tile per opening style by kind, then
+ * gate or cover screen: the design's own first, then a sideways row of gates for each kind, then
  * the god or symbol that sits above it. Only the chosen gate plays its opening, in the
  * preview beside the list (owner, 2026-10-24: drawing all 200-odd gates live made the picker
  * slow to open); every other tile is its small picture, and a tap on it chooses it. In the
@@ -158,7 +233,6 @@ export function OpeningPicker({
   const god = draftOpeningGod(draft);
   const gods = draftOpeningGods(draft);
   const offered = openingStyles(suite, scene);
-  const [kind, setKind] = useState<string>(ALL);
   // The sheet first, so every painted gate's tile has its gate the moment it is drawn
   preload(GATE_SHEET, { as: "image", fetchPriority: "high" });
   const ids = useId();
@@ -175,8 +249,6 @@ export function OpeningPicker({
       styles: group.styles.filter((id) => !mine.includes(id) && offered.includes(id)),
     })),
   ].filter((group) => group.styles.length > 0);
-  // The design's own stays above whichever kind is shown
-  const shown = groups.filter((group) => kind === ALL || group.id === "own" || group.id === kind);
 
   // The first kinds come with the dialog and the rest a moment after, so it opens at once
   const [later, setLater] = useState(false);
@@ -184,7 +256,13 @@ export function OpeningPicker({
     const timer = window.setTimeout(() => startTransition(() => setLater(true)), 60);
     return () => window.clearTimeout(timer);
   }, []);
-  const drawn = later ? shown : shown.slice(0, 3);
+  const drawn = later ? groups : groups.slice(0, 3);
+  const still = useReducedMotion();
+  // A kind's chip brings its row into view, in the dialog's own scroll
+  const jump = (id: string) =>
+    document
+      .getElementById(`${ids}-${id}`)
+      ?.scrollIntoView({ behavior: still ? "auto" : "smooth", block: "start" });
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-5">
       <div className={cn("flex flex-col gap-1.5", !titled && "sr-only")}>
@@ -197,84 +275,46 @@ export function OpeningPicker({
         <GatePreview suite={suite} style={style} god={god} />
 
         <div className="flex min-w-0 flex-col gap-5">
-          {/* So many gates: a row of kinds narrows the list to one at a time (scrolls on phones) */}
+          {/* So many gates: a row of kinds, each chip bringing its row into view */}
           <div
             role="group"
             aria-label={openingCopy.filterLabel}
-            className="-mx-1 flex [scrollbar-width:thin] gap-2 overflow-x-auto px-1 py-1 sm:flex-wrap sm:overflow-visible"
+            className="-mx-1 scrollbar-none flex gap-2 overflow-x-auto px-1 py-1"
           >
-            {[ALL, ...groups.filter((group) => group.id !== "own").map((group) => group.id)].map(
-              (id) => (
+            {groups
+              .filter((group) => group.id !== "own")
+              .map((group) => (
                 <button
-                  key={id}
+                  key={group.id}
                   type="button"
-                  aria-pressed={kind === id}
-                  onClick={() => setKind(id)}
+                  onClick={() => jump(group.id)}
                   className={cn(
-                    "flex min-h-11 shrink-0 cursor-pointer items-center rounded-full border border-line-strong bg-surface px-3.5 text-sm whitespace-nowrap text-ink shadow-raised",
-                    "aria-pressed:border-marigold aria-pressed:bg-[color-mix(in_srgb,var(--marigold)_12%,var(--surface))] aria-pressed:shadow-[0_0_0_1px_var(--marigold)]",
+                    "flex min-h-11 shrink-0 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface ps-3.5 pe-2.5 text-sm whitespace-nowrap text-ink shadow-raised",
+                    "transition-colors hover:border-marigold motion-still:transition-none",
                     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
                   )}
                 >
-                  {id === ALL
-                    ? openingCopy.filterAll
-                    : openingCopy.groups[id as keyof typeof openingCopy.groups]}
+                  {openingCopy.groups[group.id as keyof typeof openingCopy.groups]}
+                  <span className="grid min-w-6 place-items-center rounded-full bg-surface-2 px-1.5 text-xs text-ink-muted tabular-nums">
+                    {group.styles.length}
+                  </span>
                 </button>
-              ),
-            )}
+              ))}
           </div>
           <RadioPrimitive.Root
             aria-labelledby={headingId}
             value={style}
             onValueChange={(value) => setOpening({ style: value as OpeningStyle })}
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-4"
           >
             {drawn.map((group) => (
-              <div
+              <GateShelf
                 key={group.id}
-                role="presentation"
-                // Kinds out of sight aren't laid out or painted until scrolled to
-                className="flex flex-col gap-2.5 [contain-intrinsic-size:auto_24rem] [content-visibility:auto]"
-              >
-                <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-                  {openingCopy.groups[group.id as keyof typeof openingCopy.groups]}
-                </p>
-                <div
-                  role="presentation"
-                  className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 sm:gap-3 xl:grid-cols-5"
-                >
-                  {group.styles.map((id) => (
-                    // A tap chooses it: the picture is the choice, with no dot to aim for
-                    <RadioPrimitive.Item
-                      key={id}
-                      value={id}
-                      aria-label={openingCopy.styles[id].name}
-                      aria-describedby={`opening-${id}-d`}
-                      className={cn(
-                        "group/opening relative flex cursor-pointer flex-col gap-1.5 rounded-xl p-1 text-start",
-                        "transition-transform duration-200 ease-out-expo hover:-translate-y-0.5 motion-still:transition-none motion-still:hover:translate-y-0",
-                        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                      )}
-                    >
-                      <span className="relative block rounded-lg ring-1 ring-line transition-shadow group-data-[state=checked]/opening:shadow-[0_0_0_3px_var(--marigold)] group-data-[state=checked]/opening:ring-marigold">
-                        <GatePicture style={id} suite={suite} />
-                        <span
-                          aria-hidden
-                          className="absolute end-1.5 top-1.5 grid size-6 scale-0 place-items-center rounded-full bg-marigold text-on-marigold shadow-raised transition-transform group-data-[state=checked]/opening:scale-100 motion-still:transition-none"
-                        >
-                          <Check className="size-4" />
-                        </span>
-                      </span>
-                      <span className="line-clamp-2 px-0.5 text-xs leading-snug font-semibold text-ink sm:text-sm">
-                        {openingCopy.styles[id].name}
-                      </span>
-                      <span id={`opening-${id}-d`} className="sr-only">
-                        {openingCopy.styles[id].description}
-                      </span>
-                    </RadioPrimitive.Item>
-                  ))}
-                </div>
-              </div>
+                id={`${ids}-${group.id}`}
+                title={openingCopy.groups[group.id as keyof typeof openingCopy.groups]}
+                styles={group.styles}
+                suite={suite}
+              />
             ))}
           </RadioPrimitive.Root>
         </div>

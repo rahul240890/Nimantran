@@ -794,7 +794,8 @@ export const openingCopy = {
   intro:
     "The first screen guests see when they tap your link: a gate, doors, a curtain or a cover that opens onto your invitation, full screen. Tap one to watch it open. You can change it any time, even after sharing.",
   filterLabel: "Show by kind",
-  filterAll: "All",
+  shelfBack: "Scroll back",
+  shelfNext: "Scroll on",
   summaryBody: "What guests see first, before your invitation opens.",
   change: "Change opening gate",
   dialogTitle: "Choose your opening gate",
