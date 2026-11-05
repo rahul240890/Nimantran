@@ -5,7 +5,6 @@ import { CalendarPlus, ChevronLeft, ChevronRight, Flower2, Pause, Play } from "l
 import { Image } from "@/components/ui/image";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { GuestFunction } from "@/components/guest/guest-view";
-import type { FunctionId } from "@/lib/events/functions";
 import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
@@ -27,7 +26,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
-import { EventBox } from "./event-box";
+import { OrnateCard } from "./ornate-card";
 import { FlowerStage } from "./flower-blessing";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
 import { LampStage } from "./lamp-blessing";
@@ -62,7 +61,6 @@ export function ThemedDetails({
   copy,
   lang,
   functions,
-  days,
   main,
   welcome,
   photos,
@@ -81,8 +79,6 @@ export function ThemedDetails({
   /** The card's language: the page's own words follow it, like the pages above. */
   lang: CardLanguage;
   functions: readonly GuestFunction[];
-  /** Each celebration's date (YYYY-MM-DD), for the date seals and stubs on its box. */
-  days: Readonly<Partial<Record<FunctionId, string>>>;
   /** The main event's date (YYYY-MM-DD) and venue, for "Save the date". */
   main: { date: string; venue: string } | null;
   /** The photos the welcome shows: the couple's, or one each, from the design's own frames. */
@@ -131,7 +127,6 @@ export function ThemedDetails({
         look={look}
         lang={lang}
         functions={functions}
-        days={days}
         allIcsUrl={allIcsUrl}
         layouts={layouts}
         box={eventBox(suite, look.style)}
@@ -189,7 +184,7 @@ function Heading({
 }
 
 /** Plays its entrance (the style's own, in globals.css) once scrolled into view. */
-function Reveal({ className, children }: { className?: string; children: ReactNode }) {
+export function Reveal({ className, children }: { className?: string; children: ReactNode }) {
   const [ref, seen] = useInView<HTMLDivElement>();
   const mounted = useMounted();
   return (
@@ -520,7 +515,6 @@ function Celebrations({
   look,
   lang,
   functions,
-  days,
   allIcsUrl,
   layouts,
   box,
@@ -529,7 +523,6 @@ function Celebrations({
   look: GuestLook;
   lang: CardLanguage;
   functions: readonly GuestFunction[];
-  days: Readonly<Partial<Record<FunctionId, string>>>;
   allIcsUrl: string | null;
   layouts: SectionLayouts;
   /** The theme's box for each celebration's details (event-boxes.ts). */
@@ -602,14 +595,7 @@ function Celebrations({
           </Reveal>
         )}
         {line && (
-          <Timeline
-            look={look}
-            box={box}
-            images={images}
-            lang={lang}
-            functions={functions}
-            days={days}
-          />
+          <Timeline look={look} box={box} images={images} lang={lang} functions={functions} />
         )}
         {allIcsUrl && (
           <div className="mt-6 flex justify-center">
@@ -629,8 +615,6 @@ function Celebrations({
             const image = images[art] ?? images.cover;
             const headingId = `fn-${fn.kind}`;
             const overlay = layouts.hours === "overlay" && Boolean(image);
-            // Zigzag: every other hour sets its painting on the far side
-            const flipped = layouts.hours === "zigzag" && index % 2 === 1;
             return (
               <li
                 key={fn.kind}
@@ -652,38 +636,16 @@ function Celebrations({
                     />
                   </div>
                 )}
-                <Reveal
-                  className={cn(
-                    "guest-hour-body mx-auto grid w-full items-center gap-6 pt-12 sm:gap-10 md:pt-16",
-                    overlay ? "max-w-lg" : "max-w-5xl md:grid-cols-2 md:gap-14",
-                  )}
-                >
-                  {image && !overlay && (
-                    <Framed
-                      look={look}
-                      className={cn(
-                        "guest-hour-art mx-auto w-[min(60vw,20rem,calc(34svh*0.8))] md:w-[min(68vw,20rem)]",
-                        flipped && "md:order-2",
-                      )}
-                    >
-                      <Image
-                        src={image}
-                        alt=""
-                        fill
-                        unoptimized
-                        sizes="(min-width: 48rem) 20rem, 68vw"
-                        className="object-cover object-[50%_40%]"
-                      />
-                    </Framed>
-                  )}
-                  <EventBox
+                {/* Each card carries its own painting; the hour's fills the screen behind it on an overlay */}
+                <Reveal className="guest-hour-body mx-auto w-full max-w-lg pt-12 md:pt-16">
+                  <OrnateCard
                     box={box}
                     fn={fn}
-                    day={days[fn.kind] ?? ""}
                     index={index}
                     count={functions.length}
-                    lang={lang}
                     headingId={headingId}
+                    flower={look.flower}
+                    second={look.secondFlower}
                   />
                 </Reveal>
               </li>
@@ -705,14 +667,12 @@ function Timeline({
   images,
   lang,
   functions,
-  days,
 }: {
   look: GuestLook;
   box: Box;
   images: (typeof SUITES)[SuiteId]["images"];
   lang: CardLanguage;
   functions: readonly GuestFunction[];
-  days: Readonly<Partial<Record<FunctionId, string>>>;
 }) {
   return (
     <ol
@@ -764,14 +724,14 @@ function Timeline({
                 far ? "md:col-start-3" : "md:col-start-1",
               )}
             >
-              <EventBox
+              <OrnateCard
                 box={box}
                 fn={fn}
-                day={days[fn.kind] ?? ""}
                 index={index}
                 count={functions.length}
-                lang={lang}
                 headingId={`fn-${fn.kind}`}
+                flower={look.flower}
+                second={look.secondFlower}
               />
             </Reveal>
           </li>

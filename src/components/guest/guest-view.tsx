@@ -21,7 +21,8 @@ import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { CountdownFinale } from "@/components/guest/countdown-finale";
 import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
-import { FunctionFacts } from "@/components/guest/function-facts";
+import { FlowerDefs } from "@/components/guest/themed/flowers";
+import { OrnateCard } from "@/components/guest/themed/ornate-card";
 import {
   FamilyWords,
   pairedSide,
@@ -30,7 +31,7 @@ import {
 } from "@/components/guest/family-words";
 import { PhotoWall } from "@/components/guest/photo-wall";
 import { GALLERY_ASPECT, type GuestPhoto } from "@/components/guest/guest-photo";
-import { ThemedDetails } from "@/components/guest/themed/themed-details";
+import { Reveal, ThemedDetails } from "@/components/guest/themed/themed-details";
 import { FramedPhoto } from "@/components/invitation/story/framed-photo";
 import { WatermarkLayer } from "@/components/guest/watermark";
 import { MusicBars } from "@/components/invitation/music-bars";
@@ -76,6 +77,7 @@ import { daysBetween, startsAt, todayInIndia } from "@/lib/publish/countdown";
 import type { EventWindow } from "@/lib/publish/event-day";
 import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
+import { templateBox } from "@/lib/suites/event-boxes";
 import { sectionLayouts } from "@/lib/suites/section-layouts";
 import {
   couplePageIds,
@@ -85,6 +87,7 @@ import {
   sceneCouple,
 } from "@/lib/editor/couple-photos";
 import { scenePage } from "@/lib/suites/scene";
+import { stockStyle } from "@/lib/templates/stock";
 import { withClip } from "@/lib/editor/music-clip";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale } from "@/i18n/client";
@@ -505,9 +508,6 @@ export function GuestView({
                   copy={copy}
                   lang={language}
                   functions={details}
-                  days={Object.fromEntries(
-                    details.map((fn) => [fn.kind, draft.functions[fn.kind].date]),
-                  )}
                   main={
                     mainKind && mainDate
                       ? { date: mainDate, venue: draft.functions[mainKind].venue.trim() }
@@ -549,13 +549,27 @@ export function GuestView({
                           </Button>
                         )}
                       </div>
-                      <ol className="grid grid-cols-[minmax(0,1fr)] gap-4 md:grid-cols-2">
-                        {details.map((fn) => (
-                          <li key={fn.kind}>
-                            <FunctionCard fn={fn} />
-                          </li>
-                        ))}
-                      </ol>
+                      {/* The same ornate cards as a painted theme, in the template's own card stock */}
+                      <div className="oc-plain" style={stockStyle(template)}>
+                        <FlowerDefs />
+                        <ol className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-12 pt-4 md:grid-cols-2">
+                          {details.map((fn, index) => (
+                            <li key={fn.kind}>
+                              <Reveal>
+                                <OrnateCard
+                                  box={templateBox(template.id)}
+                                  fn={fn}
+                                  index={index}
+                                  count={details.length}
+                                  headingId={`fn-${fn.kind}`}
+                                  flower="marigold"
+                                  second="rose"
+                                />
+                              </Reveal>
+                            </li>
+                          ))}
+                        </ol>
+                      </div>
                     </div>
                   </section>
 
@@ -734,25 +748,5 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
         </dl>
       </div>
     </section>
-  );
-}
-
-function FunctionCard({ fn }: { fn: GuestFunction }) {
-  const headingId = `fn-${fn.kind}`;
-  return (
-    <article
-      aria-labelledby={headingId}
-      className="flex h-full flex-col gap-4 rounded-lg border border-line bg-surface p-5 shadow-raised sm:p-6"
-    >
-      <h3 id={headingId} className="flex flex-col font-display text-2xl leading-tight">
-        {fn.name}
-        {fn.localName && (
-          <span lang={fn.localName.lang} className="font-sans text-lg text-accent-text">
-            {fn.localName.text}
-          </span>
-        )}
-      </h3>
-      <FunctionFacts fn={fn} />
-    </article>
   );
 }

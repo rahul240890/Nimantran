@@ -6332,7 +6332,8 @@
  * day, light words at dusk and night. Cards are the theme's own cloth. The same in both
  * site themes, like card stock. data-guest picks the style's shapes.
  */
-.guest-themed {
+.guest-themed,
+.oc-plain {
   /* Flowers and lamps keep their own colours in every theme */
   --flower-marigold: #f6a21a;
   --flower-marigold-deep: #e06c12;
@@ -6348,6 +6349,8 @@
   --flower-clay-deep: #7c3419;
   --flower-thatch: #c89a52;
   --flower-lamp: #ffe29a;
+}
+.guest-themed {
   /* The theme's cords, jewels and cloth; any theme gets these from its own palette */
   --guest-deep: var(--suite-near);
   --guest-jewel: var(--suite-accent);
@@ -6417,6 +6420,7 @@
 .guest-sky[data-mood="dawn"],
 .guest-sky[data-mood="day"],
 .guest-card,
+.oc-card,
 .guest-date-disc {
   color-scheme: light;
   --paper: var(--guest-cloth);
@@ -6446,6 +6450,7 @@
   --accent-text: color-mix(in oklab, var(--suite-accent-text) 55%, var(--suite-ink));
 }
 .guest-sky .guest-card,
+.guest-sky .oc-card,
 .guest-sky .guest-date-disc {
   --accent-text: var(--suite-accent-text);
 }

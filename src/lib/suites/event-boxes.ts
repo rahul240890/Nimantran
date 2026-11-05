@@ -3,41 +3,23 @@ import type { GuestStyle } from "./guest-look";
 import { hash } from "./section-layouts";
 
 /*
- * The box each celebration's details sit in on the themed guest page (event-box.tsx,
- * guest-sections.css). Each style of page has its own few boxes, so a palace hangs its
- * hours in jharokha windows and Mughal arches, a procession under torans and mandap
- * roofs, a garden on kasavu, lotus petals and lace, and a party on tickets, stamps and
- * gift tags. Each theme gets one of its style's boxes, picked from its id, and every box
- * opens with its own kind of heading: a date seal, a ticket's stub, a ribbon, gilt rules
- * or a large number. Colours stay the theme's own cloth, gilt and jewel.
+ * The card each celebration's details sit in on the guest page (ornate-card.tsx,
+ * event-cards.css), owner 2026-11-04: a frame with a pearl jhalar and a gilt rod, a
+ * jharokha window with latkans, a mandap between pillars under a garland of flowers, a
+ * soft card with flowers in its corners, Kutch mirror-work with tassels, or a gilt band
+ * with temple bells. Each style of page has its own few cards and each theme gets one,
+ * picked from its id; colours stay the theme's own cloth, gilt and jewel.
  */
 
 export const EVENT_BOXES = {
-  palace: ["jharokha", "cusped", "corners", "scroll"],
-  procession: ["toran", "mandap", "corners", "scroll"],
-  garden: ["kasavu", "petal", "scallop"],
-  party: ["ticket", "stamp", "tag"],
+  palace: ["moti", "jharokha", "mandir"],
+  procession: ["mandap", "shisha", "moti"],
+  garden: ["kamal", "moti", "mandir"],
+  party: ["kamal", "shisha", "moti"],
 } as const satisfies Record<GuestStyle, readonly string[]>;
 
-export type EventBox = (typeof EVENT_BOXES)[GuestStyle][number];
-
-/** How a box's heading shows the celebration's name, number and date. */
-export type BoxHead = "seal" | "stub" | "ribbon" | "rules" | "number";
-
-export const BOX_HEADS: Record<EventBox, BoxHead> = {
-  jharokha: "seal",
-  cusped: "rules",
-  corners: "ribbon",
-  scroll: "rules",
-  toran: "stub",
-  mandap: "seal",
-  kasavu: "number",
-  petal: "number",
-  scallop: "seal",
-  ticket: "stub",
-  stamp: "seal",
-  tag: "number",
-};
+export const ORNATE_BOXES = ["moti", "jharokha", "mandir", "mandap", "shisha", "kamal"] as const;
+export type EventBox = (typeof ORNATE_BOXES)[number];
 
 /** Stirs a hash's bits (MurmurHash3's finish), so the box doesn't follow the other layouts. */
 function stir(h: number): number {
@@ -50,4 +32,9 @@ function stir(h: number): number {
 export function eventBox(suite: SuiteId, style: GuestStyle): EventBox {
   const options = EVENT_BOXES[style];
   return options[stir(hash(`${suite}:box`)) % options.length]!;
+}
+
+/** The card for a colour-card template, which has no painted theme: picked from its id. */
+export function templateBox(templateId: string): EventBox {
+  return ORNATE_BOXES[stir(hash(`${templateId}:box`)) % ORNATE_BOXES.length]!;
 }
