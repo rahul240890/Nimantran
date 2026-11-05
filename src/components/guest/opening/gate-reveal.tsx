@@ -173,95 +173,137 @@ export function GateRevealPlace({ src, kind }: { src: string; kind: RevealKind }
     const gl = cv.getContext("webgl", { premultipliedAlpha: false, antialias: false });
     if (!gl) return;
 
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    cv.width = Math.max(1, Math.round(cv.clientWidth * dpr));
-    cv.height = Math.max(1, Math.round(cv.clientHeight * dpr));
-    const shader = (type: number, source: string) => {
-      const s = gl.createShader(type)!;
-      gl.shaderSource(s, source);
-      gl.compileShader(s);
-      return s;
-    };
-    const program = gl.createProgram()!;
-    gl.attachShader(program, shader(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(program, shader(gl.FRAGMENT_SHADER, FRAG));
-    gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-    const a = gl.getAttribLocation(program, "a");
-    gl.enableVertexAttribArray(a);
-    gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
-    const u = (name: string) => gl.getUniformLocation(program, name);
-    gl.uniform2f(u("res"), cv.width, cv.height);
-    gl.uniform1f(u("night"), kind === "evening" ? 1 : 0);
-    gl.uniform1f(u("walk"), kind === "evening" ? 1 : 0);
-    gl.viewport(0, 0, cv.width, cv.height);
-
-    let want = [0, 0];
-    const look = [0, 0];
-    const onMove = (event: PointerEvent) => {
-      const box = cv.getBoundingClientRect();
-      want = [
-        ((event.clientX - box.left) / box.width - 0.5) * 2,
-        ((event.clientY - box.top) / box.height - 0.5) * 2,
-      ];
-    };
-    if (kind === "evening") window.addEventListener("pointermove", onMove, { passive: true });
-
-    const drops = kind === "rose" ? makeDrops() : [];
-    const dropData = new Float32Array(DROP_COUNT * 4);
-    const from = kind === "evening" ? EVENING_FROM_MS : 0;
-    let t0 = 0;
-
-    const frame = (now: number) => {
-      if (!alive) return;
-      const ms = now - t0;
-      look[0]! += (want[0]! - look[0]!) * 0.06;
-      look[1]! += (want[1]! - look[1]!) * 0.06;
-      gl.uniform1f(u("t"), Math.max(0, ms - from) / 1000);
-      gl.uniform2f(u("look"), look[0]!, look[1]!);
-      if (kind === "aarti") {
-        const at = thaliAt(ms);
-        gl.uniform1f(u("aarti"), at ? at.show : 0);
-        if (at) gl.uniform2f(u("flame"), at.x, at.y - 0.035 * (1 + at.near * 0.3));
+    let onMove: ((event: PointerEvent) => void) | null = null;
+    /**
+     * Sets up and runs the scene, or does nothing when the GPU won't give it what it needs:
+     * the canvas then stays clear and the painted place underneath shows as it is. A canvas
+     * keeps its context, so one this effect lost on a last cleanup comes back lost; iOS also
+     * drops contexts under memory pressure. createShader and its kin return null then.
+     */
+    const start = () => {
+      if (!alive || gl.isContextLost()) return;
+      try {
+        run();
+      } catch {
+        // A GPU that gives out halfway leaves the canvas clear, never the page broken.
       }
-      if (kind === "rose") {
-        drops.forEach((d, i) => {
-          const age = (ms - d.at) / 1000;
-          if (age < 0) return dropData.set([0, 0, 0, 0], i * 4);
-          const life = 1 - smooth((age - 9) / 3);
-          const y = d.y + Math.max(0, age - 1.2) * d.run * (1 + 0.3 * Math.sin(age * 3 + d.wobble));
-          dropData.set([d.x, y, d.r * smooth(age * 6) * life, life], i * 4);
-        });
-        gl.uniform4fv(u(`drops[0]`), dropData);
-      }
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-      if (ms < RUN_MS) raf = requestAnimationFrame(frame);
+    };
+    const restored = () => start();
+    const lost = () => cancelAnimationFrame(raf);
+    cv.addEventListener("webglcontextrestored", restored);
+    cv.addEventListener("webglcontextlost", lost);
+
+    const run = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      cv.width = Math.max(1, Math.round(cv.clientWidth * dpr));
+      cv.height = Math.max(1, Math.round(cv.clientHeight * dpr));
+      const shader = (type: number, source: string) => {
+        const s = gl.createShader(type);
+        if (!s) return null;
+        gl.shaderSource(s, source);
+        gl.compileShader(s);
+        return s;
+      };
+      const vert = shader(gl.VERTEX_SHADER, VERT);
+      const frag = shader(gl.FRAGMENT_SHADER, FRAG);
+      const program = gl.createProgram();
+      if (!vert || !frag || !program) return;
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+      gl.useProgram(program);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+      gl.bufferData(
+        gl.ARRAY_BUFFER,
+        new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
+        gl.STATIC_DRAW,
+      );
+      const a = gl.getAttribLocation(program, "a");
+      gl.enableVertexAttribArray(a);
+      gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+      const u = (name: string) => gl.getUniformLocation(program, name);
+      gl.uniform2f(u("res"), cv.width, cv.height);
+      gl.uniform1f(u("night"), kind === "evening" ? 1 : 0);
+      gl.uniform1f(u("walk"), kind === "evening" ? 1 : 0);
+      gl.viewport(0, 0, cv.width, cv.height);
+
+      let want = [0, 0];
+      const look = [0, 0];
+      onMove = (event: PointerEvent) => {
+        const box = cv.getBoundingClientRect();
+        want = [
+          ((event.clientX - box.left) / box.width - 0.5) * 2,
+          ((event.clientY - box.top) / box.height - 0.5) * 2,
+        ];
+      };
+      if (kind === "evening") window.addEventListener("pointermove", onMove, { passive: true });
+
+      const drops = kind === "rose" ? makeDrops() : [];
+      const dropData = new Float32Array(DROP_COUNT * 4);
+      const from = kind === "evening" ? EVENING_FROM_MS : 0;
+      let t0 = 0;
+
+      const frame = (now: number) => {
+        if (!alive) return;
+        const ms = now - t0;
+        look[0]! += (want[0]! - look[0]!) * 0.06;
+        look[1]! += (want[1]! - look[1]!) * 0.06;
+        gl.uniform1f(u("t"), Math.max(0, ms - from) / 1000);
+        gl.uniform2f(u("look"), look[0]!, look[1]!);
+        if (kind === "aarti") {
+          const at = thaliAt(ms);
+          gl.uniform1f(u("aarti"), at ? at.show : 0);
+          if (at) gl.uniform2f(u("flame"), at.x, at.y - 0.035 * (1 + at.near * 0.3));
+        }
+        if (kind === "rose") {
+          drops.forEach((d, i) => {
+            const age = (ms - d.at) / 1000;
+            if (age < 0) return dropData.set([0, 0, 0, 0], i * 4);
+            const life = 1 - smooth((age - 9) / 3);
+            const y =
+              d.y + Math.max(0, age - 1.2) * d.run * (1 + 0.3 * Math.sin(age * 3 + d.wobble));
+            dropData.set([d.x, y, d.r * smooth(age * 6) * life, life], i * 4);
+          });
+          gl.uniform4fv(u(`drops[0]`), dropData);
+        }
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        if (ms < RUN_MS) raf = requestAnimationFrame(frame);
+      };
+
+      const picture = new window.Image();
+      picture.decoding = "async";
+      picture.src = src;
+      picture.onload = () => {
+        if (!alive) return;
+        gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, picture);
+        t0 = performance.now();
+        raf = requestAnimationFrame(frame);
+        timers.push(window.setTimeout(() => setShown(true), from));
+      };
     };
 
-    const picture = new window.Image();
-    picture.decoding = "async";
-    picture.src = src;
-    picture.onload = () => {
-      if (!alive) return;
-      gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, picture);
-      t0 = performance.now();
-      raf = requestAnimationFrame(frame);
-      timers.push(window.setTimeout(() => setShown(true), from));
-    };
+    if (!gl.isContextLost()) start();
+    else {
+      try {
+        gl.getExtension("WEBGL_lose_context")?.restoreContext();
+      } catch {
+        // No way back: the painted place shows still.
+      }
+    }
 
     return () => {
       alive = false;
       cancelAnimationFrame(raf);
       timers.forEach((timer) => window.clearTimeout(timer));
-      window.removeEventListener("pointermove", onMove);
+      if (onMove) window.removeEventListener("pointermove", onMove);
+      cv.removeEventListener("webglcontextrestored", restored);
+      cv.removeEventListener("webglcontextlost", lost);
       setShown(false);
       gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
