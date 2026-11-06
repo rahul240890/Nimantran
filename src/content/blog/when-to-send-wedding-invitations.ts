@@ -6,14 +6,14 @@ export const whenToSendWeddingInvitations: BlogPost = {
   pair: "when-to-send",
   title: "When to send wedding invitations in India",
   description:
-    "How many days before the wedding to send invitations in India: a timeline from save the date and the first card to God, to reminders and thank-yous.",
+    "How many days before an Indian wedding to send invitations, with a timeline table: save the date, whom to give the first card, WhatsApp invites, reminders.",
   heading: "When to send wedding invitations in India: a timeline that works",
   intro:
     "Send too early and guests forget; too late and they have already promised the date to another wedding. Here is a simple timeline for an Indian wedding, from the save the date and the first card at the temple to the last reminder, with what changes for destination weddings, guests from abroad and the busy wedding season.",
   answer:
     "In India, send wedding invitations 4 to 6 weeks before the first function, and 6 to 8 weeks before for guests who must travel or in the busy season. Send a save the date 3 to 4 months ahead, or 6 months for guests abroad, and one reminder about ten days before the first function.",
   published: "2026-10-18",
-  updated: "2026-10-18",
+  updated: "2026-11-06",
   occasion: "wedding",
   keywords: [
     "when to send wedding invitations",
@@ -21,6 +21,7 @@ export const whenToSendWeddingInvitations: BlogPost = {
     "wedding invitation timeline india",
     "when to send wedding cards",
     "how early to send wedding invitations",
+    "whom to give first wedding card",
   ],
   body: [
     { h2: "The timeline at a glance", id: "timeline" },

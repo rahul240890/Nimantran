@@ -12,7 +12,7 @@ import { pagesText } from "@/i18n/copy/pages";
 import { seoText } from "@/i18n/copy/seo";
 import { ogLocale, type UiLocale } from "@/i18n/locales";
 import { CATEGORIES, CATEGORY_IDS } from "@/lib/categories/catalog";
-import { pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
+import { indexedLocales, pageAlternates, pagePath, type PublicPage } from "@/lib/seo/paths";
 import { samplePath } from "@/lib/sample/paths";
 import { itemList } from "@/lib/seo/structured-data";
 import { TEMPLATE_IDS, type TemplateId } from "@/lib/templates/ids";
@@ -84,6 +84,7 @@ export function publicMetadata(page: PublicPage, locale: UiLocale): Metadata {
     title,
     description,
     alternates: pageAlternates(page, locale),
+    ...(!indexedLocales(page).includes(locale) && { robots: { index: false, follow: true } }),
     openGraph: {
       type: "website",
       siteName: site.name,

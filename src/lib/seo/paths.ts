@@ -89,12 +89,28 @@ export function publicPages(): PublicPage[] {
   ];
 }
 
+/**
+ * The languages a page is offered to search engines in. Contact and the legal pages are
+ * searched for by name only, so their other language copies stay out of the sitemap and
+ * carry noindex: Google's crawl of a young site goes to pages people search for.
+ */
+export function indexedLocales(page: PublicPage): readonly UiLocale[] {
+  const englishOnly =
+    page.kind === "contact" ||
+    page.kind === "privacy" ||
+    page.kind === "terms" ||
+    page.kind === "refunds";
+  return englishOnly ? ["en"] : UI_LOCALES;
+}
+
 /** Canonical address and its language versions, with English as the default. */
 export function pageAlternates(page: PublicPage, locale: UiLocale): Metadata["alternates"] {
   return {
     canonical: pagePath(page, locale),
     languages: {
-      ...Object.fromEntries(UI_LOCALES.map((code) => [`${code}-IN`, pagePath(page, code)])),
+      ...Object.fromEntries(
+        indexedLocales(page).map((code) => [`${code}-IN`, pagePath(page, code)]),
+      ),
       "x-default": pagePath(page, "en"),
     },
   };

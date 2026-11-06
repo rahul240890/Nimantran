@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const annaprashanInvitationMessage: BlogPost = {
   slug: "annaprashan-invitation-message",
   locale: "en",
+  pair: "annaprashan",
   title: "Annaprashan invitation message: 21 ideas",
   description:
     "Annaprashan invitation messages to copy: traditional and modern rice ceremony wording, mukhe bhaat and choroonu lines, and short WhatsApp messages.",
