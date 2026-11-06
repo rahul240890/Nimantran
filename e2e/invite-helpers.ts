@@ -91,10 +91,11 @@ export async function fillEvent(
 
 /** Opens one of the folded parts of a design's page: Family names, Your photos and the rest. */
 export async function openPart(page: Page, title: string) {
-  // The title leads its summary, ahead of what's in it ("NamesAditya & Priya")
+  // The title leads its summary after the part's number in its flower, ahead of what's in
+  // it ("1NamesAditya & Priya")
   const escaped = title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const details = page.locator('details[name="editor-parts"]').filter({
-    has: page.locator(":scope > summary", { hasText: new RegExp(`^${escaped}`) }),
+    has: page.locator(":scope > summary", { hasText: new RegExp(`^\\d*${escaped}`) }),
   });
   if ((await details.getAttribute("open")) === null) {
     await details.locator(":scope > summary").click();

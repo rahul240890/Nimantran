@@ -1,5 +1,6 @@
 "use client";
 
+import { GuestLanguage } from "@/components/guest/guest-language";
 import { DoorOpen } from "lucide-react";
 import { useDeferredValue, useMemo } from "react";
 import { OpeningPreview } from "@/components/guest/opening/opening";
@@ -71,7 +72,17 @@ type PreviewStageProps = {
  * one left on an older invite isn't switched to here. Typing is never held up by it: the
  * words reach it as a deferred value, and it only repaints when they actually change.
  */
-export function PreviewStage({
+export function PreviewStage(props: PreviewStageProps) {
+  // The labels around the card (the scene's buttons, the card's own) follow the card's
+  // language here as they do for guests, not the language of the editor around it
+  return (
+    <GuestLanguage language={cardLanguages(props.draft)[0]}>
+      <Stage {...props} />
+    </GuestLanguage>
+  );
+}
+
+function Stage({
   draft,
   page,
   onPage,

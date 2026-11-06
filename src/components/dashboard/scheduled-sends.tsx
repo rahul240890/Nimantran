@@ -50,7 +50,7 @@ import {
 } from "@/lib/guests/schedule";
 import { googleCalendarUrl, icsCalendar, type CalendarEntry } from "@/lib/publish/calendar";
 import { whatsappToUrl } from "@/lib/publish/links";
-import { guestMessage } from "./guest-list";
+import { cardMessage, guestMessage } from "./guest-list";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
@@ -287,9 +287,7 @@ function SendDialog({
   const router = useRouter();
   const guests = sendAudience(send, view.guests);
   const kind = send.purpose;
-  const [template, setTemplate] = useState(() =>
-    dashboardCopy.messages[kind]("{name}", view.names, view.occasion, view.when),
-  );
+  const [template, setTemplate] = useState(() => cardMessage(view, kind, "{name}"));
   const [sent, setSent] = useState<string[]>([]);
   const [pending, startTransition] = useTransition();
 
@@ -297,9 +295,7 @@ function SendDialog({
 
   const copyFor = async (guest: HostGuest) => {
     try {
-      await navigator.clipboard.writeText(
-        guestMessage(dashboardCopy.messages, view, guest, kind, template),
-      );
+      await navigator.clipboard.writeText(guestMessage(view, guest, kind, template));
       toast({ title: dashboardCopy.hosts.copied, tone: "success" });
       record(guest);
     } catch {
@@ -371,7 +367,7 @@ function SendDialog({
                         <a
                           href={whatsappToUrl(
                             guest.phone,
-                            guestMessage(dashboardCopy.messages, view, guest, kind, template),
+                            guestMessage(view, guest, kind, template),
                           )}
                           target="_blank"
                           rel="noopener noreferrer"

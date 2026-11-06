@@ -14,6 +14,7 @@ import { showsWatermark } from "@/lib/payments/editions";
 import { googleCalendarUrl } from "@/lib/publish/calendar";
 import {
   calendarEntries,
+  inviteLanguage,
   inviteNames,
   inviteWhen,
   inviteWhere,
@@ -38,10 +39,12 @@ export async function generateMetadata({ params }: PageProps<"/i/[slug]">): Prom
   const invite = await findPublishedInvite(slug);
   // Families' names, dates and addresses never go into search results
   const robots = { index: false, follow: false };
-  const locale = await getLocale();
-  const { guestCopy } = publishText[locale];
-  if (!invite) return { title: guestCopy.notFoundTitle, robots };
+  if (!invite) return { title: publishText[await getLocale()].guestCopy.notFoundTitle, robots };
   const { draft } = invite;
+  // The preview WhatsApp shows under the link speaks the card's language, not the site's:
+  // WhatsApp asks without a language, so the site's would always be English
+  const locale = inviteLanguage(draft);
+  const { guestCopy } = publishText[locale];
   const title = guestCopy.metaTitle(inviteNames(draft), occasionName(draft, locale));
   const description = guestCopy.metaDescription(inviteWhen(draft, locale), inviteWhere(draft));
   // The cover at a versioned address the CDN keeps, so WhatsApp gets it at once
@@ -79,7 +82,8 @@ export default async function InvitePage({ params }: PageProps<"/i/[slug]">) {
   const locale = await getLocale();
   const { functionCopy } = editorText[locale];
   const url = inviteUrl(await requestOrigin(), invite.slug);
-  const entries = calendarEntries(draft, { id: invite.id, url }, locale);
+  // A guest's calendar names each function as the card does
+  const entries = calendarEntries(draft, { id: invite.id, url }, inviteLanguage(draft));
   const watermark = await showsWatermark(invite.slug, invite.id);
 
   const functions: GuestFunction[] = storyFunctions(draft, locale).map((told) => {

@@ -903,8 +903,9 @@ export function useVideoFilm(
   photos: PublicPhoto[],
   url: string,
 ) {
-  const { videoCopy } = useText(publishText);
   const language = cardLanguages(draft)[0];
+  // The film is for guests, so its closing words speak the card's language too
+  const { videoCopy } = publishText[language];
   const template = draftTemplate(draft);
   // The guest's opening plays first, as on the link: closed with the names, opening, the welcome
   const opening = useMemo(() => {

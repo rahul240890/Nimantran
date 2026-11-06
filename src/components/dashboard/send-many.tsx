@@ -22,7 +22,7 @@ import {
   type SendAudience,
 } from "@/lib/guests/list";
 import { personalUrl, whatsappToUrl } from "@/lib/publish/links";
-import { guestMessage } from "./guest-list";
+import { cardMessage, guestMessage } from "./guest-list";
 import type { DashboardView } from "./types";
 import { useText } from "@/i18n/client";
 import { dashboardText } from "@/i18n/copy/dashboard";
@@ -44,9 +44,7 @@ export function SendMany({ view, onDone }: { view: DashboardView; onDone: () => 
   );
   const [group, setGroup] = useState<string | null>(null);
   const [batch, setBatch] = useState<number>(SEND_BATCHES[0]);
-  const [template, setTemplate] = useState(() =>
-    dashboardCopy.messages.invite("{name}", view.names, view.occasion, view.when),
-  );
+  const [template, setTemplate] = useState(() => cardMessage(view, "invite", "{name}"));
   // The guests being sent to, fixed once sending starts so the list doesn't shift under a tap
   const [queue, setQueue] = useState<HostGuest[] | null>(null);
   const [sent, setSent] = useState<Set<string>>(new Set());
@@ -64,8 +62,7 @@ export function SendMany({ view, onDone }: { view: DashboardView; onDone: () => 
   );
   const planned = sendQueue(view.guests, { audience, group, batch });
 
-  const messageFor = (guest: HostGuest) =>
-    guestMessage(dashboardCopy.messages, view, guest, "invite", template);
+  const messageFor = (guest: HostGuest) => guestMessage(view, guest, "invite", template);
 
   const record = (guest: HostGuest) => {
     setSent((current) => new Set(current).add(guest.id));

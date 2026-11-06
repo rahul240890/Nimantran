@@ -79,19 +79,20 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-type Messages = (typeof dashboardText)["en"]["dashboardCopy"]["messages"];
+/** An invitation or reminder for a guest, in the card's language: `name` may be "{name}". */
+export function cardMessage(view: DashboardView, kind: "invite" | "reminder", name: string) {
+  const { language, occasion, when } = view.guestWords;
+  return dashboardText[language].dashboardCopy.messages[kind](name, view.names, occasion, when);
+}
 
 /** A message with the guest's name and their own link, for WhatsApp. */
 export function guestMessage(
-  messages: Messages,
   view: DashboardView,
   guest: HostGuest,
   kind: "invite" | "reminder",
   template?: string,
 ): string {
-  const body =
-    template?.replaceAll("{name}", guest.name) ??
-    messages[kind](guest.name, view.names, view.occasion, view.when);
+  const body = template?.replaceAll("{name}", guest.name) ?? cardMessage(view, kind, guest.name);
   return view.url ? withLink(body, personalUrl(view.url, guest.token)) : body.trim();
 }
 
@@ -220,7 +221,7 @@ function GuestRow({
             className="max-sm:flex-1"
           >
             <a
-              href={whatsappToUrl(guest.phone, guestMessage(copy.messages, view, guest, kind))}
+              href={whatsappToUrl(guest.phone, guestMessage(view, guest, kind))}
               target="_blank"
               rel="noopener noreferrer"
               onClick={send}
@@ -269,10 +270,7 @@ function GuestRow({
               <>
                 <DropdownMenuItem asChild>
                   <a
-                    href={whatsappToUrl(
-                      guest.phone,
-                      guestMessage(copy.messages, view, guest, "invite"),
-                    )}
+                    href={whatsappToUrl(guest.phone, guestMessage(view, guest, "invite"))}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() =>
@@ -286,10 +284,7 @@ function GuestRow({
                 {waiting && (
                   <DropdownMenuItem asChild>
                     <a
-                      href={whatsappToUrl(
-                        guest.phone,
-                        guestMessage(copy.messages, view, guest, "reminder"),
-                      )}
+                      href={whatsappToUrl(guest.phone, guestMessage(view, guest, "reminder"))}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() =>

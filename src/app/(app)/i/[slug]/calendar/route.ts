@@ -1,8 +1,7 @@
-import { getLocale } from "@/i18n/server";
 import { isFunctionId } from "@/lib/events/functions";
 import { findPublishedInvite } from "@/lib/invites/public";
 import { icsCalendar } from "@/lib/publish/calendar";
-import { calendarEntries } from "@/lib/publish/describe";
+import { calendarEntries, inviteLanguage } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 
@@ -13,9 +12,12 @@ export async function GET(request: Request, ctx: RouteContext<"/i/[slug]/calenda
   if (!invite) return new Response("Not found", { status: 404 });
   const only = new URL(request.url).searchParams.get("function");
   const url = inviteUrl(await requestOrigin(), invite.slug);
-  const entries = calendarEntries(invite.draft, { id: invite.id, url }, await getLocale()).filter(
-    (entry) => !isFunctionId(only) || entry.uid.startsWith(`${invite.id}-${only}@`),
-  );
+  // Named as the card names its functions, in the card's language
+  const entries = calendarEntries(
+    invite.draft,
+    { id: invite.id, url },
+    inviteLanguage(invite.draft),
+  ).filter((entry) => !isFunctionId(only) || entry.uid.startsWith(`${invite.id}-${only}@`));
   const name = isFunctionId(only) ? `${invite.slug}-${only}` : invite.slug;
   return new Response(icsCalendar(entries), {
     headers: {
