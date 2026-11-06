@@ -13,7 +13,7 @@ alter table public.media add primary key (event_id, id);
 -- names another invite gets a row of its own again, as it was before.
 insert into public.media (id, event_id, kind, storage_path, width, height, position, created_by, created_at)
 select distinct on (o.name)
-  m.id, e.id, m.kind, o.name, m.width, m.height, m.position, m.created_by, o.created_at
+  m.id, e.id, m.kind, o.name, m.width, m.height, m.position, m.created_by, m.created_at
 from storage.objects o
 join public.events e on e.id::text = split_part(o.name, '/', 1)
 join public.media m on m.id::text = split_part(split_part(o.name, '/', 2), '.', 1)
