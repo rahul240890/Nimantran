@@ -14,7 +14,7 @@ import { toast } from "@/components/ui/toast";
 import { formatPhone } from "@/lib/auth/phone";
 import { guestState, type HostGuest } from "@/lib/guests/list";
 import { whatsappToUrl } from "@/lib/publish/links";
-import { guestMessage } from "./guest-list";
+import { cardMessage, guestMessage } from "./guest-list";
 import type { DashboardView } from "./types";
 import { useLocale, useText } from "@/i18n/client";
 import { dateLocale } from "@/i18n/dates";
@@ -30,9 +30,7 @@ export function Reminders({ view }: { view: DashboardView }) {
   const copy = dashboardCopy.reminders;
   const router = useRouter();
   const waiting = view.guests.filter((guest) => guestState(guest) === "waiting");
-  const [template, setTemplate] = useState(() =>
-    dashboardCopy.messages.reminder("{name}", view.names, view.occasion, view.when),
-  );
+  const [template, setTemplate] = useState(() => cardMessage(view, "reminder", "{name}"));
   const [sent, setSent] = useState<string[]>([]);
 
   const record = (guest: HostGuest) => {
@@ -42,9 +40,7 @@ export function Reminders({ view }: { view: DashboardView }) {
 
   const copyFor = async (guest: HostGuest) => {
     try {
-      await navigator.clipboard.writeText(
-        guestMessage(dashboardCopy.messages, view, guest, "reminder", template),
-      );
+      await navigator.clipboard.writeText(guestMessage(view, guest, "reminder", template));
       toast({ title: dashboardCopy.hosts.copied, tone: "success" });
       record(guest);
     } catch {
@@ -119,13 +115,7 @@ export function Reminders({ view }: { view: DashboardView }) {
                           <a
                             href={whatsappToUrl(
                               guest.phone,
-                              guestMessage(
-                                dashboardCopy.messages,
-                                view,
-                                guest,
-                                "reminder",
-                                template,
-                              ),
+                              guestMessage(view, guest, "reminder", template),
                             )}
                             target="_blank"
                             rel="noopener noreferrer"

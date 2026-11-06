@@ -1,3 +1,4 @@
+import type { UiLocale } from "@/i18n/locales";
 import type { HostFunction, HostGuest } from "@/lib/guests/list";
 import type { ScheduledSend } from "@/lib/guests/schedule";
 import type { Host, HostInvite } from "@/lib/invites/hosts";
@@ -15,6 +16,11 @@ export type DashboardView = {
   names: string;
   occasion: string;
   when: string;
+  /**
+   * What the messages guests get say, in the card's language rather than the host's: a
+   * Gujarati card's guests get a Gujarati WhatsApp message.
+   */
+  guestWords: { language: UiLocale; occasion: string; when: string };
   functions: HostFunction[];
   guests: HostGuest[];
   hosts: Host[];

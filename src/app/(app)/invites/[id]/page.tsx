@@ -10,7 +10,7 @@ import { hostStore } from "@/lib/invites/hosts";
 import { editionsActive, invitePlan } from "@/lib/payments/editions";
 import { cohostLimit, inviteLimit } from "@/lib/plans/catalog";
 import { getPricing } from "@/lib/plans/pricing";
-import { inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
+import { inviteLanguage, inviteNames, inviteWhen, occasionName } from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { requestOrigin } from "@/lib/request-origin";
 import { getLocale, getText } from "@/i18n/server";
@@ -53,6 +53,11 @@ export default async function GuestsPage({ params, searchParams }: PageProps<"/i
             names: inviteNames(data.draft),
             occasion: occasionName(data.draft, await getLocale()),
             when: inviteWhen(data.draft, await getLocale()),
+            guestWords: {
+              language: inviteLanguage(data.draft),
+              occasion: occasionName(data.draft, inviteLanguage(data.draft)),
+              when: inviteWhen(data.draft, inviteLanguage(data.draft)),
+            },
             functions: data.functions,
             guests: data.guests,
             hosts: data.hosts,

@@ -38,7 +38,13 @@ import {
 import { withLink } from "@/lib/publish/message";
 import type { PerkFacts } from "@/content/celebrate";
 import { inviteStore } from "@/lib/invites/store";
-import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
+import {
+  inviteLanguage,
+  inviteNames,
+  inviteWhen,
+  inviteWhere,
+  occasionName,
+} from "@/lib/publish/describe";
 import { inviteUrl } from "@/lib/publish/links";
 import { storyFunctions } from "@/lib/publish/story";
 import { requestOrigin } from "@/lib/request-origin";
@@ -70,7 +76,6 @@ export default async function SharePage({
   params,
   searchParams,
 }: PageProps<"/invites/[id]/share">) {
-  const { shareCopy, guestCopy } = await getText(publishText);
   const { id } = await params;
   const arrived = (await searchParams)[CELEBRATE_PARAM] === "1";
   if (!z.uuid().safeParse(id).success) notFound();
@@ -95,8 +100,11 @@ export default async function SharePage({
   const covered = editionFor(plan ?? FREE_EDITION, draftDesignId(live));
   const video = active ? PLANS[covered.plan].video : "every";
   const names = inviteNames(live);
-  const occasion = occasionName(live, locale);
-  const when = inviteWhen(live, locale);
+  // What guests get, the message and the link's preview, speaks the card's language
+  const language = inviteLanguage(live);
+  const { shareCopy, guestCopy } = publishText[language];
+  const occasion = occasionName(live, language);
+  const when = inviteWhen(live, language);
   const where = inviteWhere(live);
   const message = shareCopy.message({ names, occasion, when, where });
   const functions = storyFunctions(live, locale);

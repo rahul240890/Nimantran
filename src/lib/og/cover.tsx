@@ -9,7 +9,14 @@ import { findPublishedInvite } from "@/lib/invites/public";
 import { lightTokens, ogFonts } from "@/lib/og/assets";
 import { firstReadable, readableOn } from "@/lib/og/contrast";
 import { textPicture, type TextPicture } from "@/lib/og/text";
-import { inviteNames, inviteWhen, inviteWhere, occasionName } from "@/lib/publish/describe";
+import { publishText } from "@/i18n/copy/publish";
+import {
+  inviteLanguage,
+  inviteNames,
+  inviteWhen,
+  inviteWhere,
+  occasionName,
+} from "@/lib/publish/describe";
 import { draftSuite } from "@/lib/publish/story";
 import { suitePreview } from "@/lib/suites/catalog";
 import { site } from "@/lib/site";
@@ -28,12 +35,18 @@ const size = COVER_SIZE;
 const TEXT_WIDTH = 660;
 
 /**
+ * Bumped when the picture's drawing changes, so previews the CDN keeps for good are drawn
+ * again: "l" when the preview began speaking the card's language (2026-11-06).
+ */
+const COVER_LOOK = "l";
+
+/**
  * The cover's address. The version changes with every save, so apps and the CDN may keep a
  * copy for good, and an edited invite gets a fresh picture.
  */
 export function coverPath(slug: string, updatedAt: string): string {
   const version = (Date.parse(updatedAt) || 0).toString(36);
-  return `/i/${slug}/cover?v=${version}`;
+  return `/i/${slug}/cover?v=${version}${COVER_LOOK}`;
 }
 
 /** A piece of text drawn by sharp, at its own size. */
@@ -74,7 +87,10 @@ export async function drawCover(slug: string): Promise<Response> {
 
   const { draft } = invite;
   const template = draftTemplate(draft);
-  const copy = draftCopy(draft);
+  // Everything on the preview speaks the card's language: a Gujarati card's preview reads
+  // "આપને આમંત્રણ છે · લગ્ન" and gives the date the Gujarati way
+  const language = inviteLanguage(draft);
+  const copy = draftCopy(draft, language);
   const c = template.colours;
   const back = colour(c.back, "#7d1d3a");
   const paper = colour(c.paper, "#f8efdc");
@@ -85,12 +101,19 @@ export async function drawCover(slug: string): Promise<Response> {
   const text = readableOn(back, paper, ink);
   // Gold details on the back, unless the card's gold is too close to it to read
   const detail = firstReadable(back, 3, gold, accentText, text);
-  const when = inviteWhen(draft);
+  const when = inviteWhen(draft, language);
   const where = inviteWhere(draft);
   const names = inviteNames(draft);
+  const heading = `${publishText[language].guestCopy.invited} · ${occasionName(draft, language)}`;
+  // English keeps its spaced capitals in Tenor Sans; other scripts are drawn by sharp, which
+  // shapes them (next/og would print boxes)
+  const latin = language === "en";
   // A painted theme shows its own cover painting, the first thing guests will open
-  const [painting, namesPicture, whenPicture, wherePicture] = await Promise.all([
+  const [painting, headingPicture, namesPicture, whenPicture, wherePicture] = await Promise.all([
     paintedCover(draftSuite(draft)),
+    latin
+      ? null
+      : textPicture(heading, { look: "label", size: 30, colour: detail, width: TEXT_WIDTH }),
     textPicture(names, {
       look: "display",
       size: names.length > 22 ? 64 : 84,
@@ -117,9 +140,13 @@ export async function drawCover(slug: string): Promise<Response> {
       }}
     >
       <div style={{ display: "flex", flexDirection: "column", flex: 1, gap: 18 }}>
-        <div style={{ fontFamily: "Tenor Sans", fontSize: 26, letterSpacing: 8, color: detail }}>
-          {`YOU'RE INVITED · ${occasionName(draft).toUpperCase()}`}
-        </div>
+        {headingPicture ? (
+          <TextImage picture={headingPicture} />
+        ) : (
+          <div style={{ fontFamily: "Tenor Sans", fontSize: 26, letterSpacing: 8, color: detail }}>
+            {heading.toUpperCase()}
+          </div>
+        )}
         <TextImage picture={namesPicture} />
         {whenPicture && <TextImage picture={whenPicture} style={{ marginTop: 8 }} />}
         {wherePicture && <TextImage picture={wherePicture} />}
