@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const indianWeddingFunctions: BlogPost = {
   slug: "indian-wedding-functions",
   locale: "en",
-  title: "Indian wedding functions list, in order",
+  title: "Marriage functions list: names, in order",
   description:
-    "Every Indian wedding function in order, from roka and engagement to haldi, mehendi, sangeet, pheras and reception, with regional names.",
-  heading: "Indian wedding functions, in order",
+    "Marriage functions list with the name of every Indian wedding function in order: roka, engagement, haldi, mehendi, sangeet, pheras, reception, by region.",
+  heading: "Indian wedding functions list: every function name, in order",
   intro:
     "An Indian wedding is not one event but a series of them, often over three to five days. The names and order change from family to family and region to region, but most weddings include some version of the functions below. Use this list to plan your days and your invitation.",
   answer:
     "A typical Indian wedding runs over three to five days: the roka or engagement, then the haldi, mehendi and sangeet, then the wedding itself with the baraat and pheras, then the vidaai and the reception. Names and order change by region and community, so Gujarati, Tamil and Bengali weddings each have their own.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-11-06",
   occasion: "wedding",
   keywords: [
     "indian wedding functions",
@@ -20,6 +20,10 @@ export const indianWeddingFunctions: BlogPost = {
     "wedding functions list",
     "hindu wedding rituals in order",
     "pre wedding functions",
+    "marriage functions list",
+    "wedding function names",
+    "marriage function names",
+    "indian wedding functions in order",
   ],
   body: [
     { h2: "Before the wedding", id: "before" },

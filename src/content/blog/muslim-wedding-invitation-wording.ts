@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const muslimWeddingInvitationWording: BlogPost = {
   slug: "muslim-wedding-invitation-wording",
   locale: "en",
-  title: "Muslim wedding invitation wording: 28 lines",
+  title: "Muslim wedding invitation wording and messages",
   description:
-    "Muslim wedding invitation wording with Bismillah: nikah and walima invitation messages, mehendi and manjha lines, Urdu phrases and WhatsApp messages.",
+    "Muslim wedding invitation wording with Bismillah: nikah and walima card lines, Urdu phrases and Islamic wedding invitation text messages for WhatsApp.",
   heading: "Muslim wedding invitation wording: nikah, walima and shaadi card lines",
   intro:
     "A Muslim wedding invitation usually opens with Bismillah, names the families with respect and invites guests to the nikah and the walima, often with a mehendi or manjha before. Here are 28 lines to copy, in English and in Urdu written in Latin script, with notes on what each part means.",
   answer:
     "A Muslim wedding invitation usually opens with Bismillah, names the bride and groom with their parents, and invites guests to the nikah and the walima, often with a mehendi or manjha before. Give each function's date, time and venue, and write it with respect, in English, Urdu or both.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-11-06",
   occasion: "wedding",
   keywords: [
     "muslim wedding invitation wording",
@@ -20,6 +20,7 @@ export const muslimWeddingInvitationWording: BlogPost = {
     "walima invitation message",
     "shaadi card wording with bismillah",
     "muslim marriage invitation message",
+    "islamic wedding invitation text message",
   ],
   body: [
     { h2: "Opening lines: Bismillah and blessings", id: "bismillah" },

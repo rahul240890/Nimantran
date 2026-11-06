@@ -4,7 +4,7 @@ import { blogPostPath, translatedPost } from "@/lib/blog/posts";
 import { allPostsIn } from "@/lib/blog/store";
 import { allDesigns, kindDesigns, occasionDesigns } from "@/lib/gallery/catalog";
 import { designPicture } from "@/lib/gallery/pictures";
-import { pagePath, publicPages, type PublicPage } from "@/lib/seo/paths";
+import { indexedLocales, pagePath, publicPages, type PublicPage } from "@/lib/seo/paths";
 import { absolute } from "@/lib/seo/structured-data";
 
 /*
@@ -34,7 +34,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // A language's blog is listed once it has a post of its own, never as an empty page
   const blogs = UI_LOCALES.filter((locale, i) => locale === "en" || byLocale[i]!.length > 0);
   const pages = publicPages().flatMap((page) => {
-    const locales = page.kind === "blog" ? blogs : UI_LOCALES;
+    const locales = page.kind === "blog" ? blogs : indexedLocales(page);
     const legal = page.kind === "privacy" || page.kind === "terms" || page.kind === "refunds";
     const languages = {
       ...Object.fromEntries(locales.map((code) => [`${code}-IN`, absolute(pagePath(page, code))])),

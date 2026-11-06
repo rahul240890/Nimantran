@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const shopOpeningInvitationMessage: BlogPost = {
   slug: "shop-opening-invitation-message",
   locale: "en",
-  title: "Shop opening invitation message: 25 to copy",
+  title: "Shop opening invitation message for WhatsApp",
   description:
-    "Shop opening invitation messages to copy: traditional and modern wording, office opening, new business inauguration, puja timing lines and WhatsApp texts.",
-  heading: "Shop opening invitation message: 25 messages for a new shop, office or business",
+    "Shop opening invitation messages to copy for WhatsApp, friends and customers: traditional and modern wording, office opening, puja times and welcome notes.",
+  heading: "Shop opening invitation message: 34 messages for a new shop, office or business",
   intro:
-    "Opening a shop or office is the start of something you have worked hard for, and the first people through the door matter: family for the blessings, and customers, suppliers and neighbours for the business. Here are 25 invitation messages for a shop, showroom, clinic, restaurant or office opening, plus lines for the puja and ribbon cutting.",
+    "Opening a shop or office is the start of something you have worked hard for, and the first people through the door matter: family for the blessings, and customers, suppliers and neighbours for the business. Here are 34 invitation messages for a shop, showroom, clinic, restaurant or office opening, plus lines for the puja and ribbon cutting.",
   answer:
     "A shop opening invitation names the business, invites guests to the opening or udghatan, and gives the date, the muhurat or time and the full address with a map link. Families invite elders for blessings; businesses invite customers, often with an opening offer. Mention the puja time and any refreshments.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-11-06",
   occasion: "shop-opening",
   keywords: [
     "shop opening invitation message",
@@ -21,6 +21,10 @@ export const shopOpeningInvitationMessage: BlogPost = {
     "new business inauguration invitation",
     "dukaan uddhatan invitation",
     "shop opening invitation for whatsapp",
+    "new shop opening invitation message on whatsapp",
+    "shop opening invitation message to friends",
+    "shop opening message to customers",
+    "welcome message for shop opening",
   ],
   body: [
     { h2: "Traditional shop opening invitation messages", id: "traditional" },
@@ -69,6 +73,48 @@ export const shopOpeningInvitationMessage: BlogPost = {
         {
           text: "Thank you for coming to our opening and for your blessings. We hope to see you at the shop often!",
         },
+      ],
+    },
+
+    { h2: "Shop opening invitation message to friends", id: "friends" },
+    "Friends will come for you, not for the shop, so the message can be warm and a little cheeky.",
+    {
+      wording: [
+        {
+          text: "It's finally happening! My café opens this Sunday at 5 pm. You have to be the first ones in, coffee is on me. Map in the link.",
+        },
+        {
+          text: "You heard every plan and every worry for two years. Now come and see it: Riya's Boutique opens on Friday at 11 am. Please come!",
+        },
+        {
+          text: "New shop, same me. Join us for the opening puja and snacks on Saturday morning, and bring the whole gang.",
+        },
+      ],
+    },
+
+    { h2: "Shop opening message to customers", id: "customers" },
+    "For customers, lead with what they get: the opening date, the address and any opening offer. Send it only to people who have agreed to hear from you.",
+    {
+      wording: [
+        {
+          text: "Grand opening! Agarwal Sarees opens its new showroom on MG Road this Thursday. Visit on opening day for 10% off and a free gift on every purchase.",
+        },
+        {
+          text: "We are opening our doors! Kavya's Bakehouse welcomes you from Saturday, 6 March, 9 am. The first 50 customers get a free pastry.",
+        },
+        {
+          text: "Dear valued customer, our new branch at Satellite, Ahmedabad opens on Sunday at 11 am. We would be honoured to welcome you.",
+        },
+      ],
+    },
+
+    { h2: "Welcome notes for the opening day", id: "welcome" },
+    "A short welcome note at the door or on a board at the counter thanks guests as they arrive.",
+    {
+      wording: [
+        { text: "Welcome to our new beginning. Thank you for being here on our first day." },
+        { text: "Your blessings opened this door. Welcome to Agarwal Sarees." },
+        { text: "Welcome! Every customer today is our first customer. Thank you for coming." },
       ],
     },
 
