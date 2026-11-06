@@ -66,6 +66,28 @@ const nextConfig: NextConfig = {
       "./public/suites/*/preview.jpg",
     ],
   },
+  /*
+   * Keep the server bundles small, as Vercel bills every deployment's functions for storage.
+   * The cover's painting is read by a path made at request time (src/lib/og/cover.tsx), which
+   * the tracer can't narrow, so it would copy every file in public/ (about 600 MB) into the
+   * link-preview functions; they need only the previews listed above. Public files are served
+   * from the CDN, never from a function. Vercel's functions run on glibc x64, so sharp's musl
+   * and WebAssembly builds (about 28 MB in every function) are never loaded there.
+   */
+  outputFileTracingExcludes: {
+    "/**": [
+      "./node_modules/@img/sharp-libvips-linuxmusl-x64/**",
+      "./node_modules/@img/sharp-linuxmusl-x64/**",
+      "./node_modules/@img/sharp-wasm32/**",
+    ],
+    ...Object.fromEntries(
+      ["/i/**", "/invites/**"].map((route) => [
+        route,
+        // Everything but the jpg previews (all other public media is webp, png, svg and the like)
+        ["./public/**/*.{webp,png,svg,json,mp4,m4a,webm}"],
+      ]),
+    ),
+  },
 };
 
 export default nextConfig;
