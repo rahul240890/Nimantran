@@ -616,7 +616,7 @@ export function QuickStart({
           className="flex min-w-0 flex-col gap-5 lg:max-w-2xl"
         >
           {ready && (
-            <Quiet className="flex flex-col gap-5">
+            <Quiet className="flex flex-col gap-3 sm:gap-4">
               {/* A live invite's change its package doesn't cover stays off the live copy */}
               {signedIn && (
                 <HeldBackNotice
@@ -628,6 +628,7 @@ export function QuickStart({
               {/* Every part folded to its title, the one being worked on open */}
               <Fold
                 id="part-names"
+                step={1}
                 group={PARTS}
                 open={opened === "names"}
                 title={coupleCopy.namesHeading}
@@ -638,6 +639,7 @@ export function QuickStart({
               </Fold>
               <Fold
                 id="part-when"
+                step={2}
                 group={PARTS}
                 open={opened === "when"}
                 title={quickCopy.whenHeading}
@@ -647,6 +649,7 @@ export function QuickStart({
               </Fold>
               <Fold
                 id="part-family"
+                step={3}
                 group={PARTS}
                 open={false}
                 title={quickCopy.familyTitle}
@@ -656,6 +659,7 @@ export function QuickStart({
               </Fold>
               <Fold
                 id="part-photos"
+                step={4}
                 group={PARTS}
                 open={false}
                 title={quickCopy.photosTitle}
@@ -665,6 +669,7 @@ export function QuickStart({
               </Fold>
               <Fold
                 id="part-words"
+                step={5}
                 group={PARTS}
                 open={false}
                 title={stepCopy.words.label}
@@ -674,6 +679,7 @@ export function QuickStart({
               </Fold>
               <Fold
                 id="part-music"
+                step={6}
                 group={PARTS}
                 open={false}
                 title={stepCopy.music.label}
@@ -684,6 +690,7 @@ export function QuickStart({
               {/* How it opens: the last part, the first thing guests see */}
               <Fold
                 id="part-gate"
+                step={7}
                 group={PARTS}
                 open={false}
                 title={openingCopy.heading}
