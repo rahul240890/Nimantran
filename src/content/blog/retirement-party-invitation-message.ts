@@ -5,14 +5,14 @@ export const retirementPartyInvitationMessage: BlogPost = {
   locale: "en",
   title: "Retirement party invitation message: 23 ideas",
   description:
-    "Retirement party invitation messages to copy: from family, from colleagues, formal retirement function wording, farewell lines and short WhatsApp texts.",
+    "Retirement party and retirement lunch invitation messages to copy: from family and colleagues, formal function wording, farewell lines and WhatsApp texts.",
   heading: "Retirement party invitation message: 23 ways to invite",
   intro:
     "Thirty or forty years of work deserve a proper thank-you. Whether the family is hosting a dinner for Papa or the office is saying goodbye to a much-loved colleague, here are 23 retirement invitation messages: formal, warm, light-hearted and short enough for WhatsApp.",
   answer:
     "A retirement party invitation names the person retiring, their years of service and the organisation, and invites guests to a dinner or farewell with the date, time and venue. Families write it warmly; offices keep it formal. Say whether it is a surprise, and whether guests may bring a message or memory to share.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-11-06",
   occasion: "retirement",
   keywords: [
     "retirement party invitation message",
@@ -20,6 +20,8 @@ export const retirementPartyInvitationMessage: BlogPost = {
     "farewell retirement invitation wording",
     "retirement party invitation for whatsapp",
     "retirement invitation message for father",
+    "retirement lunch invitation message",
+    "whatsapp invitation message for retirement party",
   ],
   body: [
     { h2: "Retirement invitations from the family", id: "from-family" },

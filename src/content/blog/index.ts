@@ -3,6 +3,7 @@ import { anniversaryPartyInvitationMessage } from "./anniversary-party-invitatio
 import { babyShowerInvitationMessage } from "./baby-shower-invitation-message";
 import { bestDigitalInvitationWebsitesIndia } from "./best-digital-invitation-websites-india";
 import { birthdayInvitationMessages } from "./birthday-invitation-messages";
+import { annaprashanNimantranPatra } from "./bn-annaprashan-nimantran-patra";
 import { biyerCardLekha } from "./bn-biyer-card-lekha";
 import { christmasPartyInvitationMessage } from "./christmas-party-invitation-message";
 import { digitalVsPrintedWeddingCards } from "./digital-vs-printed-wedding-cards";
@@ -37,6 +38,7 @@ import { rokaCeremonyInvitationMessage } from "./roka-ceremony-invitation-messag
 import { satyanarayanPujaInvitationMessage } from "./satyanarayan-puja-invitation-message";
 import { saveTheDateMessages } from "./save-the-date-messages";
 import { shopOpeningInvitationMessage } from "./shop-opening-invitation-message";
+import { grahapravesamAzhaippithazh } from "./ta-grahapravesam-azhaippithazh";
 import { thirumanaAzhaippithazhVasagam } from "./ta-thirumana-azhaippithazh-vasagam";
 import { threadCeremonyInvitationMessage } from "./thread-ceremony-invitation-message";
 import type { BlogPost } from "./types";
@@ -99,4 +101,6 @@ export const POSTS: readonly BlogPost[] = [
   haldiMehendiSangeetNimantran,
   bestDigitalInvitationWebsitesIndia,
   digitalVsPrintedWeddingCards,
+  annaprashanNimantranPatra,
+  grahapravesamAzhaippithazh,
 ];

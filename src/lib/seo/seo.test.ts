@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { publicMetadata } from "@/components/seo/pages";
 import { UI_LOCALES } from "@/i18n/locales";
-import { pageAlternates, pagePath, publicPages, switchLocalePath } from "./paths";
+import { indexedLocales, pageAlternates, pagePath, publicPages, switchLocalePath } from "./paths";
 import { jsonLdText } from "./structured-data";
 
 describe("public pages", () => {
@@ -34,6 +34,18 @@ describe("public pages", () => {
         "ta-IN": "/ta/invitations/sangeet",
         "x-default": "/invitations/sangeet",
       },
+    });
+  });
+
+  it("offer contact and legal pages to search in English only", () => {
+    expect(indexedLocales({ kind: "privacy" })).toEqual(["en"]);
+    expect(indexedLocales({ kind: "occasion", id: "haldi" })).toEqual(UI_LOCALES);
+    expect(publicMetadata({ kind: "terms" }, "hi").robots).toEqual({ index: false, follow: true });
+    expect(publicMetadata({ kind: "terms" }, "en").robots).toBeUndefined();
+    expect(publicMetadata({ kind: "occasion", id: "haldi" }, "ta").robots).toBeUndefined();
+    expect(pageAlternates({ kind: "refunds" }, "gu")).toEqual({
+      canonical: "/gu/refunds",
+      languages: { "en-IN": "/refunds", "x-default": "/refunds" },
     });
   });
 
