@@ -22,6 +22,8 @@ export const POST_PAIRS: readonly Partial<Record<UiLocale, string>>[] = [
     ta: "grahapravesam-azhaippithazh",
   },
   { en: "annaprashan-invitation-message", bn: "annaprashan-nimantran-patra" },
+  { en: "retirement-party-invitation-message", ta: "pani-niraivu-vizha-azhaippithazh" },
+  { en: "naming-ceremony-invitation-message", ta: "peyar-suttu-vizha-azhaippithazh" },
   { en: "haldi-mehendi-sangeet-invitation-messages", hi: "haldi-mehendi-sangeet-nimantran" },
   { en: "gujarati-wedding-invitation-wording", gu: "kankotri-lakhan" },
   { en: "satyanarayan-puja-invitation-message", hi: "satyanarayan-katha-nimantran" },
