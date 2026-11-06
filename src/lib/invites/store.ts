@@ -283,9 +283,11 @@ const supabaseStore: InviteStore = {
     const gone = media.filter((row) => !wanted.includes(row.id as string));
     if (gone.length) {
       await supabase.storage.from(BUCKET).remove(gone.map((row) => row.storage_path as string));
+      // By this invite as well: an invite written from another shares its photos' ids
       await supabase
         .from("media")
         .delete()
+        .eq("event_id", id)
         .in(
           "id",
           gone.map((row) => row.id as string),
@@ -297,6 +299,7 @@ const supabaseStore: InviteStore = {
         await supabase
           .from("media")
           .update({ position })
+          .eq("event_id", id)
           .eq("id", row.id as string);
       }
     }
@@ -316,6 +319,7 @@ const supabaseStore: InviteStore = {
       await supabase
         .from("media")
         .delete()
+        .eq("event_id", id)
         .in(
           "id",
           oldClips.map((row) => row.id as string),
@@ -355,15 +359,18 @@ const supabaseStore: InviteStore = {
       .from(BUCKET)
       .upload(path, file, { contentType: file.type, upsert: true });
     if (uploadError) return false;
-    const { error } = await supabase.from("media").upsert({
-      id: photo.id,
-      event_id: id,
-      kind: "photo",
-      storage_path: path,
-      width: photo.width,
-      height: photo.height,
-      position: photo.position,
-    });
+    const { error } = await supabase.from("media").upsert(
+      {
+        id: photo.id,
+        event_id: id,
+        kind: "photo",
+        storage_path: path,
+        width: photo.width,
+        height: photo.height,
+        position: photo.position,
+      },
+      { onConflict: "event_id,id" },
+    );
     return !error;
   },
 
@@ -375,13 +382,16 @@ const supabaseStore: InviteStore = {
       .from(BUCKET)
       .upload(path, file, { contentType: file.type, upsert: true });
     if (uploadError) return false;
-    const { error } = await supabase.from("media").upsert({
-      id: clip.id,
-      event_id: id,
-      kind: "audio",
-      storage_path: path,
-      position: 0,
-    });
+    const { error } = await supabase.from("media").upsert(
+      {
+        id: clip.id,
+        event_id: id,
+        kind: "audio",
+        storage_path: path,
+        position: 0,
+      },
+      { onConflict: "event_id,id" },
+    );
     return !error;
   },
 
