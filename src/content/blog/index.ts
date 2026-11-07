@@ -5,12 +5,14 @@ import { bestDigitalInvitationWebsitesIndia } from "./best-digital-invitation-we
 import { birthdayInvitationMessages } from "./birthday-invitation-messages";
 import { annaprashanNimantranPatra } from "./bn-annaprashan-nimantran-patra";
 import { biyerCardLekha } from "./bn-biyer-card-lekha";
+import { bouvatCardLekha } from "./bn-bouvat-card-lekha";
 import { christmasPartyInvitationMessage } from "./christmas-party-invitation-message";
 import { digitalVsPrintedWeddingCards } from "./digital-vs-printed-wedding-cards";
 import { digitalWeddingInvitationWhatsapp } from "./digital-wedding-invitation-whatsapp";
 import { diwaliPartyInvitationMessage } from "./diwali-party-invitation-message";
 import { engagementInvitationMessage } from "./engagement-invitation-message";
 import { firstBirthdayInvitationMessage } from "./first-birthday-invitation-message";
+import { formalInvitationPhrases } from "./formal-invitation-phrases";
 import { ganeshChaturthiInvitationMessage } from "./ganesh-chaturthi-invitation-message";
 import { grihaPraveshInvitationMessage } from "./griha-pravesh-invitation-message";
 import { kankotriLakhan } from "./gu-kankotri-lakhan";
@@ -39,6 +41,8 @@ import { satyanarayanPujaInvitationMessage } from "./satyanarayan-puja-invitatio
 import { saveTheDateMessages } from "./save-the-date-messages";
 import { shopOpeningInvitationMessage } from "./shop-opening-invitation-message";
 import { grahapravesamAzhaippithazh } from "./ta-grahapravesam-azhaippithazh";
+import { paniNiraivuVizhaAzhaippithazh } from "./ta-pani-niraivu-vizha-azhaippithazh";
+import { peyarSuttuVizhaAzhaippithazh } from "./ta-peyar-suttu-vizha-azhaippithazh";
 import { thirumanaAzhaippithazhVasagam } from "./ta-thirumana-azhaippithazh-vasagam";
 import { threadCeremonyInvitationMessage } from "./thread-ceremony-invitation-message";
 import type { BlogPost } from "./types";
@@ -49,6 +53,7 @@ import { weddingInvitationWording } from "./wedding-invitation-wording";
 import { weddingRsvpMessage } from "./wedding-rsvp-message";
 import { weddingThankYouMessages } from "./wedding-thank-you-messages";
 import { whenToSendWeddingInvitations } from "./when-to-send-wedding-invitations";
+import { whomToGiveFirstWeddingCard } from "./whom-to-give-first-wedding-card";
 
 /* Every blog post. A new post is one file in this folder plus a line here (docs/BLOG.md). */
 
@@ -103,4 +108,9 @@ export const POSTS: readonly BlogPost[] = [
   digitalVsPrintedWeddingCards,
   annaprashanNimantranPatra,
   grahapravesamAzhaippithazh,
+  whomToGiveFirstWeddingCard,
+  formalInvitationPhrases,
+  paniNiraivuVizhaAzhaippithazh,
+  peyarSuttuVizhaAzhaippithazh,
+  bouvatCardLekha,
 ];
