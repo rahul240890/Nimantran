@@ -10,6 +10,7 @@ import { OPEN_LEAD_S, musicMuted, type RagaMusic } from "@/components/invitation
 import { Button, buttonClasses } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
+import type { CategoryId } from "@/lib/categories/catalog";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
 import {
@@ -24,12 +25,12 @@ import {
   openingNames,
   tiedBeyond,
   tiedSpec,
-  welcomeRite,
   welcomeScene,
   type OpeningGod,
   type OpeningStyle,
   type WelcomeScene,
 } from "@/lib/opening/catalog";
+import { gateScatter, gateWordLook, gateWords } from "@/lib/opening/gate-words";
 import { englishInitial } from "@/lib/initials";
 import { warmBlurs, warmPaintings } from "@/lib/paintings";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
@@ -37,12 +38,14 @@ import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { lettering, type TypeRole } from "@/lib/suites/lettering";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
+import type { Faith } from "@/lib/traditions/faith";
 import type { Template } from "@/lib/templates/schema";
 import { CARD_COUNTDOWN_WORDS, CARD_GREETING_WORDS, daysAway } from "@/lib/templates/story-words";
 import { useClock } from "@/lib/use-clock";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { GodCrest, LotusBloom, OPENING_LAYOUT, OpeningArt, OpeningPetals } from "./opening-art";
 import { freshBackdrop } from "./opening-fresh";
+import { GateWords } from "./gate-words";
 import { OPENING_PACE, useOpeningPace, useOpeningReady } from "./opening-pace";
 import { OpeningWelcome } from "./opening-welcome";
 
@@ -53,10 +56,13 @@ export const OPEN_MS = 1500 * OPENING_PACE;
  * fresh or themed opening takes as long, its painting going its own way.
  */
 const GATE_OPEN_MS = 2500 * OPENING_PACE;
-/** A painted gate holds a little longer, as evening comes over the place (gate-reveal.tsx). */
-const PAINTED_OPEN_MS = 2800 * OPENING_PACE;
-/** A tied gate's tie comes undone first, then its doors open (tied-gates.css). */
-const TIED_OPEN_MS = 3200 * OPENING_PACE;
+/** A painted gate holds a little longer, for the occasion's words inside it (gate-words.tsx). */
+const PAINTED_OPEN_MS = 3200 * OPENING_PACE;
+/** A tied gate's tie comes undone first, then its doors open (tied-gates.css), then the words. */
+const TIED_OPEN_MS = 3600 * OPENING_PACE;
+/** When a gate's doors have opened enough for its words, in CSS ms (gate-words.css). */
+const PAINTED_WORDS_AT = 1000;
+const TIED_WORDS_AT = 1450;
 /** A depth opening's three frames go by one after another (depth-openings.css). */
 const DEPTH_OPEN_MS = 2800 * OPENING_PACE;
 /** A bloom opening's heart goes, then its rings open one after another (bloom-openings.css). */
@@ -168,6 +174,9 @@ export type OpeningProps = {
   suite: SuiteId;
   style: OpeningStyle;
   god: OpeningGod | null;
+  /** The occasion and the family's faith, for the words inside a gate (gate-words.ts). */
+  occasion: CategoryId;
+  faith: Faith;
   /** The host's own welcome scene; none picks one that suits the opening, each visit. */
   welcomeChoice?: WelcomeScene | null;
   /** Keeps the welcome up until Continue, for reviewing a scene. */
@@ -344,6 +353,8 @@ export function Opening({
   suite,
   style,
   god,
+  occasion,
+  faith,
   copy,
   lang,
   languages,
@@ -392,6 +403,9 @@ export function Opening({
   const layout = OPENING_LAYOUT[style];
   // The words in the theme's own lettering, as on the pages inside; the host's face wins
   const face = openingFace(suite, lang);
+  // Inside a gate the occasion comes in words, with flowers round them (gate-words.tsx)
+  const scatter = gateScatter(occasion);
+  const wordLook = gateWordLook(style, scatter);
 
   // The invitation follows the opening; in still mode it comes at once
   const latest = useRef(after);
@@ -549,8 +563,22 @@ export function Opening({
         data-open={open}
         className="opening-stage [container-type:size] relative h-dvh w-full overflow-hidden sm:aspect-[9/16] sm:w-auto sm:max-w-full sm:shadow-overlay"
       >
-        <OpeningArt style={style} cover={cover} rite={welcomeRite(god)} />
-        {open && !still && <OpeningPetals />}
+        <OpeningArt style={style} cover={cover} />
+        {open &&
+          !still &&
+          (wordLook ? (
+            <GateWords
+              words={gateWords(occasion, faith, lang)}
+              lang={lang}
+              look={wordLook}
+              scatter={scatter}
+              at={tied ? TIED_WORDS_AT : PAINTED_WORDS_AT}
+              face={face("names", type.names)}
+              ink={tied && !theme.centre?.dark}
+            />
+          ) : (
+            <OpeningPetals />
+          ))}
 
         <div className="absolute inset-0 z-30 flex flex-col">
           {tied && !open && (

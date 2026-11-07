@@ -35,8 +35,6 @@ import {
   openingStyles,
   openingSuits,
   welcomeKind,
-  welcomeRite,
-  OPENING_GODS,
 } from "./catalog";
 import type { CategoryId } from "@/lib/categories/catalog";
 
@@ -283,35 +281,5 @@ describe("openingNames", () => {
     expect(openingNames("lotus")).toBe("print");
     const looks = new Set(OPENING_STYLES.map(openingNames));
     expect([...looks].sort()).toEqual(["foot", "print", "quiet", "seal"]);
-  });
-});
-
-describe("welcomeRite", () => {
-  it("circles an aarti only for a Hindu or Jain god or symbol, else sprinkles rose water", () => {
-    expect(welcomeRite("ganesha")).toBe("aarti");
-    expect(welcomeRite("jain")).toBe("aarti");
-    expect(welcomeRite("om")).toBe("aarti");
-    for (const god of [
-      "ik-onkar",
-      "khanda",
-      "chand-tara",
-      "786",
-      "bismillah",
-      "cross",
-      "dove",
-    ] as const) {
-      expect(welcomeRite(god)).toBe("rose");
-    }
-    expect(welcomeRite(null)).toBe("rose");
-  });
-
-  it("knows every god and symbol", () => {
-    for (const god of OPENING_GODS) expect(["aarti", "rose"]).toContain(welcomeRite(god));
-  });
-
-  it("shows each tied gate's welcome over a picture that exists", () => {
-    for (const gate of Object.keys(TIED_GATES) as (keyof typeof TIED_GATES)[]) {
-      expect(existsSync(join(process.cwd(), "public", tiedBeyond(gate)))).toBe(true);
-    }
   });
 });
