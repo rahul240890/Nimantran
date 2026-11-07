@@ -478,6 +478,8 @@ export function GuestView({
                 suite={suite}
                 style={opening}
                 god={god}
+                occasion={draft.categoryId}
+                faith={draftFaith(draft)}
                 welcomeChoice={draft.opening.welcome}
                 holdWelcome={holdWelcome}
                 copy={copy}

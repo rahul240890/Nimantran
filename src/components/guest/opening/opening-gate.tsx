@@ -1,7 +1,6 @@
 import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import { PAINTED_GATES, type PaintedGate } from "@/lib/opening/catalog";
-import { GateRevealPlace } from "./gate-reveal";
 
 /*
  * A painted gate (the owner's paintings, in three layers): the place beyond, the two doors
@@ -9,7 +8,6 @@ import { GateRevealPlace } from "./gate-reveal";
  * the arch and light glows through the seam. Opened, the doors move (swing, slide, gather or
  * lift), the beyond lights up and the arch grows past the edges, as if the guest walks in.
  * The movement is in CSS (globals.css, "Painted gates") and follows the stage's data-open.
- * Once the doors clear, evening comes over the place and the guest walks in (gate-reveal.tsx).
  */
 
 const MOTES = Array.from({ length: 10 }, (_, i) => i);
@@ -78,7 +76,6 @@ export function PaintedGateArt({ gate, sample = false }: { gate: PaintedGate; sa
             <span className="gate-seam absolute inset-y-0 left-1/2" />
           </div>
         </div>
-        {!sample && <GateRevealPlace src={`${base}/beyond.webp`} kind="evening" />}
         <div className="gate-arch absolute inset-0">
           <Image
             src={`${base}/arch.webp`}

@@ -16,6 +16,7 @@ import {
   type WelcomeScene,
   type OpeningStyle,
 } from "@/lib/opening/catalog";
+import { CATEGORY_IDS, type CategoryId } from "@/lib/categories/catalog";
 import { SAMPLE_PHOTOS, SCENE_PHOTOS, sampleDraft, sceneDraft } from "@/lib/sample/drafts";
 import { isFaith } from "@/lib/traditions/faith";
 
@@ -37,6 +38,7 @@ export const metadata: Metadata = {
  * ?turn=1 (to 3) turns the first photo that many quarter turns, as a host can in the editor.
  * ?couple=two gives the couple one photo each, as a host can, and ?couple=one one together.
  * ?unsent=1 shows it as a family preview link does: marked Preview, with replies off.
+ * ?category=birthday (any occasion) sets the occasion, for the words inside a gate.
  */
 export default async function GuestPreviewPage({ searchParams }: PageProps<"/engine/guest">) {
   const {
@@ -53,6 +55,7 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
     faith,
     couple,
     unsent,
+    category,
   } = await searchParams;
   const previewNow =
     typeof now === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(now)
@@ -77,6 +80,9 @@ export default async function GuestPreviewPage({ searchParams }: PageProps<"/eng
       : sampled;
   const draft: InviteDraft = {
     ...placed,
+    categoryId: CATEGORY_IDS.includes(category as CategoryId)
+      ? (category as CategoryId)
+      : placed.categoryId,
     tradition: { ...placed.tradition, faith: isFaith(faith) ? faith : placed.tradition.faith },
     couplePhotos:
       shown[0] && [1, 2, 3].includes(turns)
