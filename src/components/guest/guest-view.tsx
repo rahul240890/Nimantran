@@ -79,6 +79,7 @@ import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { templateBox } from "@/lib/suites/event-boxes";
 import { sectionLayouts } from "@/lib/suites/section-layouts";
+import { sectionDress, useVisitSeed } from "@/lib/suites/section-dress";
 import {
   couplePageIds,
   couplePagePhotos,
@@ -368,6 +369,8 @@ export function GuestView({
   const replayable = Boolean(scene) || opening !== "none";
   // A theme with a guest look carries on below the pages; others keep the plain details
   const look = doorway ? guestLook(suite) : null;
+  // Each visit dresses the page below afresh, in the theme's own colours (section-dress.ts)
+  const seed = useVisitSeed();
   // The family's blocks in the language the guest is reading
   const family = storyFamily(draft, language);
   const rsvp =
@@ -385,7 +388,11 @@ export function GuestView({
   // Save the date, counting down at the end of the page in this theme's own way
   const countdown = main ? (
     <CountdownFinale
-      style={sectionLayouts(suite).countdown}
+      style={
+        look
+          ? sectionDress(suite, look.style, seed).layouts.countdown
+          : sectionLayouts(suite).countdown
+      }
       target={main.at}
       date={main.date}
       lang={language}
@@ -524,6 +531,7 @@ export function GuestView({
                   music={music}
                   reply={rsvp}
                   countdown={countdown}
+                  seed={seed}
                 />
               ) : (
                 <>
