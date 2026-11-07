@@ -1,7 +1,13 @@
 import { useSyncExternalStore } from "react";
 import type { SuiteId } from "./catalog";
 import type { GuestStyle } from "./guest-look";
-import { SECTION_LAYOUTS, hash, type SectionLayouts, type SectionPart } from "./section-layouts";
+import {
+  SECTION_LAYOUTS,
+  hash,
+  sectionLayouts,
+  type SectionLayouts,
+  type SectionPart,
+} from "./section-layouts";
 
 /*
  * How the guest page below a painted theme is dressed on this visit (owner, 2026-11-07:
@@ -69,6 +75,18 @@ function draws(seed: number) {
 
 /** This visit's dress for a theme's guest page, drawn from `seed`. */
 export function sectionDress(suite: SuiteId, style: GuestStyle, seed: number): SectionDress {
+  // Seed 0 is the theme's own page, the same every time: the server's first paint, and
+  // ?dress=0 for tests and reviews
+  if (seed === 0) {
+    const none = Object.fromEntries(FRAMED_SECTIONS.map((name) => [name, false]));
+    return {
+      welcome: "arch",
+      motif: STYLE_MOTIFS[style][0]!,
+      framed: none as Record<FramedSection, boolean>,
+      deepDate: false,
+      layouts: sectionLayouts(suite),
+    };
+  }
   const next = draws(hash(`${suite}:${seed}`));
   const pick = <T>(options: readonly T[]): T => options[Math.floor(next() * options.length)]!;
   const part = <P extends SectionPart>(name: P) => pick(SECTION_LAYOUTS[name]) as SectionLayouts[P];
@@ -97,14 +115,15 @@ export function sectionDress(suite: SuiteId, style: GuestStyle, seed: number): S
 /**
  * This visit's seed: on the server (and while the page hydrates) the theme's own, so the
  * first paint matches; in the browser one drawn once per page load. ?dress=7 fixes it, to
- * review one dress.
+ * review one dress, and ?dress=0 shows the theme's own page.
  */
 let visitSeed: number | null = null;
 function browserSeed(): number {
   if (visitSeed === null) {
-    const asked = Number(new URLSearchParams(window.location.search).get("dress"));
+    const param = new URLSearchParams(window.location.search).get("dress");
+    const asked = param === null ? NaN : Number(param);
     visitSeed =
-      Number.isInteger(asked) && asked > 0 ? asked : 1 + Math.floor(Math.random() * 1_000_000);
+      Number.isInteger(asked) && asked >= 0 ? asked : 1 + Math.floor(Math.random() * 1_000_000);
   }
   return visitSeed;
 }

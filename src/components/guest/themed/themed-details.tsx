@@ -123,9 +123,6 @@ export function ThemedDetails({
   return (
     <div
       ref={top}
-      // Drawn afresh once the visit's dress is known in the browser, so every section
-      // watches its own new parts come into view
-      key={seed}
       data-suite={suite}
       data-guest={look.style}
       className="guest-themed relative isolate overflow-clip"
@@ -144,6 +141,8 @@ export function ThemedDetails({
       />
       {main && (
         <SaveTheDate
+          // A new layout is a new date to watch come into view
+          key={layouts.date}
           main={main}
           look={look}
           lang={lang}
