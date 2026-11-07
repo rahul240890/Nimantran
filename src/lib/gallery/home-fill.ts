@@ -79,10 +79,42 @@ function occasionIds(entries: readonly CatalogEntry[], occasion: string): string
   ].map((entry) => entry.design.id);
 }
 
+/** How many designs Trending and Best sellers show that aren't for a wedding, at most. */
+export const NOT_WEDDING_AT_MOST = 2;
+
+/**
+ * Wedding designs first (owner, 2026-11-07: the home page is mostly for weddings): the
+ * list in its order, keeping only the first few that don't suit a wedding in their place
+ * and moving the rest after every wedding design.
+ */
+export function weddingFirst(
+  ids: readonly string[],
+  forWedding: (id: string) => boolean,
+  others = NOT_WEDDING_AT_MOST,
+): string[] {
+  const kept: string[] = [];
+  const later: string[] = [];
+  let left = others;
+  for (const id of ids) {
+    if (forWedding(id)) kept.push(id);
+    else if (left > 0) {
+      kept.push(id);
+      left -= 1;
+    } else later.push(id);
+  }
+  return [...kept, ...later];
+}
+
 /** Each shown section's designs, in order, none of them in two sections. */
 export function fillHomeSections(input: HomeFillInput): Partial<Record<HomeSectionId, string[]>> {
   const { sections, chosen, entries, tierOf } = input;
   const everyId = entries.map((entry) => entry.design.id);
+  const weddings = new Set(
+    entries
+      .filter((entry) => (entry.occasions as readonly string[]).includes("wedding"))
+      .map((entry) => entry.design.id),
+  );
+  const forWedding = (design: string) => weddings.has(design);
   const pins = chosen.trending ? [] : [...input.pinned];
   // What the admin chose, anywhere on the page, is theirs: no section filling itself takes it
   const reserved = new Set<string>([
@@ -103,9 +135,9 @@ export function fillHomeSections(input: HomeFillInput): Partial<Record<HomeSecti
       const occasion = sectionOccasion(id);
       const pool =
         id === "trending"
-          ? [...input.trending, ...everyId]
+          ? weddingFirst([...new Set([...input.trending, ...everyId])], forWedding)
           : id === "bestsellers"
-            ? [...input.bestsellers, ...everyId]
+            ? weddingFirst([...new Set([...input.bestsellers, ...everyId])], forWedding)
             : id === "new"
               ? [...input.newest]
               : occasionIds(entries, occasion!);

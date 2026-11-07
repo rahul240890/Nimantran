@@ -50,6 +50,8 @@ export const galleryCopy = {
   tierLabel: (tier: string, price: string | null) =>
     price ? `${tier} design, publish from ${price}` : "Free design",
   /** What photos a design takes (src/lib/gallery/photos.ts), under its name. */
+  /** The occasions a design can be used for (owner, 2026-11-07). */
+  usedFor: "Use it for",
   photoNeeds: {
     none: "No photo needed",
     one: "One photo",

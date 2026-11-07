@@ -42,6 +42,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   tiers: { free: "ફ્રી", premium: "પ્રીમિયમ", royal: "રૉયલ", signature: "સિગ્નેચર" },
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) => (price ? `${tier} ડિઝાઇન, ${price} થી પ્રકાશિત કરો` : "ફ્રી ડિઝાઇન"),
+  /** The occasions a design can be used for (owner, 2026-11-07). */
+  usedFor: "આ માટે",
   photoNeeds: {
     none: "ફોટાની જરૂર નથી",
     one: "એક ફોટો",

@@ -58,6 +58,13 @@ describe("gallery catalog", () => {
         "mishri",
         "bhil-chitra",
         "card-bandhani",
+        // Function scenes in Gujarati colours, which now make a wedding's invitation too
+        "choodi-jhalar-scene",
+        "genda-barsaat-scene",
+        "ghungroo-raat-scene",
+        "saawan-bundein-scene",
+        "shevanti-haldi-scene",
+        "tota-bagh-scene",
       ].sort(),
     );
     // The kind's painted theme opens with the kind's own card
@@ -81,8 +88,13 @@ describe("gallery catalog", () => {
         }
         expect(suiteSuits(design.suite, category), `${design.id} for ${category}`).toBe(true);
         // A wedding's theme never shows for a party, a puja or a festival; a story theme,
-        // told without a wedding in it, shows for the days of those it is painted for
-        if (!wedding && !SUITES[design.suite].storyFor)
+        // told without a wedding in it, shows for the days of those it is painted for, and
+        // a theme painted for this occasion may suit a wedding too (owner, 2026-11-07)
+        if (
+          !wedding &&
+          !SUITES[design.suite].storyFor &&
+          !SUITES[design.suite].occasions?.includes(category)
+        )
           expect(weddingFit(design.suite), `${design.id} for ${category}`).toEqual([]);
         // A birthday or a baby's day lists nothing that also tells a wedding (owner, 2026-10-24)
         if (
@@ -129,7 +141,13 @@ describe("gallery catalog", () => {
     const ids = (category: Parameters<typeof occasionDesigns>[0]) =>
       occasionDesigns(category).map((design) => design.id);
     expect(ids("save-the-date")).toContain("love-letter-scene");
-    expect(ids("wedding")).not.toContain("love-letter-scene");
+    // ...and every one of them can make the wedding's own invitation (owner, 2026-11-07)
+    expect(ids("wedding")).toContain("love-letter-scene");
+    expect(ids("wedding")).toContain("haldi-genda-scene");
+    expect(ids("haldi")).toContain("haldi-genda-scene");
+    expect(ids("mehendi")).not.toContain("haldi-genda-scene");
+    expect(ids("wedding")).toContain("saath");
+    expect(ids("anniversary")).toContain("saath");
     expect(ids("roka")).toContain("roka-shagun-scene");
     expect(ids("haldi")).not.toContain("roka-shagun-scene");
     expect(ids("haldi")).not.toContain("baraat-band-scene");

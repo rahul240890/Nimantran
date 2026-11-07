@@ -1,11 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import type { DesignNames } from "@/components/gallery/design-name";
 import { DesignNamesProvider } from "@/components/gallery/design-names";
 import { ShelfRow, type Covers } from "@/components/gallery/shelf-row";
-import { designCatalog } from "@/lib/gallery/filters";
-import type { HomeSectionId } from "@/lib/gallery/home-sections";
+import { NO_FILTERS, designCatalog } from "@/lib/gallery/filters";
+import { sectionOccasion, type HomeSectionId } from "@/lib/gallery/home-sections";
+import {
+  parseRecent,
+  recentServerSnapshot,
+  recentSnapshot,
+  subscribeRecent,
+} from "@/lib/gallery/recent";
 
 /**
  * One section as the server set it out: its words, View all, and the designs it shows in
@@ -30,16 +36,38 @@ export function HomeShelves({
   sections,
   covers,
   names,
+  recent,
 }: {
   sections: readonly HomeSection[];
   covers: Covers;
   /** The designs' names in the page's language (design-names.tsx). */
   names: DesignNames;
+  /** Recently viewed's words: the designs this browser opened lately, shown first. */
+  recent: { title: string; intro: string };
 }) {
   const byId = useMemo(() => new Map(designCatalog().map((entry) => [entry.design.id, entry])), []);
+  // Read after the page is drawn, so the server's page and the browser's first one match
+  const stored = useSyncExternalStore(subscribeRecent, recentSnapshot, recentServerSnapshot);
+  const viewed = useMemo(
+    () => parseRecent(stored).flatMap((id) => byId.get(id) ?? []),
+    [stored, byId],
+  );
 
   return (
     <DesignNamesProvider names={names}>
+      {viewed.length > 0 && (
+        <ShelfRow
+          id="home-recent"
+          title={recent.title}
+          intro={recent.intro}
+          entries={viewed}
+          total={viewed.length}
+          covers={covers}
+          priority={false}
+          layout="grid"
+          every
+        />
+      )}
       {sections.map((section, index) => {
         const shown = section.designs.flatMap((id) => byId.get(id) ?? []);
         if (shown.length === 0) return null;
@@ -58,6 +86,8 @@ export function HomeShelves({
             lazy={index > 0}
             layout="grid"
             every={section.fixed}
+            // Trending and Best sellers open a design for a wedding when it suits one
+            filters={{ ...NO_FILTERS, occasion: sectionOccasion(section.id) ?? "wedding" }}
           />
         );
       })}

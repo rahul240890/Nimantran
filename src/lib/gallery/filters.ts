@@ -104,7 +104,8 @@ export function formatOf(design: GalleryDesign): DesignFormat {
   return design.format === "scene" ? "scene" : design.suite === "classic" ? "card" : "story";
 }
 
-function occasionsOf(design: GalleryDesign): CategoryId[] {
+/** Every occasion a design can be used for, the wedding journey first. */
+export function occasionsOf(design: GalleryDesign): CategoryId[] {
   return design.suite === "classic"
     ? CATEGORY_IDS.filter((id) =>
         (CATEGORIES[id].templates as readonly string[]).includes(design.template),

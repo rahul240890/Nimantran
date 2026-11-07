@@ -180,6 +180,10 @@ export const homeRows = {
   allDesigns: "See all designs",
   bestsellers: { title: "Best sellers", intro: "The designs families pay for most." },
   newest: { title: "New designs", intro: "Just painted and added to the site." },
+  recent: {
+    title: "Recently viewed",
+    intro: "The designs you opened lately, to pick up where you left off.",
+  },
 };
 
 /**

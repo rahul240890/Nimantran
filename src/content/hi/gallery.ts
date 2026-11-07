@@ -43,6 +43,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} डिज़ाइन, ${price} से प्रकाशित करें` : "फ़्री डिज़ाइन",
+  /** The occasions a design can be used for (owner, 2026-11-07). */
+  usedFor: "इसके लिए",
   photoNeeds: {
     none: "फ़ोटो की ज़रूरत नहीं",
     one: "एक फ़ोटो",

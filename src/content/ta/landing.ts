@@ -177,6 +177,10 @@ export const homeRows: Translation<typeof en.homeRows> = {
   allDesigns: "அனைத்து டிசைன்களையும் பார்க்கவும்",
   bestsellers: { title: "அதிகம் விற்பனையானவை", intro: "குடும்பங்கள் அதிகம் வாங்கும் டிசைன்கள்." },
   newest: { title: "புதிய டிசைன்கள்", intro: "இப்போதுதான் வரையப்பட்டு தளத்தில் சேர்க்கப்பட்டவை." },
+  recent: {
+    title: "சமீபத்தில் பார்த்தவை",
+    intro: "நீங்கள் சமீபத்தில் திறந்த டிசைன்கள், விட்ட இடத்திலிருந்து தொடர.",
+  },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

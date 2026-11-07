@@ -169,6 +169,7 @@ export const homeRows: Translation<typeof en.homeRows> = {
   allDesigns: "બધી ડિઝાઇન જુઓ",
   bestsellers: { title: "બેસ્ટ સેલર", intro: "પરિવારો સૌથી વધુ ખરીદે છે તે ડિઝાઇન." },
   newest: { title: "નવી ડિઝાઇન", intro: "હમણાં જ બનેલી અને સાઇટ પર ઉમેરાયેલી." },
+  recent: { title: "હાલમાં જોયેલી", intro: "તમે હમણાં ખોલેલી ડિઝાઇન, જ્યાં અટક્યા ત્યાંથી આગળ." },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

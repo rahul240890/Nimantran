@@ -43,6 +43,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} डिझाइन, ${price} पासून प्रकाशित करा` : "मोफत डिझाइन",
+  /** The occasions a design can be used for (owner, 2026-11-07). */
+  usedFor: "यासाठी",
   photoNeeds: {
     none: "फोटोची गरज नाही",
     one: "एक फोटो",
