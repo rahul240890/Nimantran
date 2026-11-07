@@ -5,6 +5,7 @@ import { z } from "zod";
 import { designWords } from "@/components/gallery/design-words";
 import { PageTransition } from "@/components/motion/page-transition";
 import { QuickStart } from "@/components/editor/quick/quick-start";
+import { RememberDesign } from "@/components/gallery/remember-design";
 import { SuggestedDesigns } from "@/components/editor/quick/suggested-designs";
 import { editorText } from "@/i18n/copy/editor";
 import { getLocale } from "@/i18n/server";
@@ -80,6 +81,7 @@ export default async function DesignStartPage({
 
   return (
     <PageTransition>
+      <RememberDesign id={design.id} />
       <QuickStart
         designId={design.id}
         name={designWords(design, locale).name}

@@ -4,7 +4,13 @@ import type { DesignTier } from "@/lib/plans/design-tiers";
 import { DEFAULT_TRENDING } from "./trending";
 import { DEFAULT_BESTSELLERS } from "./bestsellers";
 import { designCatalog, tierOf } from "./filters";
-import { favourTiers, premiumAtMost, fillHomeSections, type HomeFillInput } from "./home-fill";
+import {
+  favourTiers,
+  premiumAtMost,
+  fillHomeSections,
+  weddingFirst,
+  type HomeFillInput,
+} from "./home-fill";
 import { DEFAULT_SHOWN, newestDesigns, sectionSize, type HomeSectionId } from "./home-sections";
 
 const tier = (id: string) => tierOf(BUILT_PRICING, id);
@@ -65,5 +71,19 @@ describe("home page sections' designs", () => {
     expect(list[0]).toBe("r1");
     // Too few Royal and Signature: the others fill the rest
     expect(favourTiers(["p1", "p2", "p3", "r1"], 4, of)).toHaveLength(4);
+  });
+});
+
+describe("weddingFirst", () => {
+  it("keeps only a couple of designs that aren't for a wedding in their place", () => {
+    const wedding = (id: string) => id.startsWith("w");
+    expect(weddingFirst(["b1", "w1", "b2", "b3", "w2", "b4"], wedding)).toEqual([
+      "b1",
+      "w1",
+      "b2",
+      "w2",
+      "b3",
+      "b4",
+    ]);
   });
 });

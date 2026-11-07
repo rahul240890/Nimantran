@@ -130,6 +130,7 @@ export async function HomeDesigns({ locale }: { locale: UiLocale }) {
           sections={sections}
           covers={covers(locale)}
           names={designNamesText[locale]}
+          recent={homeRows.recent}
         />
         <div className="flex justify-center">{all}</div>
       </div>

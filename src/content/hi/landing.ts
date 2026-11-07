@@ -174,6 +174,7 @@ export const homeRows: Translation<typeof en.homeRows> = {
     intro: "जिन डिज़ाइनों को परिवार सबसे ज़्यादा चुनकर लेते हैं।",
   },
   newest: { title: "नए डिज़ाइन", intro: "अभी-अभी बने और साइट पर जुड़े।" },
+  recent: { title: "हाल ही में देखे", intro: "जो डिज़ाइन आपने हाल में खोले, वहीं से आगे बढ़ें।" },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

@@ -33,7 +33,8 @@ test.describe("finding a design", () => {
     await page.locator('[data-kind="gujarati"]').click();
     await expect(page).toHaveURL(/\/invitations\/wedding\/gujarati$/);
     const designs = page.locator("[data-design]");
-    await expect(designs).toHaveCount(23);
+    // 23 made for the kind, and 6 function scenes in its colours that suit a wedding too
+    await expect(designs).toHaveCount(29);
     for (const scene of [
       "pithora-ghoda",
       "patola-bandh",

@@ -6249,7 +6249,6 @@ const NO_ROKA: readonly SuiteId[] = [
   "konark-chakra",
 ];
 
-/** The steps of the wedding journey a theme is painted for; none for an occasion's theme. */
 /** Whose days a story theme told without a wedding in it is painted for. */
 export type StoryAudience = "couples" | "children" | "family";
 
@@ -6288,14 +6287,32 @@ export const STORY_OCCASIONS: Record<StoryAudience, readonly CategoryId[]> = {
   ],
 };
 
+/**
+ * Themes painted for another occasion that suit a wedding too (owner, 2026-11-07: romantic
+ * and party designs were only offered for anniversaries and parties). None painted for a
+ * birthday: a birthday lists nothing that also tells a wedding (owner, 2026-10-24).
+ */
+const ALSO_WEDDING: Partial<Record<SuiteId, readonly JourneyId[]>> = {
+  saath: ["wedding", "engagement", "save-the-date", "reception"],
+  rooftop: ["wedding", "sangeet", "reception", "engagement"],
+  "bride-squad": ["wedding", "haldi", "mehendi", "sangeet"],
+  "teej-jhoola": ["wedding", "mehendi", "sangeet"],
+  "pondy-gali": ["wedding", "engagement", "save-the-date"],
+};
+
+/**
+ * The steps of the wedding journey a theme suits. A theme painted for one of the wedding's
+ * functions (a haldi, a sangeet) can make the whole wedding's invitation too (owner,
+ * 2026-11-07: designs made for weddings couldn't be chosen for a wedding).
+ */
 export function weddingFit(suite: SuiteId): readonly JourneyId[] {
-  if (SUITES[suite].occasions) return [];
+  if (SUITES[suite].occasions) return ALSO_WEDDING[suite] ?? [];
   const story = SUITES[suite].storyFor;
   if (story && !story.includes("couples") && !story.includes("family")) return [];
-  return (
+  const fit =
     WEDDING_FIT[suite] ??
-    WEDDING_JOURNEY.filter((step) => step !== "roka" || !NO_ROKA.includes(suite))
-  );
+    WEDDING_JOURNEY.filter((step) => step !== "roka" || !NO_ROKA.includes(suite));
+  return fit.includes("wedding") ? fit : [...fit, "wedding"];
 }
 
 /**

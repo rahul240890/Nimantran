@@ -170,6 +170,10 @@ export const homeRows: Translation<typeof en.homeRows> = {
   allDesigns: "सर्व डिझाइन पाहा",
   bestsellers: { title: "सर्वाधिक विक्री", intro: "कुटुंबे सर्वाधिक विकत घेत असलेली डिझाइन." },
   newest: { title: "नवी डिझाइन", intro: "नुकतीच रंगवलेली आणि साइटवर आलेली." },
+  recent: {
+    title: "अलीकडे पाहिलेली",
+    intro: "तुम्ही अलीकडे उघडलेली डिझाइन, जिथे थांबला तिथून पुढे.",
+  },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

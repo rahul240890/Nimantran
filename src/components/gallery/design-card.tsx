@@ -38,6 +38,7 @@ import type { PhotoNeed } from "@/lib/gallery/photos";
 import { occasionPages } from "@/lib/gallery/pictures";
 import type { PageArt } from "@/lib/suites/catalog";
 import { CardPicture } from "./card-picture";
+import { DesignOccasions } from "./design-occasions";
 import { ScenePoster, SceneSample } from "./scene-poster";
 import { useTrending } from "./use-trending";
 import { StorySample } from "./story-sample";
@@ -242,6 +243,7 @@ export function DesignCard({
             )}
             <span className="truncate">{galleryCopy.photoNeeds[photos]}</span>
           </p>
+          <DesignOccasions design={design} className="text-ink-muted" />
           <span className="mt-auto inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-text">
             {galleryCopy.useDesign}
             <ArrowRight
@@ -266,6 +268,7 @@ export function DesignCard({
             )}
             {galleryCopy.photoNeeds[photos]}
           </p>
+          <DesignOccasions design={design} className="-mt-1.5 text-ink-muted" />
           {/* Two cards to a row on a phone leave little room: the arrow goes and the words
             may wrap before they would ever touch the button's edge */}
           <Button
@@ -485,6 +488,7 @@ export function DesignPreview({
                 )}
                 {galleryCopy.photoNeeds[photos]}
               </p>
+              <DesignOccasions design={design} all className="text-sm text-card-ivory/80" />
               <p className="text-card-ivory/80">
                 {scene ? galleryCopy.sceneNote : total > 0 ? description : galleryCopy.cardNote}
               </p>

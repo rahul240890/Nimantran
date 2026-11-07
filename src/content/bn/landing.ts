@@ -175,6 +175,10 @@ export const homeRows: Translation<typeof en.homeRows> = {
     intro: "পরিবারেরা সবচেয়ে বেশি যে ডিজাইনগুলো কেনেন।",
   },
   newest: { title: "নতুন ডিজাইন", intro: "সদ্য আঁকা, সাইটে নতুন যোগ হয়েছে।" },
+  recent: {
+    title: "সম্প্রতি দেখা",
+    intro: "আপনার সম্প্রতি খোলা ডিজাইন, যেখানে থেমেছিলেন সেখান থেকে।",
+  },
 };
 
 export const homeWhy: Translation<typeof en.homeWhy> = {

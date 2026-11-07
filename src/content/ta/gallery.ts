@@ -48,6 +48,8 @@ export const galleryCopy: Translation<typeof en.galleryCopy> = {
   tierPrice: (tier, price) => `${tier} · ${price}`,
   tierLabel: (tier, price) =>
     price ? `${tier} டிசைன், ${price} முதல் வெளியிடலாம்` : "இலவச டிசைன்",
+  /** The occasions a design can be used for (owner, 2026-11-07). */
+  usedFor: "இவற்றுக்கு",
   photoNeeds: {
     none: "புகைப்படம் தேவையில்லை",
     one: "ஒரு புகைப்படம்",

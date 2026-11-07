@@ -81,6 +81,7 @@ export function ShelfRow({
   lazy = false,
   layout = "row",
   every = false,
+  filters = NO_FILTERS,
 }: {
   id: string;
   title: string;
@@ -106,6 +107,8 @@ export function ShelfRow({
    * last line (Trending and Best sellers 10, the wedding and the engagement 24).
    */
   every?: boolean;
+  /** What Use this design opens each design for, when it suits it (a wedding). */
+  filters?: DesignFilters;
 }) {
   const { shelfCopy, catalogCopy } = useText(galleryText);
   const label = shelfCopy.viewAllLabel(title, total);
@@ -169,7 +172,7 @@ export function ShelfRow({
               <li key={entry.design.id} data-format-item={entry.format} className={cell(index)}>
                 <CatalogCard
                   entry={entry}
-                  filters={NO_FILTERS}
+                  filters={filters}
                   covers={covers}
                   priority={priority && index < 2}
                 />
@@ -230,7 +233,7 @@ export function ShelfRow({
             <li key={entry.design.id} data-format-item={entry.format} className={item}>
               <CatalogCard
                 entry={entry}
-                filters={NO_FILTERS}
+                filters={filters}
                 covers={covers}
                 priority={priority && index < 2}
                 compact
