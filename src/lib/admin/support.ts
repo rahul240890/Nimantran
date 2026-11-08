@@ -77,8 +77,12 @@ type EventRow = {
   event_plans: { plan_id: string } | { plan_id: string }[] | null;
 };
 
+/*
+ * events reaches profiles both by its owner and through event_hosts (by host and by who
+ * added them), so each join names its key: PostgREST refuses an ambiguous one outright.
+ */
 const EVENT_SELECT =
-  "id, category_id, status, slug, content, created_at, updated_at, owner_id, profiles(name), event_plans(plan_id)";
+  "id, category_id, status, slug, content, created_at, updated_at, owner_id, profiles!events_owner_id_fkey(name), event_plans(plan_id)";
 
 function inviteFromRow(row: EventRow): SupportInvite {
   const plan = Array.isArray(row.event_plans) ? row.event_plans[0] : row.event_plans;
@@ -278,7 +282,7 @@ export async function supportHosts(eventId: string): Promise<SupportHost[]> {
   if (!service) return [];
   const { data } = await service
     .from("event_hosts")
-    .select("user_id, role, side, access, created_at, profiles(name)")
+    .select("user_id, role, side, access, created_at, profiles!event_hosts_user_id_fkey(name)")
     .eq("event_id", eventId)
     .order("created_at");
   type Row = {
