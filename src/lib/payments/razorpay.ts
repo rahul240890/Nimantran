@@ -158,3 +158,31 @@ export async function refundRazorpayPayment(
     return null;
   }
 }
+
+/**
+ * The captured payment on a Razorpay order, if any: for the admin to recheck an order the
+ * site never heard back about (the host paid, but the checkout closed before it returned).
+ * Null when nothing was captured, "error" when Razorpay couldn't be asked.
+ */
+export async function capturedPayment(
+  keys: RazorpayKeys,
+  orderId: string,
+): Promise<{ id: string; amount: number } | null | "error"> {
+  try {
+    const response = await fetch(`${API}/orders/${encodeURIComponent(orderId)}/payments`, {
+      headers: { Authorization: authHeader(keys) },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) return "error";
+    const body = (await response.json()) as {
+      items?: { id?: unknown; status?: unknown; amount?: unknown }[];
+    };
+    const paid = (body.items ?? []).find((item) => item.status === "captured");
+    return paid && typeof paid.id === "string"
+      ? { id: paid.id, amount: typeof paid.amount === "number" ? paid.amount : 0 }
+      : null;
+  } catch {
+    return "error";
+  }
+}

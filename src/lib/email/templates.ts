@@ -535,6 +535,61 @@ export function reminderEmail(brand: Brand, d: ReminderDetails): Email {
   };
 }
 
+/* ---------- A package from the team ---------- */
+
+export type PackageGiftDetails = {
+  hostName: string;
+  /** "Aarav & Meera", or empty before the names are added. */
+  names: string;
+  packageName: string;
+  /** What the package gives, a few words each. */
+  highlights: readonly string[];
+  /** The admin's own words, such as "A gift for being one of our first families". */
+  note: string;
+  /** The invite's page in their account. */
+  inviteUrl: string;
+};
+
+/**
+ * When the team gives or upgrades an invite's package by hand (Admin, Invites): a special
+ * customer, a payment that didn't reach the invite, or anything else. Sent only when the
+ * admin ticks it.
+ */
+export function packageGiftEmail(brand: Brand, d: PackageGiftDetails): Email {
+  const whose = d.names ? `${d.names}'s invitation` : "Your invitation";
+  const title = `${whose} now has ${d.packageName}`;
+  const intro = `We've given ${d.names ? `${d.names}'s invitation` : "your invitation"} the ${d.packageName} package. Everything it includes is ready for you now.`;
+  const why = `You're getting this because someone from ${brand.name} changed your invitation's package.`;
+  return {
+    subject: title,
+    html: layout(
+      brand,
+      `${d.packageName} is ready on your invitation.`,
+      `${heading(title)}${paragraph(greeting(d.hostName))}${paragraph(intro)}${
+        d.note ? paragraph(d.note) : ""
+      }${
+        d.highlights.length
+          ? `${label(`${d.packageName} gives you`)}<p style="margin:0 0 4px;font-size:15px;line-height:1.9;color:${color.ink}">${d.highlights.map((line) => `✓ ${escapeHtml(line)}`).join("<br>")}</p>`
+          : ""
+      }${button(d.inviteUrl, "Open your invitation")}${helpBlock(brand)}`,
+      { why },
+    ),
+    text: [
+      greeting(d.hostName),
+      "",
+      intro,
+      ...(d.note ? ["", d.note] : []),
+      ...(d.highlights.length
+        ? ["", `${d.packageName} gives you:`, ...d.highlights.map((line) => `- ${line}`)]
+        : []),
+      "",
+      `Open your invitation: ${d.inviteUrl}`,
+      ...helpLines(brand),
+      textFooter(brand, why),
+    ].join("\n"),
+  };
+}
+
 /* ---------- Error alert ---------- */
 
 export type ErrorAlertDetails = {

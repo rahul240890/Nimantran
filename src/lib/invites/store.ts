@@ -592,6 +592,21 @@ const previewStore: InviteStore = {
   },
 };
 
+/**
+ * Any invite, read as the server, for the admin's support page (which checks the admin
+ * first). Null when it doesn't exist.
+ */
+export async function adminReadInvite(id: string): Promise<InviteDraft | null> {
+  if (authMode() === "preview") {
+    const stored = previewDb.invites.get(id);
+    return stored
+      ? rowsToDraft(stored.event, stored.functions, stored.photos, stored.questions)
+      : null;
+  }
+  const service = supabaseService();
+  return service ? readInvite(service, id) : null;
+}
+
 /** The store for the current sign-in service, or null when accounts are off. */
 export function inviteStore(): InviteStore | null {
   const mode = authMode();
