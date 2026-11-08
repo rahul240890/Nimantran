@@ -64,6 +64,60 @@ test.describe("master admin", () => {
   });
 });
 
+test.describe("support for any host", () => {
+  test.use({ reducedMotion: "reduce" });
+
+  test("an admin finds a host's invite, sets its package and edits it for them", async ({
+    page,
+    browser,
+  }, info) => {
+    test.setTimeout(150_000);
+    const number = numberFor(info);
+    await writeInvite(page, number, ["Simran", "Kunal"]);
+    // Saved to the account once it shows on the host's list
+    await expect(async () => {
+      await page.goto("/invites");
+      await expect(page.getByText(/Simran & Kunal/).first()).toBeVisible({ timeout: 5_000 });
+    }).toPass({ timeout: 30_000 });
+
+    const adminContext = await browser.newContext();
+    const admin = await adminContext.newPage();
+    await admin.goto("/sign-in?next=%2Fadmin%2Finvites");
+    await signIn(admin, ADMIN);
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Invites");
+    await admin.getByRole("searchbox", { name: /Find a host or invite/ }).fill(number);
+    await admin.getByRole("button", { name: "Search" }).click();
+    await expect(admin.getByText("1 invite found")).toBeVisible();
+    await expect(admin).toHaveTitle(/Invites/);
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+    await admin.getByRole("link", { name: "Simran & Kunal" }).first().click();
+    await expect(admin.getByRole("heading", { level: 1 })).toHaveText("Simran & Kunal");
+    await expect(admin.getByText(new RegExp(`\\+91${number}`))).toBeVisible();
+    await expect(admin).toHaveTitle(/Invite/);
+    expect(await noOverflow(admin)).toBe(true);
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+
+    // A package by hand; email isn't set up in preview, and the admin is told so
+    await admin.getByRole("button", { name: "Set Grand" }).click();
+    await expect(admin.getByText(/now has Grand, but email isn't set up/).first()).toBeVisible();
+    await expect(admin.getByText("Now Grand.")).toBeVisible();
+
+    // Helping opens the invite's editor to the admin, as its "Shubh support" co-host
+    await admin.getByRole("button", { name: "Help as support" }).click();
+    const song = admin.getByRole("link", { name: "Change the song" });
+    await expect(song).toBeVisible();
+    await expect(admin.getByText("Shubh support").first()).toBeVisible();
+    expect((await axe(admin).analyze()).violations).toEqual([]);
+    await song.click();
+    await expect(admin).toHaveURL(/\/create\/[a-z0-9-]+\?.*invite=[0-9a-f-]+#part-music$/);
+    await admin.goBack();
+    await admin.getByRole("button", { name: "Stop helping" }).click();
+    await expect(admin.getByRole("button", { name: "Help as support" })).toBeVisible();
+    await adminContext.close();
+  });
+});
+
 test.describe("designs and prices", () => {
   test.use({ reducedMotion: "reduce" });
 

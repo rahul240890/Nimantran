@@ -28,6 +28,7 @@ import { supabaseService } from "@/lib/supabase/service";
 import { checkoutCoupons, countCouponUse } from "./coupons";
 import { invoiceNumber } from "./invoice";
 import {
+  capturedPayment,
   createRazorpayOrder,
   paymentSignatureValid,
   razorpayKeys,
@@ -1040,4 +1041,163 @@ export async function adminInvites(
     accounts: accounts ?? null,
     total: count ?? null,
   };
+}
+
+/* ---------- One invite, for the admin's support page ---------- */
+
+export type SetPlanResult =
+  { ok: true; names: string; before: PlanId } | { ok: false; reason: "not-found" | "failed" };
+
+/**
+ * The package an invite has, read as the server: the admin's support page shows it for
+ * any invite, drafts included.
+ */
+export async function adminInvitePlan(eventId: string): Promise<Edition> {
+  if (isPreview()) return preview.plans.get(eventId)?.edition ?? FREE_EDITION;
+  const service = supabaseService();
+  if (!service) return FREE_EDITION;
+  const { data } = await service
+    .from("event_plans")
+    .select(PLAN_COLUMNS_BEFORE)
+    .eq("event_id", eventId)
+    .maybeSingle<PlanRow>();
+  return editionFromRow(data);
+}
+
+/**
+ * Sets an invite's package to exactly this one (Admin, Invites, one invite): up for a
+ * special customer or a payment that didn't land, down to undo a mistake, or Free to take
+ * it away. Like a gift, it covers every design. Drafts can have one too, so a host gets
+ * their package before they publish.
+ */
+export async function setInvitePlan(eventId: string, planId: PlanId): Promise<SetPlanResult> {
+  const edition: Edition =
+    planId === "free" ? FREE_EDITION : { plan: planId, tier: "royal", design: null };
+  if (isPreview()) {
+    const stored = previewDb.invites.get(eventId);
+    if (!stored) return { ok: false, reason: "not-found" };
+    const before = preview.plans.get(eventId)?.edition.plan ?? "free";
+    if (planId === "free") preview.plans.delete(eventId);
+    else preview.plans.set(eventId, { edition, source: "admin" });
+    return { ok: true, names: namesOf(stored.event.content), before };
+  }
+  const service = supabaseService();
+  if (!service) return { ok: false, reason: "failed" };
+  const { data: event } = await service
+    .from("events")
+    .select("id, content")
+    .eq("id", eventId)
+    .maybeSingle();
+  if (!event) return { ok: false, reason: "not-found" };
+  const before = (await adminInvitePlan(eventId)).plan;
+  const names = namesOf(event.content as Record<string, string>);
+  if (planId === "free") {
+    const { error } = await service.from("event_plans").delete().eq("event_id", eventId);
+    return error ? { ok: false, reason: "failed" } : { ok: true, names, before };
+  }
+  const row: Record<string, string | null> = {
+    event_id: eventId,
+    plan_id: edition.plan,
+    design_tier: edition.tier,
+    source: "admin",
+    order_id: null,
+    updated_at: new Date().toISOString(),
+  };
+  let { error } = await service.from("event_plans").upsert({ ...row, design_id: null });
+  // Before the design column exists, the row without it
+  if (missingColumn(error)) ({ error } = await service.from("event_plans").upsert(row));
+  return error ? { ok: false, reason: "failed" } : { ok: true, names, before };
+}
+
+/**
+ * Every order for an invite or by its host, newest first, unpaid ones included: an order
+ * left at "created" after the host paid is a payment that never reached the invite.
+ */
+export async function adminOrdersFor(
+  eventIds: string[],
+  userId: string | null,
+): Promise<AdminOrder[]> {
+  if (isPreview()) {
+    return [...preview.orders.values()]
+      .filter((o) => (o.eventId && eventIds.includes(o.eventId)) || (userId && o.userId === userId))
+      .reverse()
+      .map((order) => {
+        const event = order.eventId ? previewDb.invites.get(order.eventId)?.event : undefined;
+        return { ...order, slug: event?.slug ?? null, names: namesOf(event?.content) };
+      });
+  }
+  const service = supabaseService();
+  if (!service) return [];
+  const filters = [
+    ...(eventIds.length ? [`event_id.in.(${eventIds.join(",")})`] : []),
+    ...(userId ? [`user_id.eq.${userId}`] : []),
+  ];
+  if (!filters.length) return [];
+  const { data } = await service
+    .from("orders")
+    .select(`${ORDER_COLUMNS}, events(slug, content)`)
+    .or(filters.join(","))
+    .order("created_at", { ascending: false })
+    .limit(100);
+  return ((data ?? []) as unknown as OrderRow[]).map((row) => ({
+    ...orderFromRow(row),
+    slug: row.events?.slug ?? null,
+    names: namesOf(row.events?.content),
+  }));
+}
+
+/** The invite a Razorpay payment or order id belongs to, for the admin's search. */
+export async function inviteForPayment(paymentId: string): Promise<string | null> {
+  if (isPreview()) {
+    const order = [...preview.orders.values()].find(
+      (o) => o.providerPaymentId === paymentId || o.providerOrderId === paymentId,
+    );
+    return order?.eventId ?? null;
+  }
+  const service = supabaseService();
+  if (!service) return null;
+  const column = paymentId.startsWith("order_") ? "provider_order_id" : "provider_payment_id";
+  const { data } = await service
+    .from("orders")
+    .select("event_id")
+    .eq(column, paymentId)
+    .limit(1)
+    .maybeSingle();
+  return (data?.event_id as string | null) ?? null;
+}
+
+export type RecheckResult =
+  | { ok: true; paymentId: string }
+  | { ok: false; reason: "not-found" | "not-paid" | "unreachable" | "failed" };
+
+/**
+ * Asks Razorpay whether an order the site still has as unpaid was paid after all, and if
+ * so records it exactly as the checkout would have: the order is marked paid, the invite
+ * gets its package and the host gets the receipt.
+ */
+export async function recheckOrder(orderId: string): Promise<RecheckResult> {
+  if (isPreview()) {
+    const order = [...preview.orders.values()].find((item) => item.id === orderId);
+    if (!order) return { ok: false, reason: "not-found" };
+    const paymentId = order.providerPaymentId ?? `pay_preview_${order.id.slice(0, 8)}`;
+    const paid = await fulfilOrder(order.providerOrderId, paymentId);
+    return paid ? { ok: true, paymentId } : { ok: false, reason: "failed" };
+  }
+  const service = supabaseService();
+  const keys = razorpayKeys();
+  if (!service || !keys) return { ok: false, reason: "failed" };
+  const { data: order } = await service
+    .from("orders")
+    .select("provider_order_id, amount_paise, status")
+    .eq("id", orderId)
+    .maybeSingle();
+  if (!order) return { ok: false, reason: "not-found" };
+  const providerOrderId = order.provider_order_id as string;
+  // Free orders (a 100% coupon) never go through Razorpay
+  if (!providerOrderId.startsWith("order_")) return { ok: false, reason: "not-paid" };
+  const payment = await capturedPayment(keys, providerOrderId);
+  if (payment === "error") return { ok: false, reason: "unreachable" };
+  if (!payment) return { ok: false, reason: "not-paid" };
+  const paid = await fulfilOrder(providerOrderId, payment.id);
+  return paid ? { ok: true, paymentId: payment.id } : { ok: false, reason: "failed" };
 }
