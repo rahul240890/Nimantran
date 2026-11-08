@@ -398,6 +398,11 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   clipStorageFailed: "इस ब्राउज़र में संगीत सहेजा नहीं जा सकता, जैसे प्राइवेट मोड में।",
   waveformLabel: (name) => `${name} का आकार, रखा गया हिस्सा चमकता हुआ`,
   startAt: "शुरुआत",
+  startSeconds: "शुरुआत (सेकंड)",
+  secondsShort: "से.",
+  partSeconds: (from, to) => `गाने के ${from} से ${to} सेकंड तक`,
+  startsAtSeconds: (at) => `गाने के ${at} सेकंड से शुरू`,
+  songElsewhere: 'इस डिवाइस पर पूरा गाना नहीं है। शुरुआत बदलने के लिए "बदलें" से उसे फिर चुनें।',
   tooShort: (song, need) =>
     `यह गाना ${song} का है, और आपका निमंत्रण लगभग ${need} चलता है। लंबा गाना चुनें, ताकि संगीत बिना दोहराए अंत तक चले।`,
   chooseLonger: "दूसरा गाना चुनें",

@@ -52,7 +52,14 @@ export async function copiedClip(draft: InviteDraft): Promise<MusicClip | null> 
     if (!blob) return clip;
     const id = newId();
     await savePhoto(id, blob);
-    return { ...clip, id };
+    // The whole song too, so either invite can move its start or drop it on its own
+    const whole = clip.source ? await loadPhoto(clip.source).catch(() => null) : null;
+    const copy = { ...clip, id };
+    delete copy.source;
+    if (!whole) return copy;
+    const source = newId();
+    await savePhoto(source, whole);
+    return { ...copy, source };
   } catch {
     return clip;
   }

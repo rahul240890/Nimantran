@@ -13,7 +13,7 @@ import {
   type MusicClip,
 } from "@/lib/editor/music-clip";
 import { songClock as clock, type SongLengths } from "@/lib/editor/song-length";
-import { deletePhoto, savePhoto } from "@/lib/editor/photos";
+import { deletePhoto, loadPhoto, savePhoto } from "@/lib/editor/photos";
 import { cn } from "@/lib/cn";
 import { useText } from "@/i18n/client";
 import { editorText } from "@/i18n/copy/editor";
@@ -23,15 +23,29 @@ import { forgetPhotoUrl, rememberPhotoUrl } from "./use-photo-urls";
  * The host's own music (owner, 2026-10-24: simple, and nothing to forget to press). Pick a
  * song and it is the invitation's music straight away: the part kept is as long as the
  * invitation plays (song-length.ts), from the start of the song. Moving where it starts,
- * on the slider or by tapping the song's shape, saves again a moment later. The song never
- * leaves the device; only the part kept is uploaded.
+ * on the slider, in seconds, or by tapping the song's shape, saves again a moment later.
+ * The whole song stays on this device (never uploaded; only the part kept is), so the
+ * start can move again at any time, after publishing too, without choosing the song again
+ * (owner, 2026-11-08).
  */
 
 const BARS = 56;
 /** A new start is saved this long after the slider stops moving. */
 const SAVE_AFTER_MS = 600;
 
-type Song = { buffer: AudioBuffer; name: string; peaks: number[] };
+type Song = {
+  buffer: AudioBuffer;
+  name: string;
+  peaks: number[];
+  /** Where the whole song is kept on this device; null where it couldn't be. */
+  source: string | null;
+};
+
+/** Seconds as a host reads them: whole, or to the half second. */
+function secondsText(seconds: number): string {
+  const half = Math.round(seconds * 2) / 2;
+  return Number.isInteger(half) ? String(half) : half.toFixed(1);
+}
 
 /** How long the song has to run for this invitation, as the music step works it out. */
 export type SongNeeds = SongLengths & {
@@ -185,12 +199,15 @@ function SongStart({
   song,
   needs,
   saving,
+  initialStart = 0,
   onStart,
   actions,
 }: {
   song: Song;
   needs: SongNeeds | null;
   saving: boolean;
+  /** Where the part kept starts now, in seconds. */
+  initialStart?: number;
   /** A new start, in seconds; the caller saves it. */
   onStart: (start: number, seconds: number) => void;
   actions: ReactNode;
@@ -200,7 +217,11 @@ function SongStart({
   const duration = song.buffer.duration;
   const length = keptLength(duration, needs);
   const latest = Math.max(0, Math.floor((duration - length) * 2) / 2);
-  const [start, setStart] = useState(0);
+  const [start, setStart] = useState(() =>
+    Math.min(latest, Math.max(0, Math.round(initialStart * 2) / 2)),
+  );
+  // The seconds box keeps what the host types until it reads as a start
+  const [typed, setTyped] = useState<string | null>(null);
   const part = usePartPlayer();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => clearTimeout(timer.current ?? undefined), []);
@@ -208,6 +229,7 @@ function SongStart({
   const move = (next: number) => {
     const at = Math.min(latest, Math.max(0, Math.round(next * 2) / 2));
     setStart(at);
+    setTyped(null);
     if (part.playing) void part.play(song.buffer, at, length);
     clearTimeout(timer.current ?? undefined);
     timer.current = setTimeout(() => onStart(at, length), SAVE_AFTER_MS);
@@ -262,11 +284,51 @@ function SongStart({
         })}
       </svg>
       <div className="flex flex-col gap-1">
-        <label htmlFor={`${id}-start`} className="flex justify-between text-sm text-ink">
-          <span>{extrasCopy.startAt}</span>
-          <span className="text-ink-muted tabular-nums">
-            {clock(start)} – {clock(start + length)}
+        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+          <label htmlFor={`${id}-seconds`} className="text-sm text-ink">
+            {extrasCopy.startSeconds}
+          </label>
+          <span className="flex items-center gap-1.5">
+            <input
+              id={`${id}-seconds`}
+              type="number"
+              inputMode="decimal"
+              min={0}
+              max={latest}
+              step={0.5}
+              value={typed ?? secondsText(start)}
+              disabled={latest <= 0}
+              aria-describedby={`${id}-part`}
+              onChange={(event) => {
+                const text = event.target.value;
+                const next = Number(text);
+                if (text.trim() !== "" && Number.isFinite(next) && next >= 0 && next <= latest) {
+                  move(next);
+                } else {
+                  setTyped(text);
+                }
+              }}
+              onBlur={() => {
+                if (typed === null) return;
+                const next = Number(typed);
+                if (typed.trim() !== "" && Number.isFinite(next)) move(next);
+                else setTyped(null);
+              }}
+              className={cn(
+                "h-11 w-24 rounded-md border border-line-strong bg-paper px-3 text-right text-ink tabular-nums",
+                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:opacity-50",
+              )}
+            />
+            <span aria-hidden className="text-sm text-ink-muted">
+              {extrasCopy.secondsShort}
+            </span>
           </span>
+        </div>
+        <p id={`${id}-part`} className="text-sm text-ink-muted tabular-nums">
+          {extrasCopy.partSeconds(secondsText(start), secondsText(start + length))}
+        </p>
+        <label htmlFor={`${id}-start`} className="sr-only">
+          {extrasCopy.startAt}
         </label>
         <input
           id={`${id}-start`}
@@ -276,7 +338,7 @@ function SongStart({
           step={0.5}
           value={start}
           disabled={latest <= 0}
-          aria-valuetext={clock(start)}
+          aria-valuetext={extrasCopy.startsAtSeconds(secondsText(start))}
           onChange={(event) => move(Number(event.target.value))}
           className="h-11 w-full cursor-pointer accent-marigold disabled:cursor-default"
         />
@@ -310,20 +372,28 @@ export function OwnMusic({
   const [song, setSong] = useState<Song | null>(null);
   const [reading, setReading] = useState(false);
   const [saving, setSaving] = useState(false);
+  // The whole song is being read back from this device, to move its start again
+  const [opening, setOpening] = useState(false);
   const kept = useClipPlayer(url);
   // Each save counts, so a slower one finishing after a newer start never wins
   const saves = useRef(0);
   const current = useRef(clip);
+  // The clip's whole song, read back from this device once per song
+  const opened = useRef<string | null>(null);
   useEffect(() => {
     current.current = clip;
   }, [clip]);
 
-  const discard = (old: MusicClip | null) => {
+  /** Forgets an old clip's file, and its whole song unless the new clip keeps it. */
+  const discard = (old: MusicClip | null, keepSource: string | null = null) => {
     if (!old) return;
     forgetPhotoUrl(old.id);
-    void deletePhoto(old.id).catch(() => {
-      // Left behind on the device; harmless, and cleared with the next new invite
-    });
+    const ids = old.source && old.source !== keepSource ? [old.id, old.source] : [old.id];
+    for (const id of ids) {
+      void deletePhoto(id).catch(() => {
+        // Left behind on the device; harmless, and cleared with the next new invite
+      });
+    }
   };
 
   /** Cuts the part from `start` and makes it the invitation's music. */
@@ -341,6 +411,8 @@ export function OwnMusic({
         name: picked.name,
         // Uploading is the host's word they may use it, as the note under the button says
         rights: true,
+        start: Math.round(start * 10) / 10,
+        ...(picked.source ? { source: picked.source } : {}),
       };
       try {
         await savePhoto(next.id, blob);
@@ -353,7 +425,7 @@ export function OwnMusic({
         return;
       }
       rememberPhotoUrl(next.id, blob);
-      discard(current.current);
+      discard(current.current, picked.source);
       onClip(next);
     } catch {
       toast({ title: extrasCopy.clipFailed, tone: "error" });
@@ -369,16 +441,25 @@ export function OwnMusic({
       const { decodeSong } = await import("@/lib/editor/clip-encode");
       const buffer = await decodeSong(file);
       if (buffer.duration < MIN_CLIP_SECONDS) throw new Error("Too short");
-      const picked = {
+      const short = tooShort(buffer.duration, needs);
+      // A song long enough is kept whole on this device, so its start can move later
+      let source: string | null = null;
+      if (!short) {
+        source = crypto.randomUUID();
+        await savePhoto(source, file).catch(() => {
+          source = null;
+        });
+      }
+      const picked: Song = {
         buffer,
         name: clipName(file.name),
         peaks: waveformPeaks(buffer.getChannelData(0), BARS),
+        source,
       };
+      opened.current = source;
       setSong(picked);
       // Long enough: it is the music at once, from its start
-      if (!tooShort(buffer.duration, needs)) {
-        void save(picked, 0, keptLength(buffer.duration, needs));
-      }
+      if (!short) void save(picked, 0, keptLength(buffer.duration, needs));
     } catch {
       toast({ title: extrasCopy.songFailed, tone: "error" });
     } finally {
@@ -386,10 +467,54 @@ export function OwnMusic({
     }
   };
 
+  const sourceId = clip?.source ?? null;
+  useEffect(() => {
+    if (song || !sourceId || opened.current === sourceId) return;
+    opened.current = sourceId;
+    let cancelled = false;
+    setOpening(true);
+    void (async () => {
+      try {
+        const blob = await loadPhoto(sourceId);
+        if (!blob || cancelled) return;
+        const { decodeSong } = await import("@/lib/editor/clip-encode");
+        const buffer = await decodeSong(blob);
+        if (cancelled || current.current?.source !== sourceId) return;
+        const picked: Song = {
+          buffer,
+          name: current.current.name,
+          peaks: waveformPeaks(buffer.getChannelData(0), BARS),
+          source: sourceId,
+        };
+        setSong(picked);
+        // Kept before the invitation grew: cut again from the same start, long enough now
+        const length = keptLength(buffer.duration, needs);
+        if (
+          Math.round(current.current.seconds) < Math.round(length) &&
+          !tooShort(buffer.duration, needs)
+        ) {
+          void save(picked, current.current.start ?? 0, length);
+        }
+      } catch {
+        // Not readable here: the clip still plays, and Change picks the song again
+      } finally {
+        if (!cancelled) setOpening(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      setOpening(false);
+      if (opened.current === sourceId) opened.current = null;
+    };
+    // Reads once per song; the clip's other changes are the host's own moves
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [song, sourceId]);
+
   const remove = () => {
     saves.current++;
     setSaving(false);
     setSong(null);
+    opened.current = null;
     discard(clip);
     onClip(null);
   };
@@ -447,10 +572,11 @@ export function OwnMusic({
         </div>
       ) : song ? (
         <SongStart
-          key={`${song.name}:${song.buffer.duration}`}
+          key={song.source ?? `${song.name}:${song.buffer.duration}`}
           song={song}
           needs={needs}
           saving={saving}
+          initialStart={song.source && song.source === clip?.source ? (clip.start ?? 0) : 0}
           onStart={(start, seconds) => void save(song, start, seconds)}
           actions={
             <>
@@ -463,7 +589,19 @@ export function OwnMusic({
         <>
           <SongCard
             name={clip.name}
-            meta={extrasCopy.clipMeta(clock(clip.seconds))}
+            meta={
+              opening ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <LoaderCircle
+                    aria-hidden
+                    className="size-3.5 animate-spin motion-still:animate-none"
+                  />
+                  {extrasCopy.readingSong}
+                </span>
+              ) : (
+                extrasCopy.clipMeta(clock(clip.seconds))
+              )
+            }
             playing={kept.playing}
             playDisabled={!url}
             onPlay={() => void kept.toggle()}
@@ -473,7 +611,18 @@ export function OwnMusic({
                 {removeButton}
               </>
             }
-          />
+          >
+            {!opening && (
+              <p className="text-sm text-ink-muted">
+                {clip.start !== undefined && (
+                  <span className="block text-ink tabular-nums">
+                    {extrasCopy.startsAtSeconds(secondsText(clip.start))}
+                  </span>
+                )}
+                {extrasCopy.songElsewhere}
+              </p>
+            )}
+          </SongCard>
           {/* Kept before the invitation grew (more functions, longer pages) */}
           {needs && Math.round(clip.seconds) < needs.need && (
             <Warning>{extrasCopy.shortNote(clock(clip.seconds), clock(needs.need))}</Warning>

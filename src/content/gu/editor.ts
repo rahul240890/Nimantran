@@ -404,6 +404,11 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   clipStorageFailed: "આ બ્રાઉઝરમાં સંગીત સાચવી શકાતું નથી, જેમ કે પ્રાઇવેટ મોડમાં.",
   waveformLabel: (name) => `${name} નો આકાર, રાખેલો ભાગ ઝળકતો`,
   startAt: "શરૂઆત",
+  startSeconds: "શરૂઆત (સેકન્ડ)",
+  secondsShort: "સે.",
+  partSeconds: (from, to) => `ગીતની ${from} થી ${to} સેકન્ડ સુધી`,
+  startsAtSeconds: (at) => `ગીતની ${at} સેકન્ડથી શરૂ`,
+  songElsewhere: 'આ ડિવાઇસ પર આખું ગીત નથી. શરૂઆત બદલવા "બદલો" થી તેને ફરી પસંદ કરો.',
   tooShort: (song, need) =>
     `આ ગીત ${song} નું છે, અને તમારું આમંત્રણ લગભગ ${need} ચાલે છે. લાંબું ગીત પસંદ કરો, જેથી સંગીત ફરી વાગ્યા વગર અંત સુધી ચાલે.`,
   chooseLonger: "બીજું ગીત પસંદ કરો",
