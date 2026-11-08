@@ -28,6 +28,11 @@ export const POST_PAIRS: readonly Partial<Record<UiLocale, string>>[] = [
   { en: "gujarati-wedding-invitation-wording", gu: "kankotri-lakhan" },
   { en: "satyanarayan-puja-invitation-message", hi: "satyanarayan-katha-nimantran" },
   { en: "when-to-send-wedding-invitations", hi: "shadi-card-kab-bhejein" },
+  {
+    en: "save-the-date-messages",
+    hi: "save-the-date-message-hindi",
+    gu: "save-the-date-message-gujarati",
+  },
 ];
 
 /** A post read in one language, in another: itself, its pair, or null for that blog's front page. */

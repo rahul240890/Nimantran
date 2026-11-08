@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const saveTheDateMessages: BlogPost = {
   slug: "save-the-date-messages",
   locale: "en",
+  pair: "save-the-date",
   title: "Save the date message: 24 ideas to copy",
   description:
     "Save the date messages and wording to copy: classic, fun, from parents, destination weddings and short WhatsApp texts, plus when to send them in India.",
