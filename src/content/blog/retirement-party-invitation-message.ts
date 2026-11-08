@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const retirementPartyInvitationMessage: BlogPost = {
   slug: "retirement-party-invitation-message",
   locale: "en",
+  pair: "retirement",
   title: "Retirement party invitation message: 23 ideas",
   description:
     "Retirement party and retirement lunch invitation messages to copy: from family and colleagues, formal function wording, farewell lines and WhatsApp texts.",
