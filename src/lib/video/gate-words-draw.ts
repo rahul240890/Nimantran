@@ -352,7 +352,8 @@ function drawToran(ctx: Ctx, c: OpeningPalette, local: number) {
   }
 }
 
-const RANGOLI_PETAL = new Path2D("M0 -48 C 3 -44 3 -41 0 -38 C -3 -41 -3 -44 0 -48 Z");
+// Made on first use: Path2D is only in the browser, and this module loads on the server too
+let rangoliPetal: Path2D | null = null;
 
 /** A rangoli ring drawing itself round the words, then turning slowly. */
 function drawRangoli(ctx: Ctx, c: OpeningPalette, local: number) {
@@ -395,14 +396,14 @@ function drawRangoli(ctx: Ctx, c: OpeningPalette, local: number) {
       ctx.save();
       ctx.rotate((i * 22.5 * Math.PI) / 180);
       ctx.fillStyle = i % 2 ? c.rose : c.marigold;
-      ctx.fill(RANGOLI_PETAL);
+      ctx.fill((rangoliPetal ??= new Path2D("M0 -48 C 3 -44 3 -41 0 -38 C -3 -41 -3 -44 0 -48 Z")));
       ctx.restore();
     }
   }
   ctx.restore();
 }
 
-const LOTUS_PETAL = new Path2D("M0 0 C 9 -12 8 -28 0 -38 C -8 -28 -9 -12 0 0 Z");
+let lotusPetal: Path2D | null = null;
 
 /** A lotus opening under the words, petal by petal; `top` is its box's top. */
 function drawLotus(ctx: Ctx, c: OpeningPalette, top: number, width: number, local: number) {
@@ -430,10 +431,11 @@ function drawLotus(ctx: Ctx, c: OpeningPalette, top: number, width: number, loca
     ctx.rotate((angle * Math.PI) / 180);
     ctx.scale(grow, grow);
     ctx.fillStyle = Math.abs(angle) > 30 ? c.rose : c.blush;
-    ctx.fill(LOTUS_PETAL);
+    lotusPetal ??= new Path2D("M0 0 C 9 -12 8 -28 0 -38 C -8 -28 -9 -12 0 0 Z");
+    ctx.fill(lotusPetal);
     ctx.strokeStyle = c.rose;
     ctx.lineWidth = 0.6;
-    ctx.stroke(LOTUS_PETAL);
+    ctx.stroke(lotusPetal);
     ctx.restore();
   });
   ctx.restore();
