@@ -25,7 +25,8 @@ import {
 import { designPhotos } from "@/lib/gallery/photos";
 import { blogPostPath, postsIn } from "@/lib/blog/posts";
 import { pagePath } from "@/lib/seo/paths";
-import { itemList } from "@/lib/seo/structured-data";
+import { faqPage, itemList } from "@/lib/seo/structured-data";
+import { occasionQuestions } from "@/content/occasion-questions";
 import { cn } from "@/lib/cn";
 import { samplePath } from "@/lib/sample/paths";
 import { DesignCard } from "./design-card";
@@ -368,6 +369,7 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
   const designs = occasionDesigns(id);
   const functions = category.functions.suggested;
   const posts = postsIn(locale).filter((post) => post.occasion === id);
+  const questions = occasionQuestions[locale].byOccasion[id] ?? [];
   return (
     <PublicShell
       locale={locale}
@@ -379,6 +381,7 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
             path: pagePath({ kind: "occasion", id }, locale),
           })),
         ),
+        ...(questions.length > 0 ? [faqPage(questions, locale)] : []),
       ]}
     >
       <GalleryHero eyebrow={seoCopy.invitations} heading={words.heading} intro={words.intro} />
@@ -438,6 +441,18 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
               </li>
             ))}
           </ul>
+        </Shelf>
+      )}
+      {questions.length > 0 && (
+        <Shelf id="questions" heading={occasionQuestions[locale].heading}>
+          <dl className="grid max-w-3xl gap-5">
+            {questions.map((item) => (
+              <div key={item.q} className="flex flex-col gap-1.5">
+                <dt className="font-display text-lg leading-snug sm:text-xl">{item.q}</dt>
+                <dd className="text-ink-muted">{item.a}</dd>
+              </div>
+            ))}
+          </dl>
         </Shelf>
       )}
       <Shelf id="more" heading={galleryCopy.moreOccasions}>

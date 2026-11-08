@@ -39,6 +39,9 @@ import { retirementPartyInvitationMessage } from "./retirement-party-invitation-
 import { rokaCeremonyInvitationMessage } from "./roka-ceremony-invitation-message";
 import { satyanarayanPujaInvitationMessage } from "./satyanarayan-puja-invitation-message";
 import { saveTheDateMessages } from "./save-the-date-messages";
+import { saveTheDateMessageHindi } from "./hi-save-the-date-message";
+import { saveTheDateMessageGujarati } from "./gu-save-the-date-message";
+import { christianWeddingInvitationWording } from "./christian-wedding-invitation-wording";
 import { shopOpeningInvitationMessage } from "./shop-opening-invitation-message";
 import { grahapravesamAzhaippithazh } from "./ta-grahapravesam-azhaippithazh";
 import { paniNiraivuVizhaAzhaippithazh } from "./ta-pani-niraivu-vizha-azhaippithazh";
@@ -86,6 +89,9 @@ export const POSTS: readonly BlogPost[] = [
   retirementPartyInvitationMessage,
   satyanarayanPujaInvitationMessage,
   saveTheDateMessages,
+  saveTheDateMessageHindi,
+  saveTheDateMessageGujarati,
+  christianWeddingInvitationWording,
   shopOpeningInvitationMessage,
   threadCeremonyInvitationMessage,
   weddingInvitationMessageForFriends,

@@ -3,6 +3,7 @@ import { publicMetadata } from "@/components/seo/pages";
 import { UI_LOCALES } from "@/i18n/locales";
 import { indexedLocales, pageAlternates, pagePath, publicPages, switchLocalePath } from "./paths";
 import { jsonLdText } from "./structured-data";
+import { occasionQuestions } from "@/content/occasion-questions";
 
 describe("public pages", () => {
   it("live at readable addresses in each language", () => {
@@ -74,6 +75,20 @@ describe("public pages", () => {
     expect(switchLocalePath("/mr", "en")).toBe("/");
     expect(switchLocalePath("/create", "hi")).toBeNull();
     expect(switchLocalePath("/invites/abc", "hi")).toBeNull();
+  });
+});
+
+describe("occasion questions", () => {
+  it("answer wedding and save the date questions in every language, each on its own", () => {
+    for (const locale of UI_LOCALES) {
+      const { byOccasion } = occasionQuestions[locale];
+      expect(byOccasion.wedding?.length, locale).toBeGreaterThanOrEqual(4);
+      expect(byOccasion["save-the-date"]?.length, locale).toBeGreaterThanOrEqual(2);
+      for (const items of Object.values(byOccasion)) {
+        expect(new Set(items!.map((item) => item.q)).size).toBe(items!.length);
+        for (const item of items!) expect(item.a.length, item.q).toBeLessThanOrEqual(300);
+      }
+    }
   });
 });
 
