@@ -1,6 +1,6 @@
 "use client";
 
-import { spellName } from "@/actions/transliterate";
+import { spellFamily, spellName } from "@/actions/transliterate";
 import { languageName } from "@/components/invitation/card-language-toggle";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
@@ -30,6 +30,7 @@ import { CARD_SAMPLES } from "@/lib/templates/story-words";
 import { slotsOf } from "@/lib/templates/content";
 import { SLOT_RULES, type SlotId, type Template } from "@/lib/templates/schema";
 import { defaultType } from "@/lib/editor/type";
+import { hasLatin } from "@/lib/names/family-script";
 import { isLatinName, type ScriptLanguage } from "@/lib/names/transliterate";
 import type { StepProps } from "./types";
 import { Lettering } from "../lettering";
@@ -52,29 +53,36 @@ export function shownOn(copy: CardCopy, id: SlotId): string {
 
 /**
  * A name typed in English letters, offered back in the card's script: tapping a spelling
- * puts it in the field. Shows nothing while typing, or when no spelling comes back.
+ * puts it in the field. Shows nothing while typing, or when no spelling comes back. A
+ * `family` line ("Smt. Sunita & Shri Ramesh Patel") comes back whole, its titles and "&"
+ * in the card's own words too.
  */
-function ScriptChoices({
+export function ScriptChoices({
   value,
   language,
   onPick,
+  family = false,
 }: {
   value: string;
   language: ScriptLanguage;
   onPick: (name: string) => void;
+  family?: boolean;
 }) {
   const { coupleCopy } = useText(editorText);
   const [found, setFound] = useState<{ name: string; spellings: string[] }>({
     name: "",
     spellings: [],
   });
-  const latin = isLatinName(value);
+  const latin = family ? hasLatin(value) : isLatinName(value);
 
   useEffect(() => {
     if (!latin) return;
     let live = true;
     const timer = setTimeout(() => {
-      void spellName({ name: value, language }).then((spellings) => {
+      const spelled = family
+        ? spellFamily({ text: value, language })
+        : spellName({ name: value, language });
+      void spelled.then((spellings) => {
         if (live) setFound({ name: value, spellings });
       });
     }, 450);
@@ -82,7 +90,7 @@ function ScriptChoices({
       live = false;
       clearTimeout(timer);
     };
-  }, [latin, value, language]);
+  }, [latin, value, language, family]);
 
   const spellings = latin && found.name === value ? found.spellings : [];
   return (
@@ -100,7 +108,11 @@ function ScriptChoices({
               lang={language}
               aria-label={coupleCopy.useSpelling(spelling)}
               onClick={() => onPick(spelling)}
-              className="font-display text-lg"
+              className={
+                family
+                  ? "h-auto min-h-11 max-w-full py-1.5 text-base text-balance whitespace-normal"
+                  : "font-display text-lg"
+              }
             >
               {spelling}
             </Button>

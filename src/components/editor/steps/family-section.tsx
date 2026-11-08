@@ -20,10 +20,39 @@ import {
   type FamilySide,
   type Relation,
 } from "@/lib/editor/family";
+import type { CardLanguage } from "@/lib/templates/card-languages";
 import { wordingIdeas } from "@/lib/templates/card-suggestions";
 import { WORDING_IDS, WORDING_MAX, type WordingId } from "@/lib/traditions/schema";
+import { ScriptChoices } from "./couple-step";
 import { Ideas } from "./ideas";
 import type { StepProps } from "./types";
+
+/**
+ * A family line typed in English letters on a card in another script, offered back whole
+ * in that script ("શ્રીમતી સુનીતાબેન તથા શ્રી રમેશભાઈ પટેલ"), so the family page doesn't
+ * mix English names and "&" in among its own headings. Nothing on an English card.
+ */
+function FamilySpellings({
+  language,
+  value,
+  max,
+  onPick,
+}: {
+  language: CardLanguage;
+  value: string;
+  max: number;
+  onPick: (value: string) => void;
+}) {
+  if (language === "en") return null;
+  return (
+    <ScriptChoices
+      family
+      value={value}
+      language={language}
+      onPick={(spelled) => onPick(spelled.slice(0, max))}
+    />
+  );
+}
 
 /**
  * The family section of the details (Step 12s): each side's parents and home town,
@@ -77,24 +106,40 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
           hint={familyCopy.parentsHint}
           optionalLabel={editor.optional}
         >
-          <Input
-            value={family[key].parents}
-            maxLength={FAMILY_MAX}
-            placeholder={examples.parentsExample}
-            lang={language}
-            autoComplete="off"
-            onChange={(event) => setSide(key, { parents: event.target.value })}
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              value={family[key].parents}
+              maxLength={FAMILY_MAX}
+              placeholder={examples.parentsExample}
+              lang={language}
+              autoComplete="off"
+              onChange={(event) => setSide(key, { parents: event.target.value })}
+            />
+            <FamilySpellings
+              language={language}
+              value={family[key].parents}
+              max={FAMILY_MAX}
+              onPick={(parents) => setSide(key, { parents })}
+            />
+          </div>
         </Field>
         <Field label={familyCopy.town} optionalLabel={editor.optional}>
-          <Input
-            value={family[key].town}
-            maxLength={TOWN_MAX}
-            placeholder={examples.townExample}
-            lang={language}
-            autoComplete="off"
-            onChange={(event) => setSide(key, { town: event.target.value })}
-          />
+          <div className="flex flex-col gap-2">
+            <Input
+              value={family[key].town}
+              maxLength={TOWN_MAX}
+              placeholder={examples.townExample}
+              lang={language}
+              autoComplete="off"
+              onChange={(event) => setSide(key, { town: event.target.value })}
+            />
+            <FamilySpellings
+              language={language}
+              value={family[key].town}
+              max={TOWN_MAX}
+              onPick={(town) => setSide(key, { town })}
+            />
+          </div>
         </Field>
       </fieldset>
     );
@@ -140,6 +185,15 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
                     data-wording={id}
                     onChange={(event) => setWording(id, event.target.value)}
                   />
+                  {/* The little ones' line is a sentence, not names: it isn't spelled */}
+                  {id !== "children" && (
+                    <FamilySpellings
+                      language={language}
+                      value={draft.tradition.wording[id] ?? ""}
+                      max={WORDING_MAX}
+                      onPick={(value) => setWording(id, value)}
+                    />
+                  )}
                   <Ideas
                     field={traditionCopy.wordingLabels[id]}
                     ideas={wordingIdeas(draft.categoryId, language, id)}
@@ -156,16 +210,24 @@ export function FamilySection({ draft, update }: Pick<StepProps, "draft" | "upda
             hint={familyCopy.memoryHint}
             optionalLabel={editor.optional}
           >
-            <Input
-              value={family.memory}
-              maxLength={FAMILY_MAX}
-              placeholder={examples.memoryExample}
-              lang={language}
-              autoComplete="off"
-              onChange={(event) =>
-                setFamily((current) => ({ ...current, memory: event.target.value }))
-              }
-            />
+            <div className="flex flex-col gap-2">
+              <Input
+                value={family.memory}
+                maxLength={FAMILY_MAX}
+                placeholder={examples.memoryExample}
+                lang={language}
+                autoComplete="off"
+                onChange={(event) =>
+                  setFamily((current) => ({ ...current, memory: event.target.value }))
+                }
+              />
+              <FamilySpellings
+                language={language}
+                value={family.memory}
+                max={FAMILY_MAX}
+                onPick={(memory) => setFamily((current) => ({ ...current, memory }))}
+              />
+            </div>
           </Field>
         </div>
       </fieldset>
@@ -200,14 +262,22 @@ export function ContactsSection({ draft, update }: Pick<StepProps, "draft" | "up
         <div key={index} className="flex items-end gap-3">
           <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
             <Field label={familyCopy.contactName}>
-              <Input
-                value={contact.name}
-                maxLength={CONTACT_NAME_MAX}
-                placeholder={examples.contactNameExample}
-                lang={language}
-                autoComplete="off"
-                onChange={(event) => setContact(index, { name: event.target.value })}
-              />
+              <div className="flex flex-col gap-2">
+                <Input
+                  value={contact.name}
+                  maxLength={CONTACT_NAME_MAX}
+                  placeholder={examples.contactNameExample}
+                  lang={language}
+                  autoComplete="off"
+                  onChange={(event) => setContact(index, { name: event.target.value })}
+                />
+                <FamilySpellings
+                  language={language}
+                  value={contact.name}
+                  max={CONTACT_NAME_MAX}
+                  onPick={(name) => setContact(index, { name })}
+                />
+              </div>
             </Field>
             <Field label={familyCopy.phone}>
               <Input
