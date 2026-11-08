@@ -397,6 +397,11 @@ export const extrasCopy: Translation<typeof en.extrasCopy> = {
   clipStorageFailed: "এই ব্রাউজারে সংগীত সেভ করা যায় না, যেমন প্রাইভেট মোডে।",
   waveformLabel: (name) => `${name}-এর রূপরেখা, রাখা অংশটুকু উজ্জ্বল`,
   startAt: "শুরু",
+  startSeconds: "শুরু (সেকেন্ড)",
+  secondsShort: "সে.",
+  partSeconds: (from, to) => `গানের ${from} থেকে ${to} সেকেন্ড`,
+  startsAtSeconds: (at) => `গানের ${at} সেকেন্ড থেকে শুরু`,
+  songElsewhere: 'এই ডিভাইসে পুরো গানটি নেই। শুরু বদলাতে "বদলান" দিয়ে আবার বেছে নিন।',
   tooShort: (song, need) =>
     `এই গানটি ${song} লম্বা, আর আপনার নিমন্ত্রণপত্র প্রায় ${need} চলে। একটি লম্বা গান বেছে নিন, যাতে সংগীত পুনরাবৃত্তি ছাড়াই শেষ পর্যন্ত চলে।`,
   chooseLonger: "অন্য গান বেছে নিন",

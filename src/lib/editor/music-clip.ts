@@ -43,6 +43,13 @@ export const clipSchema = z.object({
   name: z.string().max(80),
   /** The host confirmed they have the right to use this music. */
   rights: z.literal(true),
+  /** Where in the song the part starts, in seconds. */
+  start: z.number().min(0).max(36_000).optional(),
+  /**
+   * The whole song, kept on the device that picked it (never uploaded), so the start can
+   * move again at any time, after publishing too, without choosing the song again.
+   */
+  source: z.string().min(1).max(64).optional(),
 });
 export type MusicClip = z.infer<typeof clipSchema>;
 

@@ -59,6 +59,13 @@ describe("music clips", () => {
     expect(clipSchema.safeParse({ ...clip, seconds: 400 }).success).toBe(false);
   });
 
+  it("keeps where the part starts and the whole song on this device", () => {
+    const moved = { ...clip, start: 42.5, source: "song-1" };
+    expect(clipSchema.parse(moved)).toEqual(moved);
+    expect(clipSchema.parse(clip).start).toBeUndefined();
+    expect(clipSchema.safeParse({ ...clip, start: -1 }).success).toBe(false);
+  });
+
   it("reads drafts saved before clips as playing the raga", () => {
     const old = { ...newDraft(), music: { raga: "yaman", playOnOpen: true } };
     expect(parseDraft(old)?.music.clip).toBeNull();

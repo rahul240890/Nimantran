@@ -440,6 +440,13 @@ export const extrasCopy = {
   clipStorageFailed: "Music can't be saved in this browser, for example in private mode.",
   waveformLabel: (name: string) => `The shape of ${name}, with the part you keep lit`,
   startAt: "Starts at",
+  startSeconds: "Start (seconds)",
+  secondsShort: "s",
+  /** The part kept, in seconds of the song. */
+  partSeconds: (from: string, to: string) => `${from} s to ${to} s of the song`,
+  startsAtSeconds: (at: string) => `Starts ${at} seconds into the song`,
+  songElsewhere:
+    "This device doesn't have the whole song. To move where it starts, choose it again with Change.",
   tooShort: (song: string, need: string) =>
     `This song is ${song} long, and your invitation plays for about ${need}. Choose a longer song, so the music lasts to the end without repeating.`,
   chooseLonger: "Choose another song",
