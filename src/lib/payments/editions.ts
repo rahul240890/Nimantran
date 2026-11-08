@@ -1007,7 +1007,7 @@ export async function adminInvites(
     service
       .from("events")
       .select(
-        "id, category_id, status, slug, content, created_at, profiles(name), event_plans(plan_id)",
+        "id, category_id, status, slug, content, created_at, profiles!events_owner_id_fkey(name), event_plans(plan_id)",
         { count: "exact" },
       )
       .order("created_at", { ascending: false })
