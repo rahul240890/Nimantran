@@ -34,6 +34,7 @@ import {
   type InviteDraft,
 } from "@/lib/editor/draft";
 import { withClip } from "@/lib/editor/music-clip";
+import { useClipUrl } from "@/components/editor/use-photo-urls";
 import { pageType } from "@/lib/editor/type";
 import { storyBeats, type StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
@@ -398,6 +399,12 @@ type InviteVideoOptions = {
   testCodecs?: boolean;
 };
 
+/**
+ * Bumped when how a video plays its song changes, so one made before shows as out of date.
+ * 2 (2026-11-08): a song that wouldn't load had been quietly replaced by the raga.
+ */
+const SONG = 2;
+
 /** The parts of an invitation that change as it is edited or published, not its video. */
 function filmed(draft: InviteDraft) {
   return { ...draft, step: null, updatedAt: 0, remoteId: null, slug: null };
@@ -454,10 +461,14 @@ function useInviteVideo({
   }, [key, inviteId, slug, tail, url]);
 
   const { template, prepare, look } = useVideoFilm(draft, functions, photos, url);
+  // The host's song from the page, else from this device or the account: a song just
+  // chosen is on this device before its upload has finished, when the page has no link yet
+  const ownClip = useClipUrl(draft);
+  const songUrl = clipUrl ?? ownClip;
   // What this video's pages are made from: when they change, a kept video is out of date.
   // Photos and music by their ids, as their addresses change from visit to visit
   const pages = useMemo(
-    () => fingerprint({ draft: filmed(draft), functions, music: music && !silent }),
+    () => fingerprint({ draft: filmed(draft), functions, music: music && !silent, song: SONG }),
     [draft, functions, music, silent],
   );
 
@@ -492,9 +503,15 @@ function useInviteVideo({
 
   const make = async (raga = music) => {
     const playing = raga && !silent;
-    const withMusic = playing ? withClip(template, clipUrl).music : null;
+    // A video with music plays the host's own song when they chose one, never the design's
+    // song in its place: without a link to it yet, it says so and the host tries again
+    if (playing && draft.music.clip && !songUrl) {
+      toast({ title: videoCopy.songMissing, tone: "error" });
+      return;
+    }
+    const withMusic = playing ? withClip(template, songUrl).music : null;
     const made = {
-      look: fingerprint({ draft: filmed(draft), functions, music: playing }),
+      look: fingerprint({ draft: filmed(draft), functions, music: playing, song: SONG }),
       url,
       marked,
       music: playing,
@@ -519,6 +536,8 @@ function useInviteVideo({
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
         toast({ title: videoCopy.stopped });
+      } else if (error instanceof Error && error.name === "SongUnavailable") {
+        toast({ title: videoCopy.songMissing, tone: "error" });
       } else {
         toast({ title: videoCopy.failed, tone: "error" });
       }
@@ -649,7 +668,7 @@ export function PackageVideo(props: PackageVideoProps) {
   const marked = !props.allowed;
   const heading = useId();
   const clean = props.allowed && Boolean(props.published);
-  const { poster, state, percent, make, key, unfinished, finishing } = useInviteVideo({
+  const { poster, state, percent, make, key, stale, unfinished, finishing } = useInviteVideo({
     inviteId: props.inviteId,
     draft: props.draft,
     functions: props.functions,
@@ -786,6 +805,7 @@ export function PackageVideo(props: PackageVideoProps) {
               <p role="status" className="text-xs font-semibold">
                 {upgradeCopy.video.ready}
               </p>
+              {stale && <p className="text-xs text-ink-muted">{videoCopy.changed}</p>}
               {!clean && (
                 <p className="flex items-start gap-1.5 text-xs text-ink-muted">
                   <Lock aria-hidden className="mt-px size-3.5 shrink-0" />
@@ -840,7 +860,7 @@ export function PackageVideo(props: PackageVideoProps) {
               )}
               <Button
                 size="sm"
-                variant={clean && unfinished ? "secondary" : "ghost"}
+                variant={(clean && unfinished) || stale ? "secondary" : "ghost"}
                 leadingIcon={<RotateCcw aria-hidden />}
                 onClick={() => void make()}
               >

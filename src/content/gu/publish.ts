@@ -314,6 +314,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   lockedPackage: "ડાઉનલોડ સેલિબ્રેશન અને ગ્રાન્ડ પૅકેજ સાથે મળે છે.",
   lockedPublish: "આમંત્રણ લાઇવ થાય પછી ડાઉનલોડ કરો: વીડિયો તેની લિંક પર પૂરો થાય છે.",
   failed: "વીડિયો બની શક્યો નહીં. ફરી પ્રયત્ન કરો, અથવા Chrome કે Safari અજમાવો.",
+  /** The host's song couldn't be fetched or read, so no video was made without it. */
+  songMissing:
+    "વીડિયો માટે તમારું ગીત લોડ થઈ શક્યું નહીં. ઇન્ટરનેટ તપાસો અને થોડી વારમાં ફરી પ્રયત્ન કરો.",
   unsupported:
     "આ બ્રાઉઝર વીડિયો બનાવી શકતું નથી. આ પાનું Chrome, Edge કે Safari ના નવા વર્ઝનમાં ખોલો.",
   noSound:

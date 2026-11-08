@@ -379,6 +379,9 @@ export const videoCopy = {
   lockedPackage: "Downloading comes with Celebration and Grand.",
   lockedPublish: "Download once your invitation is live: the video ends on its link.",
   failed: "Couldn't make the video. Try again, or try Chrome or Safari.",
+  /** The host's song couldn't be fetched or read, so no video was made without it. */
+  songMissing:
+    "Couldn't load your song for the video. Check your connection and try again in a moment.",
   unsupported:
     "This browser can't make videos. Open this page in Chrome, Edge or the latest Safari.",
   noSound:

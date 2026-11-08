@@ -62,11 +62,36 @@ export async function renderRaga(
   return ctx.startRendering();
 }
 
+/**
+ * The song a video was to play couldn't be fetched or read. A video then fails instead of
+ * quietly playing the raga in its place (owner, 2026-11-08: a client's video came out
+ * without the song chosen for it), so the host knows to try again.
+ */
+export class SongUnavailable extends Error {
+  constructor(cause?: unknown) {
+    super("The song couldn't be loaded", { cause });
+    this.name = "SongUnavailable";
+  }
+}
+
+/** The song's file, fetched afresh: tried twice, as a phone's connection can drop once. */
+async function fetchSong(url: string): Promise<ArrayBuffer> {
+  let failure: unknown = null;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (response.ok) return await response.arrayBuffer();
+      failure = new Error(`Song answered ${response.status}`);
+    } catch (error) {
+      failure = error;
+    }
+  }
+  throw failure;
+}
+
 /** The host's own clip, looped to fill `seconds` and faded like the raga. */
 async function renderClip(url: string, seconds: number, sampleRate: number): Promise<AudioBuffer> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error("Clip unavailable");
-  const data = await response.arrayBuffer();
+  const data = await fetchSong(url);
   const ctx = new OfflineAudioContext(2, Math.ceil(seconds * sampleRate), sampleRate);
   const clip = await ctx.decodeAudioData(data);
   const master = ctx.createGain();
@@ -82,16 +107,22 @@ async function renderClip(url: string, seconds: number, sampleRate: number): Pro
   return ctx.startRendering();
 }
 
-/** The invite's music as a recording: the host's clip when they chose one, else the raga. */
+/**
+ * The invite's music as a recording: the song when there is one (the host's own, or the
+ * flute), else the raga. A song that won't load rejects with SongUnavailable.
+ */
 export async function renderMusic(
   music: MusicChoice,
   seconds: number,
   sampleRate = 48_000,
 ): Promise<AudioBuffer> {
   if (music.clip) {
-    // A clip that won't load still leaves the video with music
-    const clip = await renderClip(music.clip, seconds, sampleRate).catch(() => null);
-    if (clip) return clip;
+    try {
+      return await renderClip(music.clip, seconds, sampleRate);
+    } catch (error) {
+      console.warn("The video's song couldn't be loaded", error);
+      throw new SongUnavailable(error);
+    }
   }
   return renderRaga(music, seconds, sampleRate);
 }

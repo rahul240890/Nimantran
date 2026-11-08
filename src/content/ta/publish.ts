@@ -396,6 +396,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   lockedPublish: "அழைப்பிதழ் லைவ் ஆனதும் பதிவிறக்கலாம்: வீடியோ அதன் இணைப்புடன் முடிகிறது.",
   failed:
     "வீடியோவை உருவாக்க முடியவில்லை. மீண்டும் முயலவும், அல்லது Chrome அல்லது Safari-யில் முயலவும்.",
+  /** The host's song couldn't be fetched or read, so no video was made without it. */
+  songMissing:
+    "வீடியோவுக்கான உங்கள் பாடலை ஏற்ற முடியவில்லை. இணைய இணைப்பைச் சரிபார்த்துச் சிறிது நேரத்தில் மீண்டும் முயலவும்.",
   unsupported:
     "இந்த பிரௌசரால் வீடியோ உருவாக்க முடியாது. இந்தப் பக்கத்தை Chrome, Edge அல்லது சமீபத்திய Safari-யில் திறக்கவும்.",
   noSound:
