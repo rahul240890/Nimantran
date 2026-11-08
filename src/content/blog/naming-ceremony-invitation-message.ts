@@ -3,6 +3,7 @@ import type { BlogPost } from "./types";
 export const namingCeremonyInvitationMessage: BlogPost = {
   slug: "naming-ceremony-invitation-message",
   locale: "en",
+  pair: "naming-ceremony",
   title: "Naming ceremony invitation message: 24 to copy",
   description:
     "Naming ceremony invitation messages to copy: namkaran, barse, barasala and noolukettu wording from the family or the baby, Hindi lines and WhatsApp texts.",

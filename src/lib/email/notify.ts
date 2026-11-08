@@ -15,6 +15,7 @@ import { stopUrl } from "./stop-link";
 import { emailDesign, emailDesigns, emailOffers } from "./extras";
 import {
   discoverEmail,
+  packageGiftEmail,
   receiptEmail,
   reminderEmail,
   welcomeEmail,
@@ -540,4 +541,36 @@ export async function sampleReminderFor(userId: string, name: string, stop: stri
         .limit(10)
     : { data: null };
   return reminderFor({ id: userId, name }, (data ?? []) as EventSummary[], stop);
+}
+
+/* ---------- A package from the team ---------- */
+
+export type PackageEmailResult = "sent" | "no-email" | "not-configured" | "failed";
+
+/**
+ * Tells a host the team gave their invite a package (Admin, Invites), with the admin's
+ * note. Not claimed in email_log: the admin decides each time, and may send it again.
+ */
+export async function sendPackageEmail(input: {
+  userId: string;
+  eventId: string;
+  names: string;
+  planId: PaidPlanId;
+  note: string;
+}): Promise<PackageEmailResult> {
+  if (!emailConfigured() || authMode() === "preview") return "not-configured";
+  const user = await userById(input.userId);
+  if (!user?.email) return "no-email";
+  const email = packageGiftEmail(await brandWithHelp(), {
+    hostName: nameOf(user),
+    names: input.names,
+    packageName: planCopy[input.planId].name,
+    highlights: planCopy[input.planId].highlights,
+    note: input.note,
+    inviteUrl: `${site.url.replace(/\/$/, "")}/invites/${encodeURIComponent(input.eventId)}`,
+  });
+  const sent = await sendEmail(user.email, email, {
+    idempotencyKey: `package-${input.eventId}-${input.planId}-${Date.now()}`,
+  });
+  return sent.ok ? "sent" : "failed";
 }
