@@ -27,13 +27,18 @@ import {
 import {
   checkoutProvider,
   grantPlan,
+  recheckOrder,
   refundOrder,
+  setInvitePlan,
   setCheckoutSwitch,
   type GrantResult,
+  type RecheckResult,
   type RefundResult,
 } from "@/lib/payments/editions";
+import { startHelping, stopHelping, supportInvite } from "@/lib/admin/support";
+import { sendPackageEmail, type PackageEmailResult } from "@/lib/email/notify";
 import { checkConnection, type ConnectionCheck } from "@/lib/payments/razorpay";
-import { PAID_PLAN_IDS } from "@/lib/plans/catalog";
+import { PAID_PLAN_IDS, PLAN_IDS } from "@/lib/plans/catalog";
 import { allDesignIds, defaultTier } from "@/lib/plans/design-defaults";
 import { DESIGN_TIERS, pricesInOrder } from "@/lib/plans/design-tiers";
 import { pricingSchema } from "@/lib/plans/pricing-schema";
@@ -314,4 +319,80 @@ export async function sendTestEmails(to: unknown): Promise<TestEmailResult | nul
     ),
   );
   return results.every((result) => result.ok) ? "sent" : "failed";
+}
+
+/* ---------- Support for one invite (Admin, Invites) ---------- */
+
+/** The admin's pages for an invite, and the host's own lists, after a change to it. */
+function supportChanged(eventId: string) {
+  revalidatePath("/admin/invites");
+  revalidatePath(`/admin/invites/${eventId}`);
+  revalidatePath("/admin/orders");
+  revalidatePath("/invites");
+}
+
+/** Steps in to help with an invite: the admin becomes its "Shubh support" co-host. */
+export async function helpWithInvite(eventId: unknown, on: unknown): Promise<boolean | null> {
+  const admin = await getAdmin();
+  if (!admin) return null;
+  const parsed = z.uuid().safeParse(eventId);
+  if (!parsed.success || typeof on !== "boolean") return false;
+  const done = on
+    ? await startHelping(parsed.data, admin.account)
+    : await stopHelping(parsed.data, admin.account);
+  if (done) supportChanged(parsed.data);
+  return done;
+}
+
+const setPlanSchema = z.object({
+  eventId: z.uuid(),
+  planId: z.enum(PLAN_IDS),
+  email: z.boolean(),
+  note: z.string().trim().max(500),
+});
+
+export type ChangePackageResult =
+  | { ok: true; names: string; email: PackageEmailResult | null }
+  | { ok: false; reason: "invalid" | "not-found" | "failed" };
+
+/**
+ * Sets an invite's package by hand, to any one, drafts included, and tells the host by
+ * email when the admin asks (a special customer, a payment that didn't land, or another
+ * reason, in the admin's own note).
+ */
+export async function changeInvitePackage(input: unknown): Promise<ChangePackageResult | null> {
+  if (!(await getAdmin())) return null;
+  const parsed = setPlanSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, reason: "invalid" };
+  const { eventId, planId, email, note } = parsed.data;
+  const result = await setInvitePlan(eventId, planId);
+  if (!result.ok) return result;
+  supportChanged(eventId);
+  let sent: PackageEmailResult | null = null;
+  if (email && planId !== "free") {
+    const invite = await supportInvite(eventId);
+    sent = invite
+      ? await sendPackageEmail({
+          userId: invite.ownerId,
+          eventId,
+          names: result.names,
+          planId,
+          note,
+        })
+      : "failed";
+  }
+  return { ok: true, names: result.names, email: sent };
+}
+
+/** Asks Razorpay again about an order the site has as unpaid, and records it if it was paid. */
+export async function recheckPayment(orderId: unknown): Promise<RecheckResult | null> {
+  if (!(await getAdmin())) return null;
+  const parsed = z.uuid().safeParse(orderId);
+  if (!parsed.success) return { ok: false, reason: "not-found" };
+  const result = await recheckOrder(parsed.data);
+  if (result.ok) {
+    revalidatePath("/admin/orders");
+    revalidatePath("/admin/invites", "layout");
+  }
+  return result;
 }
