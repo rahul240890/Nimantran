@@ -239,6 +239,42 @@ export async function invitePlan(account: Account, eventId: string): Promise<Edi
 }
 
 /**
+ * The package each of a host's invites has on the design it's made with, for My invites:
+ * free when it has none, or when its package was bought for another design. Empty while
+ * payments are off, when every invite publishes with everything.
+ */
+export async function invitePlans(
+  invites: readonly { id: string; designId: string }[],
+): Promise<Record<string, PlanId>> {
+  const plans: Record<string, PlanId> = {};
+  if (!invites.length || !(await editionsActive())) return plans;
+  const editions = new Map<string, Edition>();
+  if (isPreview()) {
+    for (const { id } of invites) {
+      const stored = preview.plans.get(id);
+      if (stored) editions.set(id, stored.edition);
+    }
+  } else {
+    const supabase = await supabaseServer();
+    if (!supabase) return plans;
+    // Row level security shows a host only the packages of invites they help run
+    const ids = invites.map((invite) => invite.id);
+    const read = (columns: string) =>
+      supabase.from("event_plans").select(`event_id, ${columns}`).in("event_id", ids);
+    let { data, error } = await read(PLAN_COLUMNS);
+    if (missingColumn(error)) ({ data, error } = await read(PLAN_COLUMNS_BEFORE));
+    if (error || !data) return plans;
+    for (const row of data as unknown as (PlanRow & { event_id: string })[]) {
+      editions.set(row.event_id, editionFromRow(row));
+    }
+  }
+  for (const { id, designId } of invites) {
+    plans[id] = editionFor(editions.get(id) ?? FREE_EDITION, designId).plan;
+  }
+  return plans;
+}
+
+/**
  * Whether an invite is live, with its package: saving a live invite checks that its
  * package covers what it would show. Null when this person can't see the invite.
  */

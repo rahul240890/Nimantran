@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CloudAlert,
   FilePlus2,
+  Globe,
   HardDrive,
   Send,
   Trash2,
@@ -28,6 +29,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
 import { accountText } from "@/i18n/copy/account";
+import { editionsText } from "@/i18n/copy/editions";
 import { editorText } from "@/i18n/copy/editor";
 import { dateLocale } from "@/i18n/dates";
 import { cn } from "@/lib/cn";
@@ -45,6 +47,7 @@ import { inviteDraft } from "@/lib/editor/store";
 import type { InviteSummary } from "@/lib/invites/rows";
 import { SUITES, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
+import type { PlanId } from "@/lib/plans/catalog";
 
 const noop = () => () => {};
 
@@ -221,7 +224,15 @@ function SectionHeading({
  * the account yet (made before signing in, or while offline). invites is null when the
  * account's list couldn't be read.
  */
-export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
+export function MyInvites({
+  invites,
+  plans = {},
+}: {
+  invites: InviteSummary[] | null;
+  /** The package each invite has on its design; missing while payments are off. */
+  plans?: Partial<Record<string, PlanId>>;
+}) {
+  const { planCopy, upgradeCopy } = useText(editionsText);
   const { invitesCopy } = useText(accountText);
   const { stepCopy } = useText(editorText);
   const locale = useLocale();
@@ -339,6 +350,8 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                 invite.second,
                 invitesCopy.untitled,
               );
+              const plan = plans[invite.id];
+              const paid = plan && plan !== "free" ? plan : null;
               return (
                 <li key={invite.id}>
                   <InviteCard
@@ -363,6 +376,7 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                         ) : (
                           <Badge tone="neutral">{invitesCopy.status.draft}</Badge>
                         )}
+                        {paid && <Badge tone="gold">{planCopy[paid].name}</Badge>}
                         {invite.role === "cohost" && (
                           <Badge tone="rose">{invitesCopy.cohost}</Badge>
                         )}
@@ -377,6 +391,15 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                             {invitesCopy.guests}
                           </Link>
                         </Button>
+                        {/* Paid for but not yet live: the link to share comes with publishing */}
+                        {paid && invite.status !== "published" && invite.role === "owner" && (
+                          <Button asChild size="sm">
+                            <Link href={`/create?invite=${invite.id}&publish=1`}>
+                              <Globe aria-hidden />
+                              {upgradeCopy.publishNow}
+                            </Link>
+                          </Button>
+                        )}
                         {invite.status === "published" && (
                           <Button asChild size="sm">
                             <Link href={`/invites/${invite.id}/share`}>

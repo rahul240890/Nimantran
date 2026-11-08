@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { firstName } from "@/lib/auth/account";
 import { getAccount } from "@/lib/auth/server";
 import { inviteStore } from "@/lib/invites/store";
+import { invitePlans } from "@/lib/payments/editions";
 import { reviewStore } from "@/lib/reviews/store";
 import { dashboardText } from "@/i18n/copy/dashboard";
 import { getText } from "@/i18n/server";
@@ -32,13 +33,15 @@ export default async function InvitesPage() {
   const live = (invites ?? []).some(
     (invite) => invite.role === "owner" && invite.status === "published",
   );
-  const [reviewed, { reviewCopy }] = await Promise.all([
+  const [reviewed, { reviewCopy }, plans] = await Promise.all([
     live
       ? reviewStore()
           ?.mine(account)
           .catch(() => null)
       : null,
     getText(dashboardText),
+    // Which package each invite has, so a paid one says so and a paid draft offers Publish
+    invitePlans(invites ?? []).catch(() => ({})),
   ]);
 
   return (
@@ -100,7 +103,7 @@ export default async function InvitesPage() {
               </Button>
             </Card>
           )}
-          <MyInvites invites={invites} />
+          <MyInvites invites={invites} plans={plans} />
         </div>
       </AccountShell>
     </PageTransition>
