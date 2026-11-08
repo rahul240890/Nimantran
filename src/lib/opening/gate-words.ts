@@ -11,6 +11,14 @@ import { PAINTED_GATES, TIED_GATES, isPaintedGate, isTiedGate, type OpeningStyle
  * seven looks, so neighbouring designs differ (gate-words.tsx draws them).
  */
 
+/**
+ * When a gate's doors have opened enough for its words, in seconds of the opening's CSS
+ * (before OPENING_PACE): a painted gate's doors part first, a tied gate's tie undoes first.
+ * The guest's opening and the video both start the words here.
+ */
+export const PAINTED_WORDS_AT = 1;
+export const TIED_WORDS_AT = 1.45;
+
 /** How the words come in, and what flowers come with them. */
 export const GATE_WORD_LOOKS = [
   "petal-rain",

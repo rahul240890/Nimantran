@@ -18,6 +18,14 @@ describe("preludeTimeline", () => {
     expect(preludeTimeline("palace")!.welcome).toBeLessThan(preludeTimeline("pankhi")!.welcome);
   });
 
+  it("holds a gate open for the occasion's words, as the guest's link does", () => {
+    const gate = preludeTimeline("rajwada-pol")!;
+    const tied = preludeTimeline("reshmi-gaanth")!;
+    const painted = preludeTimeline("pankhi")!;
+    expect(gate.welcome - gate.open).toBeGreaterThan(painted.welcome - painted.open);
+    expect(tied.welcome - tied.open).toBeGreaterThan(gate.welcome - gate.open);
+  });
+
   it("has no opening without one, and one for every other style", () => {
     expect(preludeTimeline("none")).toBeNull();
     for (const style of OPENING_STYLES.filter((style) => style !== "none")) {

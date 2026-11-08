@@ -352,6 +352,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   publish: "तुमचे निमंत्रण प्रकाशित करा",
   which: "कोणता व्हिडिओ",
   whole: "संपूर्ण निमंत्रण",
+  language: "व्हिडिओची भाषा",
   ending: {
     open: "निमंत्रण उघडा",
     madeWith: "प्रेमाने बनवलेले",

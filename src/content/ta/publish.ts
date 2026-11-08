@@ -414,6 +414,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   publish: "உங்கள் அழைப்பிதழை வெளியிடவும்",
   which: "எந்த வீடியோ",
   whole: "முழு அழைப்பிதழ்",
+  language: "வீடியோ மொழி",
   ending: {
     open: "அழைப்பிதழைத் திறக்கவும்",
     madeWith: "அன்புடன் உருவாக்கப்பட்டது",

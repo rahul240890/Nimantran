@@ -21,13 +21,14 @@ import { Field } from "@/components/ui/field";
 import { Select } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/toast";
-import { useText } from "@/i18n/client";
+import { useLocale, useText } from "@/i18n/client";
 import { editionsText } from "@/i18n/copy/editions";
 import { publishText } from "@/i18n/copy/publish";
 import { couplePagePhotos, photoAspect, sceneCouple } from "@/lib/editor/couple-photos";
 import {
   cardLanguages,
   draftCopy,
+  draftFaith,
   draftOpeningGod,
   draftOpeningStyle,
   draftTemplate,
@@ -71,7 +72,16 @@ import { drawPrelude, preludeImages } from "@/lib/video/prelude-draw";
 import { PRELUDE_IDLE, preludeTimeline } from "@/lib/video/prelude-timeline";
 import { videoTimeline } from "@/lib/video/timeline";
 import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
-import { filmedWelcome, welcomeScene } from "@/lib/opening/catalog";
+import { filmedWelcome, isTiedGate, welcomeScene } from "@/lib/opening/catalog";
+import {
+  PAINTED_WORDS_AT,
+  TIED_WORDS_AT,
+  gateScatter,
+  gateWordLook,
+  gateWords,
+} from "@/lib/opening/gate-words";
+import type { CardLanguage } from "@/lib/templates/card-languages";
+import { languageName } from "@/components/invitation/card-language-toggle";
 import { instagramHandle, site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { LiveFrame } from "./live-frame";
@@ -131,6 +141,12 @@ export function VideoCard(props: VideoCardProps) {
   const marked = !allowed;
   // Grand makes a video of one function too: its own date, time and place
   const [only, setOnly] = useState<string>(ALL);
+  // A two-language card's video speaks one of them: first the one the guest's link would open
+  // in for this host, and the host can pick the other
+  const languages = cardLanguages(draft);
+  const opensIn = useOpeningLanguage(draft);
+  const [picked, setPicked] = useState<CardLanguage | null>(null);
+  const language = picked && languages.includes(picked) ? picked : opensIn;
   const perFunction = Boolean(props.perFunction) && props.functions.length > 1;
   const functions = useMemo(
     () =>
@@ -161,6 +177,7 @@ export function VideoCard(props: VideoCardProps) {
     clipUrl: props.clipUrl ?? null,
     marked,
     choice: perFunction ? only : ALL,
+    language,
     finish: clean,
     testCodecs,
   });
@@ -256,6 +273,15 @@ export function VideoCard(props: VideoCardProps) {
                   { value: ALL, label: videoCopy.whole },
                   ...props.functions.map((fn) => ({ value: fn.kind, label: fn.name })),
                 ]}
+              />
+            </Field>
+          )}
+          {languages.length > 1 && state.step !== "making" && state.step !== "unsupported" && (
+            <Field label={videoCopy.language} className="max-w-xs">
+              <Select
+                value={language}
+                onValueChange={(next) => setPicked(languages.find((code) => code === next) ?? null)}
+                options={languages.map((code) => ({ value: code, label: languageName(code) }))}
               />
             </Field>
           )}
@@ -390,6 +416,8 @@ type InviteVideoOptions = {
   marked: boolean;
   /** The whole invitation, or one function's kind. */
   choice?: string;
+  /** Which of the card's languages the video speaks; by default the one the link opens in. */
+  language?: CardLanguage;
   /**
    * Whether a video made before the invite was live, or with the preview's mark, is finished
    * by itself: made again with the invitation's link and without the mark, the host's music
@@ -411,6 +439,17 @@ function filmed(draft: InviteDraft) {
 }
 
 /**
+ * The card language the guest's link opens in for this person (guest-view.tsx): theirs when
+ * the card has it, else the card's first. The video speaks it too, so the host's video says
+ * what the host sees on the invitation.
+ */
+function useOpeningLanguage(draft: InviteDraft): CardLanguage {
+  const locale = useLocale();
+  const languages = cardLanguages(draft);
+  return languages.find((code) => code === locale) ?? languages[0];
+}
+
+/**
  * Making one invitation video: its poster, whether this browser can make it, the music
  * choice, and the video kept for this invitation and choice. Shared by the video card and
  * the package card's preview, so a video made in one shows in the other.
@@ -425,9 +464,12 @@ function useInviteVideo({
   clipUrl,
   marked,
   choice = ALL,
+  language: asked,
   finish = false,
   testCodecs,
 }: InviteVideoOptions) {
+  const opensIn = useOpeningLanguage(draft);
+  const language = asked ?? opensIn;
   const { videoCopy } = useText(publishText);
   const codecs = testCodecs ? TEST_CODECS : undefined;
   const [music, setMusic] = useState(true);
@@ -437,7 +479,8 @@ function useInviteVideo({
   // The video for this invitation, its theme and choice, kept while making and saved once
   // made: each theme the host tries keeps its own video, and a new one starts unmade. The
   // same one shows on the package card, the video page and, once live, the share page
-  const tail = `${videoDesign(draft)}:${choice}`;
+  // A two-language card's video in its second language is kept apart from the first's
+  const tail = `${videoDesign(draft)}:${choice}${language === cardLanguages(draft)[0] ? "" : `:${language}`}`;
   const key = `${inviteId}:${tail}`;
   const kept = useSyncExternalStore(
     subscribeVideos,
@@ -460,7 +503,7 @@ function useInviteVideo({
     ]);
   }, [key, inviteId, slug, tail, url]);
 
-  const { template, prepare, look } = useVideoFilm(draft, functions, photos, url);
+  const { template, prepare, look } = useVideoFilm(draft, functions, photos, url, language);
   // The host's song from the page, else from this device or the account: a song just
   // chosen is on this device before its upload has finished, when the page has no link yet
   const ownClip = useClipUrl(draft);
@@ -922,8 +965,11 @@ export function useVideoFilm(
   functions: StoryFunction[],
   photos: PublicPhoto[],
   url: string,
+  /** One of the card's languages; the first by default. */
+  asked?: CardLanguage,
 ) {
-  const language = cardLanguages(draft)[0];
+  const languages = cardLanguages(draft);
+  const language = asked && languages.includes(asked) ? asked : languages[0];
   // The film is for guests, so its closing words speak the card's language too
   const { videoCopy } = publishText[language];
   const template = draftTemplate(draft);
@@ -941,8 +987,21 @@ export function useVideoFilm(
     const style = draftOpeningStyle(draft, suite, isScene);
     const timeline = preludeTimeline(style);
     if (!timeline) return null;
+    // Inside a gate, the occasion's words as the guest sees them ("Shubh Vivah", "Save the date")
+    const scatter = gateScatter(draft.categoryId);
+    const look = gateWordLook(style, scatter);
+    const tied = isTiedGate(style);
     return {
       style,
+      gate: look
+        ? {
+            words: gateWords(draft.categoryId, draftFaith(draft), language),
+            look,
+            scatter,
+            at: tied ? TIED_WORDS_AT : PAINTED_WORDS_AT,
+            ink: tied && !SUITES[suite].centre?.dark,
+          }
+        : null,
       god: draftOpeningGod(draft),
       // The film is the same every time: the host's welcome, else the opening's own
       kind: filmedWelcome(welcomeScene(draft.opening, style)),
@@ -1042,6 +1101,7 @@ export function useVideoFilm(
       copy.line,
       copy.date,
       copy.venue,
+      opening?.gate?.words ?? "",
       videoCopy.ending.open,
       videoCopy.ending.madeWith,
       videoCopy.ending.tagline,

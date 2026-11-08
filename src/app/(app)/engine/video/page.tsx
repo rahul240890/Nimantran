@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getLocale } from "@/i18n/server";
 import { storyFunctions } from "@/lib/publish/story";
+import { isCategoryId } from "@/lib/categories/catalog";
 import { isSuiteId, type SuiteId } from "@/lib/suites/catalog";
 import {
   OPENING_GODS,
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
  * A review page for the invitation video, not a product screen: frames from the video of a
  * made-up invite in ?suite=<theme> (?lang=hi for a Hindi card). ?format=scene makes a Scene
  * invite, with ?photos=0, 1 or 2 (default 2). ?opening=<style>&god=<god> picks the opening
- * it starts with. ?from=<seconds>&step=<seconds> picks the moments. ?mark=1 adds the free
+ * it starts with, ?occasion=<category> the occasion its gate's words name. ?from=<seconds>&step=<seconds> picks the moments. ?mark=1 adds the free
  * preview's watermark.
  */
 export default async function VideoPreviewPage({ searchParams }: PageProps<"/engine/video">) {
@@ -35,6 +36,7 @@ export default async function VideoPreviewPage({ searchParams }: PageProps<"/eng
     opening,
     god,
     mark,
+    occasion,
   } = await searchParams;
   const suite: SuiteId = isSuiteId(asked) ? asked : "rajwada-bagh";
   const locale = await getLocale();
@@ -46,6 +48,7 @@ export default async function VideoPreviewPage({ searchParams }: PageProps<"/eng
   const chosen = OPENING_GODS.find((id) => id === god) as OpeningGod | undefined;
   const draft = {
     ...sampled,
+    categoryId: isCategoryId(occasion) ? occasion : sampled.categoryId,
     opening: {
       ...sampled.opening,
       style: style ?? sampled.opening.style,

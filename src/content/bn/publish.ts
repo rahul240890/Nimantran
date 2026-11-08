@@ -343,6 +343,7 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   publish: "আপনার নিমন্ত্রণ প্রকাশ করুন",
   which: "কোন ভিডিও",
   whole: "পুরো নিমন্ত্রণপত্র",
+  language: "ভিডিওর ভাষা",
   ending: {
     open: "নিমন্ত্রণপত্র খুলুন",
     madeWith: "ভালোবাসায় তৈরি",
