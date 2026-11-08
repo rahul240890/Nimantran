@@ -326,6 +326,8 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   lockedPackage: "ডাউনলোড পাবেন সেলিব্রেশন আর গ্র্যান্ড প্যাকেজে।",
   lockedPublish: "নিমন্ত্রণ লাইভ হলে ডাউনলোড করুন: ভিডিওর শেষে তার লিংক থাকে।",
   failed: "ভিডিও তৈরি করা গেল না। আবার চেষ্টা করুন, বা Chrome বা Safari-তে খুলুন।",
+  /** The host's song couldn't be fetched or read, so no video was made without it. */
+  songMissing: "ভিডিওর জন্য আপনার গান লোড করা গেল না। ইন্টারনেট দেখে একটু পরে আবার চেষ্টা করুন।",
   unsupported:
     "এই ব্রাউজার ভিডিও তৈরি করতে পারে না। পাতাটি Chrome, Edge বা Safari-র নতুন সংস্করণে খুলুন।",
   noSound:

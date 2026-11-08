@@ -341,6 +341,9 @@ export const videoCopy: Translation<typeof en.videoCopy> = {
   lockedPackage: "डाउनलोड सेलिब्रेशन और ग्रैंड पैकेज के साथ मिलता है।",
   lockedPublish: "निमंत्रण लाइव होने पर डाउनलोड करें: वीडियो उसके लिंक पर ख़त्म होता है।",
   failed: "वीडियो नहीं बन सका। फिर कोशिश करें, या Chrome या Safari में खोलें।",
+  /** The host's song couldn't be fetched or read, so no video was made without it. */
+  songMissing:
+    "वीडियो के लिए आपका गाना लोड नहीं हो पाया। इंटरनेट जाँचें और थोड़ी देर में फिर कोशिश करें।",
   unsupported:
     "यह ब्राउज़र वीडियो नहीं बना सकता। यह पन्ना Chrome, Edge या Safari के नए वर्शन में खोलें।",
   noSound:
