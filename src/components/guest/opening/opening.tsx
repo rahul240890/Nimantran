@@ -30,7 +30,13 @@ import {
   type OpeningStyle,
   type WelcomeScene,
 } from "@/lib/opening/catalog";
-import { gateScatter, gateWordLook, gateWords } from "@/lib/opening/gate-words";
+import {
+  PAINTED_WORDS_AT,
+  TIED_WORDS_AT,
+  gateScatter,
+  gateWordLook,
+  gateWords,
+} from "@/lib/opening/gate-words";
 import { englishInitial } from "@/lib/initials";
 import { warmBlurs, warmPaintings } from "@/lib/paintings";
 import { daysBetween, remaining, todayInIndia } from "@/lib/publish/countdown";
@@ -60,9 +66,6 @@ const GATE_OPEN_MS = 2500 * OPENING_PACE;
 const PAINTED_OPEN_MS = 3200 * OPENING_PACE;
 /** A tied gate's tie comes undone first, then its doors open (tied-gates.css), then the words. */
 const TIED_OPEN_MS = 3600 * OPENING_PACE;
-/** When a gate's doors have opened enough for its words, in CSS ms (gate-words.css). */
-const PAINTED_WORDS_AT = 1000;
-const TIED_WORDS_AT = 1450;
 /** A depth opening's three frames go by one after another (depth-openings.css). */
 const DEPTH_OPEN_MS = 2800 * OPENING_PACE;
 /** A bloom opening's heart goes, then its rings open one after another (bloom-openings.css). */
@@ -572,7 +575,7 @@ export function Opening({
               lang={lang}
               look={wordLook}
               scatter={scatter}
-              at={tied ? TIED_WORDS_AT : PAINTED_WORDS_AT}
+              at={(tied ? TIED_WORDS_AT : PAINTED_WORDS_AT) * 1000}
               face={face("names", type.names)}
               ink={tied && !theme.centre?.dark}
             />

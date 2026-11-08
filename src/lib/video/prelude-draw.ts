@@ -51,10 +51,21 @@ import { englishInitial } from "@/lib/initials";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
 import { keepDate, lettering, type TypeRole } from "@/lib/suites/lettering";
 import type { CardCopy } from "@/lib/templates/content";
-import { PAGE_H, PAGE_W, SCALE, fillWith, roundRect, withAlpha, wrap, type Fonts } from "./draw";
+import {
+  PAGE_H,
+  PAGE_W,
+  SCALE,
+  fillWith,
+  mix,
+  roundRect,
+  withAlpha,
+  wrap,
+  type Fonts,
+} from "./draw";
 import { bezier, clamp01, ease, easeInOut, easeOut, lerp, transition } from "./ease";
 import type { OpeningPalette } from "./look";
-import { PRELUDE_PACE, type PreludeTimeline } from "./prelude-timeline";
+import { drawGateWords, type GateWordsFilm } from "./gate-words-draw";
+import { PRELUDE_CSS, PRELUDE_PACE, WELCOME_IN, type PreludeTimeline } from "./prelude-timeline";
 import { VIDEO_HEIGHT, VIDEO_WIDTH } from "./timeline";
 
 /** What the prelude is drawn from. */
@@ -70,6 +81,8 @@ export type PreludeFilm = {
   colours: OpeningPalette;
   images: ReadonlyMap<string, CanvasImageSource>;
   timeline: PreludeTimeline;
+  /** The occasion's words inside a painted or tied gate as it opens; null for other openings. */
+  gate: GateWordsFilm | null;
 };
 
 const CQW = PAGE_W / 100;
@@ -234,6 +247,18 @@ export function drawPrelude(ctx: Ctx, film: PreludeFilm, seconds: number) {
   ctx.fillStyle = film.colours.deep;
   ctx.fillRect(0, 0, PAGE_W, PAGE_H);
   drawOpening(ctx, film, seconds, opened);
+  // Inside a gate, the occasion's words and flowers, until the welcome comes over them
+  if (film.gate && seconds > open) {
+    const leaving = 1 - transition(seconds - welcome, WELCOME_IN, -WELCOME_IN / 2);
+    drawGateWords(
+      ctx,
+      film.gate,
+      film.colours,
+      (size) => face(film, "names", size),
+      (seconds - open) / PRELUDE_CSS,
+      leaving,
+    );
+  }
 
   // The god and the names wait on the closed opening, and fade as it opens
   const words = clamp01((seconds - 0.2) / 0.8) * (1 - clamp01(opened / 0.35));
@@ -2651,25 +2676,6 @@ function drawMotes(ctx: Ctx, colour: string, seconds: number, alpha: number) {
     ctx.fill();
   }
   ctx.restore();
-}
-
-/** Two rgb() colours mixed, `t` of the first, as color-mix(in oklab) does closely enough. */
-export function mix(a: string, b: string, t: number): string {
-  const pa = rgbOf(a);
-  const pb = rgbOf(b);
-  if (!pa || !pb) return a;
-  const at = (i: number) => Math.round(pa[i]! * t + pb[i]! * (1 - t));
-  return `rgb(${at(0)}, ${at(1)}, ${at(2)})`;
-}
-
-function rgbOf(colour: string): number[] | null {
-  const match = colour.match(/rgba?\(([^)]+)\)/);
-  if (!match) return null;
-  return match[1]!
-    .split(/[\s,/]+/)
-    .filter(Boolean)
-    .slice(0, 3)
-    .map(Number);
 }
 
 function sizeOf(image: CanvasImageSource): { width: number; height: number } {

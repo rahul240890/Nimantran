@@ -21,10 +21,18 @@ import { CROSSFADE } from "./timeline";
  * calmer step the guest's link took, from OPENING_PACE 1.6 to 2.2.
  */
 export const PRELUDE_PACE = 2.2 / 1.6;
+/** Video seconds for each second of the opening's CSS, as the guest's link plays it. */
+export const PRELUDE_CSS = 1.6 * PRELUDE_PACE;
 /** The opening holds closed this long, the names on it, before it opens. */
 export const PRELUDE_IDLE = 2.4;
 /** A painted, tied, depth, fresh or themed opening opens over this long, as on the guest's link. */
 export const PRELUDE_OPEN_PAINTED = 2.6 * PRELUDE_PACE;
+/**
+ * A gate holds open longer, for the occasion's words inside it ("Shubh Vivah", "Save the
+ * Date"), as PAINTED_OPEN_MS and TIED_OPEN_MS do on the guest's link (opening.tsx).
+ */
+export const PRELUDE_OPEN_GATE = 3.2 * PRELUDE_CSS;
+export const PRELUDE_OPEN_TIED = 3.6 * PRELUDE_CSS;
 /** A drawn opening (doors, curtains, the envelope) opens sooner. */
 export const PRELUDE_OPEN_DRAWN = 1.8 * PRELUDE_PACE;
 /** The welcome with the names stays this long, as WELCOME_MS does on the link. */
@@ -58,7 +66,13 @@ export function paintedOpening(style: OpeningStyle): boolean {
 /** The prelude's timing for an opening style; null without an opening. */
 export function preludeTimeline(style: OpeningStyle): PreludeTimeline | null {
   if (style === "none") return null;
-  const opening = paintedOpening(style) ? PRELUDE_OPEN_PAINTED : PRELUDE_OPEN_DRAWN;
+  const opening = isPaintedGate(style)
+    ? PRELUDE_OPEN_GATE
+    : isTiedGate(style)
+      ? PRELUDE_OPEN_TIED
+      : paintedOpening(style)
+        ? PRELUDE_OPEN_PAINTED
+        : PRELUDE_OPEN_DRAWN;
   const open = PRELUDE_IDLE;
   const welcome = round(open + opening - WELCOME_IN);
   const pages = round(welcome + PRELUDE_WELCOME);

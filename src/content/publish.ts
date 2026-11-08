@@ -397,6 +397,8 @@ export const videoCopy = {
   publish: "Publish your invitation",
   which: "Which video",
   whole: "The whole invitation",
+  /** Picks which of a two-language card's languages the video speaks. */
+  language: "Video language",
   ending: {
     open: "Open the invitation",
     /** Above Shubh's name in the video's sign-off. */

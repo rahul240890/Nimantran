@@ -958,3 +958,22 @@ export function withAlpha(colour: string, alpha: number): string {
     .slice(0, 3);
   return `rgb(${parts.join(" ")} / ${alpha})`;
 }
+
+/** Two rgb() colours mixed, `t` of the first, as color-mix(in oklab) does closely enough. */
+export function mix(a: string, b: string, t: number): string {
+  const pa = rgbOf(a);
+  const pb = rgbOf(b);
+  if (!pa || !pb) return a;
+  const at = (i: number) => Math.round(pa[i]! * t + pb[i]! * (1 - t));
+  return `rgb(${at(0)}, ${at(1)}, ${at(2)})`;
+}
+
+function rgbOf(colour: string): number[] | null {
+  const match = colour.match(/rgba?\(([^)]+)\)/);
+  if (!match) return null;
+  return match[1]!
+    .split(/[\s,/]+/)
+    .filter(Boolean)
+    .slice(0, 3)
+    .map(Number);
+}

@@ -81,7 +81,18 @@ export type OpeningPalette = Record<
   | "accentText"
   | "ivory"
   | "wood"
-  | "woodDark",
+  | "woodDark"
+  | "rose"
+  | "blush"
+  | "jasmine"
+  | "marigoldStrong"
+  | "sealInk"
+  | "leaf"
+  | "night"
+  | "kitePink"
+  | "kiteBlue"
+  | "kiteYellow"
+  | "kiteGreen",
   string
 >;
 
@@ -102,6 +113,18 @@ const OPENING_TOKENS: Record<keyof OpeningPalette, string> = {
   ivory: "var(--card-ivory)",
   wood: "var(--open-wood)",
   woodDark: "var(--open-wood-dark)",
+  // The flowers and confetti round the words inside a gate (gate-words.tsx)
+  rose: "var(--rose)",
+  blush: "var(--petal-blush)",
+  jasmine: "var(--petal-jasmine)",
+  marigoldStrong: "var(--marigold-strong)",
+  sealInk: "var(--open-seal-ink)",
+  leaf: "var(--open-leaf)",
+  night: "var(--night)",
+  kitePink: "var(--motion-kite-pink)",
+  kiteBlue: "var(--motion-kite-blue)",
+  kiteYellow: "var(--motion-kite-yellow)",
+  kiteGreen: "var(--motion-kite-green)",
 };
 
 /** Reads the opening's colours for a theme, as the guest's first screen resolves them. */
