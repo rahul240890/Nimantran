@@ -124,6 +124,8 @@ export default async function SamplePage({ params, searchParams }: PageProps<"/s
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
         sample
+        // Prototype: ?flow=scroll runs the pages down one scroll instead of the reel
+        flow={search.get("flow") === "scroll" ? "scroll" : "reel"}
       />
     </>
   );

@@ -10037,3 +10037,27 @@ html:has(.guest-snap) {
     transform: none;
   }
 }
+
+/*
+ * One-scroll flow (prototype): a page comes in softly as the guest scrolls to it, its
+ * painting easing up from a little below while its words rise in their own time.
+ */
+@keyframes story-scroll-in {
+  from {
+    opacity: 0;
+    transform: translateY(3%) scale(1.02);
+  }
+}
+@layer components {
+  .story-scroll-in {
+    animation: story-scroll-in 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .story-scroll-in {
+      animation: none;
+    }
+  }
+  :where([data-motion="reduce"]) .story-scroll-in {
+    animation: none;
+  }
+}
