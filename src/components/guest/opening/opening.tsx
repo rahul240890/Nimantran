@@ -421,8 +421,12 @@ export function Opening({
   const goIn = () => {
     setWelcome(false);
     const next = latest.current;
-    if (next.kind === "enter") next.onEnter();
-    else setPages(true);
+    if (next.kind === "enter") {
+      // The doors close behind the guest, as they do once the pages end, so the welcome
+      // comes only once and opening it again from below plays the doors again
+      setAsked(false);
+      next.onEnter();
+    } else setPages(true);
   };
   const goInLatest = useRef(goIn);
   useEffect(() => {
