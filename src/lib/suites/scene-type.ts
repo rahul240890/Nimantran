@@ -30,7 +30,11 @@ export type SceneRole =
   /** Its place, below the day. */
   | "venue"
   /** "In 5 days". */
-  | "countdown";
+  | "countdown"
+  /** A family block's title in the slot: "Son of", "With blessings from". */
+  | "family-label"
+  /** The family's names in the slot: the parents, the elders, the hosts. */
+  | "family-names";
 
 type SceneSize = {
   role: TypeRole;
@@ -51,6 +55,8 @@ export const SCENE_SIZES: Record<SceneRole, SceneSize> = {
   detail: { role: "small", min: 0.7, fluid: 3.5, max: 1.1 },
   venue: { role: "venue", min: 0.8, fluid: 4.2, max: 1.35 },
   countdown: { role: "label", min: 0.6, fluid: 2.6, max: 0.85 },
+  "family-label": { role: "label", min: 0.62, fluid: 2.9, max: 0.9 },
+  "family-names": { role: "body", min: 0.8, fluid: 4.4, max: 1.4 },
 };
 
 /**
