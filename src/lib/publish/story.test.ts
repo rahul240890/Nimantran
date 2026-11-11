@@ -67,3 +67,23 @@ describe("the video's theme", () => {
     expect(videoDesign(kayal)).toMatch(/^kayal/);
   });
 });
+
+describe("a time the host keeps off the invite", () => {
+  it("leaves only that function's time out of what guests read, video and pages included", () => {
+    const base = gujaratiWedding();
+    const draft: InviteDraft = {
+      ...base,
+      languages: ["en"],
+      functions: {
+        ...base.functions,
+        wedding: { ...base.functions.wedding, hideTime: true },
+        haldi: { ...base.functions.haldi, included: true, date: "2026-12-11", time: "09:00" },
+      },
+    };
+    const told = storyFunctions(draft, "en");
+    expect(told.find((fn) => fn.kind === "wedding")).toMatchObject({ time: "", muhurat: null });
+    expect(told.find((fn) => fn.kind === "haldi")?.time).not.toBe("");
+    const carded = cardFunctions(told, draft, "en");
+    expect(carded.find((fn) => fn.kind === "wedding")?.time).toBe("");
+  });
+});

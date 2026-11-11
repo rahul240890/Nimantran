@@ -57,3 +57,19 @@ describe("the invitation's words for guests", () => {
     expect(entry!.title.split(" · ")[0]).not.toMatch(/[A-Za-z]/);
   });
 });
+
+describe("a time the host keeps off the invite", () => {
+  it("stays out of the message and the calendar entry, which lasts the day", () => {
+    const base = wedding(["en"]);
+    const draft: InviteDraft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        wedding: { ...base.functions.wedding, hideTime: true, endTime: "21:00" },
+      },
+    };
+    expect(inviteWhen(draft, "en")).toBe("Saturday, 12 December 2026");
+    const [entry] = calendarEntries(draft, { id: "x", url: "https://example.com" }, "en");
+    expect(entry).toMatchObject({ time: "", endTime: "" });
+  });
+});

@@ -92,6 +92,7 @@ export const emptyFunction: EventFunction = {
   date: "",
   time: "",
   endTime: "",
+  hideTime: false,
   venue: "",
   address: "",
   dressCode: "",
@@ -309,6 +310,15 @@ export function mainFunction(draft: InviteDraft): FunctionId | null {
 /** Whether the occasion needs a start time, or only a date and a city. */
 export function needsTime(draft: InviteDraft): boolean {
   return draftCategory(draft).schedule === "full";
+}
+
+/**
+ * The time guests see for a function: its start ("HH:mm"), or empty when the occasion has no
+ * times or the host chose to keep this one's time off the invitation.
+ */
+export function shownTime(draft: InviteDraft, kind: FunctionId): string {
+  const fn = draft.functions[kind];
+  return needsTime(draft) && !fn.hideTime ? fn.time : "";
 }
 
 /** The music the invite's design plays before the host picks any: its theme's, else its card's. */

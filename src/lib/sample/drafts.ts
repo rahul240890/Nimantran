@@ -26,6 +26,7 @@ export const at = (date: string, time: string, venue: string, address = "") => (
   date,
   time,
   endTime: "",
+  hideTime: false,
   venue,
   address,
   dressCode: "",

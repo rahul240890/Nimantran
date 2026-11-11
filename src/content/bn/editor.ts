@@ -120,6 +120,8 @@ export const functionFields: Translation<typeof en.functionFields> = {
   datePlaceholder: "তারিখ বেছে নিন",
   time: "শুরুর সময়",
   timePlaceholder: "সময় বেছে নিন",
+  hideTime: "সময় দেখাবেন না",
+  hideTimeHint: "অতিথিরা আমন্ত্রণ, ভিডিও ও কার্ডে শুধু তারিখ আর স্থান দেখবেন।",
   venue: "স্থান",
   venuePlaceholder: "যেমন পিছোলা লেকসাইড গার্ডেনস, উদয়পুর",
   city: "শহর বা স্থান",

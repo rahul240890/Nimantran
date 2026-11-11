@@ -110,6 +110,10 @@ export function draftToRows(draft: InviteDraft): { event: EventWrite; functions:
         family: draft.family,
         pages: draft.pages,
         guide: draft.guide,
+        // The functions whose time the host keeps off the invite; the functions table has no column
+        hiddenTimes: FUNCTION_IDS.filter(
+          (id) => draft.functions[id].included && draft.functions[id].hideTime,
+        ),
       },
       languages: draft.languages,
     },
@@ -132,6 +136,7 @@ export function rowsToDraft(
   const fns = Object.fromEntries(
     FUNCTION_IDS.map((id) => [id, { ...base.functions[id], included: false }]),
   ) as Record<FunctionId, EventFunction>;
+  const hiddenTimes = event.religious?.hiddenTimes;
   for (const row of functions) {
     if (!(FUNCTION_IDS as readonly string[]).includes(row.kind)) continue;
     fns[row.kind] = {
@@ -140,6 +145,7 @@ export function rowsToDraft(
       // Postgres returns times as HH:MM:SS
       time: row.start_time ? row.start_time.slice(0, 5) : "",
       endTime: row.end_time ? row.end_time.slice(0, 5) : "",
+      hideTime: Array.isArray(hiddenTimes) && hiddenTimes.includes(row.kind),
       venue: row.venue,
       address: row.address,
       dressCode: row.dress_code,

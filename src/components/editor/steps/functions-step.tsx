@@ -4,6 +4,7 @@ import { format, parseISO } from "date-fns";
 import { Car, ChevronDown, CopyCheck, MapPin, MapPinned, Shirt } from "lucide-react";
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -116,7 +117,12 @@ function FunctionFields({
         />
       </Field>
       {withTime && (
-        <Field label={functionFields.time} required error={message(errors[`${id}.time`])}>
+        <Field
+          label={functionFields.time}
+          required={!fn.hideTime}
+          optionalLabel={fn.hideTime ? editor.optional : undefined}
+          error={message(errors[`${id}.time`])}
+        >
           <TimePicker
             value={fn.time || undefined}
             onValueChange={(time) => set({ time })}
@@ -137,6 +143,16 @@ function FunctionFields({
           {": "}
           {functionFields.muhuratHint}
         </p>
+      )}
+      {withTime && (
+        // Some families keep the hour to the card in hand, or haven't fixed it yet
+        <Checkbox
+          label={functionFields.hideTime}
+          description={functionFields.hideTimeHint}
+          checked={fn.hideTime}
+          onCheckedChange={(checked) => set({ hideTime: checked === true })}
+          className="-mt-2 sm:col-span-2"
+        />
       )}
       <Field
         label={withTime ? functionFields.venue : functionFields.city}

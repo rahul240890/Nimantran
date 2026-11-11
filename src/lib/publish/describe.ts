@@ -8,7 +8,7 @@ import {
   formatCardDate,
   includedFunctions,
   mainFunction,
-  needsTime,
+  shownTime,
   type InviteDraft,
 } from "@/lib/editor/draft";
 import { formatCardTime } from "@/lib/templates/card-languages";
@@ -49,7 +49,8 @@ export function inviteWhen(draft: InviteDraft, locale: UiLocale = "en"): string 
   if (!main) return "";
   const fn = draft.functions[main];
   if (!fn.date) return "";
-  const time = fn.time && needsTime(draft) ? ` · ${formatCardTime(fn.time, null, locale)}` : "";
+  const start = shownTime(draft, main);
+  const time = start ? ` · ${formatCardTime(start, null, locale)}` : "";
   return `${formatCardDate(fn.date, locale)}${time}`;
 }
 
@@ -68,18 +69,19 @@ export function calendarEntries(
   // Each function named as the card names it in this language (a Gujarati card's પીઠી)
   const named = cardFunctions(storyFunctions(draft, locale), draft, locale);
   const names = inviteNames(draft);
-  const timed = needsTime(draft);
   return includedFunctions(draft).flatMap((kind) => {
     const fn = draft.functions[kind];
     if (!fn.date) return [];
+    // A time the host keeps off the invite stays out of the calendar too: an all-day entry
+    const time = shownTime(draft, kind);
     return [
       {
         // Kept from the earlier name so calendars that saved an event update it rather than add a copy.
         uid: `${id}-${kind}@shubhdwar`,
         title: `${named.find((item) => item.kind === kind)?.name ?? kind} · ${names}`,
         date: fn.date,
-        time: timed ? fn.time : "",
-        endTime: timed && fn.time ? fn.endTime : "",
+        time,
+        endTime: time ? fn.endTime : "",
         location: [fn.venue.trim(), fn.address.trim()].filter(Boolean).join(", "),
         description: fn.dressCode.trim() ? `${guestCopy.dressCode}: ${fn.dressCode.trim()}` : "",
         url,

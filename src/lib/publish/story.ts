@@ -12,7 +12,7 @@ import {
   includedFunctions,
   languagePack,
   muhuratName,
-  needsTime,
+  shownTime,
   type InviteDraft,
 } from "@/lib/editor/draft";
 import type { FamilyLine, StoryFunction } from "@/lib/engine/story";
@@ -31,12 +31,13 @@ export function storyFunctions(draft: InviteDraft, locale: UiLocale): StoryFunct
   const { guestCopy } = publishText[locale];
   const language = draftTradition(draft)?.language ?? "en";
   const words = dateLocale[locale];
-  const timed = needsTime(draft);
   return includedFunctions(draft).map((kind) => {
     const fn = draft.functions[kind];
     const local = ceremonyName(draft, kind);
     const muhurat = muhuratName(draft, kind);
-    const start = timed && fn.time ? formatTime(fn.time, words) : "";
+    // No time for a save-the-date, or when the host keeps this function's time off the invite
+    const time = shownTime(draft, kind);
+    const start = time ? formatTime(time, words) : "";
     return {
       kind,
       name: functionCopy[kind].name,
@@ -86,7 +87,7 @@ export function cardFunctions<T extends StoryFunction>(
       name,
       localName: null,
       date: date ? formatCardDate(date, language) : fn.date,
-      // Only functions that show a time have one here (needsTime), so follow fn.time
+      // Only functions that show a time have one here (shownTime), so follow fn.time
       time: fn.time && time ? formatCardTime(time, endTime || null, language) : fn.time,
       muhurat:
         fn.muhurat && muhurat

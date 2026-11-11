@@ -73,6 +73,8 @@ const functionSchema = z.object({
   time: time.or(z.literal("")).catch(""),
   /** When it ends, for a muhurat window ("9:47 to 10:31"). Kept exactly as chosen. */
   endTime: time.or(z.literal("")).catch(""),
+  /** The host keeps the time off everything guests see (owner, 2026-11-11); it isn't required then. */
+  hideTime: z.boolean().catch(false),
   venue: z.string().max(FUNCTION_RULES.venue).catch(""),
   address: z.string().max(FUNCTION_RULES.address).catch(""),
   dressCode: z.string().max(FUNCTION_RULES.dressCode).catch(""),
@@ -310,7 +312,7 @@ export function stepErrors(draft: InviteDraft, step: EditorStep): StepErrors {
     for (const id of ids) {
       const fn = draft.functions[id];
       if (!fn.date) errors[`${id}.date`] = "required";
-      if (!fn.time && needsTime(draft)) errors[`${id}.time`] = "required";
+      if (!fn.time && !fn.hideTime && needsTime(draft)) errors[`${id}.time`] = "required";
       if (!fn.venue.trim()) errors[`${id}.venue`] = "required";
     }
   }

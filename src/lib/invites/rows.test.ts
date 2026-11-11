@@ -187,3 +187,21 @@ describe("published invites and photos", () => {
     );
   });
 });
+
+describe("a time kept off the invite", () => {
+  it("comes back hidden, and only for the function it was hidden on", () => {
+    const base = sample();
+    const draft: InviteDraft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        engagement: { ...base.functions.engagement, hideTime: true },
+      },
+    };
+    const { event, functions } = asStored(draft);
+    expect(event.religious?.hiddenTimes).toEqual(["engagement"]);
+    const read = rowsToDraft(event, functions);
+    expect(read.functions.engagement).toMatchObject({ time: "18:30", hideTime: true });
+    expect(rowsToDraft(asStored(base).event, functions).functions.engagement.hideTime).toBe(false);
+  });
+});

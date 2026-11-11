@@ -51,6 +51,7 @@ import {
   draftOpeningStyle,
   draftTemplate,
   mainFunction,
+  shownTime,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -242,7 +243,7 @@ export function GuestView({
   const doorway = SUITES[suite].art !== "card" && Boolean(SUITES[suite].images.cover);
   const mainKind = mainFunction(draft);
   const mainDate = mainKind ? draft.functions[mainKind].date : "";
-  const mainAt = mainKind ? startsAt(mainDate, draft.functions[mainKind].time) : null;
+  const mainAt = mainKind ? startsAt(mainDate, shownTime(draft, mainKind)) : null;
   const main = mainAt === null ? null : { date: mainDate, at: mainAt };
   const music = useRagaMusic(template);
   // One Scene (pilot): the whole invitation on one painting, in place of the doorway and pages
