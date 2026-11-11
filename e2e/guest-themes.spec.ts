@@ -5,6 +5,7 @@ import { guestCopy } from "../src/content/publish";
 import { guestCopy as hiGuestCopy } from "../src/content/hi/publish";
 import { blessings } from "../src/lib/suites/blessings";
 import { sectionLayouts } from "../src/lib/suites/section-layouts";
+import { PHOTO_WORDS } from "../src/lib/templates/photo-words";
 import { noOverflow } from "./invite-helpers";
 
 // Best practice too, as the keyboard test on a real guest page checks
@@ -130,51 +131,57 @@ test("a Hindi card's guest page reads Hindi on an English site", async ({ page }
   expect((await axe(page).analyze()).violations).toEqual([]);
 });
 
-// Owner, 2026-10-24: a couple with one photo each saw only the first, and guests had to
-// scroll sideways through the photos
-test("the welcome shows both photos when the couple gave one each, and the photos turn by themselves", async ({
-  page,
-}) => {
-  expect(sectionLayouts("rajwada-bagh").photos).toBe("film");
+// Owner, 2026-10-24: a couple with one photo each saw only the first. Owner, 2026-11-11:
+// the photos never scroll sideways, and their heading speaks of the couple
+test("the welcome shows both photos when the couple gave one each", async ({ page }) => {
   await page.goto("/engine/guest?suite=rajwada-bagh&couple=two&dress=0");
   const welcome = page.locator('section[aria-labelledby="guest-welcome"]');
   await expect(welcome.locator("figure")).toHaveCount(2);
   await expect(welcome.locator("figcaption")).toHaveText(["Arjun", "Sia"]);
   await expect(welcome.getByRole("img", { name: guestCopy.photoAlt(2) })).toBeVisible();
-
-  const photos = page.getByRole("group", { name: "Photos" });
-  await photos.scrollIntoViewIfNeeded();
-  const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 2");
-  // It moves on by itself while on screen, unless the guest's pointer rests on it
-  await page.mouse.move(1, 1);
-  await expect(counter).toContainText("Photo 2 of 2", { timeout: 9_000 });
-  await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 1 of 2");
-  await photos.getByRole("button", { name: "Previous photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 2");
-  await photos.getByRole("button", { name: "Pause the photos" }).click();
-  await expect(photos.getByRole("button", { name: "Play the photos" })).toBeVisible();
-  await page.mouse.move(1, 1);
-  await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 2 of 2");
   expect(await noOverflow(page)).toBe(true);
-  expect((await axe(page).analyze()).violations).toEqual([]);
 });
 
-test("in still mode the photos stay put and have no pause", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one&dress=0");
-  const photos = page.getByRole("group", { name: "Photos" });
-  await photos.scrollIntoViewIfNeeded();
-  const counter = photos.locator("p[aria-live]");
-  await expect(counter).toContainText("Photo 1 of 3");
-  await expect(photos.getByRole("button", { name: "Pause the photos" })).toHaveCount(0);
-  await page.mouse.move(1, 1);
-  await page.waitForTimeout(5_500);
-  await expect(counter).toContainText("Photo 1 of 3");
-  await photos.getByRole("button", { name: "Next photo" }).click();
-  await expect(counter).toContainText("Photo 2 of 3");
+// Every photo layout shows the photos down the page, each one fully on screen in turn
+for (const suite of ["rajwada-bagh", "shahi-savari", "noor-bagh", "kutch-toran"] as const) {
+  test(`${suite}'s photos (${sectionLayouts(suite).photos}) run down the page, never sideways`, async ({
+    page,
+  }) => {
+    await page.goto(`/engine/guest?suite=${suite}&couple=one&dress=0`);
+    const section = page.locator('section[aria-labelledby="guest-photos"]');
+    await expect(section).toHaveAttribute("data-layout", sectionLayouts(suite).photos);
+    await expect(
+      section.getByRole("heading", { name: PHOTO_WORDS.en.wedding.title }),
+    ).toBeVisible();
+    await expect(section.getByText(PHOTO_WORDS.en.wedding.label)).toBeVisible();
+    const list = section.locator("ul").first();
+    await list.scrollIntoViewIfNeeded();
+    // Nothing in the gallery scrolls on its own sideways
+    expect(
+      await section.evaluate((node) =>
+        [node, ...node.querySelectorAll("*")].every(
+          (el) => !["auto", "scroll"].includes(getComputedStyle(el).overflowX),
+        ),
+      ),
+    ).toBe(true);
+    const photos = section.getByRole("img");
+    const count = await photos.count();
+    expect(count).toBeGreaterThan(1);
+    for (let i = 0; i < count; i++) {
+      await photos.nth(i).scrollIntoViewIfNeeded();
+      await expect(photos.nth(i)).toBeInViewport();
+    }
+    expect(await noOverflow(page)).toBe(true);
+    expect((await axe(page).analyze()).violations).toEqual([]);
+  });
+}
+
+test("the photos' heading follows the occasion and the card's language", async ({ page }) => {
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one&dress=0&category=anniversary");
+  const section = page.locator('section[aria-labelledby="guest-photos"]');
+  await expect(section.getByRole("heading", { name: PHOTO_WORDS.en.years.title })).toBeVisible();
+  await page.goto("/engine/guest?suite=rajwada-bagh&couple=one&dress=0&lang=hi");
+  await expect(section.getByRole("heading", { name: PHOTO_WORDS.hi.wedding.title })).toBeVisible();
 });
 
 for (const suite of ["rajwada-bagh", "kayal"] as const) {

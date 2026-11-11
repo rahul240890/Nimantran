@@ -16,8 +16,6 @@ export type ThemedWords = {
   saveDate: string;
   eventsLabel: string;
   celebrations: string;
-  photosLabel: string;
-  photos: string;
   familyLabel: string;
   family: string;
   blessingLabel: string;
@@ -28,13 +26,11 @@ export type ThemedWords = {
 
 type SiteWords = {
   functions: string;
-  photos: string;
   family: string;
   themed: {
     invitedTo: string;
     saveDateLabel: string;
     eventsLabel: string;
-    photosLabel: string;
     familyLabel: string;
     blessingLabel: string;
     replyLabel: string;
@@ -48,8 +44,6 @@ const fromSite = (site: SiteWords, language: "en" | "hi"): ThemedWords => ({
   saveDate: CARD_STORY_WORDS[language].saveTheDate,
   eventsLabel: site.themed.eventsLabel,
   celebrations: site.functions,
-  photosLabel: site.themed.photosLabel,
-  photos: site.photos,
   familyLabel: site.themed.familyLabel,
   family: site.family,
   blessingLabel: site.themed.blessingLabel,
@@ -67,8 +61,6 @@ export const CARD_THEMED_WORDS: Record<CardLanguage, ThemedWords> = {
     saveDate: CARD_STORY_WORDS.mr.saveTheDate,
     eventsLabel: "सकाळपासून रात्रीपर्यंत",
     celebrations: "सोहळे",
-    photosLabel: "आठवणी",
-    photos: "छायाचित्रे",
     familyLabel: "सोबत",
     family: "कुटुंबाकडून प्रेमपूर्वक",
     blessingLabel: "वडीलधाऱ्यांच्या आशीर्वादाने",
@@ -83,8 +75,6 @@ export const CARD_THEMED_WORDS: Record<CardLanguage, ThemedWords> = {
     saveDate: CARD_STORY_WORDS.gu.saveTheDate,
     eventsLabel: "સવારથી રાત સુધી",
     celebrations: "પ્રસંગો",
-    photosLabel: "યાદો",
-    photos: "તસવીરો",
     familyLabel: "સાથે",
     family: "પરિવાર તરફથી પ્રેમપૂર્વક",
     blessingLabel: "વડીલોના આશીર્વાદથી",
@@ -98,8 +88,6 @@ export const CARD_THEMED_WORDS: Record<CardLanguage, ThemedWords> = {
     saveDate: CARD_STORY_WORDS.bn.saveTheDate,
     eventsLabel: "সকাল থেকে রাত",
     celebrations: "অনুষ্ঠানসূচি",
-    photosLabel: "স্মৃতি",
-    photos: "ছবি",
     familyLabel: "সঙ্গে",
     family: "পরিবারের পক্ষ থেকে সস্নেহে",
     blessingLabel: "গুরুজনদের আশীর্বাদে",
@@ -114,8 +102,6 @@ export const CARD_THEMED_WORDS: Record<CardLanguage, ThemedWords> = {
     saveDate: CARD_STORY_WORDS.ta.saveTheDate,
     eventsLabel: "காலை முதல் இரவு வரை",
     celebrations: "விழாக்கள்",
-    photosLabel: "நினைவுகள்",
-    photos: "புகைப்படங்கள்",
     familyLabel: "உடன்",
     family: "குடும்பத்தினரின் அன்புடன்",
     blessingLabel: "பெரியோர்களின் ஆசியுடன்",

@@ -79,6 +79,7 @@ import { SUITES } from "@/lib/suites/catalog";
 import { guestLook } from "@/lib/suites/guest-look";
 import { templateBox } from "@/lib/suites/event-boxes";
 import { sectionLayouts } from "@/lib/suites/section-layouts";
+import { photoWords } from "@/lib/templates/photo-words";
 import { sectionDress, useVisitSeed } from "@/lib/suites/section-dress";
 import {
   couplePageIds,
@@ -525,6 +526,7 @@ export function GuestView({
                   welcome={placed.welcome}
                   photos={placed.rest}
                   onPhotoFail={photoFailed}
+                  occasion={draft.categoryId}
                   family={family}
                   familyLang={language}
                   allIcsUrl={allIcsUrl}
@@ -590,12 +592,17 @@ export function GuestView({
                       className="flex min-h-svh flex-col justify-center px-4 py-12 sm:px-6 sm:py-16"
                     >
                       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                        <h2
-                          id="guest-photos"
-                          className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                        >
-                          {guestCopy.photos}
-                        </h2>
+                        <div lang={language} className="flex flex-col gap-1">
+                          <p className="font-label text-xs tracking-[0.25em] text-accent-text uppercase">
+                            {photoWords(draft.categoryId, language).label}
+                          </p>
+                          <h2
+                            id="guest-photos"
+                            className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                          >
+                            {photoWords(draft.categoryId, language).title}
+                          </h2>
+                        </div>
                         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
                           {placed.all.map((photo, index) => (
                             <li

@@ -124,14 +124,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
   addAll: "सर्व कॅलेंडरमध्ये जोडा",
   photos: "फोटो",
   photoAlt: (index) => `कुटुंबाचा फोटो ${index}`,
-  carousel: {
-    label: "स्लाइड शो",
-    previous: "मागील फोटो",
-    next: "पुढील फोटो",
-    pause: "फोटो थांबवा",
-    play: "फोटो सुरू करा",
-    position: (index, total) => `${total} पैकी फोटो ${index}`,
-  },
   previewMark: "झलक · अजून पाठवलेले नाही",
   madeWith: "शुभ इन्व्हिटेशनने बनवलेले",
   createYours: "आपले स्वतःचे निमंत्रण बनवा",
@@ -219,7 +211,6 @@ export const guestCopy: Translation<typeof en.guestCopy> = {
     eventsLabel: "सकाळपासून रात्रीपर्यंत",
     saveDateLabel: "तारीख लक्षात ठेवा",
     saveDate: "शुभ तिथी",
-    photosLabel: "आठवणी",
     familyLabel: "कुटुंबासह",
     replyLabel: "आपले उत्तर",
     closing:
