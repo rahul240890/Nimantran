@@ -18,8 +18,12 @@ export const SECTION_LAYOUTS = {
    * that alternate, or every celebration strung on one thread through the day.
    */
   hours: ["split", "overlay", "zigzag", "timeline"],
-  /** The photos at dusk: a film to scroll, polaroids on a table, or a mosaic. */
-  photos: ["film", "polaroids", "mosaic"],
+  /**
+   * The photos at dusk, always one view down the page (owner, 2026-11-11: never a strip to
+   * scroll sideways): polaroids on a table, a mosaic, a cascade of framed photos swaying in
+   * from alternate sides, or two staggered rows of arches that bloom open one by one.
+   */
+  photos: ["polaroids", "mosaic", "cascade", "arches"],
   /** The family: cards, one scroll with ornaments between, or ribbons. */
   family: ["cards", "scroll", "ribbons"],
   /**

@@ -178,32 +178,66 @@
   }
 }
 
-/* The photos' carousel: the photo in the middle in full, its neighbours softer either side */
-.guest-slide {
-  opacity: 0.55;
-  scale: 0.92;
+/*
+ * The photos down the page (owner, 2026-11-11: never a strip to scroll sideways). A
+ * cascade's photos lean a little, each its own way; an arch's photos sit in a jharokha's
+ * arch ringed in the theme's gilt. Each comes in as the guest reaches it: a cascade's
+ * photo sways in from its side and settles, an arch opens from its sill like a window.
+ */
+.guest-cascade {
+  rotate: var(--tilt, 0deg);
 }
-.guest-slide[data-current] {
-  opacity: 1;
-  scale: 1;
-}
-/* Its buttons in the theme's jewel, ringed in gilt like the music button */
-.guest-step {
-  color: var(--guest-cloth);
-  background: var(--guest-jewel);
+.guest-arch-photo {
+  border-radius: 50% 50% 0.5rem 0.5rem / 32% 32% 0.5rem 0.5rem;
+  background: var(--guest-deep);
   box-shadow:
-    0 0 0 2px var(--guest-cloth),
-    0 0 0 3.5px var(--guest-gilt),
-    0 10px 20px -10px rgb(0 0 0 / 0.55);
-}
-.guest-step:hover {
-  background: color-mix(in oklab, var(--guest-jewel) 85%, black);
+    0 0 0 2px var(--guest-gilt),
+    0 0 0 5px var(--guest-cloth),
+    0 0 0 6px var(--guest-gilt),
+    0 24px 40px -20px rgb(0 0 0 / 0.55);
 }
 @media (prefers-reduced-motion: no-preference) {
-  :root:not([data-motion="reduce"]) .guest-slide {
-    transition:
-      opacity 500ms ease,
-      scale 500ms ease;
+  :root:not([data-motion="reduce"]) {
+    :is(.guest-cascade, .guest-arch-tile)[data-reveal="wait"] {
+      opacity: 0;
+    }
+    .guest-cascade[data-reveal="in"] {
+      animation: guest-sway-in 1100ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
+    .guest-cascade[data-side="end"] {
+      --from: 2.5rem;
+    }
+    .guest-arch-tile[data-reveal="in"] .guest-arch-photo {
+      animation: guest-window 1200ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
+    .guest-arch-tile[data-side="end"][data-reveal="in"] .guest-arch-photo {
+      animation-delay: 180ms;
+    }
+    .guest-arch-tile[data-reveal="in"] .guest-arch-photo img {
+      animation: guest-settle 1600ms cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    }
+  }
+}
+@keyframes guest-sway-in {
+  from {
+    opacity: 0;
+    translate: var(--from, -2.5rem) 1.5rem;
+    rotate: calc(var(--tilt, 0deg) * -3);
+  }
+}
+@keyframes guest-window {
+  from {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0 round 50% 50% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(-12% -12% -12% -12% round 0);
+  }
+}
+@keyframes guest-settle {
+  from {
+    scale: 1.18;
   }
 }
 

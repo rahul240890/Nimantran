@@ -6765,10 +6765,6 @@
   width: var(--size);
   height: var(--size);
 }
-.guest-gallery {
-  scrollbar-width: thin;
-  scrollbar-color: var(--guest-gilt) transparent;
-}
 .guest-float-music {
   color: var(--guest-cloth);
   background: var(--guest-jewel);

@@ -127,15 +127,6 @@ export const guestCopy = {
   addAll: "Add all to calendar",
   photos: "Photos",
   photoAlt: (index: number) => `Photo ${index} from the family`,
-  /** The photos' carousel below the card. */
-  carousel: {
-    label: "slideshow",
-    previous: "Previous photo",
-    next: "Next photo",
-    pause: "Pause the photos",
-    play: "Play the photos",
-    position: (index: number, total: number) => `Photo ${index} of ${total}`,
-  },
   previewMark: "Preview · Not sent yet",
   madeWith: `Made with ${site.shortName}`,
   createYours: "Create your own invitation",
@@ -264,7 +255,6 @@ export const guestCopy = {
     eventsLabel: "From morning to night",
     saveDateLabel: "Mark your calendar",
     saveDate: "Save the date",
-    photosLabel: "Memories",
     familyLabel: "Together with",
     replyLabel: "Your reply",
     closing: "Your presence is the greatest gift. We look forward to celebrating with you.",

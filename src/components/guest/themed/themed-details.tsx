@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import {
   useEffect,
@@ -34,7 +34,8 @@ import { usePaintingBlur, warmBlurs } from "@/lib/paintings";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { CardCopy } from "@/lib/templates/content";
 import { CARD_THEMED_WORDS, cardMonth } from "@/lib/templates/themed-words";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
+import { photoWords, type PhotoWords } from "@/lib/templates/photo-words";
+import type { CategoryId } from "@/lib/categories/catalog";
 import { OrnateCard } from "./ornate-card";
 import { FlowerDefs, FlowerFrame, Garland, PetalDrift, PetalShower } from "./flowers";
 import { LampStage } from "./lamp-blessing";
@@ -80,6 +81,7 @@ export function ThemedDetails({
   reply,
   countdown,
   onPhotoFail,
+  occasion,
   seed = 0,
 }: {
   suite: SuiteId;
@@ -105,6 +107,8 @@ export function ThemedDetails({
   countdown?: ReactNode;
   /** A photo whose file can't be shown, so the page takes it away. */
   onPhotoFail?: (id: string) => void;
+  /** The occasion, so the photos' heading speaks of it (a wedding's couple, a child's day). */
+  occasion?: CategoryId;
   /** This visit's draw of the page's dress (section-dress.ts). */
   seed?: number;
 }) {
@@ -163,6 +167,7 @@ export function ThemedDetails({
       {(photos.length > 0 || family.length > 0) && (
         <Dusk
           before={welcome.length}
+          photoHeading={photoWords(occasion, lang)}
           photos={photos}
           family={family}
           familyLang={familyLang}
@@ -923,207 +928,46 @@ function Timeline({
   );
 }
 
-/** How long each photo shows before the next comes by itself. */
-const PHOTO_MS = 4500;
-
-/** Scrolls the carousel so its photo at `index` sits in the middle. */
-function centre(list: HTMLElement, index: number, smooth: boolean) {
-  const item = list.children[index] as HTMLElement | undefined;
-  if (!item) return;
-  list.scrollTo({
-    left: item.offsetLeft - (list.clientWidth - item.offsetWidth) / 2,
-    behavior: smooth ? "smooth" : "auto",
-  });
-}
-
-/** The photo nearest the middle of the strip. */
-function nearestPhoto(list: HTMLElement): number {
-  const middle = list.scrollLeft + list.clientWidth / 2;
-  let nearest = 0;
-  let gap = Infinity;
-  Array.from(list.children).forEach((child, i) => {
-    const item = child as HTMLElement;
-    const distance = Math.abs(item.offsetLeft + item.offsetWidth / 2 - middle);
-    if (distance < gap) {
-      gap = distance;
-      nearest = i;
-    }
-  });
-  return nearest;
-}
+/** A cascade photo's tilt, and which side it sways in from, by its place in the column. */
+const CASCADE_TILT = [-2.5, 2, -1.5, 2.5, -2, 1.5] as const;
 
 /**
- * The photos one after another (owner, 2026-10-24: guests had to scroll sideways to find
- * them): each comes to the middle by itself while the section is on screen, and the guest
- * can step back and forward, swipe, or pause. Hovering or a button in focus holds it, and
- * in still mode nothing moves by itself.
+ * One photo in a column that comes in by itself as the guest scrolls to it: a cascade's
+ * photo sways in from its own side, an arch blooms open. Each watches its own place on the
+ * page, so a long column plays as the guest goes down it rather than all at once.
  */
-function PhotoCarousel({
-  photos,
-  before,
-  look,
-  onFail,
+function PhotoTile({
+  layout,
+  index,
+  className,
+  style,
+  children,
 }: {
-  photos: readonly GuestPhoto[];
-  /** How many photos the welcome already shows, so these count on from there. */
-  before: number;
-  look: GuestLook;
-  onFail?: (id: string) => void;
+  layout: "cascade" | "arches";
+  index: number;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
 }) {
-  const { guestCopy } = useGuestText();
-  const words = guestCopy.carousel;
-  const track = useRef<HTMLUListElement>(null);
-  const [area, onScreen] = useOnScreen<HTMLDivElement>();
-  const still = useReducedMotion();
-  const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
-  const [holding, setHolding] = useState(false);
-  // The photo the strip is gliding to by itself; its scrolling on the way says nothing
-  const aim = useRef<number | null>(null);
-  const count = photos.length;
-  // A photo taken away (its file couldn't be shown) never leaves the counter past the end
-  if (count > 0 && index >= count) setIndex(count - 1);
-  const playing = !still && !paused && count > 1;
-
-  useEffect(() => {
-    if (!playing || holding || !onScreen) return;
-    const timer = setTimeout(() => {
-      const next = (index + 1) % count;
-      aim.current = next;
-      if (track.current) centre(track.current, next, true);
-      setIndex(next);
-    }, PHOTO_MS);
-    return () => clearTimeout(timer);
-  }, [playing, holding, onScreen, index, count]);
-
-  const go = (to: number) => {
-    const next = (to + count) % count;
-    aim.current = next;
-    if (track.current) centre(track.current, next, !still);
-    setIndex(next);
-  };
-  // A swipe settles on a photo; the counter follows it
-  const settle = () => {
-    const list = track.current;
-    if (!list || aim.current !== null) return;
-    const nearest = nearestPhoto(list);
-    if (nearest !== index) setIndex(nearest);
-  };
-  // A glide that stopped short (a Next pressed before the last glide began, on a slow phone)
-  // goes the rest of the way at once, so the photo shown is always the one counted
-  const arrive = () => {
-    const list = track.current;
-    const target = aim.current;
-    aim.current = null;
-    if (list && target !== null && nearestPhoto(list) !== target) centre(list, target, false);
-  };
-  // The guest's own swipe, wheel or key: the counter follows the strip again
-  const takeOver = () => {
-    aim.current = null;
-  };
-
+  const [ref, seen] = useInView<HTMLLIElement>("0px 0px -10% 0px");
+  const mounted = useMounted();
   return (
-    <div
-      ref={area}
-      role="group"
-      aria-roledescription={words.label}
-      aria-labelledby="guest-photos"
-      className="mt-10 flex flex-col items-center gap-4"
-      onPointerEnter={() => setHolding(true)}
-      onPointerLeave={() => setHolding(false)}
-      onFocus={() => setHolding(true)}
-      onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) setHolding(false);
-      }}
-      onKeyDown={(event) => {
-        if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
-          event.preventDefault();
-          const back =
-            (event.key === "ArrowLeft") !==
-            (getComputedStyle(event.currentTarget).direction === "rtl");
-          go(index + (back ? -1 : 1));
-        }
-      }}
+    <li
+      ref={ref}
+      data-reveal={mounted ? (seen ? "in" : "wait") : undefined}
+      data-side={index % 2 === 0 ? "start" : "end"}
+      className={cn(layout === "cascade" ? "guest-cascade" : "guest-arch-tile", className)}
+      style={style}
     >
-      {/* Focusable so a keyboard can reach the scrolling strip; its arrow keys turn the photos */}
-      <ul
-        ref={track}
-        tabIndex={0}
-        onScroll={settle}
-        onScrollEnd={arrive}
-        onPointerDown={takeOver}
-        onWheel={takeOver}
-        onKeyDown={takeOver}
-        className="guest-gallery flex w-full snap-x snap-mandatory gap-8 overflow-x-auto px-[calc(50%-min(31vw,7.5rem))] pt-8 pb-10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring sm:gap-10"
-      >
-        {photos.map((photo, i) => (
-          <li
-            key={photo.id}
-            data-current={i === index || undefined}
-            aria-hidden={i !== index || undefined}
-            className="guest-photo guest-slide w-[min(62vw,15rem)] shrink-0 snap-center"
-          >
-            <Framed look={look}>
-              <FramedPhoto
-                photo={{ src: photo.url, alt: "", fit: photo.fit }}
-                alt={guestCopy.photoAlt(i + before + 1)}
-                frameAspect={GALLERY_ASPECT}
-                lazy={Math.abs(i - index) > 1}
-                onFail={onFail && (() => onFail(photo.id))}
-                className="size-full"
-              />
-            </Framed>
-          </li>
-        ))}
-      </ul>
-      {count > 1 && (
-        <div className="flex items-center gap-3">
-          {!still && (
-            <button
-              type="button"
-              onClick={() => setPaused((was) => !was)}
-              aria-label={paused ? words.play : words.pause}
-              className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-            >
-              {paused ? (
-                <Play aria-hidden className="size-4 fill-current rtl:-scale-x-100" />
-              ) : (
-                <Pause aria-hidden className="size-4 fill-current" />
-              )}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => go(index - 1)}
-            aria-label={words.previous}
-            className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
-          </button>
-          <p
-            aria-live={playing && !holding ? "off" : "polite"}
-            className="min-w-14 text-center font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-          >
-            <span aria-hidden>{`${index + 1} / ${count}`}</span>
-            <span className="sr-only">{words.position(index + 1, count)}</span>
-          </p>
-          <button
-            type="button"
-            onClick={() => go(index + 1)}
-            aria-label={words.next}
-            className="guest-step grid size-11 cursor-pointer place-items-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-          >
-            <ChevronRight aria-hidden className="size-5 rtl:rotate-180" />
-          </button>
-        </div>
-      )}
-    </div>
+      {children}
+    </li>
   );
 }
 
 /** Photos and family at dusk, under hanging lamps in a palace or over the water. */
 function Dusk({
   before,
+  photoHeading,
   photos,
   family,
   familyLang,
@@ -1136,6 +980,8 @@ function Dusk({
 }: {
   /** How many photos the welcome already shows, so these count on from there. */
   before: number;
+  /** The words over the photos, for the occasion (photo-words.ts). */
+  photoHeading: PhotoWords;
   photos: readonly GuestPhoto[];
   family: readonly FamilyBlock[];
   familyLang: string | undefined;
@@ -1159,22 +1005,18 @@ function Dusk({
           aria-labelledby="guest-photos"
           data-tour="9"
           data-layout={layouts.photos}
-          className={cn(
-            "relative isolate flex min-h-svh flex-col justify-center pt-20",
-            // The carousel's buttons stay clear of the floating music button
-            layouts.photos === "film" ? "pb-24" : "pb-6",
-          )}
+          className="relative isolate flex min-h-svh flex-col justify-center pt-20 pb-6"
         >
           {dress.framed.photos && <span aria-hidden className="guest-border" />}
           <div className="px-4 sm:px-6">
             <Heading
               id="guest-photos"
               lang={lang}
-              label={cardWords.photosLabel}
-              title={cardWords.photos}
+              label={photoHeading.label}
+              title={photoHeading.title}
             />
           </div>
-          {layouts.photos !== "film" && (
+          {(layouts.photos === "polaroids" || layouts.photos === "mosaic") && (
             <Reveal className="mx-auto mt-10 w-full max-w-4xl px-4 sm:px-6">
               <ul
                 className={cn(
@@ -1214,8 +1056,66 @@ function Dusk({
               </ul>
             </Reveal>
           )}
-          {layouts.photos === "film" && (
-            <PhotoCarousel photos={photos} before={before} look={look} onFail={onFail} />
+          {layouts.photos === "cascade" && (
+            // One column down the page, each photo set a little to its own side and tilted
+            <ul className="mx-auto mt-12 flex w-full max-w-2xl flex-col gap-12 px-4 pb-10 sm:gap-16 sm:px-6">
+              {photos.map((photo, index) => (
+                <PhotoTile
+                  key={photo.id}
+                  layout="cascade"
+                  index={index}
+                  className={cn(
+                    "w-[min(76vw,20rem)]",
+                    index % 2 === 0 ? "self-center sm:self-start" : "self-center sm:self-end",
+                  )}
+                  style={
+                    { "--tilt": `${CASCADE_TILT[index % CASCADE_TILT.length]}deg` } as CSSProperties
+                  }
+                >
+                  {/* By the water each photo bobs on its reflection (globals.css) */}
+                  <div className="guest-photo">
+                    <Framed look={look}>
+                      <FramedPhoto
+                        photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                        alt={guestCopy.photoAlt(index + before + 1)}
+                        frameAspect={GALLERY_ASPECT}
+                        lazy
+                        onFail={onFail && (() => onFail(photo.id))}
+                        className="size-full"
+                      />
+                    </Framed>
+                  </div>
+                </PhotoTile>
+              ))}
+            </ul>
+          )}
+          {layouts.photos === "arches" && (
+            // Two rows side by side, the second set lower, like windows down a haveli's wall
+            <ul className="mx-auto mt-12 grid w-full max-w-3xl grid-cols-2 gap-x-4 gap-y-8 px-4 pb-16 sm:gap-x-10 sm:gap-y-12 sm:px-6">
+              {photos.map((photo, index) => (
+                <PhotoTile
+                  key={photo.id}
+                  layout="arches"
+                  index={index}
+                  className={cn(
+                    // One photo alone sits in the middle; otherwise the second row steps down
+                    photos.length === 1 && "col-span-2 mx-auto w-1/2",
+                    index % 2 === 1 && "translate-y-10 sm:translate-y-16",
+                  )}
+                >
+                  <div className="guest-arch-photo relative aspect-[3/4] overflow-hidden">
+                    <FramedPhoto
+                      photo={{ src: photo.url, alt: "", fit: photo.fit }}
+                      alt={guestCopy.photoAlt(index + before + 1)}
+                      frameAspect={GALLERY_ASPECT}
+                      lazy
+                      onFail={onFail && (() => onFail(photo.id))}
+                      className="size-full"
+                    />
+                  </div>
+                </PhotoTile>
+              ))}
+            </ul>
           )}
         </section>
       )}
