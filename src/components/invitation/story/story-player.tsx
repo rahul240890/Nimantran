@@ -1211,7 +1211,8 @@ export function StoryPage({
 }
 
 /** The room a function page's dock takes at the foot of the page, kept clear of the words. */
-const DOCK_CLEAR = "calc(env(safe-area-inset-bottom) + 6.25rem)";
+// --dock-lift raises it where the page below overlaps this one's foot (the one-scroll flow)
+const DOCK_CLEAR = "calc(env(safe-area-inset-bottom) + 6.25rem + var(--dock-lift, 0px))";
 
 /** Keeps the words' area above the dock on a page that has one. */
 function clearDock(style: CSSProperties | undefined, dock: boolean): CSSProperties | undefined {
@@ -1242,7 +1243,7 @@ function PageDock({
   return (
     <div
       className={cn(
-        "absolute inset-x-0 bottom-[max(1rem,env(safe-area-inset-bottom))] z-10 flex justify-center gap-8",
+        "absolute inset-x-0 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+var(--dock-lift,0px))] z-10 flex justify-center gap-8",
         !still && "story-dock",
       )}
     >

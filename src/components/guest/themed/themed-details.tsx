@@ -1,7 +1,7 @@
 "use client";
 
 import { format, parseISO } from "date-fns";
-import { CalendarPlus, ChevronLeft, ChevronRight, Navigation, Pause, Play } from "lucide-react";
+import { CalendarPlus, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { Image } from "@/components/ui/image";
 import {
   useEffect,
@@ -728,10 +728,11 @@ function Celebrations({
   /** Only the day's plan, each with its way there: each celebration had its own page above. */
   short?: boolean;
 }) {
-  const { guestCopy, invitation } = useGuestText();
+  const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
-  const plan = layouts.plan;
+  // On the scroll the plan is a plain list, one celebration under another
+  const plan = short ? "cards" : layouts.plan;
   // On a timeline the thread itself is the day's plan, so the list above it is left out
   const line = !short && layouts.hours === "timeline";
   return (
@@ -743,6 +744,8 @@ function Celebrations({
           "guest-sky guest-sky-flat relative isolate px-4 pt-4 pb-10 sm:px-6",
           // With more than one celebration, the day's plan fills a screen of its own first
           functions.length > 1 && "flex min-h-svh flex-col justify-center py-16",
+          // On the scroll the list keeps well clear of the painted frame round it
+          short && "px-9 sm:px-12",
         )}
       >
         <Wash
@@ -771,13 +774,7 @@ function Celebrations({
               )}
             >
               {functions.map((fn) => (
-                <li
-                  key={fn.kind}
-                  className={cn(
-                    plan === "timeline" && "relative ps-9",
-                    short && "flex flex-col items-stretch gap-1",
-                  )}
-                >
+                <li key={fn.kind} className={cn(plan === "timeline" && "relative ps-9")}>
                   {plan === "timeline" && (
                     <span aria-hidden className="guest-timeline-dot absolute start-0 top-4" />
                   )}
@@ -800,21 +797,6 @@ function Celebrations({
                       </span>
                     )}
                   </a>
-                  {short && fn.mapsUrl && (
-                    <a
-                      href={fn.mapsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        "inline-flex min-h-11 items-center gap-1.5 self-center rounded-full px-3 text-ui text-accent-text underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
-                        plan === "timeline" && "self-start",
-                      )}
-                    >
-                      <Navigation aria-hidden className="size-4" />
-                      {invitation.story.directions}
-                      <span className="sr-only">: {fn.name}</span>
-                    </a>
-                  )}
                 </li>
               ))}
             </ol>

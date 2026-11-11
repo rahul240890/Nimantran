@@ -10061,3 +10061,35 @@ html:has(.guest-snap) {
     animation: none;
   }
 }
+/* Behind the one-scroll invitation, where a phone pulls past its ends: the opening's night */
+html:has(.guest-flow) {
+  background-color: var(--night);
+}
+
+/* The scratched date settles in with a small bounce once the foil falls away */
+@keyframes scratch-pop {
+  0% {
+    transform: scale(0.92);
+  }
+  60% {
+    transform: scale(1.04);
+  }
+}
+@layer components {
+  .scratch-pop {
+    animation: scratch-pop 0.6s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  }
+}
+
+/*
+ * One-scroll flow: the theme's own parts below the pages fade in from what is above them,
+ * as the pages do, so the whole invitation reads as one long painted page.
+ */
+.guest-flow .guest-themed {
+  margin-top: -9svh;
+  mask-image: linear-gradient(to bottom, transparent, black 9svh);
+}
+.guest-flow .guest-themed > :is(section, [data-mood]) + :is(section, [data-mood]) {
+  margin-top: -6svh;
+  mask-image: linear-gradient(to bottom, transparent, black 6svh);
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { pageImage, StoryPage, type StoryLabels } from "@/components/invitation/story/story-player";
 import { SuiteBackdrop } from "@/components/invitation/story/suite-backdrop";
 import { useInView } from "@/components/guest/themed/use-in-view";
@@ -18,8 +18,7 @@ import { useReducedMotion } from "@/lib/use-reduced-motion";
  * One-scroll flow (prototype, 2026-11-11): the invitation's pages one under another, a
  * screen each, instead of the reel that swiped across them. Each page plays its own way in
  * (lines rising, names revealed, the painting's slow push-in) as the guest scrolls to it,
- * and the page snaps a screen at a time as the reel did. The guest tour scrolls through
- * them by itself after the gates, each page staying as long as it stayed in the reel.
+ * and the page scrolls freely, one painting running into the next like one long page.
  */
 
 type StoryScrollProps = {
@@ -33,11 +32,19 @@ type StoryScrollProps = {
   lang: string;
 };
 
-export function StoryScroll({ beats, ...rest }: StoryScrollProps) {
+type StoryListProps = StoryScrollProps & {
+  /** A part of the page of its own (the scratch-card date), placed after one of the pages. */
+  insert?: { after: string; node: ReactNode } | null;
+};
+
+export function StoryScroll({ beats, insert, ...rest }: StoryListProps) {
   return (
     <div data-story-scroll className="contents">
       {beats.map((beat) => (
-        <ScrollPage key={beat.id} beat={beat} {...rest} />
+        <Fragment key={beat.id}>
+          <ScrollPage beat={beat} {...rest} />
+          {insert?.after === beat.id && insert.node}
+        </Fragment>
       ))}
     </div>
   );
@@ -72,7 +79,13 @@ export function ScrollPage({
       data-mood={look.mood}
       lang={lang}
       className={cn(
+        // Each page slides a little under the one above and fades in from it, so the
+        // paintings run on as one long page rather than meeting at a hard edge
         "story-scroll-page relative isolate flex h-svh justify-center overflow-hidden",
+        "not-first:-mt-[9svh] not-first:[mask-image:linear-gradient(to_bottom,transparent,black_9svh)]",
+        // The page below covers this one's foot, so the links and words keep above it, and
+        // only the links take taps: a touch on the faded edge reaches the page beneath
+        "pointer-events-none [--dock-lift:9svh] [&_:is(a,button)]:pointer-events-auto",
         themed ? "bg-suite-near" : "bg-card-back",
       )}
       style={themed ? undefined : stockStyle(template)}

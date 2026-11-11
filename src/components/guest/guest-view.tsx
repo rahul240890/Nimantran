@@ -18,6 +18,7 @@ import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { GuestTour } from "@/components/guest/guest-tour";
 import { ScrollPage, StoryScroll } from "@/components/guest/story-scroll";
+import { ScratchDate } from "@/components/guest/scratch-date";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { CountdownFinale } from "@/components/guest/countdown-finale";
@@ -268,10 +269,30 @@ export function GuestView({
   // One Scene keeps its own painting; every other invitation can run down one scroll
   const scroll = flow === "scroll" && !scene;
   // On the scroll the closing page comes last, after the reply
+  // and the day itself comes on a scratch card of its own after the family's pages
+  const saveTheDate = CARD_STORY_WORDS[language].saveTheDate;
   const scrollBeats = useMemo(
-    () => (scroll ? story.beats.filter((beat) => beat.id !== "reply") : []),
-    [scroll, story.beats],
+    () =>
+      scroll
+        ? story.beats
+            .filter((beat) => beat.id !== "reply")
+            .map((beat) =>
+              beat.scene === "family" && mainDate
+                ? {
+                    ...beat,
+                    lines: beat.lines.filter(
+                      (line) =>
+                        line.style !== "date" &&
+                        !(line.style === "label" && line.text === saveTheDate),
+                    ),
+                  }
+                : beat,
+            )
+            .filter((beat) => beat.lines.length > 0 || beat.scene !== "family")
+        : [],
+    [scroll, story.beats, mainDate, saveTheDate],
   );
+  const lastFamily = scrollBeats.findLast((beat) => beat.scene === "family")?.id;
   const closingBeat = scroll ? story.beats.find((beat) => beat.id === "reply") : undefined;
   // One Scene ends on the same welcome as the last of the pages, in the host's words if
   // they changed it
@@ -422,7 +443,7 @@ export function GuestView({
         ref={pageRoot}
         lang={language}
         data-invitation
-        className="guest-snap flex min-h-dvh flex-col"
+        className={cn(scroll ? "guest-flow" : "guest-snap", "flex min-h-dvh flex-col")}
       >
         <GuestPrelude
           suite={suite}
@@ -515,6 +536,7 @@ export function GuestView({
                 musicOnOpen={draft.music.playOnOpen}
                 guest={guestName}
                 onCarryOn={() => setTour((was) => was + 1)}
+                plain={scroll}
                 replay={again}
                 after={
                   scene
@@ -522,10 +544,17 @@ export function GuestView({
                     : scroll
                       ? {
                           kind: "enter",
-                          // Once the gates have opened, the page carries on down by itself
+                          // Once the gates have opened, the page glides down to the cover once;
+                          // from there the guest scrolls it like any page, with no snapping
                           onEnter: () => {
                             setEntered(true);
-                            setTour((was) => was + 1);
+                            requestAnimationFrame(() =>
+                              document.getElementById("cover")?.scrollIntoView({
+                                behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+                                  ? "auto"
+                                  : "smooth",
+                              }),
+                            );
                           },
                         }
                       : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
@@ -537,6 +566,21 @@ export function GuestView({
               {scroll && (
                 <StoryScroll
                   beats={scrollBeats}
+                  insert={
+                    mainDate
+                      ? {
+                          after: lastFamily ?? "cover",
+                          node: (
+                            <ScratchDate
+                              suite={suite}
+                              date={mainDate}
+                              label={saveTheDate}
+                              lang={language}
+                            />
+                          ),
+                        }
+                      : null
+                  }
                   copy={copy}
                   template={template}
                   suite={suite}
@@ -693,19 +737,21 @@ export function GuestView({
                 />
               )}
             </div>
-            <GuestTour
-              root={tourRoot}
-              run={tour}
-              stop={again}
-              music={music}
-              labels={invitation.tour}
-              musicLabels={
-                look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
-              }
-              onEnd={() => setAwake(false)}
-              onAgain={replayable ? openAgain : undefined}
-              againLabel={invitation.tour.again}
-            />
+            {!scroll && (
+              <GuestTour
+                root={tourRoot}
+                run={tour}
+                stop={again}
+                music={music}
+                labels={invitation.tour}
+                musicLabels={
+                  look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
+                }
+                onEnd={() => setAwake(false)}
+                onAgain={replayable ? openAgain : undefined}
+                againLabel={invitation.tour.again}
+              />
+            )}
             {!preview && !sample && <PhotoWall slug={slug} />}
           </main>
 
