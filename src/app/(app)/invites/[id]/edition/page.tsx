@@ -147,6 +147,13 @@ export default async function EditionPage({
   const ready = !active || planShortfalls(draft, current, design).length === 0;
   const publishHref =
     publish === "1" && !draft.slug && owner ? `${designPageHref(draft)}&publish=1` : null;
+  // However the host got here, a paid invite that isn't live yet is pointed at publishing:
+  // its link to share comes only with that
+  const goLive =
+    publishHref ??
+    (active && current.plan !== "free" && !draft.slug && owner
+      ? `${designPageHref(draft)}&publish=1`
+      : null);
 
   return (
     <PageTransition>
@@ -194,7 +201,7 @@ export default async function EditionPage({
               </Button>
             </div>
           )}
-          {publishHref && ready && (current.plan !== "free" || !active) && (
+          {goLive && ready && (current.plan !== "free" || !active) && (
             <div
               role="status"
               className="flex max-w-2xl flex-col gap-4 rounded-lg border border-success/40 bg-success/5 p-5 sm:flex-row sm:items-center"
@@ -204,7 +211,7 @@ export default async function EditionPage({
                 {active ? upgradeCopy.publishBody : upgradeCopy.publishFreeBody}
               </p>
               <Button asChild>
-                <Link href={publishHref}>
+                <Link href={goLive}>
                   <Globe aria-hidden />
                   {upgradeCopy.publishNow}
                 </Link>

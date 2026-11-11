@@ -3,10 +3,15 @@
 import { formatDistanceToNow, format, parseISO } from "date-fns";
 import {
   ArrowRight,
+  BadgeCheck,
   CalendarDays,
+  Download,
+  Film,
   CloudAlert,
   FilePlus2,
+  Globe,
   HardDrive,
+  Images,
   Send,
   Trash2,
   Users,
@@ -28,6 +33,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/toast";
 import { useLocale, useText } from "@/i18n/client";
 import { accountText } from "@/i18n/copy/account";
+import { editionsText } from "@/i18n/copy/editions";
 import { editorText } from "@/i18n/copy/editor";
 import { dateLocale } from "@/i18n/dates";
 import { cn } from "@/lib/cn";
@@ -45,6 +51,7 @@ import { inviteDraft } from "@/lib/editor/store";
 import type { InviteSummary } from "@/lib/invites/rows";
 import { SUITES, suiteFor, type SuiteId } from "@/lib/suites/catalog";
 import { isTemplateId, type TemplateId } from "@/lib/templates/ids";
+import type { PlanId } from "@/lib/plans/catalog";
 
 const noop = () => () => {};
 
@@ -191,6 +198,46 @@ function DeleteInvite({ invite, title }: { invite: InviteSummary; title: string 
   );
 }
 
+/** A live invite's video and cards, to save to the phone and send anywhere. */
+function DownloadInvite({ inviteId, title }: { inviteId: string; title: string }) {
+  const { invitesCopy } = useText(accountText);
+  const copy = invitesCopy.download;
+  const [open, setOpen] = useState(false);
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <Button size="sm" variant="secondary" onClick={() => setOpen(true)}>
+        <Download aria-hidden />
+        {copy.label}
+      </Button>
+      <DialogContent title={`${copy.title}: ${title}`} closeLabel={copy.close}>
+        <div className="flex flex-col gap-3">
+          <p className="text-ink-muted">{copy.body}</p>
+          <Button
+            asChild
+            variant="secondary"
+            className="h-auto justify-start py-2.5 text-start whitespace-normal"
+          >
+            <Link href={`/invites/${inviteId}/video`}>
+              <Film aria-hidden />
+              {copy.video}
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="secondary"
+            className="h-auto justify-start py-2.5 text-start whitespace-normal"
+          >
+            <Link href={`/invites/${inviteId}/cards`}>
+              <Images aria-hidden />
+              {copy.cards}
+            </Link>
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 function SectionHeading({
   id,
   icon,
@@ -221,7 +268,15 @@ function SectionHeading({
  * the account yet (made before signing in, or while offline). invites is null when the
  * account's list couldn't be read.
  */
-export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
+export function MyInvites({
+  invites,
+  plans = {},
+}: {
+  invites: InviteSummary[] | null;
+  /** The package each invite has on its design; missing while payments are off. */
+  plans?: Partial<Record<string, PlanId>>;
+}) {
+  const { planCopy } = useText(editionsText);
   const { invitesCopy } = useText(accountText);
   const { stepCopy } = useText(editorText);
   const locale = useLocale();
@@ -339,6 +394,8 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                 invite.second,
                 invitesCopy.untitled,
               );
+              const plan = plans[invite.id];
+              const paid = plan && plan !== "free" ? plan : null;
               return (
                 <li key={invite.id}>
                   <InviteCard
@@ -363,6 +420,12 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                         ) : (
                           <Badge tone="neutral">{invitesCopy.status.draft}</Badge>
                         )}
+                        {paid && (
+                          <Badge tone="gold">
+                            <BadgeCheck aria-hidden className="me-1 -mt-0.5 inline size-3.5" />
+                            {`${invitesCopy.paid} · ${planCopy[paid].name}`}
+                          </Badge>
+                        )}
                         {invite.role === "cohost" && (
                           <Badge tone="rose">{invitesCopy.cohost}</Badge>
                         )}
@@ -371,20 +434,32 @@ export function MyInvites({ invites }: { invites: InviteSummary[] | null }) {
                     href={`/create?invite=${invite.id}`}
                     secondary={
                       <div className="flex flex-wrap gap-2">
+                        {/* Paid for but not live yet: publishing is what gives it a link */}
+                        {paid && invite.status !== "published" && invite.role === "owner" && (
+                          <Button asChild size="sm">
+                            <Link href={`/create?invite=${invite.id}&publish=1`}>
+                              <Globe aria-hidden />
+                              {invitesCopy.publish}
+                            </Link>
+                          </Button>
+                        )}
+                        {invite.status === "published" && (
+                          <>
+                            <Button asChild size="sm">
+                              <Link href={`/invites/${invite.id}/share`}>
+                                <Send aria-hidden className="rtl:-scale-x-100" />
+                                {invitesCopy.share}
+                              </Link>
+                            </Button>
+                            <DownloadInvite inviteId={invite.id} title={title} />
+                          </>
+                        )}
                         <Button asChild size="sm" variant="secondary">
                           <Link href={`/invites/${invite.id}`}>
                             <Users aria-hidden />
                             {invitesCopy.guests}
                           </Link>
                         </Button>
-                        {invite.status === "published" && (
-                          <Button asChild size="sm">
-                            <Link href={`/invites/${invite.id}/share`}>
-                              <Send aria-hidden className="rtl:-scale-x-100" />
-                              {invitesCopy.share}
-                            </Link>
-                          </Button>
-                        )}
                       </div>
                     }
                     action={

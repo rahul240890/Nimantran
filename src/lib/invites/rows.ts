@@ -12,6 +12,7 @@ import {
 import { parseDraft } from "@/lib/editor/draft-checks";
 import { isTemplateId } from "@/lib/templates/ids";
 import { suiteFor, type SuiteId } from "@/lib/suites/catalog";
+import { draftDesignId } from "@/lib/plans/design-defaults";
 
 /*
  * An invite as the database stores it (supabase/migrations): one events row, one
@@ -195,6 +196,8 @@ export type InviteSummary = {
   mainFunction: FunctionId | null;
   /** The painted theme its pages use, for its picture in My invites. */
   theme: SuiteId;
+  /** The design it's made with, which a package is bought for. */
+  designId: string;
   updatedAt: number;
   /** Whether this person made the invite or helps run it (Step 11). */
   role: "owner" | "cohost";
@@ -231,6 +234,7 @@ export function summarize(
       templateId: draft.templateId,
       category: draft.categoryId,
     }),
+    designId: draftDesignId(draft),
     updatedAt: draft.updatedAt,
     role,
   };
