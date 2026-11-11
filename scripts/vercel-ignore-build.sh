@@ -3,6 +3,13 @@
 # Every build is billed in build CPU minutes, and every deployment it leaves is billed for storage,
 # so Vercel builds only what reaches the live site. Pull requests are checked by GitHub CI instead.
 
+# Prototype review (2026-11-11): the one-scroll branch builds its preview so the owner can
+# try it from a link. Take this out before the branch is merged.
+if [ "$VERCEL_GIT_COMMIT_REF" = "claude/project-thread-fnqmag" ]; then
+  echo "Building the preview for the one-scroll prototype."
+  exit 1
+fi
+
 if [ "$VERCEL_ENV" != "production" ]; then
   echo "Skipping: preview deployment ($VERCEL_GIT_COMMIT_REF). GitHub CI checks pull requests."
   exit 0
