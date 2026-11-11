@@ -1,13 +1,13 @@
 "use client";
 
-import { Fragment, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useEffect, type CSSProperties, type ReactNode } from "react";
 import { pageImage, StoryPage, type StoryLabels } from "@/components/invitation/story/story-player";
 import { SuiteBackdrop } from "@/components/invitation/story/suite-backdrop";
 import { useInView } from "@/components/guest/themed/use-in-view";
 import { cn } from "@/lib/cn";
 import type { PageType } from "@/lib/editor/type";
 import type { StoryBeat } from "@/lib/engine/story";
-import { usePaintingBlur } from "@/lib/paintings";
+import { usePaintingBlur, warmPaintings } from "@/lib/paintings";
 import { SUITES, pageLook, type SuiteId } from "@/lib/suites/catalog";
 import type { CardCopy } from "@/lib/templates/content";
 import type { Template } from "@/lib/templates/schema";
@@ -38,6 +38,10 @@ type StoryListProps = StoryScrollProps & {
 };
 
 export function StoryScroll({ beats, insert, ...rest }: StoryListProps) {
+  // Every page's painting starts loading at once, the nearest first, as the reel's did
+  useEffect(() => {
+    warmPaintings(beats.flatMap((beat) => pageImage(rest.suite, beat) ?? []));
+  }, [beats, rest.suite]);
   return (
     <div data-story-scroll className="contents">
       {beats.map((beat) => (
@@ -64,8 +68,10 @@ export function ScrollPage({
   const suite = SUITES[suiteId];
   const themed = suite.art !== "card";
   const still = useReducedMotion();
-  // The page plays in once half of it is on screen, and stays played
-  const [ref, seen] = useInView<HTMLElement>("0px 0px -45% 0px");
+  // The page is drawn, painting and all, well before it scrolls up, so the guest never
+  // sees it arrive; its words and moves wait, paused, until it is on screen, then play once
+  const [ref, near] = useInView<HTMLElement>("150% 0px 150% 0px");
+  const [seenRef, seen] = useInView<HTMLDivElement>("0px 0px -35% 0px");
   const image = pageImage(suiteId, beat);
   const blur = usePaintingBlur(image);
   const look = pageLook(beat.scene);
@@ -78,6 +84,7 @@ export function ScrollPage({
       data-suite={suiteId}
       data-mood={look.mood}
       lang={lang}
+      data-seen={seen || undefined}
       className={cn(
         // Each page slides a little under the one above and fades in from it, so the
         // paintings run on as one long page rather than meeting at a hard edge
@@ -104,10 +111,11 @@ export function ScrollPage({
         </div>
       )}
       <div
+        ref={seenRef}
         className="[container-type:size] relative h-full w-full overflow-hidden md:max-w-[min(100%,calc(100svh*768/1365))] md:shadow-overlay"
         style={{ "--story-scale": type?.scale ?? 1 } as CSSProperties}
       >
-        {seen ? (
+        {near && (
           <StoryPage
             beat={beat}
             copy={copy}
@@ -120,19 +128,7 @@ export function ScrollPage({
             onReply={() => {}}
             inert={false}
             lang={lang}
-            className="story-scroll-in"
           />
-        ) : (
-          // Until it comes into view: the painting's blurred copy, so the page is never blank
-          themed && (
-            <SuiteBackdrop
-              suite={suite}
-              image={blur ? undefined : image}
-              placeholder={blur}
-              lazy
-              className="absolute inset-0 overflow-hidden"
-            />
-          )
         )}
       </div>
     </section>

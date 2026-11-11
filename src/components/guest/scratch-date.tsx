@@ -1,19 +1,24 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Hand, Sparkles } from "lucide-react";
+import { useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from "react";
 import { SuiteBackdrop } from "@/components/invitation/story/suite-backdrop";
 import { cn } from "@/lib/cn";
 import { usePaintingBlur } from "@/lib/paintings";
 import { SUITES, type SuiteId } from "@/lib/suites/catalog";
+import { useVisitSeed } from "@/lib/suites/section-dress";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 /*
- * Save the date as a scratch card (prototype, 2026-11-11): a gold foil sticker over the
- * wedding day that the guest rubs away with a finger or the mouse. Once about half is gone
- * the rest falls away by itself. A button under it shows the date at once, for the
- * keyboard, screen readers and anyone who would rather not scratch.
+ * Save the date as a scratch card (prototype, 2026-11-11): a foil sticker over the wedding
+ * day that the guest rubs away with a finger or the mouse. Each visit draws its own sticker:
+ * a shape (round, arch, tile or ticket), a foil (gold, rose gold, silver or kumkum), a
+ * pattern pressed into it, and the way the day arrives once it is scratched (petals,
+ * sparkles or confetti). Until the first touch the foil glints and a hand shows how. Once
+ * about half is gone the rest falls away by itself. A button under it shows the date at
+ * once, for the keyboard, screen readers and anyone who would rather not scratch.
+ * ?scratch=N fixes the draw, to review one sticker.
  */
 
 /** The sticker's few words, in the card's language. Drafts for a native proofreader. */
@@ -25,6 +30,23 @@ const SCRATCH_WORDS: Record<CardLanguage, { scratch: string; show: string }> = {
   bn: { scratch: "ঘষে দেখুন", show: "তারিখ দেখান" },
   ta: { scratch: "சுரண்டிப் பாருங்கள்", show: "தேதியைக் காட்டு" },
 };
+
+const SHAPES = ["round", "arch", "tile", "ticket"] as const;
+const FOILS = ["gold", "rose", "silver", "kumkum"] as const;
+const PATTERNS = ["speckle", "stripes", "rings"] as const;
+const BURSTS = ["petals", "sparkles", "confetti"] as const;
+type Shape = (typeof SHAPES)[number];
+type Foil = (typeof FOILS)[number];
+
+/** Each shape's frame: its proportions and how its edge is cut, on the foil and the day alike. */
+const SHAPE_CLASS: Record<Shape, string> = {
+  round: "aspect-square w-[min(72vw,19rem)] rounded-full",
+  arch: "aspect-[4/5] w-[min(66vw,17rem)] rounded-t-full rounded-b-3xl",
+  tile: "aspect-square w-[min(70vw,18rem)] rotate-3 rounded-[2rem]",
+  ticket: "scratch-ticket aspect-[5/4] w-[min(80vw,21rem)] rounded-2xl",
+};
+
+const noSubscribe = () => () => {};
 
 /** Share of the foil that must be rubbed away before the rest falls by itself. */
 const CLEARED = 0.45;
@@ -45,11 +67,13 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
   const blur = usePaintingBlur(image);
   const still = useReducedMotion();
   const words = SCRATCH_WORDS[lang];
+  const look = useScratchLook();
   const [revealed, setRevealed] = useState(false);
+  const [touched, setTouched] = useState(false);
   const canvas = useRef<HTMLCanvasElement>(null);
   const parts = dateParts(date, lang);
 
-  // Lays the foil: the theme's gold, a soft sheen and its words
+  // Lays the foil: its colours, a sheen, the pattern pressed into it and its words
   useEffect(() => {
     const node = canvas.current;
     if (!node || revealed) return;
@@ -61,42 +85,56 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
       node.height = Math.round(box.height * scale);
       const ctx = node.getContext("2d");
       if (!ctx) return;
-      ctx.scale(scale, scale);
-      const style = getComputedStyle(node);
-      const gold = style.getPropertyValue("--card-gold").trim() || "goldenrod";
-      const ink = style.getPropertyValue("--card-ink").trim() || "black";
-      const ivory = style.getPropertyValue("--card-ivory").trim() || "white";
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
       const { width: w, height: h } = box;
+      const colours = foilColours(node, look.foil);
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = gold;
+      const base = ctx.createLinearGradient(0, 0, w, h);
+      base.addColorStop(0, colours.light);
+      base.addColorStop(0.45, colours.base);
+      base.addColorStop(0.7, colours.light);
+      base.addColorStop(1, colours.deep);
+      ctx.fillStyle = base;
       ctx.fillRect(0, 0, w, h);
-      // A sheen across the foil, light to dark, so it reads as metal rather than paint
-      const sheen = ctx.createLinearGradient(0, 0, w, h);
-      sheen.addColorStop(0, "rgba(255,255,255,0.55)");
-      sheen.addColorStop(0.35, "rgba(255,255,255,0)");
-      sheen.addColorStop(0.6, "rgba(255,255,255,0.35)");
-      sheen.addColorStop(1, "rgba(0,0,0,0.18)");
-      ctx.fillStyle = sheen;
-      ctx.fillRect(0, 0, w, h);
-      // Fine speckle, like a lottery card's foil
-      ctx.fillStyle = ivory;
-      for (let i = 0; i < 260; i++) {
-        ctx.globalAlpha = 0.12 + ((i * 37) % 10) / 40;
-        ctx.fillRect(((i * 97) % 997) * (w / 997), ((i * 61) % 991) * (h / 991), 1.5, 1.5);
+      ctx.fillStyle = colours.mark;
+      ctx.strokeStyle = colours.mark;
+      if (look.pattern === "speckle") {
+        for (let i = 0; i < 320; i++) {
+          ctx.globalAlpha = 0.15 + ((i * 37) % 10) / 30;
+          ctx.fillRect(((i * 97) % 997) * (w / 997), ((i * 61) % 991) * (h / 991), 1.6, 1.6);
+        }
+      } else if (look.pattern === "stripes") {
+        ctx.globalAlpha = 0.18;
+        ctx.lineWidth = 6;
+        for (let x = -h; x < w + h; x += 18) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x + h, h);
+          ctx.stroke();
+        }
+      } else {
+        // Rings round the middle, like a rangoli pressed into the foil
+        ctx.globalAlpha = 0.22;
+        ctx.lineWidth = 1.5;
+        for (let r = 14; r < Math.max(w, h); r += 14) {
+          ctx.beginPath();
+          ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
       }
       ctx.globalAlpha = 1;
-      ctx.fillStyle = ink;
+      ctx.fillStyle = colours.ink;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       const family = getComputedStyle(document.documentElement)
         .getPropertyValue("--font-card-label")
         .trim();
       ctx.font = `600 ${Math.round(Math.min(w, h) * 0.085)}px ${family || "serif"}`;
-      ctx.fillText(words.scratch, w / 2, h / 2, w * 0.86);
+      ctx.fillText(words.scratch, w / 2, h * 0.42, w * 0.82);
     };
     paint();
     void document.fonts?.ready.then(paint);
-  }, [revealed, words.scratch]);
+  }, [revealed, words.scratch, look.foil, look.pattern]);
 
   // Rubbing: each stroke clears a soft round path; enough cleared and the foil falls away
   const drawing = useRef<{ x: number; y: number } | null>(null);
@@ -105,6 +143,7 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
     const node = canvas.current;
     const ctx = node?.getContext("2d");
     if (!node || !ctx) return;
+    if (!touched) setTouched(true);
     const box = node.getBoundingClientRect();
     const at = { x: x - box.left, y: y - box.top };
     const from = drawing.current ?? at;
@@ -119,7 +158,7 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
     drawing.current = at;
     // Checking every pixel is slow on a phone, so only every few strokes
     strokes.current += 1;
-    if (strokes.current % 6 === 0 && clearedShare(node) >= CLEARED) setRevealed(true);
+    if (strokes.current % 6 === 0 && clearedShare(node, look.shape) >= CLEARED) setRevealed(true);
   };
 
   return (
@@ -141,7 +180,6 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
             suite={suite}
             image={image}
             placeholder={blur}
-            lazy
             className="absolute inset-0 scale-110 opacity-70 blur-2xl"
           />
           <div className="absolute inset-0 bg-scrim/40" />
@@ -154,7 +192,6 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
               suite={suite}
               image={image}
               placeholder={blur}
-              lazy
               className="absolute inset-0 overflow-hidden"
             />
             <div className="absolute inset-0 bg-card-ivory/35" />
@@ -168,12 +205,20 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
           >
             {label}
           </h2>
-          <div className="relative aspect-square w-[min(72vw,19rem)]">
+          <div
+            data-shape={look.shape}
+            className={cn(
+              "relative",
+              SHAPE_CLASS[look.shape],
+              // Until the first touch the sticker breathes, asking to be scratched
+              !touched && !revealed && !still && "scratch-breathe",
+            )}
+          >
             {/* The day under the foil */}
             <div
               lang={lang}
               className={cn(
-                "absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full border-2 border-card-gold bg-card-ivory/95 text-card-ink shadow-overlay",
+                "absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden [border-radius:inherit] border-2 border-card-gold bg-card-ivory text-card-ink shadow-overlay",
                 revealed && !still && "scratch-pop",
               )}
             >
@@ -189,7 +234,7 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
               <canvas
                 ref={canvas}
                 aria-hidden
-                className="absolute inset-0 size-full cursor-grab touch-none rounded-full shadow-overlay"
+                className="absolute inset-0 size-full cursor-grab touch-none [border-radius:inherit] shadow-overlay"
                 onPointerDown={(event) => {
                   event.currentTarget.setPointerCapture(event.pointerId);
                   drawing.current = null;
@@ -203,10 +248,21 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
                 onPointerUp={() => {
                   drawing.current = null;
                   const node = canvas.current;
-                  if (node && clearedShare(node) >= CLEARED) setRevealed(true);
+                  if (node && clearedShare(node, look.shape) >= CLEARED) setRevealed(true);
                 }}
               />
             )}
+            {/* A glint across the foil and a hand showing how, until the first touch */}
+            {!touched && !revealed && !still && (
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-0 overflow-hidden [border-radius:inherit]"
+              >
+                <span className="scratch-glint absolute inset-y-0 -left-1/2 w-1/3" />
+                <Hand className="scratch-hand absolute top-[62%] left-[38%] size-9 text-card-ivory drop-shadow-md" />
+              </span>
+            )}
+            {revealed && !still && <Burst kind={look.burst} />}
           </div>
           {/* The date in words for screen readers, and the way to it without scratching */}
           <p className="sr-only" aria-live="polite">
@@ -230,19 +286,128 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
   );
 }
 
-/** How much of the round foil has been rubbed away, sampling a grid inside the circle. */
-function clearedShare(node: HTMLCanvasElement): number {
+/** This visit's sticker: from the visit's own seed, or ?scratch=N to review one. */
+function useScratchLook() {
+  const seed = useVisitSeed();
+  // Read only once hydrated, so the first paint matches the server's
+  const asked = useSyncExternalStore(
+    noSubscribe,
+    () => Number(new URLSearchParams(window.location.search).get("scratch") ?? NaN),
+    () => NaN,
+  );
+  const n = Number.isInteger(asked) && asked >= 0 ? asked : seed;
+  return {
+    shape: SHAPES[n % SHAPES.length]!,
+    foil: FOILS[Math.floor(n / SHAPES.length) % FOILS.length]!,
+    pattern: PATTERNS[Math.floor(n / 7) % PATTERNS.length]!,
+    burst: BURSTS[Math.floor(n / 5) % BURSTS.length]!,
+  };
+}
+
+/** The foil's colours, from the card's own tokens, mixed by the page for the canvas. */
+function foilColours(node: HTMLElement, foil: Foil) {
+  const style = getComputedStyle(node);
+  const token = (name: string, fallback: string) => style.getPropertyValue(name).trim() || fallback;
+  const gold = token("--card-gold", "goldenrod");
+  const accent = token("--card-accent", "firebrick");
+  const ink = token("--card-ink", "black");
+  const ivory = token("--card-ivory", "white");
+  const rose = token("--rose", "palevioletred");
+  const kumkum = token("--card-back", "maroon");
+  const mix = (a: string, share: number, b: string) => `color-mix(in oklab, ${a} ${share}%, ${b})`;
+  const set: Record<
+    Foil,
+    { base: string; light: string; deep: string; mark: string; ink: string }
+  > = {
+    gold: {
+      base: gold,
+      light: mix(gold, 55, ivory),
+      deep: mix(gold, 70, ink),
+      mark: ivory,
+      ink,
+    },
+    rose: {
+      base: mix(gold, 45, rose),
+      light: mix(rose, 35, ivory),
+      deep: mix(rose, 75, ink),
+      mark: ivory,
+      ink,
+    },
+    silver: {
+      base: mix(ivory, 70, ink),
+      light: ivory,
+      deep: mix(ivory, 45, ink),
+      mark: ivory,
+      ink,
+    },
+    kumkum: {
+      base: kumkum,
+      light: mix(kumkum, 70, accent),
+      deep: mix(kumkum, 70, ink),
+      mark: gold,
+      ink: ivory,
+    },
+  };
+  // A canvas may not read every CSS colour (color-mix), so the page resolves each first
+  const probe = document.createElement("span");
+  node.parentElement?.append(probe);
+  const resolve = (colour: string) => {
+    probe.style.color = colour;
+    return getComputedStyle(probe).color;
+  };
+  const chosen = set[foil];
+  const out = {
+    base: resolve(chosen.base),
+    light: resolve(chosen.light),
+    deep: resolve(chosen.deep),
+    mark: resolve(chosen.mark),
+    ink: resolve(chosen.ink),
+  };
+  probe.remove();
+  return out;
+}
+
+/** The day arriving: petals, sparkles or confetti flying out from the sticker. */
+function Burst({ kind }: { kind: (typeof BURSTS)[number] }) {
+  const pieces = Array.from({ length: kind === "sparkles" ? 14 : 22 }, (_, i) => i);
+  return (
+    <span aria-hidden data-burst-wrap className="pointer-events-none absolute inset-0 z-20">
+      {pieces.map((i) => {
+        const angle = (i / pieces.length) * Math.PI * 2 + (i % 3) * 0.2;
+        const far = 55 + ((i * 29) % 45);
+        return (
+          <span
+            key={i}
+            data-burst={kind}
+            className="scratch-piece absolute top-1/2 left-1/2"
+            style={
+              {
+                "--bx": `${(Math.cos(angle) * far) / 7}rem`,
+                "--by": `${(Math.sin(angle) * far) / 7}rem`,
+                "--br": `${(i * 47) % 360}deg`,
+                "--bd": `${(i % 5) * 40}ms`,
+              } as CSSProperties
+            }
+          />
+        );
+      })}
+    </span>
+  );
+}
+
+/** How much of the foil has been rubbed away, sampling a grid inside its shape. */
+function clearedShare(node: HTMLCanvasElement, shape: Shape): number {
   const ctx = node.getContext("2d");
   const { width: w, height: h } = node;
   if (!ctx || w === 0) return 0;
   const { data } = ctx.getImageData(0, 0, w, h);
   const r = Math.min(w, h) / 2;
-  const step = Math.max(4, Math.round(r / 40));
+  const step = Math.max(4, Math.round(Math.min(w, h) / 80));
   let clear = 0;
   let seen = 0;
   for (let y = 0; y < h; y += step) {
     for (let x = 0; x < w; x += step) {
-      if ((x - w / 2) ** 2 + (y - h / 2) ** 2 > r * r) continue;
+      if (shape === "round" && (x - w / 2) ** 2 + (y - h / 2) ** 2 > r * r) continue;
       seen += 1;
       if (data[(y * w + x) * 4 + 3]! < 32) clear += 1;
     }

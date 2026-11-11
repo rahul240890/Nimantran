@@ -359,13 +359,28 @@ export function GuestView({
     const first = () => {
       events.forEach((name) => window.removeEventListener(name, first, true));
       startTransition(() => setAwake(true));
-      if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
+      // On the one scroll the song waits for Open the invitation itself (Opening plays it)
+      if (playOnOpen && !scroll && !latestMusic.current.playing && !musicMuted()) {
         void latestMusic.current.play(OPEN_LEAD_S);
       }
     };
     events.forEach((name) => window.addEventListener(name, first, true));
     return () => events.forEach((name) => window.removeEventListener(name, first, true));
-  }, [playOnOpen]);
+  }, [playOnOpen, scroll]);
+  // On the one scroll the page stays on the gate until the invitation is opened: nothing
+  // below can be scrolled to before the doors have opened and the welcome has gone
+  useEffect(() => {
+    if (!scroll || entered) return;
+    const html = document.documentElement;
+    const before = { overflow: html.style.overflow, overscroll: html.style.overscrollBehavior };
+    window.scrollTo({ top: 0, behavior: "auto" });
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+    return () => {
+      html.style.overflow = before.overflow;
+      html.style.overscrollBehavior = before.overscroll;
+    };
+  }, [scroll, entered]);
   // The sections below the first screen are drawn only as they near it, once each has been
   // drawn whole (with its lettering in, or after a second), so the page keeps its true
   // length (globals.css). Only while the guest is on the first screen: switched on further
@@ -548,12 +563,15 @@ export function GuestView({
                           // from there the guest scrolls it like any page, with no snapping
                           onEnter: () => {
                             setEntered(true);
+                            // Two frames on, once the page has been let go to scroll
                             requestAnimationFrame(() =>
-                              document.getElementById("cover")?.scrollIntoView({
-                                behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-                                  ? "auto"
-                                  : "smooth",
-                              }),
+                              requestAnimationFrame(() =>
+                                document.getElementById("cover")?.scrollIntoView({
+                                  behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+                                    ? "auto"
+                                    : "smooth",
+                                }),
+                              ),
                             );
                           },
                         }
