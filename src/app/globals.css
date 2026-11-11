@@ -4896,6 +4896,48 @@
 .story-place-mark {
   font-size: calc(clamp(1rem, 4cqmin, 1.35rem) * var(--story-fit, 1));
 }
+/*
+ * The groom's and the bride's names on the family page, each on its own plate (owner,
+ * 2026-11-11): a soft band of the theme's gold between two fine rules that fade out at
+ * their ends, and a small jewel at either side. The second side's plate takes the theme's
+ * accent, so the two families read apart. Sized in em, so it follows the name, and drawn
+ * in the line's own background (no inner box), so the page's fit measures it as it is.
+ * The video draws the same plate (src/lib/video/draw.ts drawPlate).
+ */
+.name-plate {
+  --plate: var(--card-gold);
+  --plate-line: var(--card-gold-text);
+  padding: 0.16em 1.25em 0.22em;
+  background:
+    radial-gradient(circle, var(--plate-line) 0.07em, transparent 0.1em) 0.45em 50% / 0.3em 0.3em
+      no-repeat,
+    radial-gradient(circle, var(--plate-line) 0.07em, transparent 0.1em) calc(100% - 0.45em) 50% /
+      0.3em 0.3em no-repeat,
+    linear-gradient(90deg, transparent, var(--plate-line) 24%, var(--plate-line) 76%, transparent)
+      top / 100% 1px no-repeat,
+    linear-gradient(90deg, transparent, var(--plate-line) 24%, var(--plate-line) 76%, transparent)
+      bottom / 100% 1px no-repeat,
+    linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--plate) 20%, transparent) 22%,
+      color-mix(in oklab, var(--plate) 20%, transparent) 78%,
+      transparent
+    );
+}
+.name-plate[data-side="second"] {
+  --plate: var(--card-accent);
+  --plate-line: var(--card-accent-text);
+}
+/* On the guest page the plates take the theme's gilt and jewel, as its rules do */
+.guest-themed .name-plate {
+  --plate: var(--guest-gilt);
+  --plate-line: var(--guest-gilt);
+}
+.guest-themed .name-plate[data-side="second"] {
+  --plate: var(--guest-jewel);
+  --plate-line: var(--guest-jewel);
+}
 /* Words break only when a page is too full to fit them whole even at the smallest size */
 [data-overflow] > .story-line {
   overflow-wrap: anywhere;

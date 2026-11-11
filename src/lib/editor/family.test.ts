@@ -143,7 +143,8 @@ describe("the family page", () => {
       family: blocks.slice(0, 1),
     });
     expect(page!.lines).toEqual([
-      { text: "Aarav", style: "label", lang: "en" },
+      // The groom's or bride's own name leads the side, set large on its plate
+      { text: "Aarav", style: "display", lang: "en" },
       { text: "Son of", style: "small", lang: "en" },
       // Each parent stays whole on a line; the page breaks between them
       { text: "Smt.\u00a0Sunita &\u00a0Shri\u00a0Ramesh\u00a0Patel", style: "body", lang: "en" },

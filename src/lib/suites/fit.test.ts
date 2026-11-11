@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { FIT_GROW, FIT_MAX, FIT_MIN, FIT_ROOM, fitGrowth, fitRoom, fitScale } from "./fit";
+import {
+  FIT_GROW,
+  FIT_GROW_FAMILY,
+  FIT_MAX,
+  FIT_MIN,
+  FIT_ROOM,
+  fitCapped,
+  fitGrowth,
+  fitRoom,
+  fitScale,
+} from "./fit";
 
 describe("fitting words to a painting", () => {
   it("grows short words up to the most, never past it", () => {
@@ -33,6 +43,19 @@ describe("how far a page's words may grow", () => {
 
   it("lets a family page of reading words grow to fill its calm space", () => {
     expect(fitGrowth(["body", "label", "body", "small"])).toBe(FIT_GROW);
+  });
+
+  it("grows the family page with the couple's names less, so the parents stay smaller", () => {
+    expect(fitGrowth(["intro", "person", "kin", "body", "kin"])).toBe(FIT_GROW_FAMILY);
+    expect(FIT_GROW_FAMILY).toBeLessThan(FIT_GROW);
+  });
+
+  it("keeps the small words round the family's names to the theme's proportions", () => {
+    expect(fitCapped("label")).toBe(true);
+    expect(fitCapped("kin")).toBe(true);
+    expect(fitCapped("intro")).toBe(true);
+    expect(fitCapped("body")).toBe(false);
+    expect(fitCapped("person")).toBe(false);
   });
 
   it("grows a page with a day on it less than one of reading words only", () => {

@@ -166,9 +166,12 @@ export function scriptOfLang(lang: string | undefined): FontScript {
 /**
  * A kind of line on the page. The couple's names on the cover are their own kind, the
  * largest on any page; "date" is a function's day, set below its name, and "venue" its
- * place, below the day.
+ * place, below the day. The family page has three of its own, so its words read in order
+ * (owner, 2026-11-11: all one size looked a mess): "intro" its quiet opening words,
+ * "person" the groom's or bride's name on its plate, the largest, and "kin" the small words
+ * round the parents ("Son of", the home town); the parents themselves are "body", between.
  */
-export type TypeRole = Exclude<LineStyle, "symbol"> | "names";
+export type TypeRole = Exclude<LineStyle, "symbol"> | "names" | "person" | "kin" | "intro";
 
 type RoleSpec = {
   face: Face;
@@ -190,6 +193,9 @@ export const ROLES: Record<TypeRole, RoleSpec> = {
   venue: { face: "words", min: 1.06, fluid: 4.8, max: 1.5, leading: [1.32, 1.52] },
   small: { face: "words", min: 0.92, fluid: 3.8, max: 1.18, leading: [1.42, 1.6] },
   label: { face: "label", min: 0.78, fluid: 3.2, max: 1.04, leading: [1.3, 1.5] },
+  person: { face: "names", min: 1.5, fluid: 7.6, max: 2.9, leading: [1.12, 1.3] },
+  intro: { face: "words", min: 0.88, fluid: 3.5, max: 1.12, leading: [1.36, 1.56] },
+  kin: { face: "words", min: 0.78, fluid: 3, max: 0.98, leading: [1.3, 1.5] },
 };
 
 /**
@@ -271,6 +277,11 @@ export function spaceBefore(role: TypeRole, previous: TypeRole | null): number {
 /** A line's kind on its page: the couple's names on the cover are a kind of their own. */
 export function roleOf(beat: StoryBeat, style: LineStyle): TypeRole {
   if (style === "display" && beat.scene === "cover") return "names";
+  if (beat.scene === "family") {
+    if (style === "display") return "person";
+    if (style === "small") return "kin";
+    if (style === "script") return "intro";
+  }
   return style === "symbol" ? "label" : style;
 }
 
@@ -325,7 +336,10 @@ export function lineSpace(beat: StoryBeat, index: number, symbol: boolean): numb
   const previous = roleOf(beat, beat.lines[index - 1]!.style);
   // On the family page "Son of", the parents' names and their town read as one group
   const pair = new Set([role, previous]);
-  if (beat.scene === "family" && pair.has("small") && pair.has("body")) return 0.5;
+  if (pair.has("kin") && pair.has("body")) return 0.5;
+  // A side starts afresh at its name's plate, and "Son of" sits just beneath the plate
+  if (role === "person") return 4.2;
+  if (previous === "person") return 1.2;
   // Each family's heading sits a little closer on the family pages, so their names can grow
   if (beat.scene === "family" && role === "label") return 3;
   return spaceBefore(role, previous);
@@ -352,7 +366,7 @@ export function oneLine(beat: StoryBeat, index: number): boolean {
   const line = beat.lines[index];
   if (!line || [...line.text].length > ONE_LINE_MAX) return false;
   const role = roleOf(beat, line.style);
-  if (role === "label") return true;
+  if (role === "label" || role === "person") return true;
   // The invocation: the first line of a cover or of the god's page, set in the flowing hand
   if (role === "script") {
     const first = beat.lines.findIndex((other) => other.style === "script");

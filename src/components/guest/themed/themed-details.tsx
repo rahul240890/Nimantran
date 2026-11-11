@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useGuestText } from "@/components/guest/guest-language";
 import { cn } from "@/lib/cn";
 import {
+  FamilyTitle,
   FamilyWords,
   pairedSide,
   useNamesFit,
@@ -1261,17 +1262,19 @@ function Dusk({
                   {layouts.family === "scroll" && index > 0 && (
                     <span aria-hidden className="guest-rule mb-4" />
                   )}
-                  <dt
+                  <FamilyTitle
+                    family={family}
+                    block={block}
                     className={cn(
                       "font-label text-xs tracking-[0.25em] uppercase",
                       layouts.family === "ribbons" ? "guest-ribbon px-6 py-2" : "text-accent-text",
                     )}
-                  >
-                    {block.title}
-                  </dt>
+                    name="mb-1 font-display text-4xl leading-tight text-ink sm:text-5xl"
+                  />
                   <FamilyWords
                     block={block}
                     className="font-display text-2xl text-ink"
+                    parents="font-display text-xl text-ink sm:text-2xl"
                     soft="text-ink-muted"
                   />
                 </div>

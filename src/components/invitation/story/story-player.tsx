@@ -42,6 +42,7 @@ import {
   FIT_HELD_GAIN,
   FIT_KEEP_NAMES,
   FIT_MAX,
+  fitCapped,
   FIT_PHOTO,
   fitGrowth,
   fitRoom,
@@ -148,6 +149,9 @@ const LINE_COLOUR: Record<TypeRole, string> = {
   small: "text-card-ink-muted",
   venue: "text-card-ink",
   label: "text-card-gold-text",
+  person: "text-card-ink",
+  intro: "text-card-accent-text",
+  kin: "text-card-ink-muted",
 };
 
 /* The page coming in, and (for turns that move it) the page going out */
@@ -701,6 +705,11 @@ function PageArrow({
   );
 }
 
+/** How many names on plates come before line `index` of a family page. */
+function personBefore(beat: StoryBeat, index: number): number {
+  return beat.lines.slice(0, index).filter((line) => roleOf(beat, line.style) === "person").length;
+}
+
 /** The painting behind a page: the couple's framed one on their photo page. */
 export function pageImage(suiteId: SuiteId, beat: StoryBeat): string | undefined {
   const frames = beat.photos?.length ? photoPage(suiteId, beat.photos.length) : null;
@@ -765,7 +774,7 @@ function lineStyle(
     // Small headings ("With the blessings of") grow no further than the theme's own
     // proportions: spaced wide, they would reach the art where an arch narrows
     // A line kept to one line shrinks on its own by --line-fit (StoryPage's fit)
-    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${role === "label" ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"} * var(--line-fit, 1))`,
+    fontSize: `calc(${roleSizeCss(role)} * ${size.toFixed(3)} * var(--story-scale, 1) * ${fitCapped(role) ? `min(var(--story-fit, 1), ${FIT_MAX})` : "var(--story-fit, 1)"} * var(--line-fit, 1))`,
     lineHeight: Number((set.leading * leading).toFixed(3)),
     letterSpacing:
       name && type?.capitals ? "0.04em" : set.tracking ? `${set.tracking}em` : "normal",
@@ -968,8 +977,10 @@ export function StoryPage({
       // too far to read wraps after all, and the page is fitted again with it wrapping
       let wrapped = false;
       for (const line of single) {
-        if (line.scrollWidth <= line.clientWidth + 1) continue;
-        const share = Math.floor((line.clientWidth / line.scrollWidth) * 100) / 100;
+        // The words' width, with the padding a plate keeps at their end (name-plate)
+        const wide = line.scrollWidth + parseFloat(getComputedStyle(line).paddingRight || "0");
+        if (wide <= line.clientWidth + 1) continue;
+        const share = Math.floor((line.clientWidth / wide) * 100) / 100;
         if (share >= ONE_LINE_MIN) line.style.setProperty("--line-fit", String(share));
         else {
           line.dataset.wrap = "true";
@@ -1137,9 +1148,14 @@ export function StoryPage({
                 )}
                 <p
                   lang={line.lang}
+                  // The groom's and the bride's plates differ a little, so each side reads as its own
+                  data-side={
+                    role === "person" ? (personBefore(beat, i) % 2 ? "second" : "first") : undefined
+                  }
                   className={cn(
                     "story-line text-balance",
                     oneLine(beat, i) && "story-one",
+                    role === "person" && "name-plate",
                     // The names arrive in the theme's way instead of rising in with the rest
                     reveal && nameLines.includes(i) && "reveal-line",
                     LINE_COLOUR[role],
