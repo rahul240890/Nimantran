@@ -211,6 +211,8 @@ export type OpeningProps = {
   after:
     | { kind: "pages"; template: Template; beats: readonly StoryBeat[]; textBox: boolean }
     | { kind: "enter"; onEnter: () => void };
+  /** Only the way in under the names: no reply or details links (the one-scroll prototype). */
+  plain?: boolean;
 };
 
 /** The opening's lettering for one role, in the theme's own voice; the host's face wins. */
@@ -373,6 +375,7 @@ export function Opening({
   after,
   welcomeChoice = null,
   holdWelcome = false,
+  plain = false,
 }: OpeningProps) {
   const { guestCopy, invitation } = useGuestText();
   const still = useReducedMotion();
@@ -421,8 +424,12 @@ export function Opening({
   const goIn = () => {
     setWelcome(false);
     const next = latest.current;
-    if (next.kind === "enter") next.onEnter();
-    else setPages(true);
+    if (next.kind === "enter") {
+      // The doors close behind the guest, as they do once the pages end, so the welcome
+      // comes only once and opening it again from below plays the doors again
+      setAsked(false);
+      next.onEnter();
+    } else setPages(true);
   };
   const goInLatest = useRef(goIn);
   useEffect(() => {
@@ -662,18 +669,20 @@ export function Opening({
               {guestCopy.doorway.open}
             </Button>
             {/* The quieter ways on, in one line under the way in */}
-            <div className="flex flex-wrap items-center justify-center gap-x-1">
-              {reply && (
-                <a href={reply.href} className={QUIET_LINK}>
-                  <MailCheck aria-hidden className="size-4" />
-                  {reply.label}
+            {!plain && (
+              <div className="flex flex-wrap items-center justify-center gap-x-1">
+                {reply && (
+                  <a href={reply.href} className={QUIET_LINK}>
+                    <MailCheck aria-hidden className="size-4" />
+                    {reply.label}
+                  </a>
+                )}
+                <a href="#guest-functions" className={QUIET_LINK}>
+                  {guestCopy.doorway.details}
+                  <ChevronDown aria-hidden className="size-4" />
                 </a>
-              )}
-              <a href="#guest-functions" className={QUIET_LINK}>
-                {guestCopy.doorway.details}
-                <ChevronDown aria-hidden className="size-4" />
-              </a>
-            </div>
+              </div>
+            )}
           </div>
         </div>
         {welcome && (

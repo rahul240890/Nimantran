@@ -17,6 +17,8 @@ import { cn } from "@/lib/cn";
 import type { InvitationStory } from "@/components/invitation/invitation";
 import { EventDayBanner } from "@/components/guest/event-day-banner";
 import { GuestTour } from "@/components/guest/guest-tour";
+import { ScrollPage, StoryScroll } from "@/components/guest/story-scroll";
+import { ScratchDate } from "@/components/guest/scratch-date";
 import { Opening } from "@/components/guest/opening/opening";
 import { useGuestName } from "@/components/guest/guest-reply";
 import { CountdownFinale } from "@/components/guest/countdown-finale";
@@ -151,6 +153,11 @@ type GuestViewProps = {
   holdWelcome?: boolean;
   /** A live invitation's "Make an invitation like this", for guests (lib/gallery/make-like-this.ts). */
   makeHref?: string | null;
+  /**
+   * "scroll" (prototype, 2026-11-11): after the gates, the pages run down the page one under
+   * another instead of the reel across them, then the day's plan, countdown, photos and reply.
+   */
+  flow?: "reel" | "scroll";
 };
 
 export function GuestView({
@@ -169,6 +176,7 @@ export function GuestView({
   sample = false,
   holdWelcome = false,
   makeHref = null,
+  flow = "reel",
 }: GuestViewProps) {
   const locale = useLocale();
   const languages = cardLanguages(draft);
@@ -262,6 +270,34 @@ export function GuestView({
     [draft, photos, copy],
   );
   const scene = draftShowsScene(draft) ? scenePage(suite, scenePhotos.length) : null;
+  // One Scene keeps its own painting; every other invitation can run down one scroll
+  const scroll = flow === "scroll" && !scene;
+  // On the scroll the closing page comes last, after the reply
+  // and the day itself comes on a scratch card of its own after the family's pages
+  const saveTheDate = CARD_STORY_WORDS[language].saveTheDate;
+  const scrollBeats = useMemo(
+    () =>
+      scroll
+        ? story.beats
+            .filter((beat) => beat.id !== "reply")
+            .map((beat) =>
+              beat.scene === "family" && mainDate
+                ? {
+                    ...beat,
+                    lines: beat.lines.filter(
+                      (line) =>
+                        line.style !== "date" &&
+                        !(line.style === "label" && line.text === saveTheDate),
+                    ),
+                  }
+                : beat,
+            )
+            .filter((beat) => beat.lines.length > 0 || beat.scene !== "family")
+        : [],
+    [scroll, story.beats, mainDate, saveTheDate],
+  );
+  const lastFamily = scrollBeats.findLast((beat) => beat.scene === "family")?.id;
+  const closingBeat = scroll ? story.beats.find((beat) => beat.id === "reply") : undefined;
   // One Scene ends on the same welcome as the last of the pages, in the host's words if
   // they changed it
   const closing = useMemo(() => {
@@ -327,13 +363,28 @@ export function GuestView({
     const first = () => {
       events.forEach((name) => window.removeEventListener(name, first, true));
       startTransition(() => setAwake(true));
-      if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
+      // On the one scroll the song waits for Open the invitation itself (Opening plays it)
+      if (playOnOpen && !scroll && !latestMusic.current.playing && !musicMuted()) {
         void latestMusic.current.play(OPEN_LEAD_S);
       }
     };
     events.forEach((name) => window.addEventListener(name, first, true));
     return () => events.forEach((name) => window.removeEventListener(name, first, true));
-  }, [playOnOpen]);
+  }, [playOnOpen, scroll]);
+  // On the one scroll the page stays on the gate until the invitation is opened: nothing
+  // below can be scrolled to before the doors have opened and the welcome has gone
+  useEffect(() => {
+    if (!scroll || entered) return;
+    const html = document.documentElement;
+    const before = { overflow: html.style.overflow, overscroll: html.style.overscrollBehavior };
+    window.scrollTo({ top: 0, behavior: "auto" });
+    html.style.overflow = "hidden";
+    html.style.overscrollBehavior = "none";
+    return () => {
+      html.style.overflow = before.overflow;
+      html.style.overscrollBehavior = before.overscroll;
+    };
+  }, [scroll, entered]);
   // The sections below the first screen are drawn only as they near it, once each has been
   // drawn whole (with its lettering in, or after a second), so the page keeps its true
   // length (globals.css). Only while the guest is on the first screen: switched on further
@@ -411,7 +462,7 @@ export function GuestView({
         ref={pageRoot}
         lang={language}
         data-invitation
-        className="guest-snap flex min-h-dvh flex-col"
+        className={cn(scroll ? "guest-flow" : "guest-snap", "flex min-h-dvh flex-col")}
       >
         <GuestPrelude
           suite={suite}
@@ -504,16 +555,63 @@ export function GuestView({
                 musicOnOpen={draft.music.playOnOpen}
                 guest={guestName}
                 onCarryOn={() => setTour((was) => was + 1)}
+                plain={scroll}
                 replay={again}
                 after={
                   scene
                     ? { kind: "enter", onEnter: () => setEntered(true) }
-                    : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
+                    : scroll
+                      ? {
+                          kind: "enter",
+                          // Once the gates have opened, the page glides down to the cover once;
+                          // from there the guest scrolls it like any page, with no snapping
+                          onEnter: () => {
+                            setEntered(true);
+                            // Two frames on, once the page has been let go to scroll
+                            requestAnimationFrame(() =>
+                              requestAnimationFrame(() =>
+                                document.getElementById("cover")?.scrollIntoView({
+                                  behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+                                    ? "auto"
+                                    : "smooth",
+                                }),
+                              ),
+                            );
+                          },
+                        }
+                      : { kind: "pages", template, beats: story.beats, textBox: draft.textBox }
                 }
               />
             )}
 
             <div ref={tourRoot} className="contents">
+              {scroll && (
+                <StoryScroll
+                  beats={scrollBeats}
+                  insert={
+                    mainDate
+                      ? {
+                          after: lastFamily ?? "cover",
+                          node: (
+                            <ScratchDate
+                              suite={suite}
+                              date={mainDate}
+                              label={saveTheDate}
+                              lang={language}
+                            />
+                          ),
+                        }
+                      : null
+                  }
+                  copy={copy}
+                  template={template}
+                  suite={suite}
+                  textBox={draft.textBox}
+                  type={story.type}
+                  labels={invitation.story}
+                  lang={language}
+                />
+              )}
               {look ? (
                 <ThemedDetails
                   suite={suite}
@@ -537,56 +635,60 @@ export function GuestView({
                   reply={rsvp}
                   countdown={countdown}
                   seed={seed}
+                  flow={scroll ? "scroll" : "reel"}
                 />
               ) : (
                 <>
-                  <FamilyWording family={family} lang={language} />
+                  {!scroll && <FamilyWording family={family} lang={language} />}
 
-                  <section
-                    aria-labelledby="guest-functions"
-                    data-tour
-                    className="flex min-h-svh flex-col justify-center border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
-                  >
-                    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-                      <div className="flex flex-wrap items-end justify-between gap-4">
-                        <h2
-                          id="guest-functions"
-                          className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
-                        >
-                          {guestCopy.functions}
-                        </h2>
-                        {allIcsUrl && (
-                          <Button asChild variant="secondary">
-                            <a href={allIcsUrl} download>
-                              <CalendarPlus aria-hidden />
-                              {guestCopy.addAll}
-                            </a>
-                          </Button>
-                        )}
+                  {scroll && countdown}
+                  {!scroll && (
+                    <section
+                      aria-labelledby="guest-functions"
+                      data-tour
+                      className="flex min-h-svh flex-col justify-center border-t border-line bg-surface-2/50 px-4 py-12 sm:px-6 sm:py-16"
+                    >
+                      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+                        <div className="flex flex-wrap items-end justify-between gap-4">
+                          <h2
+                            id="guest-functions"
+                            className="font-display text-[1.75rem] leading-tight sm:text-[2.2rem]"
+                          >
+                            {guestCopy.functions}
+                          </h2>
+                          {allIcsUrl && (
+                            <Button asChild variant="secondary">
+                              <a href={allIcsUrl} download>
+                                <CalendarPlus aria-hidden />
+                                {guestCopy.addAll}
+                              </a>
+                            </Button>
+                          )}
+                        </div>
+                        {/* The same ornate cards as a painted theme, in the template's own card stock */}
+                        <div className="oc-plain" style={stockStyle(template)}>
+                          <FlowerDefs />
+                          <ol className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-12 pt-4 md:grid-cols-2">
+                            {details.map((fn, index) => (
+                              <li key={fn.kind}>
+                                <Reveal>
+                                  <OrnateCard
+                                    box={templateBox(template.id)}
+                                    fn={fn}
+                                    index={index}
+                                    count={details.length}
+                                    headingId={`fn-${fn.kind}`}
+                                    flower="marigold"
+                                    second="rose"
+                                  />
+                                </Reveal>
+                              </li>
+                            ))}
+                          </ol>
+                        </div>
                       </div>
-                      {/* The same ornate cards as a painted theme, in the template's own card stock */}
-                      <div className="oc-plain" style={stockStyle(template)}>
-                        <FlowerDefs />
-                        <ol className="grid grid-cols-[minmax(0,1fr)] gap-x-6 gap-y-12 pt-4 md:grid-cols-2">
-                          {details.map((fn, index) => (
-                            <li key={fn.kind}>
-                              <Reveal>
-                                <OrnateCard
-                                  box={templateBox(template.id)}
-                                  fn={fn}
-                                  index={index}
-                                  count={details.length}
-                                  headingId={`fn-${fn.kind}`}
-                                  flower="marigold"
-                                  second="rose"
-                                />
-                              </Reveal>
-                            </li>
-                          ))}
-                        </ol>
-                      </div>
-                    </div>
-                  </section>
+                    </section>
+                  )}
 
                   {placed.all.length > 0 && (
                     <section
@@ -647,23 +749,37 @@ export function GuestView({
                       </div>
                     </section>
                   )}
-                  {countdown}
+                  {!scroll && countdown}
                 </>
               )}
+              {closingBeat && (
+                <ScrollPage
+                  beat={closingBeat}
+                  copy={copy}
+                  template={template}
+                  suite={suite}
+                  textBox={draft.textBox}
+                  type={story.type}
+                  labels={invitation.story}
+                  lang={language}
+                />
+              )}
             </div>
-            <GuestTour
-              root={tourRoot}
-              run={tour}
-              stop={again}
-              music={music}
-              labels={invitation.tour}
-              musicLabels={
-                look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
-              }
-              onEnd={() => setAwake(false)}
-              onAgain={replayable ? openAgain : undefined}
-              againLabel={invitation.tour.again}
-            />
+            {!scroll && (
+              <GuestTour
+                root={tourRoot}
+                run={tour}
+                stop={again}
+                music={music}
+                labels={invitation.tour}
+                musicLabels={
+                  look ? null : { play: invitation.playMusic, pause: invitation.pauseMusic }
+                }
+                onEnd={() => setAwake(false)}
+                onAgain={replayable ? openAgain : undefined}
+                againLabel={invitation.tour.again}
+              />
+            )}
             {!preview && !sample && <PhotoWall slug={slug} />}
           </main>
 

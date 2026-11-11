@@ -83,6 +83,7 @@ export function ThemedDetails({
   onPhotoFail,
   occasion,
   seed = 0,
+  flow = "reel",
 }: {
   suite: SuiteId;
   look: GuestLook;
@@ -111,7 +112,14 @@ export function ThemedDetails({
   occasion?: CategoryId;
   /** This visit's draw of the page's dress (section-dress.ts). */
   seed?: number;
+  /**
+   * "scroll" (prototype): the invitation's own pages already ran down the page above, so the
+   * welcome, the date and each celebration's card are left out; the day's plan stays short,
+   * the countdown comes before the photos, and the reply closes it.
+   */
+  flow?: "reel" | "scroll";
 }) {
+  const scroll = flow === "scroll";
   // The music button floats while the guest reads this page
   const [top, onScreen] = useOnScreen<HTMLDivElement>();
   const [burst, setBurst] = useState(0);
@@ -132,18 +140,20 @@ export function ThemedDetails({
       className="guest-themed relative isolate overflow-clip"
     >
       <FlowerDefs />
-      <Welcome
-        copy={copy}
-        lang={lang}
-        look={look}
-        dress={dress}
-        painting={images.cover}
-        photos={welcome}
-        onFail={onPhotoFail}
-        // Petals fall over the couple by themselves as the welcome comes in
-        onSeen={() => setBurst((was) => was + 1)}
-      />
-      {main && (
+      {!scroll && (
+        <Welcome
+          copy={copy}
+          lang={lang}
+          look={look}
+          dress={dress}
+          painting={images.cover}
+          photos={welcome}
+          onFail={onPhotoFail}
+          // Petals fall over the couple by themselves as the welcome comes in
+          onSeen={() => setBurst((was) => was + 1)}
+        />
+      )}
+      {main && !scroll && (
         <SaveTheDate
           // A new layout is a new date to watch come into view
           key={layouts.date}
@@ -154,22 +164,32 @@ export function ThemedDetails({
           painting={images.wedding ?? images.cover}
         />
       )}
-      <Celebrations
-        suite={suite}
-        look={look}
-        lang={lang}
-        functions={functions}
-        allIcsUrl={allIcsUrl}
-        layouts={layouts}
-        dress={dress}
-        box={eventBox(suite, look.style)}
-      />
-      {(photos.length > 0 || family.length > 0) && (
+      {(!scroll || functions.length > 1) && (
+        <Celebrations
+          short={scroll}
+          suite={suite}
+          look={look}
+          lang={lang}
+          functions={functions}
+          allIcsUrl={allIcsUrl}
+          layouts={layouts}
+          dress={dress}
+          box={eventBox(suite, look.style)}
+        />
+      )}
+      {scroll && countdown && (
+        // The countdown keeps the evening sky it had at the foot of the page
+        <div data-mood="dusk" className="guest-sky relative isolate">
+          <Wash painting={images.reception ?? images.cover} motif={dress.motif} />
+          {countdown}
+        </div>
+      )}
+      {(photos.length > 0 || (!scroll && family.length > 0)) && (
         <Dusk
           before={welcome.length}
           photoHeading={photoWords(occasion, lang)}
           photos={photos}
-          family={family}
+          family={scroll ? [] : family}
           familyLang={familyLang}
           look={look}
           lang={lang}
@@ -187,7 +207,8 @@ export function ThemedDetails({
         look={look}
         way={ways.lamp}
         reply={reply}
-        countdown={countdown}
+        countdown={scroll ? undefined : countdown}
+        short={scroll}
       />
       {onScreen && <FloatingMusic music={music} />}
       <PetalShower flowers={flowers} burst={burst} />
@@ -690,6 +711,7 @@ function SaveTheDate({
 
 /** Each celebration in its own hour of the day, under its own painting from the theme. */
 function Celebrations({
+  short = false,
   suite,
   look,
   lang,
@@ -708,13 +730,16 @@ function Celebrations({
   dress: SectionDress;
   /** The theme's box for each celebration's details (event-boxes.ts). */
   box: Box;
+  /** Only the day's plan, each with its way there: each celebration had its own page above. */
+  short?: boolean;
 }) {
   const { guestCopy } = useGuestText();
   const cardWords = CARD_THEMED_WORDS[lang];
   const images = SUITES[suite].images;
-  const plan = layouts.plan;
+  // On the scroll the plan is a plain list, one celebration under another
+  const plan = short ? "cards" : layouts.plan;
   // On a timeline the thread itself is the day's plan, so the list above it is left out
-  const line = layouts.hours === "timeline";
+  const line = !short && layouts.hours === "timeline";
   return (
     <section aria-labelledby="guest-functions" className="relative isolate">
       <div
@@ -724,6 +749,8 @@ function Celebrations({
           "guest-sky guest-sky-flat relative isolate px-4 pt-4 pb-10 sm:px-6",
           // With more than one celebration, the day's plan fills a screen of its own first
           functions.length > 1 && "flex min-h-svh flex-col justify-center py-16",
+          // On the scroll the list keeps well clear of the painted frame round it
+          short && "px-9 sm:px-12",
         )}
       >
         <Wash
@@ -794,7 +821,7 @@ function Celebrations({
           </div>
         )}
       </div>
-      {!line && (
+      {!line && !short && (
         <ol data-layout={layouts.hours}>
           {functions.map((fn, index) => {
             const { art, mood } = pageLook(fn.kind);
@@ -1189,6 +1216,7 @@ function Dusk({
  * 2026-11-07: no taps to give), then the blessing and the reply.
  */
 function Night({
+  short = false,
   copy,
   lang,
   look,
@@ -1206,6 +1234,8 @@ function Night({
   way: LampBlessing;
   reply: ReactNode;
   countdown?: ReactNode;
+  /** Only the reply: the invitation's own closing page follows it. */
+  short?: boolean;
 }) {
   const { guestCopy, rsvpCopy } = useGuestText();
   const words = guestCopy.themed;
@@ -1220,27 +1250,32 @@ function Night({
     >
       <Wash painting={painting} motif={dress.motif} />
       <Festoon className="guest-festoon h-12 w-full sm:h-16" />
-      <section
-        ref={lampsRef}
-        aria-label={words.lampsLabel}
-        data-tour="7"
-        className="relative flex min-h-svh flex-col justify-center px-4 pt-10 pb-6 sm:px-6"
-      >
-        <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
-          <p lang={lang} className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">
-            {cardWords.blessingLabel}
-          </p>
-          {copy.blessing && (
-            <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
-              {copy.blessing}
+      {!short && (
+        <section
+          ref={lampsRef}
+          aria-label={words.lampsLabel}
+          data-tour="7"
+          className="relative flex min-h-svh flex-col justify-center px-4 pt-10 pb-6 sm:px-6"
+        >
+          <Reveal className="guest-stagger mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+            <p
+              lang={lang}
+              className="font-label text-xs tracking-[0.3em] text-accent-text uppercase"
+            >
+              {cardWords.blessingLabel}
             </p>
-          )}
-          <div className="guest-lamps flex w-full justify-center">
-            <LampStage way={way} flower={look.flower} />
-          </div>
-          <p className="min-h-6 text-sm text-balance text-ink-muted">{lit ? light.given : ""}</p>
-        </Reveal>
-      </section>
+            {copy.blessing && (
+              <p lang={lang} className="font-display text-2xl text-balance text-ink sm:text-3xl">
+                {copy.blessing}
+              </p>
+            )}
+            <div className="guest-lamps flex w-full justify-center">
+              <LampStage way={way} flower={look.flower} />
+            </div>
+            <p className="min-h-6 text-sm text-balance text-ink-muted">{lit ? light.given : ""}</p>
+          </Reveal>
+        </section>
+      )}
       {reply && (
         <section
           id="rsvp"
@@ -1262,13 +1297,15 @@ function Night({
         </section>
       )}
       {countdown}
-      <p
-        lang={lang}
-        data-snap
-        className="relative px-6 pt-10 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
-      >
-        {cardWords.closing}
-      </p>
+      {!short && (
+        <p
+          lang={lang}
+          data-snap
+          className="relative px-6 pt-10 pb-40 text-center font-display text-xl text-balance text-ink-muted sm:pb-48"
+        >
+          {cardWords.closing}
+        </p>
+      )}
       <Ground look={look} className="absolute inset-x-0 bottom-0 -z-10 h-28 w-full sm:h-36" />
     </div>
   );
