@@ -361,9 +361,15 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
-  metaTitle: (names) => (names ? `${names}: આમંત્રણની ઝલક` : "આમંત્રણની ઝલક"),
-  badge: "ઝલક · હજી મહેમાનોને મોકલ્યું નથી",
-  metaDescription: "પરિવારને જોવા માટે એક ઝલક. તે હજી મહેમાનોને મોકલાઈ નથી, અને જવાબ બંધ છે.",
+  metaTitle: (names) =>
+    names ? `${names}: પરિવાર માટે ઝલક, અંતિમ આમંત્રણ નથી` : "પરિવાર માટે ઝલક, અંતિમ આમંત્રણ નથી",
+  badge: "પરિવાર માટે ઝલક · અંતિમ નથી",
+  note: "ચુકવણી બાકી છે. આ મહેમાનો માટેનું આમંત્રણ નથી.",
+  watermark: "પરિવાર માટે ઝલક · અંતિમ નથી",
+  ogHeading: "પરિવાર માટે ઝલક",
+  ogLine: "અંતિમ આમંત્રણ નથી. ચુકવણી બાકી છે.",
+  metaDescription:
+    "પરિવારને તપાસવા માટેનો એક મુસદ્દો, Shubh Invitation પર બનાવેલો. તે હજી અંતિમ નથી અને તેની ચુકવણી બાકી છે, તેથી આ મહેમાનો માટેનું આમંત્રણ નથી, અને જવાબ બંધ છે.",
 };
 
 /** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */

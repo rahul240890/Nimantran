@@ -623,7 +623,7 @@ export const previewCopy = {
   /** Before paying, a preview the family can see (lib/invites/family-link.ts). */
   familyTitle: "Show your family first",
   familyBody:
-    "Send them a preview on WhatsApp to check. It says Preview across every screen and replies are off, so it can't go out as the invitation. Guests get it clean once you send it.",
+    "Send them a preview on WhatsApp to check. It says Family preview, not final across every screen and on the WhatsApp card, and replies are off, so it can't go out as the invitation. Guests get it clean once you send it.",
   familySend: "Send to family on WhatsApp",
   familyCopy: "Copy link",
   familyCopied: "Link copied",
@@ -632,7 +632,7 @@ export const previewCopy = {
     "Sign in and we'll make a preview link you can send to your family on WhatsApp.",
   familySignIn: "Sign in to share",
   familyMessage: (url: string) =>
-    `Here's a preview of our invitation. Have a look and tell us what you think before we send it: ${url}`,
+    `Here's a preview of our invitation, just for family. It isn't final yet, so please don't forward it. Have a look and tell us what you think: ${url}`,
 } as const;
 
 /** The event pages' themes (Step 12e): a name, the place it paints, and its fit. */

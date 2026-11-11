@@ -583,7 +583,7 @@ export const previewCopy: Translation<typeof en.previewCopy> = {
     "साइन इन करें, हम एक झलक का लिंक बना देंगे जिसे आप परिवार को WhatsApp पर भेज सकें।",
   familySignIn: "भेजने के लिए साइन इन करें",
   familyMessage: (url) =>
-    `हमारे निमंत्रण की एक झलक। देखकर बताइए कैसा लगा, फिर हम इसे भेजेंगे: ${url}`,
+    `हमारे निमंत्रण की एक झलक, सिर्फ़ परिवार के लिए। यह अभी अंतिम नहीं है, इसलिए किसी और को आगे न भेजें। देखकर बताइए कैसा लगा: ${url}`,
 };
 
 export const suiteCopy: Translation<typeof en.suiteCopy> = {

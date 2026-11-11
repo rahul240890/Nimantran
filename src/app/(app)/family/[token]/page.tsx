@@ -37,7 +37,13 @@ export async function generateMetadata({
     title: { absolute: title },
     description: familyCopy.metaDescription,
     openGraph: { title, description: familyCopy.metaDescription },
-    robots: { index: false, follow: false },
+    twitter: { card: "summary_large_image", title, description: familyCopy.metaDescription },
+    robots: {
+      index: false,
+      follow: false,
+      nocache: true,
+      googleBot: { index: false, follow: false },
+    },
   };
 }
 
@@ -78,19 +84,24 @@ export default async function FamilyPreviewPage({ params }: PageProps<"/family/[
         clipUrl={clip ? (urls[clip.id] ?? null) : null}
         allIcsUrl={null}
         rsvpFunctions={rsvpFunctions}
-        watermark
+        watermark="tiled"
+        watermarkLabel={familyCopy.watermark}
         preview
         unsent
         makeHref={makeLikeThisHref(draft, "family")}
       />
-      {/* Never taken for the real thing: it says, in marigold above every screen, that it
-          hasn't gone to guests yet */}
+      {/* Never taken for the real thing: it says, in marigold above every screen, that it is
+          for the family, not final and not paid for, and the brand's name runs across every
+          screen beneath it, so a screenshot or a forward says so too */}
       <p
         data-family-preview
-        className="pointer-events-none fixed top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] left-1/2 z-[80] flex max-w-[calc(100vw-7rem)] -translate-x-1/2 items-center gap-1.5 rounded-full bg-marigold px-3.5 py-1.5 text-center text-xs font-semibold text-on-marigold shadow-overlay ring-2 ring-card-ivory/70"
+        className="pointer-events-none fixed top-[calc(max(0.75rem,env(safe-area-inset-top))+0.75rem)] left-1/2 z-[80] flex max-w-[calc(100vw-7rem)] -translate-x-1/2 items-center gap-2 rounded-3xl bg-marigold px-3.5 py-1.5 text-start text-on-marigold shadow-overlay ring-2 ring-card-ivory/70"
       >
         <Eye aria-hidden className="size-4 shrink-0" />
-        <span>{familyCopy.badge}</span>
+        <span className="flex flex-col">
+          <span className="text-xs font-semibold">{familyCopy.badge}</span>
+          <span className="text-[0.7rem] leading-snug">{familyCopy.note}</span>
+        </span>
       </p>
     </>
   );
