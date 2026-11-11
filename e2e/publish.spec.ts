@@ -407,7 +407,11 @@ test.describe("publish and share", () => {
     const article = guest.getByRole("article", { name: "હસ્તમેળાપ" });
     await expect(article.getByText("શુભ મુહૂર્ત")).toBeVisible();
     await expect(article.getByText("સવારે 9:47 થી 10:31")).toBeVisible();
-    await article.getByRole("button", { name: "કૅલેન્ડરમાં ઉમેરો" }).click();
+    // The page snaps a screen at a time, and this tall function's section can snap the
+    // button back out of view while a click scrolls to it, so it is opened from the keyboard
+    const addToCalendar = article.getByRole("button", { name: "કૅલેન્ડરમાં ઉમેરો" });
+    await addToCalendar.focus();
+    await guest.keyboard.press("Enter");
     const ics = await guest.getByRole("menuitem", { name: /Apple/ }).getAttribute("href");
     const calendar = await (await guest.request.get(ics!)).text();
     expect(calendar).toContain("DTSTART:20261015T041700Z");
