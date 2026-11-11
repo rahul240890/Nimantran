@@ -917,13 +917,34 @@ export type FloatInstance = {
 };
 
 /**
+ * One floating copy's journey, in numbers: the video draws it from these (moving-draw.ts)
+ * and the live scene sets them as custom properties. Places are percent of the painting.
+ */
+export type FloatPath = Omit<FloatInstance, "style"> & {
+  /** Its width, in percent of the painting's. */
+  width: number;
+  /** Its height over its width. */
+  tall: number;
+  from: readonly [number, number];
+  to: readonly [number, number];
+  time: number;
+  /** Negative: how far along its journey it already is when the scene opens. */
+  delay: number;
+  wobble: number;
+  wobbleTime: number;
+  spin: number;
+  /** 1, or -1 for a glide going left, turned to face its way. */
+  face: 1 | -1;
+};
+
+/**
  * Each floating piece's copies, spread through the painting and through time: where it
  * starts and ends, how long it takes, how far it sways and spins on the way. All start
  * part-way through their journey, so the scene is already alive when it opens.
  */
-export function floatInstances(scene: MovingScene): FloatInstance[] {
+export function floatPaths(scene: MovingScene): FloatPath[] {
   const next = random(scene.id);
-  const out: FloatInstance[] = [];
+  const out: FloatPath[] = [];
   scene.floats.forEach((float, f) => {
     const sprite = scene.sprites[float.sprite];
     if (!sprite) return;
@@ -957,22 +978,41 @@ export function floatInstances(scene: MovingScene): FloatInstance[] {
         kind: float.kind,
         src: `/suites/${scene.id}/float-${float.sprite}.webp`,
         pair: float.pair === undefined ? null : `/suites/${scene.id}/float-${float.pair}.webp`,
-        style: {
-          width: `${float.size * (0.8 + next() * 0.4)}%`,
-          "--x0": `${from[0]}cqw`,
-          "--y0": `${from[1]}cqh`,
-          "--x1": `${to[0]}cqw`,
-          "--y1": `${to[1]}cqh`,
-          "--time": `${time.toFixed(2)}s`,
-          // Already part-way along when the scene opens
-          "--delay": `${(-next() * time).toFixed(2)}s`,
-          "--wobble": `${(1 + next() * 2.5).toFixed(2)}cqw`,
-          "--wobble-time": `${(2.4 + next() * 2.2).toFixed(2)}s`,
-          "--spin": `${float.kind === "fall" ? Math.round(15 + next() * 45) : Math.round(next() * 8)}deg`,
-          "--face": left ? -1 : 1,
-        } as CSSProperties,
+        width: float.size * (0.8 + next() * 0.4),
+        tall: 1 / sprite.aspect,
+        from,
+        to,
+        time: Number(time.toFixed(2)),
+        delay: Number((-next() * time).toFixed(2)),
+        wobble: Number((1 + next() * 2.5).toFixed(2)),
+        wobbleTime: Number((2.4 + next() * 2.2).toFixed(2)),
+        spin: float.kind === "fall" ? Math.round(15 + next() * 45) : Math.round(next() * 8),
+        face: left ? -1 : 1,
       });
     }
   });
   return out;
+}
+
+/** The floating copies for the live scene, their journeys set as custom properties. */
+export function floatInstances(scene: MovingScene): FloatInstance[] {
+  return floatPaths(scene).map((path) => ({
+    key: path.key,
+    kind: path.kind,
+    src: path.src,
+    pair: path.pair,
+    style: {
+      width: `${path.width}%`,
+      "--x0": `${path.from[0]}cqw`,
+      "--y0": `${path.from[1]}cqh`,
+      "--x1": `${path.to[0]}cqw`,
+      "--y1": `${path.to[1]}cqh`,
+      "--time": `${path.time.toFixed(2)}s`,
+      "--delay": `${path.delay.toFixed(2)}s`,
+      "--wobble": `${path.wobble.toFixed(2)}cqw`,
+      "--wobble-time": `${path.wobbleTime.toFixed(2)}s`,
+      "--spin": `${path.spin}deg`,
+      "--face": path.face,
+    } as CSSProperties,
+  }));
 }
