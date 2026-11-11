@@ -52,6 +52,8 @@ test("a photo that can't be shown leaves no blank frame for guests", async ({
   await guest.goto(`${link}?quality=2d`);
   const gallery = guest.locator("section[aria-labelledby=guest-photos]");
   await gallery.scrollIntoViewIfNeeded();
+  // The photos run down the page and load as the guest reaches them, so go down them all
+  await gallery.evaluate((node) => node.scrollIntoView({ block: "end" }));
   // Two photos drew; the third is taken off the page rather than left empty
   await expect(gallery.locator("li")).toHaveCount(2);
   for (const img of await gallery.locator("img").all()) {
