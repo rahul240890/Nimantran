@@ -134,82 +134,97 @@ export function ScratchDate({ suite: suiteId, date, label, lang }: ScratchDatePr
         themed ? "bg-suite-near" : "bg-card-back",
       )}
     >
+      {/* On wide screens the painting, blurred, fills the sides, as the pages do */}
       {themed && (
-        <div aria-hidden className="absolute inset-0">
+        <div aria-hidden className="absolute inset-0 hidden md:block">
           <SuiteBackdrop
             suite={suite}
             image={image}
             placeholder={blur}
             lazy
-            className="absolute inset-0 overflow-hidden"
+            className="absolute inset-0 scale-110 opacity-70 blur-2xl"
           />
-          <div className="absolute inset-0 bg-card-ivory/35" />
+          <div className="absolute inset-0 bg-scrim/40" />
         </div>
       )}
-      <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center gap-5 px-6 text-center">
-        <h2
-          id="save-the-date"
-          lang={lang}
-          className="font-card-label text-sm tracking-[0.3em] text-card-accent-text uppercase"
-        >
-          {label}
-        </h2>
-        <div className="relative aspect-square w-[min(72vw,19rem)]">
-          {/* The day under the foil */}
-          <div
+      <div className="relative flex h-full w-full items-center justify-center overflow-hidden md:max-w-[min(100%,calc(100svh*768/1365))] md:shadow-overlay">
+        {themed && (
+          <div aria-hidden className="absolute inset-0">
+            <SuiteBackdrop
+              suite={suite}
+              image={image}
+              placeholder={blur}
+              lazy
+              className="absolute inset-0 overflow-hidden"
+            />
+            <div className="absolute inset-0 bg-card-ivory/35" />
+          </div>
+        )}
+        <div className="relative z-10 flex w-full max-w-md flex-col items-center justify-center gap-5 px-6 text-center">
+          <h2
+            id="save-the-date"
             lang={lang}
+            className="font-card-label text-sm tracking-[0.3em] text-card-accent-text uppercase"
+          >
+            {label}
+          </h2>
+          <div className="relative aspect-square w-[min(72vw,19rem)]">
+            {/* The day under the foil */}
+            <div
+              lang={lang}
+              className={cn(
+                "absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full border-2 border-card-gold bg-card-ivory/95 text-card-ink shadow-overlay",
+                revealed && !still && "scratch-pop",
+              )}
+            >
+              <span className="font-card-label text-sm tracking-[0.2em] text-card-ink-muted uppercase">
+                {parts.weekday}
+              </span>
+              <span className="font-card-display text-[4.5rem] leading-none font-semibold">
+                {parts.day}
+              </span>
+              <span className="font-card-display text-2xl leading-tight">{parts.monthYear}</span>
+            </div>
+            {!revealed && (
+              <canvas
+                ref={canvas}
+                aria-hidden
+                className="absolute inset-0 size-full cursor-grab touch-none rounded-full shadow-overlay"
+                onPointerDown={(event) => {
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  drawing.current = null;
+                  rub(event.clientX, event.clientY);
+                }}
+                onPointerMove={(event) => {
+                  // A mouse rubs only while pressed; a finger or pen whenever it moves on the foil
+                  if (event.pointerType === "mouse" && event.buttons === 0) return;
+                  rub(event.clientX, event.clientY);
+                }}
+                onPointerUp={() => {
+                  drawing.current = null;
+                  const node = canvas.current;
+                  if (node && clearedShare(node) >= CLEARED) setRevealed(true);
+                }}
+              />
+            )}
+          </div>
+          {/* The date in words for screen readers, and the way to it without scratching */}
+          <p className="sr-only" aria-live="polite">
+            {revealed ? `${parts.weekday} ${parts.day} ${parts.monthYear}` : ""}
+          </p>
+          <button
+            type="button"
+            onClick={() => setRevealed(true)}
+            disabled={revealed}
             className={cn(
-              "absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full border-2 border-card-gold bg-card-ivory/95 text-card-ink shadow-overlay",
-              revealed && !still && "scratch-pop",
+              "inline-flex min-h-11 items-center gap-2 rounded-full bg-night/45 px-5 text-ui text-card-ivory backdrop-blur-sm transition-opacity hover:bg-night/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none",
+              revealed && "pointer-events-none opacity-0",
             )}
           >
-            <span className="font-card-label text-sm tracking-[0.2em] text-card-ink-muted uppercase">
-              {parts.weekday}
-            </span>
-            <span className="font-card-display text-[4.5rem] leading-none font-semibold">
-              {parts.day}
-            </span>
-            <span className="font-card-display text-2xl leading-tight">{parts.monthYear}</span>
-          </div>
-          {!revealed && (
-            <canvas
-              ref={canvas}
-              aria-hidden
-              className="absolute inset-0 size-full cursor-grab touch-none rounded-full shadow-overlay"
-              onPointerDown={(event) => {
-                event.currentTarget.setPointerCapture(event.pointerId);
-                drawing.current = null;
-                rub(event.clientX, event.clientY);
-              }}
-              onPointerMove={(event) => {
-                // A mouse rubs only while pressed; a finger or pen whenever it moves on the foil
-                if (event.pointerType === "mouse" && event.buttons === 0) return;
-                rub(event.clientX, event.clientY);
-              }}
-              onPointerUp={() => {
-                drawing.current = null;
-                const node = canvas.current;
-                if (node && clearedShare(node) >= CLEARED) setRevealed(true);
-              }}
-            />
-          )}
+            <Sparkles aria-hidden className="size-4" />
+            {words.show}
+          </button>
         </div>
-        {/* The date in words for screen readers, and the way to it without scratching */}
-        <p className="sr-only" aria-live="polite">
-          {revealed ? `${parts.weekday} ${parts.day} ${parts.monthYear}` : ""}
-        </p>
-        <button
-          type="button"
-          onClick={() => setRevealed(true)}
-          disabled={revealed}
-          className={cn(
-            "inline-flex min-h-11 items-center gap-2 rounded-full bg-night/45 px-5 text-ui text-card-ivory backdrop-blur-sm transition-opacity hover:bg-night/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring motion-still:transition-none",
-            revealed && "pointer-events-none opacity-0",
-          )}
-        >
-          <Sparkles aria-hidden className="size-4" />
-          {words.show}
-        </button>
       </div>
     </section>
   );
