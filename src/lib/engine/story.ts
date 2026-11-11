@@ -337,8 +337,10 @@ export function storyBeats({
   // The family page: who invites, their words, and the day itself
   // A side's parents read as a name of their own: "Son of" small, the parents' names, then
   // the home town small beneath, rather than one long sentence that wraps anywhere
+  // The name a side's parents stand behind (the groom, the bride) is the page's largest line,
+  // set on its own plate (owner, 2026-11-11): "display" on a family page (lettering.ts roleOf)
   const blockLines = (block: FamilyLine) => [
-    ...line(block.title, "label", block.lang),
+    ...line(block.title, block.parts ? "display" : "label", block.lang),
     ...(block.parts
       ? [
           ...line(block.parts.lead, "small", block.lang),
@@ -364,7 +366,8 @@ export function storyBeats({
     family.map(weight),
     family.map((block) => Boolean(block.parts)),
   ).map((range) => lines(family.slice(...range)));
-  const blessings = [...line(copy.families, "small"), ...(pages[0] ?? [])];
+  // The family's opening words ("Together with their families") read small and quiet
+  const blessings = [...line(copy.families, "script"), ...(pages[0] ?? [])];
   const more = pages.slice(1);
   const invite = [
     ...line(copy.line, "body"),

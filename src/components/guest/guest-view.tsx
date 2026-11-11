@@ -24,6 +24,7 @@ import { RsvpForm, type RsvpFunction } from "@/components/guest/rsvp-form";
 import { FlowerDefs } from "@/components/guest/themed/flowers";
 import { OrnateCard } from "@/components/guest/themed/ornate-card";
 import {
+  FamilyTitle,
   FamilyWords,
   pairedSide,
   useNamesFit,
@@ -751,7 +752,12 @@ function FamilyWording({ family, lang }: { family: readonly FamilyBlock[]; lang:
               key={block.id}
               className={cn("flex flex-col gap-1", !pairedSide(family, block) && "sm:col-span-2")}
             >
-              <dt className="text-sm text-accent-text">{block.title}</dt>
+              <FamilyTitle
+                family={family}
+                block={block}
+                className="text-sm text-accent-text"
+                name="mb-1 font-display text-3xl leading-tight text-ink sm:text-4xl"
+              />
               <FamilyWords block={block} className="text-lg" soft="text-ink-muted" />
             </div>
           ))}

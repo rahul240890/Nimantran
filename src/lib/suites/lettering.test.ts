@@ -13,6 +13,7 @@ import {
   lineSpace,
   placeMarkAt,
   roleOf,
+  ROLES,
   ruleAt,
   scriptOfLang,
   voiceFaces,
@@ -104,6 +105,30 @@ describe("lettering on the event pages", () => {
     const cover = page("cover", [{ text: "Arjun", style: "display" }]);
     expect(roleOf(cover, "display")).toBe("names");
     expect(roleOf(page("reply", []), "display")).toBe("display");
+  });
+
+  it("sets the family page in order: quiet opening words, large names, medium parents, small kin", () => {
+    const family = page("family", [
+      { text: "Together with their families", style: "script" },
+      { text: "Arjun", style: "display" },
+      { text: "Son of", style: "small" },
+      { text: "Smt. Sunita & Shri Ramesh Sharma", style: "body" },
+    ]);
+    expect(family.lines.map((line) => roleOf(family, line.style))).toEqual([
+      "intro",
+      "person",
+      "kin",
+      "body",
+    ]);
+    const fluid = (i: number) => ROLES[roleOf(family, family.lines[i]!.style)].fluid;
+    expect(fluid(1)).toBeGreaterThan(fluid(3));
+    expect(fluid(3)).toBeGreaterThan(fluid(0));
+    expect(fluid(0)).toBeGreaterThan(fluid(2));
+    // The name keeps to one line, and "Son of" sits close beneath its plate
+    expect(oneLine(family, 1)).toBe(true);
+    expect(lineSpace(family, 2, false)).toBeLessThan(lineSpace(family, 1, false));
+    // Off the family page the same kinds keep their own roles
+    expect(roleOf(page("haldi", []), "small")).toBe("small");
   });
 });
 

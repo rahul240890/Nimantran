@@ -7,7 +7,7 @@
 
 import { SYMBOLS, glyphScale } from "@/components/invitation/art/symbols";
 import type { PageType } from "@/lib/editor/type";
-import type { LineStyle, StoryBeat } from "@/lib/engine/story";
+import type { StoryBeat } from "@/lib/engine/story";
 import { seededRandom } from "@/lib/engine/particles";
 import { DEFAULT_AREA, textArea, type TextArea } from "@/lib/suites/areas";
 import {
@@ -25,7 +25,7 @@ import {
   ONE_LINE_MIN,
   type TypeRole,
 } from "@/lib/suites/lettering";
-import { FIT_MAX, fitGrowth, fitRoom } from "@/lib/suites/fit";
+import { FIT_MAX, fitCapped, fitGrowth, fitRoom } from "@/lib/suites/fit";
 import { SUITES, pageLook, paintedTone, type Mood, type SuiteId } from "@/lib/suites/catalog";
 import { photoBox, photoPage } from "@/lib/suites/photo-frames";
 import { photoPlacement, type PhotoFit } from "@/lib/editor/photo-fit";
@@ -319,20 +319,15 @@ type Placed = {
   lineHeight: number;
   /** Space above it, and whether a fine rule or the place's mark sits in that space. */
   space: number;
+  /** A groom's or bride's name on the family page, set on its plate (drawPlate). */
+  plate?: "first" | "second";
   rule?: boolean;
   mark?: boolean;
 };
 
-function styleOf(
-  style: LineStyle,
-  name: boolean,
-  cq: number,
-  scene: VideoScene,
-  colours: Palette,
-  lang: string,
-) {
+function styleOf(role: TypeRole, cq: number, scene: VideoScene, colours: Palette, lang: string) {
   // The same lettering as the live pages (lettering.ts): the theme's voice in the line's script
-  const role: TypeRole = name ? "names" : style === "symbol" ? "label" : style;
+  const name = role === "names";
   const set = lettering(SUITES[scene.suite].voice ?? "regal", role, lang);
   const names = ROLES[role].face === "names";
   const type = scene.type;
@@ -363,6 +358,9 @@ const ROLE_INK: Record<TypeRole, keyof Palette> = {
   small: "inkMuted",
   venue: "ink",
   label: "goldText",
+  person: "ink",
+  intro: "accentText",
+  kin: "inkMuted",
 };
 
 function greedy(ctx: CanvasRenderingContext2D, words: readonly string[], width: number): string[] {
@@ -445,10 +443,9 @@ function drawWords(
     const rule = ruleAt(beat);
     const mark = placeMarkAt(beat);
     for (const [index, line] of beat.lines.entries()) {
-      const name = beat.scene === "cover" && line.style === "display";
       const lang = line.lang ?? scene.lang;
-      const style = styleOf(line.style, name, cq, scene, colours, lang);
-      let size = style.size * (style.role === "label" ? Math.min(fit, FIT_MAX) : fit);
+      const style = styleOf(roleOf(beat, line.style), cq, scene, colours, lang);
+      let size = style.size * (fitCapped(style.role) ? Math.min(fit, FIT_MAX) : fit);
       const lineHeight = style.lineHeight * leadingScale(beat, style.role);
       let font = `${style.prefix}${size}px ${style.family}`;
       ctx.font = font;
@@ -456,10 +453,12 @@ function drawWords(
       const said = style.role === "date" ? keepDate(line.text) : line.text;
       const text = style.upper ? said.toLocaleUpperCase(lang) : said;
       // Reading lines keep clear of the art's edges, as on the live pages
+      const plate = style.role === "person";
       const room = (boxW - padX * 2) * lineShare(beat, style.role);
       // An invocation or a small heading shrinks to stay on one line, as on the live pages
       if (oneLine(beat, index)) {
-        const share = Math.floor((room / ctx.measureText(text).width) * 100) / 100;
+        const wide = ctx.measureText(text).width + (plate ? PLATE_X * 2 * size : 0);
+        const share = Math.floor((room / wide) * 100) / 100;
         if (share < 1 && share >= ONE_LINE_MIN) {
           size *= share;
           font = `${style.prefix}${size}px ${style.family}`;
@@ -467,13 +466,15 @@ function drawWords(
           ctx.letterSpacing = `${style.spacing * size}px`;
         }
       }
-      const lines = wrap(ctx, text, room);
+      const lines = wrap(ctx, text, plate ? room - PLATE_X * 2 * size : room);
+      const sides = placed.filter((item) => item.plate).length;
       placed.push({
         kind: "text",
         lines,
         font,
         size,
-        height: lines.length * size * lineHeight,
+        height: lines.length * size * lineHeight + (plate ? PLATE_Y * size : 0),
+        ...(plate ? { plate: sides % 2 ? ("second" as const) : ("first" as const) } : {}),
         colour: style.colour,
         spacing: style.spacing * size,
         lineHeight,
@@ -562,9 +563,15 @@ function drawWords(
           ctx.shadowColor = colours.glow;
           ctx.shadowBlur = item.size * 0.6;
         }
+        if (item.plate) {
+          const wide = Math.max(...item.lines.map((text) => ctx.measureText(text).width));
+          drawPlate(ctx, x, y + rise, wide + PLATE_X * 2 * item.size, item.height, item, colours);
+        }
         if (p < 1) ctx.filter = `blur(${((1 - eased) * 6).toFixed(2)}px)`;
+        // A plate's name sits inside its padding, a little above the plate's middle
+        const inset = item.plate ? PLATE_TOP * item.size : 0;
         item.lines.forEach((text, i) => {
-          const lineY = y + item.size * item.lineHeight * (i + 0.5) + rise;
+          const lineY = y + inset + item.size * item.lineHeight * (i + 0.5) + rise;
           // Letter spacing adds space after the last letter too; centre what is seen
           ctx.fillText(text, x + item.spacing / 2, lineY);
           if (printed) ctx.fillText(text, x + item.spacing / 2, lineY);
@@ -574,6 +581,59 @@ function drawWords(
     }
     y += item.height;
   });
+}
+
+/** The plate round a family page's name, in em of the name (globals.css .name-plate). */
+const PLATE_X = 1.25;
+const PLATE_TOP = 0.16;
+const PLATE_Y = 0.38;
+
+/**
+ * The groom's or bride's name plate on the family page, as the live page draws it: a soft
+ * band between two fine rules that fade out at their ends, a small jewel at either side;
+ * gold for the first side, the theme's accent for the second.
+ */
+function drawPlate(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  top: number,
+  width: number,
+  height: number,
+  item: Placed,
+  colours: Palette,
+) {
+  const second = item.plate === "second";
+  const tint = second ? colours.accent : colours.gold;
+  const line = second ? colours.accentText : colours.goldText;
+  const left = x - width / 2;
+  const fade = (colour: string, edge: number, middle: number) => {
+    const g = ctx.createLinearGradient(left, 0, left + width, 0);
+    g.addColorStop(0, withAlpha(colour, edge));
+    g.addColorStop(middle, colour);
+    g.addColorStop(1 - middle, colour);
+    g.addColorStop(1, withAlpha(colour, edge));
+    return g;
+  };
+  ctx.save();
+  ctx.shadowColor = "transparent";
+  ctx.fillStyle = fade(withAlpha(tint, 0.2), 0, 0.22);
+  ctx.fillRect(left, top, width, height);
+  ctx.fillStyle = fade(line, 0, 0.24);
+  ctx.fillRect(left, top, width, 1);
+  ctx.fillRect(left, top + height - 1, width, 1);
+  ctx.fillStyle = line;
+  for (const side of [-1, 1]) {
+    ctx.beginPath();
+    ctx.arc(
+      x + side * (width / 2 - 0.6 * item.size),
+      top + height / 2,
+      0.07 * item.size,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 /**

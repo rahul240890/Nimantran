@@ -93,6 +93,38 @@ function People({ names, className }: { names: string; className: string }) {
 }
 
 /**
+ * A family block's heading. A side's heading is the groom's or bride's own name, so it is
+ * set as the largest line of the family, on its plate (globals.css .name-plate; owner,
+ * 2026-11-11), the second side's in the theme's accent; every other block keeps its small
+ * heading ("With the blessings of").
+ */
+export function FamilyTitle({
+  family,
+  block,
+  className,
+  name,
+}: {
+  family: readonly FamilyBlock[];
+  block: FamilyBlock;
+  /** A small heading's size, face and colour. */
+  className: string;
+  /** The groom's or bride's name's size, face and colour. */
+  name: string;
+}) {
+  if (!block.parts) return <dt className={className}>{block.title}</dt>;
+  const side = family.filter((b) => b.parts).indexOf(block) % 2 ? "second" : "first";
+  return (
+    <dt
+      lang={block.lang}
+      data-side={side}
+      className={cn("name-plate max-w-full self-center text-balance break-words", name)}
+    >
+      {block.title}
+    </dt>
+  );
+}
+
+/**
  * A family block's words under its heading. A side's parents are set as a name of their
  * own: "Son of" small above, each parent kept whole on a line (breaking at the "&"), and
  * the home town small beneath, so a long pair of names never wraps mid-name. Blessings,
@@ -101,11 +133,14 @@ function People({ names, className }: { names: string; className: string }) {
 export function FamilyWords({
   block,
   className,
+  parents = className,
   soft,
 }: {
   block: FamilyBlock;
   /** The names' (or plain words') own size and face. */
   className: string;
+  /** A side's parents' names, a size below the groom's or bride's name above them. */
+  parents?: string;
   /** The colour of the small words round the names. */
   soft: string;
 }) {
@@ -124,7 +159,7 @@ export function FamilyWords({
   return (
     <dd className="flex w-full flex-col items-center gap-1">
       {parts.lead && <span className={cn("text-sm", latin && "italic", soft)}>{parts.lead}</span>}
-      <People names={parts.names} className={className} />
+      <People names={parts.names} className={parents} />
       {parts.tail && <span className={cn("text-sm", soft)}>{parts.tail}</span>}
       {parts.place && (
         <span

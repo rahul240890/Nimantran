@@ -16,6 +16,8 @@ export const FIT_MAX = 1.25;
  * couple's names on the cover (owner, 2026-11-03: the family's words read too small at 1.9).
  */
 export const FIT_GROW = 2.2;
+/** The most the family page with the groom's and bride's names on it may grow. */
+export const FIT_GROW_FAMILY = 1.7;
 /** The names under a couple's photos may grow this far into the plain wall below the frames. */
 export const FIT_PHOTO = 1.6;
 /** Words grown to FIT_GROW fill at most this share of the calm space's height. */
@@ -38,10 +40,23 @@ export function fitRoom(scale: number): number {
  * names on a family page don't sit small in an empty arch.
  */
 export function fitGrowth(roles: readonly TypeRole[]): number {
+  // The groom's and bride's names on their plates lead the page; it grows to fill its calm
+  // space, but less far, so the parents' names under them stay clearly smaller
+  if (roles.includes("person")) return FIT_GROW_FAMILY;
   const largest = Math.max(0, ...roles.map((role) => ROLES[role].fluid));
   if (largest === 0) return FIT_MAX;
   const heading = ROLES.display.fluid / largest;
   return Math.round(Math.min(FIT_GROW, Math.max(FIT_MAX, heading)) * 100) / 100;
+}
+
+/**
+ * The small words that grow no further than the theme's own proportions when a page grows:
+ * small headings, which spaced wide would reach the art where an arch narrows, and the
+ * family page's opening words and the words round the parents, which stay small beside the
+ * names (owner, 2026-11-11).
+ */
+export function fitCapped(role: TypeRole): boolean {
+  return role === "label" || role === "intro" || role === "kin";
 }
 
 /**
