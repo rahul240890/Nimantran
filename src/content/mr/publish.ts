@@ -372,10 +372,17 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
-  metaTitle: (names) => (names ? `${names}: निमंत्रणाची झलक` : "निमंत्रणाची झलक"),
-  badge: "झलक · अजून पाहुण्यांना पाठवलेले नाही",
+  metaTitle: (names) =>
+    names
+      ? `${names}: कुटुंबासाठी झलक, अंतिम निमंत्रण नाही`
+      : "कुटुंबासाठी झलक, अंतिम निमंत्रण नाही",
+  badge: "कुटुंबासाठी झलक · अंतिम नाही",
+  note: "पेमेंट बाकी आहे. हे पाहुण्यांसाठीचे निमंत्रण नाही.",
+  watermark: "कुटुंबासाठी झलक · अंतिम नाही",
+  ogHeading: "कुटुंबासाठी झलक",
+  ogLine: "अंतिम निमंत्रण नाही. पेमेंट बाकी आहे.",
   metaDescription:
-    "कुटुंबाने पाहण्यासाठी एक झलक. ही अजून पाहुण्यांना पाठवलेली नाही, आणि उत्तरे बंद आहेत.",
+    "कुटुंबाने तपासण्यासाठी एक मसुदा, Shubh Invitation वर बनवलेला. तो अजून अंतिम नाही आणि त्याचे पेमेंट बाकी आहे, त्यामुळे हे पाहुण्यांसाठीचे निमंत्रण नाही, आणि उत्तरे बंद आहेत.",
 };
 
 /** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */

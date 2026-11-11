@@ -56,19 +56,27 @@ test.describe("family preview links", () => {
     const context = await browser.newContext({ reducedMotion: "reduce" });
     const family = await context.newPage();
     await family.goto(path!);
-    await expect(family).toHaveTitle("Aditya & Priya: invitation preview");
+    await expect(family).toHaveTitle("Aditya & Priya: family preview, not the final invitation");
     await expect(family.locator("[data-family-preview]")).toHaveText(
-      "Preview · not sent to guests yet",
+      "Family preview · Not finalPayment pending. Not for guests yet.",
     );
     // Owner, 2026-10-24: a preview passed on to every guest mustn't stand in for the
-    // invitation, so its one badge says so, its replies say they are off before anything is
-    // filled in, and WhatsApp's card for the link says it too. Since 2026-10-27 "Preview"
-    // no longer runs across every screen
+    // invitation, so its badge says so, its replies say they are off before anything is
+    // filled in, and WhatsApp's card for the link says it too. Since 2026-11-11 the brand's
+    // name and "Family preview · Not final" run across every screen as well, so a forward or
+    // a screenshot can't pass for the invitation
     await expect(family.locator("[data-preview-mark]")).toHaveCount(0);
+    await expect(family.locator("[data-watermark-tiled]")).toContainText(
+      "Shubh Invitation · Family preview · Not final",
+    );
     await expect(family.locator("[data-preview-replies]")).toHaveText(/replies are off/);
     await expect(family.locator('meta[property="og:description"]')).toHaveAttribute(
       "content",
-      /hasn't been sent to guests yet/,
+      /isn't the invitation for guests/,
+    );
+    await expect(family.locator('meta[property="og:image"]')).toHaveAttribute(
+      "content",
+      /\/family\/.+\/opengraph-image/,
     );
     await expect(family.locator("footer [data-make-like-this]").getByRole("link")).toHaveAttribute(
       "href",

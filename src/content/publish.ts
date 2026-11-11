@@ -419,10 +419,17 @@ export const hostPreviewCopy = {
 
 /** A family preview link (/family/<token>): the invitation before it is sent. */
 export const familyCopy = {
-  metaTitle: (names: string) => (names ? `${names}: invitation preview` : "Invitation preview"),
-  badge: "Preview · not sent to guests yet",
+  metaTitle: (names: string) =>
+    names
+      ? `${names}: family preview, not the final invitation`
+      : "Family preview, not the final invitation",
+  badge: "Family preview · Not final",
+  note: "Payment pending. Not for guests yet.",
+  watermark: "Family preview · Not final",
+  ogHeading: "Family preview",
+  ogLine: "Not the final invitation. Payment pending.",
   metaDescription:
-    "A preview for the family to check. It hasn't been sent to guests yet, and replies are off.",
+    "A draft for the family to check, made on Shubh Invitation. It isn't final or paid for yet, so it isn't the invitation for guests, and replies are off.",
 } as const;
 
 /** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */

@@ -363,10 +363,17 @@ export const hostPreviewCopy: Translation<typeof en.hostPreviewCopy> = {
 };
 
 export const familyCopy: Translation<typeof en.familyCopy> = {
-  metaTitle: (names) => (names ? `${names}: নিমন্ত্রণপত্রের ঝলক` : "নিমন্ত্রণপত্রের ঝলক"),
-  badge: "ঝলক · এখনও অতিথিদের পাঠানো হয়নি",
+  metaTitle: (names) =>
+    names
+      ? `${names}: পরিবারের জন্য ঝলক, চূড়ান্ত নিমন্ত্রণপত্র নয়`
+      : "পরিবারের জন্য ঝলক, চূড়ান্ত নিমন্ত্রণপত্র নয়",
+  badge: "পরিবারের জন্য ঝলক · চূড়ান্ত নয়",
+  note: "পেমেন্ট বাকি। এটি অতিথিদের নিমন্ত্রণপত্র নয়।",
+  watermark: "পরিবারের জন্য ঝলক · চূড়ান্ত নয়",
+  ogHeading: "পরিবারের জন্য ঝলক",
+  ogLine: "চূড়ান্ত নিমন্ত্রণপত্র নয়। পেমেন্ট বাকি।",
   metaDescription:
-    "পরিবারের দেখার জন্য একটি ঝলক। এটি এখনও অতিথিদের পাঠানো হয়নি, আর উত্তর বন্ধ আছে।",
+    "পরিবারের দেখে নেওয়ার জন্য একটি খসড়া, Shubh Invitation-এ তৈরি। এটি এখনও চূড়ান্ত নয় এবং পেমেন্ট বাকি, তাই এটি অতিথিদের নিমন্ত্রণপত্র নয়, আর উত্তর বন্ধ আছে।",
 };
 
 /** Trying the invitation before signing in (/try/...): its website, video and cards, with the mark. */

@@ -137,6 +137,8 @@ type GuestViewProps = {
    * "tiled" is the invitation tried before signing in: the brand's name across the screen too.
    */
   watermark?: boolean | "tiled";
+  /** Words beside the brand's name in the tiled watermark (a family preview's "Not final"). */
+  watermarkLabel?: string | null;
   /** A fixed moment for the event-day banner, on review pages. */
   previewNow?: number;
   /** The host's preview before publishing: replies aren't sent and there is no photo wall. */
@@ -160,6 +162,7 @@ export function GuestView({
   allIcsUrl,
   rsvpFunctions,
   watermark = false,
+  watermarkLabel = null,
   previewNow,
   preview = false,
   unsent = false,
@@ -428,7 +431,7 @@ export function GuestView({
         />
         <EventDayBanner functions={details} previewNow={previewNow} />
         <div className="relative flex flex-1 flex-col">
-          {watermark && <WatermarkLayer tiled={watermark === "tiled"} />}
+          {watermark && <WatermarkLayer tiled={watermark === "tiled"} label={watermarkLabel} />}
           <main id="main" className="flex flex-1 flex-col">
             {scene && !showOpening ? (
               <OneScene
