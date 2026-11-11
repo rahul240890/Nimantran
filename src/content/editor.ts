@@ -127,6 +127,8 @@ export const functionFields = {
   datePlaceholder: "Pick a date",
   time: "Starts at",
   timePlaceholder: "Pick a time",
+  hideTime: "Don't show the time",
+  hideTimeHint: "Guests see the date and place only, on the invitation, video and cards.",
   venue: "Venue",
   venuePlaceholder: "e.g. Pichola Lakeside Gardens, Udaipur",
   city: "City or venue",

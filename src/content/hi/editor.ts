@@ -120,6 +120,8 @@ export const functionFields: Translation<typeof en.functionFields> = {
   datePlaceholder: "तारीख़ चुनें",
   time: "शुरू होने का समय",
   timePlaceholder: "समय चुनें",
+  hideTime: "समय न दिखाएँ",
+  hideTimeHint: "मेहमानों को निमंत्रण, वीडियो और कार्ड पर केवल तारीख और जगह दिखेगी।",
   venue: "जगह",
   venuePlaceholder: "जैसे पिछोला लेकसाइड गार्डन्स, उदयपुर",
   city: "शहर या जगह",

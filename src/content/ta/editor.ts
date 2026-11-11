@@ -124,6 +124,9 @@ export const functionFields: Translation<typeof en.functionFields> = {
   datePlaceholder: "தேதியைத் தேர்ந்தெடுக்கவும்",
   time: "தொடங்கும் நேரம்",
   timePlaceholder: "நேரத்தைத் தேர்ந்தெடுக்கவும்",
+  hideTime: "நேரத்தைக் காட்ட வேண்டாம்",
+  hideTimeHint:
+    "விருந்தினர்கள் அழைப்பிதழ், வீடியோ மற்றும் கார்டுகளில் தேதியும் இடமும் மட்டுமே பார்ப்பார்கள்.",
   venue: "இடம்",
   venuePlaceholder: "எ.கா. பிச்சோலா லேக்சைடு கார்டன்ஸ், உதய்பூர்",
   city: "ஊர் அல்லது இடம்",

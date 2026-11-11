@@ -25,6 +25,7 @@ import {
   draftOpeningStyle,
   draftTemplate,
   mainFunction,
+  shownTime,
   type CardLanguage,
   type InviteDraft,
 } from "@/lib/editor/draft";
@@ -344,7 +345,7 @@ function GateScreen({
   const open = useBeat(!useReducedMotion());
   const mainKind = mainFunction(draft);
   const date = mainKind ? draft.functions[mainKind].date : "";
-  const at = mainKind ? startsAt(date, draft.functions[mainKind].time) : null;
+  const at = mainKind ? startsAt(date, shownTime(draft, mainKind)) : null;
   const { doorway } = guestText[language].guestCopy;
   return (
     <OpeningPreview

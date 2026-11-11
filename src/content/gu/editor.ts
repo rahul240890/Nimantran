@@ -119,6 +119,8 @@ export const functionFields: Translation<typeof en.functionFields> = {
   datePlaceholder: "તારીખ પસંદ કરો",
   time: "શરૂ થવાનો સમય",
   timePlaceholder: "સમય પસંદ કરો",
+  hideTime: "સમય ન બતાવો",
+  hideTimeHint: "મહેમાનોને આમંત્રણ, વિડિયો અને કાર્ડ પર ફક્ત તારીખ અને સ્થળ દેખાશે.",
   venue: "સ્થળ",
   venuePlaceholder: "જેમ કે પિછોલા લેકસાઇડ ગાર્ડન્સ, ઉદયપુર",
   city: "શહેર કે સ્થળ",

@@ -243,6 +243,18 @@ describe("invite draft", () => {
     expect(stepErrors(wedding, "functions")).toEqual({ "wedding.time": "required" });
   });
 
+  it("asks no time of a function whose time the host keeps off the invite", () => {
+    const base = complete();
+    const draft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        wedding: { ...base.functions.wedding, time: "", hideTime: true },
+      },
+    };
+    expect(stepErrors(draft, "functions")).toEqual({});
+  });
+
   it("puts the roka's date on a roka card even when the wedding is planned too", () => {
     const base = withCategory(complete(), "roka");
     const draft = {
