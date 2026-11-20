@@ -2,6 +2,7 @@
 
 import NextImage, { type ImageProps } from "next/image";
 import { useState } from "react";
+import { mediaUrl } from "@/lib/media";
 
 /*
  * next/image that falls back to the picture itself when the image resizer can't make it
@@ -10,9 +11,11 @@ import { useState } from "react";
  * refused stayed empty. The picture as it is, larger but there, takes its place.
  * next/image sends an error from before the page woke up again once it has, so none is
  * missed. Use this in place of next/image everywhere.
+ * Theme paintings are asked for at their R2 address once that's set up (src/lib/media.ts).
  */
-export function Image({ unoptimized, onError, alt, ...props }: ImageProps) {
+export function Image({ unoptimized, onError, alt, src, ...rest }: ImageProps) {
   const [direct, setDirect] = useState(false);
+  const props = { ...rest, src: typeof src === "string" ? mediaUrl(src) : src };
   // A picture that never goes through the resizer has nothing to fall back to
   if (unoptimized || direct) {
     return <NextImage {...props} alt={alt} unoptimized onError={onError} />;
