@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import { MEDIA_FOLDERS, mediaBase } from "./src/lib/media";
+
+/** Where the theme paintings live once they're on Cloudflare R2 (src/lib/media.ts). */
+const MEDIA = mediaBase();
 
 /*
  * Safe defaults for every response (docs/LAUNCH.md). Scripts are not restricted by a CSP,
@@ -47,7 +51,18 @@ const nextConfig: NextConfig = {
       ],
     })),
   ],
+  // Any page or script still asking this site for a painting is sent on to R2
+  redirects: async () =>
+    MEDIA
+      ? MEDIA_FOLDERS.map((folder) => ({
+          source: `/${folder}/:path*`,
+          destination: `${MEDIA}/${folder}/:path*`,
+          permanent: true,
+        }))
+      : [],
   images: {
+    // The resizer may fetch the paintings from R2, and nothing else from outside
+    remotePatterns: MEDIA ? MEDIA_FOLDERS.map((folder) => new URL(`${MEDIA}/${folder}/**`)) : [],
     // 480 sits between 384 and 640, so a phone's hero cards (about 430px wide) aren't sent at 640
     imageSizes: [32, 48, 64, 96, 128, 256, 384, 480],
   },
