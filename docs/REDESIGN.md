@@ -33,7 +33,7 @@ Every public address, page title, description, hreflang and structured-data bloc
 Each phase is one pull request with phone and desktop screenshots in light and dark, approved before the next starts.
 
 1. **Foundations.** Anek in every script, new paper, ink and maroon tokens, sentence-case labels. _In review._
-2. **Blog and wording pages.** Answer first, samples as a list with Copy, a sticky "make this card" button, related posts.
-3. **Header, footer and home.** Simpler menu, paintings on the first screen, six sections instead of nine, offer bar only.
+2. **Blog and wording pages.** The answer straight under the title, wording samples as one list with Copy beside each, a sticky "make this card" button on phones, posts as painting-and-title cards, flat buttons. _In review._
+3. **Home.** Three paintings on a phone's first screen, each opening live; fixed-size design sections show 4 on a phone, then View all (laptops keep the owner's 10 and 24); offer bar only, no welcome pop-up or offers section. The header menu stays as the owner set it on 2026-10-24, as it links search engines to every occasion page. _In review._
 4. **Designs gallery and design pages.** The three-part card, filters in one row, one Use this design button per design page.
 5. **Pricing, help, legal, account and editor chrome.** The same rules carried into the app pages. Split `globals.css` so site pages stop downloading invitation motion.

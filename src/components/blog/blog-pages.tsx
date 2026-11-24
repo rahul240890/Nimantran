@@ -77,16 +77,15 @@ function coverOf(post: BlogPost): { src: string; alt: string } | null {
   return tile ? { src: tile, alt: "" } : null;
 }
 
-const POST_CARD_COVER =
-  "-mx-5 -mt-5 mb-1 aspect-[16/9] w-[calc(100%+2.5rem)] max-w-none object-cover sm:-mx-6 sm:-mt-6 sm:w-[calc(100%+3rem)]";
+const POST_CARD_COVER = "mb-1 aspect-[16/9] w-full rounded-lg object-cover";
 
 function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "h2" | "h3" }) {
   const Heading = headingLevel;
   return (
-    <ul className="grid gap-5 sm:grid-cols-2">
+    <ul className="grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
       {posts.map((post) => (
         <li key={post.slug} className="flex">
-          <article className="relative flex w-full flex-col gap-3 overflow-hidden rounded-lg border border-line bg-surface p-5 shadow-raised transition-[border-color,transform] duration-150 focus-within:border-marigold hover:-translate-y-0.5 hover:border-marigold motion-reduce:hover:translate-y-0 sm:p-6">
+          <article className="group relative flex w-full flex-col gap-2">
             {coverOf(post) &&
               (coverOf(post)!.src.startsWith("/") ? (
                 // An occasion's painted tile, the site's own, at the card's size (768px as it is)
@@ -110,10 +109,10 @@ function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "
                   className={POST_CARD_COVER}
                 />
               ))}
-            <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
+            <p className="font-label text-sm text-accent-text">
               {CATEGORIES[post.occasion].names[post.locale]}
             </p>
-            <Heading className="font-display text-xl leading-tight sm:text-2xl">
+            <Heading className="font-display text-xl leading-snug group-hover:text-accent-text">
               <Link
                 href={blogPostPath(post.slug, post.locale)}
                 className="rounded-sm after:absolute after:inset-0 after:rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
@@ -121,8 +120,8 @@ function PostCards({ posts, headingLevel }: { posts: BlogPost[]; headingLevel: "
                 {post.heading}
               </Link>
             </Heading>
-            <p className="text-ink-muted">{post.description}</p>
-            <div className="mt-auto pt-2">
+            <p className="line-clamp-3 text-ink-muted">{post.description}</p>
+            <div className="mt-auto pt-1">
               <PostMeta post={post} />
             </div>
           </article>
@@ -158,13 +157,10 @@ export function BlogIndexPage({
         aria-labelledby="page-title"
         className="mx-auto flex w-full max-w-site flex-col gap-5 px-4 pt-6 pb-4 sm:px-6 lg:px-8"
       >
-        <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-          <span aria-hidden className="h-px w-6 bg-marigold" />
-          {blogCopy.eyebrow}
-        </p>
+        <p className="font-label text-sm text-accent-text">{blogCopy.eyebrow}</p>
         <h1
           id="page-title"
-          className="max-w-3xl font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.6rem]"
+          className="max-w-3xl font-display text-4xl leading-[1.1] break-words sm:text-5xl"
         >
           {blogCopy.heading}
         </h1>
@@ -203,13 +199,16 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
   }
   if ("h2" in block) {
     return (
-      <h2 id={block.id} className="scroll-mt-24 pt-4 font-display text-2xl sm:text-3xl">
+      <h2
+        id={block.id}
+        className="scroll-mt-24 pt-6 font-display text-2xl leading-snug sm:text-3xl"
+      >
         {block.h2}
       </h2>
     );
   }
   if ("h3" in block) {
-    return <h3 className="pt-2 font-display text-xl sm:text-2xl">{block.h3}</h3>;
+    return <h3 className="pt-2 font-display text-xl leading-snug">{block.h3}</h3>;
   }
   if ("list" in block) {
     const List = block.ordered ? "ol" : "ul";
@@ -230,7 +229,7 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
   }
   if ("tip" in block) {
     return (
-      <aside className="rounded-lg border border-marigold/50 bg-surface-2 px-5 py-4">
+      <aside className="rounded-lg bg-surface-2 px-5 py-4">
         <Inline text={block.tip} />
       </aside>
     );
@@ -242,17 +241,14 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
     // view; the frame takes focus so the keyboard can scroll it too
     return (
       <figure className="flex flex-col gap-2">
-        <figcaption
-          id={captionId}
-          className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-        >
+        <figcaption id={captionId} className="font-label text-sm text-ink-muted">
           {caption}
         </figcaption>
         <div
           role="region"
           aria-labelledby={captionId}
           tabIndex={0}
-          className="overflow-x-auto rounded-lg border border-line bg-surface shadow-raised focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+          className="overflow-x-auto rounded-lg border border-line bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
         >
           <table
             aria-labelledby={captionId}
@@ -302,20 +298,18 @@ function PostBody({ block, index, locale }: { block: PostBlock; index: number; l
     );
   }
   return (
-    <ul className="flex flex-col gap-4">
+    <ul className="flex flex-col border-y border-line">
       {block.wording.map((item, position) => (
         <li
           key={`${index}-${position}`}
-          className="flex flex-col gap-3 rounded-lg border border-line bg-surface p-5 shadow-raised"
+          className="flex flex-col gap-2 border-t border-line py-4 first:border-t-0 sm:flex-row sm:items-start sm:gap-6"
         >
-          {item.label && (
-            <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {item.label}
-            </p>
-          )}
-          <blockquote lang={item.lang} className="text-lg leading-relaxed">
-            {item.text}
-          </blockquote>
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
+            {item.label && <p className="font-label text-sm text-ink-muted">{item.label}</p>}
+            <blockquote lang={item.lang} className="text-lg leading-relaxed">
+              {item.text}
+            </blockquote>
+          </div>
           <CopyButton
             text={item.text}
             label={blogCopy.copy}
@@ -351,33 +345,26 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
         className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-6 pb-16 leading-relaxed sm:px-6 lg:px-8"
       >
         <header className="flex flex-col gap-4">
-          <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
-            {occasion}
-          </p>
+          <p className="font-label text-sm text-accent-text">{occasion}</p>
           <h1
             id="page-title"
-            className="font-display text-[1.9rem] leading-[1.08] break-words sm:text-[2.45rem]"
+            className="font-display text-[2rem] leading-[1.12] break-words sm:text-5xl sm:leading-[1.08]"
           >
             {post.heading}
           </h1>
           <PostMeta post={post} full />
-          <p className="text-lg text-ink-muted">{post.intro}</p>
+          {/* The answer first, straight under the title, for the reader who came for it */}
           {post.answer && (
-            <section
-              aria-labelledby="in-short"
-              className="rounded-lg border border-marigold/60 bg-surface-2 px-5 py-4"
-            >
-              <h2
-                id="in-short"
-                className="font-label text-xs tracking-[0.2em] text-accent-text uppercase"
-              >
+            <section aria-labelledby="in-short" className="rounded-lg bg-surface-2 px-5 py-4">
+              <h2 id="in-short" className="font-label text-sm text-accent-text">
                 {blogCopy.inShort}
               </h2>
-              <p className="mt-2 text-lg">
+              <p className="mt-1 text-lg">
                 <Inline text={post.answer} />
               </p>
             </section>
           )}
+          <p className="text-lg">{post.intro}</p>
           {cover && (
             // eslint-disable-next-line @next/next/no-img-element -- covers come from the admin's bucket at any size
             <img
@@ -386,20 +373,14 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
               width={1200}
               height={675}
               fetchPriority="high"
-              className="mt-2 aspect-[16/9] w-full rounded-lg border border-line object-cover shadow-raised"
+              className="mt-2 aspect-[16/9] w-full rounded-lg object-cover"
             />
           )}
         </header>
 
         {contents.length > 2 && (
-          <nav
-            aria-labelledby="post-contents"
-            className="rounded-lg border border-line bg-surface p-5 shadow-raised"
-          >
-            <h2
-              id="post-contents"
-              className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-            >
+          <nav aria-labelledby="post-contents" className="border-y border-line py-4">
+            <h2 id="post-contents" className="font-label text-sm text-ink-muted">
               {blogCopy.onThisPage}
             </h2>
             <ol className="-ms-2 mt-2 grid gap-x-6 sm:grid-cols-2">
@@ -445,7 +426,7 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
 
         <section
           aria-labelledby="cta-heading"
-          className="relative isolate mt-4 flex flex-col gap-4 overflow-hidden rounded-xl border border-marigold/50 bg-surface p-6 shadow-float sm:p-8"
+          className="mt-4 flex flex-col gap-4 rounded-xl bg-surface-2 p-6 sm:p-8"
         >
           <h2 id="cta-heading" className="font-display text-2xl sm:text-3xl">
             {blogCopy.ctaHeading(occasion)}
@@ -475,6 +456,18 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           <PostCards posts={more} headingLevel="h3" />
         </Block>
       )}
+
+      {/* On a phone the way from the words to a card stays in reach while reading; the
+          spacer keeps the footer clear of it */}
+      <div aria-hidden className="h-20 sm:hidden" />
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur sm:hidden">
+        <Button asChild className="w-full">
+          <Link href={startHref(post.occasion)} data-blog-sticky-start>
+            {blogCopy.ctaCreate}
+            <ArrowRight aria-hidden className="rtl:rotate-180" />
+          </Link>
+        </Button>
+      </div>
     </PublicShell>
   );
 }

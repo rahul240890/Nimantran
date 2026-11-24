@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { TemplateCover } from "@/components/brand/template-cover";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { OfferBar } from "@/components/offers/offer-bar";
-import { WelcomeOffer } from "@/components/offers/welcome-offer";
 import { JsonLd } from "@/components/seo/json-ld";
 import { SiteFooter } from "@/components/shell/site-footer";
 import { SiteHeader } from "@/components/shell/site-header";
@@ -45,7 +44,6 @@ export function PublicShell({
       <SiteHeader menu={siteMenu(locale)} />
       {/* Shown above the header, but after it for the keyboard: the skip link stays first */}
       <OfferBar />
-      <WelcomeOffer />
       <main id="main" tabIndex={-1} className="flex-1 overflow-x-clip outline-none">
         <nav
           aria-label={seoCopy.breadcrumbs}
@@ -55,10 +53,17 @@ export function PublicShell({
             {crumbs.map((crumb, index) => {
               const current = index === crumbs.length - 1;
               return (
-                <li key={crumb.path} className="flex items-center gap-1">
+                <li
+                  key={crumb.path}
+                  // A long page's own name is its heading just below; on a phone it isn't repeated
+                  className={cn(
+                    "flex items-center gap-1",
+                    current && index > 1 && "max-sm:sr-only",
+                  )}
+                >
                   {index > 0 && <ChevronRight aria-hidden className="size-4 rtl:rotate-180" />}
                   {current ? (
-                    <span aria-current="page" className="py-3 text-ink">
+                    <span aria-current="page" className="line-clamp-1 py-3 text-ink">
                       {crumb.name}
                     </span>
                   ) : (
