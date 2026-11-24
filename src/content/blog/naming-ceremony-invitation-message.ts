@@ -4,9 +4,9 @@ export const namingCeremonyInvitationMessage: BlogPost = {
   slug: "naming-ceremony-invitation-message",
   locale: "en",
   pair: "naming-ceremony",
-  title: "Naming ceremony invitation message: 24 to copy",
+  title: "Naming ceremony invitation: 24 messages + Hindi",
   description:
-    "Naming ceremony invitation messages to copy: namkaran, barse, barasala and noolukettu wording from the family or the baby, Hindi lines and WhatsApp texts.",
+    "24 naming ceremony invitation messages: namkaran, barse, barasala and noolukettu wording from the parents or the baby, Hindi lines and WhatsApp texts.",
   heading: "Naming ceremony invitation messages: namkaran, barse, barasala and more",
   intro:
     "A baby's naming ceremony is the first time the whole family gathers for the new arrival, and every region has its own name and day for it. Here are 24 invitation messages to copy: traditional wording from the parents and grandparents, sweet lines from the baby, regional wording for barse, barasala and noolukettu, Hindi messages and short WhatsApp texts.",

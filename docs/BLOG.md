@@ -65,6 +65,8 @@ Google's AI Overviews, ChatGPT, Perplexity and Gemini answer many of these searc
 - its FAQ covers the follow-up questions, each answer complete on its own;
 - it shows when it was last updated: change `updated` when the facts change, and the post shows "Updated" beside the date.
 
+**IndexNow** (`src/lib/seo/indexnow.ts`, 24 November 2026) tells Bing, whose index feeds ChatGPT search and Copilot, about new and changed pages within minutes. A post published from Admin pings at once; after each production deploy the IndexNow workflow (`.github/workflows/indexnow.yml`) sends posts updated in the last three days. After a change to many pages at once (titles, occasion pages), run that workflow by hand with **all** ticked. The key file is `/45ee731174a20f128b1ba8fda783dadb.txt`. Bing Webmaster Tools can import the site straight from Google Search Console.
+
 `/llms.txt` lists what Shubh is, its main pages, occasions, traditions and every post, for AI assistants that read it. It is a small extra, not a ranking tool: Google does not use it and studies so far show no clear effect. It is built from the site's own words and posts, so it costs nothing to keep.
 
 ## Keywords
@@ -84,6 +86,8 @@ Written (58 posts):
 Research (18 October 2026, web results only; no Search Console yet): niche occasions have almost no copyable wording, mostly template galleries; the closest content rival (Invifest) gives about four messages a page and Hindi only in Roman letters; the "best digital invitation website" lists that answer engines cite are vendors' own lists, and Shubh is in none of them; timing advice online is old (2019) and disagrees. Google's guidance for its AI features: no special schema or AI text file is needed; original, useful, up-to-date content is what counts. AI assistants cite newer pages than Google's normal results do, so keep `updated` honest and refresh seasonal posts every year.
 
 Search Console (6 November 2026, first 19 days of data): blog posts took 78% of impressions and clicks; the four posts in Bengali, Gujarati, Marathi and Tamil took 45% of all clicks at 5.7% CTR, against 1.4% for English posts. Many searches are typed in Latin letters ("biyer card lekha", "kankotri lakhan", "shadi ka card kitne din pahle"), so regional posts carry those spellings in the description and FAQ, not only in `keywords`. The full plan, with the 12-week calendar, is the "Shubh Invitation SEO growth plan" doc in the project.
+
+Search Console (24 November 2026, 28 days): 17,287 impressions and 495 clicks, 87% of clicks from posts; Bengali biyer card lekha alone 36%. Ten posts ranked 4 to 8 with under 1.5% CTR, so their titles now lead with the count or the answer ("4–6 हफ़्ते") and descriptions carry the Roman spellings people type. Occasion pages rank 17 to 50 for "… invitation card" searches, so they are getting questions and answers (`occasion-questions.ts`), starting with Lohri and Bengali annaprashan. The full plan, with videos and the 12-week calendar, is the "Shubh search growth plan: SEO, AEO and GEO" doc in the project.
 
 Next, in order:
 

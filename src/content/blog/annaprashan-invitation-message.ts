@@ -4,9 +4,9 @@ export const annaprashanInvitationMessage: BlogPost = {
   slug: "annaprashan-invitation-message",
   locale: "en",
   pair: "annaprashan",
-  title: "Annaprashan invitation message: 21 ideas",
+  title: "Annaprashan invitation message: 21 to copy",
   description:
-    "Annaprashan invitation messages to copy: traditional and modern rice ceremony wording, mukhe bhaat and choroonu lines, and short WhatsApp messages.",
+    "21 annaprashan invitation messages for your baby's rice ceremony: card wording, mukhe bhaat and choroonu lines, and short WhatsApp texts. Copy in one tap.",
   heading: "Annaprashan invitation messages for your baby's first rice ceremony",
   intro:
     "Annaprashan, the first time a baby is fed rice, is one of the sweetest family ceremonies, usually held when the baby is around six months old. Here are annaprashan invitation messages you can copy: traditional ones for elders, cute ones in the baby's voice, wording for a Bengali mukhe bhaat and a Malayali choroonu, and short texts for WhatsApp.",

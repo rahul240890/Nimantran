@@ -63,6 +63,24 @@ export const occasionQuestions: Record<UiLocale, LocaleQuestions> = {
           a: "Yes. Send a digital save the date link with a short personal message. Guests open it without an app, and you can send the full invitation to the same people later.",
         },
       ],
+      lohri: [
+        {
+          q: "When is Lohri in 2027?",
+          a: "Lohri falls on Wednesday, 13 January 2027. The bonfire is lit after sunset, so most Lohri invitations give an evening time such as 7 pm.",
+        },
+        {
+          q: "What should a Lohri invitation say?",
+          a: "A greeting such as Lohri di lakh lakh vadhaiyan, whose Lohri it is for a baby's or a new bride's first Lohri, the date, the evening time, the place of the bonfire, and whether dinner and dhol follow.",
+        },
+        {
+          q: "When should we send Lohri invitations?",
+          a: "One to two weeks before, so around the first week of January, with a call to elders and a short reminder on the morning of 13 January.",
+        },
+        {
+          q: "Can we make a first Lohri invitation card with the baby's photo?",
+          a: "Yes. Pick a Lohri design on Shubh, add the baby's or the couple's photo, names, time and place, and send it as one WhatsApp link. Guests open it without an app and reply in one tap.",
+        },
+      ],
     },
   },
   hi: {
@@ -102,6 +120,24 @@ export const occasionQuestions: Record<UiLocale, LocaleQuestions> = {
         {
           q: "सेव द डेट और शादी के कार्ड में क्या फ़र्क़ है?",
           a: "सेव द डेट सिर्फ़ तारीख़ खाली रखने को कहता है। शादी का कार्ड बाद में आता है, जिसमें हर फ़ंक्शन, समय और जगह होती है और मेहमानों से जवाब माँगा जाता है।",
+        },
+      ],
+      lohri: [
+        {
+          q: "2027 में लोहड़ी कब है?",
+          a: "लोहड़ी बुधवार, 13 जनवरी 2027 को है। अलाव सूर्यास्त के बाद जलता है, इसलिए ज़्यादातर निमंत्रणों में शाम का समय, जैसे 7 बजे, लिखा जाता है।",
+        },
+        {
+          q: "लोहड़ी के निमंत्रण में क्या लिखें?",
+          a: "लोहड़ी की बधाई, पहली लोहड़ी हो तो बच्चे या नई बहू का नाम, तारीख़, शाम का समय, अलाव की जगह, और भोजन या ढोल हो तो वह भी।",
+        },
+        {
+          q: "लोहड़ी का निमंत्रण कितने दिन पहले भेजें?",
+          a: "एक से दो हफ़्ते पहले, यानी जनवरी के पहले हफ़्ते तक। बुज़ुर्गों को फ़ोन भी करें और 13 जनवरी की सुबह एक छोटा याद-संदेश भेजें।",
+        },
+        {
+          q: "क्या पहली लोहड़ी के कार्ड में बच्चे की फ़ोटो लगा सकते हैं?",
+          a: "हाँ। शुभ इन्विटेशन पर लोहड़ी का डिज़ाइन चुनें, बच्चे या जोड़े की फ़ोटो, नाम, समय और जगह जोड़ें, और एक WhatsApp लिंक में भेजें। मेहमान बिना ऐप के खोलकर एक टैप में जवाब देते हैं।",
         },
       ],
     },
@@ -201,6 +237,24 @@ export const occasionQuestions: Record<UiLocale, LocaleQuestions> = {
         {
           q: "সেভ দ্য ডেটে কী লিখব?",
           a: "দুজনের নাম, বিয়ের তারিখ, শহর, আর নিমন্ত্রণ পত্র পরে আসবে এমন একটা লাইন। সময় আর জায়গা কার্ডে দিন।",
+        },
+      ],
+      annaprashan: [
+        {
+          q: "অন্নপ্রাশনের নিমন্ত্রণ পত্রে কী লিখব?",
+          a: "শুরুতে ঠাকুরের আশীর্বাদের একটি লাইন, শিশুর নাম, বাবা-মা বা দাদু-ঠাকুমার পক্ষ থেকে আমন্ত্রণ, অন্নপ্রাশনের তারিখ, সময়, স্থান, আর মধ্যাহ্নভোজ বা প্রীতিভোজের সময়।",
+        },
+        {
+          q: "অন্নপ্রাশনের নিমন্ত্রণ কত দিন আগে পাঠাব?",
+          a: "দুই থেকে তিন সপ্তাহ আগে পাঠান। বয়স্ক আত্মীয়দের ফোনেও বলুন, আর অনুষ্ঠানের আগের দিন একটি ছোট মনে করিয়ে দেওয়ার বার্তা দিন।",
+        },
+        {
+          q: "অন্নপ্রাশন আর মুখেভাত কি একই অনুষ্ঠান?",
+          a: "হ্যাঁ। শিশুর প্রথম ভাত খাওয়ার অনুষ্ঠানকে বাংলায় অন্নপ্রাশন বা মুখেভাত বলা হয়। কার্ডে যে নামটি আপনার পরিবারে চলে, সেটিই লিখুন।",
+        },
+        {
+          q: "অন্নপ্রাশনের কার্ড কি WhatsApp-এ পাঠানো যায়?",
+          a: "হ্যাঁ। শুভ ইনভিটেশনে অন্নপ্রাশনের ডিজাইন বেছে শিশুর ছবি, নাম, সময় আর স্থান যোগ করে একটি লিংক পাঠান। অতিথিরা কোনো অ্যাপ ছাড়াই খুলে এক ট্যাপে উত্তর দেন।",
         },
       ],
     },

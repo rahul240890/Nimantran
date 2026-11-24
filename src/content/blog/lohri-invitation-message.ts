@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const lohriInvitationMessage: BlogPost = {
   slug: "lohri-invitation-message",
   locale: "en",
-  title: "Lohri invitation message: 24 to copy",
+  title: "Lohri invitation message and card: 26 to copy",
   description:
-    "Lohri invitation messages to copy: for a baby's first Lohri, a new bride's first Lohri, family bonfires and society parties, in English and Hindi.",
+    "26 Lohri invitation messages and card lines to copy: baby's and new bride's first Lohri, family bonfires, society parties, in English and Hindi.",
   heading: "Lohri invitation messages, from the first Lohri to the society bonfire",
   intro:
-    "Lohri brings everyone round the bonfire with rewari, gajak, peanuts and bhangra, and the first Lohri of a new baby or a new bride is a celebration the whole family waits for. Here are 24 Lohri invitation messages to copy, for the first Lohri, family bonfires, society and office parties, in English and Hindi, with short WhatsApp texts.",
+    "Lohri brings everyone round the bonfire with rewari, gajak, peanuts and bhangra, and the first Lohri of a new baby or a new bride is a celebration the whole family waits for. Here are 26 Lohri invitation messages and card lines to copy, for the first Lohri, family bonfires, society and office parties, in English and Hindi, with short WhatsApp texts.",
   answer:
     "A Lohri invitation gives the date, usually 13 January, the evening time, the place of the bonfire and a festive line such as Happy Lohri. For a baby's or a new bride's first Lohri, name them and invite guests to bless them. Mention dinner and dhol, and send it a week or two before.",
   published: "2026-10-18",
-  updated: "2026-10-18",
+  updated: "2026-11-24",
   occasion: "lohri",
   keywords: [
     "lohri invitation message",
@@ -20,6 +20,9 @@ export const lohriInvitationMessage: BlogPost = {
     "baby first lohri invitation message",
     "lohri party invitation",
     "lohri invitation in hindi",
+    "lohri invitation card",
+    "lohri card",
+    "lohri 2027 date",
   ],
   body: [
     { h2: "Baby's first Lohri invitations", id: "baby" },
@@ -119,6 +122,36 @@ export const lohriInvitationMessage: BlogPost = {
       ],
     },
 
+    { h2: "Lohri invitation card wording", id: "card" },
+    "A Lohri card has room for less than a message, so keep it to the greeting, whose Lohri it is, the date, time and place. These two read well on a card or the first page of a digital invitation.",
+    {
+      wording: [
+        {
+          label: "First Lohri card",
+          text: "Lohri di lakh lakh vadhaiyan! With joy we invite you to the first Lohri of our son Veer. Wednesday, 13 January 2027, 7 pm onwards, Green Acres Farm, Ludhiana. Bonfire, dhol and dinner. With love, the Bajwa family.",
+        },
+        {
+          label: "Family Lohri card",
+          text: "Happy Lohri! The Malhotra family requests the pleasure of your company round the Lohri bonfire on 13 January 2027 at 7 pm, at our home. Dinner follows.",
+        },
+      ],
+    },
+    "On a digital Lohri card the date, place and map sit on their own page, so the front can hold just the greeting and a photo of the baby or the couple. See [Lohri invitation card designs](/invitations/lohri).",
+
+    { h2: "Lohri 2027: date and when to send", id: "dates" },
+    {
+      table: {
+        caption: "Lohri 2027 invitation timeline",
+        head: ["What", "When"],
+        rows: [
+          ["Lohri", "Wednesday, 13 January 2027, bonfire after sunset"],
+          ["Send the invitation", "About 30 December to 6 January"],
+          ["Call elders and close family", "When you send the invitation"],
+          ["Reminder", "The morning of 13 January"],
+        ],
+      },
+    },
+
     { h2: "What to write on a Lohri invitation", id: "what-to-write" },
     {
       list: [
@@ -138,6 +171,14 @@ export const lohriInvitationMessage: BlogPost = {
     "Browse [Lohri invitation designs](/invitations/lohri). Celebrating a first birthday soon after? Read [1st birthday invitation messages](/blog/first-birthday-invitation-message), and for the next festival, [Diwali party invitation messages](/blog/diwali-party-invitation-message).",
   ],
   faq: [
+    {
+      q: "When is Lohri in 2027?",
+      a: "Lohri falls on Wednesday, 13 January 2027. The bonfire is lit after sunset, so most invitations give an evening time such as 7 pm.",
+    },
+    {
+      q: "How do I make a Lohri invitation card online?",
+      a: "Pick a Lohri design on Shubh, add the names, date, time and place and a photo if you like, then send it as one WhatsApp link. Guests open it without an app and reply in one tap.",
+    },
     {
       q: "What do you write in a Lohri invitation?",
       a: "The date, usually 13 January, the evening time, the place of the bonfire and a greeting such as Happy Lohri. For a first Lohri, the baby's or the bride's name.",

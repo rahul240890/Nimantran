@@ -1,0 +1,27 @@
+name: IndexNow
+
+# After each production deploy, tell Bing and other IndexNow engines which pages changed
+# (scripts/indexnow.mjs). Run it by hand with "all" after a change that touches many pages.
+
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Send every page in the sitemap, not only recently updated posts"
+        type: boolean
+        default: false
+
+jobs:
+  ping:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/indexnow.mjs https://www.shubhinvitations.com ${{ inputs.all && '--all' || '' }}
