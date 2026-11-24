@@ -1,4 +1,10 @@
+import { existsSync } from "node:fs";
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
+import { MEDIA_FOLDERS, mediaBase } from "./src/lib/media";
+
+/** Where the theme paintings live once they're on Cloudflare R2 (src/lib/media.ts). */
+const MEDIA = mediaBase();
 
 /*
  * Safe defaults for every response (docs/LAUNCH.md). Scripts are not restricted by a CSP,
@@ -47,7 +53,18 @@ const nextConfig: NextConfig = {
       ],
     })),
   ],
+  // Any page or script still asking this site for a painting is sent on to R2
+  redirects: async () =>
+    MEDIA
+      ? MEDIA_FOLDERS.map((folder) => ({
+          source: `/${folder}/:path*`,
+          destination: `${MEDIA}/${folder}/:path*`,
+          permanent: true,
+        }))
+      : [],
   images: {
+    // The resizer may fetch the paintings from R2, and nothing else from outside
+    remotePatterns: MEDIA ? MEDIA_FOLDERS.map((folder) => new URL(`${MEDIA}/${folder}/**`)) : [],
     // 480 sits between 384 and 640, so a phone's hero cards (about 430px wide) aren't sent at 640
     imageSizes: [32, 48, 64, 96, 128, 256, 384, 480],
   },
@@ -90,4 +107,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+/*
+ * A build pointed at R2 must have copied the paintings there first (scripts/media-sync.mjs,
+ * run by "npm run build"). A build command that skips it would send guests to paintings that
+ * aren't on R2, so it stops here and the live site stays as it is.
+ */
+export default function config(phase: string): NextConfig {
+  if (phase === PHASE_PRODUCTION_BUILD && MEDIA && !existsSync(".media-synced")) {
+    throw new Error(
+      "NEXT_PUBLIC_MEDIA_URL is set but the paintings weren't copied to R2: build with `npm run build`.",
+    );
+  }
+  return nextConfig;
+}
