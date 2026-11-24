@@ -1,4 +1,6 @@
+import { existsSync } from "node:fs";
 import type { NextConfig } from "next";
+import { PHASE_PRODUCTION_BUILD } from "next/constants";
 import { MEDIA_FOLDERS, mediaBase } from "./src/lib/media";
 
 /** Where the theme paintings live once they're on Cloudflare R2 (src/lib/media.ts). */
@@ -105,4 +107,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+/*
+ * A build pointed at R2 must have copied the paintings there first (scripts/media-sync.mjs,
+ * run by "npm run build"). A build command that skips it would send guests to paintings that
+ * aren't on R2, so it stops here and the live site stays as it is.
+ */
+export default function config(phase: string): NextConfig {
+  if (phase === PHASE_PRODUCTION_BUILD && MEDIA && !existsSync(".media-synced")) {
+    throw new Error(
+      "NEXT_PUBLIC_MEDIA_URL is set but the paintings weren't copied to R2: build with `npm run build`.",
+    );
+  }
+  return nextConfig;
+}

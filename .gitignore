@@ -50,3 +50,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# written by scripts/media-sync.mjs
+/.media-synced

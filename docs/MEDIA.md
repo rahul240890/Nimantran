@@ -44,7 +44,9 @@ request to R2, so code that names a painting by its path keeps working.
 6. **Vercel.** In the project's **Settings › Environment Variables**, for Production only, add
    `NEXT_PUBLIC_MEDIA_URL` = `https://media.shubhinvitations.com`, `R2_ACCOUNT_ID`,
    `R2_BUCKET` = `shubh-media`, `R2_ACCESS_KEY_ID` and `R2_SECRET_ACCESS_KEY`. Check
-   **Settings › Build and Deployment › Build Command** is the default (`npm run build`).
+   **Settings › Build and Deployment › Build Command** is the default (`npm run build`): a
+   build with `NEXT_PUBLIC_MEDIA_URL` set that skipped the copy step stops with an error
+   (`next.config.ts`).
 7. **Redeploy** production. The first build uploads all ~6,200 files, which takes a few minutes;
    later builds upload only what changed.
 

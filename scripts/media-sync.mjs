@@ -18,7 +18,7 @@
  * Setup steps: docs/MEDIA.md.
  */
 import { createHash } from "node:crypto";
-import { readdir, readFile, rm } from "node:fs/promises";
+import { readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { extname, join, relative, sep } from "node:path";
 import { AwsClient } from "aws4fetch";
 
@@ -178,6 +178,9 @@ const sample = files.map(toKey).filter((key) => !keepOnDisk(key));
 for (const key of [sample[0], sample[Math.floor(sample.length / 2)], sample.at(-1)]) {
   await checkPublic(base, key, origin);
 }
+
+// next.config.ts refuses a build with the media host set that didn't come through here
+await writeFile(join(process.cwd(), ".media-synced"), `${base}\n`);
 
 if (process.env.VERCEL) {
   const leave = files.filter((path) => !keepOnDisk(toKey(path)));
