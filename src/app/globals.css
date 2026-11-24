@@ -41,17 +41,17 @@
   color-scheme: light;
 
   /* Surfaces */
-  --paper: #fbf6ec;
+  --paper: #fffcf7;
   --surface: #ffffff;
-  --surface-2: #f4ecdc;
-  --line: #e5d8c0;
-  --line-strong: #cdb993;
+  --surface-2: #f6f1e8;
+  --line: #ece4d8;
+  --line-strong: #d9cdbb;
 
   /* Text */
-  --ink: #2a1a24;
-  --ink-muted: #6b5864;
-  --ink-faint: #8f7c87; /* non-text or large text only: 3.6:1 on paper */
-  --line-control: #948273; /* input and checkbox borders: 3:1 on every surface */
+  --ink: #221a1f;
+  --ink-muted: #6b6067;
+  --ink-faint: #8c8088; /* non-text or large text only: 3.6:1 on paper */
+  --line-control: #8f8389; /* input and checkbox borders: 3:1 on every surface */
 
   /* Brand */
   --marigold: #f0a431;
@@ -59,9 +59,9 @@
   --on-marigold: #2a1a24;
   --marigold-edge: #c77410; /* the pressed-in edge under primary buttons */
   --gold-glint: #fff4d6; /* the light that sweeps across gold */
-  --accent-text: #9a4c08;
+  --accent-text: #7d1d3a;
   --rose: #a8334f;
-  --night: #120f24;
+  --night: #16121a;
 
   /* Status */
   --success: #1a6f45;
@@ -70,7 +70,7 @@
   --on-danger: #ffffff;
 
   /* Focus ring */
-  --ring: #9a4c08;
+  --ring: #7d1d3a;
 
   /* Depth: warm shadows on paper */
   --scrim: rgb(42 26 36 / 0.45);
@@ -197,24 +197,24 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     color-scheme: dark;
-    --paper: #120f24;
-    --surface: #1b1532;
-    --surface-2: #241c40;
-    --line: #3a3056;
-    --line-strong: #54477a;
-    --ink: #f6ecd8;
-    --ink-muted: #b9aac7;
-    --ink-faint: #8e80a0;
+    --paper: #16121a;
+    --surface: #201a24;
+    --surface-2: #2a2330;
+    --line: #352c38;
+    --line-strong: #4d4250;
+    --ink: #f3ece4;
+    --ink-muted: #b5aab0;
+    --ink-faint: #8a7f86;
     --marigold: #f0a431;
     --marigold-strong: #f5b75a;
     --on-marigold: #1c0f08;
-    --accent-text: #f5b75a;
+    --accent-text: #eaa0b4;
     --rose: #e67594;
     --success: #4cc38a;
     --warning: #f0b43c;
     --danger: #f2837a;
-    --ring: #f5b75a;
-    --line-control: #7a6c9c;
+    --ring: #eaa0b4;
+    --line-control: #7f7381;
     --marigold-edge: #a3590a;
     --on-danger: #2a0a08;
     --scrim: rgb(5 3 12 / 0.7);
@@ -230,24 +230,24 @@
 
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --paper: #120f24;
-  --surface: #1b1532;
-  --surface-2: #241c40;
-  --line: #3a3056;
-  --line-strong: #54477a;
-  --ink: #f6ecd8;
-  --ink-muted: #b9aac7;
-  --ink-faint: #8e80a0;
+  --paper: #16121a;
+  --surface: #201a24;
+  --surface-2: #2a2330;
+  --line: #352c38;
+  --line-strong: #4d4250;
+  --ink: #f3ece4;
+  --ink-muted: #b5aab0;
+  --ink-faint: #8a7f86;
   --marigold: #f0a431;
   --marigold-strong: #f5b75a;
   --on-marigold: #1c0f08;
-  --accent-text: #f5b75a;
+  --accent-text: #eaa0b4;
   --rose: #e67594;
   --success: #4cc38a;
   --warning: #f0b43c;
   --danger: #f2837a;
-  --ring: #f5b75a;
-  --line-control: #7a6c9c;
+  --ring: #eaa0b4;
+  --line-control: #7f7381;
   --marigold-edge: #a3590a;
   --on-danger: #2a0a08;
   --scrim: rgb(5 3 12 / 0.7);
@@ -5072,22 +5072,52 @@
 }
 
 /*
- * Type. The site's own pages set headings in Fraunces (Noto Serif Devanagari for Hindi and
- * Marathi) and everything else in Karla, small labels included, on a scale a step smaller
- * than Tailwind's (owner, 2026-10-24: clean and calm, not bold). Not inline, so a page's
- * invitation can put back the type it was designed in ([data-invitation], below).
- * Gujarati, Bengali and Tamil fall back to faces only the guest page and the editor load
- * (invitation/type/fonts.css), so a Tamil card's reply form reads in Tamil type there and
- * no other page downloads them.
+ * Type (owner, 2026-11-24 redesign): the site's own pages set everything in Anek, one design
+ * drawn for Latin, Devanagari (Hindi, Marathi), Bangla, Gujarati and Tamil, so every language
+ * reads as the same brand. Headings at semi-bold, text at regular, labels in sentence case.
+ * Each script's file downloads only when a page shows that script (unicode-range); the page's
+ * own language comes first in --site-face (below), so a Bengali page draws its dandas from
+ * Anek Bangla and never fetches the Devanagari file. "Anek Rupee" is the ₹ alone, cut from
+ * Anek Devanagari (src/app/fonts), so an English price doesn't fetch a whole script.
+ * Invitations keep the lettering they were designed in ([data-invitation], below).
  */
+@font-face {
+  font-family: "Anek Rupee";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 800;
+  src: url("./fonts/anek-rupee.woff2") format("woff2-variations");
+  unicode-range: U+20B9;
+}
+
+:root {
+  --site-face:
+    "Anek Latin Variable", "Anek Rupee", "Anek Devanagari Variable", "Anek Bangla Variable",
+    "Anek Gujarati Variable", "Anek Tamil Variable", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
+:root:lang(bn) {
+  --site-face:
+    "Anek Latin Variable", "Anek Rupee", "Anek Bangla Variable", "Anek Devanagari Variable",
+    "Anek Gujarati Variable", "Anek Tamil Variable", system-ui, sans-serif;
+}
+:root:lang(gu) {
+  --site-face:
+    "Anek Latin Variable", "Anek Rupee", "Anek Gujarati Variable", "Anek Devanagari Variable",
+    "Anek Bangla Variable", "Anek Tamil Variable", system-ui, sans-serif;
+}
+:root:lang(ta) {
+  --site-face:
+    "Anek Latin Variable", "Anek Rupee", "Anek Tamil Variable", "Anek Devanagari Variable",
+    "Anek Bangla Variable", "Anek Gujarati Variable", system-ui, sans-serif;
+}
+
 @theme {
-  --font-display:
-    "Fraunces Variable", "Noto Serif Devanagari", "Baloo Bhai 2", "Baloo Da 2", "Catamaran",
-    "Georgia", serif;
-  --font-sans:
-    "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
-    "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-label:
+  --font-display: var(--site-face);
+  --font-sans: var(--site-face);
+  --font-label: var(--site-face);
+  /* What invitations read in: Karla, and for Indian scripts the faces it always fell back to */
+  --font-card-sans:
     "Karla Variable", "Karla", "Noto Sans Devanagari Variable", "Hind Vadodara", "Baloo Da 2",
     "Catamaran", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* The lettering of invitations: their headings, labels and sacred symbols. Cormorant
@@ -5117,7 +5147,10 @@
 
 /* An invitation keeps the type it was designed in, on a guest's page and in every preview */
 [data-invitation] {
+  --font-sans: var(--font-card-sans);
   --font-display: var(--font-card-display);
+  /* The page's body is in Anek; the invitation's own words go back to its reading face */
+  font-family: var(--font-sans);
   --font-label: var(--font-card-label);
   --text-ui: 1rem;
   --text-lg: 1.125rem;
@@ -5317,11 +5350,12 @@
     }
   }
 
-  /* Headings in Fraunces at its regular weight, Karla labels at medium (owner, 2026-11-04:
-     lighter). Invitations set their own faces' weights */
-  :where(.font-display) {
-    font-weight: 400;
-    /* The Devanagari face comes in this one weight; never a smeared fake bold of it */
+  /* Headings in Anek at semi-bold, labels at medium (owner, 2026-11-24 redesign).
+     Invitations set their own faces' weights */
+  /* A class, not :where(), so it outranks the reset's h1 { font-weight: inherit } */
+  .font-display {
+    font-weight: 600;
+    /* Invitation faces come in one weight; never a smeared fake bold of them */
     font-synthesis-weight: none;
   }
   :where(.font-label) {
@@ -5613,6 +5647,19 @@
  * close-set and a touch larger, and give body text room for the matras. Labels on a guest
  * page in Marathi, Gujarati, Bengali or Tamil (the card's language) do the same.
  */
+/*
+ * Site labels are sentence case and close-set in every language (owner, 2026-11-24 redesign):
+ * no spaced-out capitals. Overrides the older uppercase and tracking classes until each page
+ * is redone; invitations keep their small capitals.
+ */
+.font-label:not(:where([data-invitation], [data-invitation] *)) {
+  letter-spacing: 0.01em !important;
+  text-transform: none !important;
+}
+.font-label.text-xs:not(:where([data-invitation], [data-invitation] *)) {
+  font-size: 0.8125rem;
+}
+
 :is(:lang(hi), :lang(mr), :lang(gu), :lang(bn), :lang(ta)) .font-label {
   letter-spacing: 0.02em !important;
   text-transform: none;

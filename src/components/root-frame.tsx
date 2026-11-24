@@ -1,11 +1,17 @@
 import type { ReactNode } from "react";
-// The site's headings: Fraunces, and for Hindi and Marathi one weight of Noto Serif Devanagari
-import "@fontsource-variable/fraunces/wght.css";
-import "@fontsource/noto-serif-devanagari/devanagari-500.css";
+// The site's one family, Anek, in each script it is drawn for (globals.css, --site-face); a
+// page downloads a script's file only when it shows that script
+import "@fontsource-variable/anek-latin/wght.css";
+import "@fontsource-variable/anek-devanagari/wght.css";
+import "@fontsource-variable/anek-bangla/wght.css";
+import "@fontsource-variable/anek-gujarati/wght.css";
+import "@fontsource-variable/anek-tamil/wght.css";
 // The lettering invitations keep (globals.css, [data-invitation]); a page downloads a face only when it shows it
 import "@fontsource/cormorant-garamond/600.css";
 import "@fontsource/cormorant-garamond/600-italic.css";
 import "@fontsource/tenor-sans";
+import "@fontsource/noto-serif-devanagari/devanagari-500.css";
+// What invitations read in (--font-card-sans)
 import "@fontsource-variable/karla";
 import "@fontsource-variable/karla/wght-italic.css";
 import "@fontsource-variable/noto-sans-devanagari";

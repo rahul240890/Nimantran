@@ -24,7 +24,7 @@ export function Logo({ className, href = "/" }: LogoProps) {
         <span className="font-display text-[1.375rem] leading-none tracking-[0.08em] uppercase">
           {site.shortName}
         </span>
-        <span className="font-label text-[0.6875rem] leading-none tracking-[0.24em] text-ink-muted">
+        <span className="font-sans text-[0.6875rem] leading-none font-medium tracking-[0.24em] text-ink-muted">
           Invitation
         </span>
       </span>
