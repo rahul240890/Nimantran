@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const firstBirthdayInvitationMessage: BlogPost = {
   slug: "first-birthday-invitation-message",
   locale: "en",
-  title: "1st birthday invitation message: 28 ideas",
+  title: "1st birthday invitation message: 28 samples",
   description:
-    "1st birthday invitation messages to copy: cute lines from the baby, warm wording from parents, traditional, themed and short WhatsApp messages.",
+    "28 first birthday invitation message samples: cute lines from the baby, warm wording from the parents, themed ideas and short WhatsApp invites.",
   heading: "1st birthday invitation messages: 28 lines from the baby, the parents and the family",
   intro:
     "A baby's first birthday is as much a thank-you to everyone who helped through the first year as it is a party. Here are first birthday invitation messages written as if the baby is inviting, warm wording from parents, traditional lines with the elders' blessings, themed party lines and short texts to send on WhatsApp. Copy any of them and change the names.",

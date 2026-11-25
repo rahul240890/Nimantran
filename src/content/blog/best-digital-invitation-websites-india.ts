@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const bestDigitalInvitationWebsitesIndia: BlogPost = {
   slug: "best-digital-invitation-websites-india",
   locale: "en",
-  title: "Best digital invitation websites in India",
+  title: "Best wedding invitation websites in India",
   description:
-    "Digital invitation websites and apps in India compared: what each makes, RSVP and guest lists, WhatsApp, languages and prices in rupees, checked Oct 2026.",
+    "The best wedding and digital invitation websites in India compared: designs, RSVP and guest lists, WhatsApp, languages and prices, checked Oct 2026.",
   heading: "Best digital invitation websites in India, compared (2026)",
   intro:
     "There are now many ways to send a wedding invitation on WhatsApp, and they are not the same thing: some make an image or a video to forward, some build an invitation website for you, some send messages and collect replies on WhatsApp. Here is what each popular option actually does and costs, from each company's own pages, so you can pick the one that fits your wedding.",

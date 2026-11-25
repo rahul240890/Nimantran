@@ -4,16 +4,16 @@ export const retirementPartyInvitationMessage: BlogPost = {
   slug: "retirement-party-invitation-message",
   locale: "en",
   pair: "retirement",
-  title: "Retirement party invitation message: 23 ideas",
+  title: "Retirement invitation message: 23 for WhatsApp",
   description:
-    "Retirement party and retirement lunch invitation messages to copy: from family and colleagues, formal function wording, farewell lines and WhatsApp texts.",
+    "23 retirement party and retirement lunch invitation messages for WhatsApp: from family and colleagues, formal function wording and farewell lines.",
   heading: "Retirement party invitation message: 23 ways to invite",
   intro:
     "Thirty or forty years of work deserve a proper thank-you. Whether the family is hosting a dinner for Papa or the office is saying goodbye to a much-loved colleague, here are 23 retirement invitation messages: formal, warm, light-hearted and short enough for WhatsApp.",
   answer:
     "A retirement party invitation names the person retiring, their years of service and the organisation, and invites guests to a dinner or farewell with the date, time and venue. Families write it warmly; offices keep it formal. Say whether it is a surprise, and whether guests may bring a message or memory to share.",
   published: "2026-10-03",
-  updated: "2026-11-06",
+  updated: "2026-11-25",
   occasion: "retirement",
   keywords: [
     "retirement party invitation message",
@@ -152,6 +152,10 @@ export const retirementPartyInvitationMessage: BlogPost = {
     "It is free to make and share an invitation with one function. See [retirement invitation designs](/invitations/retirement) or [farewell party designs](/invitations/farewell-party). Planning a milestone for parents? Read [anniversary party invitation messages](/blog/anniversary-party-invitation-message) and [birthday invitation messages](/blog/birthday-invitation-messages).",
   ],
   faq: [
+    {
+      q: "How do I send a retirement party invitation on WhatsApp?",
+      a: 'Send a short, warm message with whose retirement it is, the day, time and place, and the invitation link. For example: "Papa retires this month after 35 years! Join us for lunch on Sunday, 1 pm. Details in this link."',
+    },
     {
       q: "What do you write in a retirement party invitation?",
       a: "Whose retirement it is, their years of service, who is hosting, the date, time and venue, whether it is a surprise, and how to reply.",

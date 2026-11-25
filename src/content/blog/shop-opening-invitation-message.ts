@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const shopOpeningInvitationMessage: BlogPost = {
   slug: "shop-opening-invitation-message",
   locale: "en",
-  title: "Shop opening invitation message for WhatsApp",
+  title: "Shop opening invitation message: 34 for WhatsApp",
   description:
-    "Shop opening invitation messages to copy for WhatsApp, friends and customers: traditional and modern wording, office opening, puja times and welcome notes.",
+    "34 new shop opening invitation messages for WhatsApp, friends and customers: puja and inauguration wording, office opening lines and welcome notes.",
   heading: "Shop opening invitation message: 34 messages for a new shop, office or business",
   intro:
     "Opening a shop or office is the start of something you have worked hard for, and the first people through the door matter: family for the blessings, and customers, suppliers and neighbours for the business. Here are 34 invitation messages for a shop, showroom, clinic, restaurant or office opening, plus lines for the puja and ribbon cutting.",
   answer:
     "A shop opening invitation names the business, invites guests to the opening or udghatan, and gives the date, the muhurat or time and the full address with a map link. Families invite elders for blessings; businesses invite customers, often with an opening offer. Mention the puja time and any refreshments.",
   published: "2026-10-03",
-  updated: "2026-11-06",
+  updated: "2026-11-25",
   occasion: "shop-opening",
   keywords: [
     "shop opening invitation message",
@@ -213,6 +213,10 @@ export const shopOpeningInvitationMessage: BlogPost = {
     "It is free to make and share an invitation with one function. See [shop opening invitation designs](/invitations/shop-opening), or [launch invitation designs](/invitations/launch) for a product or company launch. For a home, read [griha pravesh invitation messages](/blog/griha-pravesh-invitation-message), and for a katha at the shop see [Satyanarayan puja invitation messages](/blog/satyanarayan-puja-invitation-message).",
   ],
   faq: [
+    {
+      q: "What is a good welcome message for a shop opening?",
+      a: 'Keep it to two lines that thank guests and invite them back. For example: "Welcome to Sharma Sweets! Thank you for being part of our first day. We hope to serve you for many years."',
+    },
     {
       q: "What do you write in a shop opening invitation?",
       a: "A blessing line, the name of the shop or business, who is inviting, the date, puja and inauguration time, the address with a map, and how to reply.",

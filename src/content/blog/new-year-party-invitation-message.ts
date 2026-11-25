@@ -3,12 +3,12 @@ import type { BlogPost } from "./types";
 export const newYearPartyInvitationMessage: BlogPost = {
   slug: "new-year-party-invitation-message",
   locale: "en",
-  title: "New Year party invitation message: 26 to copy",
+  title: "New Year party invitation message: 22 to copy",
   description:
     "New Year's Eve party invitation messages for 2027: house parties, office celebrations, society events and family dinners, with short WhatsApp texts.",
   heading: "New Year party invitation messages for 2027",
   intro:
-    "Whether it is a house party that runs past midnight, a family dinner with the cousins, the society's terrace party or the office's year-end bash, the invitation sets the mood. Here are 26 New Year party invitation messages to copy, short WhatsApp texts, and what every New Year's Eve invitation should say.",
+    "Whether it is a house party that runs past midnight, a family dinner with the cousins, the society's terrace party or the office's year-end bash, the invitation sets the mood. Here are 22 New Year party invitation messages to copy, short WhatsApp texts, and what every New Year's Eve invitation should say.",
   answer:
     "A New Year party invitation gives the date and time, usually 31 December from the evening till after midnight, the place, and the kind of party, from a house party to a family dinner. Add the dress code or theme, whether it is a potluck, and how guests get home late. Send it two to three weeks before.",
   published: "2026-10-18",

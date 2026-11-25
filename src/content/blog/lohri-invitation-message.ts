@@ -3,12 +3,12 @@ import type { BlogPost } from "./types";
 export const lohriInvitationMessage: BlogPost = {
   slug: "lohri-invitation-message",
   locale: "en",
-  title: "Lohri invitation message and card: 26 to copy",
+  title: "Lohri invitation message and card: 24 to copy",
   description:
-    "26 Lohri invitation messages and card lines to copy: baby's and new bride's first Lohri, family bonfires, society parties, in English and Hindi.",
+    "24 Lohri invitation messages and card lines to copy: baby's and new bride's first Lohri, family bonfires, society parties, in English and Hindi.",
   heading: "Lohri invitation messages, from the first Lohri to the society bonfire",
   intro:
-    "Lohri brings everyone round the bonfire with rewari, gajak, peanuts and bhangra, and the first Lohri of a new baby or a new bride is a celebration the whole family waits for. Here are 26 Lohri invitation messages and card lines to copy, for the first Lohri, family bonfires, society and office parties, in English and Hindi, with short WhatsApp texts.",
+    "Lohri brings everyone round the bonfire with rewari, gajak, peanuts and bhangra, and the first Lohri of a new baby or a new bride is a celebration the whole family waits for. Here are 24 Lohri invitation messages and card lines to copy, for the first Lohri, family bonfires, society and office parties, in English and Hindi, with short WhatsApp texts.",
   answer:
     "A Lohri invitation gives the date, usually 13 January, the evening time, the place of the bonfire and a festive line such as Happy Lohri. For a baby's or a new bride's first Lohri, name them and invite guests to bless them. Mention dinner and dhol, and send it a week or two before.",
   published: "2026-10-18",

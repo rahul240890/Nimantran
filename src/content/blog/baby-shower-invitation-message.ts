@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const babyShowerInvitationMessage: BlogPost = {
   slug: "baby-shower-invitation-message",
   locale: "en",
-  title: "Baby shower invitation message: 25 ideas",
+  title: "Baby shower invitation message: 25 to copy",
   description:
-    "Baby shower invitation messages to copy, with wording for godh bharai, seemantham, valaikappu and dohale jevan, and what each regional ceremony means.",
+    "25 baby shower invitation messages for WhatsApp and cards: godh bharai, seemantham, valaikappu and dohale jevan wording, and what each one means.",
   heading: "Baby shower invitation messages, from godh bharai to valaikappu",
   intro:
     "Across India, families bless a mother-to-be in the last months of her pregnancy, and every region has its own name and way of doing it. Here are baby shower invitation messages you can copy: modern ones for friends, traditional ones for elders, and wording for a godh bharai, seemantham, valaikappu or dohale jevan, with a short guide to what each name means.",
