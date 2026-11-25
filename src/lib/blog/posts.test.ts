@@ -3,6 +3,8 @@ import { POSTS } from "@/content/blog";
 import { POST_PAIRS } from "@/lib/blog/addresses";
 import { UI_LOCALES } from "@/i18n/locales";
 import { pagePath, publicPages, switchLocalePath } from "@/lib/seo/paths";
+import { SAMPLE_VIDEOS } from "@/lib/videos/catalog";
+import { VIDEOS_INDEX, videoPath } from "@/lib/videos/pages";
 import {
   blogPostPath,
   postLinks,
@@ -62,6 +64,8 @@ describe("blog posts", () => {
     const known = new Set([
       ...publicPages().flatMap((page) => UI_LOCALES.map((locale) => pagePath(page, locale))),
       ...POSTS.map((post) => blogPostPath(post.slug, post.locale)),
+      VIDEOS_INDEX,
+      ...SAMPLE_VIDEOS.map(videoPath),
     ]);
     for (const post of POSTS) {
       for (const link of postLinks(post))

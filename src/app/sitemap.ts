@@ -1,4 +1,7 @@
 import type { MetadataRoute } from "next";
+import { videoText } from "@/components/videos/video-pages";
+import { SAMPLE_VIDEOS } from "@/lib/videos/catalog";
+import { VIDEOS_INDEX, VIDEOS_PUBLISHED, videoFileUrls, videoPath } from "@/lib/videos/pages";
 import { UI_LOCALES } from "@/i18n/locales";
 import { blogPostPath, translatedPost } from "@/lib/blog/posts";
 import { allPostsIn } from "@/lib/blog/store";
@@ -65,5 +68,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates: { languages },
     };
   });
-  return [...pages, ...posts];
+  // Each sample video's page, with the video itself, so search can show it (src/lib/videos)
+  const videos = SAMPLE_VIDEOS.map((video) => {
+    const { title, description } = videoText(video);
+    const { src, poster } = videoFileUrls(video);
+    return {
+      url: absolute(videoPath(video)),
+      lastModified: VIDEOS_PUBLISHED,
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+      videos: [
+        {
+          title,
+          description,
+          thumbnail_loc: poster,
+          content_loc: src,
+          duration: Math.round(video.seconds),
+          publication_date: VIDEOS_PUBLISHED,
+          family_friendly: "yes" as const,
+          requires_subscription: "no" as const,
+        },
+      ],
+    };
+  });
+  const videoIndex = {
+    url: absolute(VIDEOS_INDEX),
+    lastModified: VIDEOS_PUBLISHED,
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  };
+  return [...pages, ...posts, videoIndex, ...videos];
 }

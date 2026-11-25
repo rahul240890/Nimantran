@@ -28,6 +28,7 @@ import { cn } from "@/lib/cn";
 import { CopyButton } from "./copy-button";
 import { Inline } from "./inline";
 import { SampleDesigns } from "./sample-designs";
+import { OccasionVideo } from "@/components/videos/video-pages";
 
 /*
  * The blog (docs/BLOG.md): its front page in each language, and each post. Every word is
@@ -442,6 +443,8 @@ export function BlogPostPage({ post, more }: { post: BlogPost; more: BlogPost[] 
           locale={locale}
           heading={blogCopy.sampleDesigns(occasion)}
         />
+
+        <OccasionVideo occasion={post.occasion} locale={locale} />
 
         <section
           aria-labelledby="cta-heading"

@@ -89,6 +89,8 @@ Search Console (6 November 2026, first 19 days of data): blog posts took 78% of 
 
 Search Console (24 November 2026, 28 days): 17,287 impressions and 495 clicks, 87% of clicks from posts; Bengali biyer card lekha alone 36%. Ten posts ranked 4 to 8 with under 1.5% CTR, so their titles now lead with the count or the answer ("4–6 हफ़्ते") and descriptions carry the Roman spellings people type. Occasion pages rank 17 to 50 for "… invitation card" searches, so they are getting questions and answers (`occasion-questions.ts`), starting with Lohri and Bengali annaprashan. The full plan, with videos and the 12-week calendar, is the "Shubh search growth plan: SEO, AEO and GEO" doc in the project.
 
+Four steps (25 November 2026): Sankranti, Pongal and griha pravesh occasion pages answer questions in every language; two Bengali posts, ছেলের বিয়ের কার্ডের লেখা (groom's side) and মেয়ের বিয়ের কার্ডের লেখা (bride's side), paired with বিয়ের কার্ডের লেখা; 16 sample invitation videos, each with a watch page (`/videos/<id>`, VideoObject data and a video sitemap entry), shown on occasion pages and posts (`src/lib/videos/catalog.ts`; make more with `node scripts/sample-videos.mjs <dev server url>`, the build uploads them to R2 with the other media); and the page-two English posts retitled from their queries. Counts in titles and headings now match the wordings in the post: check them whenever wordings are added or removed.
+
 Next, in order:
 
 1. Ask the lists that rank for "best invitation app India" (Weddingkart, The Curated Knot, Samaro) to include Shubh.

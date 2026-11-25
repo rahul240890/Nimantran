@@ -131,6 +131,31 @@ export function blogPosting(post: {
   };
 }
 
+/** A video with its file, poster and length, so search can show it with a thumbnail. */
+export function videoObject(video: {
+  name: string;
+  description: string;
+  contentUrl: string;
+  thumbnailUrl: string;
+  seconds: number;
+  path: string;
+  locale: UiLocale;
+}): Thing {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: video.name,
+    description: video.description,
+    contentUrl: video.contentUrl,
+    thumbnailUrl: [video.thumbnailUrl],
+    uploadDate: "2026-11-25T00:00:00+05:30",
+    duration: `PT${Math.round(video.seconds)}S`,
+    inLanguage: inLanguage(video.locale),
+    url: absolute(video.path),
+    publisher: { "@id": absolute("/#organization") },
+  };
+}
+
 /** JSON for a script tag: "<" is escaped so no text can close the tag early. */
 export function jsonLdText(data: Thing | Thing[]): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");

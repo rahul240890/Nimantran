@@ -3,16 +3,16 @@ import type { BlogPost } from "./types";
 export const weddingInvitationVideo: BlogPost = {
   slug: "wedding-invitation-video",
   locale: "en",
-  title: "Wedding invitation video for WhatsApp Status",
+  title: "Wedding invitation video for WhatsApp: samples",
   description:
-    "How to make a wedding invitation video for WhatsApp Status and Instagram Reels: length, size, music, what to show, and how to pair it with an RSVP link.",
+    "Wedding invitation videos for WhatsApp Status and Reels: watch sample videos, then get the length, size, music and what to show right for your own.",
   heading: "How to make a wedding invitation video for WhatsApp Status and Reels",
   intro:
     "Video invitations have become part of the Indian wedding: a short vertical film of the card, the couple's names and each function, set to music, posted on WhatsApp Status and Instagram. Studios charge ₹2,000 to ₹6,000 for one. Here is what makes a good one, and how to make yours from your invitation in a few minutes.",
   answer:
     "A wedding invitation video is a short vertical film of the card, the couple's names and each function, set to music, for WhatsApp Status and Instagram Reels, usually 30 to 60 seconds long. On Shubh the video is made from your invitation itself and comes with the Celebration and Grand packages.",
   published: "2026-10-03",
-  updated: "2026-10-03",
+  updated: "2026-11-25",
   occasion: "wedding",
   keywords: [
     "wedding invitation video",
@@ -22,6 +22,7 @@ export const weddingInvitationVideo: BlogPost = {
     "wedding invitation reel",
   ],
   body: [
+    "To see what a finished one looks like, watch our [sample invitation videos](/videos) for weddings, griha pravesh, festivals and birthdays, in Hindi, Gujarati, Marathi, Bengali, Tamil and English, each made from an invitation in a few minutes.",
     { h2: "What makes a good invitation video", id: "good-video" },
     {
       list: [
