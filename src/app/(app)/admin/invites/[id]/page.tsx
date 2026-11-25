@@ -402,7 +402,7 @@ export default async function AdminInvitePage({ params }: PageProps<"/admin/invi
 function Detail({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-4">
-      <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase sm:w-20 sm:shrink-0 sm:pt-0.5">
+      <dt className="font-label text-[0.7rem] text-ink-muted sm:w-20 sm:shrink-0 sm:pt-0.5">
         {label}
       </dt>
       <dd className="min-w-0">{children}</dd>

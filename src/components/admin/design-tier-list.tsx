@@ -133,7 +133,7 @@ function ChipRow<T extends string>({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">{label}</p>
+      <p className="font-label text-xs text-ink-muted">{label}</p>
       <div role="group" aria-label={label} className="flex flex-wrap gap-2">
         {options.map((option) => (
           <button
@@ -574,7 +574,7 @@ export function DesignTierList({
           pages={paintedPages(open.design)}
           badge={
             <p className="flex flex-wrap items-center gap-2 text-sm text-card-ivory/80">
-              <span className="inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] tracking-[0.12em] text-on-marigold uppercase">
+              <span className="inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] text-on-marigold">
                 {TIER_NAMES[tierOf(open)]}
                 {tierOf(open) !== "free" &&
                   ` · ${formatRupees(tierPricePaise(prices, tierOf(open)))}`}
@@ -585,7 +585,7 @@ export function DesignTierList({
           action={
             <div className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
-                <p className="font-label text-xs tracking-[0.2em] text-card-ivory/80 uppercase">
+                <p className="font-label text-xs text-card-ivory/80">
                   Tier
                   {tierOf(open) !== open.tier && (
                     <span className="ms-2 tracking-normal text-marigold normal-case">

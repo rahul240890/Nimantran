@@ -78,10 +78,7 @@ export async function LegalPage({
           aria-labelledby="legal-contents"
           className="rounded-lg border border-line bg-surface p-5 shadow-raised"
         >
-          <h2
-            id="legal-contents"
-            className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-          >
+          <h2 id="legal-contents" className="font-label text-xs text-ink-muted">
             {legalCopy.onThisPage}
           </h2>
           <ol className="-ms-2 mt-2 grid gap-x-6 sm:grid-cols-2">

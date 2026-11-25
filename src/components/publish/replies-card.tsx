@@ -65,9 +65,7 @@ export async function RepliesCard({
             ))}
           </ul>
           <div className="flex flex-col gap-2">
-            <h3 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {repliesCopy.latest}
-            </h3>
+            <h3 className="font-label text-xs text-ink-muted">{repliesCopy.latest}</h3>
             <ul className="flex flex-col divide-y divide-line">
               {latest.map((guest, index) => (
                 <li key={`${guest.name}-${index}`} className="flex flex-col gap-1 py-3">

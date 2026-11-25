@@ -109,10 +109,7 @@ export function PreviewOffers({
     >
       <h3
         id={`offers-${designId}`}
-        className={cn(
-          "flex items-center gap-2 font-label text-xs tracking-[0.2em] uppercase",
-          colours.heading,
-        )}
+        className={cn("flex items-center gap-2 font-label text-xs", colours.heading)}
       >
         <Sparkles aria-hidden className="size-4 animate-twinkle text-marigold" />
         {words.previewHeading}

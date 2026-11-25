@@ -28,9 +28,7 @@ import type { DashboardView } from "./types";
 function Stat({ label, value, note }: { label: string; value: string; note: string }) {
   return (
     <div className="flex min-w-0 flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised sm:px-5">
-      <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-        {label}
-      </dt>
+      <dt className="font-label text-[0.7rem] text-ink-muted">{label}</dt>
       <dd className="font-display text-3xl leading-none tabular-nums sm:text-4xl">{value}</dd>
       <dd className="text-sm text-ink-muted">{note}</dd>
     </div>
@@ -63,7 +61,7 @@ export async function GuestDashboard({
         </Link>
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div className="flex min-w-0 flex-col gap-2">
-            <p className="flex flex-wrap items-center gap-2 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
+            <p className="flex flex-wrap items-center gap-2 font-label text-xs text-accent-text">
               {copy.eyebrow}
               {view.live ? (
                 <Badge tone="success" dot>
@@ -204,9 +202,7 @@ export async function GuestDashboard({
         </dl>
         {counts.functions.length > 0 && counts.guests > 0 && (
           <div className="flex flex-col gap-3">
-            <h2 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {copy.functionsHeading}
-            </h2>
+            <h2 className="font-label text-xs text-ink-muted">{copy.functionsHeading}</h2>
             <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {counts.functions.map((fn) => (
                 <li

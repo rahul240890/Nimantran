@@ -110,7 +110,7 @@ export default async function InvoicePage({
 
           <div className="grid gap-6 sm:grid-cols-2">
             <section aria-labelledby="from" className="flex flex-col gap-1">
-              <h2 id="from" className="font-label text-[0.7rem] tracking-[0.2em] uppercase">
+              <h2 id="from" className="font-label text-[0.7rem]">
                 From
               </h2>
               <p className="font-semibold text-ink">{business.legalName || site.name}</p>
@@ -119,7 +119,7 @@ export default async function InvoicePage({
               {business.email && <p>{business.email}</p>}
             </section>
             <section aria-labelledby="to" className="flex flex-col gap-1">
-              <h2 id="to" className="font-label text-[0.7rem] tracking-[0.2em] uppercase">
+              <h2 id="to" className="font-label text-[0.7rem]">
                 Billed to
               </h2>
               <p className="font-semibold text-ink">{buyer?.name || "Customer"}</p>
@@ -131,16 +131,10 @@ export default async function InvoicePage({
           <table className="w-full text-start">
             <thead>
               <tr className="border-b border-line">
-                <th
-                  scope="col"
-                  className="py-2 text-start font-label text-[0.7rem] font-normal tracking-[0.2em] uppercase"
-                >
+                <th scope="col" className="py-2 text-start font-label text-[0.7rem] font-normal">
                   Item
                 </th>
-                <th
-                  scope="col"
-                  className="py-2 text-end font-label text-[0.7rem] font-normal tracking-[0.2em] uppercase"
-                >
+                <th scope="col" className="py-2 text-end font-label text-[0.7rem] font-normal">
                   Amount
                 </th>
               </tr>

@@ -119,9 +119,7 @@ function Summary({ summary }: { summary: VisitSummary }) {
             key={tile.label}
             className="flex min-w-0 flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised"
           >
-            <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-              {tile.label}
-            </dt>
+            <dt className="font-label text-[0.7rem] text-ink-muted">{tile.label}</dt>
             <dd className="font-display text-3xl leading-none tabular-nums">
               {number.format(tile.value)}
             </dd>
@@ -250,11 +248,7 @@ function Summary({ summary }: { summary: VisitSummary }) {
 }
 
 function ListLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="-mb-4 font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-      {children}
-    </p>
-  );
+  return <p className="-mb-4 font-label text-[0.7rem] text-ink-muted">{children}</p>;
 }
 
 /** Rows with a bar behind each count, longest first. */

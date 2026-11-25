@@ -63,9 +63,7 @@ function TabLinks({
       </ul>
       {tab.more && (
         <div className="mt-2 flex flex-col gap-2 border-t border-line px-3 pt-3">
-          <p className="font-label text-xs tracking-[0.18em] text-ink-muted uppercase">
-            {tab.more.title}
-          </p>
+          <p className="font-label text-xs text-ink-muted">{tab.more.title}</p>
           <ul className="flex flex-wrap gap-2">
             {tab.more.links.map((link) => (
               <li key={link.href}>
@@ -166,9 +164,7 @@ function MobileMenu({ menu }: { menu: SiteMenu }) {
         </div>
         <div className="mt-6 flex flex-col gap-6 border-t border-line pt-6">
           <div className="flex flex-col gap-2.5">
-            <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {shell.language.label}
-            </p>
+            <p className="font-label text-xs text-ink-muted">{shell.language.label}</p>
             <LanguageSwitcher variant="full" />
           </div>
           <Button asChild fullWidth>

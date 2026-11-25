@@ -50,9 +50,7 @@ export function CollectionTiles({
         const ids = COLLECTION_IDS.filter((id) => COLLECTIONS[id].group === group);
         return (
           <div key={group} className="flex flex-col gap-2">
-            <h3 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-              {collectionCopy.groups[group]}
-            </h3>
+            <h3 className="font-label text-xs text-ink-muted">{collectionCopy.groups[group]}</h3>
             <ScrollRow
               labels={shelfCopy}
               className={cn(
@@ -96,7 +94,7 @@ export function CollectionTiles({
                           className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-night/85 via-night/40 to-transparent"
                         />
                         <span className="absolute inset-x-0 bottom-0 flex flex-col gap-0.5 p-3">
-                          <span className="font-label text-[0.6rem] tracking-[0.18em] text-card-ivory/80 uppercase">
+                          <span className="font-label text-[0.6rem] text-card-ivory/80">
                             {collectionCopy.label}
                           </span>
                           <span className="font-display text-lg leading-tight text-card-ivory">

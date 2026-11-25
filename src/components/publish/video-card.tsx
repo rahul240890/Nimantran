@@ -256,7 +256,7 @@ export function VideoCard(props: VideoCardProps) {
           {/* Being made: the frames as they're drawn, so the video is seen coming */}
           {state.step === "making" && <LiveFrame frame={state.frame} done={state.done} />}
           {shownMarked && (
-            <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-night/65 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.18em] text-card-ivory uppercase">
+            <span className="pointer-events-none absolute start-2 top-2 rounded-full bg-night/65 px-2.5 py-1 font-label text-[0.65rem] text-card-ivory">
               {videoCopy.preview}
             </span>
           )}

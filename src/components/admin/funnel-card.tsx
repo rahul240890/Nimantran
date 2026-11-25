@@ -73,9 +73,7 @@ export function FunnelCard({ funnel }: { funnel: FunnelSummary | null }) {
               key={tile.label}
               className="flex min-w-0 flex-col gap-1 rounded-md border border-line bg-surface-2 px-4 py-3"
             >
-              <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-                {tile.label}
-              </dt>
+              <dt className="font-label text-[0.7rem] text-ink-muted">{tile.label}</dt>
               <dd className="font-display text-2xl leading-none tabular-nums">{tile.value}</dd>
             </div>
           ))}
@@ -133,7 +131,7 @@ export function FunnelCard({ funnel }: { funnel: FunnelSummary | null }) {
         {funnel.sources.length > 0 && (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[34rem] text-sm tabular-nums">
-              <caption className="pb-2 text-start font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
+              <caption className="pb-2 text-start font-label text-[0.7rem] text-ink-muted">
                 How far each source got
               </caption>
               <thead className="text-ink-muted">
@@ -183,9 +181,7 @@ export function FunnelCard({ funnel }: { funnel: FunnelSummary | null }) {
 
         {funnel.designs.length > 0 && (
           <div className="flex flex-col gap-2">
-            <p className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-              Designs opened most
-            </p>
+            <p className="font-label text-[0.7rem] text-ink-muted">Designs opened most</p>
             <ul className="flex flex-wrap gap-2">
               {funnel.designs.map((design) => (
                 <li

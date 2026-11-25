@@ -32,9 +32,7 @@ import {
 function Row({ term, children }: { term: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1 border-t border-line py-3 first:border-t-0 first:pt-0 sm:flex-row sm:justify-between sm:gap-6">
-      <dt className="shrink-0 font-label text-xs tracking-[0.16em] text-ink-muted uppercase sm:pt-0.5">
-        {term}
-      </dt>
+      <dt className="shrink-0 font-label text-xs text-ink-muted sm:pt-0.5">{term}</dt>
       <dd className="min-w-0 text-sm text-ink sm:text-end">{children}</dd>
     </div>
   );
@@ -69,9 +67,7 @@ export function TemplatesReview({
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="flex flex-col gap-3">
-          <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-            {t.eyebrow}
-          </p>
+          <p className="font-label text-xs text-accent-text">{t.eyebrow}</p>
           <h1 className="font-display text-[1.9rem] leading-[1.05] sm:text-5xl">{t.title}</h1>
           <p className="max-w-2xl text-lg text-ink-muted">{t.intro}</p>
         </div>

@@ -125,10 +125,7 @@ export function PageHero({
         }}
       />
       <div className={cn("flex flex-col gap-5", !aside && "lg:col-span-2 lg:max-w-3xl")}>
-        <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-          <span aria-hidden className="h-px w-6 bg-marigold" />
-          {eyebrow}
-        </p>
+        <p className="flex items-center gap-3 font-label text-xs text-accent-text">{eyebrow}</p>
         <h1
           id="page-title"
           className="font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.6rem] lg:text-[2.85rem]"

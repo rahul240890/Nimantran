@@ -115,8 +115,7 @@ export async function HomeDesigns({ locale }: { locale: UiLocale }) {
       <div className="mx-auto flex w-full max-w-site flex-col gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:gap-12 lg:px-8">
         <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
           <div className="flex max-w-2xl min-w-0 flex-col gap-2">
-            <p className="flex items-center gap-3 font-label text-xs tracking-[0.24em] text-accent-text uppercase">
-              <span aria-hidden className="h-px w-6 bg-marigold" />
+            <p className="flex items-center gap-3 font-label text-xs text-accent-text">
               {homeRows.eyebrow}
             </p>
             <h2 id="designs-title" className="font-display text-[1.6rem] leading-tight sm:text-3xl">

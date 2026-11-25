@@ -19,7 +19,7 @@ export function GuestPreviewLoading() {
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-night px-6 text-card-ivory">
       <Spinner className="size-8" />
-      <p role="status" className="font-label text-xs tracking-[0.2em] uppercase">
+      <p role="status" className="font-label text-xs">
         {hostPreviewCopy.opening}
       </p>
     </div>
@@ -72,9 +72,7 @@ export function SharePageLoading() {
             <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
             {shareCopy.back}
           </span>
-          <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-            {shareCopy.eyebrow}
-          </p>
+          <p className="font-label text-xs text-accent-text">{shareCopy.eyebrow}</p>
           <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
             {shareCopy.title}
           </h1>

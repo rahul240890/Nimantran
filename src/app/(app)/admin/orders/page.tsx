@@ -46,23 +46,17 @@ export default async function OrdersPage() {
       <div className="flex flex-col gap-6">
         <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:max-w-2xl">
           <div className="flex flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised">
-            <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-              Paid
-            </dt>
+            <dt className="font-label text-[0.7rem] text-ink-muted">Paid</dt>
             <dd className="font-display text-3xl leading-none tabular-nums">{paid.length}</dd>
           </div>
           <div className="flex flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised">
-            <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-              Taken
-            </dt>
+            <dt className="font-label text-[0.7rem] text-ink-muted">Taken</dt>
             <dd className="font-display text-3xl leading-none tabular-nums">
               {formatRupees(revenue)}
             </dd>
           </div>
           <div className="flex flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised">
-            <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-              Refunded
-            </dt>
+            <dt className="font-label text-[0.7rem] text-ink-muted">Refunded</dt>
             <dd className="font-display text-3xl leading-none tabular-nums">{refunded.length}</dd>
           </div>
         </dl>
@@ -96,7 +90,7 @@ export default async function OrdersPage() {
                           <th
                             key={head}
                             scope="col"
-                            className="px-3 py-2.5 text-start font-label text-[0.7rem] font-normal tracking-[0.18em] uppercase first:ps-5 last:pe-5 sm:first:ps-6 sm:last:pe-6"
+                            className="px-3 py-2.5 text-start font-label text-[0.7rem] font-normal first:ps-5 last:pe-5 sm:first:ps-6 sm:last:pe-6"
                           >
                             {head || <span className="sr-only">Actions</span>}
                           </th>

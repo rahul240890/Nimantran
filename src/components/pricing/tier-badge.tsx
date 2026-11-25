@@ -71,7 +71,7 @@ export function TierBadge({
         data-tier={tier}
         data-paid={paid}
         className={cn(
-          "inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-label text-[0.65rem] tracking-[0.12em] whitespace-nowrap uppercase",
+          "inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-label text-[0.65rem] whitespace-nowrap",
           PAID_TONES[variant],
           className,
         )}
@@ -86,7 +86,7 @@ export function TierBadge({
     <span
       data-tier={tier}
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-label text-[0.65rem] tracking-[0.12em] whitespace-nowrap uppercase",
+        "inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-label text-[0.65rem] whitespace-nowrap",
         TONES[variant][tier],
         className,
       )}

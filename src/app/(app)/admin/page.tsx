@@ -68,9 +68,7 @@ export default async function AdminOverview() {
               key={tile.label}
               className="flex min-w-0 flex-col gap-2 rounded-lg border border-line bg-surface px-5 py-5 shadow-raised"
             >
-              <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-                {tile.label}
-              </dt>
+              <dt className="font-label text-[0.7rem] text-ink-muted">{tile.label}</dt>
               <dd className="font-display text-[1.5rem] leading-none">{tile.value}</dd>
               <dd>
                 <Badge tone={tile.state.tone} dot>

@@ -419,9 +419,7 @@ export function Cohosts({ view }: { view: DashboardView }) {
 
       {owner && view.hostInvites.length > 0 && (
         <div className="flex flex-col gap-3 border-t border-line pt-4">
-          <h3 className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-            {copy.pending}
-          </h3>
+          <h3 className="font-label text-xs text-ink-muted">{copy.pending}</h3>
           <ul className="flex flex-col gap-4">
             {view.hostInvites.map((invite) => (
               <li key={invite.id} className="flex flex-col gap-2">

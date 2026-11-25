@@ -161,9 +161,7 @@ export default async function EditionPage({
               {publishHref ? upgradeCopy.backToEditor : upgradeCopy.back}
             </Link>
             <div className="flex max-w-2xl flex-col gap-2">
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                {upgradeCopy.eyebrow}
-              </p>
+              <p className="font-label text-xs text-accent-text">{upgradeCopy.eyebrow}</p>
               <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2.15rem]">
                 {upgradeCopy.title}
               </h1>

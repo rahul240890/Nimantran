@@ -119,9 +119,7 @@ export function SharePanel({
           <ArrowLeft aria-hidden className="size-4 rtl:rotate-180" />
           {shareCopy.back}
         </Link>
-        <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-          {shareCopy.eyebrow}
-        </p>
+        <p className="font-label text-xs text-accent-text">{shareCopy.eyebrow}</p>
         <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
           {shareCopy.title}
         </h1>

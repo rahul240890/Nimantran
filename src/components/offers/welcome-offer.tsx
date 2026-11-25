@@ -152,7 +152,7 @@ function WelcomeDialog({
 
             <div className="flex min-h-0 flex-col md:overflow-y-auto">
               <div className="flex flex-col gap-2 px-5 pt-5 sm:px-7 sm:pt-7 md:pe-16">
-                <p className="inline-flex items-center gap-1.5 self-start rounded-full bg-marigold/15 px-3 py-1 font-label text-xs tracking-[0.14em] text-accent-text uppercase">
+                <p className="inline-flex items-center gap-1.5 self-start rounded-full bg-marigold/15 px-3 py-1 font-label text-xs text-accent-text">
                   <Sparkles aria-hidden className="size-3.5" />
                   {copy.eyebrow}
                 </p>
@@ -265,7 +265,7 @@ function OfferSide({ offer }: { offer: SiteOffer | null }) {
 
       {offer ? (
         <div className="flex flex-col gap-3">
-          <p className="inline-flex items-center gap-1.5 self-start rounded-full bg-card-ivory/15 px-3 py-1 font-label text-xs tracking-[0.14em] uppercase backdrop-blur-sm">
+          <p className="inline-flex items-center gap-1.5 self-start rounded-full bg-card-ivory/15 px-3 py-1 font-label text-xs backdrop-blur-sm">
             <Sparkles aria-hidden className="size-3.5 text-card-gold" />
             {offer.label || words.festival}
           </p>

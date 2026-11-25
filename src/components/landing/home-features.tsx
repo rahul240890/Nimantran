@@ -202,9 +202,7 @@ function Cover({
         className="absolute inset-x-2 bottom-2.5 flex flex-col items-center text-center text-card-ivory"
       >
         <span className="font-display text-lg leading-tight">{copy.names}</span>
-        <span className="font-label text-[0.6rem] tracking-[0.18em] uppercase">
-          {copy.dateValue}
-        </span>
+        <span className="font-label text-[0.6rem]">{copy.dateValue}</span>
       </span>
     </div>
   );
@@ -218,7 +216,7 @@ function FreeScreen({ copy, picture }: { copy: FeaturesCopy["phone"]; picture: s
         <span
           data-flow="pop"
           style={at(0.3)}
-          className="absolute end-5 top-4 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.62rem] tracking-[0.14em] text-on-marigold uppercase shadow-raised"
+          className="absolute end-5 top-4 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.62rem] text-on-marigold shadow-raised"
         >
           {copy.free}
         </span>
@@ -312,9 +310,7 @@ function VideoScreen({ copy, picture }: { copy: FeaturesCopy["phone"]; picture: 
         className="absolute inset-x-3 bottom-20 flex flex-col items-center gap-1 text-center text-card-ivory"
       >
         <span className="font-display text-2xl leading-tight">{copy.names}</span>
-        <span className="font-label text-[0.65rem] tracking-[0.2em] uppercase">
-          {copy.dateValue}
-        </span>
+        <span className="font-label text-[0.65rem]">{copy.dateValue}</span>
       </span>
       <span
         data-flow="rise"
@@ -678,10 +674,7 @@ export function HomeFeatures({
 
         {/* The feature on screen, in words */}
         <div className="flex w-full max-w-[19rem] flex-col items-center gap-3 text-center md:items-start md:rounded-2xl md:bg-surface/90 md:p-6 md:text-start md:shadow-raised md:ring-1 md:ring-line md:backdrop-blur-sm">
-          <p
-            aria-hidden
-            className="font-label text-xs tracking-[0.18em] text-accent-text uppercase"
-          >
+          <p aria-hidden className="font-label text-xs text-accent-text">
             {current.label}
           </p>
           <p

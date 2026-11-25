@@ -90,7 +90,7 @@ const typeScale = [
   },
   {
     label: "Label · Tenor Sans",
-    className: "font-label text-xs tracking-[0.28em] uppercase text-accent-text",
+    className: "font-label text-xs text-accent-text",
     text: "Shubh vivah · 12 December",
   },
   { label: "Indic fallback", className: "font-display text-3xl", text: "शुभ विवाह · আমন্ত্রণ" },

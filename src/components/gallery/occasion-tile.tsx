@@ -130,7 +130,7 @@ export function OccasionTile({
           <span className="grid size-11 shrink-0 place-items-center rounded-full border border-line-strong bg-surface-2 text-accent-text">
             <Icon aria-hidden className="size-5" />
           </span>
-          <span className="rounded-full border border-line bg-paper px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-ink-muted uppercase">
+          <span className="rounded-full border border-line bg-paper px-2.5 py-1 font-label text-[0.65rem] text-ink-muted">
             {soonLabel}
           </span>
         </span>
@@ -226,7 +226,7 @@ export function PaintedTile({
           className="object-cover transition-transform duration-700 ease-out-expo group-hover:scale-105 motion-still:transition-none motion-still:group-hover:scale-100"
         />
         {soonLabel && (
-          <span className="absolute end-2.5 top-2.5 rounded-full bg-night/75 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] text-card-ivory uppercase backdrop-blur-sm">
+          <span className="absolute end-2.5 top-2.5 rounded-full bg-night/75 px-2.5 py-1 font-label text-[0.65rem] text-card-ivory backdrop-blur-sm">
             {soonLabel}
           </span>
         )}

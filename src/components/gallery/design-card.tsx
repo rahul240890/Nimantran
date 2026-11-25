@@ -114,20 +114,16 @@ export function DesignCard({
     <article
       data-design={design.id}
       data-format={scene ? "scene" : painted ? "story" : "card"}
-      className={cn(
-        "group flex h-full flex-col",
-        compact
-          ? "gap-3"
-          : "overflow-hidden rounded-xl border border-line bg-surface shadow-raised transition-shadow duration-300 hover:shadow-float",
-      )}
+      // The painting, its name, its price and what it is for, and nothing in a box around
+      // them (owner, 2026-11-24 redesign): one marigold button per screen, so no card has one
+      className="group flex h-full flex-col gap-2.5"
     >
       {/* The painting opens the design's own page, as its words do (owner, 2026-10-24: tap a
-          design to fill in the details); Live demo beside it opens it as a guest gets it */}
+          design to fill in the details); the play button on it opens it as a guest gets it */}
       <div
         className={cn(
-          "@container/tile relative",
-          compact &&
-            "rounded-2xl shadow-raised ring-1 ring-line transition-[transform,box-shadow] duration-500 ease-out-expo group-hover:-translate-y-1 group-hover:shadow-float motion-still:transition-none motion-still:group-hover:translate-y-0",
+          "@container/tile relative rounded-xl ring-1 ring-line transition-transform duration-500 ease-out-expo",
+          "group-hover:-translate-y-0.5 motion-still:transition-none motion-still:group-hover:translate-y-0",
         )}
       >
         {/* A second way to the same page for the pointer: keyboards and screen readers take
@@ -137,38 +133,22 @@ export function DesignCard({
           tabIndex={-1}
           aria-hidden
           data-design-picture
-          className={cn(
-            "relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden bg-night",
-            compact && "rounded-2xl",
-          )}
+          className="relative isolate block aspect-[3/4] w-full cursor-pointer overflow-hidden rounded-xl bg-night"
         >
           {scene ? (
-            <>
-              <ScenePoster
-                suite={design.suite}
-                alt={alt}
-                priority={priority}
-                className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
-              />
-              <span
-                aria-hidden
-                className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
-              />
-            </>
+            <ScenePoster
+              suite={design.suite}
+              alt={alt}
+              priority={priority}
+              className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.03] motion-still:transition-none motion-still:group-hover:scale-100"
+            />
           ) : painted ? (
-            <>
-              <CardPicture
-                src={pages[0]!.src}
-                alt={alt}
-                priority={priority}
-                className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.04] motion-still:transition-none motion-still:group-hover:scale-100"
-              />
-              {/* A soft shade at the foot keeps the badge and button readable */}
-              <span
-                aria-hidden
-                className="absolute inset-x-0 bottom-0 h-1/3 bg-linear-to-t from-night/70 to-transparent"
-              />
-            </>
+            <CardPicture
+              src={pages[0]!.src}
+              alt={alt}
+              priority={priority}
+              className="transition-transform duration-700 ease-out-expo group-hover:scale-[1.03] motion-still:transition-none motion-still:group-hover:scale-100"
+            />
           ) : (
             <span className="absolute inset-0 grid place-items-center bg-surface-2 p-[12%]">
               <span
@@ -184,31 +164,35 @@ export function DesignCard({
               )}
             </span>
           )}
-          <span className="absolute start-3 top-3 inline-flex max-w-[calc(100%-1.5rem)] items-center gap-1.5 overflow-hidden rounded-full bg-night/70 px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-card-ivory uppercase backdrop-blur-sm">
-            {moving ? (
-              <Clapperboard aria-hidden className="size-3.5" />
-            ) : scene ? (
-              <ImageIcon aria-hidden className="size-3.5" />
-            ) : painted ? (
-              <Layers aria-hidden className="size-3.5" />
-            ) : (
-              <Rotate3d aria-hidden className="size-3.5" />
-            )}
-            {moving
-              ? galleryCopy.movingBadge
-              : scene
-                ? galleryCopy.sceneBadge
-                : painted
-                  ? galleryCopy.storyBadge(pages.length)
-                  : galleryCopy.card}
-          </span>
-          {trending && (
+          {/* One tag at most: Trending when it is, otherwise what kind of design it is */}
+          {trending ? (
             <span
               data-trending
-              className="absolute start-3 top-10 inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-[0.65rem] tracking-[0.14em] whitespace-nowrap text-on-marigold uppercase shadow-raised"
+              className="absolute start-2 top-2 inline-flex items-center gap-1 rounded-full bg-marigold px-2.5 py-1 font-label text-xs whitespace-nowrap text-on-marigold"
             >
               <Flame aria-hidden className="size-3.5" />
               {galleryCopy.trendingBadge}
+            </span>
+          ) : (
+            <span className="absolute start-2 top-2 inline-flex max-w-[calc(100%-1rem)] items-center gap-1 overflow-hidden rounded-full bg-night/65 px-2.5 py-1 font-label text-xs whitespace-nowrap text-card-ivory backdrop-blur-sm">
+              {moving ? (
+                <Clapperboard aria-hidden className="size-3.5 shrink-0" />
+              ) : scene ? (
+                <ImageIcon aria-hidden className="size-3.5 shrink-0" />
+              ) : painted ? (
+                <Layers aria-hidden className="size-3.5 shrink-0" />
+              ) : (
+                <Rotate3d aria-hidden className="size-3.5 shrink-0" />
+              )}
+              <span className="truncate">
+                {moving
+                  ? galleryCopy.movingBadge
+                  : scene
+                    ? galleryCopy.sceneBadge
+                    : painted
+                      ? galleryCopy.storyBadge(pages.length)
+                      : galleryCopy.card}
+              </span>
             </span>
           )}
         </Link>
@@ -228,61 +212,29 @@ export function DesignCard({
           </span>
         </Link>
       </div>
-      {compact ? (
-        <Link
-          href={href}
-          className="group/use flex flex-1 flex-col gap-1 rounded-lg px-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+      <Link
+        href={href}
+        data-photos={photos}
+        className="group/use flex flex-1 flex-col gap-1 rounded-lg px-0.5 outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+      >
+        <h3
+          className={cn(
+            "font-display text-lg leading-tight text-ink group-hover/use:text-accent-text",
+            compact && "truncate",
+          )}
         >
-          <h3 className="truncate font-display text-lg leading-tight text-ink">{name}</h3>
-          <DesignPrice designId={design.id} />
-          <p data-photos={photos} className="flex items-center gap-1.5 text-xs text-ink-muted">
-            {photos === "none" ? (
-              <CameraOff aria-hidden className="size-3.5 shrink-0" />
-            ) : (
-              <Camera aria-hidden className="size-3.5 shrink-0" />
-            )}
-            <span className="truncate">{galleryCopy.photoNeeds[photos]}</span>
-          </p>
-          <DesignOccasions design={design} className="text-ink-muted" />
-          <span className="mt-auto inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-text">
-            {galleryCopy.useDesign}
-            <ArrowRight
-              aria-hidden
-              className="size-4 transition-transform duration-200 group-hover/use:translate-x-1 rtl:rotate-180 motion-still:transition-none motion-still:group-hover/use:translate-x-0"
-            />
-          </span>
-        </Link>
-      ) : (
-        /* Named "tile" so a narrow card's button drops its arrow. Its name, what it costs
-           and what photos it takes, nothing more (owner, 2026-10-25: a clear, simple card) */
-        <div className="@container/tile flex flex-1 flex-col gap-3 p-3 sm:p-4">
-          <div className="flex flex-col gap-1.5">
-            <h3 className="font-display text-xl leading-tight">{name}</h3>
-            <DesignPrice designId={design.id} />
-          </div>
-          <p data-photos={photos} className="flex items-start gap-1.5 text-xs text-ink-muted">
-            {photos === "none" ? (
-              <CameraOff aria-hidden className="mt-px size-3.5 shrink-0" />
-            ) : (
-              <Camera aria-hidden className="mt-px size-3.5 shrink-0" />
-            )}
-            {galleryCopy.photoNeeds[photos]}
-          </p>
-          <DesignOccasions design={design} className="-mt-1.5 text-ink-muted" />
-          {/* Two cards to a row on a phone leave little room: the arrow goes and the words
-            may wrap before they would ever touch the button's edge */}
-          <Button
-            asChild
-            size="sm"
-            className="mt-auto h-auto min-h-11 w-full px-3 py-2 text-center leading-tight whitespace-normal"
-          >
-            <Link href={href}>
-              {galleryCopy.useDesign}
-              <ArrowRight aria-hidden className="@max-[10.5rem]:hidden rtl:rotate-180" />
-            </Link>
-          </Button>
-        </div>
-      )}
+          {name}
+        </h3>
+        <DesignPrice designId={design.id} />
+        <DesignOccasions design={design} className="text-ink-muted" />
+        <span className="mt-auto inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-accent-text">
+          {galleryCopy.useDesign}
+          <ArrowRight
+            aria-hidden
+            className="size-4 transition-transform duration-200 group-hover/use:translate-x-1 rtl:rotate-180 motion-still:transition-none motion-still:group-hover/use:translate-x-0"
+          />
+        </span>
+      </Link>
     </article>
   );
 }
@@ -432,9 +384,7 @@ export function DesignPreview({
                   <ChevronLeft aria-hidden className="size-5 rtl:rotate-180" />
                 </button>
                 <p className="flex min-w-36 flex-col items-center gap-0.5 text-center">
-                  <span className="font-label text-xs tracking-[0.2em] uppercase">
-                    {galleryCopy.pageNames[current!.page]}
-                  </span>
+                  <span className="font-label text-xs">{galleryCopy.pageNames[current!.page]}</span>
                   {/* Announced only when the visitor steps, not on every turn by itself */}
                   <span
                     aria-live={turning ? "off" : "polite"}

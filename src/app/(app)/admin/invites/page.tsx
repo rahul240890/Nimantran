@@ -103,9 +103,7 @@ export default async function InvitesPage({ searchParams }: PageProps<"/admin/in
               key={count.label}
               className="flex flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-4 shadow-raised"
             >
-              <dt className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-                {count.label}
-              </dt>
+              <dt className="font-label text-[0.7rem] text-ink-muted">{count.label}</dt>
               <dd className="font-display text-3xl leading-none tabular-nums">{count.value}</dd>
               {count.note && <dd className="text-xs text-ink-muted">{count.note}</dd>}
             </div>

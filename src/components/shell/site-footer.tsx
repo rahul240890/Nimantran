@@ -39,7 +39,7 @@ export function SiteFooter({ locale }: { locale: UiLocale }) {
       href: pagePath({ kind: "tradition", id }, locale),
     })),
   ];
-  const headingClass = "font-label text-xs tracking-[0.2em] text-ink-muted uppercase";
+  const headingClass = "font-label text-xs text-ink-muted";
   return (
     <footer className="relative isolate overflow-hidden border-t border-line bg-surface-2/60">
       <Mandala className="pointer-events-none absolute -end-24 -bottom-32 -z-10 size-96 text-line-strong opacity-40" />

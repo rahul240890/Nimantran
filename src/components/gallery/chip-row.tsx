@@ -31,7 +31,7 @@ export function ChipRow<T extends string>({
 }) {
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">{label}</p>
+      <p className="font-label text-xs text-ink-muted">{label}</p>
       <div
         role="group"
         aria-label={label}

@@ -24,9 +24,7 @@ export function DesignHeader() {
         <div className="flex min-w-0 items-center gap-3">
           {/* Below 360px only the mandala shows, so the theme switch fits beside it */}
           <Logo className="max-[359px]:[&>span]:sr-only" />
-          <span className="hidden font-label text-xs tracking-[0.24em] text-ink-muted uppercase md:inline">
-            Design system
-          </span>
+          <span className="hidden font-label text-xs text-ink-muted md:inline">Design system</span>
         </div>
         {/* On phones the motion switch drops to its own row; from sm up both controls sit together */}
         <div className="contents sm:flex sm:items-center sm:gap-5">

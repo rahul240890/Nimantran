@@ -37,8 +37,7 @@ export function Closing({ locale }: { locale: UiLocale }) {
           className="absolute inset-x-10 top-0 h-px bg-linear-to-r from-transparent via-marigold to-transparent"
         />
         <div className="flex max-w-xl flex-col gap-5">
-          <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-marigold uppercase">
-            <span aria-hidden className="h-px w-6 bg-marigold" />
+          <p className="flex items-center gap-3 font-label text-xs text-marigold">
             {closing.eyebrow}
           </p>
           <h2

@@ -43,9 +43,7 @@ export default async function ReviewPage() {
           {live ? (
             <>
               <div className="flex flex-col gap-2">
-                <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                  {reviewCopy.eyebrow}
-                </p>
+                <p className="font-label text-xs text-accent-text">{reviewCopy.eyebrow}</p>
                 <h1 className="font-display text-[1.75rem] leading-tight sm:text-[2.15rem]">
                   {reviewCopy.title}
                 </h1>
