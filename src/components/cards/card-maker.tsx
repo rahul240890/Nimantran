@@ -45,6 +45,7 @@ import { SCENE_FLY, sceneTimeline } from "@/lib/video/scene-timeline";
 import { LINES_START, type VideoTimeline } from "@/lib/video/timeline";
 import { loadWatermarkLook, withWatermark, type WatermarkLook } from "@/lib/video/watermark";
 import "@/components/invitation/type/fonts.css";
+import "@/app/invitation.css";
 
 type CardMakerProps = {
   inviteId: string;

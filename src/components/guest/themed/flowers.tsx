@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from "react";
 import type { GuestFlower } from "@/lib/suites/guest-look";
+import "@/app/invitation.css";
 
 /*
  * The flowers of the themed guest page, drawn once as SVG symbols and reused: marigold,

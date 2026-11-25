@@ -1,6 +1,7 @@
 import { cn } from "@/lib/cn";
 import { SUITES, type Mood, type SuiteId } from "@/lib/suites/catalog";
 import { SuiteBackdrop } from "./suite-backdrop";
+import "@/app/invitation.css";
 
 /** A small portrait of a theme's page, for pickers. The card-colour theme shows paper. */
 export function SuiteThumb({

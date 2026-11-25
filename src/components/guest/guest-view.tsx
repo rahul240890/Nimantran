@@ -95,6 +95,7 @@ import type { PublicPhoto } from "@/lib/invites/public";
 import { useLocale } from "@/i18n/client";
 import { guestText } from "@/i18n/copy/guest";
 import { GuestLanguage, useGuestText } from "@/components/guest/guest-language";
+import "@/app/invitation.css";
 
 const noSubscribe = () => () => {};
 

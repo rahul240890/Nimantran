@@ -3,6 +3,7 @@ import type { LampBlessing } from "@/lib/suites/blessings";
 import type { GuestFlower, GuestLamp } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
 import { Flame, LampDefs, Lamps } from "./scenery";
+import "@/app/invitation.css";
 
 /*
  * The light a guest gives at night (blessings.ts): the first four are the lamps the page

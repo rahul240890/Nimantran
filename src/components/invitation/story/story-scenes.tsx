@@ -1,6 +1,7 @@
 import { createContext, use, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import type { StorySceneId } from "@/lib/engine/story";
+import "@/app/invitation.css";
 
 /*
  * The painted scene behind each beat of the story (Step 12d, docs/MOTION.md section 3):

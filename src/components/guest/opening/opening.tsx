@@ -54,6 +54,7 @@ import { freshBackdrop } from "./opening-fresh";
 import { GateWords } from "./gate-words";
 import { OPENING_PACE, useOpeningPace, useOpeningReady } from "./opening-pace";
 import { OpeningWelcome } from "./opening-welcome";
+import "@/app/invitation.css";
 
 /** How long the opening takes to open before the pages come in, at the opening's pace. */
 export const OPEN_MS = 1500 * OPENING_PACE;

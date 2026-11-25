@@ -14,6 +14,7 @@ import { cardFunctions, draftBlessing, storyFamily, storyFunctions } from "@/lib
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { videoTimeline } from "@/lib/video/timeline";
 import { Hint } from "@/components/ui/quiet";
+import "@/app/invitation.css";
 
 const AUTO = "auto";
 

@@ -1,6 +1,7 @@
 import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import { THEMED_OPENINGS, type ThemedMove, type ThemedOpening } from "@/lib/opening/catalog";
+import "@/app/invitation.css";
 
 /*
  * A themed opening (the owner's paintings, 2026-10-11): the theme's own opening painting

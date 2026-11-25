@@ -1,5 +1,6 @@
 import { VolumeX } from "lucide-react";
 import { cn } from "@/lib/cn";
+import "@/app/invitation.css";
 
 /**
  * The music's one sign, wherever its button sits (the opening's welcome, the pages, One

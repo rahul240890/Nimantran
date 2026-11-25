@@ -8,6 +8,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import { CARD_COUNTDOWN_WORDS, CARD_STORY_WORDS, daysAway } from "@/lib/templates/story-words";
 import { useClock } from "@/lib/use-clock";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import "@/app/invitation.css";
 import "@/app/guest-countdown.css";
 
 const noSubscribe = () => () => {};

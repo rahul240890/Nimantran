@@ -2,6 +2,7 @@
 
 import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
+import "@/app/invitation.css";
 import "@/app/bloom-openings.css";
 import { bloomBeyond, bloomRings, bloomSpec, type BloomOpening } from "@/lib/opening/catalog";
 

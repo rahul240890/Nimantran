@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import "@/app/welcome-scenes.css";
+import "@/app/invitation.css";
 
 /*
  * Ten more welcomes for the moment between the opening and the pages (welcome-scenes.css):

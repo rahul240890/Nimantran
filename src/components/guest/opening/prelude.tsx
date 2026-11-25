@@ -10,6 +10,7 @@ import type { CardLanguage } from "@/lib/templates/card-languages";
 import type { Faith } from "@/lib/traditions/faith";
 import { SCENES, type PreludeColors, type SceneKit } from "./prelude-scenes";
 import "@/app/preludes.css";
+import "@/app/invitation.css";
 
 /** The longest a prelude can hold the gate back, whatever happens in it. */
 const CAP_MS = 12_000;

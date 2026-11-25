@@ -9,6 +9,7 @@ import { SUITES, pageLook, type PageArt, type SuiteId } from "@/lib/suites/catal
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { useSampleInvite, type SampleFunction } from "./sample";
+import "@/app/invitation.css";
 
 const noop = () => {};
 

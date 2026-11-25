@@ -2,6 +2,7 @@ import { useId, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { CONTROLS_CLEAR } from "@/lib/suites/controls";
 import type { Suite } from "@/lib/suites/catalog";
+import "@/app/invitation.css";
 
 /*
  * The landscape behind a themed event page (Step 12e): a Mughal palace garden, a royal

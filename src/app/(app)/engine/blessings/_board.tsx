@@ -18,6 +18,7 @@ import type { GuestLook } from "@/lib/suites/guest-look";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import "@/app/guest-sections.css";
 import "@/app/guest-blessings.css";
+import "@/app/invitation.css";
 
 /** Every way of giving flowers and light, side by side in one theme's colours. */
 export function BlessingsBoard({

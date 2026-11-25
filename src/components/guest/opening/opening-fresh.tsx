@@ -2,6 +2,7 @@ import { Image } from "@/components/ui/image";
 import type { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { freshBeyond, type FreshOpening } from "@/lib/opening/catalog";
+import "@/app/invitation.css";
 import "@/app/fresh-openings.css";
 
 /*

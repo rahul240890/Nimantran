@@ -6,6 +6,7 @@ import type { InviteDraft } from "@/lib/editor/draft";
 import type { StoryFunction } from "@/lib/engine/story";
 import type { PublicPhoto } from "@/lib/invites/public";
 import { loadWatermarkLook, withWatermark } from "@/lib/video/watermark";
+import "@/app/invitation.css";
 
 /** Frames every `step` seconds from `from`, after the poster and up to the last frame. */
 export function FilmStrip(props: {
