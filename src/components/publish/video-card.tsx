@@ -86,6 +86,7 @@ import { instagramHandle, site } from "@/lib/site";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { LiveFrame } from "./live-frame";
 import "@/components/invitation/type/fonts.css";
+import "@/app/invitation.css";
 
 type VideoCardProps = {
   /** The invitation, which keeps the same video before and after it is live. */

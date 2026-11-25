@@ -14,6 +14,7 @@ import type { Template } from "@/lib/templates/schema";
 import { stockStyle } from "@/lib/templates/stock";
 import type { CardCopy } from "@/lib/templates/content";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import "@/app/invitation.css";
 
 const noop = () => {};
 

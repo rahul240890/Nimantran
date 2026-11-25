@@ -8,6 +8,7 @@ import { useText } from "@/i18n/client";
 import { publishText } from "@/i18n/copy/publish";
 import { awayVideos, seenVideo, subscribeVideos } from "@/lib/video/keep";
 import { LiveFrame } from "./live-frame";
+import "@/app/invitation.css";
 
 const none = () => [] as const;
 

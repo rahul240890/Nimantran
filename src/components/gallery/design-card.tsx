@@ -42,6 +42,7 @@ import { DesignOccasions } from "./design-occasions";
 import { ScenePoster, SceneSample } from "./scene-poster";
 import { useTrending } from "./use-trending";
 import { StorySample } from "./story-sample";
+import "@/app/invitation.css";
 
 type DesignCardProps = {
   design: GalleryDesign;

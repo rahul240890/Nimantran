@@ -21,6 +21,7 @@ import {
   Sunrise,
   Waves,
 } from "./welcome-scenes";
+import "@/app/invitation.css";
 
 /*
  * The moment between the opening and the invitation (Step 12y, redrawn): the words alone,

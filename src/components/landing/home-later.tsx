@@ -4,6 +4,7 @@ import { nearScreen } from "@/components/ui/near-screen";
 // Their stylesheets stay with the page, so what the server draws is styled from the first paint
 import "@/components/invitation/type/fonts.css";
 import "@/app/reveals.css";
+import "@/app/invitation.css";
 
 /*
  * The home page's rows of designs, whose script is large (the design cards and their

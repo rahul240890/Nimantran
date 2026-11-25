@@ -1,6 +1,7 @@
 import { BrandMark } from "@/components/brand/brand-mark";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import "@/app/invitation.css";
 
 /*
  * "Made with Shubh" on a free invite (Step 17): a small mark in the bottom corner of the

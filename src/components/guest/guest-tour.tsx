@@ -6,6 +6,7 @@ import { MusicBars } from "@/components/invitation/music-bars";
 import type { RagaMusic } from "@/components/invitation/use-raga-music";
 import { cn } from "@/lib/cn";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
+import "@/app/invitation.css";
 
 /** How long a full-screen section stays before the page moves on, unless it names its own. */
 const DWELL_SECONDS = 7;

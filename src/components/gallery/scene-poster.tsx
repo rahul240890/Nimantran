@@ -11,6 +11,7 @@ import { sceneLine } from "@/lib/suites/scene-type";
 import { scenePage, type ScenePage } from "@/lib/suites/scene";
 import { CardPicture } from "./card-picture";
 import { useSampleInvite } from "./sample";
+import "@/app/invitation.css";
 
 /*
  * A Scene design in the gallery: its painting with sample photos in the couple's frames,

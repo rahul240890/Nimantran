@@ -34,6 +34,7 @@ import { GATE_SHEET, gatePoster } from "@/lib/opening/posters";
 import type { SuiteId } from "@/lib/suites/catalog";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { RowArrows, ScrollRow, useScrollRow } from "@/components/ui/scroll-row";
+import "@/app/invitation.css";
 
 const NONE = "none";
 const AUTO = "auto";

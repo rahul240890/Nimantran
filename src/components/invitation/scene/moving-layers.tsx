@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { FrameBox } from "@/lib/suites/photo-frames";
 import { floatInstances, type MovingScene } from "@/lib/suites/moving";
+import "@/app/invitation.css";
 
 /*
  * A moving scene's painting in its layers (moving.ts): the sky at the back, the place in

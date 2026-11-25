@@ -4,7 +4,7 @@
  * A theme is only the look (the place, colours, ornaments and page turn). The tradition
  * pack still gives the ceremony names, blessing and sacred symbol, and the language the
  * words, so any theme works for any family; each tradition suggests the one that suits it.
- * Colours live in globals.css under [data-suite] and [data-mood]. Painted backgrounds in
+ * Colours live in invitation.css under [data-suite] and [data-mood]. Painted backgrounds in
  * `images` replace the vector landscape page by page (docs/SUITES.md).
  */
 

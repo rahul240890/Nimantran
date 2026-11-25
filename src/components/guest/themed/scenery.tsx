@@ -3,6 +3,7 @@ import { strokeLength, strokePath } from "@/lib/engine/patterns";
 import type { GuestFlower, GuestLamp, GuestPattern } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
 import { floorStrokes } from "./floor-patterns";
+import "@/app/invitation.css";
 
 /*
  * The scenery of the themed guest page: a palace skyline and palms by the water, a

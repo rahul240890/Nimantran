@@ -1,6 +1,7 @@
 import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import { PAINTED_GATES, type PaintedGate } from "@/lib/opening/catalog";
+import "@/app/invitation.css";
 
 /*
  * A painted gate (the owner's paintings, in three layers): the place beyond, the two doors

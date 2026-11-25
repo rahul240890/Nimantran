@@ -14,6 +14,7 @@ import { sampleDraft } from "../_language-samples";
 import type { CardLanguage } from "@/lib/templates/card-languages";
 import { CARD_STORY_WORDS } from "@/lib/templates/story-words";
 import "@/components/invitation/type/fonts.css";
+import "@/app/invitation.css";
 
 const noop = () => {};
 

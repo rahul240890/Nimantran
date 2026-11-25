@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
+import "@/app/invitation.css";
 
 /*
  * Thirteen more openings (Step 12y), drawn like the first six: container units of the

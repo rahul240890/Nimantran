@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { inviteDraft } from "@/lib/editor/store";
 import type { SuiteId } from "@/lib/suites/catalog";
+import "@/app/invitation.css";
 
 /** The couple's names as the draft has them, "Kabir & Meera", or nothing yet. */
 function draftNames(): string {

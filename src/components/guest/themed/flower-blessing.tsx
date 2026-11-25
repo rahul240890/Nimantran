@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import type { FlowerBlessing } from "@/lib/suites/blessings";
 import type { GuestFlower } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
+import "@/app/invitation.css";
 
 /*
  * The flowers a guest gives after the welcome (blessings.ts), each a small drawing that

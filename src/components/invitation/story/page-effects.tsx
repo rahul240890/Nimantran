@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import type { PageArt } from "@/lib/suites/catalog";
+import "@/app/invitation.css";
 
 /*
  * A light layer of movement over a painted page (Step 12g): petals on the haldi and

@@ -8,6 +8,7 @@ import type { EventBox as OrnateBox } from "@/lib/suites/event-boxes";
 import type { GuestFlower } from "@/lib/suites/guest-look";
 import { Bloom } from "./flowers";
 import "@/app/event-cards.css";
+import "@/app/invitation.css";
 
 /**
  * One celebration as an ornate card (owner, 2026-11-04): the celebration's own painting

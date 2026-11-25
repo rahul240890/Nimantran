@@ -1,4 +1,5 @@
 import { Fragment, useId, type CSSProperties, type ReactNode } from "react";
+import "@/app/invitation.css";
 import "@/app/gate-words.css";
 import type { GateScatter, GateWordLook } from "@/lib/opening/gate-words";
 import type { CardLanguage } from "@/lib/templates/card-languages";

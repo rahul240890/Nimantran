@@ -2,6 +2,7 @@
 
 import { Image } from "@/components/ui/image";
 import { useEffect, useRef, type CSSProperties } from "react";
+import "@/app/invitation.css";
 import "@/app/depth-openings.css";
 import { depthBeyond, depthSpec, type DepthOpening } from "@/lib/opening/catalog";
 import { useReducedMotion } from "@/lib/use-reduced-motion";

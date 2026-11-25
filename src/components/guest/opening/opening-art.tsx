@@ -47,6 +47,7 @@ import { FreshOpeningArt } from "./opening-fresh";
 import { PaintedGateArt } from "./opening-gate";
 import { ThemedOpeningArt } from "./opening-themed";
 import { TiedGateArt } from "./opening-tied";
+import "@/app/invitation.css";
 
 /*
  * The drawn pieces of each opening (Step 12x). Everything is sized in container units of the

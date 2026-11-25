@@ -58,6 +58,7 @@ import {
 import type { CardCopy } from "@/lib/templates/content";
 import "@/components/invitation/type/fonts.css";
 import "@/app/reveals.css";
+import "@/app/invitation.css";
 
 /*
  * One Scene (pilot): the whole invitation on one painting. The photos show through the

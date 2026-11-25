@@ -2,6 +2,7 @@ import { Image } from "@/components/ui/image";
 import type { CSSProperties } from "react";
 import "@/app/tied-gates.css";
 import { tiedBeyond, tiedSpec, type TiedGate } from "@/lib/opening/catalog";
+import "@/app/invitation.css";
 
 /*
  * A tied gate (the owner's paintings, templates 41 on): the template's centre picture
