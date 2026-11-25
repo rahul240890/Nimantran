@@ -9,31 +9,23 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "group/button relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-md font-semibold whitespace-nowrap select-none " +
+  "group/button relative isolate inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg font-semibold whitespace-nowrap select-none " +
   "transition-[transform,box-shadow,background-color,border-color,color] duration-150 ease-out-expo " +
   "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-ring " +
   "disabled:cursor-not-allowed aria-disabled:cursor-not-allowed " +
   "[&_svg]:size-5 [&_svg]:shrink-0";
 
 /*
- * Primary and danger buttons sit on a thin edge and press down into it, like a raised key.
- * The edge disappears and the face moves 2px when pressed.
+ * Flat buttons (owner, 2026-11-24 redesign): marigold for the one main action on a screen,
+ * an outline for everything else. A press nudges the face down 1px.
  */
 const variants: Record<ButtonVariant, string> = {
-  primary:
-    "bg-marigold text-on-marigold " +
-    "shadow-[inset_0_1px_0_rgb(255_255_255/0.45),0_2px_0_var(--marigold-edge),0_6px_16px_-6px_color-mix(in_srgb,var(--marigold-edge)_70%,transparent)] " +
-    "hover:bg-marigold-strong " +
-    "active:translate-y-[2px] active:shadow-[inset_0_2px_4px_rgb(0_0_0/0.18),0_0_0_var(--marigold-edge)]",
+  primary: "bg-marigold text-on-marigold hover:bg-marigold-strong active:translate-y-px",
   danger:
-    "bg-danger text-on-danger " +
-    "shadow-[inset_0_1px_0_rgb(255_255_255/0.25),0_2px_0_color-mix(in_srgb,var(--danger)_60%,black),0_6px_16px_-8px_var(--danger)] " +
-    "hover:bg-[color-mix(in_srgb,var(--danger)_88%,black)] " +
-    "active:translate-y-[2px] active:shadow-[inset_0_2px_4px_rgb(0_0_0/0.25)]",
+    "bg-danger text-on-danger hover:bg-[color-mix(in_srgb,var(--danger)_88%,black)] active:translate-y-px",
   secondary:
-    "border border-line-strong bg-surface text-ink shadow-raised " +
-    "hover:border-line-control hover:bg-surface-2 " +
-    "active:translate-y-px active:shadow-[inset_0_2px_4px_rgb(0_0_0/0.08)]",
+    "border border-line-strong bg-surface text-ink " +
+    "hover:border-line-control hover:bg-surface-2 active:translate-y-px",
   ghost: "text-ink hover:bg-surface-2 active:translate-y-px active:bg-line/60",
 };
 
@@ -44,7 +36,7 @@ const variants: Record<ButtonVariant, string> = {
 const sizes: Record<ButtonSize, string> = {
   sm: "h-11 px-4 text-sm [&_svg]:size-4",
   md: "h-12 px-5 text-ui",
-  lg: "min-h-14 px-7 py-2 text-lg text-balance whitespace-normal",
+  lg: "min-h-13 px-6 py-2 text-lg text-balance whitespace-normal",
 };
 
 /* Disabled buttons flatten: no edge, no press, lower contrast (exempt from contrast rules) */

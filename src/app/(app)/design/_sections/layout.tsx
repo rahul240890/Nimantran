@@ -13,7 +13,7 @@ export function Section({ id, eyebrow, title, intro, children }: SectionProps) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="scroll-mt-40 lg:scroll-mt-28">
       <div className="mb-6 flex flex-col gap-2 sm:mb-8">
-        <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">{eyebrow}</p>
+        <p className="font-label text-xs text-accent-text">{eyebrow}</p>
         <h2 id={`${id}-title`} className="font-display text-3xl leading-tight sm:text-4xl">
           {title}
         </h2>
@@ -53,9 +53,5 @@ export function Specimen({ title, note, children, className, stageClassName }: S
 
 /** A small caption above one state of a component, such as "Disabled". */
 export function StateLabel({ children }: { children: ReactNode }) {
-  return (
-    <p className="mb-2 font-label text-[0.7rem] tracking-[0.16em] text-ink-muted uppercase">
-      {children}
-    </p>
-  );
+  return <p className="mb-2 font-label text-[0.7rem] text-ink-muted">{children}</p>;
 }

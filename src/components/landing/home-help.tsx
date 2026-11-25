@@ -34,7 +34,7 @@ export function HomeHelp({ locale }: { locale: UiLocale }) {
             />
           </div>
           <div className="flex max-w-md flex-1 flex-col gap-3">
-            <p className="inline-flex items-center gap-2 font-label text-xs tracking-[0.24em] text-marigold uppercase">
+            <p className="inline-flex items-center gap-2 font-label text-xs text-marigold">
               <Star aria-hidden className="size-4 fill-marigold" />
               {homeHelp.set.eyebrow}
             </p>
@@ -55,9 +55,7 @@ export function HomeHelp({ locale }: { locale: UiLocale }) {
           <span className="grid size-12 place-items-center rounded-full bg-success/15">
             <SocialIcon channel="whatsapp" className="size-6 text-success" />
           </span>
-          <p className="font-label text-xs tracking-[0.24em] text-accent-text uppercase">
-            {homeHelp.make.eyebrow}
-          </p>
+          <p className="font-label text-xs text-accent-text">{homeHelp.make.eyebrow}</p>
           <h2 className="font-display text-2xl leading-tight sm:text-3xl">{homeHelp.make.title}</h2>
           <p className="text-ink-muted">{homeHelp.make.body}</p>
           <a

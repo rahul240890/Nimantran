@@ -326,9 +326,7 @@ function PublishDialog({ draft, onClose }: { draft: InviteDraft; onClose: () => 
         ) : (
           <div className="flex flex-col gap-3 rounded-lg border border-line bg-surface-2 px-4 py-3">
             <div className="flex min-w-0 flex-col gap-1">
-              <p className="font-label text-xs tracking-[0.14em] text-ink-muted uppercase">
-                {publishCopy.linkLabel}
-              </p>
+              <p className="font-label text-xs text-ink-muted">{publishCopy.linkLabel}</p>
               <p className="text-base break-all text-ink-muted">
                 {`${location.host}/i/`}
                 <span className="font-semibold text-ink">{slug}</span>

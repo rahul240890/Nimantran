@@ -39,14 +39,7 @@ export function Section({
             align === "centre" && "mx-auto max-w-2xl items-center text-center",
           )}
         >
-          <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-            <span aria-hidden className="h-px w-6 bg-marigold" />
-            {eyebrow}
-            <span
-              aria-hidden
-              className={cn("h-px w-6 bg-marigold", align !== "centre" && "hidden")}
-            />
-          </p>
+          <p className="flex items-center gap-3 font-label text-xs text-accent-text">{eyebrow}</p>
           <h2
             id={`${id}-title`}
             className="font-display text-[1.8rem] leading-[1.08] sm:text-5xl lg:text-[2.5rem]"

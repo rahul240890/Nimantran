@@ -311,6 +311,8 @@ test.describe("landing page motion", () => {
 
   test("the phone moves on to the next feature by itself, and Pause holds it", async ({ page }) => {
     await visit(page);
+    // On a phone the paintings come first and the phone sits below them; it plays once seen
+    await page.locator("[data-flow-live]").scrollIntoViewIfNeeded();
     await expect(currentFeature(page)).toHaveAccessibleName(/One link to share/, {
       timeout: 8000,
     });

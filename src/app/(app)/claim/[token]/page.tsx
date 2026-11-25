@@ -104,9 +104,7 @@ async function ClaimCard({
         </TiltCard>
       </div>
       <div className="flex min-w-0 flex-col gap-4">
-        <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-          {claimCopy.eyebrow}
-        </p>
+        <p className="font-label text-xs text-accent-text">{claimCopy.eyebrow}</p>
         <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
           {claimCopy.title(names)}
         </h1>

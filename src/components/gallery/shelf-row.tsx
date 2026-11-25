@@ -154,9 +154,14 @@ export function ShelfRow({
 
   if (layout === "grid") {
     const shown = every ? entries : entries.slice(0, SECTION_SHOWN);
+    // On a phone a section shows PHONE_SHOWN, then View all (owner, 2026-11-24 redesign: the
+    // home page was 28 screens long); wider screens keep every design they were given
+    const phoneShown = Math.min(shown.length, PHONE_SHOWN);
     // Fewer on narrower screens, so the grid ends on a full line with View all
     const cell = (index: number) =>
-      every ? undefined : cn(index >= 7 ? "max-xl:hidden" : index >= 5 && "max-lg:hidden");
+      every
+        ? cn(index >= PHONE_SHOWN && "max-sm:hidden")
+        : cn(index >= 7 ? "max-xl:hidden" : index >= 5 && "max-lg:hidden");
     return (
       <section
         ref={watch}
@@ -187,13 +192,13 @@ export function ShelfRow({
           )}
           {href &&
             (every ? (
-              <li className={tileSpan(shown.length).cell}>
+              <li className={tileSpan(shown.length, phoneShown).cell}>
                 <ViewAllTile
                   href={href}
                   label={label}
                   total={total}
                   fill
-                  shape={tileSpan(shown.length).shape}
+                  shape={tileSpan(shown.length, phoneShown).shape}
                 />
               </li>
             ) : (
@@ -256,6 +261,9 @@ export function ShelfRow({
  * is a short bar across the grid instead of a tall tile.
  */
 const GRID_COLUMNS = [2, 3, 4, 5] as const;
+
+/** How many designs a home section with a fixed size shows on a phone, before View all. */
+const PHONE_SHOWN = 4;
 const TILE_SPANS = [
   ["col-span-1", "col-span-2"],
   ["sm:col-span-1", "sm:col-span-2", "sm:col-span-3"],
@@ -275,12 +283,15 @@ const TILE_TALL = [
   "xl:min-h-56 xl:flex-col",
 ] as const;
 
-/** Where View all sits after `count` designs: the cells it spans, and its shape. */
-export function tileSpan(count: number): { cell: string; shape: string } {
+/**
+ * Where View all sits after `count` designs: the cells it spans, and its shape. A phone may
+ * show fewer (`phoneCount`), so its two columns are worked out from that.
+ */
+export function tileSpan(count: number, phoneCount = count): { cell: string; shape: string } {
   const cell: string[] = [];
   const shape: string[] = [];
   GRID_COLUMNS.forEach((columns, at) => {
-    const span = columns - (count % columns);
+    const span = columns - ((at === 0 ? phoneCount : count) % columns);
     cell.push(TILE_SPANS[at]![span - 1]!);
     shape.push((span === columns ? TILE_SHORT : TILE_TALL)[at]!);
   });

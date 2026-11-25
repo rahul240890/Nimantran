@@ -47,9 +47,7 @@ export default async function InvitesPage() {
         <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div className="flex min-w-0 flex-col gap-2">
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                {invitesCopy.eyebrow}
-              </p>
+              <p className="font-label text-xs text-accent-text">{invitesCopy.eyebrow}</p>
               <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
                 {invitesCopy.greeting(firstName(account))}
               </h1>

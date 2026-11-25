@@ -131,7 +131,7 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
                 <tr>
                   <th
                     scope="col"
-                    className="px-1.5 py-3 text-start text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal sm:tracking-[0.14em] sm:uppercase"
+                    className="sm: sm: px-1.5 py-3 text-start text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal"
                   >
                     {copy.designColumn}
                   </th>
@@ -139,7 +139,7 @@ export async function PricingPage({ locale }: { locale: UiLocale }) {
                     <th
                       key={id}
                       scope="col"
-                      className="px-1.5 py-3 text-end text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal sm:tracking-[0.14em] sm:uppercase"
+                      className="sm: sm: px-1.5 py-3 text-end text-xs font-semibold text-ink-muted sm:px-4 sm:font-label sm:font-normal"
                     >
                       {planCopy[id].name}
                     </th>

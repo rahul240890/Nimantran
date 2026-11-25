@@ -204,10 +204,7 @@ function SectionHeading({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <h2
-        id={id}
-        className="flex items-center gap-2 font-label text-xs tracking-[0.24em] text-ink-muted uppercase"
-      >
+      <h2 id={id} className="flex items-center gap-2 font-label text-xs text-ink-muted">
         {icon}
         {title}
       </h2>

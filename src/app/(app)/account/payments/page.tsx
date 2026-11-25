@@ -145,9 +145,7 @@ export default async function PaymentsPage() {
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
           <AccountTabs current="payments" />
           <div className="flex flex-col gap-2">
-            <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-              {copy.eyebrow}
-            </p>
+            <p className="font-label text-xs text-accent-text">{copy.eyebrow}</p>
             <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2.15rem]">
               {copy.title}
             </h1>
@@ -172,9 +170,7 @@ export default async function PaymentsPage() {
                 className="flex flex-wrap items-end justify-between gap-4 rounded-lg border border-line bg-surface-2 p-4 sm:p-5"
               >
                 <div className="flex flex-col gap-1">
-                  <p className="font-label text-[0.7rem] tracking-[0.2em] text-ink-muted uppercase">
-                    {copy.totalPaid}
-                  </p>
+                  <p className="font-label text-[0.7rem] text-ink-muted">{copy.totalPaid}</p>
                   <p className="font-display text-3xl leading-none tabular-nums">
                     {formatRupees(totalPaise)}
                   </p>

@@ -59,10 +59,7 @@ export function DesignPackages({
       data-design-packages
       className={cn("flex flex-col gap-2", className)}
     >
-      <h3
-        id={`packages-${designId}`}
-        className={cn("font-label text-xs tracking-[0.2em] uppercase", colours.heading)}
-      >
+      <h3 id={`packages-${designId}`} className={cn("font-label text-xs", colours.heading)}>
         {galleryCopy.packagesHeading}
       </h3>
       <ul className={cn("grid grid-cols-3 gap-2", extras && "pt-1.5")}>

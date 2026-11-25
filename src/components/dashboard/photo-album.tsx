@@ -156,9 +156,7 @@ export function PhotoAlbum({
         </Link>
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div className="flex min-w-0 flex-col gap-2">
-            <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-              {copy.eyebrow}
-            </p>
+            <p className="font-label text-xs text-accent-text">{copy.eyebrow}</p>
             <h1 className="font-display text-[1.75rem] leading-[1.08] break-words sm:text-[2.15rem]">
               {names}
             </h1>

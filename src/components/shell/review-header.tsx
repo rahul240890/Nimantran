@@ -10,9 +10,7 @@ export function ReviewHeader({ label }: { label: string }) {
       <div className="mx-auto flex w-full max-w-7xl flex-wrap items-center justify-between gap-x-5 gap-y-1.5 px-4 py-2.5 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           <Logo className="max-[359px]:[&>span]:sr-only" />
-          <span className="hidden font-label text-xs tracking-[0.24em] text-ink-muted uppercase md:inline">
-            {label}
-          </span>
+          <span className="hidden font-label text-xs text-ink-muted md:inline">{label}</span>
         </div>
         <div className="contents sm:flex sm:items-center sm:gap-5">
           <StillModeSwitch className="gap-3 py-0 max-sm:order-last max-sm:w-full max-sm:border-t max-sm:border-line max-sm:pt-1.5" />

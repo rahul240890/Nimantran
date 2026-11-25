@@ -63,7 +63,7 @@ function FlowerTile({
   const words = guestText[lang].guestCopy.themed.flowers[way];
   return (
     <div className="flex flex-col items-center gap-3 text-center">
-      <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">{way}</p>
+      <p className="font-label text-xs text-accent-text">{way}</p>
       <FlowerStage
         way={way}
         flower={look.flower}
@@ -87,7 +87,7 @@ function LampTile({ way, look, lang }: { way: LampBlessing; look: GuestLook; lan
   const words = guestText[lang].guestCopy.themed.lights[way];
   return (
     <div data-lit={lit || undefined} className="flex flex-col items-center gap-3 text-center">
-      <p className="font-label text-xs tracking-[0.3em] text-accent-text uppercase">{way}</p>
+      <p className="font-label text-xs text-accent-text">{way}</p>
       <div className="guest-lamps flex min-h-44 w-full items-center justify-center">
         <LampStage way={way} flower={look.flower} />
       </div>

@@ -75,7 +75,7 @@ export function TrendingPicker({
       </CardHeader>
       <CardBody className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">Pinned</p>
+          <p className="font-label text-xs text-ink-muted">Pinned</p>
           {pinned.length === 0 ? (
             <p className="text-sm text-ink-muted">Nothing pinned: the row follows real use.</p>
           ) : (
@@ -118,10 +118,7 @@ export function TrendingPicker({
         </div>
 
         <div className="flex flex-col gap-2">
-          <label
-            htmlFor="trending-search"
-            className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-          >
+          <label htmlFor="trending-search" className="font-label text-xs text-ink-muted">
             Pin a design
           </label>
           <Input
@@ -156,9 +153,7 @@ export function TrendingPicker({
         </div>
 
         <div className="flex flex-col gap-1">
-          <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
-            Trending now, in order
-          </p>
+          <p className="font-label text-xs text-ink-muted">Trending now, in order</p>
           <p className="text-sm text-ink-muted">{trending.map(label).join(" · ")}</p>
         </div>
 

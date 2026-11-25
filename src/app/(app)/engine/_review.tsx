@@ -94,7 +94,7 @@ function FpsReadout({ active }: { active: boolean }) {
 function StatusRow({ term, children }: { term: string; children: ReactNode }) {
   return (
     <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5 border-t border-line py-2.5 first:border-t-0">
-      <dt className="font-label text-xs tracking-[0.16em] text-ink-muted uppercase">{term}</dt>
+      <dt className="font-label text-xs text-ink-muted">{term}</dt>
       <dd className="text-end text-sm font-semibold text-ink">{children}</dd>
     </div>
   );
@@ -166,9 +166,7 @@ export function EngineReview({
 
       <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="flex flex-col gap-3">
-          <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-            Step 4 · Invitation engine
-          </p>
+          <p className="font-label text-xs text-accent-text">Step 4 · Invitation engine</p>
           <h1 className="font-display text-[1.9rem] leading-[1.05] sm:text-5xl">
             The card your guests open
           </h1>

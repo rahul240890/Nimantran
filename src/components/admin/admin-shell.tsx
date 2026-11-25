@@ -16,7 +16,7 @@ export async function AdminShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-2 px-4 sm:px-6 lg:px-8">
           <div className="flex min-w-0 items-center gap-3">
             <Logo className="max-[399px]:[&>span]:sr-only" />
-            <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-marigold/50 bg-marigold/15 px-2.5 font-label text-[0.68rem] tracking-[0.2em] text-accent-text uppercase">
+            <span className="inline-flex h-7 items-center gap-1.5 rounded-full border border-marigold/50 bg-marigold/15 px-2.5 font-label text-[0.68rem] text-accent-text">
               <ShieldCheck aria-hidden className="size-3.5" />
               Admin
             </span>
@@ -54,7 +54,7 @@ export function AdminHeading({
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div className="flex max-w-2xl min-w-0 flex-col gap-2">
-        <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">{eyebrow}</p>
+        <p className="font-label text-xs text-accent-text">{eyebrow}</p>
         <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2.1rem]">{title}</h1>
         {intro && <p className="text-ink-muted">{intro}</p>}
       </div>

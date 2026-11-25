@@ -196,10 +196,7 @@ function Browse({
       <TraditionTiles designsPath={designsPath} />
 
       <section aria-labelledby="occasions-heading" className="flex flex-col gap-2">
-        <h2
-          id="occasions-heading"
-          className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-        >
+        <h2 id="occasions-heading" className="font-label text-xs text-ink-muted">
           {shelfCopy.occasionsHeading}
         </h2>
         <ScrollRow
@@ -233,9 +230,8 @@ function Browse({
       >
         <h2
           id="group-trending"
-          className="flex items-center gap-3 font-label text-xs tracking-[0.24em] text-accent-text uppercase"
+          className="flex items-center gap-3 font-label text-xs text-accent-text"
         >
-          <span aria-hidden className="h-px w-6 bg-marigold" />
           {shelfCopy.trending.group}
         </h2>
         <TrendingRow id="trending" covers={covers} entries={entries} />
@@ -249,9 +245,8 @@ function Browse({
         >
           <h2
             id={`group-${group}`}
-            className="flex items-center gap-3 font-label text-xs tracking-[0.24em] text-accent-text uppercase"
+            className="flex items-center gap-3 font-label text-xs text-accent-text"
           >
-            <span aria-hidden className="h-px w-6 bg-marigold" />
             {title}
           </h2>
           {shelves.map((shelf, index) => {

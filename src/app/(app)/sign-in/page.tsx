@@ -73,9 +73,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
           >
             <CardFan />
             <div className="flex max-w-sm flex-col gap-3">
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                {signInCopy.side.eyebrow}
-              </p>
+              <p className="font-label text-xs text-accent-text">{signInCopy.side.eyebrow}</p>
               <p className="font-display text-3xl leading-tight">{signInCopy.side.title}</p>
               <ul className="mt-2 flex flex-col gap-2 text-start text-ink-muted">
                 {signInCopy.side.points.map((point) => (
@@ -90,9 +88,7 @@ export default async function SignInPage({ searchParams }: PageProps<"/sign-in">
 
           <Card className="w-full gap-7 p-6 sm:p-8">
             <div className="flex flex-col gap-2">
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                {signInCopy.eyebrow}
-              </p>
+              <p className="font-label text-xs text-accent-text">{signInCopy.eyebrow}</p>
               <h1 className="font-display text-[1.75rem] leading-[1.08] sm:text-[2rem]">
                 {mode === "off"
                   ? signInCopy.off.title

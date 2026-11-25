@@ -100,7 +100,7 @@ export function HomeWhy({ locale }: { locale: UiLocale }) {
           <span className="grid size-12 place-items-center rounded-full bg-marigold/20 text-accent-text">
             <BadgeIndianRupee aria-hidden className="size-6" />
           </span>
-          <p className="rounded-full bg-marigold px-3 py-1 font-label text-xs tracking-[0.18em] text-on-marigold uppercase">
+          <p className="rounded-full bg-marigold px-3 py-1 font-label text-xs text-on-marigold">
             {homeWhy.free}
           </p>
           <h3 className="font-display text-2xl leading-tight text-ink">{payLater.title}</h3>

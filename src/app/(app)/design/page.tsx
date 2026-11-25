@@ -30,9 +30,7 @@ export default function DesignPage() {
           <DesignSideNav />
           <main className="flex min-w-0 flex-col gap-20 sm:gap-24">
             <div className="flex flex-col gap-4">
-              <p className="font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-                Step 2 · Design system
-              </p>
+              <p className="font-label text-xs text-accent-text">Step 2 · Design system</p>
               <h1 className="font-display text-[2rem] leading-[1.05] sm:text-6xl">
                 The pieces every screen is built from
               </h1>

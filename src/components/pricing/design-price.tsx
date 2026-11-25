@@ -48,7 +48,7 @@ export function DesignPrice({
         <span
           aria-hidden
           className={cn(
-            "inline-flex items-center gap-1 font-label tracking-[0.12em] whitespace-nowrap text-accent-text uppercase",
+            "inline-flex items-center gap-1 font-label whitespace-nowrap text-accent-text",
             size === "sm" ? "text-[0.6rem]" : "text-[0.65rem]",
           )}
         >

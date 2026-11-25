@@ -77,10 +77,7 @@ export function GalleryHero({
             "radial-gradient(closest-side, color-mix(in srgb, var(--marigold) 22%, transparent), color-mix(in srgb, var(--rose) 6%, transparent) 60%, transparent)",
         }}
       />
-      <p className="flex items-center gap-3 font-label text-xs tracking-[0.28em] text-accent-text uppercase">
-        <span aria-hidden className="h-px w-6 bg-marigold" />
-        {eyebrow}
-      </p>
+      <p className="flex items-center gap-3 font-label text-xs text-accent-text">{eyebrow}</p>
       <h1
         id="page-title"
         className="font-display text-[1.95rem] leading-[1.06] break-words sm:text-[2.5rem] lg:text-[2.7rem]"
@@ -343,9 +340,7 @@ export function GalleryIndexPage({ locale }: { locale: UiLocale }) {
                 </ul>
                 {later.length > 0 && (
                   <p className="mt-5 text-sm leading-relaxed text-ink-muted">
-                    <span className="font-label text-xs tracking-[0.18em] text-ink uppercase">
-                      {galleryCopy.soon}:
-                    </span>{" "}
+                    <span className="font-label text-xs text-ink">{galleryCopy.soon}:</span>{" "}
                     {later.map((occasion) => occasion.names[locale]).join(" · ")}
                   </p>
                 )}

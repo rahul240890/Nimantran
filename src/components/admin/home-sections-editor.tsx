@@ -134,7 +134,7 @@ export function HomeSectionsEditor({
                     }
                   />
                   <div className="flex flex-col gap-2">
-                    <p className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase">
+                    <p className="font-label text-xs text-ink-muted">
                       {chosen ? "Designs, in order" : "Shows now"}
                     </p>
                     <p className="text-sm text-ink-muted">
@@ -256,10 +256,7 @@ function DesignList({
         ))}
       </ol>
       <div className="flex flex-col gap-2">
-        <label
-          htmlFor={searchId}
-          className="font-label text-xs tracking-[0.2em] text-ink-muted uppercase"
-        >
+        <label htmlFor={searchId} className="font-label text-xs text-ink-muted">
           Add a design to {sectionTitle}
         </label>
         <Input

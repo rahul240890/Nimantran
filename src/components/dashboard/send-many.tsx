@@ -217,9 +217,7 @@ export function SendMany({ view, onDone }: { view: DashboardView; onDone: () => 
 
         {next ? (
           <div className="flex flex-col gap-3 rounded-lg border border-marigold/45 bg-marigold/10 p-4">
-            <p className="font-label text-xs tracking-[0.2em] text-accent-text uppercase">
-              {copy.next}
-            </p>
+            <p className="font-label text-xs text-accent-text">{copy.next}</p>
             <div className="flex min-w-0 flex-col">
               <span className="font-display text-2xl leading-tight break-words">{next.name}</span>
               <span className="text-sm text-ink-muted tabular-nums">
