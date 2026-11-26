@@ -5,7 +5,7 @@ import { authMode } from "@/lib/auth/mode";
 import { isCategoryId } from "@/lib/categories/catalog";
 import { RSVP_QUESTION_IDS, type RsvpQuestionId } from "@/lib/categories/ids";
 import { isFunctionId } from "@/lib/events/functions";
-import type { InviteDraft } from "@/lib/editor/draft";
+import { whenKey, type InviteDraft } from "@/lib/editor/draft";
 import type { GuestReplyRow, HostFunction, HostGuest, ReplyStatus } from "@/lib/guests/list";
 import {
   SCHEDULE_LIMIT,
@@ -228,9 +228,19 @@ function withReplies(
   };
 }
 
-function orderedFunctions(rows: { id: string; kind: string; position: number }[]): HostFunction[] {
+/** The invite's functions in the order they happen (as on the guest page), then as stored. */
+function orderedFunctions(
+  rows: {
+    id: string;
+    kind: string;
+    position: number;
+    date: string | null;
+    start_time: string | null;
+  }[],
+): HostFunction[] {
+  const key = (row: (typeof rows)[number]) => whenKey(row.date, row.start_time?.slice(0, 5) ?? "");
   return [...rows]
-    .sort((a, b) => a.position - b.position)
+    .sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : a.position - b.position))
     .flatMap((row) => (isFunctionId(row.kind) ? [{ id: row.id, kind: row.kind }] : []));
 }
 
@@ -608,7 +618,9 @@ const previewStore: HostStore = {
       status: stored.event.status,
       slug: stored.event.status === "published" ? stored.event.slug : null,
       draft: rowsToDraft(stored.event, stored.functions, [], stored.questions),
-      functions: stored.functions.map((fn) => ({ id: `${id}:${fn.kind}`, kind: fn.kind })),
+      functions: orderedFunctions(
+        stored.functions.map((fn) => ({ ...fn, id: `${id}:${fn.kind}` })),
+      ),
       questions: stored.questions,
       guests: guestsOf(id).map(previewGuestView),
       hosts: (stored.hosts ?? []).map((host) => ({

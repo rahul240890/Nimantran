@@ -10,7 +10,7 @@ import {
   draftCategory,
   draftTradition,
   functionOrder,
-  includedFunctions,
+  plannedFunctions,
   mainFunction,
   type FunctionId,
 } from "@/lib/editor/draft";
@@ -31,7 +31,7 @@ export function QuickFunctions({ draft, update, errors }: Omit<StepProps, "goTo"
   const { functionCopy, quickCopy } = useText(editorText);
   const fields = useFunctionFields(draft, update);
   const main = mainFunction(draft) ?? draftCategory(draft).functions.primary;
-  const included = includedFunctions(draft);
+  const included = plannedFunctions(draft);
   const { suggested, more } = functionOrder(draft);
   const offered = suggested.includes(main) ? suggested : [main, ...suggested];
   // The rarer events show once asked for, or once one of them is ticked
