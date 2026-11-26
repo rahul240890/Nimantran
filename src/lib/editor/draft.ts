@@ -290,9 +290,28 @@ export function functionOrder(draft: InviteDraft): {
   return { suggested, more };
 }
 
-export function includedFunctions(draft: InviteDraft): FunctionId[] {
+/** The planned functions in the editor's order, so a form doesn't move while its date is typed. */
+export function plannedFunctions(draft: InviteDraft): FunctionId[] {
   const { suggested, more } = functionOrder(draft);
   return [...suggested, ...more].filter((id) => draft.functions[id].included);
+}
+
+/**
+ * When a function sorts: its date, then its start time. A function without a time comes
+ * first on its day (it takes the whole day), and one without a date comes last.
+ */
+export function whenKey(date: string | null, time: string | null): string {
+  return date ? `${date} ${time ?? ""}` : "~";
+}
+
+/**
+ * The planned functions in the order they happen, by date and then time, whatever order
+ * the host added them in: an engagement dated before the wedding is shown first. Ties keep
+ * the editor's order.
+ */
+export function includedFunctions(draft: InviteDraft): FunctionId[] {
+  const key = (id: FunctionId) => whenKey(draft.functions[id].date, draft.functions[id].time);
+  return plannedFunctions(draft).sort((a, b) => (key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0));
 }
 
 /**

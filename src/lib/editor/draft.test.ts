@@ -15,6 +15,7 @@ import {
   includedFunctions,
   mainFunction,
   muhuratName,
+  plannedFunctions,
   newDraft,
   symbolOptions,
   traditionLanguage,
@@ -180,6 +181,41 @@ describe("invite draft", () => {
     expect(draft?.step).toBe("design");
     expect(draft?.functions.roka.included).toBe(false);
     expect(draft?.functions.wedding.venue).toBe("Taj Falaknuma, Hyderabad");
+  });
+
+  it("lists the functions by date and then time, whatever order they were added in", () => {
+    const base = complete();
+    const at = (date: string, time = "") => ({ included: true, date, time });
+    const draft: InviteDraft = {
+      ...base,
+      functions: {
+        ...base.functions,
+        // The engagement falls before the wedding, as in the owner's report
+        engagement: { ...base.functions.engagement, ...at("2027-02-10", "11:00") },
+        reception: { ...base.functions.reception, ...at("2027-02-14", "12:00") },
+        mehendi: { ...base.functions.mehendi, ...at("2027-02-14") },
+        haldi: { ...base.functions.haldi, ...at("") },
+      },
+    };
+    expect(includedFunctions(draft)).toEqual([
+      "engagement",
+      "mehendi",
+      "reception",
+      "wedding",
+      "haldi",
+    ]);
+    // The editor's own form keeps its order, so fields don't jump while a date is typed
+    expect(plannedFunctions(draft).indexOf("haldi")).toBeLessThan(
+      plannedFunctions(draft).indexOf("wedding"),
+    );
+    // With no dates yet, the usual order of a wedding's functions stands
+    const undated: InviteDraft = {
+      ...draft,
+      functions: Object.fromEntries(
+        Object.entries(draft.functions).map(([id, fn]) => [id, { ...fn, date: "", time: "" }]),
+      ) as InviteDraft["functions"],
+    };
+    expect(includedFunctions(undated)).toEqual(plannedFunctions(undated));
   });
 
   it("plans the occasion's functions and keeps everything already typed", () => {
