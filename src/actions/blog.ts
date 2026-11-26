@@ -1,12 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 import { z } from "zod";
 import { getAdmin } from "@/lib/admin/access";
 import { draftPost, testAi, type PostDraft } from "@/lib/blog/ai-draft";
 import { blogPostPath } from "@/lib/blog/posts";
 import { adminPost, deletePost, savePost, uploadCover, type SaveResult } from "@/lib/blog/store";
 import { isCategoryId } from "@/lib/categories/catalog";
+import { submitToIndexNow } from "@/lib/seo/indexnow";
 import { UI_LOCALES } from "@/i18n/locales";
 
 /* Admin, Blog: writing, publishing and removing posts, their covers, and AI drafts. */
@@ -57,6 +59,10 @@ export async function saveBlogPost(
     refreshBlog(post.slug, post.locale);
     if (before && (before.slug !== post.slug || before.locale !== post.locale)) {
       revalidatePath(blogPostPath(before.slug, before.locale));
+    }
+    // A post published now tells Bing at once; a scheduled one is picked up by the deploy ping or a crawl
+    if (post.status === "published" && Date.parse(post.publishedAt) <= Date.now()) {
+      after(() => submitToIndexNow([blogPostPath(post.slug, post.locale)]));
     }
   }
   return result;

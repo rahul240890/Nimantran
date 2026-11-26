@@ -4,9 +4,9 @@ export const grihaPraveshInvitationMessage: BlogPost = {
   slug: "griha-pravesh-invitation-message",
   locale: "en",
   pair: "griha-pravesh",
-  title: "Griha pravesh invitation message: 30 to copy",
+  title: "Griha pravesh invitation message in English",
   description:
-    "Griha pravesh invitation messages to copy: English and Hinglish wording, puja and havan timing lines, new flat wording, WhatsApp texts and when to send.",
+    "30 griha pravesh invitation messages in English and Hinglish: card wording, puja and havan timing lines, new flat wording and WhatsApp texts. Copy any.",
   heading: "Griha pravesh invitation message: 30 housewarming messages to copy",
   intro:
     "A new home is a blessing you want to share, first with the gods and then with family and friends. Here are 30 griha pravesh invitation messages in English and Hinglish, lines for the puja and havan timings, wording for a new flat, and simple advice on when to send the invitation.",

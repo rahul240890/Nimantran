@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const formalInvitationPhrases: BlogPost = {
   slug: "formal-invitation-phrases",
   locale: "en",
-  title: "Formal invitation phrases: 35 lines to copy",
+  title: "Formal invitation phrases: 35 with examples",
   description:
-    "Formal invitation phrases for Indian cards: 'cordially invite you to grace the auspicious occasion', openings, requests and closings, with meanings.",
+    "35 formal invitation phrases with examples: 'cordially invite you to grace the auspicious occasion', 'request the pleasure of your company', and closings.",
   heading: "Formal invitation phrases: openings, requests and closings for Indian invitation cards",
   intro:
     "Indian invitation cards have their own formal English: 'request the pleasure of your company', 'cordially invite you to grace the auspicious occasion', 'with best compliments from'. These phrases sound right to elders and on a printed-style card, but it helps to know which one fits which part of the card and which ones to skip. Here are 35 formal lines to copy, grouped by where they go, with a note on what each means.",

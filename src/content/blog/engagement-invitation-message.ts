@@ -4,9 +4,9 @@ export const engagementInvitationMessage: BlogPost = {
   slug: "engagement-invitation-message",
   locale: "en",
   pair: "engagement",
-  title: "Engagement invitation message: 28 to copy",
+  title: "Engagement invitation message: 28 quotes, texts",
   description:
-    "Engagement invitation messages to copy: from parents, from the couple, ring ceremony wording, roka lines and short WhatsApp texts for every guest.",
+    "28 engagement invitation messages and quotes: ring ceremony and roka wording from the parents or the couple, simple lines and Indian WhatsApp texts.",
   heading: "Engagement invitation message: 28 lines for the ring ceremony",
   intro:
     "The engagement is the first time both families celebrate together in front of everyone, so the invitation sets the tone for the whole wedding season. Here are 28 engagement invitation messages: formal lines from the parents, warm ones from the couple, roka and sagai wording, and short texts to send on WhatsApp.",

@@ -1,7 +1,8 @@
 /*
  * The theme paintings live on Cloudflare R2 once NEXT_PUBLIC_MEDIA_URL is set (owner,
  * 2026-11-20: the hosting bill). Vercel bills every deployment for the files it carries, and
- * public/suites, public/openings and public/cards are about 600 MB of every one; R2 keeps a
+ * public/suites, public/openings and public/cards are about 600 MB (public/videos, the sample
+ * videos, joined them on 2026-11-25) of every one; R2 keeps a
  * single copy and charges nothing for guests downloading it. The files stay in the repository
  * as the source: scripts/media-sync.mjs copies them to R2 in each production build and then
  * leaves them out of the deployment. Without the setting (tests, local work) nothing changes.
@@ -10,7 +11,7 @@
  */
 
 /** The public folders that move to R2, as their address prefixes. */
-export const MEDIA_FOLDERS = ["suites", "openings", "cards"] as const;
+export const MEDIA_FOLDERS = ["suites", "openings", "cards", "videos"] as const;
 
 const PREFIX = new RegExp(`^/(${MEDIA_FOLDERS.join("|")})/`);
 

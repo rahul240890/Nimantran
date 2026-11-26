@@ -4,9 +4,9 @@ export const whenToSendWeddingInvitations: BlogPost = {
   slug: "when-to-send-wedding-invitations",
   locale: "en",
   pair: "when-to-send",
-  title: "When to send wedding invitations in India",
+  title: "When to send wedding invitations: 4–6 weeks",
   description:
-    "How many days before an Indian wedding to send invitations, with a timeline table: save the date, whom to give the first card, WhatsApp invites, reminders.",
+    "Send Indian wedding invitations 4–6 weeks before the first function and save the dates 3–4 months ahead. Timeline table, first card, WhatsApp, reminders.",
   heading: "When to send wedding invitations in India: a timeline that works",
   intro:
     "Send too early and guests forget; too late and they have already promised the date to another wedding. Here is a simple timeline for an Indian wedding, from the save the date and the first card at the temple to the last reminder, with what changes for destination weddings, guests from abroad and the busy wedding season.",

@@ -27,6 +27,8 @@ import { blogPostPath, postsIn } from "@/lib/blog/posts";
 import { pagePath } from "@/lib/seo/paths";
 import { faqPage, itemList } from "@/lib/seo/structured-data";
 import { occasionQuestions } from "@/content/occasion-questions";
+import { OccasionVideo } from "@/components/videos/video-pages";
+import { videoFor } from "@/lib/videos/pages";
 import { cn } from "@/lib/cn";
 import { samplePath } from "@/lib/sample/paths";
 import { DesignCard } from "./design-card";
@@ -97,7 +99,7 @@ export function GalleryHero({
   );
 }
 
-function Shelf({
+export function Shelf({
   id,
   heading,
   intro,
@@ -397,6 +399,11 @@ export function OccasionGalleryPage({ id, locale }: { id: CategoryId; locale: Ui
           opensPage={id !== "wedding"}
         />
       </Shelf>
+      {videoFor(id, locale) && (
+        <div className="mx-auto w-full max-w-site px-4 pb-14 sm:px-6 lg:px-8">
+          <OccasionVideo occasion={id} locale={locale} />
+        </div>
+      )}
       <FeatureRow locale={locale} />
       {functions.length > 1 && (
         <Shelf

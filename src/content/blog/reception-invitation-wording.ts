@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const receptionInvitationWording: BlogPost = {
   slug: "reception-invitation-wording",
   locale: "en",
-  title: "Reception invitation wording: 26 messages",
+  title: "Reception invitation wording: 26 to copy",
   description:
-    "Reception invitation wording to copy: formal card matter, from parents and the couple, reception after a private wedding, and short WhatsApp messages.",
+    "26 reception invitation wordings to copy: formal card matter from the parents or the couple, a reception after a private wedding, and WhatsApp texts.",
   heading: "Reception invitation wording: 26 messages for the wedding reception",
   intro:
     "The reception is often the biggest guest list of the whole wedding: colleagues, neighbours, business friends and relatives who could not travel for the pheras. Here are 26 reception invitation messages to copy, from formal card matter to short WhatsApp texts, including wording for a reception held after a small or court wedding.",

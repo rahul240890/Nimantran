@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const digitalWeddingInvitationWhatsapp: BlogPost = {
   slug: "digital-wedding-invitation-whatsapp",
   locale: "en",
-  title: "How to send a wedding invitation on WhatsApp",
+  title: "Digital wedding invitation for WhatsApp: a guide",
   description:
-    "Make a digital wedding invitation and send it on WhatsApp: what to include, when to send, personal links for each guest, and collecting RSVPs.",
+    "How to make a digital wedding invitation and send it on WhatsApp: what to include, when to send, a personal link for each guest and collecting RSVPs.",
   heading: "How to make a digital wedding invitation and send it on WhatsApp",
   intro:
     "Most Indian families now share wedding invitations on WhatsApp. Done well, a digital invitation feels as special as a printed card, and it does what paper can't: show the venue on a map, take replies for each function and update itself when plans change. Here is how to do it, step by step.",

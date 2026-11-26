@@ -23,7 +23,7 @@ import { extname, join, relative, sep } from "node:path";
 import { AwsClient } from "aws4fetch";
 
 /** Must match MEDIA_FOLDERS in src/lib/media.ts. */
-const FOLDERS = ["suites", "openings", "cards"];
+const FOLDERS = ["suites", "openings", "cards", "videos"];
 const PUBLIC = join(process.cwd(), "public");
 const CACHE_CONTROL = "public, max-age=86400, stale-while-revalidate=604800";
 const AT_ONCE = 16;

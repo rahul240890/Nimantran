@@ -6,6 +6,8 @@ import { birthdayInvitationMessages } from "./birthday-invitation-messages";
 import { annaprashanNimantranPatra } from "./bn-annaprashan-nimantran-patra";
 import { biyerCardLekha } from "./bn-biyer-card-lekha";
 import { bouvatCardLekha } from "./bn-bouvat-card-lekha";
+import { chelerBiyerCardLekha } from "./bn-cheler-biyer-card-lekha";
+import { meyerBiyerCardLekha } from "./bn-meyer-biyer-card-lekha";
 import { christmasPartyInvitationMessage } from "./christmas-party-invitation-message";
 import { digitalVsPrintedWeddingCards } from "./digital-vs-printed-wedding-cards";
 import { digitalWeddingInvitationWhatsapp } from "./digital-wedding-invitation-whatsapp";
@@ -119,4 +121,6 @@ export const POSTS: readonly BlogPost[] = [
   paniNiraivuVizhaAzhaippithazh,
   peyarSuttuVizhaAzhaippithazh,
   bouvatCardLekha,
+  chelerBiyerCardLekha,
+  meyerBiyerCardLekha,
 ];

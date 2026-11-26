@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const weddingInvitationWording: BlogPost = {
   slug: "wedding-invitation-wording",
   locale: "en",
-  title: "Wedding invitation wording: 30 messages",
+  title: "Wedding invitation wording: 30 Indian samples",
   description:
-    "Wedding invitation wording for every family: traditional, from parents, from the couple, short WhatsApp messages, function lines and RSVP lines. Copy any.",
+    "30 Indian wedding invitation wording samples: traditional, from the parents, from the couple, short WhatsApp messages, function and RSVP lines. Copy any.",
   heading: "Wedding invitation wording: 30 messages to copy",
   intro:
     "The right words make guests feel personally called, whether they are your grandmother's sister or your college friends. Here is how an Indian wedding invitation is put together, and 30 messages you can copy as they are or change to sound like your family.",

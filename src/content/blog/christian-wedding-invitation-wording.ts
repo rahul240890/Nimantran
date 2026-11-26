@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const christianWeddingInvitationWording: BlogPost = {
   slug: "christian-wedding-invitation-wording",
   locale: "en",
-  title: "Christian wedding invitation wording: 24 lines",
+  title: "Christian wedding invitation wording: 24 samples",
   description:
-    "Christian wedding invitation wording for India: Bible verses, holy matrimony and nuptial mass lines, reception wording and short WhatsApp messages.",
+    "24 Christian wedding invitation wording samples for India: Bible verses, holy matrimony and nuptial mass lines, reception text and WhatsApp messages.",
   heading: "Christian wedding invitation wording: church, verses and reception lines",
   intro:
     "A Christian wedding invitation in India usually opens with a Bible verse, names both families, and invites guests to the marriage service at church and the reception after it. Here are 24 lines to copy, from formal cards sent by parents to short messages for WhatsApp, with notes for Catholic and Protestant families.",

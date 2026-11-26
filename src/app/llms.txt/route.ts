@@ -9,6 +9,10 @@ import { WEDDING_KINDS } from "@/lib/gallery/ids";
 import { pagePath } from "@/lib/seo/paths";
 import { absolute } from "@/lib/seo/structured-data";
 import { site } from "@/lib/site";
+import { videoText } from "@/components/videos/video-pages";
+import { videoWords } from "@/content/videos";
+import { SAMPLE_VIDEOS } from "@/lib/videos/catalog";
+import { VIDEOS_INDEX, videoPath } from "@/lib/videos/pages";
 import { TRADITION_IDS } from "@/lib/traditions/schema";
 
 /*
@@ -63,6 +67,14 @@ export async function GET() {
         seoCopy.occasions[id].description,
       ),
     ),
+    "",
+    "## Sample invitation videos",
+    "",
+    link("All sample videos", VIDEOS_INDEX, videoWords.en.indexDescription),
+    ...SAMPLE_VIDEOS.map((video) => {
+      const { title, description } = videoText(video);
+      return link(title, videoPath(video), description);
+    }),
     "",
     "## Wedding invitations by region and community",
     "",

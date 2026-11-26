@@ -4,7 +4,7 @@ export const grihaPraveshNimantranSandesh: BlogPost = {
   slug: "griha-pravesh-nimantran-sandesh",
   locale: "hi",
   pair: "griha-pravesh",
-  title: "गृह प्रवेश निमंत्रण संदेश: कार्ड मैटर, 25 नमूने",
+  title: "गृह प्रवेश निमंत्रण संदेश, कार्ड मैटर: 26 नमूने",
   description:
     "गृह प्रवेश निमंत्रण संदेश हिंदी में: मंगलाचरण, कार्ड मैटर, वास्तु शांति और हवन का समय, निवेदक की पंक्तियाँ और WhatsApp संदेश। कॉपी करें और अपना बनाएँ।",
   heading: "गृह प्रवेश निमंत्रण संदेश: कार्ड मैटर और WhatsApp के 25 नमूने",

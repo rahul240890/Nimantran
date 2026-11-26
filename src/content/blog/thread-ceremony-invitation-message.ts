@@ -3,9 +3,9 @@ import type { BlogPost } from "./types";
 export const threadCeremonyInvitationMessage: BlogPost = {
   slug: "thread-ceremony-invitation-message",
   locale: "en",
-  title: "Thread ceremony invitation message: 20 ideas",
+  title: "Thread ceremony invitation message: 20 to copy",
   description:
-    "Thread ceremony invitation messages to copy, with wording for an upanayanam, janeu, munja and poonal function, and what each regional name means.",
+    "20 thread ceremony invitation messages to copy: upanayanam, janeu, munja and poonal wording, what each name means, and short WhatsApp lines.",
   heading: "Thread ceremony invitation messages: upanayanam, janeu, munja and more",
   intro:
     "The sacred thread ceremony, upanayana, is a proud day for a family, and its name changes from region to region. Here are thread ceremony invitation messages you can copy: traditional wording for elders, lines for an upanayanam, a janeu sanskar and a Marathi munja, short WhatsApp texts, and a guide to the regional names.",
