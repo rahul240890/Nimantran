@@ -30,4 +30,23 @@ describe("Image", () => {
       /^(http:\/\/localhost:3000)?\/suites\/kayal\/cover\.webp$/,
     );
   });
+
+  it("asks R2 for a theme painting directly, without the resizer, once R2 is set up", () => {
+    vi.stubEnv("NEXT_PUBLIC_MEDIA_URL", "https://media.example.com");
+    try {
+      render(<Image src="/suites/kayal/cover.webp" alt="Kayal on R2" width={320} height={568} />);
+      expect(screen.getByRole("img", { name: "Kayal on R2" }).getAttribute("src")).toBe(
+        "https://media.example.com/suites/kayal/cover.webp",
+      );
+      // Anything else still goes through the resizer
+      render(
+        <Image src="/occasions/wedding.webp" alt="Resized wedding" width={320} height={240} />,
+      );
+      expect(screen.getByRole("img", { name: "Resized wedding" }).getAttribute("src")).toMatch(
+        /\/_next\/image\?url=%2Foccasions%2Fwedding\.webp/,
+      );
+    } finally {
+      vi.unstubAllEnvs();
+    }
+  });
 });
