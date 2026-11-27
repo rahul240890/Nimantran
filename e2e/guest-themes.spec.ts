@@ -102,9 +102,15 @@ for (const suite of THEMES) {
         await expect(page.locator(".guest-night")).toHaveAttribute("data-lit", "true");
         await expect(page.getByText(light.given)).toBeVisible();
 
-        // The guest's first tap anywhere starts the music
+        // A tap on the page doesn't start the music (owner, 2026-11-26): only the way in or
+        // the music's own button does
         await page.getByRole("heading", { name: "Save the date" }).click();
         await page.locator("#rsvp").scrollIntoViewIfNeeded();
+        await expect(page.getByRole("button", { name: /Pause the music/ })).toHaveCount(0);
+        await page
+          .getByRole("button", { name: /Play the music/ })
+          .last()
+          .click();
         await expect(page.getByRole("button", { name: /Pause the music/ }).last()).toBeVisible();
 
         expect(await noOverflow(page)).toBe(true);
@@ -354,9 +360,10 @@ for (const [i, scene] of (
   });
 }
 
-// The guest's first tap starts the music and keeps the screen on; once the invitation has
-// played to the reply form, it offers to play again, from the top, music and all
-test("the music starts on the first tap, and the invitation opens again at the end", async ({
+// The music waits for the tap that opens the invitation, though the guest's first tap keeps
+// the screen on; once the invitation has played to the reply form, it offers to play again,
+// from the top, music and all
+test("the music starts as the invitation opens, and it opens again at the end", async ({
   page,
 }) => {
   test.slow();
@@ -378,8 +385,10 @@ test("the music starts on the first tap, and the invitation opens again at the e
   await page.goto("/engine/guest?suite=rajwada-bagh&opening=palace");
   const open = page.getByRole("button", { name: "Open the invitation", exact: true });
   await expect(open).toBeVisible();
-  // A tap anywhere before the gate is enough to start the music
+  // A tap anywhere before the gate leaves the music quiet (owner, 2026-11-26)
   await page.mouse.click(5, 5);
+  await page.clock.runFor(2000);
+  await expect(page.getByRole("button", { name: /^Pause (the )?music$/ })).toHaveCount(0);
   await open.click();
   await page.clock.runFor(8000);
   await expect(page.getByRole("button", { name: "Pause music" }).first()).toBeVisible();

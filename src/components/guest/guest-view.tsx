@@ -314,11 +314,12 @@ export function GuestView({
   // The screen stays on from the guest's first tap until the page has moved on to its end
   const [awake, setAwake] = useState(false);
   useStayAwake(awake);
-  // The music starts with the guest's first tap anywhere, the gate's or any other: a phone
-  // plays no sound before one, and the song is then already playing as the gate opens. The
-  // raga's first notes wait a moment and the page's own updates give way, so the gate's
-  // first moves come smoothly
+  // The music waits for the guest's tap on the way in (owner, 2026-11-26: a tap on the
+  // language switch, the welcome or a swipe used to start the song before the invitation
+  // was opened). With an opening, its own tap starts it (opening.tsx); only an invitation
+  // with no opening to tap, a Scene shown at once, starts it with the first tap anywhere
   const playOnOpen = draft.music.playOnOpen;
+  const musicOnFirstTap = playOnOpen && opening === "none";
   const latestMusic = useRef(music);
   useEffect(() => {
     latestMusic.current = music;
@@ -328,13 +329,13 @@ export function GuestView({
     const first = () => {
       events.forEach((name) => window.removeEventListener(name, first, true));
       startTransition(() => setAwake(true));
-      if (playOnOpen && !latestMusic.current.playing && !musicMuted()) {
+      if (musicOnFirstTap && !latestMusic.current.playing && !musicMuted()) {
         void latestMusic.current.play(OPEN_LEAD_S);
       }
     };
     events.forEach((name) => window.addEventListener(name, first, true));
     return () => events.forEach((name) => window.removeEventListener(name, first, true));
-  }, [playOnOpen]);
+  }, [musicOnFirstTap]);
   // The sections below the first screen are drawn only as they near it, once each has been
   // drawn whole (with its lettering in, or after a second), so the page keeps its true
   // length (globals.css). Only while the guest is on the first screen: switched on further
