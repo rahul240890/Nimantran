@@ -11,13 +11,17 @@ import { mediaUrl } from "@/lib/media";
  * refused stayed empty. The picture as it is, larger but there, takes its place.
  * next/image sends an error from before the page woke up again once it has, so none is
  * missed. Use this in place of next/image everywhere.
- * Theme paintings are asked for at their R2 address once that's set up (src/lib/media.ts).
+ * Theme paintings are asked for at their R2 address once that's set up (src/lib/media.ts), and
+ * straight from R2 rather than through the resizer (owner, 2026-11-27: the resizer's writes and
+ * transformations were most of what was left on the Vercel bill). R2 charges nothing for
+ * downloads, and the paintings are already WebP at about the size a phone shows them.
  */
 export function Image({ unoptimized, onError, alt, src, ...rest }: ImageProps) {
   const [direct, setDirect] = useState(false);
-  const props = { ...rest, src: typeof src === "string" ? mediaUrl(src) : src };
+  const remote = typeof src === "string" ? mediaUrl(src) : src;
+  const props = { ...rest, src: remote };
   // A picture that never goes through the resizer has nothing to fall back to
-  if (unoptimized || direct) {
+  if (unoptimized || direct || remote !== src) {
     return <NextImage {...props} alt={alt} unoptimized onError={onError} />;
   }
   return (
